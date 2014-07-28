@@ -1,2 +1,4 @@
 # project metadata
 /.idea
+# build output
+/out
