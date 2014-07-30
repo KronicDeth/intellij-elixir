@@ -1,0 +1,464 @@
+{
+  parserClass="org.elixir_lang.parser.ElixirParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Elixir"
+  psiImplClassSuffix="Impl"
+  psiPackage="org.elixir_lang.psi"
+  psiImplPackage="org.elixir_lang.psi.impl"
+
+  elementTypeHolderClass="org.elixir_lang.psi.ElixirTypes"
+  elementTypeClass="org.elixir_lang.psi.ElixirElementType"
+  tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
+}
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L75-L80
+elixirFile ::= (EOL | expressionList | (EOL expressionList) | (EOL expressionList EOL) | '')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L83-L84
+expressionList ::= (expression | (expressionList EOL expression))
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L86-L89
+expression ::= (emptyParentheses | matchedExpression | noParenthesesExpression | unmatchedExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L113-L122
+matchedExpression ::= (
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L113-L114
+  (matchedExpression (matchedOperatorExpression | noParenthesesExpression)) |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L115-L120
+  ((unaryOperatorEOL | atOperatorEOL | captureOperatorEOL) (matchedExpression | noParenthesesExpression))
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L121
+  noParenthesesOneExpression |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L122
+  accessExpression
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L124-L125
+noParenthesesExpression ::= ((dotOperatorIdentifier | dotIdentifier) | callArgumentsNoParenthesesManyStrict)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L127-L133
+unmatchedExpression ::= (
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L127-L129
+  ((emptyParentheses | matchedExpression | unmatchedExpression) operatorExpression) |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L130-L132
+  ((unaryOperatorEOL | atOperatorEOL | captureOperatorEOL) expression) |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L133
+  blockExpression
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L135-L138
+blockExpression ::= (
+  (
+    // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L135-L136
+    (parenthesesCall callArgumentsParentheses callArgumentsParentheses?) |
+    // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L137
+    dotDoIdentifier |
+    // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L138
+    (dotIdentifier callArgumentsNoParenthesesAll)
+  ) doBlock
+)
+
+operatorEOL ::= (
+  matchOperatorEOL |
+  addOperatorEOL |
+  multiplyOperatorEOL |
+  hatOperatorEOL |
+  twoOperatorEOL |
+  andOperatorEOL |
+  orOperatorEOL |
+  inOperatorEOL |
+  inMatchOperatorEOL |
+  typeOperatorEOL |
+  whenOperatorEOL |
+  pipeOperatorEOL |
+  compOperatorEOL |
+  relOperatorEOL |
+  arrowOperatorEOL
+)
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L140-L154
+operatorExpression ::= (operatorEOL expression)
+
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L156-L169
+noParenthesesOperatorExpression ::= (
+  (operatorEOL noParenthesesExpression) |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L173
+  (whenOperatorEOL callArgumentsNoParenthesesKeyword)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L175-L189
+matchedOperatorExpression ::= (operatorEOL matchedExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L191-L194
+noParenthesesOneExpression ::= ((dotDoIdentifier | dotIdentifier) callArgumentsNoParenthesesOne?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L200-L219
+accessExpression ::= (
+  bracketAtExpression |
+  bracketExpression |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L202-L204
+  ((atOperatorEOL | unaryOperatorEOL | captureOperatorEOL) number) |
+  (fnEOL stab endEOL) |
+  (openParenthesis stab closeParenthesis) |
+  number |
+  signed_number |
+  list |
+  map |
+  tuple |
+  'true' |
+  'false' |
+  'nil' |
+  binaryString |
+  listString |
+  bitString |
+  sigil |
+  maxExpression
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L222-L227
+maxExpression ::= (
+  atom |
+  atom_safe |
+  atom_unsafe |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L225-L226
+  (parenthesesCall callArgumentsParentheses callArgumentsParentheses?) |
+  dotAlias
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L229-L231
+bracketArgument ::= (
+  openBracket
+  (
+    keyword |
+    // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L230-L231
+    (containerExpression ','?)
+  )
+  closeBracket
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L233-L234
+bracketExpression ::= ((dotBracketIdentifier | accessExpression) bracketArgument)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L236-L239
+bracketAtExpression ::= (atOperatorEOL (dotBracketIdentifier | accessExpression) bracketArgument)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L243-L246
+doBlock ::= (
+  doEOL (
+    'end' |
+    (stab endEOL) |
+    // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L245-L246
+    (stabEOL? blockList 'end')
+  )
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L248-L249
+fnEOL ::= ('fn' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L251-L252
+doEOL ::= ('do' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L254-L255
+endEOL ::= (EOL? 'end')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L257-L258
+blockEOL ::= (blockIdentifier EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L260-L261
+stab ::= ((stab EOL)? stabExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L263-L264
+stabEOL ::= (
+  expression |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L267-L269
+  (callArgumentsNoParenthesesAll? stabOperatorEOL stabMaybeExpression) |
+  // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L270-L273
+  (stabParenthesesMany (whenOperator expression)? stabOperatorEOL stabMaybeExpression)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L275-L276
+stabMaybeExpression ::= ('expr' | '')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L278-L279
+blockItem ::= (blockEOL stabEOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L281-L282
+blockList ::= blockItem blockList?
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L286-L287
+openParenthesis ::= ('(' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L288-L289
+closeParenthesis ::= (EOL? ')')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L291
+emptyParentheses ::= (openParenthesis ')')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L293-L294
+openBracket ::= ('[' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L295-L296
+closeBracket ::= (EOL? ']')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L298-L299
+openBit ::= ('<<' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L300-L301
+closeBit ::= (EOL? '>>')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L303-L304
+openCurly ::= ('{' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L305-L306
+closeCurly ::= (EOL? '}')
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L310-L313
+addOperatorEOL ::= ((addOperator | dualOperator) EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L315-L316
+multiplyOperatorEOL ::= (multiplyOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L318-L319
+hatOperatorEOL ::= (hatOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L321-L322
+twoOperatorEOL ::= (twoOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L324-L325
+pipeOperatorEOL ::= (pipeOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L327-L328
+captureOperatorEOL ::= (captureOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L330-L333
+unaryOperatorEOL ::= ((unaryOperator | dualOperator) EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L335-L336
+matchOperatorEOL ::= (matchOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L338-L339
+andOperatorEOL ::= (andOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L341-L342
+orOperatorEOL ::= (orOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L344-L345
+inOperatorEOL ::= (inOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L347-L348
+inMatchOperatorEOL ::= (inMatchOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L350-L351
+typeOperatorEOL ::= (twoOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L353-L354
+whenOperatorEOL ::= (whenOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L356-L357
+stabOperatorEOL ::= (stabOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L359-L360
+atOperatorEOL ::= (atOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L362-L363
+compOperatorEOL ::= (compOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L365-L366
+relOperatorEOL ::= (relOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L368-L369
+arrowOperatorEOL ::= (arrowOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L373-L374
+dotOperator ::= ('.' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L376-L377
+dotIdentifier ::= ((matchedExpression dotOperator)? identifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L379-L380
+dotAlias ::= ((matchedExpression dotOperator)? identifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L382-L383
+dotOperatorIdentifier ::= ((matchedExpression dotOperator)? operatorIdentifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L385-L386
+dotDoIdentifier ::= ((matchedExpression dotOperator)? doIdentifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L388-L389
+dotBracketIdentifier ::= ((matchedExpression dotOperator)? bracketIdentifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L391-L392
+dotParenthesesIdentifier ::= ((matchedExpression dotOperator)? parenthesesIdentifier)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L394-L395
+parenthesesCall ::= (dotParenthesesIdentifier | (matchedExpression dotCallOperator))
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L399-L401
+callArgumentsParenthesesExpression ::= (matchedExpression | emptyParentheses | noParenthesesExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L403-L404
+callArgumentsNoParenthesesCommaExpression ::= (
+  (matchedExpression | callArgumentsNoParenthesesCommaExpression)
+  ','
+  callArgumentsNoParenthesesExpression
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L406-L407
+callArgumentsNoParenthesesAll ::= (callArgumentsNoParenthesesOne | callArgumentsNoParenthesesMany)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L409-L411
+callArgumentsNoParenthesesOne ::= (callArgumentsNoParenthesesKeyword | matchedExpression | noParenthesesExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L413-L415
+callArgumentsNoParenthesesMany ::= (
+  (matchedExpression ',' callArgumentsNoParenthesesKeyword) |
+  callArgumentsNoParenthesesCommaExpression |
+  (callArgumentsNoParenthesesCommaExpression ',' callArgumentsNoParenthesesKeyword)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L417-L420
+callArgumentsNoParenthesesManyStrict ::= (
+  callArgumentsNoParenthesesMany |
+  emptyParentheses |
+  (openParenthesis  callArgumentsNoParenthesesKeyword closeParenthesis) |
+  (openParenthesis  callArgumentsNoParenthesesMany closeParenthesis)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L422-L424
+stabParenthesesMany ::= (
+  emptyParentheses |
+  (
+    openParenthesis
+    (callArgumentsNoParenthesesKeyword | callArgumentsNoParenthesesMany)
+    closeParenthesis
+  )
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L428-L431
+containerExpression ::= (emptyParentheses | matchedExpression | unmatchedExpression | noParenthesesExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L433-L434
+containerArgumentsBase ::= ((containerArgumentsBase ',')? containerExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L436-L438
+containerArguments ::= (containerArgumentsBase (',' keyword?)?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L440-L441
+callArgumentsParenthesesBase ::= ((callArgumentsParenthesesBase ',')? containerExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L443-L447
+callArgumentsParentheses ::= (
+  emptyParentheses |
+  (
+    openParenthesis
+    (
+      noParenthesesExpression |
+      keyword |
+      (callArgumentsParenthesesBase (',' keyword)?)
+    )
+    closeParenthesis
+  )
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L451-L456
+keywordEOL ::= (
+  (keywordIdentifier EOL?) |
+  (keywordIdentifierSafe EOL?) |
+  (keywordIdentifierSafe EOL?)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L458-L459
+keywordBase ::= (((keywordBase ',')? keywordEOL) containerExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L461-L462
+keyword ::= (keywordBase ','?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L464
+callArgumentsNoParenthesesKeywordExpression ::= (keywordEOL callArgumentsNoParenthesesExpression)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L465-L466
+callArgumentsNoParenthesesKeyword ::= (callArgumentsNoParenthesesKeywordExpression (',' callArgumentsNoParenthesesKeyword)?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L470-L473
+listArguments ::= (
+  keyword |
+  (containerArgumentsBase (',' keyword?)?)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L475-L476
+list ::= (openBracket (']' | (listArguments closeBracket)))
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L480-L481
+tuple ::= (openCurly ('}' | (containerArguments closeCurly)))
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L485-L486
+bitString ::= (openBit ('>>' | (containerArguments closeBit)))
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L490-L492
+mapExpression ::= (
+  maxExpression |
+  dotIdentifier |
+  (atOperatorEOL mapExpression)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L494-L495
+assocOperatorEOL ::= (assocOperator EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L497-L498
+assocExpression ::= (
+  (containerExpression assocOperatorEOL containerExpression) |
+  mapExpression
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L500-L502
+assocUpdate ::= (
+  (matchedExpression pipeOperatorEOL matchedExpression assocOperatorEOL matchedExpression) |
+  (unmatchedExpression pipeOperatorEOL expression assocOperatorEOL expression) |
+  (matchedExpression pipeOperatorEOL mapExpression)
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L504-L505
+assocUpdateKeyword ::= ((matchedExpression | unmatchedExpression) pipeOperatorEOL keyword)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L507-L508
+assocBase ::= (assocExpression (',' assocExpression)?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L510-L511
+assoc ::= (assocBase ','?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L513-L514
+mapOperator ::= ('%{}' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L516-L518
+mapClose ::= (
+  (
+    keyword |
+    assoc |
+    (assocBase ',' keyword)
+  )
+  closeCurly
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L520-L525
+mapArguments ::= (
+  openCurly
+  (
+    '}' |
+    mapClose |
+    (assocUpdate ','? (closeCurly | mapClose)) |
+    (assocUpdateKeyword closeCurly)
+  )
+)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L527-L528
+structOperator ::= ('%' EOL?)
+
+// https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L530-L532
+map ::= (
+  (
+    mapOperator |
+    (structOperator mapExpression EOL?)
+  )
+  mapArguments
+)
