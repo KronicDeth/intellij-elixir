@@ -117,6 +117,7 @@ public interface ElixirTypes {
   IElementType BRACKETIDENTIFIER = new ElixirTokenType("bracketIdentifier");
   IElementType CALLARGUMENTSNOPARENTHESESEXPRESSION = new ElixirTokenType("callArgumentsNoParenthesesExpression");
   IElementType CAPTUREOPERATOR = new ElixirTokenType("captureOperator");
+  IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPOPERATOR = new ElixirTokenType("compOperator");
   IElementType DOIDENTIFIER = new ElixirTokenType("doIdentifier");
   IElementType DOTCALLOPERATOR = new ElixirTokenType("dotCallOperator");

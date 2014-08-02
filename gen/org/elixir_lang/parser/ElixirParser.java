@@ -1708,41 +1708,67 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // EOL | expressionList | (EOL expressionList) | (EOL expressionList EOL) | ''
+  // !<<eof>>
+  //   (
+  //     EOL |
+  //     (EOL? expressionList EOL?)
+  //   )
   static boolean elixirFile(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "elixirFile")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, EOL);
-    if (!result_) result_ = expressionList(builder_, level_ + 1);
-    if (!result_) result_ = elixirFile_2(builder_, level_ + 1);
-    if (!result_) result_ = elixirFile_3(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, "");
+    result_ = elixirFile_0(builder_, level_ + 1);
+    result_ = result_ && elixirFile_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // EOL expressionList
-  private static boolean elixirFile_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "elixirFile_2")) return false;
+  // !<<eof>>
+  private static boolean elixirFile_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NOT_, null);
+    result_ = !eof(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, null, result_, false, null);
+    return result_;
+  }
+
+  // EOL |
+  //     (EOL? expressionList EOL?)
+  private static boolean elixirFile_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, EOL);
-    result_ = result_ && expressionList(builder_, level_ + 1);
+    if (!result_) result_ = elixirFile_1_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // EOL expressionList EOL
-  private static boolean elixirFile_3(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "elixirFile_3")) return false;
+  // EOL? expressionList EOL?
+  private static boolean elixirFile_1_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1_1")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, EOL);
+    result_ = elixirFile_1_1_0(builder_, level_ + 1);
     result_ = result_ && expressionList(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, EOL);
+    result_ = result_ && elixirFile_1_1_2(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
+  }
+
+  // EOL?
+  private static boolean elixirFile_1_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1_1_0")) return false;
+    consumeToken(builder_, EOL);
+    return true;
+  }
+
+  // EOL?
+  private static boolean elixirFile_1_1_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1_1_2")) return false;
+    consumeToken(builder_, EOL);
+    return true;
   }
 
   /* ********************************************************** */
@@ -1777,12 +1803,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // emptyParentheses | matchedExpression | noParenthesesExpression | unmatchedExpression
+  // COMMENT | emptyParentheses | matchedExpression | noParenthesesExpression | unmatchedExpression
   public static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _NONE_, "<expression>");
-    result_ = emptyParentheses(builder_, level_ + 1);
+    result_ = consumeToken(builder_, COMMENT);
+    if (!result_) result_ = emptyParentheses(builder_, level_ + 1);
     if (!result_) result_ = matchedExpression(builder_, level_ + 1);
     if (!result_) result_ = noParenthesesExpression(builder_, level_ + 1);
     if (!result_) result_ = unmatchedExpression(builder_, level_ + 1);
