@@ -14,7 +14,7 @@
 }
 
 // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L75-L80
-elixirFile ::= (EOL | expressionList | (EOL expressionList) | (EOL expressionList EOL))
+elixirFile ::= (EOL | expressionList | (EOL expressionList) | (expressionList EOL) | (EOL expressionList EOL))
 
 // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L83-L84
 expressionList ::= (expression | (expressionList EOL expression))
