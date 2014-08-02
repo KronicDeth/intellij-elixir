@@ -26,7 +26,7 @@ elixirFile ::= (
 expressionList ::= (expression | (expressionList EOL expression))
 
 // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L86-L89
-expression ::= (emptyParentheses | matchedExpression | noParenthesesExpression | unmatchedExpression)
+expression ::= (COMMENT | emptyParentheses | matchedExpression | noParenthesesExpression | unmatchedExpression)
 
 // https://github.com/elixir-lang/elixir/blob/a47751f4de72322118e35e1cfd3aa6b4d9c27c13/lib/elixir/src/elixir_parser.yrl#L113-L122
 matchedExpression ::= (
