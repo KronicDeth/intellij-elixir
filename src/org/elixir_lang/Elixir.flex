@@ -23,9 +23,9 @@ COMMENT = "#" [^\r\n]*
 %%
 
 <YYINITIAL> {
-  {COMMENT} { yybegin(YYINITIAL); return ElixirTypes.COMMENT; }
+  {COMMENT} { return ElixirTypes.COMMENT; }
 }
 
-{EOL}          { yybegin(YYINITIAL); return ElixirTypes.EOL; }
-{WHITE_SPACE}+ { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+{EOL}          { return ElixirTypes.EOL; }
+{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
 .              { return TokenType.BAD_CHARACTER; }
