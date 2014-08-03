@@ -38,7 +38,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new FlexAdapter(new ElixirLexer((Reader) null));
+        return new ElixirLexer();
     }
 
     @NotNull

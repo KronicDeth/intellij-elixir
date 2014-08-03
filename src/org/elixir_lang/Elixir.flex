@@ -7,7 +7,7 @@ import com.intellij.psi.TokenType;
 
 %%
 
-%class ElixirLexer
+%class ElixirFlexLexer
 %implements FlexLexer
 %unicode
 %function advance

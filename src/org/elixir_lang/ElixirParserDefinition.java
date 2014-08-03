@@ -32,7 +32,7 @@ public class ElixirParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new FlexAdapter(new ElixirLexer((Reader) null));
+        return new ElixirLexer();
     }
 
     @NotNull
