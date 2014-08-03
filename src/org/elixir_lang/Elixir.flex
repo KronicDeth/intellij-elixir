@@ -22,10 +22,9 @@ COMMENT = "#" [^\r\n]*
 
 %%
 
-<YYINITIAL> {
-  {COMMENT} { return ElixirTypes.COMMENT; }
-}
+{COMMENT} { return ElixirTypes.COMMENT; }
 
 {EOL}          { return ElixirTypes.EOL; }
 {WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+
 .              { return TokenType.BAD_CHARACTER; }
