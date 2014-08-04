@@ -1,0 +1,2 @@
+Elixir File(0,10)
+  PsiElement(ElixirTokenType.NUMBER)('0xdeadbeaf')(0,10)

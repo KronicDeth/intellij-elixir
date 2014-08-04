@@ -1,0 +1,4 @@
+Elixir File(0,30)
+  PsiComment(ElixirTokenType.COMMENT)('# Comment\n')(0,10)
+  PsiWhiteSpace('  ')(10,12)
+  PsiComment(ElixirTokenType.COMMENT)('# Indented Comment')(12,30)
