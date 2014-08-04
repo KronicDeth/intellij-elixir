@@ -30,31 +30,46 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (NUMBER EOL)+
+  // NUMBER (EOL NUMBER)* EOL?
   static boolean elixirFile(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "elixirFile")) return false;
     if (!nextTokenIs(builder_, NUMBER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = elixirFile_0(builder_, level_ + 1);
-    int pos_ = current_position_(builder_);
-    while (result_) {
-      if (!elixirFile_0(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "elixirFile", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
+    result_ = consumeToken(builder_, NUMBER);
+    result_ = result_ && elixirFile_1(builder_, level_ + 1);
+    result_ = result_ && elixirFile_2(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // NUMBER EOL
-  private static boolean elixirFile_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "elixirFile_0")) return false;
+  // (EOL NUMBER)*
+  private static boolean elixirFile_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!elixirFile_1_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "elixirFile_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL NUMBER
+  private static boolean elixirFile_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_1_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, NUMBER, EOL);
+    result_ = consumeTokens(builder_, 0, EOL, NUMBER);
     exit_section_(builder_, marker_, null, result_);
     return result_;
+  }
+
+  // EOL?
+  private static boolean elixirFile_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "elixirFile_2")) return false;
+    consumeToken(builder_, EOL);
+    return true;
   }
 
 }

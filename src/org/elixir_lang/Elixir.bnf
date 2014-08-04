@@ -17,4 +17,4 @@
   ]
 }
 
-elixirFile ::= (NUMBER EOL)+
+elixirFile ::= NUMBER (EOL NUMBER)* EOL?
