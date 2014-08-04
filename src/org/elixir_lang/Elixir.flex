@@ -18,7 +18,7 @@ import com.intellij.psi.TokenType;
 EOL = \n|\r|\r\n
 WHITE_SPACE=[\ \t\f]
 
-COMMENT = "#" [^\r\n]*
+COMMENT = "#" [^\r\n]* {EOL}?
 
 /*
  *   Integers

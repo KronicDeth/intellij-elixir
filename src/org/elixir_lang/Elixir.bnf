@@ -13,7 +13,7 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
-    COMMENT = "regexp:#[^\r\n]*"
+    COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
   ]
 }
 
