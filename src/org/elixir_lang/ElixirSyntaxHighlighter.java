@@ -21,14 +21,14 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by luke.imhoff on 8/2/14.
  */
 public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
-    public static final TextAttributesKey COMMENT = createTextAttributesKey(
-            "ELIXIR_COMMENT",
-            DefaultLanguageHighlighterColors.LINE_COMMENT
-    );
-
     static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey(
             "ELIXIR_BAD_CHARACTER",
             HighlighterColors.BAD_CHARACTER
+    );
+
+    public static final TextAttributesKey COMMENT = createTextAttributesKey(
+            "ELIXIR_COMMENT",
+            DefaultLanguageHighlighterColors.LINE_COMMENT
     );
 
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
