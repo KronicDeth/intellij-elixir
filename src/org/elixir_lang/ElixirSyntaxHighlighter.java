@@ -31,9 +31,15 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.LINE_COMMENT
     );
 
+    public static final TextAttributesKey NUMBER = createTextAttributesKey(
+            "ELIXIR_NUMBER",
+            DefaultLanguageHighlighterColors.NUMBER
+    );
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+    private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
 
     @NotNull
     @Override
@@ -44,10 +50,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (tokenType.equals(ElixirTypes.COMMENT)) {
-            return COMMENT_KEYS;
-        } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
+        if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
+        } else if (tokenType.equals(ElixirTypes.COMMENT)) {
+            return COMMENT_KEYS;
+        } else if (tokenType.equals(ElixirTypes.NUMBER)) {
+            return NUMBER_KEYS;
         } else {
             return EMPTY_KEYS;
         }
