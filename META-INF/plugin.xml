@@ -22,6 +22,7 @@
   <depends>com.intellij.modules.lang</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
