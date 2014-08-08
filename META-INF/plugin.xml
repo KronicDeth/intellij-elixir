@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,22 +9,19 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.0.2</h1>
+      <h1>v0.0.3</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
-            <li>Binary, Hexadecimal, and Octal numbers (including deprecated syntax) are recognized as numbers.</li>
-            <li>Syntax Highlighting for numbers.</li>
-            <li>Color Settings page for changing the color of comments and numbers for Elixir (Preferences > Editor > Colors & Fonts > Elixir).</li>
-          </ul>
-        </li>
-        <li>
-          <p>Bug Fixes</p>
-          <ul>
-            <li>Parser no longer freezes IDE on tokens it doesn't understand.</li>
-            <li>White space at beginning of lines no longer leads to annotation errors.</li>
-            <li>White space and EOLs at beginning of file no longer lead to annotation errors.</li>
+            <li>Single quoted string with highlighting. ('String' in Color Settings.)</li>
+            <li>
+              <p>Double quoted strings with highlighting. ('Interpolated String' in Color Settings.)</p>
+              <ul>
+                <li>Interpolation (<code>#{</code> and <code>}</code>) with highlighting.  ('Expression Substitution Mark' in Color Settings.)</li>
+                <li>Escape sequences for <code>"</code> and <code>#</code> with highlighting.  ('Escape Sequence' in Color Settings.)</li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
