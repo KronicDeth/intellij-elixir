@@ -1,0 +1,2 @@
+Elixir File(0,11)
+  PsiElement(ElixirTokenType.SINGLE_QUOTED_STRING)(''one' 'two'')(0,11)

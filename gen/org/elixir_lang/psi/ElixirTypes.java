@@ -6,9 +6,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
 
 public interface ElixirTypes {
+
+
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
+  IElementType SINGLE_QUOTED_STRING = new ElixirTokenType("SINGLE_QUOTED_STRING");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

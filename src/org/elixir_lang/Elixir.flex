@@ -32,8 +32,12 @@ HEXADECIMAL_INTEGER = "0" [Xx][A-Fa-f0-9]+
 OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
+SINGLE_QUOTE = "'"
+SINGLE_QUOTED_STRING = {SINGLE_QUOTE} ("\'" | [^'])* {SINGLE_QUOTE}
+
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
+%state STRING_WITHOUT_INTERPOLATION
 
 %%
 
@@ -46,6 +50,8 @@ INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
   {COMMENT}                   { yybegin(BODY); return ElixirTypes.COMMENT; }
 
   {INTEGER}                   { yybegin(BODY); return ElixirTypes.NUMBER; }
+
+  {SINGLE_QUOTED_STRING}      { yybegin(BODY); return ElixirTypes.SINGLE_QUOTED_STRING; }
 
   .                           { yybegin(BODY); return TokenType.BAD_CHARACTER; }
 }
@@ -63,6 +69,8 @@ INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
   {COMMENT}                   { return ElixirTypes.COMMENT; }
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
+
+  {SINGLE_QUOTED_STRING}      { return ElixirTypes.SINGLE_QUOTED_STRING; }
 
   .                           { return TokenType.BAD_CHARACTER; }
 }

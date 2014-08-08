@@ -30,20 +30,20 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER (EOL NUMBER)* EOL?
+  // expression (EOL expression)* EOL?
   static boolean elixirFile(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "elixirFile")) return false;
-    if (!nextTokenIs(builder_, NUMBER)) return false;
+    if (!nextTokenIs(builder_, "", NUMBER, SINGLE_QUOTED_STRING)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, NUMBER);
+    result_ = expression(builder_, level_ + 1);
     result_ = result_ && elixirFile_1(builder_, level_ + 1);
     result_ = result_ && elixirFile_2(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
-  // (EOL NUMBER)*
+  // (EOL expression)*
   private static boolean elixirFile_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "elixirFile_1")) return false;
     int pos_ = current_position_(builder_);
@@ -55,12 +55,13 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // EOL NUMBER
+  // EOL expression
   private static boolean elixirFile_1_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "elixirFile_1_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, EOL, NUMBER);
+    result_ = consumeToken(builder_, EOL);
+    result_ = result_ && expression(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -70,6 +71,19 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "elixirFile_2")) return false;
     consumeToken(builder_, EOL);
     return true;
+  }
+
+  /* ********************************************************** */
+  // NUMBER | SINGLE_QUOTED_STRING
+  static boolean expression(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression")) return false;
+    if (!nextTokenIs(builder_, "", NUMBER, SINGLE_QUOTED_STRING)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, NUMBER);
+    if (!result_) result_ = consumeToken(builder_, SINGLE_QUOTED_STRING);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
 }

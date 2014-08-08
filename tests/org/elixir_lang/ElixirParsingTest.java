@@ -30,7 +30,15 @@ public class ElixirParsingTest extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEmptySingleQuotedString() {
+        doTest(true);
+    }
+
     public void testMultipleNumbersOnLine() {
+        doTest(true);
+    }
+
+    public void testMultipleStringsOnLine() {
         doTest(true);
     }
 
@@ -39,6 +47,18 @@ public class ElixirParsingTest extends ParsingTestCase {
     }
 
     public void testRealistic() {
+        doTest(true);
+    }
+
+    public void testSingleQuotedStringWithEscapedNewline() {
+        doTest(true);
+    }
+
+    public void testSingleQuotedStringWithUnescapedNewline() {
+        doTest(true);
+    }
+
+    public void testSingleQuotedStringWithEscapedSingleQuote() {
         doTest(true);
     }
 

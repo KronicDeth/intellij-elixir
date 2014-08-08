@@ -17,4 +17,6 @@
   ]
 }
 
-elixirFile ::= NUMBER (EOL NUMBER)* EOL?
+elixirFile ::= expression (EOL expression)* EOL?
+
+private expression ::= (NUMBER | SINGLE_QUOTED_STRING)
