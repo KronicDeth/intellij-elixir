@@ -9,6 +9,8 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+import org.apache.sanselan.formats.tiff.constants.TagInfo;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,15 +33,42 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.LINE_COMMENT
     );
 
+    public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
+            "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
+            DefaultLanguageHighlighterColors.PARENTHESES
+    );
+
+    public static final TextAttributesKey INTERPOLATED_STRING = createTextAttributesKey(
+            "ELIXIR_INTERPOLATED_STRING",
+            DefaultLanguageHighlighterColors.STRING
+    );
+
     public static final TextAttributesKey NUMBER = createTextAttributesKey(
             "ELIXIR_NUMBER",
             DefaultLanguageHighlighterColors.NUMBER
     );
 
+    public static final TextAttributesKey STRING = createTextAttributesKey(
+            "ELIXIR_STRING",
+            DefaultLanguageHighlighterColors.STRING
+    );
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
+    private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
+    private static final TextAttributesKey[] INTERPOLATED_STRING_KEYS = new TextAttributesKey[]{INTERPOLATED_STRING};
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
+    private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
+
+    private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
+            ElixirTypes.INTERPOLATION_START,
+            ElixirTypes.INTERPOLATION_END
+    );
+    private static final TokenSet INTERPOLATED_STRINGS = TokenSet.create(
+            ElixirTypes.DOUBLE_QUOTES,
+            ElixirTypes.STRING_FRAGMENT
+    );
 
     @NotNull
     @Override
@@ -54,8 +83,14 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return BAD_CHAR_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMENT)) {
             return COMMENT_KEYS;
+        } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {
+            return EXPRESSION_SUBSTITUTION_MARK_KEYS;
+        } else if (INTERPOLATED_STRINGS.contains(tokenType)) {
+            return INTERPOLATED_STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
+        } else if (tokenType.equals(ElixirTypes.SINGLE_QUOTED_STRING)) {
+            return STRING_KEYS;
         } else {
             return EMPTY_KEYS;
         }

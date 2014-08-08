@@ -17,7 +17,10 @@ import java.util.Map;
 public class ElixirColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
-            new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER)
+            new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
+            new AttributesDescriptor("Interpolated String", ElixirSyntaxHighlighter.INTERPOLATED_STRING),
+            new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER),
+            new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING)
     };
 
     @Nullable
@@ -35,13 +38,14 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
     @NotNull
     @Override
     public String getDemoText() {
-        return "# Only non-base-10 numbers (and these '#' comments) are supported right now.\n" +
-                "0b10 # binary\n" +
+        return "0b10 # binary\n" +
                 "0B10 # deprecated binary\n" +
                 "0o12345670 # octal\n" +
                 "012345670 # deprecated octal\n" +
                 "0x1234567890abcdefABCDEF # hexadecimal\n" +
-                "0X1234567890abcdefABCDEF # deprecated hexadecimal\n";
+                "0X1234567890abcdefABCDEF # deprecated hexadecimal\n" +
+                "'single quoted strings'\n" +
+                "\"Double quoted string with #{0x42} (interpolation) and contain \\\" and \\# (escapes)\"";
     }
 
     @Nullable
