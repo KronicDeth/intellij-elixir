@@ -1,15 +1,11 @@
-package org.elixir_lang;
+package org.elixir_lang.parser_definition;
 
-import com.intellij.testFramework.ParsingTestCase;
+import org.elixir_lang.ElixirParserDefinition;
 
 /**
  * Created by luke.imhoff on 8/3/14.
  */
-public class ElixirParsingTest extends ParsingTestCase {
-    public ElixirParsingTest() {
-        super("", "ex", new ElixirParserDefinition());
-    }
-
+public class GeneralParsingTestCase extends ParsingTestCase {
     public void testBadCharacterPrefix() {
         doTest(true);
     }
@@ -52,16 +48,6 @@ public class ElixirParsingTest extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return "testData";
-    }
-
-    @Override
-    protected boolean skipSpaces() {
-        return false;
-    }
-
-    @Override
-    protected boolean includeRanges() {
-        return true;
+        return super.getTestDataPath() + "/general_parsing_test_case";
     }
 }
