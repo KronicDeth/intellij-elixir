@@ -53,6 +53,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.STRING
     );
 
+    public static final TextAttributesKey VALID_ESCAPE_SEQUENCE = createTextAttributesKey(
+            "ELIXIR_VALID_ESCAPE_SEQUENCE",
+            DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+    );
+
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
@@ -60,6 +65,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] INTERPOLATED_STRING_KEYS = new TextAttributesKey[]{INTERPOLATED_STRING};
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
+    private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
 
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
@@ -91,6 +97,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return NUMBER_KEYS;
         } else if (tokenType.equals(ElixirTypes.SINGLE_QUOTED_STRING)) {
             return STRING_KEYS;
+        } else if (tokenType.equals(ElixirTypes.VALID_ESCAPE_SEQUENCE)) {
+            return VALID_ESCAPE_SEQUENCE_KEYS;
         } else {
             return EMPTY_KEYS;
         }

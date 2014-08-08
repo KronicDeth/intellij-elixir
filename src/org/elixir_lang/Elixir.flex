@@ -80,8 +80,8 @@ INTERPOLATION_END = "}"
   {INTERPOLATION_START}            { lexicalStateStack.push(yystate());
                                      yybegin(INTERPOLATION);
                                      return ElixirTypes.INTERPOLATION_START; }
-  {ESCAPED_DOUBLE_QUOTES}          { return ElixirTypes.STRING_FRAGMENT; }
-  {ESCAPED_INTERPOLATION_START}    { return ElixirTypes.STRING_FRAGMENT; }
+  {ESCAPED_DOUBLE_QUOTES}          { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
+  {ESCAPED_INTERPOLATION_START}    { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
   {DOUBLE_QUOTED_STRING_CHARACTER} { return ElixirTypes.STRING_FRAGMENT; }
   {DOUBLE_QUOTES}                  { int previousLexicalState = lexicalStateStack.pop();
                                      yybegin(previousLexicalState);

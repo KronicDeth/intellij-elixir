@@ -8,6 +8,10 @@ public class BodyParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEscapeSequences() {
+        doTest(true);
+    }
+
     public void testWithInterpolation() {
         doTest(true);
     }

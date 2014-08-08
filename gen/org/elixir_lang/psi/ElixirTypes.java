@@ -19,6 +19,7 @@ public interface ElixirTypes {
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType SINGLE_QUOTED_STRING = new ElixirTokenType("SINGLE_QUOTED_STRING");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
+  IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

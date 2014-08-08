@@ -38,7 +38,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // DOUBLE_QUOTES (interpolation | STRING_FRAGMENT)* DOUBLE_QUOTES
+  // DOUBLE_QUOTES (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)* DOUBLE_QUOTES
   public static boolean doubleQuotedString(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "doubleQuotedString")) return false;
     if (!nextTokenIs(builder_, DOUBLE_QUOTES)) return false;
@@ -51,7 +51,7 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // (interpolation | STRING_FRAGMENT)*
+  // (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
   private static boolean doubleQuotedString_1(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "doubleQuotedString_1")) return false;
     int pos_ = current_position_(builder_);
@@ -63,13 +63,14 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // interpolation | STRING_FRAGMENT
+  // interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
   private static boolean doubleQuotedString_1_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "doubleQuotedString_1_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = interpolation(builder_, level_ + 1);
     if (!result_) result_ = consumeToken(builder_, STRING_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }

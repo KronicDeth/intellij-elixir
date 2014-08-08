@@ -17,6 +17,7 @@ import java.util.Map;
 public class ElixirColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
+            new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Interpolated String", ElixirSyntaxHighlighter.INTERPOLATED_STRING),
             new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER),
