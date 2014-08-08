@@ -17,6 +17,12 @@
   ]
 }
 
-elixirFile ::= expression (EOL expression)* EOL?
+elixirFile ::= expressionList
 
-private expression ::= (NUMBER | SINGLE_QUOTED_STRING)
+// In alphabetical order
+
+doubleQuotedString ::= DOUBLE_QUOTES (interpolation | STRING_FRAGMENT)* DOUBLE_QUOTES
+private expression ::= (NUMBER | string)
+private expressionList ::= expression (EOL expression)* EOL?
+interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+private string ::= (doubleQuotedString | SINGLE_QUOTED_STRING)

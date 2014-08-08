@@ -1,0 +1,4 @@
+Elixir File(0,2)
+  ElixirDoubleQuotedStringImpl(DOUBLE_QUOTED_STRING)(0,2)
+    PsiElement(ElixirTokenType.DOUBLE_QUOTES)('"')(0,1)
+    PsiElement(ElixirTokenType.DOUBLE_QUOTES)('"')(1,2)
