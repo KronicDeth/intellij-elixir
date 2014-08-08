@@ -12,6 +12,13 @@ public class BodyParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    /* Tests that '#' for comments and '#' for interpolation are treated differently.  Covers bug reported in
+     * {@link https://github.com/KronicDeth/intellij-elixir/issues/2}.
+     */
+    public void testInterpolationRegression() {
+        doTest(true);
+    }
+
     public void testWithInterpolation() {
         doTest(true);
     }
