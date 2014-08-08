@@ -50,18 +50,6 @@ public class ElixirParsingTest extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testSingleQuotedStringWithEscapedNewline() {
-        doTest(true);
-    }
-
-    public void testSingleQuotedStringWithUnescapedNewline() {
-        doTest(true);
-    }
-
-    public void testSingleQuotedStringWithEscapedSingleQuote() {
-        doTest(true);
-    }
-
     @Override
     protected String getTestDataPath() {
         return "testData";

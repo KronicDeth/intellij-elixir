@@ -11,6 +11,7 @@ public class ElixirTestCase extends TestCase {
         TestSuite suite = new TestSuite();
 
         suite.addTestSuite(ElixirParsingTest.class);
+        suite.addTestSuite(org.elixir_lang.parser_definition.SingleQuotedStringParsingTestCase.class);
 
         return suite;
     }
