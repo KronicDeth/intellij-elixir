@@ -1,5 +1,5 @@
 Elixir File(0,26)
-  ElixirDoubleQuotedStringImpl(DOUBLE_QUOTED_STRING)(0,26)
+  ElixirInterpolatedStringImpl(INTERPOLATED_STRING)(0,26)
     PsiElement(ElixirTokenType.DOUBLE_QUOTES)('"')(0,1)
     PsiElement(ElixirTokenType.VALID_ESCAPE_SEQUENCE)('\"')(1,3)
     PsiElement(ElixirTokenType.VALID_ESCAPE_SEQUENCE)('\#')(3,5)

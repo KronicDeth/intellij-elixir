@@ -24,14 +24,14 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirDoubleQuotedString> getDoubleQuotedStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDoubleQuotedString.class);
+  public List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedHeredoc.class);
+  public List<ElixirInterpolatedString> getInterpolatedStringList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedString.class);
   }
 
 }

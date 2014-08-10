@@ -1,2 +1,4 @@
 
-"The answer is #{0x2A}"
+"""
+The answer is #{0x2A}
+"""

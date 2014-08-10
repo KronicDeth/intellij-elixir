@@ -8,8 +8,8 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
-  IElementType DOUBLE_QUOTED_STRING = new ElixirElementType("DOUBLE_QUOTED_STRING");
   IElementType INTERPOLATED_HEREDOC = new ElixirElementType("INTERPOLATED_HEREDOC");
+  IElementType INTERPOLATED_STRING = new ElixirElementType("INTERPOLATED_STRING");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
 
   IElementType COMMENT = new ElixirTokenType("COMMENT");
@@ -26,11 +26,11 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == DOUBLE_QUOTED_STRING) {
-        return new ElixirDoubleQuotedStringImpl(node);
-      }
-      else if (type == INTERPOLATED_HEREDOC) {
+       if (type == INTERPOLATED_HEREDOC) {
         return new ElixirInterpolatedHeredocImpl(node);
+      }
+      else if (type == INTERPOLATED_STRING) {
+        return new ElixirInterpolatedStringImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);

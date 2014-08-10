@@ -50,7 +50,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
-%state DOUBLE_QUOTED_STRING
+%state INTERPOLATED_STRING
 %state INTERPOLATED_HEREDOC_END
 %state INTERPOLATED_HEREDOC_LINE_BODY
 %state INTERPOLATED_HEREDOC_LINE_START
@@ -78,14 +78,14 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   {DOUBLE_QUOTES}             { // return to BODY instead of YYINITIAL since beginning of file error handling has
                                 // finished.
                                 lexicalStateStack.push(BODY);
-                                yybegin(DOUBLE_QUOTED_STRING);
+                                yybegin(INTERPOLATED_STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
 
   .                           { yybegin(BODY); return TokenType.BAD_CHARACTER; }
 }
 
 // Rules common to interpolated strings
-<DOUBLE_QUOTED_STRING, INTERPOLATED_HEREDOC_LINE_BODY> {
+<INTERPOLATED_STRING, INTERPOLATED_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}            { lexicalStateStack.push(yystate());
                                      yybegin(INTERPOLATION);
                                      return ElixirTypes.INTERPOLATION_START; }
@@ -93,8 +93,8 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   {ESCAPED_INTERPOLATION_START}    { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
 }
 
-// Rules that aren't common to DOUBLE_QUOTED_STRING and INTERPOLATED_HEREDOC_BODY
-<DOUBLE_QUOTED_STRING> {
+// Rules that aren't common to INTERPOLATED_STRING and INTERPOLATED_HEREDOC_BODY
+<INTERPOLATED_STRING> {
   {DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
                     yybegin(previousLexicalState);
                     return ElixirTypes.DOUBLE_QUOTES; }
@@ -121,7 +121,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
                                 yybegin(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
   {DOUBLE_QUOTES}             { lexicalStateStack.push(yystate());
-                                yybegin(DOUBLE_QUOTED_STRING);
+                                yybegin(INTERPOLATED_STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
 }
 

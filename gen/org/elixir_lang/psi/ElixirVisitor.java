@@ -7,11 +7,11 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
-  public void visitDoubleQuotedString(@NotNull ElixirDoubleQuotedString o) {
+  public void visitInterpolatedHeredoc(@NotNull ElixirInterpolatedHeredoc o) {
     visitPsiElement(o);
   }
 
-  public void visitInterpolatedHeredoc(@NotNull ElixirInterpolatedHeredoc o) {
+  public void visitInterpolatedString(@NotNull ElixirInterpolatedString o) {
     visitPsiElement(o);
   }
 

@@ -21,7 +21,7 @@ elixirFile ::= expressionList
 
 // In alphabetical order
 
-doubleQuotedString ::= DOUBLE_QUOTES
+interpolatedString ::= DOUBLE_QUOTES
                        interpolatedStringBody
                        DOUBLE_QUOTES
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
@@ -31,4 +31,4 @@ interpolatedHeredoc ::= TRIPLE_DOUBLE_QUOTES EOL
 private expression ::= (NUMBER | string)
 private expressionList ::= expression (EOL expression)* EOL?
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-private string ::= (doubleQuotedString | interpolatedHeredoc | SINGLE_QUOTED_STRING)
+private string ::= (interpolatedString | interpolatedHeredoc | SINGLE_QUOTED_STRING)

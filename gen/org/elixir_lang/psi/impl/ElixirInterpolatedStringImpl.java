@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirDoubleQuotedStringImpl extends ASTWrapperPsiElement implements ElixirDoubleQuotedString {
+public class ElixirInterpolatedStringImpl extends ASTWrapperPsiElement implements ElixirInterpolatedString {
 
-  public ElixirDoubleQuotedStringImpl(ASTNode node) {
+  public ElixirInterpolatedStringImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDoubleQuotedString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedString(this);
     else super.accept(visitor);
   }
 

@@ -8,9 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
-  List<ElixirDoubleQuotedString> getDoubleQuotedStringList();
+  List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList();
+  List<ElixirInterpolatedString> getInterpolatedStringList();
 
 }
