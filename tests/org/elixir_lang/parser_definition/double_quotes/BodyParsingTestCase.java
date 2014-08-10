@@ -19,6 +19,9 @@ public class BodyParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testMultiline() {
+        doTest(true);
+    }
     public void testWithInterpolation() {
         doTest(true);
     }

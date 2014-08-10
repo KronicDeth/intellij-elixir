@@ -98,7 +98,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   {DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
                     yybegin(previousLexicalState);
                     return ElixirTypes.DOUBLE_QUOTES; }
-  .               { return ElixirTypes.STRING_FRAGMENT; }
+  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
