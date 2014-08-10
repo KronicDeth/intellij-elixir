@@ -2,3 +2,5 @@
 /.idea/workspace.xml
 # build output
 /out
+# old lexer generated from Elixir.flex
+src/org/elixir_lang/ElixirFlexLexer.java~
