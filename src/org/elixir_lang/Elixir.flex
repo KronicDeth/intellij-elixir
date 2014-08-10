@@ -63,25 +63,10 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
    * it is filtered out.
    */
-  ({EOL}|{WHITE_SPACE})+      { yybegin(BODY); return TokenType.WHITE_SPACE; }
+  ({EOL}|{WHITE_SPACE})+                                                { yybegin(BODY); return TokenType.WHITE_SPACE; }
 
-  {COMMENT}                   { yybegin(BODY); return ElixirTypes.COMMENT; }
-
-  {INTEGER}                   { yybegin(BODY); return ElixirTypes.NUMBER; }
-
-  {STRING}                    { yybegin(BODY); return ElixirTypes.STRING; }
-  {TRIPLE_DOUBLE_QUOTES}      { // return to BODY instead of YYINITIAL since beginning of file error handling has
-                                // fininished.
-                                lexicalStateStack.push(BODY);
-                                yybegin(INTERPOLATED_HEREDOC_START);
-                                return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-  {DOUBLE_QUOTES}             { // return to BODY instead of YYINITIAL since beginning of file error handling has
-                                // finished.
-                                lexicalStateStack.push(BODY);
-                                yybegin(INTERPOLATED_STRING);
-                                return ElixirTypes.DOUBLE_QUOTES; }
-
-  .                           { yybegin(BODY); return TokenType.BAD_CHARACTER; }
+  // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
+  {COMMENT}|{INTEGER}|{STRING}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { yypushback(yylength()); yybegin(BODY); }
 }
 
 // Rules common to interpolated strings
