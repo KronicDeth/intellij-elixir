@@ -26,10 +26,6 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testEmptySingleQuotedString() {
-        doTest(true);
-    }
-
     public void testMultipleNumbersOnLine() {
         doTest(true);
     }

@@ -1,0 +1,2 @@
+Elixir File(0,4)
+  PsiElement(ElixirTokenType.STRING)(''\''')(0,4)

@@ -95,7 +95,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return INTERPOLATED_STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
-        } else if (tokenType.equals(ElixirTypes.SINGLE_QUOTED_STRING)) {
+        } else if (tokenType.equals(ElixirTypes.STRING)) {
             return STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.VALID_ESCAPE_SEQUENCE)) {
             return VALID_ESCAPE_SEQUENCE_KEYS;

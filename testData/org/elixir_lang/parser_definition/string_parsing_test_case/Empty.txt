@@ -1,0 +1,4 @@
+Elixir File(0,6)
+  PsiElement(ElixirTokenType.STRING)('''')(0,2)
+  PsiElement(ElixirTokenType.EOL)('\n\n')(2,4)
+  PsiElement(ElixirTokenType.STRING)('''')(4,6)

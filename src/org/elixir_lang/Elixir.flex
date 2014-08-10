@@ -37,7 +37,7 @@ OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
 SINGLE_QUOTE = "'"
-SINGLE_QUOTED_STRING = {SINGLE_QUOTE} ("\\'" | [^'])* {SINGLE_QUOTE}
+STRING = {SINGLE_QUOTE} ("\\'" | [^'])* {SINGLE_QUOTE}
 
 DOUBLE_QUOTES = "\""
 ESCAPED_DOUBLE_QUOTES = "\\" {DOUBLE_QUOTES}
@@ -69,7 +69,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
   {INTEGER}                   { yybegin(BODY); return ElixirTypes.NUMBER; }
 
-  {SINGLE_QUOTED_STRING}      { yybegin(BODY); return ElixirTypes.SINGLE_QUOTED_STRING; }
+  {STRING}                    { yybegin(BODY); return ElixirTypes.STRING; }
   {TRIPLE_DOUBLE_QUOTES}      { // return to BODY instead of YYINITIAL since beginning of file error handling has
                                 // fininished.
                                 lexicalStateStack.push(BODY);
@@ -116,7 +116,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
 
-  {SINGLE_QUOTED_STRING}      { return ElixirTypes.SINGLE_QUOTED_STRING; }
+  {STRING}                    { return ElixirTypes.STRING; }
   {TRIPLE_DOUBLE_QUOTES}      { lexicalStateStack.push(yystate());
                                 yybegin(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }

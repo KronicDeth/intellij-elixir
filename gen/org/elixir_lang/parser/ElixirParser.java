@@ -47,13 +47,15 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER | string
+  // NUMBER | interpolatedString | interpolatedHeredoc | STRING
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = string(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedString(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, STRING);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -177,19 +179,6 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "interpolation_1")) return false;
     expressionList(builder_, level_ + 1);
     return true;
-  }
-
-  /* ********************************************************** */
-  // interpolatedString | interpolatedHeredoc | SINGLE_QUOTED_STRING
-  static boolean string(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "string")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = interpolatedString(builder_, level_ + 1);
-    if (!result_) result_ = interpolatedHeredoc(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, SINGLE_QUOTED_STRING);
-    exit_section_(builder_, marker_, null, result_);
-    return result_;
   }
 
 }

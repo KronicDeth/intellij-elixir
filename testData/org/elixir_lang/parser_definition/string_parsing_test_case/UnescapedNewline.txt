@@ -1,0 +1,2 @@
+Elixir File(0,5)
+  PsiElement(ElixirTokenType.STRING)(''a\nb'')(0,5)

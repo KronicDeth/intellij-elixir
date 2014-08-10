@@ -1,2 +1,0 @@
-Elixir File(0,20)
-  PsiElement(ElixirTokenType.SINGLE_QUOTED_STRING)(''\nmultiple\n\nlines\n\n'')(0,20)

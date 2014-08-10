@@ -1,2 +1,0 @@
-Elixir File(0,6)
-  PsiElement(ElixirTokenType.SINGLE_QUOTED_STRING)(''a\\nb'')(0,6)

@@ -18,7 +18,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
-  IElementType SINGLE_QUOTED_STRING = new ElixirTokenType("SINGLE_QUOTED_STRING");
+  IElementType STRING = new ElixirTokenType("STRING");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
   IElementType TRIPLE_DOUBLE_QUOTES = new ElixirTokenType("TRIPLE_DOUBLE_QUOTES");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
