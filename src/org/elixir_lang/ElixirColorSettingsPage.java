@@ -49,7 +49,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "\"Double quoted string with #{0x42} (interpolation) and contain \\\" and \\# (escapes)\"\n" +
                 "   \"\"\"\n" +
                 "   Interpolated #{0x42} heredoc\n" +
-                "   \"\"\"";
+                "   \"\"\"\n" +
+                "   '''\n" +
+                "   Heredoc\n" +
+                "   '''";
     }
 
     @Nullable

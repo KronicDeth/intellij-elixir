@@ -78,7 +78,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
     private static final TokenSet STRINGS = TokenSet.create(
             ElixirTypes.SINGLE_QUOTE,
-            ElixirTypes.STRING_FRAGMENT
+            ElixirTypes.STRING_FRAGMENT,
+            ElixirTypes.TRIPLE_SINGLE_QUOTE
     );
 
     @NotNull
