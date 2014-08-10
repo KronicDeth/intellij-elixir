@@ -8,6 +8,10 @@ public class SingleQuotedStringParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testMultiline() {
+        doTest(true);
+    }
+
     public void testUnescapedNewline() {
         doTest(true);
     }
