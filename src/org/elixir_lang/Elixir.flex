@@ -84,7 +84,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   {DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
                     yybegin(previousLexicalState);
                     return ElixirTypes.DOUBLE_QUOTES; }
-  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
+  {EOL}|.         { return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
 }
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
@@ -154,8 +154,8 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 }
 
 <INTERPOLATED_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
-  .     { return ElixirTypes.STRING_FRAGMENT; }
+  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
+  .     { return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
 }
 
 <INTERPOLATED_HEREDOC_END> {

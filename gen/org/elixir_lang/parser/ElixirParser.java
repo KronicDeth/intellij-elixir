@@ -139,7 +139,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  // (interpolation | INTERPOLATED_STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
   static boolean interpolatedStringBody(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedStringBody")) return false;
     int pos_ = current_position_(builder_);
@@ -151,13 +151,13 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
+  // interpolation | INTERPOLATED_STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
   private static boolean interpolatedStringBody_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedStringBody_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = interpolation(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, STRING_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, INTERPOLATED_STRING_FRAGMENT);
     if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
     exit_section_(builder_, marker_, null, result_);
     return result_;

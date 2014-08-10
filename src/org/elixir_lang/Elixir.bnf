@@ -24,7 +24,7 @@ elixirFile ::= expressionList
 interpolatedString ::= DOUBLE_QUOTES
                        interpolatedStringBody
                        DOUBLE_QUOTES
-private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+private interpolatedStringBody ::=  (interpolation | INTERPOLATED_STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolatedHeredoc ::= TRIPLE_DOUBLE_QUOTES EOL
                         interpolatedStringBody
                         TRIPLE_DOUBLE_QUOTES

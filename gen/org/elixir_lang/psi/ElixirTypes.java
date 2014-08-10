@@ -16,6 +16,7 @@ public interface ElixirTypes {
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType DOUBLE_QUOTES = new ElixirTokenType("DOUBLE_QUOTES");
   IElementType EOL = new ElixirTokenType("EOL");
+  IElementType INTERPOLATED_STRING_FRAGMENT = new ElixirTokenType("INTERPOLATED_STRING_FRAGMENT");
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
