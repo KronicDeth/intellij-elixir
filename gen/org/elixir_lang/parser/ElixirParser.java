@@ -29,6 +29,9 @@ public class ElixirParser implements PsiParser {
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
+    else if (root_ == STRING) {
+      result_ = string(builder_, 0);
+    }
     else {
       result_ = parse_root_(root_, builder_, 0);
     }
@@ -47,7 +50,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER | interpolatedString | interpolatedHeredoc | STRING
+  // NUMBER | interpolatedString | interpolatedHeredoc | string
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
@@ -55,7 +58,7 @@ public class ElixirParser implements PsiParser {
     result_ = consumeToken(builder_, NUMBER);
     if (!result_) result_ = interpolatedString(builder_, level_ + 1);
     if (!result_) result_ = interpolatedHeredoc(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, STRING);
+    if (!result_) result_ = string(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -179,6 +182,45 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "interpolation_1")) return false;
     expressionList(builder_, level_ + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // SINGLE_QUOTE
+  //            (STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  //            SINGLE_QUOTE
+  public static boolean string(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "string")) return false;
+    if (!nextTokenIs(builder_, SINGLE_QUOTE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, SINGLE_QUOTE);
+    result_ = result_ && string_1(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, SINGLE_QUOTE);
+    exit_section_(builder_, marker_, STRING, result_);
+    return result_;
+  }
+
+  // (STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  private static boolean string_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "string_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!string_1_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "string_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
+  private static boolean string_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "string_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, STRING_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
 }

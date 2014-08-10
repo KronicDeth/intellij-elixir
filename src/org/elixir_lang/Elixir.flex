@@ -37,7 +37,7 @@ OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
 SINGLE_QUOTE = "'"
-STRING = {SINGLE_QUOTE} ("\\'" | [^'])* {SINGLE_QUOTE}
+ESCAPED_SINGLE_QUOTE = "\\" {SINGLE_QUOTE}
 
 DOUBLE_QUOTES = "\""
 ESCAPED_DOUBLE_QUOTES = "\\" {DOUBLE_QUOTES}
@@ -56,6 +56,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 %state INTERPOLATED_HEREDOC_LINE_START
 %state INTERPOLATED_HEREDOC_START
 %state INTERPOLATION
+%state STRING
 
 %%
 
@@ -66,7 +67,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   ({EOL}|{WHITE_SPACE})+                                                { yybegin(BODY); return TokenType.WHITE_SPACE; }
 
   // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
-  {COMMENT}|{INTEGER}|{STRING}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { yypushback(yylength()); yybegin(BODY); }
+  {COMMENT}|{INTEGER}|{SINGLE_QUOTE}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { yypushback(yylength()); yybegin(BODY); }
 }
 
 // Rules common to interpolated strings
@@ -101,7 +102,9 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
 
-  {STRING}                    { return ElixirTypes.STRING; }
+  {SINGLE_QUOTE}              { lexicalStateStack.push(yystate());
+                                yybegin(STRING);
+                                return ElixirTypes.SINGLE_QUOTE; }
   {TRIPLE_DOUBLE_QUOTES}      { lexicalStateStack.push(yystate());
                                 yybegin(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
@@ -159,4 +162,12 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   {TRIPLE_DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
                            yybegin(previousLexicalState);
                            return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
+}
+
+<STRING> {
+  {ESCAPED_SINGLE_QUOTE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
+  {SINGLE_QUOTE}         { int previousLexicalState = lexicalStateStack.pop();
+                           yybegin(previousLexicalState);
+                           return ElixirTypes.SINGLE_QUOTE; }
+  {EOL}|.                { return ElixirTypes.STRING_FRAGMENT; }
 }

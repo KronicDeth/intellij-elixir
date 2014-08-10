@@ -28,6 +28,9 @@ private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESC
 interpolatedHeredoc ::= TRIPLE_DOUBLE_QUOTES EOL
                         interpolatedStringBody
                         TRIPLE_DOUBLE_QUOTES
-private expression ::= (NUMBER | interpolatedString | interpolatedHeredoc | STRING)
+private expression ::= (NUMBER | interpolatedString | interpolatedHeredoc | string)
 private expressionList ::= expression (EOL expression)* EOL?
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+string ::= SINGLE_QUOTE
+           (STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+           SINGLE_QUOTE

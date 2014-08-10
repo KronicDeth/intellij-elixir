@@ -13,4 +13,7 @@ public interface ElixirInterpolation extends PsiElement {
   @NotNull
   List<ElixirInterpolatedString> getInterpolatedStringList();
 
+  @NotNull
+  List<ElixirString> getStringList();
+
 }

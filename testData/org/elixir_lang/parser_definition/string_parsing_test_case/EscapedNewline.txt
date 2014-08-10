@@ -1,2 +1,5 @@
 Elixir File(0,6)
-  PsiElement(ElixirTokenType.STRING)(''a\\nb'')(0,6)
+  ElixirStringImpl(STRING)(0,6)
+    PsiElement(ElixirTokenType.SINGLE_QUOTE)(''')(0,1)
+    PsiElement(ElixirTokenType.STRING_FRAGMENT)('a\\nb')(1,5)
+    PsiElement(ElixirTokenType.SINGLE_QUOTE)(''')(5,6)

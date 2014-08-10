@@ -45,7 +45,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "012345670 # deprecated octal\n" +
                 "0x1234567890abcdefABCDEF # hexadecimal\n" +
                 "0X1234567890abcdefABCDEF # deprecated hexadecimal\n" +
-                "'single quoted strings'\n" +
+                "'single quoted strings with \\' escapes '\n" +
                 "\"Double quoted string with #{0x42} (interpolation) and contain \\\" and \\# (escapes)\"\n" +
                 "   \"\"\"\n" +
                 "   Interpolated #{0x42} heredoc\n" +

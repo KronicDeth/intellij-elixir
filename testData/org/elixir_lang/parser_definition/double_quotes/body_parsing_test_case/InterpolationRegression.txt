@@ -1,6 +1,6 @@
 Elixir File(0,95)
   PsiComment(ElixirTokenType.COMMENT)('# This comment will to displayed correctly\n')(0,43)
-  PsiErrorElement:ElixirTokenType.DOUBLE_QUOTES, ElixirTokenType.NUMBER, ElixirTokenType.STRING or ElixirTokenType.TRIPLE_DOUBLE_QUOTES expected, got 'I'(43,44)
+  PsiErrorElement:ElixirTokenType.DOUBLE_QUOTES, ElixirTokenType.NUMBER, ElixirTokenType.SINGLE_QUOTE or ElixirTokenType.TRIPLE_DOUBLE_QUOTES expected, got 'I'(43,44)
     PsiElement(BAD_CHARACTER)('I')(43,44)
   PsiElement(DUMMY_BLOCK)(44,64)
     PsiElement(BAD_CHARACTER)('O')(44,45)
