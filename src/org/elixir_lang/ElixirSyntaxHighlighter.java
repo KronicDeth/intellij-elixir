@@ -73,6 +73,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
     private static final TokenSet INTERPOLATED_STRINGS = TokenSet.create(
             ElixirTypes.DOUBLE_QUOTES,
+            ElixirTypes.TRIPLE_DOUBLE_QUOTES,
             ElixirTypes.STRING_FRAGMENT
     );
 
