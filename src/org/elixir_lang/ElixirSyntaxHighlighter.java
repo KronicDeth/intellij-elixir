@@ -76,6 +76,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.TRIPLE_DOUBLE_QUOTES,
             ElixirTypes.INTERPOLATED_STRING_FRAGMENT
     );
+    private static final TokenSet STRINGS = TokenSet.create(
+            ElixirTypes.SINGLE_QUOTE,
+            ElixirTypes.STRING_FRAGMENT
+    );
 
     @NotNull
     @Override
@@ -96,7 +100,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return INTERPOLATED_STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
-        } else if (tokenType.equals(ElixirTypes.STRING)) {
+        } else if (STRINGS.contains(tokenType)) {
             return STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.VALID_ESCAPE_SEQUENCE)) {
             return VALID_ESCAPE_SEQUENCE_KEYS;
