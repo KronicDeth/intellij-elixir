@@ -18,6 +18,14 @@ public class BodyParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testMinimal() {
+        doTest(true);
+    }
+
+    public void testWhitespaceEndPrefix() {
+        doTest(true);
+    }
+
     public void testWithNestedInterpolation() {
         doTest(true);
     }

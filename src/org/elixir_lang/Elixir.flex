@@ -20,7 +20,7 @@ import com.intellij.psi.TokenType;
 
   private void callState(int nextLexicalState) {
     lexicalStateStack.push(yystate());
-    yybegin(nextState);
+    yybegin(nextLexicalState);
   }
 
   private void returnFromState() {
@@ -61,10 +61,25 @@ ESCAPED_INTERPOLATION_START = "\\#"
 INTERPOLATION_START = "#{"
 INTERPOLATION_END = "}"
 
+TRIPLE_SINGLE_QUOTE = {SINGLE_QUOTE}{3}
 TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
+
+NON_WHITE_SPACE = {COMMENT} |
+                  {INTEGER} |
+                  // MUST be before {SINGLE_QUOTE} so that 3 {SINGLE_QUOTE} are NOT matched as (1,1,1)
+                  {TRIPLE_SINGLE_QUOTE} |
+                  {SINGLE_QUOTE} |
+                  // MUST be before {DOUBLE_QUOTES} so that 3 {DOUBLE_QUOTES} are NOT matched as (1,1,1)
+                  {TRIPLE_DOUBLE_QUOTES} |
+                  {DOUBLE_QUOTES} |
+                  .
 
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
+%state HEREDOC_END
+%state HEREDOC_LINE_BODY
+%state HEREDOC_LINE_START
+%state HEREDOC_START
 %state INTERPOLATED_STRING
 %state INTERPOLATED_HEREDOC_END
 %state INTERPOLATED_HEREDOC_LINE_BODY
@@ -79,11 +94,11 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
    * it is filtered out.
    */
-  ({EOL}|{WHITE_SPACE})+                                                      { yybegin(BODY);
-                                                                                return TokenType.WHITE_SPACE; }
+  ({EOL}|{WHITE_SPACE})+ { yybegin(BODY);
+                           return TokenType.WHITE_SPACE; }
 
   // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
-  {COMMENT}|{INTEGER}|{SINGLE_QUOTE}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { handleInState(BODY); }
+  {NON_WHITE_SPACE}      { handleInState(BODY); }
 }
 
 // Rules common to interpolated strings
@@ -116,6 +131,8 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
 
+  {TRIPLE_SINGLE_QUOTE}       { callState(HEREDOC_START);
+                                return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
   {SINGLE_QUOTE}              { callState(STRING);
                                 return ElixirTypes.SINGLE_QUOTE; }
   {TRIPLE_DOUBLE_QUOTES}      { callState(INTERPOLATED_HEREDOC_START);
@@ -137,6 +154,27 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
                                 return ElixirTypes.INTERPOLATION_END; }
 
   .                           { return TokenType.BAD_CHARACTER; }
+}
+
+<HEREDOC_START> {
+  {EOL} { yybegin(HEREDOC_LINE_START); return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
+}
+
+<HEREDOC_LINE_START> {
+  {WHITE_SPACE}+ / {TRIPLE_SINGLE_QUOTE} { yybegin(HEREDOC_END); return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES}                 { handleInState(HEREDOC_END); }
+  .                                      { handleInState(HEREDOC_LINE_BODY); }
+}
+
+<HEREDOC_LINE_BODY> {
+  {EOL} { yybegin(HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
+  .     { return ElixirTypes.STRING_FRAGMENT; }
+}
+
+<HEREDOC_END> {
+  {TRIPLE_SINGLE_QUOTE} { returnFromState();
+                          return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
 }
 
 /* The start of a heredoc is unique as we want to handle the error condition of having characters other than a newline
