@@ -17,6 +17,11 @@ import com.intellij.psi.TokenType;
 
 %{
   private java.util.Stack<Integer> lexicalStateStack = new java.util.Stack<Integer>();
+
+  private void callState(int nextState) {
+    lexicalStateStack.push(yystate());
+    yybegin(nextState);
+  }
 %}
 
 EOL = \n|\r|\r\n
@@ -72,8 +77,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
 // Rules common to interpolated strings
 <INTERPOLATED_STRING, INTERPOLATED_HEREDOC_LINE_BODY> {
-  {INTERPOLATION_START}            { lexicalStateStack.push(yystate());
-                                     yybegin(INTERPOLATION);
+  {INTERPOLATION_START}            { callState(INTERPOLATION);
                                      return ElixirTypes.INTERPOLATION_START; }
   {ESCAPED_DOUBLE_QUOTES}          { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
   {ESCAPED_INTERPOLATION_START}    { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
@@ -102,14 +106,11 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
 
-  {SINGLE_QUOTE}              { lexicalStateStack.push(yystate());
-                                yybegin(STRING);
+  {SINGLE_QUOTE}              { callState(STRING);
                                 return ElixirTypes.SINGLE_QUOTE; }
-  {TRIPLE_DOUBLE_QUOTES}      { lexicalStateStack.push(yystate());
-                                yybegin(INTERPOLATED_HEREDOC_START);
+  {TRIPLE_DOUBLE_QUOTES}      { callState(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-  {DOUBLE_QUOTES}             { lexicalStateStack.push(yystate());
-                                yybegin(INTERPOLATED_STRING);
+  {DOUBLE_QUOTES}             { callState(INTERPOLATED_STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
 }
 
