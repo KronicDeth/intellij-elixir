@@ -11,27 +11,21 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements ElixirInterpolation {
+public class ElixirInterpolatedHeredocImpl extends ASTWrapperPsiElement implements ElixirInterpolatedHeredoc {
 
-  public ElixirInterpolationImpl(ASTNode node) {
+  public ElixirInterpolatedHeredocImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedHeredoc(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public List<ElixirDoubleQuotedString> getDoubleQuotedStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDoubleQuotedString.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedHeredoc.class);
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }
 
 }

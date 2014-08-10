@@ -1,0 +1,7 @@
+Elixir File(0,35)
+  ElixirInterpolatedHeredocImpl(INTERPOLATED_HEREDOC)(0,35)
+    PsiElement(ElixirTokenType.TRIPLE_DOUBLE_QUOTES)('"""')(0,3)
+    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
+    PsiElement(ElixirTokenType.STRING_FRAGMENT)('  without\n  interpolation\n')(4,30)
+    PsiWhiteSpace('  ')(30,32)
+    PsiElement(ElixirTokenType.TRIPLE_DOUBLE_QUOTES)('"""')(32,35)

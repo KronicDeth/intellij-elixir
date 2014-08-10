@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirInterpolation extends PsiElement {
+public interface ElixirInterpolatedStringLine extends PsiElement {
 
   @NotNull
-  List<ElixirDoubleQuotedString> getDoubleQuotedStringList();
-
-  @NotNull
-  List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList();
+  List<ElixirInterpolation> getInterpolationList();
 
 }

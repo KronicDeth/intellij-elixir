@@ -11,6 +11,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitInterpolatedHeredoc(@NotNull ElixirInterpolatedHeredoc o) {
+    visitPsiElement(o);
+  }
+
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitPsiElement(o);
   }

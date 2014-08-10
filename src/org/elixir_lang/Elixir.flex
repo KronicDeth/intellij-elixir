@@ -42,15 +42,19 @@ SINGLE_QUOTED_STRING = {SINGLE_QUOTE} ("\\'" | [^'])* {SINGLE_QUOTE}
 DOUBLE_QUOTES = "\""
 ESCAPED_DOUBLE_QUOTES = "\\" {DOUBLE_QUOTES}
 ESCAPED_INTERPOLATION_START = "\\#"
-// ESCAPED_DOUBLE_QUOTES and INTERPOLATION_START are longer, so they win over this single character
-DOUBLE_QUOTED_STRING_CHARACTER = [^\"]
 
 INTERPOLATION_START = "#{"
 INTERPOLATION_END = "}"
 
+TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
+
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
 %state DOUBLE_QUOTED_STRING
+%state INTERPOLATED_HEREDOC_END
+%state INTERPOLATED_HEREDOC_LINE_BODY
+%state INTERPOLATED_HEREDOC_LINE_START
+%state INTERPOLATED_HEREDOC_START
 %state INTERPOLATION
 
 %%
@@ -66,6 +70,11 @@ INTERPOLATION_END = "}"
   {INTEGER}                   { yybegin(BODY); return ElixirTypes.NUMBER; }
 
   {SINGLE_QUOTED_STRING}      { yybegin(BODY); return ElixirTypes.SINGLE_QUOTED_STRING; }
+  {TRIPLE_DOUBLE_QUOTES}      { // return to BODY instead of YYINITIAL since beginning of file error handling has
+                                // fininished.
+                                lexicalStateStack.push(BODY);
+                                yybegin(INTERPOLATED_HEREDOC_START);
+                                return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
   {DOUBLE_QUOTES}             { // return to BODY instead of YYINITIAL since beginning of file error handling has
                                 // finished.
                                 lexicalStateStack.push(BODY);
@@ -75,17 +84,21 @@ INTERPOLATION_END = "}"
   .                           { yybegin(BODY); return TokenType.BAD_CHARACTER; }
 }
 
-
-<DOUBLE_QUOTED_STRING> {
+// Rules common to interpolated strings
+<DOUBLE_QUOTED_STRING, INTERPOLATED_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}            { lexicalStateStack.push(yystate());
                                      yybegin(INTERPOLATION);
                                      return ElixirTypes.INTERPOLATION_START; }
   {ESCAPED_DOUBLE_QUOTES}          { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
   {ESCAPED_INTERPOLATION_START}    { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
-  {DOUBLE_QUOTED_STRING_CHARACTER} { return ElixirTypes.STRING_FRAGMENT; }
-  {DOUBLE_QUOTES}                  { int previousLexicalState = lexicalStateStack.pop();
-                                     yybegin(previousLexicalState);
-                                     return ElixirTypes.DOUBLE_QUOTES; }
+}
+
+// Rules that aren't common to DOUBLE_QUOTED_STRING and INTERPOLATED_HEREDOC_BODY
+<DOUBLE_QUOTED_STRING> {
+  {DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
+                    yybegin(previousLexicalState);
+                    return ElixirTypes.DOUBLE_QUOTES; }
+  .               { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
@@ -104,6 +117,9 @@ INTERPOLATION_END = "}"
   {INTEGER}                   { return ElixirTypes.NUMBER; }
 
   {SINGLE_QUOTED_STRING}      { return ElixirTypes.SINGLE_QUOTED_STRING; }
+  {TRIPLE_DOUBLE_QUOTES}      { lexicalStateStack.push(yystate());
+                                yybegin(INTERPOLATED_HEREDOC_START);
+                                return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
   {DOUBLE_QUOTES}             { lexicalStateStack.push(yystate());
                                 yybegin(DOUBLE_QUOTED_STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
@@ -124,4 +140,38 @@ INTERPOLATION_END = "}"
                               }
 
   .                           { return TokenType.BAD_CHARACTER; }
+}
+
+/* The start of a heredoc is unique as we want to handle the error condition of having characters other than a newline
+   after the {TRIPLE_DOUBLE_QUOTES}:
+
+       iex> """a
+            ** (SyntaxError) iex:6: heredoc start must be followed by a new line after """ */
+<INTERPOLATED_HEREDOC_START> {
+  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
+}
+
+<INTERPOLATED_HEREDOC_LINE_START> {
+  /* TRIPLE_DOUBLE_QUOTES only end the heredoc when preceeded ONLY by whitespace on the line
+     iex(7)>     """
+     ...(7)>  hi
+     ...(7)>   there"""
+     ...(7)>
+     ...(7)> """
+     " hi\n  there\"\"\"\n\n" */
+  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(INTERPOLATED_HEREDOC_END); return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES} { yypushback(yylength()); yybegin(INTERPOLATED_HEREDOC_END); }
+  .                      { yypushback(yylength()); yybegin(INTERPOLATED_HEREDOC_LINE_BODY); }
+}
+
+<INTERPOLATED_HEREDOC_LINE_BODY> {
+  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
+  .     { return ElixirTypes.STRING_FRAGMENT; }
+}
+
+<INTERPOLATED_HEREDOC_END> {
+  {TRIPLE_DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
+                           yybegin(previousLexicalState);
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
 }
