@@ -22,6 +22,11 @@ import com.intellij.psi.TokenType;
     lexicalStateStack.push(yystate());
     yybegin(nextState);
   }
+
+  private void returnFromState() {
+    int previousLexicalState = lexicalStateStack.pop();
+    yybegin(previousLexicalState);
+  }
 %}
 
 EOL = \n|\r|\r\n
@@ -85,8 +90,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
 // Rules that aren't common to INTERPOLATED_STRING and INTERPOLATED_HEREDOC_BODY
 <INTERPOLATED_STRING> {
-  {DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
-                    yybegin(previousLexicalState);
+  {DOUBLE_QUOTES} { returnFromState();
                     return ElixirTypes.DOUBLE_QUOTES; }
   {EOL}|.         { return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
 }
@@ -123,10 +127,8 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 // Only rules for <INTERPOLATON>, but not <BODY> go here.
 // @note must be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
 <INTERPOLATION> {
-  {INTERPOLATION_END}         { int previousLexicalState = lexicalStateStack.pop();
-                                yybegin(previousLexicalState);
-                                return ElixirTypes.INTERPOLATION_END;
-                              }
+  {INTERPOLATION_END}         { returnFromState();
+                                return ElixirTypes.INTERPOLATION_END; }
 
   .                           { return TokenType.BAD_CHARACTER; }
 }
@@ -160,15 +162,13 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 }
 
 <INTERPOLATED_HEREDOC_END> {
-  {TRIPLE_DOUBLE_QUOTES} { int previousLexicalState = lexicalStateStack.pop();
-                           yybegin(previousLexicalState);
+  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
                            return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
 }
 
 <STRING> {
   {ESCAPED_SINGLE_QUOTE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
-  {SINGLE_QUOTE}         { int previousLexicalState = lexicalStateStack.pop();
-                           yybegin(previousLexicalState);
+  {SINGLE_QUOTE}         { returnFromState();
                            return ElixirTypes.SINGLE_QUOTE; }
   {EOL}|.                { return ElixirTypes.STRING_FRAGMENT; }
 }
