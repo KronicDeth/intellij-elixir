@@ -18,7 +18,7 @@ import com.intellij.psi.TokenType;
 %{
   private java.util.Stack<Integer> lexicalStateStack = new java.util.Stack<Integer>();
 
-  private void callState(int nextState) {
+  private void callState(int nextLexicalState) {
     lexicalStateStack.push(yystate());
     yybegin(nextState);
   }
@@ -26,6 +26,11 @@ import com.intellij.psi.TokenType;
   private void returnFromState() {
     int previousLexicalState = lexicalStateStack.pop();
     yybegin(previousLexicalState);
+  }
+
+  private void handleInState(int nextLexicalState) {
+    yypushback(yylength());
+    yybegin(nextLexicalState);
   }
 %}
 
@@ -74,10 +79,11 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
   /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
    * it is filtered out.
    */
-  ({EOL}|{WHITE_SPACE})+                                                { yybegin(BODY); return TokenType.WHITE_SPACE; }
+  ({EOL}|{WHITE_SPACE})+                                                      { yybegin(BODY);
+                                                                                return TokenType.WHITE_SPACE; }
 
   // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
-  {COMMENT}|{INTEGER}|{SINGLE_QUOTE}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { yypushback(yylength()); yybegin(BODY); }
+  {COMMENT}|{INTEGER}|{SINGLE_QUOTE}|{TRIPLE_DOUBLE_QUOTES}|{DOUBLE_QUOTES}|. { handleInState(BODY); }
 }
 
 // Rules common to interpolated strings
@@ -152,8 +158,8 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
      ...(7)> """
      " hi\n  there\"\"\"\n\n" */
   {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(INTERPOLATED_HEREDOC_END); return TokenType.WHITE_SPACE; }
-  {TRIPLE_DOUBLE_QUOTES} { yypushback(yylength()); yybegin(INTERPOLATED_HEREDOC_END); }
-  .                      { yypushback(yylength()); yybegin(INTERPOLATED_HEREDOC_LINE_BODY); }
+  {TRIPLE_DOUBLE_QUOTES} { handleInState(INTERPOLATED_HEREDOC_END); }
+  .                      { handleInState(INTERPOLATED_HEREDOC_LINE_BODY); }
 }
 
 <INTERPOLATED_HEREDOC_LINE_BODY> {
