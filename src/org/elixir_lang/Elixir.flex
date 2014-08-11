@@ -87,10 +87,10 @@ NON_WHITE_SPACE = {COMMENT} |
 %state CHAR_LIST_HEREDOC_LINE_START
 %state CHAR_LIST_HEREDOC_START
 %state STRING
-%state INTERPOLATED_HEREDOC_END
-%state INTERPOLATED_HEREDOC_LINE_BODY
-%state INTERPOLATED_HEREDOC_LINE_START
-%state INTERPOLATED_HEREDOC_START
+%state STRING_HEREDOC_END
+%state STRING_HEREDOC_LINE_BODY
+%state STRING_HEREDOC_LINE_START
+%state STRING_HEREDOC_START
 %state INTERPOLATION
 %state CHAR_LIST
 
@@ -107,17 +107,17 @@ NON_WHITE_SPACE = {COMMENT} |
   {NON_WHITE_SPACE}      { handleInState(BODY); }
 }
 
-// Rules common to interpolated CharLists and Strings
+// Rules common to CharLists and Strings
 <CHAR_LIST,
  CHAR_LIST_HEREDOC_LINE_BODY,
  STRING,
- INTERPOLATED_HEREDOC_LINE_BODY> {
+ STRING_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}   { callState(INTERPOLATION);
                             return ElixirTypes.INTERPOLATION_START; }
   {VALID_ESCAPE_SEQUENCE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
 }
 
-// Rules that aren't common to STRING and INTERPOLATED_HEREDOC_BODY
+// Rules that aren't common to STRING and STRING_HEREDOC_BODY
 <STRING> {
   {DOUBLE_QUOTES} { returnFromState();
                     return ElixirTypes.DOUBLE_QUOTES; }
@@ -143,7 +143,7 @@ NON_WHITE_SPACE = {COMMENT} |
                                 return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
   {SINGLE_QUOTE}              { callState(CHAR_LIST);
                                 return ElixirTypes.SINGLE_QUOTE; }
-  {TRIPLE_DOUBLE_QUOTES}      { callState(INTERPOLATED_HEREDOC_START);
+  {TRIPLE_DOUBLE_QUOTES}      { callState(STRING_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
   {DOUBLE_QUOTES}             { callState(STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
@@ -190,12 +190,12 @@ NON_WHITE_SPACE = {COMMENT} |
 
        iex> """a
             ** (SyntaxError) iex:6: heredoc start must be followed by a new line after """ */
-<INTERPOLATED_HEREDOC_START> {
-  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.EOL; }
+<STRING_HEREDOC_START> {
+  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.EOL; }
   .     { return TokenType.BAD_CHARACTER; }
 }
 
-<INTERPOLATED_HEREDOC_LINE_START> {
+<STRING_HEREDOC_LINE_START> {
   /* TRIPLE_DOUBLE_QUOTES only end the heredoc when preceeded ONLY by whitespace on the line
      iex(7)>     """
      ...(7)>  hi
@@ -203,17 +203,17 @@ NON_WHITE_SPACE = {COMMENT} |
      ...(7)>
      ...(7)> """
      " hi\n  there\"\"\"\n\n" */
-  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(INTERPOLATED_HEREDOC_END); return TokenType.WHITE_SPACE; }
-  {TRIPLE_DOUBLE_QUOTES} { handleInState(INTERPOLATED_HEREDOC_END); }
-  .                      { handleInState(INTERPOLATED_HEREDOC_LINE_BODY); }
+  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(STRING_HEREDOC_END); return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES} { handleInState(STRING_HEREDOC_END); }
+  .                      { handleInState(STRING_HEREDOC_LINE_BODY); }
 }
 
-<INTERPOLATED_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
+<STRING_HEREDOC_LINE_BODY> {
+  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
   .     { return ElixirTypes.STRING_FRAGMENT; }
 }
 
-<INTERPOLATED_HEREDOC_END> {
+<STRING_HEREDOC_END> {
   {TRIPLE_DOUBLE_QUOTES} { returnFromState();
                            return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
 }

@@ -10,9 +10,9 @@ public interface ElixirTypes {
 
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
-  IElementType INTERPOLATED_HEREDOC = new ElixirElementType("INTERPOLATED_HEREDOC");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType STRING = new ElixirElementType("STRING");
+  IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
 
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
@@ -36,14 +36,14 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
       }
-      else if (type == INTERPOLATED_HEREDOC) {
-        return new ElixirInterpolatedHeredocImpl(node);
-      }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
       }
       else if (type == STRING) {
         return new ElixirStringImpl(node);
+      }
+      else if (type == STRING_HEREDOC) {
+        return new ElixirStringHeredocImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

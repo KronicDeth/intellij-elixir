@@ -15,15 +15,15 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitInterpolatedHeredoc(@NotNull ElixirInterpolatedHeredoc o) {
-    visitPsiElement(o);
-  }
-
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitPsiElement(o);
   }
 
   public void visitString(@NotNull ElixirString o) {
+    visitPsiElement(o);
+  }
+
+  public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitPsiElement(o);
   }
 
