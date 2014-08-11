@@ -1,4 +1,4 @@
 Elixir File(0,2)
-  ElixirInterpolatedStringImpl(INTERPOLATED_STRING)(0,2)
+  ElixirStringImpl(STRING)(0,2)
     PsiElement(ElixirTokenType.DOUBLE_QUOTES)('"')(0,1)
     PsiElement(ElixirTokenType.DOUBLE_QUOTES)('"')(1,2)

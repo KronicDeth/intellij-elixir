@@ -42,8 +42,8 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedString> getInterpolatedStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedString.class);
+  public List<ElixirString> getStringList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
   }
 
 }

@@ -86,7 +86,7 @@ NON_WHITE_SPACE = {COMMENT} |
 %state CHAR_LIST_HEREDOC_LINE_BODY
 %state CHAR_LIST_HEREDOC_LINE_START
 %state CHAR_LIST_HEREDOC_START
-%state INTERPOLATED_STRING
+%state STRING
 %state INTERPOLATED_HEREDOC_END
 %state INTERPOLATED_HEREDOC_LINE_BODY
 %state INTERPOLATED_HEREDOC_LINE_START
@@ -110,18 +110,18 @@ NON_WHITE_SPACE = {COMMENT} |
 // Rules common to interpolated CharLists and Strings
 <CHAR_LIST,
  CHAR_LIST_HEREDOC_LINE_BODY,
- INTERPOLATED_STRING,
+ STRING,
  INTERPOLATED_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}   { callState(INTERPOLATION);
                             return ElixirTypes.INTERPOLATION_START; }
   {VALID_ESCAPE_SEQUENCE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
 }
 
-// Rules that aren't common to INTERPOLATED_STRING and INTERPOLATED_HEREDOC_BODY
-<INTERPOLATED_STRING> {
+// Rules that aren't common to STRING and INTERPOLATED_HEREDOC_BODY
+<STRING> {
   {DOUBLE_QUOTES} { returnFromState();
                     return ElixirTypes.DOUBLE_QUOTES; }
-  {EOL}|.         { return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
+  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
@@ -145,7 +145,7 @@ NON_WHITE_SPACE = {COMMENT} |
                                 return ElixirTypes.SINGLE_QUOTE; }
   {TRIPLE_DOUBLE_QUOTES}      { callState(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-  {DOUBLE_QUOTES}             { callState(INTERPOLATED_STRING);
+  {DOUBLE_QUOTES}             { callState(STRING);
                                 return ElixirTypes.DOUBLE_QUOTES; }
 }
 
@@ -209,8 +209,8 @@ NON_WHITE_SPACE = {COMMENT} |
 }
 
 <INTERPOLATED_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
-  .     { return ElixirTypes.INTERPOLATED_STRING_FRAGMENT; }
+  {EOL} { yybegin(INTERPOLATED_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
+  .     { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 <INTERPOLATED_HEREDOC_END> {

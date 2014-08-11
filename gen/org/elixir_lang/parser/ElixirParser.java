@@ -29,11 +29,11 @@ public class ElixirParser implements PsiParser {
     else if (root_ == INTERPOLATED_HEREDOC) {
       result_ = interpolatedHeredoc(builder_, 0);
     }
-    else if (root_ == INTERPOLATED_STRING) {
-      result_ = interpolatedString(builder_, 0);
-    }
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
+    }
+    else if (root_ == STRING) {
+      result_ = string(builder_, 0);
     }
     else {
       result_ = parse_root_(root_, builder_, 0);
@@ -85,7 +85,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER | charList | charListHeredoc | interpolatedString | interpolatedHeredoc
+  // NUMBER | charList | charListHeredoc | interpolatedHeredoc | string
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
@@ -93,8 +93,8 @@ public class ElixirParser implements PsiParser {
     result_ = consumeToken(builder_, NUMBER);
     if (!result_) result_ = charList(builder_, level_ + 1);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
-    if (!result_) result_ = interpolatedString(builder_, level_ + 1);
     if (!result_) result_ = interpolatedHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = string(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -184,23 +184,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // DOUBLE_QUOTES
-  //                        interpolatedStringBody
-  //                        DOUBLE_QUOTES
-  public static boolean interpolatedString(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "interpolatedString")) return false;
-    if (!nextTokenIs(builder_, DOUBLE_QUOTES)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, DOUBLE_QUOTES);
-    result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, DOUBLE_QUOTES);
-    exit_section_(builder_, marker_, INTERPOLATED_STRING, result_);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // (interpolation | INTERPOLATED_STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  // (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
   static boolean interpolatedStringBody(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedStringBody")) return false;
     int pos_ = current_position_(builder_);
@@ -212,13 +196,13 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // interpolation | INTERPOLATED_STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
+  // interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE
   private static boolean interpolatedStringBody_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedStringBody_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = interpolation(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, INTERPOLATED_STRING_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, STRING_FRAGMENT);
     if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
     exit_section_(builder_, marker_, null, result_);
     return result_;
@@ -243,6 +227,22 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "interpolation_1")) return false;
     expressionList(builder_, level_ + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // DOUBLE_QUOTES
+  //            interpolatedStringBody
+  //            DOUBLE_QUOTES
+  public static boolean string(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "string")) return false;
+    if (!nextTokenIs(builder_, DOUBLE_QUOTES)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, DOUBLE_QUOTES);
+    result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, DOUBLE_QUOTES);
+    exit_section_(builder_, marker_, STRING, result_);
+    return result_;
   }
 
 }

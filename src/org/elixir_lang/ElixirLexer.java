@@ -13,7 +13,7 @@ import org.elixir_lang.psi.ElixirTypes;
 public class ElixirLexer extends LookAheadLexer {
     public static final TokenSet FRAGMENTS = TokenSet.create(
             ElixirTypes.CHAR_LIST_FRAGMENT,
-            ElixirTypes.INTERPOLATED_STRING_FRAGMENT
+            ElixirTypes.STRING_FRAGMENT
     );
 
     public ElixirLexer() {

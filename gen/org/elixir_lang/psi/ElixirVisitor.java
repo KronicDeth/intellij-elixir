@@ -19,11 +19,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitInterpolatedString(@NotNull ElixirInterpolatedString o) {
+  public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitPsiElement(o);
   }
 
-  public void visitInterpolation(@NotNull ElixirInterpolation o) {
+  public void visitString(@NotNull ElixirString o) {
     visitPsiElement(o);
   }
 
