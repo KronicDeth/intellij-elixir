@@ -11,15 +11,21 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirStringImpl extends ASTWrapperPsiElement implements ElixirString {
+public class ElixirCharListImpl extends ASTWrapperPsiElement implements ElixirCharList {
 
-  public ElixirStringImpl(ASTNode node) {
+  public ElixirCharListImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharList(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }
 
 }

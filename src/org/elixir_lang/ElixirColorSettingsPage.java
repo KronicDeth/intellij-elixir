@@ -17,11 +17,11 @@ import java.util.Map;
 public class ElixirColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
+            new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Interpolated String", ElixirSyntaxHighlighter.INTERPOLATED_STRING),
-            new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER),
-            new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING)
+            new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER)
     };
 
     @Nullable
@@ -45,7 +45,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "012345670 # deprecated octal\n" +
                 "0x1234567890abcdefABCDEF # hexadecimal\n" +
                 "0X1234567890abcdefABCDEF # deprecated hexadecimal\n" +
-                "'single quoted strings with \\' escapes '\n" +
+                "'This CharList\\'s body contains #{\"interpolation \\#{}\"} and escapes'\n" +
                 "\"Double quoted string with #{0x42} (interpolation) and contain \\\" and \\# (escapes)\"\n" +
                 "   \"\"\"\n" +
                 "   Interpolated #{0x42} heredoc\n" +

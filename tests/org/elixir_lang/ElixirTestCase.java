@@ -3,6 +3,7 @@ package org.elixir_lang;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.elixir_lang.parser_definition.CharListHeredocParsingTestCase;
+import org.elixir_lang.parser_definition.CharListParsingTestCase;
 
 /**
  * Created by luke.imhoff on 8/3/14.
@@ -13,7 +14,7 @@ public class ElixirTestCase extends TestCase {
 
         suite.addTestSuite(org.elixir_lang.parser_definition.GeneralParsingTestCase.class);
         suite.addTestSuite(CharListHeredocParsingTestCase.class);
-        suite.addTestSuite(org.elixir_lang.parser_definition.StringParsingTestCase.class);
+        suite.addTestSuite(CharListParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.double_quotes.BodyParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.double_quotes.YYInitialParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.triple_double_quotes.BodyParsingTestCase.class);

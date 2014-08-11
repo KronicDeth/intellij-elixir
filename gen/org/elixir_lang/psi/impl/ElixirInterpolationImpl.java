@@ -24,6 +24,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirCharList> getCharListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirCharListHeredoc> getCharListHeredocList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
   }
@@ -38,12 +44,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirInterpolatedString> getInterpolatedStringList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedString.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirString> getStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
   }
 
 }

@@ -21,6 +21,9 @@ elixirFile ::= expressionList
 
 // In alphabetical order
 
+charList ::= SINGLE_QUOTE
+             interpolatedCharListBody
+             SINGLE_QUOTE
 charListHeredoc ::= TRIPLE_SINGLE_QUOTE EOL
                     interpolatedCharListBody
                     TRIPLE_SINGLE_QUOTE
@@ -32,9 +35,6 @@ private interpolatedStringBody ::=  (interpolation | INTERPOLATED_STRING_FRAGMEN
 interpolatedHeredoc ::= TRIPLE_DOUBLE_QUOTES EOL
                         interpolatedStringBody
                         TRIPLE_DOUBLE_QUOTES
-private expression ::= (NUMBER | charListHeredoc | interpolatedString | interpolatedHeredoc | string)
+private expression ::= (NUMBER | charList | charListHeredoc | interpolatedString | interpolatedHeredoc)
 private expressionList ::= expression (EOL expression)* EOL?
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-string ::= SINGLE_QUOTE
-           (STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-           SINGLE_QUOTE

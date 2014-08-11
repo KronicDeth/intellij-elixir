@@ -92,7 +92,7 @@ NON_WHITE_SPACE = {COMMENT} |
 %state INTERPOLATED_HEREDOC_LINE_START
 %state INTERPOLATED_HEREDOC_START
 %state INTERPOLATION
-%state STRING
+%state CHAR_LIST
 
 %%
 
@@ -108,10 +108,13 @@ NON_WHITE_SPACE = {COMMENT} |
 }
 
 // Rules common to interpolated CharLists and Strings
-<CHAR_LIST_HEREDOC_LINE_BODY, INTERPOLATED_STRING, INTERPOLATED_HEREDOC_LINE_BODY> {
-  {INTERPOLATION_START}            { callState(INTERPOLATION);
-                                     return ElixirTypes.INTERPOLATION_START; }
-  {VALID_ESCAPE_SEQUENCE}          { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
+<CHAR_LIST,
+ CHAR_LIST_HEREDOC_LINE_BODY,
+ INTERPOLATED_STRING,
+ INTERPOLATED_HEREDOC_LINE_BODY> {
+  {INTERPOLATION_START}   { callState(INTERPOLATION);
+                            return ElixirTypes.INTERPOLATION_START; }
+  {VALID_ESCAPE_SEQUENCE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
 }
 
 // Rules that aren't common to INTERPOLATED_STRING and INTERPOLATED_HEREDOC_BODY
@@ -138,7 +141,7 @@ NON_WHITE_SPACE = {COMMENT} |
 
   {TRIPLE_SINGLE_QUOTE}       { callState(CHAR_LIST_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
-  {SINGLE_QUOTE}              { callState(STRING);
+  {SINGLE_QUOTE}              { callState(CHAR_LIST);
                                 return ElixirTypes.SINGLE_QUOTE; }
   {TRIPLE_DOUBLE_QUOTES}      { callState(INTERPOLATED_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
@@ -215,9 +218,8 @@ NON_WHITE_SPACE = {COMMENT} |
                            return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
 }
 
-<STRING> {
-  {ESCAPED_SINGLE_QUOTE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
+<CHAR_LIST> {
   {SINGLE_QUOTE}         { returnFromState();
                            return ElixirTypes.SINGLE_QUOTE; }
-  {EOL}|.                { return ElixirTypes.STRING_FRAGMENT; }
+  {EOL}|.                { return ElixirTypes.CHAR_LIST_FRAGMENT; }
 }
