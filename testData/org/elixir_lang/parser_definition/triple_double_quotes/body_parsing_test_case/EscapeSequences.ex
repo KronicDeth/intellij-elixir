@@ -1,3 +1,5 @@
 """
-\"\#{not interpolated}\"
+\'
+\"
+\#{not interpolated}
 """

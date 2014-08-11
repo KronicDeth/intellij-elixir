@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
-  List<ElixirHeredoc> getHeredocList();
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
   List<ElixirInterpolatedHeredoc> getInterpolatedHeredocList();

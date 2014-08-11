@@ -24,8 +24,8 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirHeredoc> getHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHeredoc.class);
+  public List<ElixirCharListHeredoc> getCharListHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
   }
 
   @Override

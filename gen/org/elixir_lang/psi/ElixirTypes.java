@@ -8,12 +8,13 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
-  IElementType HEREDOC = new ElixirElementType("HEREDOC");
+  IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType INTERPOLATED_HEREDOC = new ElixirElementType("INTERPOLATED_HEREDOC");
   IElementType INTERPOLATED_STRING = new ElixirElementType("INTERPOLATED_STRING");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType STRING = new ElixirElementType("STRING");
 
+  IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType DOUBLE_QUOTES = new ElixirTokenType("DOUBLE_QUOTES");
   IElementType EOL = new ElixirTokenType("EOL");
@@ -30,8 +31,8 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == HEREDOC) {
-        return new ElixirHeredocImpl(node);
+       if (type == CHAR_LIST_HEREDOC) {
+        return new ElixirCharListHeredocImpl(node);
       }
       else if (type == INTERPOLATED_HEREDOC) {
         return new ElixirInterpolatedHeredocImpl(node);

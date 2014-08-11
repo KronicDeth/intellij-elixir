@@ -11,7 +11,11 @@ import org.elixir_lang.psi.ElixirTypes;
  * Created by luke.imhoff on 8/3/14.
  */
 public class ElixirLexer extends LookAheadLexer {
-    public static final TokenSet FRAGMENTS = TokenSet.create(ElixirTypes.INTERPOLATED_STRING_FRAGMENT, ElixirTypes.STRING_FRAGMENT);
+    public static final TokenSet FRAGMENTS = TokenSet.create(
+            ElixirTypes.CHAR_LIST_FRAGMENT,
+            ElixirTypes.INTERPOLATED_STRING_FRAGMENT,
+            ElixirTypes.STRING_FRAGMENT
+    );
 
     public ElixirLexer() {
         super(

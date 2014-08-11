@@ -1,0 +1,7 @@
+Elixir File(0,25)
+  ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,25)
+    PsiElement(ElixirTokenType.TRIPLE_SINGLE_QUOTE)(''''')(0,3)
+    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
+    PsiElement(ElixirTokenType.CHAR_LIST_FRAGMENT)('  hi\n   there'''\n')(4,21)
+    PsiWhiteSpace(' ')(21,22)
+    PsiElement(ElixirTokenType.TRIPLE_SINGLE_QUOTE)(''''')(22,25)
