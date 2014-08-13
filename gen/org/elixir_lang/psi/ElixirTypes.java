@@ -8,16 +8,16 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
-  IElementType HEREDOC = new ElixirElementType("HEREDOC");
-  IElementType INTERPOLATED_HEREDOC = new ElixirElementType("INTERPOLATED_HEREDOC");
-  IElementType INTERPOLATED_STRING = new ElixirElementType("INTERPOLATED_STRING");
+  IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
+  IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType STRING = new ElixirElementType("STRING");
+  IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
 
+  IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType DOUBLE_QUOTES = new ElixirTokenType("DOUBLE_QUOTES");
   IElementType EOL = new ElixirTokenType("EOL");
-  IElementType INTERPOLATED_STRING_FRAGMENT = new ElixirTokenType("INTERPOLATED_STRING_FRAGMENT");
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
@@ -30,20 +30,20 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == HEREDOC) {
-        return new ElixirHeredocImpl(node);
+       if (type == CHAR_LIST) {
+        return new ElixirCharListImpl(node);
       }
-      else if (type == INTERPOLATED_HEREDOC) {
-        return new ElixirInterpolatedHeredocImpl(node);
-      }
-      else if (type == INTERPOLATED_STRING) {
-        return new ElixirInterpolatedStringImpl(node);
+      else if (type == CHAR_LIST_HEREDOC) {
+        return new ElixirCharListHeredocImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
       }
       else if (type == STRING) {
         return new ElixirStringImpl(node);
+      }
+      else if (type == STRING_HEREDOC) {
+        return new ElixirStringHeredocImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirInterpolatedString extends PsiElement {
+public interface ElixirCharList extends PsiElement {
 
   @NotNull
   List<ElixirInterpolation> getInterpolationList();

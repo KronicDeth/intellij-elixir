@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirInterpolatedStringImpl extends ASTWrapperPsiElement implements ElixirInterpolatedString {
+public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements ElixirStringHeredoc {
 
-  public ElixirInterpolatedStringImpl(ASTNode node) {
+  public ElixirStringHeredocImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStringHeredoc(this);
     else super.accept(visitor);
   }
 

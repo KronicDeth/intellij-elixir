@@ -7,15 +7,11 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
-  public void visitHeredoc(@NotNull ElixirHeredoc o) {
+  public void visitCharList(@NotNull ElixirCharList o) {
     visitPsiElement(o);
   }
 
-  public void visitInterpolatedHeredoc(@NotNull ElixirInterpolatedHeredoc o) {
-    visitPsiElement(o);
-  }
-
-  public void visitInterpolatedString(@NotNull ElixirInterpolatedString o) {
+  public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
     visitPsiElement(o);
   }
 
@@ -24,6 +20,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitString(@NotNull ElixirString o) {
+    visitPsiElement(o);
+  }
+
+  public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitPsiElement(o);
   }
 

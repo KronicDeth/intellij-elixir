@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirString extends PsiElement {
 
+  @NotNull
+  List<ElixirInterpolation> getInterpolationList();
+
 }

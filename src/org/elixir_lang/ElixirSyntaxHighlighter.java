@@ -28,6 +28,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             HighlighterColors.BAD_CHARACTER
     );
 
+    public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
+            "ELIXIR_CHAR_LIST",
+            DefaultLanguageHighlighterColors.STRING
+    );
+
     public static final TextAttributesKey COMMENT = createTextAttributesKey(
             "ELIXIR_COMMENT",
             DefaultLanguageHighlighterColors.LINE_COMMENT
@@ -36,11 +41,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
             "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
             DefaultLanguageHighlighterColors.PARENTHESES
-    );
-
-    public static final TextAttributesKey INTERPOLATED_STRING = createTextAttributesKey(
-            "ELIXIR_INTERPOLATED_STRING",
-            DefaultLanguageHighlighterColors.STRING
     );
 
     public static final TextAttributesKey NUMBER = createTextAttributesKey(
@@ -59,27 +59,28 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     );
 
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
+    private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
-    private static final TextAttributesKey[] INTERPOLATED_STRING_KEYS = new TextAttributesKey[]{INTERPOLATED_STRING};
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
 
+
+    private static final TokenSet CHAR_LISTS = TokenSet.create(
+            ElixirTypes.SINGLE_QUOTE,
+            ElixirTypes.CHAR_LIST_FRAGMENT,
+            ElixirTypes.TRIPLE_SINGLE_QUOTE
+    );
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
             ElixirTypes.INTERPOLATION_END
     );
-    private static final TokenSet INTERPOLATED_STRINGS = TokenSet.create(
-            ElixirTypes.DOUBLE_QUOTES,
-            ElixirTypes.TRIPLE_DOUBLE_QUOTES,
-            ElixirTypes.INTERPOLATED_STRING_FRAGMENT
-    );
     private static final TokenSet STRINGS = TokenSet.create(
-            ElixirTypes.SINGLE_QUOTE,
+            ElixirTypes.DOUBLE_QUOTES,
             ElixirTypes.STRING_FRAGMENT,
-            ElixirTypes.TRIPLE_SINGLE_QUOTE
+            ElixirTypes.TRIPLE_DOUBLE_QUOTES
     );
 
     @NotNull
@@ -93,12 +94,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
         if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
+        } else if (CHAR_LISTS.contains(tokenType)) {
+            return CHAR_LIST_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMENT)) {
             return COMMENT_KEYS;
         } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {
             return EXPRESSION_SUBSTITUTION_MARK_KEYS;
-        } else if (INTERPOLATED_STRINGS.contains(tokenType)) {
-            return INTERPOLATED_STRING_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
         } else if (STRINGS.contains(tokenType)) {

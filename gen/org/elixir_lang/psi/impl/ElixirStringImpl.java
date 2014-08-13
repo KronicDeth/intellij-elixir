@@ -22,4 +22,10 @@ public class ElixirStringImpl extends ASTWrapperPsiElement implements ElixirStri
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  }
+
 }
