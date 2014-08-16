@@ -23,19 +23,27 @@ import com.intellij.psi.TokenType;
     yybegin(nextLexicalState);
   }
 
-  private void returnFromState() {
-    int previousLexicalState = lexicalStateStack.pop();
-    yybegin(previousLexicalState);
-  }
-
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
   }
+
+  private void returnFromState() {
+    int previousLexicalState = lexicalStateStack.pop();
+    yybegin(previousLexicalState);
+  }
 %}
+
+/*
+ * White Space
+ */
 
 EOL = \n|\r|\r\n
 WHITE_SPACE=[\ \t\f]
+
+/*
+ *  Comments
+ */
 
 COMMENT = "#" [^\r\n]* {EOL}?
 
@@ -51,24 +59,43 @@ HEXADECIMAL_INTEGER = "0" [Xx][A-Fa-f0-9]+
 OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
-ESCAPE = "\\"
-
-SINGLE_QUOTE = "'"
-ESCAPED_SINGLE_QUOTE = {ESCAPE} {SINGLE_QUOTE}
-
-DOUBLE_QUOTES = "\""
-ESCAPED_DOUBLE_QUOTES = {ESCAPE} {DOUBLE_QUOTES}
+/*
+ * Interpolation
+ */
 
 INTERPOLATION_START = "#{"
-ESCAPED_INTERPOLATION_START = {ESCAPE} {INTERPOLATION_START}
 INTERPOLATION_END = "}"
+
+/*
+ *  Quotations
+ */
+
+DOUBLE_QUOTES = "\""
+SINGLE_QUOTE = "'"
+
+/*
+ *  Heredoc
+ */
 
 TRIPLE_SINGLE_QUOTE = {SINGLE_QUOTE}{3}
 TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
+/*
+ * Escape Sequences
+ */
+
+ESCAPE = "\\"
+ESCAPED_DOUBLE_QUOTES = {ESCAPE} {DOUBLE_QUOTES}
+ESCAPED_SINGLE_QUOTE = {ESCAPE} {SINGLE_QUOTE}
+ESCAPED_INTERPOLATION_START = {ESCAPE} {INTERPOLATION_START}
+
 VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                         {ESCAPED_SINGLE_QUOTE} |
                         {ESCAPED_INTERPOLATION_START}
+
+/*
+ *  Non-White Space
+ */
 
 NON_WHITE_SPACE = {COMMENT} |
                   {INTEGER} |
@@ -80,22 +107,27 @@ NON_WHITE_SPACE = {COMMENT} |
                   {DOUBLE_QUOTES} |
                   .
 
+/*
+ *  States - Ordered lexigraphically
+ */
+
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
+%state CHAR_LIST
 %state CHAR_LIST_HEREDOC_END
 %state CHAR_LIST_HEREDOC_LINE_BODY
 %state CHAR_LIST_HEREDOC_LINE_START
 %state CHAR_LIST_HEREDOC_START
+%state INTERPOLATION
 %state STRING
 %state STRING_HEREDOC_END
 %state STRING_HEREDOC_LINE_BODY
 %state STRING_HEREDOC_LINE_START
 %state STRING_HEREDOC_START
-%state INTERPOLATION
-%state CHAR_LIST
 
 %%
 
+// YYINITIAL is first even though it isn't lexicographically first because it is the first state.
 <YYINITIAL> {
   /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
    * it is filtered out.
@@ -107,6 +139,11 @@ NON_WHITE_SPACE = {COMMENT} |
   {NON_WHITE_SPACE}      { handleInState(BODY); }
 }
 
+/*
+ *  Lexical rules - Ordered alphabetically by state name except when the order of the internal rules need to be
+ *  maintained to ensure precedence.
+ */
+
 // Rules common to CharLists and Strings
 <CHAR_LIST,
  CHAR_LIST_HEREDOC_LINE_BODY,
@@ -115,13 +152,6 @@ NON_WHITE_SPACE = {COMMENT} |
   {INTERPOLATION_START}   { callState(INTERPOLATION);
                             return ElixirTypes.INTERPOLATION_START; }
   {VALID_ESCAPE_SEQUENCE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
-}
-
-// Rules that aren't common to STRING and STRING_HEREDOC_BODY
-<STRING> {
-  {DOUBLE_QUOTES} { returnFromState();
-                    return ElixirTypes.DOUBLE_QUOTES; }
-  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
@@ -155,6 +185,33 @@ NON_WHITE_SPACE = {COMMENT} |
   .                           { return TokenType.BAD_CHARACTER; }
 }
 
+<CHAR_LIST> {
+  {SINGLE_QUOTE}         { returnFromState();
+                           return ElixirTypes.SINGLE_QUOTE; }
+  {EOL}|.                { return ElixirTypes.CHAR_LIST_FRAGMENT; }
+}
+
+<CHAR_LIST_HEREDOC_END> {
+  {TRIPLE_SINGLE_QUOTE} { returnFromState();
+                          return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
+}
+
+<CHAR_LIST_HEREDOC_LINE_BODY> {
+  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.CHAR_LIST_FRAGMENT; }
+  .     { return ElixirTypes.CHAR_LIST_FRAGMENT; }
+}
+
+<CHAR_LIST_HEREDOC_LINE_START> {
+  {WHITE_SPACE}+ / {TRIPLE_SINGLE_QUOTE} { yybegin(CHAR_LIST_HEREDOC_END); return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES}                 { handleInState(CHAR_LIST_HEREDOC_END); }
+  .                                      { handleInState(CHAR_LIST_HEREDOC_LINE_BODY); }
+}
+
+<CHAR_LIST_HEREDOC_START> {
+  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
+}
+
 // Only rules for <INTERPOLATON>, but not <BODY> go here.
 // @note must be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
 <INTERPOLATION> {
@@ -164,35 +221,21 @@ NON_WHITE_SPACE = {COMMENT} |
   .                           { return TokenType.BAD_CHARACTER; }
 }
 
-<CHAR_LIST_HEREDOC_START> {
-  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.EOL; }
-  .     { return TokenType.BAD_CHARACTER; }
+// Rules that aren't common to STRING and STRING_HEREDOC_BODY
+<STRING> {
+  {DOUBLE_QUOTES} { returnFromState();
+                    return ElixirTypes.DOUBLE_QUOTES; }
+  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
 }
 
-<CHAR_LIST_HEREDOC_LINE_START> {
-  {WHITE_SPACE}+ / {TRIPLE_SINGLE_QUOTE} { yybegin(CHAR_LIST_HEREDOC_END); return TokenType.WHITE_SPACE; }
-  {TRIPLE_DOUBLE_QUOTES}                 { handleInState(CHAR_LIST_HEREDOC_END); }
-  .                                      { handleInState(CHAR_LIST_HEREDOC_LINE_BODY); }
+<STRING_HEREDOC_END> {
+  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
 }
 
-<CHAR_LIST_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.CHAR_LIST_FRAGMENT; }
-  .     { return ElixirTypes.CHAR_LIST_FRAGMENT; }
-}
-
-<CHAR_LIST_HEREDOC_END> {
-  {TRIPLE_SINGLE_QUOTE} { returnFromState();
-                          return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
-}
-
-/* The start of a heredoc is unique as we want to handle the error condition of having characters other than a newline
-   after the {TRIPLE_DOUBLE_QUOTES}:
-
-       iex> """a
-            ** (SyntaxError) iex:6: heredoc start must be followed by a new line after """ */
-<STRING_HEREDOC_START> {
-  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.EOL; }
-  .     { return TokenType.BAD_CHARACTER; }
+<STRING_HEREDOC_LINE_BODY> {
+  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
+  .     { return ElixirTypes.STRING_FRAGMENT; }
 }
 
 <STRING_HEREDOC_LINE_START> {
@@ -208,18 +251,12 @@ NON_WHITE_SPACE = {COMMENT} |
   .                      { handleInState(STRING_HEREDOC_LINE_BODY); }
 }
 
-<STRING_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
-  .     { return ElixirTypes.STRING_FRAGMENT; }
-}
+/* The start of a heredoc is unique as we want to handle the error condition of having characters other than a newline
+   after the {TRIPLE_DOUBLE_QUOTES}:
 
-<STRING_HEREDOC_END> {
-  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
-                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-}
-
-<CHAR_LIST> {
-  {SINGLE_QUOTE}         { returnFromState();
-                           return ElixirTypes.SINGLE_QUOTE; }
-  {EOL}|.                { return ElixirTypes.CHAR_LIST_FRAGMENT; }
+       iex> """a
+            ** (SyntaxError) iex:6: heredoc start must be followed by a new line after """ */
+<STRING_HEREDOC_START> {
+  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
 }
