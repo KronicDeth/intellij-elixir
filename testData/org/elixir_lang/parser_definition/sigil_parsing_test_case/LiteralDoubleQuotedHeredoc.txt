@@ -1,0 +1,8 @@
+Elixir File(0,26)
+  ElixirSigilImpl(SIGIL)(0,26)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.SIGIL_LITERAL_NAME)('S')(1,2)
+    PsiElement(ElixirTokenType.TRIPLE_DOUBLE_QUOTES)('"""')(2,5)
+    PsiElement(ElixirTokenType.EOL)('\n')(5,6)
+    PsiElement(ElixirTokenType.SIGIL_FRAGMENT)('\"\#{0x1}\n#{0x1}\n')(6,23)
+    PsiElement(ElixirTokenType.TRIPLE_DOUBLE_QUOTES)('"""')(23,26)

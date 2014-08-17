@@ -8,6 +8,10 @@ public class SigilParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testLiteralDoubleQuotedHeredoc() {
+        doTest(true);
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/sigil_parsing_test_case";

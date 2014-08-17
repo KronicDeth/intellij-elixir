@@ -172,6 +172,22 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // TILDE SIGIL_INTERPOLATING_NAME TRIPLE_DOUBLE_QUOTES EOL
+  //                               interpolatedSigilBody
+  //                               TRIPLE_DOUBLE_QUOTES
+  static boolean interpolatedSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, SIGIL_INTERPOLATING_NAME, TRIPLE_DOUBLE_QUOTES, EOL);
+    result_ = result_ && interpolatedSigilBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
   // (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
   static boolean interpolatedSigilBody(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedSigilBody")) return false;
@@ -243,17 +259,43 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE SIGIL_INTERPOLATING_NAME TRIPLE_DOUBLE_QUOTES EOL
-  //           interpolatedSigilBody
-  //           TRIPLE_DOUBLE_QUOTES
+  // TILDE SIGIL_LITERAL_NAME TRIPLE_DOUBLE_QUOTES EOL
+  //                          literalSigilBody
+  //                          TRIPLE_DOUBLE_QUOTES
+  static boolean literalSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, SIGIL_LITERAL_NAME, TRIPLE_DOUBLE_QUOTES, EOL);
+    result_ = result_ && literalSigilBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // SIGIL_FRAGMENT*
+  static boolean literalSigilBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalSigilBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, SIGIL_FRAGMENT)) break;
+      if (!empty_element_parsed_guard_(builder_, "literalSigilBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // interpolatedSigil | literalSigil
   public static boolean sigil(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "sigil")) return false;
     if (!nextTokenIs(builder_, TILDE)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, TILDE, SIGIL_INTERPOLATING_NAME, TRIPLE_DOUBLE_QUOTES, EOL);
-    result_ = result_ && interpolatedSigilBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    result_ = interpolatedSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalSigil(builder_, level_ + 1);
     exit_section_(builder_, marker_, SIGIL, result_);
     return result_;
   }

@@ -30,15 +30,20 @@ charListHeredoc ::= TRIPLE_SINGLE_QUOTE EOL
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+private interpolatedSigil ::= TILDE SIGIL_INTERPOLATING_NAME TRIPLE_DOUBLE_QUOTES EOL
+                              interpolatedSigilBody
+                              TRIPLE_DOUBLE_QUOTES
+private literalSigil ::= TILDE SIGIL_LITERAL_NAME TRIPLE_DOUBLE_QUOTES EOL
+                         literalSigilBody
+                         TRIPLE_DOUBLE_QUOTES
+private literalSigilBody ::= SIGIL_FRAGMENT*
 stringHeredoc ::= TRIPLE_DOUBLE_QUOTES EOL
                   interpolatedStringBody
                   TRIPLE_DOUBLE_QUOTES
 private expression ::= (NUMBER | charList | charListHeredoc | sigil | string | stringHeredoc)
 private expressionList ::= expression (EOL expression)* EOL?
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-sigil ::= TILDE SIGIL_INTERPOLATING_NAME TRIPLE_DOUBLE_QUOTES EOL
-          interpolatedSigilBody
-          TRIPLE_DOUBLE_QUOTES
+sigil ::= interpolatedSigil | literalSigil
 string ::= DOUBLE_QUOTES
            interpolatedStringBody
            DOUBLE_QUOTES

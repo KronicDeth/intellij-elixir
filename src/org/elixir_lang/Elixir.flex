@@ -86,6 +86,7 @@ TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
 TILDE = "~"
 SIGIL_INTERPOLATING_NAME = [a-z]
+SIGIL_LITERAL_NAME = [A-Z]
 
 /*
  * Escape Sequences
@@ -132,6 +133,11 @@ NON_WHITE_SPACE = {COMMENT} |
 %state INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_START
 %state INTERPOLATING_SIGIL
 %state INTERPOLATION
+%state LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_END
+%state LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY
+%state LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START
+%state LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_START
+%state LITERAL_SIGIL
 %state SIGIL
 %state STRING
 %state STRING_HEREDOC_END
@@ -269,9 +275,41 @@ NON_WHITE_SPACE = {COMMENT} |
   .                           { return TokenType.BAD_CHARACTER; }
 }
 
+<LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_END> {
+  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
+}
+
+<LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY> {
+  {EOL}                   { yybegin(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START);
+                            return ElixirTypes.SIGIL_FRAGMENT; }
+  .                       { return ElixirTypes.SIGIL_FRAGMENT; }
+}
+
+<LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START> {
+  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_END);
+                                            return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES}                  { handleInState(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_END); }
+  .                                       { handleInState(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY); }
+}
+
+<LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_START> {
+  {EOL} { yybegin(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START);
+          return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
+}
+
+<LITERAL_SIGIL> {
+  {TRIPLE_DOUBLE_QUOTES} { yybegin(LITERAL_DOUBLE_QUOTED_HEREDOC_SIGIL_START);
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
+  .                      { return TokenType.BAD_CHARACTER; }
+}
+
 <SIGIL> {
   {SIGIL_INTERPOLATING_NAME} { yybegin(INTERPOLATING_SIGIL);
                                return ElixirTypes.SIGIL_INTERPOLATING_NAME; }
+  {SIGIL_LITERAL_NAME}       { yybegin(LITERAL_SIGIL);
+                               return ElixirTypes.SIGIL_LITERAL_NAME; }
   .                          { return TokenType.BAD_CHARACTER; }
 }
 

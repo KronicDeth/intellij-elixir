@@ -24,6 +24,7 @@ public interface ElixirTypes {
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_INTERPOLATING_NAME = new ElixirTokenType("SIGIL_INTERPOLATING_NAME");
+  IElementType SIGIL_LITERAL_NAME = new ElixirTokenType("SIGIL_LITERAL_NAME");
   IElementType SINGLE_QUOTE = new ElixirTokenType("SINGLE_QUOTE");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
   IElementType TILDE = new ElixirTokenType("TILDE");
