@@ -19,6 +19,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitSigil(@NotNull ElixirSigil o) {
+    visitPsiElement(o);
+  }
+
   public void visitString(@NotNull ElixirString o) {
     visitPsiElement(o);
   }

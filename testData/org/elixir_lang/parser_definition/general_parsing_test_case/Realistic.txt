@@ -1,5 +1,5 @@
 Elixir File(0,900)
-  PsiErrorElement:ElixirTokenType.DOUBLE_QUOTES, ElixirTokenType.NUMBER, ElixirTokenType.SINGLE_QUOTE, ElixirTokenType.TRIPLE_DOUBLE_QUOTES or ElixirTokenType.TRIPLE_SINGLE_QUOTE expected, got 'd'(0,1)
+  PsiErrorElement:ElixirTokenType.DOUBLE_QUOTES, ElixirTokenType.NUMBER, ElixirTokenType.SINGLE_QUOTE, ElixirTokenType.TILDE, ElixirTokenType.TRIPLE_DOUBLE_QUOTES or ElixirTokenType.TRIPLE_SINGLE_QUOTE expected, got 'd'(0,1)
     PsiElement(BAD_CHARACTER)('d')(0,1)
   PsiElement(DUMMY_BLOCK)(1,243)
     PsiElement(DUMMY_BLOCK)(1,12)

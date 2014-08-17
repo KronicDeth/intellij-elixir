@@ -14,6 +14,9 @@ public interface ElixirInterpolation extends PsiElement {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
+  List<ElixirSigil> getSigilList();
+
+  @NotNull
   List<ElixirString> getStringList();
 
   @NotNull

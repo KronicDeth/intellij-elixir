@@ -81,6 +81,13 @@ TRIPLE_SINGLE_QUOTE = {SINGLE_QUOTE}{3}
 TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
 
 /*
+ *  Sigils
+ */
+
+TILDE = "~"
+SIGIL_INTERPOLATING_NAME = [a-z]
+
+/*
  * Escape Sequences
  */
 
@@ -99,6 +106,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 
 NON_WHITE_SPACE = {COMMENT} |
                   {INTEGER} |
+                  {TILDE} |
                   // MUST be before {SINGLE_QUOTE} so that 3 {SINGLE_QUOTE} are NOT matched as (1,1,1)
                   {TRIPLE_SINGLE_QUOTE} |
                   {SINGLE_QUOTE} |
@@ -118,7 +126,13 @@ NON_WHITE_SPACE = {COMMENT} |
 %state CHAR_LIST_HEREDOC_LINE_BODY
 %state CHAR_LIST_HEREDOC_LINE_START
 %state CHAR_LIST_HEREDOC_START
+%state INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_END
+%state INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY
+%state INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START
+%state INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_START
+%state INTERPOLATING_SIGIL
 %state INTERPOLATION
+%state SIGIL
 %state STRING
 %state STRING_HEREDOC_END
 %state STRING_HEREDOC_LINE_BODY
@@ -147,6 +161,7 @@ NON_WHITE_SPACE = {COMMENT} |
 // Rules common to CharLists and Strings
 <CHAR_LIST,
  CHAR_LIST_HEREDOC_LINE_BODY,
+ INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY,
  STRING,
  STRING_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}   { callState(INTERPOLATION);
@@ -168,6 +183,9 @@ NON_WHITE_SPACE = {COMMENT} |
   {COMMENT}                   { return ElixirTypes.COMMENT; }
 
   {INTEGER}                   { return ElixirTypes.NUMBER; }
+
+  {TILDE}                     { callState(SIGIL);
+                                return ElixirTypes.TILDE; }
 
   {TRIPLE_SINGLE_QUOTE}       { callState(CHAR_LIST_HEREDOC_START);
                                 return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
@@ -212,6 +230,36 @@ NON_WHITE_SPACE = {COMMENT} |
   .     { return TokenType.BAD_CHARACTER; }
 }
 
+<INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_END> {
+  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
+}
+
+<INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY> {
+  {EOL}                   { yybegin(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START);
+                            return ElixirTypes.SIGIL_FRAGMENT; }
+  .                       { return ElixirTypes.SIGIL_FRAGMENT; }
+}
+
+<INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START> {
+  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_END);
+                                            return TokenType.WHITE_SPACE; }
+  {TRIPLE_DOUBLE_QUOTES}                  { handleInState(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_END); }
+  .                                       { handleInState(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_BODY); }
+}
+
+<INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_START> {
+  {EOL} { yybegin(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_LINE_START);
+          return ElixirTypes.EOL; }
+  .     { return TokenType.BAD_CHARACTER; }
+}
+
+<INTERPOLATING_SIGIL> {
+  {TRIPLE_DOUBLE_QUOTES} { yybegin(INTERPOLATING_DOUBLE_QUOTED_HEREDOC_SIGIL_START);
+                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
+  .                      { return TokenType.BAD_CHARACTER; }
+}
+
 // Only rules for <INTERPOLATON>, but not <BODY> go here.
 // @note must be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
 <INTERPOLATION> {
@@ -219,6 +267,12 @@ NON_WHITE_SPACE = {COMMENT} |
                                 return ElixirTypes.INTERPOLATION_END; }
 
   .                           { return TokenType.BAD_CHARACTER; }
+}
+
+<SIGIL> {
+  {SIGIL_INTERPOLATING_NAME} { yybegin(INTERPOLATING_SIGIL);
+                               return ElixirTypes.SIGIL_INTERPOLATING_NAME; }
+  .                          { return TokenType.BAD_CHARACTER; }
 }
 
 // Rules that aren't common to STRING and STRING_HEREDOC_BODY

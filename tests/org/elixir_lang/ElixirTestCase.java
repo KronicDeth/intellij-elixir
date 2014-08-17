@@ -13,6 +13,7 @@ public class ElixirTestCase extends TestCase {
         TestSuite suite = new TestSuite();
 
         suite.addTestSuite(org.elixir_lang.parser_definition.GeneralParsingTestCase.class);
+        suite.addTestSuite(org.elixir_lang.parser_definition.SigilParsingTestCase.class);
         suite.addTestSuite(CharListHeredocParsingTestCase.class);
         suite.addTestSuite(CharListParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.double_quotes.BodyParsingTestCase.class);
