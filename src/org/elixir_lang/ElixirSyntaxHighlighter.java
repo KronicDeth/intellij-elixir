@@ -69,18 +69,22 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
 
     private static final TokenSet CHAR_LISTS = TokenSet.create(
-            ElixirTypes.SINGLE_QUOTE,
             ElixirTypes.CHAR_LIST_FRAGMENT,
-            ElixirTypes.TRIPLE_SINGLE_QUOTE
+            ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,
+            ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,
+            ElixirTypes.CHAR_LIST_PROMOTER,
+            ElixirTypes.CHAR_LIST_TERMINATOR
     );
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
             ElixirTypes.INTERPOLATION_END
     );
     private static final TokenSet STRINGS = TokenSet.create(
-            ElixirTypes.DOUBLE_QUOTES,
             ElixirTypes.STRING_FRAGMENT,
-            ElixirTypes.TRIPLE_DOUBLE_QUOTES
+            ElixirTypes.STRING_HEREDOC_PROMOTER,
+            ElixirTypes.STRING_HEREDOC_TERMINATOR,
+            ElixirTypes.STRING_PROMOTER,
+            ElixirTypes.STRING_TERMINATOR
     );
 
     @NotNull

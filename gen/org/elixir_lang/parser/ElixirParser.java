@@ -50,33 +50,33 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // SINGLE_QUOTE
+  // CHAR_LIST_PROMOTER
   //              interpolatedCharListBody
-  //              SINGLE_QUOTE
+  //              CHAR_LIST_TERMINATOR
   public static boolean charList(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "charList")) return false;
-    if (!nextTokenIs(builder_, SINGLE_QUOTE)) return false;
+    if (!nextTokenIs(builder_, CHAR_LIST_PROMOTER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, SINGLE_QUOTE);
+    result_ = consumeToken(builder_, CHAR_LIST_PROMOTER);
     result_ = result_ && interpolatedCharListBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, SINGLE_QUOTE);
+    result_ = result_ && consumeToken(builder_, CHAR_LIST_TERMINATOR);
     exit_section_(builder_, marker_, CHAR_LIST, result_);
     return result_;
   }
 
   /* ********************************************************** */
-  // TRIPLE_SINGLE_QUOTE EOL
+  // CHAR_LIST_HEREDOC_PROMOTER EOL
   //                     interpolatedCharListBody
-  //                     TRIPLE_SINGLE_QUOTE
+  //                     CHAR_LIST_HEREDOC_TERMINATOR
   public static boolean charListHeredoc(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "charListHeredoc")) return false;
-    if (!nextTokenIs(builder_, TRIPLE_SINGLE_QUOTE)) return false;
+    if (!nextTokenIs(builder_, CHAR_LIST_HEREDOC_PROMOTER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, TRIPLE_SINGLE_QUOTE, EOL);
+    result_ = consumeTokens(builder_, 0, CHAR_LIST_HEREDOC_PROMOTER, EOL);
     result_ = result_ && interpolatedCharListBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, TRIPLE_SINGLE_QUOTE);
+    result_ = result_ && consumeToken(builder_, CHAR_LIST_HEREDOC_TERMINATOR);
     exit_section_(builder_, marker_, CHAR_LIST_HEREDOC, result_);
     return result_;
   }
@@ -172,17 +172,148 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE SIGIL_INTERPOLATING_NAME TRIPLE_DOUBLE_QUOTES EOL
-  //                               interpolatedSigilBody
-  //                               TRIPLE_DOUBLE_QUOTES
+  // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
+  static boolean interpolatedCharListSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedCharListSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    result_ = result_ && interpolatedCharListBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CHAR_LIST_SIGIL_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+  //                                              interpolatedCharListBody
+  //                                              CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
+  static boolean interpolatedHeredocCharListSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedHeredocCharListSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && interpolatedCharListBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+  //                                      interpolatedRegexBody
+  //                                      REGEX_HEREDOC_TERMINATOR
+  static boolean interpolatedHeredocRegex(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedHeredocRegex")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && interpolatedRegexBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, REGEX_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+  //                                      interpolatedSigilBody
+  //                                      SIGIL_HEREDOC_PROMOTER
+  static boolean interpolatedHeredocSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedHeredocSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && interpolatedSigilBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, SIGIL_HEREDOC_PROMOTER);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+  //                                            interpolatedStringBody
+  //                                            STRING_SIGIL_HEREDOC_TERMINATOR
+  static boolean interpolatedHeredocStringSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedHeredocStringSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, STRING_SIGIL_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+  //                                      interpolatedWordsBody
+  //                                      WORDS_HEREDOC_TERMINATOR
+  static boolean interpolatedHeredocWords(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedHeredocWords")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && interpolatedWordsBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, WORDS_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR
+  static boolean interpolatedRegex(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedRegex")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
+    result_ = result_ && interpolatedRegexBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, REGEX_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // (interpolation | REGEX_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  static boolean interpolatedRegexBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedRegexBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!interpolatedRegexBody_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "interpolatedRegexBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // interpolation | REGEX_FRAGMENT | VALID_ESCAPE_SEQUENCE
+  private static boolean interpolatedRegexBody_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedRegexBody_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = interpolation(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, REGEX_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR
   static boolean interpolatedSigil(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolatedSigil")) return false;
     if (!nextTokenIs(builder_, TILDE)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, TILDE, SIGIL_INTERPOLATING_NAME, TRIPLE_DOUBLE_QUOTES, EOL);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_PROMOTER);
     result_ = result_ && interpolatedSigilBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    result_ = result_ && consumeToken(builder_, SIGIL_TERMINATOR);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -238,6 +369,45 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
+  static boolean interpolatedStringSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedStringSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, STRING_SIGIL_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+  static boolean interpolatedWordsBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedWordsBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!interpolatedWordsBody_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "interpolatedWordsBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE
+  private static boolean interpolatedWordsBody_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "interpolatedWordsBody_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = interpolation(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, WORDS_FRAGMENT);
+    if (!result_) result_ = consumeToken(builder_, VALID_ESCAPE_SEQUENCE);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
   // INTERPOLATION_START expressionList? INTERPOLATION_END
   public static boolean interpolation(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "interpolation")) return false;
@@ -259,17 +429,133 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE SIGIL_LITERAL_NAME TRIPLE_DOUBLE_QUOTES EOL
-  //                          literalSigilBody
-  //                          TRIPLE_DOUBLE_QUOTES
+  // CHAR_LIST_FRAGMENT*
+  static boolean literalCharListBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalCharListBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, CHAR_LIST_FRAGMENT)) break;
+      if (!empty_element_parsed_guard_(builder_, "literalCharListBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
+  static boolean literalCharListSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalCharListSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    result_ = result_ && literalCharListBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, CHAR_LIST_SIGIL_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+  //                                 literalRegexBody
+  //                                 REGEX_HEREDOC_TERMINATOR
+  static boolean literalHeredocRegex(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalHeredocRegex")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_REGEX_SIGIL_NAME, REGEX_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && literalRegexBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, REGEX_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+  //                                 literalSigilBody
+  //                                 SIGIL_HEREDOC_TERMINATOR
+  static boolean literalHeredocSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalHeredocSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && literalSigilBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, SIGIL_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+  //                                       literalStringBody
+  //                                       STRING_SIGIL_HEREDOC_TERMINATOR
+  static boolean literalHeredocStringSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalHeredocStringSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && literalStringBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, STRING_SIGIL_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+  //                                 literalWordsBody
+  //                                 WORDS_HEREDOC_TERMINATOR
+  static boolean literalHeredocWords(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalHeredocWords")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
+    result_ = result_ && literalWordsBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, WORDS_HEREDOC_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR
+  static boolean literalRegex(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalRegex")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_SIGIL_NAME, REGEX_PROMOTER);
+    result_ = result_ && literalRegexBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, REGEX_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // REGEX_FRAGMENT*
+  static boolean literalRegexBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalRegexBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, REGEX_FRAGMENT)) break;
+      if (!empty_element_parsed_guard_(builder_, "literalRegexBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR
   static boolean literalSigil(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "literalSigil")) return false;
     if (!nextTokenIs(builder_, TILDE)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, TILDE, SIGIL_LITERAL_NAME, TRIPLE_DOUBLE_QUOTES, EOL);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
     result_ = result_ && literalSigilBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    result_ = result_ && consumeToken(builder_, SIGIL_TERMINATOR);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -288,46 +574,131 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // interpolatedSigil | literalSigil
+  // STRING_FRAGMENT*
+  static boolean literalStringBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalStringBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, STRING_FRAGMENT)) break;
+      if (!empty_element_parsed_guard_(builder_, "literalStringBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
+  static boolean literalStringSigil(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalStringSigil")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    result_ = result_ && literalStringBody(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, STRING_SIGIL_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR
+  static boolean literalWords(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalWords")) return false;
+    if (!nextTokenIs(builder_, TILDE)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, TILDE, LITERAL_SIGIL_NAME, WORDS_PROMOTER, LITERAL, WORDS_TERMINATOR);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // WORDS_FRAGMENT*
+  static boolean literalWordsBody(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "literalWordsBody")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, WORDS_FRAGMENT)) break;
+      if (!empty_element_parsed_guard_(builder_, "literalWordsBody", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // interpolatedCharListSigil |
+  //           interpolatedHeredocCharListSigil |
+  //           interpolatedHeredocRegex |
+  //           interpolatedHeredocSigil |
+  //           interpolatedHeredocStringSigil |
+  //           interpolatedHeredocWords |
+  //           interpolatedRegex |
+  //           interpolatedSigil |
+  //           interpolatedStringSigil |
+  //           literalCharListSigil |
+  //           literalHeredocRegex |
+  //           literalHeredocSigil |
+  //           literalHeredocStringSigil |
+  //           literalHeredocWords |
+  //           literalRegex |
+  //           literalSigil |
+  //           literalStringSigil |
+  //           literalWords
   public static boolean sigil(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "sigil")) return false;
     if (!nextTokenIs(builder_, TILDE)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = interpolatedSigil(builder_, level_ + 1);
+    result_ = interpolatedCharListSigil(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredocCharListSigil(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredocRegex(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredocSigil(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredocStringSigil(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedHeredocWords(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedRegex(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedSigil(builder_, level_ + 1);
+    if (!result_) result_ = interpolatedStringSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalCharListSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalHeredocRegex(builder_, level_ + 1);
+    if (!result_) result_ = literalHeredocSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalHeredocStringSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalHeredocWords(builder_, level_ + 1);
+    if (!result_) result_ = literalRegex(builder_, level_ + 1);
     if (!result_) result_ = literalSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalStringSigil(builder_, level_ + 1);
+    if (!result_) result_ = literalWords(builder_, level_ + 1);
     exit_section_(builder_, marker_, SIGIL, result_);
     return result_;
   }
 
   /* ********************************************************** */
-  // DOUBLE_QUOTES
+  // STRING_PROMOTER
   //            interpolatedStringBody
-  //            DOUBLE_QUOTES
+  //            STRING_TERMINATOR
   public static boolean string(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "string")) return false;
-    if (!nextTokenIs(builder_, DOUBLE_QUOTES)) return false;
+    if (!nextTokenIs(builder_, STRING_PROMOTER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, DOUBLE_QUOTES);
+    result_ = consumeToken(builder_, STRING_PROMOTER);
     result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, DOUBLE_QUOTES);
+    result_ = result_ && consumeToken(builder_, STRING_TERMINATOR);
     exit_section_(builder_, marker_, STRING, result_);
     return result_;
   }
 
   /* ********************************************************** */
-  // TRIPLE_DOUBLE_QUOTES EOL
+  // STRING_HEREDOC_PROMOTER EOL
   //                   interpolatedStringBody
-  //                   TRIPLE_DOUBLE_QUOTES
+  //                   STRING_HEREDOC_TERMINATOR
   public static boolean stringHeredoc(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "stringHeredoc")) return false;
-    if (!nextTokenIs(builder_, TRIPLE_DOUBLE_QUOTES)) return false;
+    if (!nextTokenIs(builder_, STRING_HEREDOC_PROMOTER)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, TRIPLE_DOUBLE_QUOTES, EOL);
+    result_ = consumeTokens(builder_, 0, STRING_HEREDOC_PROMOTER, EOL);
     result_ = result_ && interpolatedStringBody(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, TRIPLE_DOUBLE_QUOTES);
+    result_ = result_ && consumeToken(builder_, STRING_HEREDOC_TERMINATOR);
     exit_section_(builder_, marker_, STRING_HEREDOC, result_);
     return result_;
   }
