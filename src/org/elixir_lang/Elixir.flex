@@ -89,7 +89,8 @@ import org.elixir_lang.psi.ElixirTypes;
     return stack.sigilNameType();
   }
 
-  private void pushAndBegin(int lexicalState) {
+  // public for testing
+  public void pushAndBegin(int lexicalState) {
     stack.push(yystate());
     yybegin(lexicalState);
   }
