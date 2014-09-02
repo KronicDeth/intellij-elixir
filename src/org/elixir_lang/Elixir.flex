@@ -8,6 +8,8 @@ import org.elixir_lang.psi.ElixirTypes;
 
 %%
 
+// public instead of package-local to make testing easier.
+%public
 %class ElixirFlexLexer
 %implements FlexLexer
 %unicode
