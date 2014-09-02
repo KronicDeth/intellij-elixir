@@ -283,15 +283,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                                               return promoterType(); }
 }
 
-<NAMED_SIGIL> {
-  {SIGIL_HEREDOC_PROMOTER} { setPromoter(yytext());
-                             yybegin(GROUP_HEREDOC_START);
-                             return promoterType(); }
-  {SIGIL_PROMOTER}         { setPromoter(yytext());
-                             yybegin(GROUP);
-                             return promoterType(); }
-}
-
 <GROUP,
  GROUP_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}   {
@@ -311,6 +302,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                           }
 }
 
+// Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
 <GROUP> {
   {GROUP_TERMINATOR} {
                        if (isTerminator(yytext())) {
@@ -325,6 +317,19 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 
 }
 
+<GROUP_HEREDOC_END> {
+    {GROUP_HEREDOC_TERMINATOR} {
+                                   if (isTerminator(yytext())) {
+                                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                      yybegin(stackFrame.getLastLexicalState());
+                                      return stackFrame.terminatorType();
+                                   } else {
+                                      handleInState(GROUP_HEREDOC_LINE_BODY);
+                                   }
+                               }
+}
+
+// Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
   {EOL} {
           yybegin(GROUP_HEREDOC_LINE_START);
@@ -342,18 +347,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   .                                           { handleInState(GROUP_HEREDOC_LINE_BODY); }
 }
 
-<GROUP_HEREDOC_END> {
-    {GROUP_HEREDOC_TERMINATOR} {
-                                   if (isTerminator(yytext())) {
-                                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                      yybegin(stackFrame.getLastLexicalState());
-                                      return stackFrame.terminatorType();
-                                   } else {
-                                      handleInState(GROUP_HEREDOC_LINE_BODY);
-                                   }
-                               }
-}
-
 <GROUP_HEREDOC_START> {
   {EOL} { yybegin(GROUP_HEREDOC_LINE_START);
           return ElixirTypes.EOL; }
@@ -365,6 +358,15 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   {INTERPOLATION_END}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                 yybegin(stackFrame.getLastLexicalState());
                                 return ElixirTypes.INTERPOLATION_END; }
+}
+
+<NAMED_SIGIL> {
+  {SIGIL_HEREDOC_PROMOTER} { setPromoter(yytext());
+                             yybegin(GROUP_HEREDOC_START);
+                             return promoterType(); }
+  {SIGIL_PROMOTER}         { setPromoter(yytext());
+                             yybegin(GROUP);
+                             return promoterType(); }
 }
 
 <SIGIL> {
