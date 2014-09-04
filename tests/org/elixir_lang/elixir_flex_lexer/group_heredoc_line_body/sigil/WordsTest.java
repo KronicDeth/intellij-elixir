@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/3/14.
  */
-public class WordTest {
+public class WordsTest {
     private ElixirFlexLexer flexLexer;
 
     private void reset(CharSequence charSequence) throws IOException {
