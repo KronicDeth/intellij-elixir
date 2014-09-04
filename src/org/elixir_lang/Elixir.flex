@@ -344,7 +344,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                                                   return TokenType.WHITE_SPACE;
                                               }
   {GROUP_HEREDOC_TERMINATOR}                  { handleInState(GROUP_HEREDOC_END); }
-  .                                           { handleInState(GROUP_HEREDOC_LINE_BODY); }
+  {EOL}|.                                     { handleInState(GROUP_HEREDOC_LINE_BODY); }
 }
 
 <GROUP_HEREDOC_START> {
