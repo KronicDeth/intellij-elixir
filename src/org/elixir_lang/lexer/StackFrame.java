@@ -4,7 +4,6 @@ import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.lexer.group.Base;
 import org.elixir_lang.lexer.group.Quote;
 import org.elixir_lang.lexer.group.Sigil;
-import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

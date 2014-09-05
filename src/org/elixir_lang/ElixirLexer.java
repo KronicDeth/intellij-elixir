@@ -1,9 +1,7 @@
 package org.elixir_lang;
 
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.LookAheadLexer;
 import com.intellij.lexer.MergingLexerAdapter;
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.psi.ElixirTypes;
 

@@ -1,12 +1,7 @@
 package org.elixir_lang.lexer;
 
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.lexer.group.Base;
 import org.elixir_lang.lexer.group.Quote;
-import org.elixir_lang.lexer.group.Sigil;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by luke.imhoff on 8/19/14.
