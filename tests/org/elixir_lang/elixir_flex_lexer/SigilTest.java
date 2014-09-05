@@ -30,6 +30,14 @@ public class SigilTest {
     }
 
     @Test
+    public void C() throws IOException {
+        reset("C");
+
+        assertEquals(ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.NAMED_SIGIL, flexLexer.yystate());
+    }
+
+    @Test
     public void R() throws IOException {
         reset("R");
 
@@ -58,6 +66,14 @@ public class SigilTest {
         reset("X");
 
         assertEquals(ElixirTypes.LITERAL_SIGIL_NAME, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.NAMED_SIGIL, flexLexer.yystate());
+    }
+
+    @Test
+    public void c() throws IOException {
+        reset("c");
+
+        assertEquals(ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME, flexLexer.advance());
         assertEquals(ElixirFlexLexer.NAMED_SIGIL, flexLexer.yystate());
     }
 

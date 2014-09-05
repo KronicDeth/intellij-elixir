@@ -13,9 +13,11 @@ public class SigilName {
     private static final Map<Character, IElementType> elementTypeBySigilName = new HashMap<Character, IElementType>();
 
     static {
+        elementTypeBySigilName.put('C', ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME);
         elementTypeBySigilName.put('R', ElixirTypes.LITERAL_REGEX_SIGIL_NAME);
         elementTypeBySigilName.put('S', ElixirTypes.LITERAL_STRING_SIGIL_NAME);
         elementTypeBySigilName.put('W', ElixirTypes.LITERAL_WORDS_SIGIL_NAME);
+        elementTypeBySigilName.put('c', ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME);
         elementTypeBySigilName.put('r', ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME);
         elementTypeBySigilName.put('s', ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME);
         elementTypeBySigilName.put('w', ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME);
