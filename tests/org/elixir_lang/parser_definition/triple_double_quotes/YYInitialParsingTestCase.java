@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition.triple_double_quotes;
 
-import org.elixir_lang.parser_definition.triple_double_quotes.ParsingTestCase;
-
 /**
  * Created by luke.imhoff on 8/8/14.
  */

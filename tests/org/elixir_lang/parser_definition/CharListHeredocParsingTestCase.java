@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition;
 
-import org.elixir_lang.parser_definition.ParsingTestCase;
-
 /**
  * Created by luke.imhoff on 8/8/14.
  */

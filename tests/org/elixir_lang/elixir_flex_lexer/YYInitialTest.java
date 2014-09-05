@@ -1,21 +1,16 @@
 package org.elixir_lang.elixir_flex_lexer;
 
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
-import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
-import org.elixir_lang.ElixirFlexLexerAdapter;
-import org.elixir_lang.ElixirFlexLexerTest;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Reader;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by luke.imhoff on 9/1/14.

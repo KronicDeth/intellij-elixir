@@ -1,6 +1,5 @@
 package org.elixir_lang.elixir_flex_lexer;
 
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;

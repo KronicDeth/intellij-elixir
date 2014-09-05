@@ -1,7 +1,5 @@
 package org.elixir_lang.elixir_flex_lexer.named_sigil;
 
-import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.TokenType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.Before;
