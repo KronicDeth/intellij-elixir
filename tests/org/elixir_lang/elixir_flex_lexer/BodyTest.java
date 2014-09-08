@@ -15,19 +15,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/1/14.
  */
-public class BodyTest {
-    private FlexLexer flexLexer;
-    private int initialState = ElixirFlexLexer.BODY;
-
-    private void reset(CharSequence charSequence) {
-        flexLexer.reset(charSequence, 0, charSequence.length(), initialState);
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
-    }
-
+public class BodyTest  extends org.elixir_lang.elixir_flex_lexer.Test {
     @Test
     public void eol() throws IOException {
         reset("\n");
