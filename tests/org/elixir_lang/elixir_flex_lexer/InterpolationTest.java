@@ -14,21 +14,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/1/14.
  */
-public class InterpolationTest {
-    private ElixirFlexLexer flexLexer;
-    private int initialState = ElixirFlexLexer.INTERPOLATION;
-
-    private void reset(CharSequence charSequence) {
-        reset(charSequence, initialState);
-    }
-
-    private void reset(CharSequence charSequence, int initialState) {
-        flexLexer.reset(charSequence, 0, charSequence.length(), initialState);
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
+public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.Test {
+    @Override
+    protected int initialState() {
+        return ElixirFlexLexer.INTERPOLATION;
     }
 
     @Test
@@ -36,7 +25,7 @@ public class InterpolationTest {
         reset("\n");
 
         assertEquals(ElixirTypes.EOL, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -44,7 +33,7 @@ public class InterpolationTest {
         reset(" ");
 
         assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -52,7 +41,7 @@ public class InterpolationTest {
         reset("\t");
 
         assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -60,7 +49,7 @@ public class InterpolationTest {
         reset("\f");
 
         assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -68,7 +57,7 @@ public class InterpolationTest {
         reset("\n \t\f");
 
         assertEquals(ElixirTypes.EOL, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -76,7 +65,7 @@ public class InterpolationTest {
         reset("#");
 
         assertEquals(ElixirTypes.COMMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -84,7 +73,7 @@ public class InterpolationTest {
         reset("0b10");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -92,7 +81,7 @@ public class InterpolationTest {
         reset("0B10");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -100,7 +89,7 @@ public class InterpolationTest {
         reset("0X0123456789abcdefABCDEF");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -108,7 +97,7 @@ public class InterpolationTest {
         reset("0x0123456789abcdefABCDEF");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -116,7 +105,7 @@ public class InterpolationTest {
         reset("0o01234567");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -124,7 +113,7 @@ public class InterpolationTest {
         reset("001234567");
 
         assertEquals(ElixirTypes.NUMBER, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.INTERPOLATION, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
@@ -171,7 +160,7 @@ public class InterpolationTest {
     public void closingBrace() throws IOException {
         int lastLexicalState = ElixirFlexLexer.GROUP;
         reset("}", lastLexicalState);
-        flexLexer.pushAndBegin(ElixirFlexLexer.INTERPOLATION);
+        flexLexer.pushAndBegin(initialState());
 
         assertEquals(ElixirTypes.INTERPOLATION_END, flexLexer.advance());
         assertEquals(lastLexicalState, flexLexer.yystate());
