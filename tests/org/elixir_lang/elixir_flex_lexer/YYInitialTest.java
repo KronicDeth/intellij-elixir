@@ -15,17 +15,10 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/1/14.
  */
-public class YYInitialTest {
-    private FlexLexer flexLexer;
-    private int initialState = ElixirFlexLexer.YYINITIAL;
-
-    private void reset(CharSequence charSequence) {
-        flexLexer.reset(charSequence, 0, charSequence.length(), initialState);
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
+public class YYInitialTest extends org.elixir_lang.elixir_flex_lexer.Test {
+    @Override
+    protected int initialState() {
+        return ElixirFlexLexer.YYINITIAL;
     }
 
     @Test

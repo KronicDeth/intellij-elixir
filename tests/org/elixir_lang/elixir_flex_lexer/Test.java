@@ -11,10 +11,13 @@ import java.io.Reader;
  */
 public class Test {
     protected ElixirFlexLexer flexLexer;
-    protected int initialState = ElixirFlexLexer.BODY;
+
+    protected int initialState() {
+        return ElixirFlexLexer.BODY;
+    }
 
     protected void reset(CharSequence charSequence) throws IOException {
-        reset(charSequence, initialState);
+        reset(charSequence, initialState());
     }
 
     protected void reset(CharSequence charSequence, int initialState) throws IOException {
