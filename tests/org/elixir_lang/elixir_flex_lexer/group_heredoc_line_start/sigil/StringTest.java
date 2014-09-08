@@ -14,14 +14,12 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/3/14.
  */
-public class StringTest {
-    private ElixirFlexLexer flexLexer;
-    private int initialState = ElixirFlexLexer.BODY;
-
-    private void reset(CharSequence charSequence) throws IOException {
+public class StringTest extends org.elixir_lang.elixir_flex_lexer.Test {
+    @Override
+    protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP state
         CharSequence fullCharSequence = "~s'''\n" + charSequence;
-        flexLexer.reset(fullCharSequence, 0, fullCharSequence.length(), initialState);
+        super.reset(fullCharSequence);
         // consume '~'
         flexLexer.advance();
         // consume 's'
@@ -30,11 +28,6 @@ public class StringTest {
         flexLexer.advance();
         // consume '\n'
         flexLexer.advance();
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
     }
 
     @Test
@@ -90,7 +83,7 @@ public class StringTest {
         reset("'''");
 
         assertEquals(ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test
