@@ -14,20 +14,14 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/4/14.
  */
-public class GroupHeredocStartTest {
-    private ElixirFlexLexer flexLexer;
-
-    private void reset(CharSequence charSequence) throws IOException {
+public class GroupHeredocStartTest extends org.elixir_lang.elixir_flex_lexer.Test {
+    @Override
+    protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP_HEREDOC_START state
         CharSequence fullCharSequence = "'''" + charSequence;
-        flexLexer.reset(fullCharSequence, 0, fullCharSequence.length(), ElixirFlexLexer.BODY);
+        super.reset(fullCharSequence);
         // consume "'''"
         flexLexer.advance();
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
     }
 
     @Test
