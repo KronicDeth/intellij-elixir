@@ -41,6 +41,6 @@ public class DoubleQuotesTest extends org.elixir_lang.elixir_flex_lexer.group.qu
         reset("\"");
 
         assertEquals(ElixirTypes.STRING_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 }

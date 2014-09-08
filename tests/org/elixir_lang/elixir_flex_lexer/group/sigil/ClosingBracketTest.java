@@ -39,7 +39,7 @@ public class ClosingBracketTest extends org.elixir_lang.elixir_flex_lexer.group.
         reset("]");
 
         assertEquals(ElixirTypes.SIGIL_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test

@@ -32,7 +32,7 @@ public class SingleQuoteTest extends org.elixir_lang.elixir_flex_lexer.group.quo
         reset("'");
 
         assertEquals(ElixirTypes.CHAR_LIST_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState, flexLexer.yystate());
+        assertEquals(initialState(), flexLexer.yystate());
     }
 
     @Test

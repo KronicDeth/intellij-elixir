@@ -9,18 +9,9 @@ import java.io.Reader;
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-public class Test {
-    protected ElixirFlexLexer flexLexer;
-    protected int initialState = ElixirFlexLexer.BODY;
-
+public class Test extends org.elixir_lang.elixir_flex_lexer.Test {
     protected void reset(CharSequence charSequence) throws IOException {
-        flexLexer.reset(charSequence, 0, charSequence.length(), initialState);
+        super.reset(charSequence);
         flexLexer.advance();
     }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
-    }
-
 }
