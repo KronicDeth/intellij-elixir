@@ -13,22 +13,16 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/2/14.
  */
-public class InterpolationTest {
-    private ElixirFlexLexer flexLexer;
-
-    private void reset(CharSequence charSequence) throws IOException {
+public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body.Test {
+    @Override
+    protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP state with isInterpolating being true
         CharSequence fullCharSequence = "\"\"\"\n" + charSequence;
-        flexLexer.reset(fullCharSequence, 0, fullCharSequence.length(), ElixirFlexLexer.BODY);
+        super.reset(fullCharSequence);
         // consume "\"\"\""
         flexLexer.advance();
         // consume '\n'
         flexLexer.advance();
-    }
-
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
     }
 
     @Test

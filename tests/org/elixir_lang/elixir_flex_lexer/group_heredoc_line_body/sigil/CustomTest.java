@@ -1,53 +1,24 @@
 package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body.sigil;
 
-import org.elixir_lang.ElixirFlexLexer;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.io.Reader;
+import org.jetbrains.annotations.NotNull;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * Created by luke.imhoff on 9/3/14.
  */
-public class CustomTest {
-    private ElixirFlexLexer flexLexer;
-
-    private void reset(CharSequence charSequence) throws IOException {
-        // start to trigger GROUP state
-        CharSequence fullCharSequence = "~x'''\n" + charSequence;
-        flexLexer.reset(fullCharSequence, 0, fullCharSequence.length(), ElixirFlexLexer.BODY);
-        // consume '~'
-        flexLexer.advance();
-        // consume 'x'
-        flexLexer.advance();
-        // consume "'''"
-        flexLexer.advance();
-        // consume '\n'
-        flexLexer.advance();
+public class CustomTest extends PromoterTest {
+    @NotNull
+    @Override
+    protected IElementType fragmentType() {
+        return ElixirTypes.SIGIL_FRAGMENT;
     }
 
-    @Before
-    public void setUp() {
-        flexLexer = new ElixirFlexLexer((Reader) null);
-    }
-
-    @Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(ElixirTypes.SIGIL_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_START, flexLexer.yystate());
-    }
-
-    @Test
-    public void character() throws IOException {
-        reset("a");
-
-        assertEquals(ElixirTypes.SIGIL_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, flexLexer.yystate());
+    @Override
+    protected char sigilName() {
+        // arbitrary character so long as it is not a defined sigil in the Elixir standard library
+        return 'x';
     }
 }

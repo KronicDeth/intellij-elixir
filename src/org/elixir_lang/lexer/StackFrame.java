@@ -23,11 +23,13 @@ public class StackFrame {
         terminatorByPromoter.put("'", "'");
         terminatorByPromoter.put("'''", "'''");
         terminatorByPromoter.put("(", ")");
+        terminatorByPromoter.put("/", "/");
         terminatorByPromoter.put("<", ">");
         terminatorByPromoter.put("[", "]");
         terminatorByPromoter.put("\"", "\"");
         terminatorByPromoter.put("\"\"\"", "\"\"\"");
         terminatorByPromoter.put("{", "}");
+        terminatorByPromoter.put("|", "|");
     }
 
     /*
