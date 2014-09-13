@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,19 +9,31 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.0.3</h1>
+      <h1>v0.0.4</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
-            <li>Single quoted string with highlighting. ('String' in Color Settings.)</li>
             <li>
-              <p>Double quoted strings with highlighting. ('Interpolated String' in Color Settings.)</p>
-              <ul>
-                <li>Interpolation (<code>#{</code> and <code>}</code>) with highlighting.  ('Expression Substitution Mark' in Color Settings.)</li>
-                <li>Escape sequences for <code>"</code> and <code>#</code> with highlighting.  ('Escape Sequence' in Color Settings.)</li>
-              </ul>
-            </li>
+            Literal and interpolated sigils with highlighting
+            <ul>
+              <li>Char List Sigils (<code>~c</code> and <code>~C</code>) highlighted as 'Char List' in Settings.</li>
+              <li>
+                Regex Sigils (<code>~r</code> and <code>~R</code>) highlighted as 'Sigil' in Settings.
+                <strong>NOTE: RegExp syntax is not internally highlighted yet</strong>
+              </li>
+              <li>String Sigils (<code>~s</code> and <code>~S</code> highlighted as 'String' in Settings.</li>
+              <li>Word Sigils (<code>~w</code> and <code>~W</code> highlighted as 'Sigil' in Settings.</li>
+              <li>Custom Sigils highlighted as 'Sigil' in Settings.</li>
+              <li>Modifiers are highlighted on Regex, Word, and Custom while modifiers aren't allowed on CharList and String Sigils.</li>
+            </ul>
+          </ul>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Single-quoted strings are correctly referred to as 'Character List' now instead of 'String' in Settings.</li>
+            <li>Double-quoted strings are correctly referred to as 'String' now instead of 'Interpolated String' in Settings.</li>
+            <li>Non-Heredoc CharLists and Strings can be multiline.</li>
+            <li>CharLists and Strings support interpolation and escape sequences.</li>
           </ul>
         </li>
       </ul>

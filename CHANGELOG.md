@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.4
+
+* Enhancements
+  * Literal and interpolated sigils with highlighting
+    * CharList Sigils (`~c` and `~C`) highlighted as 'Char List' in Settings.</li>
+    * Regex Sigils (`~r` and `~R`) highlighted as 'Sigil' in Settings. **NOTE: Regex syntax is not internally highlighted yet**
+    * String Sigils (`~s` and `~S`) highlighted as 'String' in Settings.
+    * Word Sigils (`~w` and `~W`) highlighted as 'Sigil' in Settings.
+    * Custom Sigils highlighted as 'Sigil' in Settings.
+    * Modifiers are highlighted on Regex, Word, and Custom while modifiers aren't allowed on CharList and String Sigils.
+* Bug Fixes
+  * Single-quoted strings are correctly referred to as 'Character List' now instead of 'String' in Settings.
+  * Double-quoted strings are correctly referred to as 'String' now instead of 'Interpolated String' in Settings.
+  * Non-Heredoc CharLists and Strings can be multiline.
+  * CharLists and Strings support interpolation and escape sequences.
+
 ## v0.0.3
 
 * Enhancements
