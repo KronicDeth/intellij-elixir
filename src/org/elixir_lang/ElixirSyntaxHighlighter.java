@@ -90,11 +90,9 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TokenSet SIGILS = TokenSet.create(
             ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_SIGIL_NAME,
-            ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME,
             ElixirTypes.LITERAL_REGEX_SIGIL_NAME,
             ElixirTypes.LITERAL_SIGIL_NAME,
-            ElixirTypes.LITERAL_STRING_SIGIL_NAME,
             ElixirTypes.LITERAL_WORDS_SIGIL_NAME,
             ElixirTypes.REGEX_FRAGMENT,
             ElixirTypes.REGEX_HEREDOC_PROMOTER,
@@ -107,10 +105,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.SIGIL_MODIFIER,
             ElixirTypes.SIGIL_PROMOTER,
             ElixirTypes.SIGIL_TERMINATOR,
-            ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER,
-            ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR,
-            ElixirTypes.STRING_SIGIL_PROMOTER,
-            ElixirTypes.STRING_SIGIL_TERMINATOR,
             ElixirTypes.TILDE,
             ElixirTypes.WORDS_FRAGMENT,
             ElixirTypes.WORDS_HEREDOC_PROMOTER,
@@ -119,10 +113,16 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.WORDS_TERMINATOR
     );
     private static final TokenSet STRINGS = TokenSet.create(
+            ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME,
+            ElixirTypes.LITERAL_STRING_SIGIL_NAME,
             ElixirTypes.STRING_FRAGMENT,
             ElixirTypes.STRING_HEREDOC_PROMOTER,
             ElixirTypes.STRING_HEREDOC_TERMINATOR,
             ElixirTypes.STRING_PROMOTER,
+            ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER,
+            ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR,
+            ElixirTypes.STRING_SIGIL_PROMOTER,
+            ElixirTypes.STRING_SIGIL_TERMINATOR,
             ElixirTypes.STRING_TERMINATOR
     );
 
