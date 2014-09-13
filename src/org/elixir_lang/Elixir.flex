@@ -61,6 +61,10 @@ import org.elixir_lang.psi.ElixirTypes;
     return (sigilName >= 'a' && sigilName <= 'z');
   }
 
+  private boolean isSigil() {
+    return stack.isSigil();
+  }
+
   private void nameSigil(CharSequence sigilName) {
     stack.nameSigil(sigilName.charAt(0));
   }
@@ -93,6 +97,10 @@ import org.elixir_lang.psi.ElixirTypes;
   public void pushAndBegin(int lexicalState) {
     stack.push(yystate());
     yybegin(lexicalState);
+  }
+
+  private IElementType terminatorType() {
+    return stack.terminatorType();
   }
 %}
 
@@ -163,6 +171,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  */
 
 TILDE = "~"
+SIGIL_MODIFIER = [a-z]
 SIGIL_NAME = [A-Za-z]
 
 /*
@@ -248,6 +257,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 %state INTERPOLATION
 %state NAMED_SIGIL
 %state SIGIL
+%state SIGIL_MODIFIERS
 
 %%
 
@@ -330,9 +340,14 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 <GROUP_HEREDOC_END> {
     {GROUP_HEREDOC_TERMINATOR} {
                                    if (isTerminator(yytext())) {
-                                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                      yybegin(stackFrame.getLastLexicalState());
-                                      return stackFrame.terminatorType();
+                                      if (isSigil()) {
+                                        yybegin(SIGIL_MODIFIERS);
+                                        return terminatorType();
+                                      } else {
+                                        org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                        yybegin(stackFrame.getLastLexicalState());
+                                        return stackFrame.terminatorType();
+                                      }
                                    } else {
                                       handleInState(GROUP_HEREDOC_LINE_BODY);
                                    }
@@ -383,6 +398,12 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   {SIGIL_NAME}               { nameSigil(yytext());
                                yybegin(NAMED_SIGIL);
                                return sigilNameType(); }
+}
+
+<SIGIL_MODIFIERS> {
+  {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
+  {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     handleInState(stackFrame.getLastLexicalState()); }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states

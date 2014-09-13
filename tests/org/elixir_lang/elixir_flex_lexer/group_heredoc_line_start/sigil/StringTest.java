@@ -83,7 +83,7 @@ public class StringTest extends org.elixir_lang.elixir_flex_lexer.Test {
         reset("'''");
 
         assertEquals(ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        assertEquals(ElixirFlexLexer.SIGIL_MODIFIERS, flexLexer.yystate());
     }
 
     @Test

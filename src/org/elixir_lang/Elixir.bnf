@@ -34,19 +34,19 @@ private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL
                                              CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
 private interpolatedHeredocRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                      interpolatedRegexBody
-                                     REGEX_HEREDOC_TERMINATOR
+                                     REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 private interpolatedHeredocSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedSigilBody
-                                     SIGIL_HEREDOC_PROMOTER
+                                     SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
 private interpolatedHeredocStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                            interpolatedStringBody
                                            STRING_SIGIL_HEREDOC_TERMINATOR
 private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                                      interpolatedWordsBody
-                                     WORDS_HEREDOC_TERMINATOR
-private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR
+                                     WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR
+private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
@@ -55,23 +55,23 @@ private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                 literalRegexBody
-                                REGEX_HEREDOC_TERMINATOR
+                                REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 private literalHeredocSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                                 literalSigilBody
-                                SIGIL_HEREDOC_TERMINATOR
+                                SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 private literalHeredocStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                       literalStringBody
                                       STRING_SIGIL_HEREDOC_TERMINATOR
 private literalHeredocWords ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                                 literalWordsBody
-                                WORDS_HEREDOC_TERMINATOR
-private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR
+                                WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private literalRegexBody ::= REGEX_FRAGMENT*
-private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR
+private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private literalSigilBody ::= SIGIL_FRAGMENT*
 private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
-private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR
+private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody

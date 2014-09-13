@@ -180,6 +180,10 @@ public class StackFrame {
         return getGroup().fragmentType;
     }
 
+    public boolean isSigil() {
+        return getGroup() instanceof Sigil;
+    }
+
     public IElementType sigilNameType() {
         return SigilName.elementType(getSigilName());
     }

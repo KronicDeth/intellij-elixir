@@ -83,7 +83,7 @@ public class RegexTest extends org.elixir_lang.elixir_flex_lexer.Test {
         reset("'''");
 
         assertEquals(ElixirTypes.REGEX_HEREDOC_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
+        assertEquals(ElixirFlexLexer.SIGIL_MODIFIERS, flexLexer.yystate());
     }
 
     @Test

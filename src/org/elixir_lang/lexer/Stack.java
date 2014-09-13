@@ -34,6 +34,10 @@ public class Stack extends java.util.Stack<StackFrame> {
         return peek().isInterpolating();
     }
 
+    public boolean isSigil() {
+        return peek().isSigil();
+    }
+
     public void nameSigil(char sigilName) {
         peek().nameSigil(sigilName);
     }
@@ -52,5 +56,9 @@ public class Stack extends java.util.Stack<StackFrame> {
 
     public String terminator() {
         return peek().getTerminator();
+    }
+
+    public IElementType terminatorType() {
+        return peek().terminatorType();
     }
 }

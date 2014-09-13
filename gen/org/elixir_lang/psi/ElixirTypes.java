@@ -48,6 +48,7 @@ public interface ElixirTypes {
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("SIGIL_HEREDOC_PROMOTER");
   IElementType SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("SIGIL_HEREDOC_TERMINATOR");
+  IElementType SIGIL_MODIFIER = new ElixirTokenType("SIGIL_MODIFIER");
   IElementType SIGIL_PROMOTER = new ElixirTokenType("SIGIL_PROMOTER");
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("SIGIL_TERMINATOR");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
