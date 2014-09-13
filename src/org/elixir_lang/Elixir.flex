@@ -1,12 +1,15 @@
 package org.elixir_lang;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.psi.ElixirTypes;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.lexer.group.*;
+import org.elixir_lang.psi.ElixirTypes;
 
 %%
 
+// public instead of package-local to make testing easier.
+%public
 %class ElixirFlexLexer
 %implements FlexLexer
 %unicode
@@ -16,26 +19,101 @@ import com.intellij.psi.TokenType;
 %eof}
 
 %{
-  private java.util.Stack<Integer> lexicalStateStack = new java.util.Stack<Integer>();
+  private org.elixir_lang.lexer.Stack stack = new org.elixir_lang.lexer.Stack();
 
-  private void callState(int nextLexicalState) {
-    lexicalStateStack.push(yystate());
-    yybegin(nextLexicalState);
+  private void startQuote(CharSequence quotePromoterCharSequence) {
+    String quotePromoter = quotePromoterCharSequence.toString();
+    stack.push(quotePromoter, yystate());
+
+    if (Base.isHeredocPromoter(quotePromoter)) {
+      yybegin(GROUP_HEREDOC_START);
+    } else {
+      yybegin(GROUP);
+    }
   }
 
-  private void returnFromState() {
-    int previousLexicalState = lexicalStateStack.pop();
-    yybegin(previousLexicalState);
+  private IElementType fragmentType() {
+    return stack.fragmentType();
   }
 
   private void handleInState(int nextLexicalState) {
     yypushback(yylength());
     yybegin(nextLexicalState);
   }
+
+  private boolean isTerminator(CharSequence terminator) {
+    return stack.terminator().equals(terminator.toString());
+  }
+
+  private boolean isInterpolating() {
+    return stack.isInterpolating();
+  }
+
+  private boolean isInterpolatingSigil(CharSequence sigilName) {
+    if (sigilName.length() != 1) {
+      throw new IllegalArgumentException("sigil names can only be 1 character long");
+    }
+
+    return isInterpolatingSigil(sigilName.charAt(0));
+  }
+
+  private boolean isInterpolatingSigil(char sigilName) {
+    return (sigilName >= 'a' && sigilName <= 'z');
+  }
+
+  private boolean isSigil() {
+    return stack.isSigil();
+  }
+
+  private void nameSigil(CharSequence sigilName) {
+    stack.nameSigil(sigilName.charAt(0));
+  }
+
+  private org.elixir_lang.lexer.StackFrame pop() {
+    return stack.pop();
+  }
+
+  private org.elixir_lang.lexer.group.Quote promotedQuote(CharSequence promoterCharSequence) {
+    // CharSequences don't look up correctly, so convert to String, which do.
+    String promoter = promoterCharSequence.toString();
+    org.elixir_lang.lexer.group.Quote quote = org.elixir_lang.lexer.group.Quote.fetch(promoter);
+
+    return quote;
+  }
+
+  private IElementType promoterType() {
+    return stack.promoterType();
+  }
+
+  private void setPromoter(CharSequence promoter) {
+    stack.setPromoter(promoter.toString());
+  }
+
+  private IElementType sigilNameType() {
+    return stack.sigilNameType();
+  }
+
+  // public for testing
+  public void pushAndBegin(int lexicalState) {
+    stack.push(yystate());
+    yybegin(lexicalState);
+  }
+
+  private IElementType terminatorType() {
+    return stack.terminatorType();
+  }
 %}
+
+/*
+ * White Space
+ */
 
 EOL = \n|\r|\r\n
 WHITE_SPACE=[\ \t\f]
+
+/*
+ *  Comments
+ */
 
 COMMENT = "#" [^\r\n]* {EOL}?
 
@@ -51,51 +129,139 @@ HEXADECIMAL_INTEGER = "0" [Xx][A-Fa-f0-9]+
 OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
-ESCAPE = "\\"
-
-SINGLE_QUOTE = "'"
-ESCAPED_SINGLE_QUOTE = {ESCAPE} {SINGLE_QUOTE}
-
-DOUBLE_QUOTES = "\""
-ESCAPED_DOUBLE_QUOTES = {ESCAPE} {DOUBLE_QUOTES}
+/*
+ * Interpolation
+ */
 
 INTERPOLATION_START = "#{"
-ESCAPED_INTERPOLATION_START = {ESCAPE} {INTERPOLATION_START}
 INTERPOLATION_END = "}"
 
-TRIPLE_SINGLE_QUOTE = {SINGLE_QUOTE}{3}
-TRIPLE_DOUBLE_QUOTES = {DOUBLE_QUOTES}{3}
+/*
+ *
+ *  Quotes
+ *
+ */
+
+CHAR_LIST_PROMOTER = "'"
+CHAR_LIST_TERMINATOR = "'"
+
+STRING_PROMOTER = "\""
+STRING_TERMINATOR = "\""
+
+QUOTE_PROMOTER = {CHAR_LIST_PROMOTER} | {STRING_PROMOTER}
+QUOTE_TERMINATOR = {CHAR_LIST_TERMINATOR} | {STRING_TERMINATOR}
+
+/*
+ * Quote Heredocs
+ */
+
+CHAR_LIST_HEREDOC_PROMOTER = {CHAR_LIST_PROMOTER}{3}
+CHAR_LIST_HEREDOC_TERMINATOR = {CHAR_LIST_TERMINATOR}{3}
+
+STRING_HEREDOC_PROMOTER = {STRING_PROMOTER}{3}
+STRING_HEREDOC_TERMINATOR = {STRING_TERMINATOR}{3}
+
+QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER}
+QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
+
+/*
+ *
+ *  Sigils
+ *
+ */
+
+TILDE = "~"
+SIGIL_MODIFIER = [a-z]
+SIGIL_NAME = [A-Za-z]
+
+/*
+ * Sigil quotes
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/a4a23b9a937cb22b5c1a2487c02289817b991d8f/lib/elixir/src/elixir.hrl#L59-L60
+ */
+
+SIGIL_BRACES_PROMOTER = "{"
+SIGIL_BRACES_TERMINATOR = "}"
+SIGIL_BRACKETS_PROMOTER = "["
+SIGIL_BRACKETS_TERMINATOR = "]"
+SIGIL_CHEVRONS_PROMOTER = "<"
+SIGIL_CHEVRONS_TERMINATOR = ">"
+SIGIL_DOUBLE_QUOTES_PROMOTER = "\""
+SIGIL_DOUBLE_QUOTES_TERMINATOR = "\""
+SIGIL_FORWARD_SLASH_PROMOTER = "/"
+SIGIL_FORWARD_SLASH_TERMINATOR = "/"
+SIGIL_PARENTHESES_PROMOTER = "("
+SIGIL_PARENTHESES_TERMINATOR = ")"
+SIGIL_PIPE_PROMOTER = "|"
+SIGIL_PIPE_TERMINATOR = "|"
+SIGIL_SINGLE_QUOTES_PROMOTER = "'"
+SIGIL_SINGLE_QUOTES_TERMINATOR = "'"
+
+SIGIL_PROMOTER = {SIGIL_BRACES_PROMOTER} |
+                 {SIGIL_BRACKETS_PROMOTER} |
+                 {SIGIL_CHEVRONS_PROMOTER} |
+                 {SIGIL_DOUBLE_QUOTES_PROMOTER} |
+                 {SIGIL_FORWARD_SLASH_PROMOTER} |
+                 {SIGIL_PARENTHESES_PROMOTER} |
+                 {SIGIL_PIPE_PROMOTER} |
+                 {SIGIL_SINGLE_QUOTES_PROMOTER}
+
+
+SIGIL_TERMINATOR = {SIGIL_BRACES_TERMINATOR} |
+                   {SIGIL_BRACKETS_TERMINATOR} |
+                   {SIGIL_CHEVRONS_TERMINATOR} |
+                   {SIGIL_DOUBLE_QUOTES_TERMINATOR} |
+                   {SIGIL_FORWARD_SLASH_TERMINATOR} |
+                   {SIGIL_PARENTHESES_TERMINATOR} |
+                   {SIGIL_PIPE_TERMINATOR} |
+                   {SIGIL_SINGLE_QUOTES_TERMINATOR}
+
+/*
+ * Sigil heredocs
+ */
+
+SIGIL_HEREDOC_PROMOTER = ({SIGIL_DOUBLE_QUOTES_PROMOTER}|{SIGIL_SINGLE_QUOTES_PROMOTER}){3}
+SIGIL_HEREDOC_TERMINATOR = ({SIGIL_DOUBLE_QUOTES_TERMINATOR}|{SIGIL_SINGLE_QUOTES_TERMINATOR}){3}
+
+/*
+ * Groups
+ */
+
+GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
+GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
+
+/*
+ * Escape Sequences
+ */
+
+ESCAPE = "\\"
+ESCAPED_DOUBLE_QUOTES = {ESCAPE} "\""
+ESCAPED_SINGLE_QUOTE = {ESCAPE} "'"
+ESCAPED_INTERPOLATION_START = {ESCAPE} {INTERPOLATION_START}
 
 VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                         {ESCAPED_SINGLE_QUOTE} |
                         {ESCAPED_INTERPOLATION_START}
 
-NON_WHITE_SPACE = {COMMENT} |
-                  {INTEGER} |
-                  // MUST be before {SINGLE_QUOTE} so that 3 {SINGLE_QUOTE} are NOT matched as (1,1,1)
-                  {TRIPLE_SINGLE_QUOTE} |
-                  {SINGLE_QUOTE} |
-                  // MUST be before {DOUBLE_QUOTES} so that 3 {DOUBLE_QUOTES} are NOT matched as (1,1,1)
-                  {TRIPLE_DOUBLE_QUOTES} |
-                  {DOUBLE_QUOTES} |
-                  .
+/*
+ *  States - Ordered lexigraphically
+ */
 
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
-%state CHAR_LIST_HEREDOC_END
-%state CHAR_LIST_HEREDOC_LINE_BODY
-%state CHAR_LIST_HEREDOC_LINE_START
-%state CHAR_LIST_HEREDOC_START
-%state STRING
-%state STRING_HEREDOC_END
-%state STRING_HEREDOC_LINE_BODY
-%state STRING_HEREDOC_LINE_START
-%state STRING_HEREDOC_START
+%state GROUP
+%state GROUP_HEREDOC_END
+%state GROUP_HEREDOC_LINE_BODY
+%state GROUP_HEREDOC_LINE_START
+%state GROUP_HEREDOC_START
 %state INTERPOLATION
-%state CHAR_LIST
+%state NAMED_SIGIL
+%state SIGIL
+%state SIGIL_MODIFIERS
 
 %%
 
+// YYINITIAL is first even though it isn't lexicographically first because it is the first state.
 <YYINITIAL> {
   /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
    * it is filtered out.
@@ -104,25 +270,13 @@ NON_WHITE_SPACE = {COMMENT} |
                            return TokenType.WHITE_SPACE; }
 
   // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
-  {NON_WHITE_SPACE}      { handleInState(BODY); }
+  .                      { handleInState(BODY); }
 }
 
-// Rules common to CharLists and Strings
-<CHAR_LIST,
- CHAR_LIST_HEREDOC_LINE_BODY,
- STRING,
- STRING_HEREDOC_LINE_BODY> {
-  {INTERPOLATION_START}   { callState(INTERPOLATION);
-                            return ElixirTypes.INTERPOLATION_START; }
-  {VALID_ESCAPE_SEQUENCE} { return ElixirTypes.VALID_ESCAPE_SEQUENCE; }
-}
-
-// Rules that aren't common to STRING and STRING_HEREDOC_BODY
-<STRING> {
-  {DOUBLE_QUOTES} { returnFromState();
-                    return ElixirTypes.DOUBLE_QUOTES; }
-  {EOL}|.         { return ElixirTypes.STRING_FRAGMENT; }
-}
+/*
+ *  Lexical rules - Ordered alphabetically by state name except when the order of the internal rules need to be
+ *  maintained to ensure precedence.
+ */
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
 <BODY, INTERPOLATION> {
@@ -131,95 +285,128 @@ NON_WHITE_SPACE = {COMMENT} |
    * @see https://github.com/idavis/Innovatian.Idea.PowerShell/blob/80bbe5bbcb15f95d8b33f4a34b86acb6b65ac67e/src/lang/lexer/PowerShell.flex#L78
    * @see https://github.com/idavis/Innovatian.Idea.PowerShell/blob/80bbe5bbcb15f95d8b33f4a34b86acb6b65ac67e/src/lang/lexer/PowerShell.flex#L227
    */
-  {EOL}({EOL}|{WHITE_SPACE})* { return ElixirTypes.EOL; }
+  {EOL}({EOL}|{WHITE_SPACE})*               { return ElixirTypes.EOL; }
   // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
-  {WHITE_SPACE}+              { return TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 
-  {COMMENT}                   { return ElixirTypes.COMMENT; }
+  {COMMENT}                                 { return ElixirTypes.COMMENT; }
 
-  {INTEGER}                   { return ElixirTypes.NUMBER; }
+  {INTEGER}                                 { return ElixirTypes.NUMBER; }
 
-  {TRIPLE_SINGLE_QUOTE}       { callState(CHAR_LIST_HEREDOC_START);
-                                return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
-  {SINGLE_QUOTE}              { callState(CHAR_LIST);
-                                return ElixirTypes.SINGLE_QUOTE; }
-  {TRIPLE_DOUBLE_QUOTES}      { callState(STRING_HEREDOC_START);
-                                return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-  {DOUBLE_QUOTES}             { callState(STRING);
-                                return ElixirTypes.DOUBLE_QUOTES; }
+  {TILDE}                                   { pushAndBegin(SIGIL);
+                                              return ElixirTypes.TILDE; }
+
+  {QUOTE_HEREDOC_PROMOTER}                  { startQuote(yytext());
+                                              return promoterType(); }
+
+  {QUOTE_PROMOTER}                          { startQuote(yytext());
+                                              return promoterType(); }
 }
 
-// Only rules for <BODY>, but not <INTERPOLATION> go here.
-// @note MUST be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
-<BODY> {
-  .                           { return TokenType.BAD_CHARACTER; }
+<GROUP,
+ GROUP_HEREDOC_LINE_BODY> {
+  {INTERPOLATION_START}   {
+                            if (isInterpolating()) {
+                             pushAndBegin(INTERPOLATION);
+                             return ElixirTypes.INTERPOLATION_START;
+                            } else {
+                             return fragmentType();
+                            }
+                          }
+  {VALID_ESCAPE_SEQUENCE} {
+                            if (isInterpolating()) {
+                              return ElixirTypes.VALID_ESCAPE_SEQUENCE;
+                            } else {
+                              return fragmentType();
+                            }
+                          }
+}
+
+// Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
+<GROUP> {
+  {GROUP_TERMINATOR} {
+                       if (isTerminator(yytext())) {
+                         org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                         yybegin(stackFrame.getLastLexicalState());
+                         return stackFrame.terminatorType();
+                       } else {
+                         return fragmentType();
+                       }
+                     }
+  {EOL}|.            { return fragmentType(); }
+
+}
+
+<GROUP_HEREDOC_END> {
+    {GROUP_HEREDOC_TERMINATOR} {
+                                   if (isTerminator(yytext())) {
+                                      if (isSigil()) {
+                                        yybegin(SIGIL_MODIFIERS);
+                                        return terminatorType();
+                                      } else {
+                                        org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                        yybegin(stackFrame.getLastLexicalState());
+                                        return stackFrame.terminatorType();
+                                      }
+                                   } else {
+                                      handleInState(GROUP_HEREDOC_LINE_BODY);
+                                   }
+                               }
+}
+
+// Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
+<GROUP_HEREDOC_LINE_BODY> {
+  {EOL} {
+          yybegin(GROUP_HEREDOC_LINE_START);
+          return fragmentType();
+        }
+  .     { return fragmentType(); }
+}
+
+<GROUP_HEREDOC_LINE_START> {
+  {WHITE_SPACE}+ / {GROUP_HEREDOC_TERMINATOR} {
+                                                  yybegin(GROUP_HEREDOC_END);
+                                                  return TokenType.WHITE_SPACE;
+                                              }
+  {GROUP_HEREDOC_TERMINATOR}                  { handleInState(GROUP_HEREDOC_END); }
+  {EOL}|.                                     { handleInState(GROUP_HEREDOC_LINE_BODY); }
+}
+
+<GROUP_HEREDOC_START> {
+  {EOL} { yybegin(GROUP_HEREDOC_LINE_START);
+          return ElixirTypes.EOL; }
 }
 
 // Only rules for <INTERPOLATON>, but not <BODY> go here.
 // @note must be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
 <INTERPOLATION> {
-  {INTERPOLATION_END}         { returnFromState();
+  {INTERPOLATION_END}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                yybegin(stackFrame.getLastLexicalState());
                                 return ElixirTypes.INTERPOLATION_END; }
-
-  .                           { return TokenType.BAD_CHARACTER; }
 }
 
-<CHAR_LIST_HEREDOC_START> {
-  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.EOL; }
-  .     { return TokenType.BAD_CHARACTER; }
+<NAMED_SIGIL> {
+  {SIGIL_HEREDOC_PROMOTER} { setPromoter(yytext());
+                             yybegin(GROUP_HEREDOC_START);
+                             return promoterType(); }
+  {SIGIL_PROMOTER}         { setPromoter(yytext());
+                             yybegin(GROUP);
+                             return promoterType(); }
 }
 
-<CHAR_LIST_HEREDOC_LINE_START> {
-  {WHITE_SPACE}+ / {TRIPLE_SINGLE_QUOTE} { yybegin(CHAR_LIST_HEREDOC_END); return TokenType.WHITE_SPACE; }
-  {TRIPLE_DOUBLE_QUOTES}                 { handleInState(CHAR_LIST_HEREDOC_END); }
-  .                                      { handleInState(CHAR_LIST_HEREDOC_LINE_BODY); }
+<SIGIL> {
+  {SIGIL_NAME}               { nameSigil(yytext());
+                               yybegin(NAMED_SIGIL);
+                               return sigilNameType(); }
 }
 
-<CHAR_LIST_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(CHAR_LIST_HEREDOC_LINE_START); return ElixirTypes.CHAR_LIST_FRAGMENT; }
-  .     { return ElixirTypes.CHAR_LIST_FRAGMENT; }
+<SIGIL_MODIFIERS> {
+  {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
+  {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     handleInState(stackFrame.getLastLexicalState()); }
 }
 
-<CHAR_LIST_HEREDOC_END> {
-  {TRIPLE_SINGLE_QUOTE} { returnFromState();
-                          return ElixirTypes.TRIPLE_SINGLE_QUOTE; }
-}
-
-/* The start of a heredoc is unique as we want to handle the error condition of having characters other than a newline
-   after the {TRIPLE_DOUBLE_QUOTES}:
-
-       iex> """a
-            ** (SyntaxError) iex:6: heredoc start must be followed by a new line after """ */
-<STRING_HEREDOC_START> {
-  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.EOL; }
-  .     { return TokenType.BAD_CHARACTER; }
-}
-
-<STRING_HEREDOC_LINE_START> {
-  /* TRIPLE_DOUBLE_QUOTES only end the heredoc when preceeded ONLY by whitespace on the line
-     iex(7)>     """
-     ...(7)>  hi
-     ...(7)>   there"""
-     ...(7)>
-     ...(7)> """
-     " hi\n  there\"\"\"\n\n" */
-  {WHITE_SPACE}+ / {TRIPLE_DOUBLE_QUOTES} { yybegin(STRING_HEREDOC_END); return TokenType.WHITE_SPACE; }
-  {TRIPLE_DOUBLE_QUOTES} { handleInState(STRING_HEREDOC_END); }
-  .                      { handleInState(STRING_HEREDOC_LINE_BODY); }
-}
-
-<STRING_HEREDOC_LINE_BODY> {
-  {EOL} { yybegin(STRING_HEREDOC_LINE_START); return ElixirTypes.STRING_FRAGMENT; }
-  .     { return ElixirTypes.STRING_FRAGMENT; }
-}
-
-<STRING_HEREDOC_END> {
-  {TRIPLE_DOUBLE_QUOTES} { returnFromState();
-                           return ElixirTypes.TRIPLE_DOUBLE_QUOTES; }
-}
-
-<CHAR_LIST> {
-  {SINGLE_QUOTE}         { returnFromState();
-                           return ElixirTypes.SINGLE_QUOTE; }
-  {EOL}|.                { return ElixirTypes.CHAR_LIST_FRAGMENT; }
+// MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
+<BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
+  . { return TokenType.BAD_CHARACTER; }
 }

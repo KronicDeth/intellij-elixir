@@ -1,5 +1,5 @@
 Elixir File(0,38)
-  PsiErrorElement:ElixirTokenType.DOUBLE_QUOTES, ElixirTokenType.NUMBER, ElixirTokenType.SINGLE_QUOTE, ElixirTokenType.TRIPLE_DOUBLE_QUOTES or ElixirTokenType.TRIPLE_SINGLE_QUOTE expected, got 'b'(0,1)
+  PsiErrorElement:ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.NUMBER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER or ElixirTokenType.TILDE expected, got 'b'(0,1)
     PsiElement(BAD_CHARACTER)('b')(0,1)
   PsiElement(DUMMY_BLOCK)(1,11)
     PsiElement(BAD_CHARACTER)('a')(1,2)

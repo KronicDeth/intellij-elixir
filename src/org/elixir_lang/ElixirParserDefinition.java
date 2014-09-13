@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
-import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
@@ -18,13 +17,18 @@ import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Reader;
-
 /**
  * Created by luke.imhoff on 8/2/14.
  */
 public class ElixirParserDefinition implements ParserDefinition {
     public static final TokenSet COMMENTS = TokenSet.create(ElixirTypes.COMMENT);
+    public static final TokenSet STRING_LITERALS = TokenSet.create(
+            ElixirTypes.CHAR_LIST_FRAGMENT,
+            ElixirTypes.REGEX_FRAGMENT,
+            ElixirTypes.SIGIL_FRAGMENT,
+            ElixirTypes.STRING_FRAGMENT,
+            ElixirTypes.WORDS_FRAGMENT
+    );
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
 
     public static final IFileElementType FILE = new IFileElementType(Language.<ElixirLanguage>findInstance(ElixirLanguage.class));
@@ -47,7 +51,7 @@ public class ElixirParserDefinition implements ParserDefinition {
 
     @NotNull
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return STRING_LITERALS;
     }
 
     @NotNull
