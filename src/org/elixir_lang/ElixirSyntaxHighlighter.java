@@ -74,23 +74,24 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,
             ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,
             ElixirTypes.CHAR_LIST_PROMOTER,
-            ElixirTypes.CHAR_LIST_TERMINATOR
+            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER,
+            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR,
+            ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,
+            ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,
+            ElixirTypes.CHAR_LIST_TERMINATOR,
+            ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME,
+            ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME
     );
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
             ElixirTypes.INTERPOLATION_END
     );
+    // @todo Highlight each type of sigil separately and group char list and string with non-sigil versions
     private static final TokenSet SIGILS = TokenSet.create(
-            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER,
-            ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR,
-            ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,
-            ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,
-            ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME,
             ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME,
-            ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME,
             ElixirTypes.LITERAL_REGEX_SIGIL_NAME,
             ElixirTypes.LITERAL_SIGIL_NAME,
             ElixirTypes.LITERAL_STRING_SIGIL_NAME,
