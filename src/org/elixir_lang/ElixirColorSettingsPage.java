@@ -21,6 +21,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER),
+            new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING)
     };
 
@@ -52,7 +53,47 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "\"This String's body contains #{\"interpolation\"} and \\#{escapes}\"\n" +
                 "   \"\"\"\n" +
                 "   This String Heredoc's body contains #{\"interpolation\"} and \\#{escapes}\n" +
-                "   \"\"\"\n";
+                "   \"\"\"\n" +
+                "~c(CharList with #{\"interpolation\"})\n" +
+                "  ~c\"\"\"\n" +
+                "  CharList heredoc with #{\"interpolation\"}\n" +
+                "  \"\"\"\n" +
+                "~C/CharList without #{\"interpolation\"}/\n" +
+                "  ~C\"\"\"\n" +
+                "  CharList heredoc without #{\"interpolation\"}\n" +
+                "  \"\"\"\n" +
+                "~r{Regex with #{\"interpolation\"}\n" +
+                "  ~r\"\"\"\n" +
+                "  Regex heredoc with #{\"interpolation\"}\n" +
+                "  \"\"\"\n" +
+                "~R[Regex without #{\"interpolation\"]\n" +
+                "  ~R'''\n" +
+                "  Regex heredoc without #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~s<String with #{\"interpolation\"}>\n" +
+                "  ~s'''\n" +
+                "  String heredoc with #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~S|String without #{\"interpolation\"}|\n" +
+                "  ~S'''\n" +
+                "  String heredoc without #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~w'Words with #{\"interpolation\"}'\n" +
+                "  ~w'''\n" +
+                "  Words heredoc with #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~W\"Words without #{'interpolation'}\"\n" +
+                "  ~W'''\n" +
+                "  Words heredoc without #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~x'Sigil with #{\"interpolation\"}'\n" +
+                "  ~x'''\n" +
+                "  Sigil heredoc with #{\"interpolation\"}\n" +
+                "  '''\n" +
+                "~X{Sigil without #{'interpolation'}}\n" +
+                "  ~X'''\n" +
+                "  Sigil heredoc without #{\"interpolation\"}\n" +
+                "  '''";
     }
 
     @Nullable
