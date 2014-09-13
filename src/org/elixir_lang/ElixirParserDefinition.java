@@ -22,6 +22,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ElixirParserDefinition implements ParserDefinition {
     public static final TokenSet COMMENTS = TokenSet.create(ElixirTypes.COMMENT);
+    public static final TokenSet STRING_LITERALS = TokenSet.create(
+            ElixirTypes.CHAR_LIST_FRAGMENT,
+            ElixirTypes.REGEX_FRAGMENT,
+            ElixirTypes.SIGIL_FRAGMENT,
+            ElixirTypes.STRING_FRAGMENT,
+            ElixirTypes.WORDS_FRAGMENT
+    );
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
 
     public static final IFileElementType FILE = new IFileElementType(Language.<ElixirLanguage>findInstance(ElixirLanguage.class));
@@ -44,7 +51,7 @@ public class ElixirParserDefinition implements ParserDefinition {
 
     @NotNull
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return STRING_LITERALS;
     }
 
     @NotNull
