@@ -4,7 +4,7 @@
 
 * Enhancements
   * Literal and interpolated sigils with highlighting
-    * CharList Sigils (`~c` and `~C`) highlighted as 'Char List' in Settings.</li>
+    * CharList Sigils (`~c` and `~C`) highlighted as 'Char List' in Settings.
     * Regex Sigils (`~r` and `~R`) highlighted as 'Sigil' in Settings. **NOTE: Regex syntax is not internally highlighted yet**
     * String Sigils (`~s` and `~S`) highlighted as 'String' in Settings.
     * Word Sigils (`~w` and `~W`) highlighted as 'Sigil' in Settings.
