@@ -66,7 +66,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "  ~r\"\"\"\n" +
                 "  Regex heredoc with #{\"interpolation\"}\n" +
                 "  \"\"\"\n" +
-                "~R[Regex without #{\"interpolation\"]\n" +
+                "~R[Regex without #{\"interpolation\"}]\n" +
                 "  ~R'''\n" +
                 "  Regex heredoc without #{\"interpolation\"}\n" +
                 "  '''\n" +
