@@ -10,6 +10,7 @@
     * Word Sigils (`~w` and `~W`) highlighted as 'Sigil' in Settings.
     * Custom Sigils highlighted as 'Sigil' in Settings.
     * Modifiers are highlighted on Regex, Word, and Custom while modifiers aren't allowed on CharList and String Sigils.
+    
 * Bug Fixes
   * Single-quoted strings are correctly referred to as 'Character List' now instead of 'String' in Settings.
   * Double-quoted strings are correctly referred to as 'String' now instead of 'Interpolated String' in Settings.
