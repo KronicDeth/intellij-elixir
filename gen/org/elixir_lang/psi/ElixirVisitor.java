@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
+  public void visitAtom(@NotNull ElixirAtom o) {
+    visitPsiElement(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
     visitPsiElement(o);
   }

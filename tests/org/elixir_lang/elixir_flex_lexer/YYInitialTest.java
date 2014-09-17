@@ -22,6 +22,14 @@ public class YYInitialTest extends org.elixir_lang.elixir_flex_lexer.Test {
     }
 
     @Test
+    public void colon() throws IOException {
+        reset(":");
+
+        assertEquals(ElixirTypes.COLON, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.ATOM, flexLexer.yystate());
+    }
+
+    @Test
     public void empty() throws IOException {
         reset("");
 

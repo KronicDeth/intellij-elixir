@@ -8,6 +8,7 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
+  IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
@@ -24,6 +25,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_PROMOTER");
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
+  IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
@@ -71,7 +73,10 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == CHAR_LIST) {
+       if (type == ATOM) {
+        return new ElixirAtomImpl(node);
+      }
+      else if (type == CHAR_LIST) {
         return new ElixirCharListImpl(node);
       }
       else if (type == CHAR_LIST_HEREDOC) {

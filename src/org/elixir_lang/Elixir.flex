@@ -105,6 +105,12 @@ import org.elixir_lang.psi.ElixirTypes;
 %}
 
 /*
+ * Atom
+ */
+
+COLON = :
+
+/*
  * White Space
  */
 
@@ -247,6 +253,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
  *  States - Ordered lexigraphically
  */
 
+%state ATOM
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
 %state GROUP
@@ -289,6 +296,9 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
   {WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 
+  {COLON}                                   { yybegin(ATOM);
+                                              return ElixirTypes.COLON; }
+
   {COMMENT}                                 { return ElixirTypes.COMMENT; }
 
   {INTEGER}                                 { return ElixirTypes.NUMBER; }
@@ -298,9 +308,14 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 
   {QUOTE_HEREDOC_PROMOTER}                  { startQuote(yytext());
                                               return promoterType(); }
+}
 
-  {QUOTE_PROMOTER}                          { startQuote(yytext());
-                                              return promoterType(); }
+/* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
+   {QUOTE_PROMOTER} */
+<ATOM, BODY, INTERPOLATION> {
+  {QUOTE_PROMOTER} { startQuote(yytext());
+                     return promoterType(); }
+  {EOL}            { return TokenType.BAD_CHARACTER; }
 }
 
 <GROUP,
@@ -407,6 +422,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
-<BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
+<ATOM, BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
   . { return TokenType.BAD_CHARACTER; }
 }

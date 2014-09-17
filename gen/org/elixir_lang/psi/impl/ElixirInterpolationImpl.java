@@ -24,6 +24,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirAtom> getAtomList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirCharList> getCharListList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
   }

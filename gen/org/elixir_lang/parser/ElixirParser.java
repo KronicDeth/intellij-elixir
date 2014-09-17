@@ -20,7 +20,10 @@ public class ElixirParser implements PsiParser {
     boolean result_;
     builder_ = adapt_builder_(root_, builder_, this, null);
     Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
-    if (root_ == CHAR_LIST) {
+    if (root_ == ATOM) {
+      result_ = atom(builder_, 0);
+    }
+    else if (root_ == CHAR_LIST) {
       result_ = charList(builder_, 0);
     }
     else if (root_ == CHAR_LIST_HEREDOC) {
@@ -47,6 +50,19 @@ public class ElixirParser implements PsiParser {
 
   protected boolean parse_root_(final IElementType root_, final PsiBuilder builder_, final int level_) {
     return elixirFile(builder_, level_ + 1);
+  }
+
+  /* ********************************************************** */
+  // COLON quote
+  public static boolean atom(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "atom")) return false;
+    if (!nextTokenIs(builder_, COLON)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, COLON);
+    result_ = result_ && quote(builder_, level_ + 1);
+    exit_section_(builder_, marker_, ATOM, result_);
+    return result_;
   }
 
   /* ********************************************************** */
@@ -88,16 +104,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // NUMBER | charList | charListHeredoc | sigil | string | stringHeredoc
+  // atom | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = charList(builder_, level_ + 1);
+    result_ = atom(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, NUMBER);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = sigil(builder_, level_ + 1);
-    if (!result_) result_ = string(builder_, level_ + 1);
     if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
@@ -766,6 +782,19 @@ public class ElixirParser implements PsiParser {
       pos_ = current_position_(builder_);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // charList | string
+  static boolean quote(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "quote")) return false;
+    if (!nextTokenIs(builder_, "", CHAR_LIST_PROMOTER, STRING_PROMOTER)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = charList(builder_, level_ + 1);
+    if (!result_) result_ = string(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
   }
 
   /* ********************************************************** */
