@@ -108,6 +108,9 @@ import org.elixir_lang.psi.ElixirTypes;
  * Atom
  */
 
+ATOM_START = [a-zA-Z_]
+ATOM_MIDDLE = [0-9a-zA-Z@_]
+ATOM_END = [?!]
 COLON = :
 
 /*
@@ -253,7 +256,8 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
  *  States - Ordered lexigraphically
  */
 
-%state ATOM
+%state ATOM_BODY
+%state ATOM_START
 // state after YYINITIAL has taken care of any white space prefix
 %state BODY
 %state GROUP
@@ -280,6 +284,30 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   .                      { handleInState(BODY); }
 }
 
+<ATOM_BODY> {
+  {ATOM_END}     { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                   yybegin(stackFrame.getLastLexicalState());
+                   return ElixirTypes.ATOM_FRAGMENT; }
+  {ATOM_MIDDLE}+ { return ElixirTypes.ATOM_FRAGMENT; }
+  // any other character ends the atom
+  {EOL}|.        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                   handleInState(stackFrame.getLastLexicalState()); }
+}
+
+/// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
+<ATOM_START> {
+  {ATOM_START}     { yybegin(ATOM_BODY);
+                     return ElixirTypes.ATOM_FRAGMENT; }
+  {QUOTE_PROMOTER} { /* At the end of the quote, return the state (BODY or INTERPOLATION) before ATOM_START as anything
+                        after the closing quote should be handle by the state prior to ATOM_START.  Without this,
+                        EOL and WHITESPACE won't be handled correctly */
+                     org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     yybegin(stackFrame.getLastLexicalState());
+                     startQuote(yytext());
+                     return promoterType(); }
+  {EOL}            { return TokenType.BAD_CHARACTER; }
+}
+
 /*
  *  Lexical rules - Ordered alphabetically by state name except when the order of the internal rules need to be
  *  maintained to ensure precedence.
@@ -296,7 +324,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
   {WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 
-  {COLON}                                   { yybegin(ATOM);
+  {COLON}                                   { pushAndBegin(ATOM_START);
                                               return ElixirTypes.COLON; }
 
   {COMMENT}                                 { return ElixirTypes.COMMENT; }
@@ -308,14 +336,10 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 
   {QUOTE_HEREDOC_PROMOTER}                  { startQuote(yytext());
                                               return promoterType(); }
-}
-
-/* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
-   {QUOTE_PROMOTER} */
-<ATOM, BODY, INTERPOLATION> {
-  {QUOTE_PROMOTER} { startQuote(yytext());
-                     return promoterType(); }
-  {EOL}            { return TokenType.BAD_CHARACTER; }
+  /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
+     {QUOTE_PROMOTER} */
+  {QUOTE_PROMOTER}                          { startQuote(yytext());
+                                              return promoterType(); }
 }
 
 <GROUP,
@@ -422,6 +446,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
-<ATOM, BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
+<ATOM_START, BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
   . { return TokenType.BAD_CHARACTER; }
 }

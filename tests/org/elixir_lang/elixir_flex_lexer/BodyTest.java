@@ -21,7 +21,7 @@ public class BodyTest  extends org.elixir_lang.elixir_flex_lexer.Test {
         reset(":");
 
         assertEquals(ElixirTypes.COLON, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM, flexLexer.yystate());
+        assertEquals(ElixirFlexLexer.ATOM_START, flexLexer.yystate());
     }
 
     @Test

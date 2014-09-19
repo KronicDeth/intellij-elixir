@@ -21,7 +21,7 @@ elixirFile ::= expressionList
 
 // In alphabetical order
 
-atom ::= COLON quote
+atom ::= COLON (ATOM_FRAGMENT | quote)
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR

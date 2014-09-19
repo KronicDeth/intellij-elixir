@@ -53,15 +53,26 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // COLON quote
+  // COLON (ATOM_FRAGMENT | quote)
   public static boolean atom(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "atom")) return false;
     if (!nextTokenIs(builder_, COLON)) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, COLON);
-    result_ = result_ && quote(builder_, level_ + 1);
+    result_ = result_ && atom_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, ATOM, result_);
+    return result_;
+  }
+
+  // ATOM_FRAGMENT | quote
+  private static boolean atom_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "atom_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, ATOM_FRAGMENT);
+    if (!result_) result_ = quote(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
