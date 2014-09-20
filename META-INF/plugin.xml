@@ -9,33 +9,17 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.1.0</h1>
+      <h1>v0.1.1</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
-            <li>
-            Literal and interpolated sigils with highlighting
-            <ul>
-              <li>Char List Sigils (<code>~c</code> and <code>~C</code>) highlighted as 'Char List' in Settings.</li>
-              <li>
-                Regex Sigils (<code>~r</code> and <code>~R</code>) highlighted as 'Sigil' in Settings.
-                <strong>NOTE: RegExp syntax is not internally highlighted yet</strong>
-              </li>
-              <li>String Sigils (<code>~s</code> and <code>~S</code> highlighted as 'String' in Settings.</li>
-              <li>Word Sigils (<code>~w</code> and <code>~W</code> highlighted as 'Sigil' in Settings.</li>
-              <li>Custom Sigils highlighted as 'Sigil' in Settings.</li>
-              <li>Modifiers are highlighted on Regex, Word, and Custom while modifiers aren't allowed on CharList and String Sigils.</li>
-            </ul>
           </ul>
          </li>
          <li>
           <p>Bug Fixes</p>
           <ul>
-            <li>Single-quoted strings are correctly referred to as 'Character List' now instead of 'String' in Settings.</li>
-            <li>Double-quoted strings are correctly referred to as 'String' now instead of 'Interpolated String' in Settings.</li>
-            <li>Non-Heredoc CharLists and Strings can be multiline.</li>
-            <li>CharLists and Strings support interpolation and escape sequences.</li>
+            <li>Build using JDK 6 instead of 7 so that plugin will work by default on OSX Mavericks.</li>
           </ul>
         </li>
       </ul>
