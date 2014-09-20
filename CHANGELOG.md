@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.1
+
+* Bug Fixes
+  * Build using JDK 6 instead of 7 so that plugin will work by default on OSX Mavericks.
+
 ## v0.1.0
 
 * Enhancements
