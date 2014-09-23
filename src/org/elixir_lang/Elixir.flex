@@ -105,12 +105,75 @@ import org.elixir_lang.psi.ElixirTypes;
 %}
 
 /*
+ * Operator
+ *
+ * Note: before Atom because operator prefixed by {COLON} are valid Atoms
+ */
+
+FOUR_TOKEN_OPERATOR = "<<>>"
+
+THREE_TOKEN_OPERATOR = "!==" |
+                       "%{}" |
+                       "&&&" |
+                       "..." |
+                       "<<<" |
+                       "<<~" |
+                       "<|>" |
+                       "<~>" |
+                       "===" |
+                       ">>>" |
+                       "^^^" |
+                       "|||" |
+                       "~>>" |
+                       "~~~"
+
+TWO_TOKEN_OPERATOR = "!=" |
+                     "&&" |
+                     "++" |
+                     "--" |
+                     "->" |
+                     "::" |
+                     "<-" |
+                     "<=" |
+                     "<>" |
+                     "<~" |
+                     "==" |
+                     "=~" |
+                     ">=" |
+                     "\\\\" |
+                     "{}" |
+                     "|>" |
+                     "||" |
+                     "~>"
+
+ONE_TOKEN_OPERATOR = "!" |
+                     "%" |
+                     "&" |
+                     "*" |
+                     "+" |
+                     "-" |
+                     "." |
+                     "/" |
+                     "<" |
+                     "=" |
+                     ">" |
+                     "@" |
+                     "^" |
+                     "|"
+
+// OPERATOR is from longest to shortest so longest match wins
+OPERATOR = {FOUR_TOKEN_OPERATOR} |
+           {THREE_TOKEN_OPERATOR} |
+           {TWO_TOKEN_OPERATOR} |
+           {ONE_TOKEN_OPERATOR}
+
+/*
  * Atom
  */
 
-ATOM_START = [a-zA-Z_]
-ATOM_MIDDLE = [0-9a-zA-Z@_]
 ATOM_END = [?!]
+ATOM_MIDDLE = [0-9a-zA-Z@_]
+ATOM_START = [a-zA-Z_]
 COLON = :
 
 /*
@@ -305,6 +368,9 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
                      yybegin(stackFrame.getLastLexicalState());
                      startQuote(yytext());
                      return promoterType(); }
+  {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     yybegin(stackFrame.getLastLexicalState());
+                     return ElixirTypes.ATOM_FRAGMENT; }
   {EOL}            { return TokenType.BAD_CHARACTER; }
 }
 
