@@ -50,6 +50,8 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 ":literal_atom\n" +
                 ":\"double #{\"quoted\"} atom\"\n" +
                 ":'single #{\'quoted\'} atom'\n" +
+                "# operator atoms\n" +
+                ":|>\n" +
                 "'This CharList\\'s body contains #{'interpolation'} and \\#{escapes}'\n" +
                 "  '''\n" +
                 "  This CharList Heredoc's body contains #{'interpolation'} and \\#{escapes}\n" +
