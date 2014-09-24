@@ -14,6 +14,10 @@ public class AtomParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testOperator() {
+        doTest(true);
+    }
+
     public void testSingleQuoted() {
         doTest(true);
     }
