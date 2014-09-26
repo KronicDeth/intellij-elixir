@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public class ElixirColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
+            new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
@@ -46,6 +47,11 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "012345670 # deprecated octal\n" +
                 "0x1234567890abcdefABCDEF # hexadecimal\n" +
                 "0X1234567890abcdefABCDEF # deprecated hexadecimal\n" +
+                ":literal_atom\n" +
+                ":\"double #{\"quoted\"} atom\"\n" +
+                ":'single #{\'quoted\'} atom'\n" +
+                "# operator atoms\n" +
+                ":|>\n" +
                 "'This CharList\\'s body contains #{'interpolation'} and \\#{escapes}'\n" +
                 "  '''\n" +
                 "  This CharList Heredoc's body contains #{'interpolation'} and \\#{escapes}\n" +

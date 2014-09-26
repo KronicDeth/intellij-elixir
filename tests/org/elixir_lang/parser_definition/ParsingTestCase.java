@@ -5,7 +5,7 @@ import org.elixir_lang.ElixirParserDefinition;
 /**
  * Created by luke.imhoff on 8/7/14.
  */
-public class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
+public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
         super("", "ex", new ElixirParserDefinition());
     }

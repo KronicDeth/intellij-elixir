@@ -17,6 +17,11 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by luke.imhoff on 8/2/14.
  */
 public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
+    static final TextAttributesKey ATOM = createTextAttributesKey(
+            "ELIXIR_ATOM",
+            DefaultLanguageHighlighterColors.INSTANCE_FIELD
+    );
+
     static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey(
             "ELIXIR_BAD_CHARACTER",
             HighlighterColors.BAD_CHARACTER
@@ -58,6 +63,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
     );
 
+    private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
@@ -68,7 +74,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
 
-
+    private static final TokenSet ATOMS = TokenSet.create(
+            ElixirTypes.COLON,
+            ElixirTypes.ATOM_FRAGMENT
+    );
     private static final TokenSet CHAR_LISTS = TokenSet.create(
             ElixirTypes.CHAR_LIST_FRAGMENT,
             ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,
@@ -135,7 +144,9 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (tokenType.equals(TokenType.BAD_CHARACTER)) {
+        if (ATOMS.contains(tokenType)) {
+            return ATOM_KEYS;
+        } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
         } else if (CHAR_LISTS.contains(tokenType)) {
             return CHAR_LIST_KEYS;

@@ -17,6 +17,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class BodyTest  extends org.elixir_lang.elixir_flex_lexer.Test {
     @Test
+    public void colon() throws IOException {
+        reset(":");
+
+        assertEquals(ElixirTypes.COLON, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.ATOM_START, flexLexer.yystate());
+    }
+
+    @Test
     public void eol() throws IOException {
         reset("\n");
 

@@ -21,6 +21,7 @@ elixirFile ::= expressionList
 
 // In alphabetical order
 
+atom ::= COLON (ATOM_FRAGMENT | quote)
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -73,10 +74,11 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
+private quote ::= (charList | string)
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-private expression ::= (NUMBER | charList | charListHeredoc | sigil | string | stringHeredoc)
+private expression ::= (atom | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
 private expressionList ::= expression (EOL expression)* EOL?
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 sigil ::= interpolatedCharListSigil |
