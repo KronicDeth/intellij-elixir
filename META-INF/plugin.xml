@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,19 +9,24 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.1.1</h1>
+      <h1>v0.1.2</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
+            <li>
+              <p>Atoms with highlighting</p>
+              <ul>
+                <li>
+                  Atom with double or single quotes to allow interpolation.  Double quotes are highlighted as 'String'
+                  while single quotes are highlighted as 'Char List'.  This may be changed in the future.
+                </li>
+                <li>Literal atoms highlighted as 'Atom'.</li>
+                <li>Operator atoms highlighted as 'Atom'.</li>
+              </ul>
+            </li>
           </ul>
          </li>
-         <li>
-          <p>Bug Fixes</p>
-          <ul>
-            <li>Build using JDK 6 instead of 7 so that plugin will work by default on OSX Mavericks.</li>
-          </ul>
-        </li>
       </ul>
     ]]>
   </change-notes>

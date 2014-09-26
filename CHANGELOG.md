@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.1.2
+
+* Enhancements
+ * Atoms with highlighting
+   * Atom with double or single quotes to allow interpolation.  Double quotes are highlighted as 'String' while single
+     quotes are highlighted as 'Char List'.  This may be changed in the future.
+   * Literal atoms highlighted as 'Atom'.
+   * Operator atoms highlighted as 'Atom'.
+
 ## v0.1.1
 
 * Bug Fixes
@@ -15,7 +24,6 @@
     * Word Sigils (`~w` and `~W`) highlighted as 'Sigil' in Settings.
     * Custom Sigils highlighted as 'Sigil' in Settings.
     * Modifiers are highlighted on Regex, Word, and Custom while modifiers aren't allowed on CharList and String Sigils.
-    
 * Bug Fixes
   * Single-quoted strings are correctly referred to as 'Character List' now instead of 'String' in Settings.
   * Double-quoted strings are correctly referred to as 'String' now instead of 'Interpolated String' in Settings.
@@ -36,7 +44,6 @@
   * Binary, Hexadecimal, and Octal numbers (including deprecated syntax) are recognized as numbers.
   * Syntax Highlighting for numbers.
   * Color Settings page for changing the color of comments and numbers for Elixir (Preferences > Editor > Colors & Fonts > Elixir).
-
 * Bug Fixes
   * Parser no longer freezes IDE on tokens it doesn't understand.
   * White space at beginning of lines no longer leads to annotation errors.
