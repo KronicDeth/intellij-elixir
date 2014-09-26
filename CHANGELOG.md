@@ -4,10 +4,10 @@
 
 * Enhancements
  * Atoms with highlighting
-   * Atom with double or single quotes to allow interpolation.  Double quotes are highlighted as 'String' while single
-     quotes are highlighted as 'Char List'.  This may be changed in the future.
-   * Literal atoms highlighted as 'Atom'.
-   * Operator atoms highlighted as 'Atom'.
+    * Atom with double or single quotes to allow interpolation.  Double quotes are highlighted as 'String' while single
+      quotes are highlighted as 'Char List'.  This may be changed in the future.
+    * Literal atoms highlighted as 'Atom'.
+    * Operator atoms highlighted as 'Atom'.
 
 ## v0.1.1
 
