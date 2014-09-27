@@ -16,7 +16,7 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class YYInitialTest extends org.elixir_lang.elixir_flex_lexer.Test {
     /*
-     *
+     * Constants
      */
 
     private static final int INITIAL_STATE = ElixirFlexLexer.YYINITIAL;
