@@ -1,22 +1,14 @@
 package org.elixir_lang.elixir_flex_lexer;
 
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by luke.imhoff on 9/1/14.
@@ -24,25 +16,15 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 public class BodyTest  extends org.elixir_lang.elixir_flex_lexer.Test {
     /*
-     * Fields
-     */
-
-    private CharSequence charSequence;
-    private int lexicalState;
-    private IElementType tokenType;
-
-    /*
      * Constructors
      */
 
     public BodyTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
-        this.charSequence = charSequence;
-        this.lexicalState = lexicalState;
-        this.tokenType = tokenType;
+        super(charSequence, tokenType, lexicalState);
     }
 
     @Parameterized.Parameters(
-            name = "{0} parses as {1} token and advances to state {2}"
+            name = "\"{0}\" parses as {1} token and advances to state {2}"
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][] {
@@ -66,14 +48,5 @@ public class BodyTest  extends org.elixir_lang.elixir_flex_lexer.Test {
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
                 }
         );
-    }
-
-    @Test
-    public void token() throws IOException {
-        reset(charSequence);
-
-        assertEquals(tokenType, flexLexer.advance());
-        assertEquals(lexicalState, flexLexer.yystate());
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
     }
 }
