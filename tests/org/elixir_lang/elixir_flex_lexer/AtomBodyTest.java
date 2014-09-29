@@ -1,18 +1,33 @@
 package org.elixir_lang.elixir_flex_lexer;
 
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/16/14.
  */
+@RunWith(Parameterized.class)
 public class AtomBodyTest extends TokenTest {
+    /*
+     * Constructors
+     */
+
+    public AtomBodyTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        super(charSequence, tokenType, lexicalState);
+    }
+
+    /*
+     * Methods
+     */
+
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger ATOM_BODY state
@@ -24,75 +39,21 @@ public class AtomBodyTest extends TokenTest {
         flexLexer.advance();
     }
 
-    @Test
-    public void atSign() throws IOException {
-        reset("@");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void digit() throws IOException {
-        reset("0");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(ElixirTypes.EOL, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
-    }
-
-    @Test
-    public void exclamationPoint() throws IOException {
-        reset("!");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
-    }
-
-    @Test
-    public void lowerCaseLetter() throws IOException {
-        reset("a");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void questionMark() throws IOException {
-        reset("?");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
-    }
-
-    @Test
-    public void space() throws IOException {
-        reset(" ");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
-    }
-
-    @Test
-    public void underscore() throws IOException {
-        reset("_");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void upperCaseLetter() throws IOException {
-        reset("A");
-
-        assertEquals(ElixirTypes.ATOM_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.ATOM_BODY, flexLexer.yystate());
+    @Parameterized.Parameters(
+            name = "\"{0}\" parses as {1} token and advances to state {2}"
+    )
+    public static Collection<Object[]> generateData() {
+        return Arrays.asList(new Object[][] {
+                        { " ", TokenType.WHITE_SPACE, INITIAL_STATE },
+                        { "!", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "0", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "?", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "@", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "\n", ElixirTypes.EOL, INITIAL_STATE },
+                        { "_", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "a", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY }
+                }
+        );
     }
 }
