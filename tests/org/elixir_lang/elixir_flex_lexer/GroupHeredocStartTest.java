@@ -4,23 +4,18 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.Collection;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by luke.imhoff on 9/4/14.
  */
 @RunWith(Parameterized.class)
-public class GroupHeredocStartTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class GroupHeredocStartTest extends TokenTest {
     /*
      * Constructors
      */

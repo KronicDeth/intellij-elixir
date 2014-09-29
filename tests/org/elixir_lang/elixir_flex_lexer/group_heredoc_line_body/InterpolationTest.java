@@ -1,19 +1,18 @@
 package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body;
 
 import org.elixir_lang.ElixirFlexLexer;
+import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import static org.junit.Assert.assertEquals;
 
 /**
  * Created by luke.imhoff on 9/2/14.
  */
-public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class InterpolationTest extends TokenTest {
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP state with isInterpolating being true

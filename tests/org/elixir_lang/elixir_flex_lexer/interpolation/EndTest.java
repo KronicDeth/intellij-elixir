@@ -1,6 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer.interpolation;
 
 import org.elixir_lang.ElixirFlexLexer;
+import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/27/14.
  */
-public class EndTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class EndTest extends TokenTest {
     /*
      * Methods
      */

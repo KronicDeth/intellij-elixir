@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by luke.imhoff on 9/1/14.
  */
 @RunWith(Parameterized.class)
-public class YYInitialTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class YYInitialTest extends TokenTest {
     /*
      * Constants
      */

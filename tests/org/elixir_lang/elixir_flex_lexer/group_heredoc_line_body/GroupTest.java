@@ -6,6 +6,6 @@ import org.elixir_lang.elixir_flex_lexer.*;
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-public abstract class GroupTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public abstract class GroupTest extends TokenTest {
     protected abstract IElementType fragmentType();
 }

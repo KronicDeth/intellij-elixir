@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by luke.imhoff on 9/4/14.
  */
 @RunWith(Parameterized.class)
-public class SigilTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class SigilTest extends TokenTest {
     /*
      * Constants
      */

@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by luke.imhoff on 9/16/14.
  */
-public class AtomBodyTest extends org.elixir_lang.elixir_flex_lexer.Test {
+public class AtomBodyTest extends TokenTest {
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger ATOM_BODY state
