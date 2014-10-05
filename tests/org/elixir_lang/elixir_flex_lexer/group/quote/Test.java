@@ -2,79 +2,51 @@ package org.elixir_lang.elixir_flex_lexer.group.quote;
 
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
-import org.elixir_lang.elixir_flex_lexer.group.GroupTest;
-import org.junit.Before;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Vector;
 
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-public abstract class Test extends GroupTest {
-    @org.junit.Test
-    public void forwardSlash() throws IOException {
-        reset("/");
+public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test {
+    /*
+     * Constants
+     */
 
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+    public static final int LEXICAL_STATE = ElixirFlexLexer.GROUP;
+
+    /*
+     * Constructors
+     */
+
+
+    public Test(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        super(charSequence, tokenType, lexicalState);
     }
 
-    @org.junit.Test
-    public void closingBrace() throws IOException {
-        reset("}");
+    /*
+     * Methods
+     */
 
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
+    public static Collection<Object[]> generateData(IElementType fragmentType, Collection<Object[]> quoteData) {
+        Collection<Object[]> commonData = Arrays.asList(new Object[][]{
+                        { ")", fragmentType, LEXICAL_STATE },
+                        { "/", fragmentType, LEXICAL_STATE },
+                        { ">", fragmentType, LEXICAL_STATE },
+                        { "\n", fragmentType, LEXICAL_STATE },
+                        { "]", fragmentType, LEXICAL_STATE },
+                        { "a", fragmentType, LEXICAL_STATE },
+                        { "|", fragmentType, LEXICAL_STATE },
+                        { "}", fragmentType, LEXICAL_STATE }
+                }
+        );
 
-    @org.junit.Test
-    public void closingBracket() throws IOException {
-        reset("]");
+        Collection<Object[]> combinedData = new Vector<Object[]>();
+        combinedData.addAll(commonData);
+        combinedData.addAll(quoteData);
 
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @org.junit.Test
-    public void closingChrevon() throws IOException {
-        reset(">");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @org.junit.Test
-    public void closingParenthesis() throws IOException {
-        reset(")");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @org.junit.Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @org.junit.Test
-    public void character() throws IOException {
-        reset("a");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @org.junit.Test
-    public void pipe() throws IOException {
-        reset("|");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+        return combinedData;
     }
 }
