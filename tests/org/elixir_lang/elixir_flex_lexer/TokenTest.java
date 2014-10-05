@@ -22,6 +22,7 @@ public abstract class TokenTest extends Test {
     private CharSequence charSequence;
     private int lexicalState;
     private IElementType tokenType;
+    private boolean consumeAll;
 
     /*
      * Constructors
@@ -31,9 +32,14 @@ public abstract class TokenTest extends Test {
     }
 
     public TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        this(charSequence, tokenType, lexicalState, true);
+    }
+
+    public TokenTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
         this.charSequence = charSequence;
         this.lexicalState = lexicalState;
         this.tokenType = tokenType;
+        this.consumeAll = consumeAll;
     }
 
     /*
@@ -46,6 +52,11 @@ public abstract class TokenTest extends Test {
 
         assertEquals(tokenType, flexLexer.advance());
         assertEquals(lexicalState, flexLexer.yystate());
-        assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+
+        if (consumeAll) {
+            assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
+        } else {
+            assertTrue("Failure: expected all of \"" + charSequence + "\" not to be consumed", flexLexer.advance() != null);
+        }
     }
 }
