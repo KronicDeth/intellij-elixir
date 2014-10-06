@@ -9,6 +9,18 @@ import java.io.IOException;
  * Created by luke.imhoff on 9/12/14.
  */
 public abstract class Test extends TokenTest {
+    /*
+     * Constructors
+     */
+
+    public Test(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+        super(charSequence, tokenType, lexicalState, consumeAll);
+    }
+
+    /*
+     * Methods
+     */
+
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         CharSequence fullCharSequence = sigilName() + promoter() + '\n' + charSequence;
@@ -21,16 +33,6 @@ public abstract class Test extends TokenTest {
         flexLexer.advance();
     }
 
-    protected abstract IElementType fragmentType();
     protected abstract String promoter();
     protected abstract char sigilName();
-    protected abstract IElementType terminatorType();
-
-    public void tripleDoubleQuotes() throws IOException {
-        reset("\"\"\"");
-    }
-
-    public void tripleSingleQuotes() throws IOException {
-        reset("'''");
-    }
 }

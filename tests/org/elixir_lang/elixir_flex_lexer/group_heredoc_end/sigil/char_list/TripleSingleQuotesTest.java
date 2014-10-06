@@ -3,42 +3,49 @@ package org.elixir_lang.elixir_flex_lexer.group_heredoc_end.sigil.char_list;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/8/14.
  */
+@RunWith(Parameterized.class)
 public class TripleSingleQuotesTest extends org.elixir_lang.elixir_flex_lexer.group_heredoc_end.sigil.char_list.Test {
-    protected IElementType fragmentType() {
-        return ElixirTypes.CHAR_LIST_FRAGMENT;
+    /*
+     * Constants
+     */
+
+    public static final IElementType FRAGMENT_TYPE = ElixirTypes.CHAR_LIST_FRAGMENT;
+    public static final IElementType TERMINATOR_TYPE = ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR;
+
+    /*
+     * Constructors
+     */
+
+    public TripleSingleQuotesTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+        super(charSequence, tokenType, lexicalState, consumeAll);
+    }
+
+    /*
+     * Methods
+     */
+
+    @Parameterized.Parameters(
+            name = "\"{0}\" parses as {1} token and advances to state {2}"
+    )
+    public static Collection<Object[]> generateData() {
+        return Arrays.asList(
+                new Object[][]{
+                        {"'''", TERMINATOR_TYPE, INITIAL_STATE, true},
+                        {"\"\"\"", FRAGMENT_TYPE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false}
+                }
+        );
     }
 
     protected String promoter() {
         return "'''";
-    }
-
-    protected IElementType terminatorType() {
-        return ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR;
-    }
-
-    @Override
-    @Test
-    public void tripleDoubleQuotes() throws IOException {
-        super.tripleDoubleQuotes();
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void tripleSingleQuotes() throws IOException {
-        super.tripleSingleQuotes();
-
-        assertEquals(terminatorType(), flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
     }
 }
