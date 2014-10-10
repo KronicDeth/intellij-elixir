@@ -9,11 +9,14 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.1.2</h1>
+      <h1>v0.1.3</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
+            <li>
+              <p>Support for creation of Elixir modules</p>
+            </li>
             <li>
               <p>Atoms with highlighting</p>
               <ul>
@@ -43,6 +46,8 @@
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+
+    <internalFileTemplate name="Elixir Module"/>
   </extensions>
 
   <application-components>
@@ -54,7 +59,10 @@
   </project-components>
 
   <actions>
-    <!-- Add your actions here -->
+    <action id="Elixir.NewErlangFile" class="org.elixir_lang.action.CreateElixirFileAction"
+            text="Elixir File" description="Create new Elixir file">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+    </action>
   </actions>
 
 </idea-plugin>
