@@ -1,8 +1,9 @@
-package org.elixir_lang.elixir_flex_lexer;
+package org.elixir_lang.elixir_flex_lexer.atom_start;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
+import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -12,15 +13,15 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Created by luke.imhoff on 9/16/14.
+ * Created by luke.imhoff on 9/28/14.
  */
 @RunWith(Parameterized.class)
-public class AtomBodyTest extends TokenTest {
+public class FragmentTest extends TokenTest {
     /*
      * Constructors
      */
 
-    public AtomBodyTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+    public FragmentTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
         super(charSequence, tokenType, lexicalState);
     }
 
@@ -30,12 +31,10 @@ public class AtomBodyTest extends TokenTest {
 
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
-        // start to trigger ATOM_BODY state
-        CharSequence fullCharSequence = ":_" + charSequence;
+        // start to trigger ATOM_START state
+        CharSequence fullCharSequence = ":" + charSequence;
         super.reset(fullCharSequence);
-        // consume ':'
-        flexLexer.advance();
-        // consume '_'
+        // consume '~'
         flexLexer.advance();
     }
 
@@ -44,13 +43,10 @@ public class AtomBodyTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][] {
-                        { " ", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "!", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
-                        { "0", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
-                        { "?", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
-                        { "@", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
                         { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
-                        { "\n", ElixirTypes.EOL, INITIAL_STATE },
+                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
+                        { "\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
                         { "_", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
                         { "a", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY }
                 }

@@ -2,20 +2,37 @@ package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body.quote;
 
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
-import org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body.GroupTest;
-import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
+import org.elixir_lang.elixir_flex_lexer.TokenTest;
 
 import java.io.IOException;
-import java.io.Reader;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/6/14.
  */
-public abstract class PromoterTest extends GroupTest {
+public abstract class PromoterTest extends TokenTest {
+    /*
+     * Constructors
+     */
+
+    public PromoterTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        super(charSequence, tokenType, lexicalState);
+    }
+
+    /*
+     * Methods
+     */
+
+    public static Collection<Object[]> generateData(IElementType fragmentType) {
+        return Arrays.asList(
+                new Object[][] {
+                        { "\n", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
+                        { "a", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY }
+                }
+        );
+    }
+
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP state
@@ -28,20 +45,4 @@ public abstract class PromoterTest extends GroupTest {
     }
 
     protected abstract String promoter();
-
-    @Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_START, flexLexer.yystate());
-    }
-
-    @Test
-    public void character() throws IOException {
-        reset("a");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, flexLexer.yystate());
-    }
 }

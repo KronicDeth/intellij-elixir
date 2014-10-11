@@ -1,84 +1,52 @@
 package org.elixir_lang.elixir_flex_lexer.group.sigil;
 
-import org.elixir_lang.ElixirFlexLexer;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
-import java.io.IOException;
-import java.io.Reader;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/2/14.
  */
-public class ClosingBracketTest extends org.elixir_lang.elixir_flex_lexer.group.sigil.Test {
+@RunWith(Parameterized.class)
+public class ClosingBracketTest extends Test {
+    /*
+     * Constructors
+     */
+
+    public ClosingBracketTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        super(charSequence, tokenType, lexicalState);
+    }
+
+    /*
+     * Methods
+     */
+
     protected char promoter() {
         return '[';
     }
 
-    @Test
-    public void forwardSlash() throws IOException {
-        reset("/");
 
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void closingBrace() throws IOException {
-        reset("}");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void closingBracket() throws IOException {
-        reset("]");
-
-        assertEquals(ElixirTypes.SIGIL_TERMINATOR, flexLexer.advance());
-        assertEquals(initialState(), flexLexer.yystate());
-    }
-
-    @Test
-    public void closingChrevon() throws IOException {
-        reset(">");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void closingParenthesis() throws IOException {
-        reset(")");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void character() throws IOException {
-        reset("a");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
-    }
-
-    @Test
-    public void pipe() throws IOException {
-        reset("|");
-
-        assertEquals(fragmentType(), flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+    @Parameterized.Parameters(
+            name = "\"{0}\" parses as {1} token and advances to state {2}"
+    )
+    public static Collection<Object[]> generateData() {
+        return Test.generateData(
+                Arrays.asList(
+                        new Object[][] {
+                                { ")", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { "/", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { ">", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { "\n", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { "]", ElixirTypes.SIGIL_TERMINATOR, INITIAL_STATE },
+                                { "a", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { "|", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { "}", FRAGMENT_TYPE, LEXICAL_STATE}
+                        }
+                )
+        );
     }
 }

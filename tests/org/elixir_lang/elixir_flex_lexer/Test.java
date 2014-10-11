@@ -7,13 +7,27 @@ import java.io.IOException;
 import java.io.Reader;
 
 /**
- * Created by luke.imhoff on 9/8/14.
+ * Created by luke.imhoff on 9/28/14.
  */
-public class Test {
+public abstract class Test {
+    /*
+     * Constants
+     */
+
+    public static final int INITIAL_STATE = ElixirFlexLexer.BODY;
+
+    /*
+     * Fields
+     */
+
     protected ElixirFlexLexer flexLexer;
 
+    /*
+     * Methods
+     */
+
     protected int initialState() {
-        return ElixirFlexLexer.BODY;
+        return INITIAL_STATE;
     }
 
     protected void reset(CharSequence charSequence) throws IOException {
@@ -23,6 +37,10 @@ public class Test {
     protected void reset(CharSequence charSequence, int initialState) throws IOException {
         flexLexer.reset(charSequence, 0, charSequence.length(), initialState);
     }
+
+    /*
+     * Callbacks
+     */
 
     @Before
     public void setUp() {

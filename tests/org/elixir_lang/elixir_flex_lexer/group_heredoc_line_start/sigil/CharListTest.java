@@ -1,20 +1,54 @@
 package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_start.sigil;
 
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
+import org.elixir_lang.elixir_flex_lexer.TokenTest;
 import org.elixir_lang.psi.ElixirTypes;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.IOException;
-import java.io.Reader;
-
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Created by luke.imhoff on 9/3/14.
  */
-public class CharListTest extends org.elixir_lang.elixir_flex_lexer.Test {
+@RunWith(Parameterized.class)
+public class CharListTest extends TokenTest {
+    /*
+     * Constructors
+     */
+
+    public CharListTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+        super(charSequence, tokenType, lexicalState, consumeAll);
+    }
+
+    /*
+     * Methods
+     */
+
+    @Parameterized.Parameters(
+            name = "\"{0}\" parses as {1} token and advances to state {2}"
+    )
+    public static Collection<Object[]> generateData() {
+        return Arrays.asList(
+                new Object[][]{
+                        { " '''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { " \"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { "'''", ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS, true },
+                        { "\"\"\"", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false },
+                        { "\f'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { "\f\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { "\n", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
+                        { "\t'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { "\t\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
+                        { "a", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true }
+                }
+        );
+    }
+
     @Override
     protected void reset(CharSequence charSequence) throws IOException {
         // start to trigger GROUP state
@@ -28,85 +62,5 @@ public class CharListTest extends org.elixir_lang.elixir_flex_lexer.Test {
         flexLexer.advance();
         // consume '\n'
         flexLexer.advance();
-    }
-
-    @Test
-    public void spaceTripleSingleQuotes() throws IOException {
-        reset(" '''");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void tabTripleSingleQuotes() throws IOException {
-       reset("\t'''");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void formFeedTripleSingleQuotes() throws IOException {
-        reset("\f'''");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void spaceTripleDoubleQuotes() throws IOException {
-        reset(" \"\"\"");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void tabTripleDoubleQuotes() throws IOException {
-        reset("\t\"\"\"");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void formFeedTripleDoubleQuotes() throws IOException {
-        reset("\f\"\"\"");
-
-        assertEquals(TokenType.WHITE_SPACE, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_END, flexLexer.yystate());
-    }
-
-    @Test
-    public void tripleSingleQuotes() throws IOException {
-        reset("'''");
-
-        assertEquals(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.SIGIL_MODIFIERS, flexLexer.yystate());
-    }
-
-    @Test
-    public void tripleDoubleQuotes() throws IOException {
-        reset("\"\"\"");
-
-        assertEquals(ElixirTypes.CHAR_LIST_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, flexLexer.yystate());
-    }
-
-    @Test
-    public void eol() throws IOException {
-        reset("\n");
-
-        assertEquals(ElixirTypes.CHAR_LIST_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_START, flexLexer.yystate());
-    }
-
-    @Test
-    public void character() throws IOException {
-        reset("a");
-
-        assertEquals(ElixirTypes.CHAR_LIST_FRAGMENT, flexLexer.advance());
-        assertEquals(ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, flexLexer.yystate());
     }
 }
