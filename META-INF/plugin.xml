@@ -9,22 +9,12 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.1.2</h1>
+      <h1>Next Release</h1>
       <ul>
         <li>
-          <p>Enhancements</p>
+          <p>Bug Fixes</p>
           <ul>
-            <li>
-              <p>Atoms with highlighting</p>
-              <ul>
-                <li>
-                  Atom with double or single quotes to allow interpolation.  Double quotes are highlighted as 'String'
-                  while single quotes are highlighted as 'Char List'.  This may be changed in the future.
-                </li>
-                <li>Literal atoms highlighted as 'Atom'.</li>
-                <li>Operator atoms highlighted as 'Atom'.</li>
-              </ul>
-            </li>
+            <li>Blank lines are properly parsed as whitespace instead of bad characters.</li>
           </ul>
          </li>
       </ul>
