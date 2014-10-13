@@ -42,8 +42,7 @@ public class BodyTest  extends TokenTest {
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                         { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START },
                         { "\f", TokenType.WHITE_SPACE, ElixirFlexLexer.BODY },
-                        { "\n \t\f", ElixirTypes.EOL, ElixirFlexLexer.BODY },
-                        { "\n", ElixirTypes.EOL, ElixirFlexLexer.BODY },
+                        { "\n", TokenType.WHITE_SPACE, ElixirFlexLexer.BODY },
                         { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.BODY },
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
                 }

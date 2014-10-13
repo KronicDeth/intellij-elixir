@@ -381,12 +381,10 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
 
 // Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
 <BODY, INTERPOLATION> {
-  /* Compress {EOL} followed by more {EOL} or whitespace into {EOL} as only {EOL} is significant for Elixir's grammar.
-   *
-   * @see https://github.com/idavis/Innovatian.Idea.PowerShell/blob/80bbe5bbcb15f95d8b33f4a34b86acb6b65ac67e/src/lang/lexer/PowerShell.flex#L78
-   * @see https://github.com/idavis/Innovatian.Idea.PowerShell/blob/80bbe5bbcb15f95d8b33f4a34b86acb6b65ac67e/src/lang/lexer/PowerShell.flex#L227
-   */
-  {EOL}({EOL}|{WHITE_SPACE})*               { return ElixirTypes.EOL; }
+  // Blank line
+  ^{WHITE_SPACE}*{EOL}                      { return TokenType.WHITE_SPACE; }
+  // EOL preceded by non-whitespace.  These EOLs are significant for Elixir's grammar for separating expressions.
+  {EOL}                                     { return ElixirTypes.EOL; }
   // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
   {WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 

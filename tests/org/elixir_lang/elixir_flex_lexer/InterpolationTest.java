@@ -43,23 +43,22 @@ public class InterpolationTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
-                        { "\n", ElixirTypes.EOL, INITIAL_STATE },
                         { " ", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\t", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\f", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\n \r\f", ElixirTypes.EOL, INITIAL_STATE },
                         { "#", ElixirTypes.COMMENT, INITIAL_STATE },
-                        { "0b10", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "001234567", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL },
-                        { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
+                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
+                        { "001234567", ElixirTypes.NUMBER, INITIAL_STATE },
+                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
+                        { "0b10", ElixirTypes.NUMBER, INITIAL_STATE },
+                        { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE },
+                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
+                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
+                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
+                        { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
+                        { "\f", TokenType.WHITE_SPACE, INITIAL_STATE },
+                        { "\n", TokenType.WHITE_SPACE, INITIAL_STATE },
+                        { "\t", TokenType.WHITE_SPACE, INITIAL_STATE },
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
                 }
         );
     }
