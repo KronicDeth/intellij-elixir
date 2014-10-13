@@ -1,5 +1,6 @@
 package org.elixir_lang.elixir_flex_lexer;
 
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
@@ -16,17 +17,11 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class SigilTest extends TokenTest {
     /*
-     * Constants
-     */
-
-    private static final int FINAL_STATE = ElixirFlexLexer.NAMED_SIGIL;
-
-    /*
      * Constructors
      */
 
-    public SigilTest(CharSequence charSequence, IElementType tokenType) {
-        super(charSequence, tokenType, FINAL_STATE);
+    public SigilTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
+        super(charSequence, tokenType, lexicalState);
     }
 
     /*
@@ -47,16 +42,17 @@ public class SigilTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        { "C", ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME },
-                        { "R", ElixirTypes.LITERAL_REGEX_SIGIL_NAME },
-                        { "S", ElixirTypes.LITERAL_STRING_SIGIL_NAME },
-                        { "W", ElixirTypes.LITERAL_WORDS_SIGIL_NAME },
-                        { "X", ElixirTypes.LITERAL_SIGIL_NAME },
-                        { "c", ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME },
-                        { "r", ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME },
-                        { "s", ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME },
-                        { "w", ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME },
-                        { "x", ElixirTypes.INTERPOLATING_SIGIL_NAME }
+                        { "C", ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "R", ElixirTypes.LITERAL_REGEX_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "S", ElixirTypes.LITERAL_STRING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "W", ElixirTypes.LITERAL_WORDS_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "X", ElixirTypes.LITERAL_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.SIGIL },
+                        { "c", ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "r", ElixirTypes.INTERPOLATING_REGEX_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "s", ElixirTypes.INTERPOLATING_STRING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "w", ElixirTypes.INTERPOLATING_WORDS_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL },
+                        { "x", ElixirTypes.INTERPOLATING_SIGIL_NAME, ElixirFlexLexer.NAMED_SIGIL }
                 }
         );
     }
