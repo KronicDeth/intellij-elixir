@@ -4,6 +4,7 @@
 
 * Bug Fixes
  * Blank lines are properly parsed as whitespace instead of bad characters.
+ * EOL is parsed as bad character in sigil name (after `~`) instead of causing the lexer to fail to match, which raised exceptions in Event Log.
 
 ## v0.1.2
 
