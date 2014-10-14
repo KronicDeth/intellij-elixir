@@ -501,6 +501,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
   {SIGIL_NAME}               { nameSigil(yytext());
                                yybegin(NAMED_SIGIL);
                                return sigilNameType(); }
+  {EOL}                      { return TokenType.BAD_CHARACTER; }
 }
 
 <SIGIL_MODIFIERS> {

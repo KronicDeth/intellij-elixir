@@ -15,6 +15,7 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Blank lines are properly parsed as whitespace instead of bad characters.</li>
+            <li>EOL is parsed as bad character in sigil name (after `~`) instead of causing the lexer to fail to match, which raised exceptions in Event Log.</li>
           </ul>
          </li>
       </ul>
