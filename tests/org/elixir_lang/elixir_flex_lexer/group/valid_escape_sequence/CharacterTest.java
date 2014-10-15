@@ -8,7 +8,6 @@ import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.Vector;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +23,7 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
     public static final int MINIMUM_PRINTABLE_CHAR = 32;
     public static final int MAXIMUM_PRINTABLE_CHAR = 126;
+    public static final int PRINTABLE_CHAR_COUNT = MAXIMUM_PRINTABLE_CHAR - MINIMUM_PRINTABLE_CHAR + 1;
 
     /*
      * Methods
@@ -31,15 +31,13 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
     @DataPoints
     public static CharSequence[] dataPoints() {
-        Vector<CharSequence> charSequences = new Vector<CharSequence>();
+        CharSequence[] charSequences = new CharSequence[PRINTABLE_CHAR_COUNT];
 
         for (char c = MINIMUM_PRINTABLE_CHAR; c <= MAXIMUM_PRINTABLE_CHAR; c++) {
-            if (c != 'x') {
-                charSequences.add("\\" + c);
-            }
+            charSequences[c - MINIMUM_PRINTABLE_CHAR] = "\\" + c;
         }
 
-        return charSequences.toArray(new CharSequence[charSequences.size()]);
+        return charSequences;
     }
 
     protected void reset(CharSequence charSequence) throws IOException {

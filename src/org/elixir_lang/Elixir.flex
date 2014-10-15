@@ -314,8 +314,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 ESCAPE = "\\"
 
-// x is not allowed because it is assumed to be for {ESCAPED_CHARACTER_CODE}, but the user forgot the hexadecimal digits
-ESCAPED_CHARACTER = {ESCAPE} [^x]
+ESCAPED_CHARACTER = {ESCAPE} .
 ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
                          {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
 
