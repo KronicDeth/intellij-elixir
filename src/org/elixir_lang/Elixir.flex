@@ -177,6 +177,12 @@ ATOM_START = [a-zA-Z_]
 COLON = :
 
 /*
+ * Digits
+ */
+
+HEXADECIMAL_DIGIT = [A-Fa-f0-9]
+
+/*
  * White Space
  */
 
@@ -196,7 +202,7 @@ COMMENT = "#" [^\r\n]* {EOL}?
 // Include deprecated '0B' so it can be corrected
 BINARY_INTEGER = "0" [Bb][01]+
 // Include deprecated '0X' so it can be corrected
-HEXADECIMAL_INTEGER = "0" [Xx][A-Fa-f0-9]+
+HEXADECIMAL_INTEGER = "0" [Xx]{HEXADECIMAL_DIGIT}+
 // Include deprecated '0' so it can be corrected
 OCTAL_INTEGER = "0" o?[0-7]+
 INTEGER = {BINARY_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
@@ -307,13 +313,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
  */
 
 ESCAPE = "\\"
-ESCAPED_DOUBLE_QUOTES = {ESCAPE} "\""
-ESCAPED_SINGLE_QUOTE = {ESCAPE} "'"
-ESCAPED_INTERPOLATION_START = {ESCAPE} {INTERPOLATION_START}
 
-VALID_ESCAPE_SEQUENCE = {ESCAPED_DOUBLE_QUOTES} |
-                        {ESCAPED_SINGLE_QUOTE} |
-                        {ESCAPED_INTERPOLATION_START}
+// x is not allowed because it is assumed to be for {ESCAPED_CHARACTER_CODE}, but the user forgot the hexadecimal digits
+ESCAPED_CHARACTER = {ESCAPE} [^x]
+ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
+                         {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
+
+VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
+                        {ESCAPED_CHARACTER}
 
 /*
  *  States - Ordered lexigraphically
