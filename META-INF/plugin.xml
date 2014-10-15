@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.1.3</version>
+  <version>0.1.4-prerelease</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,13 +9,18 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v0.1.3</h1>
+      <h1>Next Release</h1>
       <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>All valid escape sequences (<code>\&lt;character&gt;</code>, <code>\x&lt;hexadecimal&gt;</code>, <code>\x{&lt;hexadecimal&gt;}</code>,) are recognized.</li>
+          </ul>
+        </li>
         <li>
           <p>Bug Fixes</p>
           <ul>
-            <li>Blank lines are properly parsed as whitespace instead of bad characters.</li>
-            <li>EOL is parsed as bad character in sigil name (after `~`) instead of causing the lexer to fail to match, which raised exceptions in Event Log.</li>
+            <li>Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.</li>
           </ul>
          </li>
       </ul>
