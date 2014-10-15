@@ -40,6 +40,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testSigilTerminatorEscape() {
+        doTest(true);
+    }
+
     public void testValidEscapeSequences() {
         doTest(true);
     }
