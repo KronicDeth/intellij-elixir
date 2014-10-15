@@ -1,5 +1,12 @@
 # Changelog
 
+## Next Release
+
+* Enhancements
+ * All valid escape sequences (`\<character>`, `\x<hexadecimal>`, `\x{<hexadecimal>}` are recognized.
+* Bug Fixes
+ * Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.
+
 ## v0.1.3
 
 * Bug Fixes
