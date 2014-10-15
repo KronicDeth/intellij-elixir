@@ -1,6 +1,6 @@
 # Changelog
 
-## Next Release
+## v0.1.3
 
 * Bug Fixes
  * Blank lines are properly parsed as whitespace instead of bad characters.

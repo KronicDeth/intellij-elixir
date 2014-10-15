@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.1.2</version>
+  <version>0.1.3</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>Next Release</h1>
+      <h1>v0.1.3</h1>
       <ul>
         <li>
           <p>Bug Fixes</p>
