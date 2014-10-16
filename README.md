@@ -37,3 +37,4 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 ## Screenshots
 
 ![Color Settings](/screenshots/Color%20Settings.png?raw=true "Color Settings")
+![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")

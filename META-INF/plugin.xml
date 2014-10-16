@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.1.4-prerelease</version>
+  <version>0.1.4</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,12 +9,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>Next Release</h1>
+      <h1>v0.1.4</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
             <li>All valid escape sequences (<code>\&lt;character&gt;</code>, <code>\x&lt;hexadecimal&gt;</code>, <code>\x{&lt;hexadecimal&gt;}</code>,) are recognized.</li>
+            <li>Support for creation of Elixir modules</li>
           </ul>
         </li>
         <li>
@@ -37,6 +38,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
+    <internalFileTemplate name="Elixir Module"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
   </extensions>
@@ -50,7 +52,10 @@
   </project-components>
 
   <actions>
-    <!-- Add your actions here -->
+    <action id="Elixir.NewErlangFile" class="org.elixir_lang.action.CreateElixirFileAction"
+            text="Elixir File" description="Create new Elixir file">
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+    </action>
   </actions>
 
 </idea-plugin>
