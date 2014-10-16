@@ -16,6 +16,7 @@
           <ul>
             <li>All valid escape sequences (<code>\&lt;character&gt;</code>, <code>\x&lt;hexadecimal&gt;</code>, <code>\x{&lt;hexadecimal&gt;}</code>,) are recognized.</li>
             <li>Support for creation of Elixir modules</li>
+            <li>Use pygments' elixir_example.ex supplied by Alexei Sholik for Color Settings Page.<li>
           </ul>
         </li>
         <li>
