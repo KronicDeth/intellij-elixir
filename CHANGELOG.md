@@ -1,9 +1,10 @@
 # Changelog
 
-## Next Release
+## v0.1.4
 
 * Enhancements
  * All valid escape sequences (`\<character>`, `\x<hexadecimal>`, `\x{<hexadecimal>}` are recognized.
+ * Support for creation of Elixir modules
 * Bug Fixes
  * Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.
 
