@@ -43,7 +43,7 @@ public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.group.T
                         { "#{", ElixirTypes.INTERPOLATION_START, ElixirFlexLexer.INTERPOLATION },
                         { "\\\"", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP },
                         { "\\'", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP },
-                        { "\\#{", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP }
+                        { "\\#", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP }
                 }
         );
     }

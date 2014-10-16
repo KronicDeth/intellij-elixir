@@ -35,7 +35,7 @@ public class InterpolationTest extends TokenTest {
         return Arrays.asList(
                 new Object[][]{
                         { "#{", ElixirTypes.INTERPOLATION_START, ElixirFlexLexer.INTERPOLATION },
-                        { "\\#{", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY },
+                        { "\\#", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY },
                         { "\\'", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY },
                         { "\\\"", ElixirTypes.VALID_ESCAPE_SEQUENCE, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY }
                 }
