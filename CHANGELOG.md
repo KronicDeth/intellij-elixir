@@ -3,16 +3,16 @@
 ## v0.1.4
 
 * Enhancements
- * All valid escape sequences (`\<character>`, `\x<hexadecimal>`, `\x{<hexadecimal>}` are recognized.
- * Support for creation of Elixir modules ![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")
+ * [#17](https://github.com/KronicDeth/intellij-elixir/pull/17): All valid escape sequences (`\<character>`, `\x<hexadecimal>`, `\x{<hexadecimal>}` are recognized. - [@KronicDeth](https://github.com/KronicDeth)
+ * [#18](https://github.com/KronicDeth/intellij-elixir/pull/18): Support for creation of Elixir modules - [@abaire](https://github.com/abaire) ![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")
 * Bug Fixes
- * Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.
+ * [#17](https://github.com/KronicDeth/intellij-elixir/pull/17): Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.1.3
 
 * Bug Fixes
- * Blank lines are properly parsed as whitespace instead of bad characters.
- * EOL is parsed as bad character in sigil name (after `~`) instead of causing the lexer to fail to match, which raised exceptions in Event Log.
+ * [#10](https://github.com/KronicDeth/intellij-elixir/pull/10): Blank lines are properly parsed as whitespace instead of bad characters. - [@KronicDeth](https://github.com/KronicDeth)
+ * [#13](https://github.com/KronicDeth/intellij-elixir/pull/13): EOL is parsed as bad character in sigil name (after `~`) instead of causing the lexer to fail to match, which raised exceptions in Event Log. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.1.2
 
@@ -31,7 +31,7 @@
 ## v0.1.0
 
 * Enhancements
-  * Literal and interpolated sigils with highlighting
+  * [#3](https://github.com/KronicDeth/intellij-elixir/pull/3): Literal and interpolated sigils with highlighting - [@KronicDeth](https://github.com/KronicDeth)
     * CharList Sigils (`~c` and `~C`) highlighted as 'Char List' in Settings.
     * Regex Sigils (`~r` and `~R`) highlighted as 'Sigil' in Settings. **NOTE: Regex syntax is not internally highlighted yet**
     * String Sigils (`~s` and `~S`) highlighted as 'String' in Settings.
