@@ -4,7 +4,7 @@
 
 * Enhancements
  * All valid escape sequences (`\<character>`, `\x<hexadecimal>`, `\x{<hexadecimal>}` are recognized.
- * Support for creation of Elixir modules
+ * Support for creation of Elixir modules ![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")
 * Bug Fixes
  * Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.
 
