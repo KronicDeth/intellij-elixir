@@ -17,7 +17,9 @@
   ]
 }
 
-elixirFile ::= expressionList
+// expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
+// lines
+elixirFile ::= EOL* (expressionList EOL*)?
 
 // In alphabetical order
 
@@ -79,7 +81,8 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
 private expression ::= (atom | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
-private expressionList ::= expression (EOL expression)* EOL?
+// allow multiple EOLs to separate expressions to handle lines comments
+private expressionList ::= expression (EOL+ expression)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |

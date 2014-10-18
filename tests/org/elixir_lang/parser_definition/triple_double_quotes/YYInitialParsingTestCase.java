@@ -8,7 +8,27 @@ public class YYInitialParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEscapeSequences() {
+        doTest(true);
+    }
+
     public void testMinimal() {
+        doTest(true);
+    }
+
+    public void testWithInterpolation() {
+        doTest(true);
+    }
+
+    public void testWhitespaceEndPrefix() {
+        doTest(true);
+    }
+
+    public void testWithNestedInterpolation() {
+        doTest(true);
+    }
+
+    public void testWithoutInterpolation() {
         doTest(true);
     }
 

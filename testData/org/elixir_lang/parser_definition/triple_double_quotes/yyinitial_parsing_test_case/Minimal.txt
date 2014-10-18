@@ -1,5 +1,2 @@
-Elixir File(0,7)
-  ElixirStringHeredocImpl(STRING_HEREDOC)(0,7)
-    PsiElement(ElixirTokenType.STRING_HEREDOC_PROMOTER)('"""')(0,3)
-    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
-    PsiElement(ElixirTokenType.STRING_HEREDOC_TERMINATOR)('"""')(4,7)
+Elixir File(0,0)
+  <empty list>

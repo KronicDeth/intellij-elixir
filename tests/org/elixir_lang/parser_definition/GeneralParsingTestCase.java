@@ -20,6 +20,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testCommentEOL() {
+        doTest(true);
+    }
+
     public void testEmpty() {
         doTest(true);
     }
