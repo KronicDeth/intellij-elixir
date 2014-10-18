@@ -163,12 +163,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // atom | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = atom(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, CHAR_TOKEN);
     if (!result_) result_ = consumeToken(builder_, NUMBER);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
     if (!result_) result_ = quote(builder_, level_ + 1);
