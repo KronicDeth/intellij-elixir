@@ -23,6 +23,7 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.</li>
+            <li>Comments do not consume EOL, so trailing comments don't cause error parsing expression on following line.</li>
           </ul>
          </li>
       </ul>
