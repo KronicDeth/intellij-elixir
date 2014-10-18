@@ -193,7 +193,7 @@ WHITE_SPACE=[\ \t\f]
  *  Comments
  */
 
-COMMENT = "#" [^\r\n]* {EOL}?
+COMMENT = "#" [^\r\n]*
 
 /*
  *   Integers
