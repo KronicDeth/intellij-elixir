@@ -327,8 +327,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
 
 %state ATOM_BODY
 %state ATOM_START
-// state after YYINITIAL has taken care of any white space prefix
-%state BODY
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
@@ -341,52 +339,10 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
 
 %%
 
-// YYINITIAL is first even though it isn't lexicographically first because it is the first state.
-<YYINITIAL> {
-  /* Turn EOL and whitespace at beginning of file into a single {@link org.elixir_lang.psi.ElixirTypes.WHITE_SPACE} so
-   * it is filtered out.
-   */
-  ({EOL}|{WHITE_SPACE})+ { yybegin(BODY);
-                           return TokenType.WHITE_SPACE; }
-
-  // Push back and left BODY handle normal actions so they don't need to be duplicated in YYINITIAL and BODY.
-  .                      { handleInState(BODY); }
-}
-
-<ATOM_BODY> {
-  {ATOM_END}     { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   yybegin(stackFrame.getLastLexicalState());
-                   return ElixirTypes.ATOM_FRAGMENT; }
-  {ATOM_MIDDLE}+ { return ElixirTypes.ATOM_FRAGMENT; }
-  // any other character ends the atom
-  {EOL}|.        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   handleInState(stackFrame.getLastLexicalState()); }
-}
-
-/// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
-<ATOM_START> {
-  {ATOM_START}     { yybegin(ATOM_BODY);
-                     return ElixirTypes.ATOM_FRAGMENT; }
-  {QUOTE_PROMOTER} { /* At the end of the quote, return the state (BODY or INTERPOLATION) before ATOM_START as anything
-                        after the closing quote should be handle by the state prior to ATOM_START.  Without this,
-                        EOL and WHITESPACE won't be handled correctly */
-                     org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
-                     startQuote(yytext());
-                     return promoterType(); }
-  {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                     yybegin(stackFrame.getLastLexicalState());
-                     return ElixirTypes.ATOM_FRAGMENT; }
-  {EOL}            { return TokenType.BAD_CHARACTER; }
-}
-
-/*
- *  Lexical rules - Ordered alphabetically by state name except when the order of the internal rules need to be
- *  maintained to ensure precedence.
- */
-
-// Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <BODY> and <INTERPOLATION>
-<BODY, INTERPOLATION> {
+/* <YYINITIAL> is first even though it isn't lexicographically first because it is the first state.
+   Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
+   <INTERPOLATION> */
+<YYINITIAL, INTERPOLATION> {
   // Blank line
   ^{WHITE_SPACE}*{EOL}                      { return TokenType.WHITE_SPACE; }
   // EOL preceded by non-whitespace.  These EOLs are significant for Elixir's grammar for separating expressions.
@@ -410,6 +366,38 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
      {QUOTE_PROMOTER} */
   {QUOTE_PROMOTER}                          { startQuote(yytext());
                                               return promoterType(); }
+}
+
+/*
+ *  Lexical rules - Ordered alphabetically by state name except when the order of the internal rules need to be
+ *  maintained to ensure precedence.
+ */
+
+<ATOM_BODY> {
+  {ATOM_END}     { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                   yybegin(stackFrame.getLastLexicalState());
+                   return ElixirTypes.ATOM_FRAGMENT; }
+  {ATOM_MIDDLE}+ { return ElixirTypes.ATOM_FRAGMENT; }
+  // any other character ends the atom
+  {EOL}|.        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                   handleInState(stackFrame.getLastLexicalState()); }
+}
+
+/// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
+<ATOM_START> {
+  {ATOM_START}     { yybegin(ATOM_BODY);
+                     return ElixirTypes.ATOM_FRAGMENT; }
+  {QUOTE_PROMOTER} { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
+                        anything after the closing quote should be handle by the state prior to ATOM_START.  Without
+                        this, EOL and WHITESPACE won't be handled correctly */
+                     org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     yybegin(stackFrame.getLastLexicalState());
+                     startQuote(yytext());
+                     return promoterType(); }
+  {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     yybegin(stackFrame.getLastLexicalState());
+                     return ElixirTypes.ATOM_FRAGMENT; }
+  {EOL}            { return TokenType.BAD_CHARACTER; }
 }
 
 <GROUP,
@@ -486,8 +474,9 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
           return ElixirTypes.EOL; }
 }
 
-// Only rules for <INTERPOLATON>, but not <BODY> go here.
-// @note must be after <BODY, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of {WHITE_SPACE}+.
+/* Only rules for <INTERPOLATON>, but not <YYINITIAL> go here.
+   @note must be after <YYINITIAL, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of
+     {WHITE_SPACE}+. */
 <INTERPOLATION> {
   {INTERPOLATION_END}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                 yybegin(stackFrame.getLastLexicalState());
@@ -517,6 +506,6 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
-<ATOM_START, BODY, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL> {
+<ATOM_START, GROUP_HEREDOC_START, INTERPOLATION, NAMED_SIGIL, SIGIL, YYINITIAL> {
   . { return TokenType.BAD_CHARACTER; }
 }

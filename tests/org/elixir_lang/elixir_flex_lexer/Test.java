@@ -14,7 +14,7 @@ public abstract class Test {
      * Constants
      */
 
-    public static final int INITIAL_STATE = ElixirFlexLexer.BODY;
+    public static final int INITIAL_STATE = ElixirFlexLexer.YYINITIAL;
 
     /*
      * Fields
