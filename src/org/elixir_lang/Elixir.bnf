@@ -80,7 +80,7 @@ private quote ::= (charList | string)
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-private expression ::= (atom | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
+private expression ::= (atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
 // allow multiple EOLs to separate expressions to handle lines comments
 private expressionList ::= expression (EOL+ expression)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END

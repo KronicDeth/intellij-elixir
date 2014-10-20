@@ -12,6 +12,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testCharToken() {
+        doTest(true);
+    }
+
     public void testCommentAfterNumber() {
         doTest(true);
     }

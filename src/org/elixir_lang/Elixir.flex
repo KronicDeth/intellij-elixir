@@ -183,6 +183,25 @@ COLON = :
 HEXADECIMAL_DIGIT = [A-Fa-f0-9]
 
 /*
+ * Escape Sequences
+ */
+
+ESCAPE = "\\"
+
+ESCAPED_CHARACTER = {ESCAPE} .
+ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
+                         {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
+
+VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
+                        {ESCAPED_CHARACTER}
+
+/*
+ * Char tokens
+ */
+
+CHAR_TOKEN = "?" ({VALID_ESCAPE_SEQUENCE} | .)
+
+/*
  * White Space
  */
 
@@ -309,19 +328,6 @@ GROUP_TERMINATOR = {QUOTE_TERMINATOR}|{SIGIL_TERMINATOR}
 GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 /*
- * Escape Sequences
- */
-
-ESCAPE = "\\"
-
-ESCAPED_CHARACTER = {ESCAPE} .
-ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
-                         {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
-
-VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
-                        {ESCAPED_CHARACTER}
-
-/*
  *  States - Ordered lexigraphically
  */
 
@@ -350,6 +356,8 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
   // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
   {WHITE_SPACE}+                            { return TokenType.WHITE_SPACE; }
 
+  {CHAR_TOKEN}                              { return ElixirTypes.CHAR_TOKEN; }
+  
   {COLON}                                   { pushAndBegin(ATOM_START);
                                               return ElixirTypes.COLON; }
 

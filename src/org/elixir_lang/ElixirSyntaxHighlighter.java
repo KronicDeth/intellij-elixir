@@ -32,6 +32,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.STRING
     );
 
+    public static final TextAttributesKey CHAR_TOKEN = createTextAttributesKey(
+            "ELIXIR_CHAR_TOKEN",
+            DefaultLanguageHighlighterColors.MARKUP_ENTITY
+    );
+
     public static final TextAttributesKey COMMENT = createTextAttributesKey(
             "ELIXIR_COMMENT",
             DefaultLanguageHighlighterColors.LINE_COMMENT
@@ -66,6 +71,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
+    private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
@@ -150,6 +156,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return BAD_CHAR_KEYS;
         } else if (CHAR_LISTS.contains(tokenType)) {
             return CHAR_LIST_KEYS;
+        } else if (tokenType == ElixirTypes.CHAR_TOKEN) {
+            return CHAR_TOKEN_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMENT)) {
             return COMMENT_KEYS;
         } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {

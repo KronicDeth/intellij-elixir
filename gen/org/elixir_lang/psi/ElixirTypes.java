@@ -26,6 +26,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_PROMOTER");
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
+  IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType EOL = new ElixirTokenType("EOL");
