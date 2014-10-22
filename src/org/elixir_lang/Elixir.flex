@@ -205,7 +205,7 @@ CHAR_TOKEN = "?" ({VALID_ESCAPE_SEQUENCE} | .)
  * White Space
  */
 
-EOL = \n|\r|\r\n
+EOL = \n|\r\n
 WHITE_SPACE=[\ \t\f]
 
 /*
