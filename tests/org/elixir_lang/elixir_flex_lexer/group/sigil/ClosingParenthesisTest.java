@@ -37,13 +37,13 @@ public class ClosingParenthesisTest extends Test {
                 Arrays.asList(
                         new Object[][] {
                                 { ")", ElixirTypes.SIGIL_TERMINATOR, INITIAL_STATE },
-                                { "/", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { ">", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "\n", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "]", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "a", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "|", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "}", FRAGMENT_TYPE, LEXICAL_STATE}
+                                { "/", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { ">", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "\n", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "]", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "a", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "|", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "}", FRAGMENT_TYPE, LEXICAL_STATE }
                         }
                 )
         );
