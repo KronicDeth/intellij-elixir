@@ -37,13 +37,15 @@ public class ClosingBraceTest extends Test {
         return Test.generateData(
                 Arrays.asList(
                         new Object[][] {
-                                { ")", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "/", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { ">", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "\n", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "]", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "a", FRAGMENT_TYPE, LEXICAL_STATE},
-                                { "|", FRAGMENT_TYPE, LEXICAL_STATE},
+                                { ")", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "/", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { ";", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { ">", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "\n", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "\r\n", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "]", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "a", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "|", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "}", ElixirTypes.SIGIL_TERMINATOR, INITIAL_STATE }
                         }
                 )

@@ -34,8 +34,10 @@ public abstract class Test extends org.elixir_lang.elixir_flex_lexer.group.Test 
         Collection<Object[]> commonData = Arrays.asList(new Object[][]{
                         { ")", fragmentType, LEXICAL_STATE },
                         { "/", fragmentType, LEXICAL_STATE },
+                        { ";", fragmentType, LEXICAL_STATE },
                         { ">", fragmentType, LEXICAL_STATE },
                         { "\n", fragmentType, LEXICAL_STATE },
+                        { "\r\n", fragmentType, LEXICAL_STATE },
                         { "]", fragmentType, LEXICAL_STATE },
                         { "a", fragmentType, LEXICAL_STATE },
                         { "|", fragmentType, LEXICAL_STATE },

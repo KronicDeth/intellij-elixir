@@ -86,7 +86,7 @@ hexadecimal digits
 
 for i <- 32..126, do: IO.puts "\\\#{<<i>>}"
 
-\
+\ # escaped space.  Comment needed so space isn't stripped.
 \!
 \"
 \#
