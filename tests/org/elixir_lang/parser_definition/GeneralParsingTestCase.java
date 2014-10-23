@@ -32,6 +32,14 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testEOLPosix() {
+        doTest(true);
+    }
+
+    public void testEOLWindows() {
+        doTest(true);
+    }
+
     public void testMultipleNumbersOnLine() {
         doTest(true);
     }
