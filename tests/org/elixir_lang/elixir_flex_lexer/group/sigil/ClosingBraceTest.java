@@ -39,8 +39,10 @@ public class ClosingBraceTest extends Test {
                         new Object[][] {
                                 { ")", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "/", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { ";", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ">", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "\n", FRAGMENT_TYPE, LEXICAL_STATE },
+                                { "\r\n", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "]", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "a", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { "|", FRAGMENT_TYPE, LEXICAL_STATE },

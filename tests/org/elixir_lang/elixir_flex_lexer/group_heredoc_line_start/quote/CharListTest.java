@@ -38,10 +38,12 @@ public class CharListTest extends TokenTest {
                         { " '''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { " \"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR, INITIAL_STATE, true },
+                        { ";", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         { "\"\"\"", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false },
                         { "\f'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { "\f\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { "\n", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
+                        { "\r\n", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         { "\t'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { "\t\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false },
                         { "a", ElixirTypes.CHAR_LIST_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true }

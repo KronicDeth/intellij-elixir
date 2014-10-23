@@ -38,10 +38,12 @@ public class StringTest extends TokenTest {
                         {" '''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {" \"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"'''", ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS, true},
+                        {";", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         {"\"\"\"", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"\f'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\f\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\n", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true},
+                        {"\r\n", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         {"\t'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\t\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"a", ElixirTypes.STRING_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true}

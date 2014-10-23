@@ -53,6 +53,7 @@ public class InterpolationTest extends TokenTest {
                         { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE },
                         { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
+                        { ";", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "? ", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
                         { "?\\a", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
                         { "?\\xa", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
@@ -67,6 +68,7 @@ public class InterpolationTest extends TokenTest {
                         { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
                         { "\f", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "\n", TokenType.WHITE_SPACE, INITIAL_STATE },
+                        { "\r\n", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "\t", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
                 }

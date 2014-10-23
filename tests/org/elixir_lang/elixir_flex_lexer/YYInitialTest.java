@@ -54,12 +54,14 @@ public class YYInitialTest extends TokenTest {
                         { "0o01234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
                         { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
+                        { ";", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                         { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START },
                         { "\f", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
                         { "\n", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
+                        { "\r\n", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL },
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
                 }
         );
     }

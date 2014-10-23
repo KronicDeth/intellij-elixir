@@ -38,10 +38,12 @@ public class CustomTest extends TokenTest {
                         {" '''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {" \"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"'''", ElixirTypes.SIGIL_HEREDOC_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS, true},
+                        {";", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         {"\"\"\"", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"\f'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\f\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\n", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true},
+                        {"\r\n", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         {"\t'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"\t\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"a", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true}
