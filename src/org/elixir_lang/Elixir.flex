@@ -358,14 +358,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
-  // Before {EOL} so {ESCAPE} and {EOL} are consumed together
-  {ESCAPED_CONTROL_EOL}                     { return TokenType.WHITE_SPACE; }
-  // Blank line
-  ^{WHITE_SPACE}*{EOL}                      { return TokenType.WHITE_SPACE; }
-  // EOL preceded by non-whitespace.  These EOLs are significant for Elixir's grammar for separating expressions.
   {EOL}                                     { return ElixirTypes.EOL; }
-  // This rule is only meant to match whitespace surrounded by other tokens as the above rule will handle blank lines.
-  {ESCAPED_EOL}|{WHITE_SPACE}+              { return TokenType.WHITE_SPACE; }
+
+  {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+      { return TokenType.WHITE_SPACE; }
 
   {CHAR_TOKEN}                              { return ElixirTypes.CHAR_TOKEN; }
   

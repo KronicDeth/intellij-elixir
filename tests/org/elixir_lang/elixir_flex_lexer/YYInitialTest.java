@@ -25,8 +25,8 @@ public class YYInitialTest extends TokenTest {
      * Constructors
      */
 
-    public YYInitialTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
-        super(charSequence, tokenType, lexicalState);
+    public YYInitialTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+        super(charSequence, tokenType, lexicalState, consumeAll);
     }
 
     /*
@@ -42,26 +42,29 @@ public class YYInitialTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "", null, INITIAL_STATE },
-                        { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL },
-                        { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
-                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "001234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { "0B10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { "0b10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { "0o01234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL },
-                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
-                        { ";", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
-                        { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "\f", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "\n", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "\r\n", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
+                        { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "", null, INITIAL_STATE, true },
+                        { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
+                        { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
+                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "001234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0B10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0b10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0o01234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
+                        { ";", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
+                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
+                        { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },
+                        { "\\\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\\\r\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\f", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
+                        { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
+                        { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
                 }
         );
     }

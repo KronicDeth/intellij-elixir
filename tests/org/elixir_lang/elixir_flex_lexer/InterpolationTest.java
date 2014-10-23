@@ -25,8 +25,8 @@ public class InterpolationTest extends TokenTest {
      * Constructors
      */
 
-    public InterpolationTest(CharSequence charSequence, IElementType tokenType, int lexicalState) {
-        super(charSequence, tokenType, lexicalState);
+    public InterpolationTest(CharSequence charSequence, IElementType tokenType, int lexicalState, boolean consumeAll) {
+        super(charSequence, tokenType, lexicalState, consumeAll);
     }
 
     /*
@@ -43,34 +43,37 @@ public class InterpolationTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        { " ", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "#", ElixirTypes.COMMENT, INITIAL_STATE },
-                        { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
-                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "001234567", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0b10", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE },
-                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START },
-                        { ";", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "? ", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\a", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\xa", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\xaB", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{890aBc}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{890aB}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{890a}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{890}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{89}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "?\\x{8}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE },
-                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
-                        { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START },
-                        { "\f", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\n", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\r\n", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "\t", TokenType.WHITE_SPACE, INITIAL_STATE },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
+                        { " ", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
+                        { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
+                        { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "001234567", ElixirTypes.NUMBER, INITIAL_STATE, true },
+                        { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },
+                        { "0b10", ElixirTypes.NUMBER, INITIAL_STATE, true },
+                        { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE, true },
+                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },
+                        { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
+                        { ";", ElixirTypes.EOL, INITIAL_STATE, true },
+                        { "? ", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\a", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\xa", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\xaB", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{890aBc}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{890aB}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{890a}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{890}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{89}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "?\\x{8}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
+                        { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
+                        { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },
+                        { "\\\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\\\r\n", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\f", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "\n", ElixirTypes.EOL, INITIAL_STATE, true },
+                        { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
+                        { "\t", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
                 }
         );
     }
