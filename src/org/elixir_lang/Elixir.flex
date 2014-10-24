@@ -358,28 +358,21 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
-  {EOL}                                     { return ElixirTypes.EOL; }
-
-  {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+      { return TokenType.WHITE_SPACE; }
-
-  {CHAR_TOKEN}                              { return ElixirTypes.CHAR_TOKEN; }
-  
-  {COLON}                                   { pushAndBegin(ATOM_START);
-                                              return ElixirTypes.COLON; }
-
-  {COMMENT}                                 { return ElixirTypes.COMMENT; }
-
-  {INTEGER}                                 { return ElixirTypes.NUMBER; }
-
-  {TILDE}                                   { pushAndBegin(SIGIL);
-                                              return ElixirTypes.TILDE; }
-
-  {QUOTE_HEREDOC_PROMOTER}                  { startQuote(yytext());
-                                              return promoterType(); }
+  {EOL}                                { return ElixirTypes.EOL; }
+  {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {CHAR_TOKEN}                         { return ElixirTypes.CHAR_TOKEN; }
+  {COLON}                              { pushAndBegin(ATOM_START);
+                                         return ElixirTypes.COLON; }
+  {COMMENT}                            { return ElixirTypes.COMMENT; }
+  {INTEGER}                            { return ElixirTypes.NUMBER; }
+  {TILDE}                              { pushAndBegin(SIGIL);
+                                         return ElixirTypes.TILDE; }
+  {QUOTE_HEREDOC_PROMOTER}             { startQuote(yytext());
+                                         return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
      {QUOTE_PROMOTER} */
-  {QUOTE_PROMOTER}                          { startQuote(yytext());
-                                              return promoterType(); }
+  {QUOTE_PROMOTER}                     { startQuote(yytext());
+                                         return promoterType(); }
 }
 
 /*
