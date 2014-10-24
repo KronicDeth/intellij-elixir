@@ -437,9 +437,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <GROUP> {
   {GROUP_TERMINATOR} {
                        if (isTerminator(yytext())) {
-                         org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                         yybegin(stackFrame.getLastLexicalState());
-                         return stackFrame.terminatorType();
+                         if (isSigil()) {
+                           yybegin(SIGIL_MODIFIERS);
+                           return terminatorType();
+                         } else {
+                           org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                           yybegin(stackFrame.getLastLexicalState());
+                           return stackFrame.terminatorType();
+                         }
                        } else {
                          return fragmentType();
                        }
