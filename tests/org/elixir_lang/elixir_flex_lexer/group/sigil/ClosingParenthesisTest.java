@@ -1,6 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer.group.sigil;
 
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,7 +37,7 @@ public class ClosingParenthesisTest extends Test {
         return Test.generateData(
                 Arrays.asList(
                         new Object[][] {
-                                { ")", ElixirTypes.SIGIL_TERMINATOR, INITIAL_STATE },
+                                { ")", ElixirTypes.SIGIL_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS },
                                 { "/", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ";", FRAGMENT_TYPE, LEXICAL_STATE },
                                 { ">", FRAGMENT_TYPE, LEXICAL_STATE },
