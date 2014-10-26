@@ -43,10 +43,13 @@ public class YYInitialTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "!", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "", null, INITIAL_STATE, true },
                         { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "+", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "-", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "001234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
                         { "0B10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
                         { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
@@ -64,7 +67,10 @@ public class YYInitialTest extends TokenTest {
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
                         { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
+                        { "^", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
+                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
                 }
         );
     }

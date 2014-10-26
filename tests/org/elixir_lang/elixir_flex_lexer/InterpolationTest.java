@@ -44,9 +44,12 @@ public class InterpolationTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, INITIAL_STATE, true },
+                        { "!", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { "+", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "-", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "001234567", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { "0b10", ElixirTypes.NUMBER, INITIAL_STATE, true },
@@ -73,7 +76,10 @@ public class InterpolationTest extends TokenTest {
                         { "\n", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "\t", TokenType.WHITE_SPACE, INITIAL_STATE, true },
-                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true }
+                        { "^", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
+                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
                 }
         );
     }
