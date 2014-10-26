@@ -42,12 +42,6 @@ public class ElixirUnaryOperationImpl extends ASTWrapperPsiElement implements El
 
   @Override
   @Nullable
-  public ElixirHatOperation getHatOperation() {
-    return findChildByClass(ElixirHatOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirSigil getSigil() {
     return findChildByClass(ElixirSigil.class);
   }
@@ -62,12 +56,6 @@ public class ElixirUnaryOperationImpl extends ASTWrapperPsiElement implements El
   @Nullable
   public ElixirStringHeredoc getStringHeredoc() {
     return findChildByClass(ElixirStringHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnaryOperation getUnaryOperation() {
-    return findChildByClass(ElixirUnaryOperation.class);
   }
 
 }

@@ -169,22 +169,27 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // unaryOperation | hatOperation | atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+  // hatOperand hatOperation*
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = unaryOperation(builder_, level_ + 1);
-    if (!result_) result_ = hatOperation(builder_, level_ + 1);
-    if (!result_) result_ = atom(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, CHAR_TOKEN);
-    if (!result_) result_ = consumeToken(builder_, NUMBER);
-    if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
-    if (!result_) result_ = quote(builder_, level_ + 1);
-    if (!result_) result_ = sigil(builder_, level_ + 1);
-    if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
+    result_ = hatOperand(builder_, level_ + 1);
+    result_ = result_ && expression_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
+  }
+
+  // hatOperation*
+  private static boolean expression_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "expression_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!hatOperation(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "expression_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -239,16 +244,54 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // HAT_OPERATOR expression
+  // unaryOperation | unaryOperand
+  static boolean hatOperand(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperand")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = unaryOperation(builder_, level_ + 1);
+    if (!result_) result_ = unaryOperand(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // EOL* HAT_OPERATOR EOL* hatOperand
   public static boolean hatOperation(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "hatOperation")) return false;
-    if (!nextTokenIs(builder_, HAT_OPERATOR)) return false;
+    if (!nextTokenIs(builder_, "<hat operation>", EOL, HAT_OPERATOR)) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _LEFT_, null);
-    result_ = consumeToken(builder_, HAT_OPERATOR);
-    result_ = result_ && expression(builder_, level_ + 1);
+    Marker marker_ = enter_section_(builder_, level_, _LEFT_, "<hat operation>");
+    result_ = hatOperation_0(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, HAT_OPERATOR);
+    result_ = result_ && hatOperation_2(builder_, level_ + 1);
+    result_ = result_ && hatOperand(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, HAT_OPERATION, result_, false, null);
     return result_;
+  }
+
+  // EOL*
+  private static boolean hatOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperation_0")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "hatOperation_0", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean hatOperation_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperation_2")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "hatOperation_2", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -965,7 +1008,24 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // UNARY_OPERATOR EOL* expression
+  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+  static boolean unaryOperand(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "unaryOperand")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = atom(builder_, level_ + 1);
+    if (!result_) result_ = consumeToken(builder_, CHAR_TOKEN);
+    if (!result_) result_ = consumeToken(builder_, NUMBER);
+    if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = quote(builder_, level_ + 1);
+    if (!result_) result_ = sigil(builder_, level_ + 1);
+    if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // UNARY_OPERATOR EOL* unaryOperand
   public static boolean unaryOperation(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "unaryOperation")) return false;
     if (!nextTokenIs(builder_, UNARY_OPERATOR)) return false;
@@ -973,7 +1033,7 @@ public class ElixirParser implements PsiParser {
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, UNARY_OPERATOR);
     result_ = result_ && unaryOperation_1(builder_, level_ + 1);
-    result_ = result_ && expression(builder_, level_ + 1);
+    result_ = result_ && unaryOperand(builder_, level_ + 1);
     exit_section_(builder_, marker_, UNARY_OPERATION, result_);
     return result_;
   }

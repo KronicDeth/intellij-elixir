@@ -1,7 +1,7 @@
 Elixir File(0,95)
   PsiComment(ElixirTokenType.COMMENT)('# This comment will to displayed correctly')(0,42)
   PsiElement(ElixirTokenType.EOL)('\n')(42,43)
-  PsiErrorElement:ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.CHAR_TOKEN, ElixirTokenType.COLON, ElixirTokenType.EOL, ElixirTokenType.HAT_OPERATOR, ElixirTokenType.NUMBER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER, ElixirTokenType.TILDE or ElixirTokenType.UNARY_OPERATOR expected, got 'I'(43,44)
+  PsiErrorElement:ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.CHAR_TOKEN, ElixirTokenType.COLON, ElixirTokenType.EOL, ElixirTokenType.NUMBER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER, ElixirTokenType.TILDE or ElixirTokenType.UNARY_OPERATOR expected, got 'I'(43,44)
     PsiElement(BAD_CHARACTER)('I')(43,44)
   PsiElement(DUMMY_BLOCK)(44,64)
     PsiElement(BAD_CHARACTER)('O')(44,45)

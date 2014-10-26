@@ -4,3 +4,16 @@ not 0x1
 +0x1
 -0x1
 ^0x1
+
+# unary operators are higher precedence than hat
+~~~0x1 ^^^ ~~~0x2
+
+# hat is left associative
+~~~0x1 ^^^ ~~~0x2 ^^^ ~~~0x4
+
+# hat operands can be separated by white space or EOLs
+~~~0x1
+
+^^^
+
+~~~0x2 ^^^ ~~~0x4

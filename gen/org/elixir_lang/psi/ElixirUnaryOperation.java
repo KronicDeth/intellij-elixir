@@ -17,9 +17,6 @@ public interface ElixirUnaryOperation extends PsiElement {
   ElixirCharListHeredoc getCharListHeredoc();
 
   @Nullable
-  ElixirHatOperation getHatOperation();
-
-  @Nullable
   ElixirSigil getSigil();
 
   @Nullable
@@ -27,8 +24,5 @@ public interface ElixirUnaryOperation extends PsiElement {
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
-
-  @Nullable
-  ElixirUnaryOperation getUnaryOperation();
 
 }

@@ -7,28 +7,28 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirHatOperation extends PsiElement {
 
-  @Nullable
-  ElixirAtom getAtom();
+  @NotNull
+  List<ElixirAtom> getAtomList();
 
-  @Nullable
-  ElixirCharList getCharList();
+  @NotNull
+  List<ElixirCharList> getCharListList();
 
-  @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @Nullable
   ElixirHatOperation getHatOperation();
 
-  @Nullable
-  ElixirSigil getSigil();
+  @NotNull
+  List<ElixirSigil> getSigilList();
 
-  @Nullable
-  ElixirString getString();
+  @NotNull
+  List<ElixirString> getStringList();
 
-  @Nullable
-  ElixirStringHeredoc getStringHeredoc();
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
 
-  @Nullable
-  ElixirUnaryOperation getUnaryOperation();
+  @NotNull
+  List<ElixirUnaryOperation> getUnaryOperationList();
 
 }
