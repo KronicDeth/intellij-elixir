@@ -112,7 +112,11 @@ import org.elixir_lang.psi.ElixirTypes;
 
 FOUR_TOKEN_OPERATOR = "<<>>"
 
-THREE_TOKEN_OPERATOR = "!==" |
+THREE_TOKEN_UNARY_OPERATOR = "not" |
+                             "~~~"
+
+THREE_TOKEN_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
+                       "!==" |
                        "%{}" |
                        "&&&" |
                        "..." |
@@ -124,8 +128,7 @@ THREE_TOKEN_OPERATOR = "!==" |
                        ">>>" |
                        "^^^" |
                        "|||" |
-                       "~>>" |
-                       "~~~"
+                       "~>>"
 
 TWO_TOKEN_OPERATOR = "!=" |
                      "&&" |
@@ -146,7 +149,12 @@ TWO_TOKEN_OPERATOR = "!=" |
                      "||" |
                      "~>"
 
-ONE_TOKEN_OPERATOR = "!" |
+ONE_TOKEN_UNARY_OPERATOR = "!" |
+                           "+" |
+                           "-" |
+                           "^"
+
+ONE_TOKEN_OPERATOR = {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
                      "&" |
                      "*" |
@@ -158,8 +166,10 @@ ONE_TOKEN_OPERATOR = "!" |
                      "=" |
                      ">" |
                      "@" |
-                     "^" |
                      "|"
+
+UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
+                 {ONE_TOKEN_UNARY_OPERATOR}
 
 // OPERATOR is from longest to shortest so longest match wins
 OPERATOR = {FOUR_TOKEN_OPERATOR} |
@@ -365,6 +375,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                          return ElixirTypes.COLON; }
   {COMMENT}                            { return ElixirTypes.COMMENT; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
+  {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
                                          return ElixirTypes.TILDE; }
   {QUOTE_HEREDOC_PROMOTER}             { startQuote(yytext());

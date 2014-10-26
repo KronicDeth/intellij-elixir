@@ -15,6 +15,7 @@ public interface ElixirTypes {
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType UNARY_OPERATION = new ElixirElementType("UNARY_OPERATION");
 
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
@@ -65,6 +66,7 @@ public interface ElixirTypes {
   IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("STRING_SIGIL_TERMINATOR");
   IElementType STRING_TERMINATOR = new ElixirTokenType("STRING_TERMINATOR");
   IElementType TILDE = new ElixirTokenType("TILDE");
+  IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
@@ -95,6 +97,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == UNARY_OPERATION) {
+        return new ElixirUnaryOperationImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

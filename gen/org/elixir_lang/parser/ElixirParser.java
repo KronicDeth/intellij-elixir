@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.psi.tree.IElementType;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -40,6 +40,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (root_ == STRING_HEREDOC) {
       result_ = stringHeredoc(builder_, 0);
+    }
+    else if (root_ == UNARY_OPERATION) {
+      result_ = unaryOperation(builder_, 0);
     }
     else {
       result_ = parse_root_(root_, builder_, 0);
@@ -163,7 +166,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc | unaryOperation
   static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
@@ -175,6 +178,7 @@ public class ElixirParser implements PsiParser {
     if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = sigil(builder_, level_ + 1);
     if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = unaryOperation(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -941,6 +945,32 @@ public class ElixirParser implements PsiParser {
     result_ = result_ && consumeToken(builder_, STRING_HEREDOC_TERMINATOR);
     exit_section_(builder_, marker_, STRING_HEREDOC, result_);
     return result_;
+  }
+
+  /* ********************************************************** */
+  // UNARY_OPERATOR EOL* expression
+  public static boolean unaryOperation(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "unaryOperation")) return false;
+    if (!nextTokenIs(builder_, UNARY_OPERATOR)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, UNARY_OPERATOR);
+    result_ = result_ && unaryOperation_1(builder_, level_ + 1);
+    result_ = result_ && expression(builder_, level_ + 1);
+    exit_section_(builder_, marker_, UNARY_OPERATION, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean unaryOperation_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "unaryOperation_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "unaryOperation_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
   }
 
 }

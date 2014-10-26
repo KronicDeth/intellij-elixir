@@ -58,4 +58,10 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
   }
 
+  @Override
+  @NotNull
+  public List<ElixirUnaryOperation> getUnaryOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryOperation.class);
+  }
+
 }
