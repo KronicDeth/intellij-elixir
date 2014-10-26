@@ -52,6 +52,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testOperator() {
+        doTest(true);
+    }
+
     public void testPygment() {
         doTest(true);
     }
