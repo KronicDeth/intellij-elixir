@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirInterpolation extends PsiElement {
+public interface ElixirHatOperation extends PsiElement {
 
   @Nullable
   ElixirAtom getAtom();

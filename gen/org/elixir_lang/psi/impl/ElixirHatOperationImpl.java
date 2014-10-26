@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirUnaryOperation {
+public class ElixirHatOperationImpl extends ASTWrapperPsiElement implements ElixirHatOperation {
 
-  public ElixirUnaryOperationImpl(ASTNode node) {
+  public ElixirHatOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnaryOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHatOperation(this);
     else super.accept(visitor);
   }
 

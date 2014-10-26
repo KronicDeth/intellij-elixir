@@ -23,45 +23,51 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public List<ElixirAtom> getAtomList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
+  @Nullable
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharList> getCharListList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
+  @Nullable
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
+  @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirSigil> getSigilList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigil.class);
+  @Nullable
+  public ElixirHatOperation getHatOperation() {
+    return findChildByClass(ElixirHatOperation.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirString> getStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
+  @Nullable
+  public ElixirSigil getSigil() {
+    return findChildByClass(ElixirSigil.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirUnaryOperation> getUnaryOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryOperation.class);
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnaryOperation getUnaryOperation() {
+    return findChildByClass(ElixirUnaryOperation.class);
   }
 
 }
