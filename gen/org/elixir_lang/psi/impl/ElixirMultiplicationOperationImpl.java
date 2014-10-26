@@ -7,17 +7,18 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements ElixirInterpolation {
+public class ElixirMultiplicationOperationImpl extends ASTWrapperPsiElement implements ElixirMultiplicationOperation {
 
-  public ElixirInterpolationImpl(ASTNode node) {
+  public ElixirMultiplicationOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMultiplicationOperation(this);
     else super.accept(visitor);
   }
 
@@ -46,9 +47,9 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public List<ElixirMultiplicationOperation> getMultiplicationOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMultiplicationOperation.class);
+  @Nullable
+  public ElixirMultiplicationOperation getMultiplicationOperation() {
+    return findChildByClass(ElixirMultiplicationOperation.class);
   }
 
   @Override

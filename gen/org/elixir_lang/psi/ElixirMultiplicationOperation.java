@@ -3,10 +3,11 @@ package org.elixir_lang.psi;
 
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirInterpolation extends PsiElement {
+public interface ElixirMultiplicationOperation extends PsiElement {
 
   @NotNull
   List<ElixirAtom> getAtomList();
@@ -20,8 +21,8 @@ public interface ElixirInterpolation extends PsiElement {
   @NotNull
   List<ElixirHatOperation> getHatOperationList();
 
-  @NotNull
-  List<ElixirMultiplicationOperation> getMultiplicationOperationList();
+  @Nullable
+  ElixirMultiplicationOperation getMultiplicationOperation();
 
   @NotNull
   List<ElixirSigil> getSigilList();

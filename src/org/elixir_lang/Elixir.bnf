@@ -30,7 +30,7 @@ charList ::= CHAR_LIST_PROMOTER
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
-private expression ::= hatOperand hatOperation*
+private expression ::= multiplicationOperand multiplicationOperation*
 // allow multiple EOLs to separate expressions to handle lines comments
 private expressionList ::= expression (EOL+ expression)*
 private hatOperand ::= (unaryOperation | unaryOperand)
@@ -82,6 +82,8 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
+private multiplicationOperand ::= hatOperand hatOperation*
+left multiplicationOperation ::= EOL* MULTIPLICATION_OPERATOR EOL* multiplicationOperand
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |

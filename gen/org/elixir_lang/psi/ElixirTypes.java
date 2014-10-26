@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
+  IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
@@ -46,6 +47,7 @@ public interface ElixirTypes {
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
+  IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("REGEX_HEREDOC_PROMOTER");
@@ -93,6 +95,9 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
+      }
+      else if (type == MULTIPLICATION_OPERATION) {
+        return new ElixirMultiplicationOperationImpl(node);
       }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);

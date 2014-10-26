@@ -1,5 +1,5 @@
 Elixir File(0,12)
   PsiElement(ElixirTokenType.NUMBER)('0b111')(0,5)
   PsiWhiteSpace(' ')(5,6)
-  PsiErrorElement:<hat operation> or ElixirTokenType.EOL expected, got '0xabad'(6,12)
+  PsiErrorElement:<hat operation>, <multiplication operation> or ElixirTokenType.EOL expected, got '0xabad'(6,12)
     PsiElement(ElixirTokenType.NUMBER)('0xabad')(6,12)
