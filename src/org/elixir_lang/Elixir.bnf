@@ -30,6 +30,9 @@ charList ::= CHAR_LIST_PROMOTER
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
+private expression ::= (atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
+// allow multiple EOLs to separate expressions to handle lines comments
+private expressionList ::= expression (EOL+ expression)*
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -54,6 +57,7 @@ private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -77,13 +81,6 @@ private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROM
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
 private quote ::= (charList | string)
-stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringBody
-                  STRING_HEREDOC_TERMINATOR
-private expression ::= (atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
-// allow multiple EOLs to separate expressions to handle lines comments
-private expressionList ::= expression (EOL+ expression)*
-interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |
           interpolatedHeredocRegex |
@@ -105,3 +102,6 @@ sigil ::= interpolatedCharListSigil |
 string ::= STRING_PROMOTER
            interpolatedStringBody
            STRING_TERMINATOR
+stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
+                  interpolatedStringBody
+                  STRING_HEREDOC_TERMINATOR
