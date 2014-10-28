@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(binary|unary)Operation|value")=expression
-  extends("(hat|multiplication)Operation")=binaryOperation
+  extends("(addition|hat|multiplication)Operation")=binaryOperation
 
   name("unaryOperation")="`not`, `~~~`, `!`, `+`, `-`, `^`, Atom, Char Token, Number, Heredoc, or Sigil"
 
@@ -27,6 +27,10 @@ elixirFile ::= EOL* (expressionList EOL*)?
 
 // In alphabetical order
 
+/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
+   is interpreted as unaryOperation */
+left additionOperation ::= DUAL_OPERATOR EOL* multiplicationOperationList
+private additionOperationList ::= multiplicationOperationList additionOperation*
 atom ::= COLON (ATOM_FRAGMENT | quote)
 fake binaryOperation ::= expression + {
   methods = [
@@ -40,7 +44,7 @@ charList ::= CHAR_LIST_PROMOTER
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
-expression ::= multiplicationOperationList
+expression ::= additionOperationList
 private expressionList ::= expression (EOL+ expression)*
 left hatOperation ::= EOL* HAT_OPERATOR EOL* unaryOperationList
 private hatOperationList ::= unaryOperationList hatOperation*
@@ -118,7 +122,7 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-unaryOperation ::= UNARY_OPERATOR EOL* unaryOperation | value
+unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation | value
 // list is just operation because operation is not associative
 private unaryOperationList ::= unaryOperation
 value ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc

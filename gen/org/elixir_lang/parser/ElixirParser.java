@@ -20,7 +20,10 @@ public class ElixirParser implements PsiParser {
     boolean result_;
     builder_ = adapt_builder_(root_, builder_, this, EXTENDS_SETS_);
     Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
-    if (root_ == ATOM) {
+    if (root_ == ADDITION_OPERATION) {
+      result_ = additionOperation(builder_, 0);
+    }
+    else if (root_ == ATOM) {
       result_ = atom(builder_, 0);
     }
     else if (root_ == CHAR_LIST) {
@@ -68,9 +71,59 @@ public class ElixirParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(ATOM, EXPRESSION, HAT_OPERATION, MULTIPLICATION_OPERATION,
-      UNARY_OPERATION, VALUE),
+    create_token_set_(ADDITION_OPERATION, ATOM, EXPRESSION, HAT_OPERATION,
+      MULTIPLICATION_OPERATION, UNARY_OPERATION, VALUE),
   };
+
+  /* ********************************************************** */
+  // DUAL_OPERATOR EOL* multiplicationOperationList
+  public static boolean additionOperation(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperation")) return false;
+    if (!nextTokenIs(builder_, DUAL_OPERATOR)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _LEFT_, null);
+    result_ = consumeToken(builder_, DUAL_OPERATOR);
+    result_ = result_ && additionOperation_1(builder_, level_ + 1);
+    result_ = result_ && multiplicationOperationList(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, ADDITION_OPERATION, result_, false, null);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean additionOperation_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperation_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "additionOperation_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // multiplicationOperationList additionOperation*
+  static boolean additionOperationList(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperationList")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = multiplicationOperationList(builder_, level_ + 1);
+    result_ = result_ && additionOperationList_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // additionOperation*
+  private static boolean additionOperationList_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperationList_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!additionOperation(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "additionOperationList_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
 
   /* ********************************************************** */
   // COLON (ATOM_FRAGMENT | quote)
@@ -183,12 +236,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // multiplicationOperationList
+  // additionOperationList
   public static boolean expression(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<expression>");
-    result_ = multiplicationOperationList(builder_, level_ + 1);
+    result_ = additionOperationList(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, EXPRESSION, result_, false, null);
     return result_;
   }
@@ -1084,7 +1137,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // UNARY_OPERATOR EOL* unaryOperation | value
+  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation | value
   public static boolean unaryOperation(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "unaryOperation")) return false;
     boolean result_;
@@ -1095,14 +1148,25 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // UNARY_OPERATOR EOL* unaryOperation
+  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation
   private static boolean unaryOperation_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "unaryOperation_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, UNARY_OPERATOR);
+    result_ = unaryOperation_0_0(builder_, level_ + 1);
     result_ = result_ && unaryOperation_0_1(builder_, level_ + 1);
     result_ = result_ && unaryOperation(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // DUAL_OPERATOR | UNARY_OPERATOR
+  private static boolean unaryOperation_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "unaryOperation_0_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, DUAL_OPERATOR);
+    if (!result_) result_ = consumeToken(builder_, UNARY_OPERATOR);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }

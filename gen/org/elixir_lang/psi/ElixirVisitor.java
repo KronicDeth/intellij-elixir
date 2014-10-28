@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
+  public void visitAdditionOperation(@NotNull ElixirAdditionOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitAtom(@NotNull ElixirAtom o) {
     visitExpression(o);
   }

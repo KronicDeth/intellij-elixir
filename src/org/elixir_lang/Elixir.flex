@@ -150,19 +150,20 @@ TWO_TOKEN_OPERATOR = "!=" |
                      "||" |
                      "~>"
 
+/* Dual because they have a dual role as unary operators and binary operators
+   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
+ONE_TOKEN_DUAL_OPERATOR = "+" |
+                          "-"
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
                                     "/"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
-                           "+" |
-                           "-" |
                            "^"
 
-ONE_TOKEN_OPERATOR = {ONE_TOKEN_UNARY_OPERATOR} |
+ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                     {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
                      "&" |
-                     "+" |
-                     "-" |
                      "." |
                      "<" |
                      "=" |
@@ -170,6 +171,8 @@ ONE_TOKEN_OPERATOR = {ONE_TOKEN_UNARY_OPERATOR} |
                      "@" |
                      "|"
 
+// Dual because they have a dual role as unary operators and binary operators
+DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
@@ -378,6 +381,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COLON}                              { pushAndBegin(ATOM_START);
                                          return ElixirTypes.COLON; }
   {COMMENT}                            { return ElixirTypes.COMMENT; }
+  {DUAL_OPERATOR}                      { return ElixirTypes.DUAL_OPERATOR; }
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }

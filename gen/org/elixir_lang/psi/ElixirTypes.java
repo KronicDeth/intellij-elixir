@@ -8,6 +8,7 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
+  IElementType ADDITION_OPERATION = new ElixirElementType("ADDITION_OPERATION");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -34,6 +35,7 @@ public interface ElixirTypes {
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
+  IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
@@ -83,7 +85,10 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ATOM) {
+       if (type == ADDITION_OPERATION) {
+        return new ElixirAdditionOperationImpl(node);
+      }
+      else if (type == ATOM) {
         return new ElixirAtomImpl(node);
       }
       else if (type == CHAR_LIST) {
