@@ -8,29 +8,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
+public class ElixirExpressionImpl extends ASTWrapperPsiElement implements ElixirExpression {
 
-  public ElixirAtomImpl(ASTNode node) {
+  public ElixirExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAtom(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitExpression(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
   }
 
 }

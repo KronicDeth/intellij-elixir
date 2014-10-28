@@ -10,27 +10,21 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
+public class ElixirBinaryOperationImpl extends ElixirExpressionImpl implements ElixirBinaryOperation {
 
-  public ElixirAtomImpl(ASTNode node) {
+  public ElixirBinaryOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAtom(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryOperation(this);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
+  @NotNull
+  public List<ElixirExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
   }
 
 }

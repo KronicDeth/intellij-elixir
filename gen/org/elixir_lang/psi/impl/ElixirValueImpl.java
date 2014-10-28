@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
+public class ElixirValueImpl extends ElixirExpressionImpl implements ElixirValue {
 
-  public ElixirAtomImpl(ASTNode node) {
+  public ElixirValueImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAtom(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitValue(this);
     else super.accept(visitor);
   }
 
@@ -29,8 +29,26 @@ public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
 
   @Override
   @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirSigil getSigil() {
+    return findChildByClass(ElixirSigil.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirString getString() {
     return findChildByClass(ElixirString.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
   }
 
 }

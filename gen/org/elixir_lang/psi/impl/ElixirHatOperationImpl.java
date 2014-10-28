@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirHatOperationImpl extends ASTWrapperPsiElement implements ElixirHatOperation {
+public class ElixirHatOperationImpl extends ElixirBinaryOperationImpl implements ElixirHatOperation {
 
   public ElixirHatOperationImpl(ASTNode node) {
     super(node);
@@ -24,50 +23,8 @@ public class ElixirHatOperationImpl extends ASTWrapperPsiElement implements Elix
 
   @Override
   @NotNull
-  public List<ElixirAtom> getAtomList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCharList> getCharListList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirHatOperation getHatOperation() {
-    return findChildByClass(ElixirHatOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirSigil> getSigilList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigil.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirString> getStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirUnaryOperation> getUnaryOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryOperation.class);
+  public List<ElixirExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
   }
 
 }

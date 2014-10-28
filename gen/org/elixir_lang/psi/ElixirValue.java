@@ -5,12 +5,21 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirAtom extends ElixirExpression {
+public interface ElixirValue extends ElixirExpression {
 
   @Nullable
   ElixirCharList getCharList();
 
   @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
+
+  @Nullable
+  ElixirSigil getSigil();
+
+  @Nullable
   ElixirString getString();
+
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
 
 }

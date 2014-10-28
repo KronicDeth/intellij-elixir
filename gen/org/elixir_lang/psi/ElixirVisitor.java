@@ -8,7 +8,11 @@ import com.intellij.psi.PsiElement;
 public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitAtom(@NotNull ElixirAtom o) {
-    visitPsiElement(o);
+    visitExpression(o);
+  }
+
+  public void visitBinaryOperation(@NotNull ElixirBinaryOperation o) {
+    visitExpression(o);
   }
 
   public void visitCharList(@NotNull ElixirCharList o) {
@@ -19,8 +23,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitHatOperation(@NotNull ElixirHatOperation o) {
+  public void visitExpression(@NotNull ElixirExpression o) {
     visitPsiElement(o);
+  }
+
+  public void visitHatOperation(@NotNull ElixirHatOperation o) {
+    visitBinaryOperation(o);
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
@@ -28,7 +36,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMultiplicationOperation(@NotNull ElixirMultiplicationOperation o) {
-    visitPsiElement(o);
+    visitBinaryOperation(o);
   }
 
   public void visitSigil(@NotNull ElixirSigil o) {
@@ -44,7 +52,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnaryOperation(@NotNull ElixirUnaryOperation o) {
-    visitPsiElement(o);
+    visitExpression(o);
+  }
+
+  public void visitValue(@NotNull ElixirValue o) {
+    visitExpression(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

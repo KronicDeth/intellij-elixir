@@ -2,6 +2,10 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends("atom|(binary|unary)Operation|value")=expression
+  extends("(hat|multiplication)Operation")=binaryOperation
+
+  name("unaryOperation")="`not`, `~~~`, `!`, `+`, `-`, `^`, Atom, Char Token, Number, Heredoc, or Sigil"
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -24,17 +28,22 @@ elixirFile ::= EOL* (expressionList EOL*)?
 // In alphabetical order
 
 atom ::= COLON (ATOM_FRAGMENT | quote)
+fake binaryOperation ::= expression + {
+  methods = [
+    left = "/expr[0]"  // will be @NotNull as far as we have "+" in the expression
+    right = "/expr[1]" // "expr" is the name of the auto-calculated child property (singular or list)
+  ]
+}
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
-private expression ::= multiplicationOperand multiplicationOperation*
-// allow multiple EOLs to separate expressions to handle lines comments
+expression ::= multiplicationOperationList
 private expressionList ::= expression (EOL+ expression)*
-private hatOperand ::= (unaryOperation | unaryOperand)
-left hatOperation ::= EOL* HAT_OPERATOR EOL* hatOperand
+left hatOperation ::= EOL* HAT_OPERATOR EOL* unaryOperationList
+private hatOperationList ::= unaryOperationList hatOperation*
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -82,8 +91,8 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
-private multiplicationOperand ::= hatOperand hatOperation*
-left multiplicationOperation ::= EOL* MULTIPLICATION_OPERATOR EOL* multiplicationOperand
+left multiplicationOperation ::= EOL* MULTIPLICATION_OPERATOR EOL* hatOperationList
+private multiplicationOperationList ::= hatOperationList multiplicationOperation*
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |
@@ -109,5 +118,7 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-private unaryOperand ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
-unaryOperation ::= (UNARY_OPERATOR EOL* unaryOperand)
+unaryOperation ::= UNARY_OPERATOR EOL* unaryOperation | value
+// list is just operation because operation is not associative
+private unaryOperationList ::= unaryOperation
+value ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc

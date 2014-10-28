@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirUnaryOperation {
+public class ElixirUnaryOperationImpl extends ElixirExpressionImpl implements ElixirUnaryOperation {
 
   public ElixirUnaryOperationImpl(ASTNode node) {
     super(node);
@@ -20,42 +19,6 @@ public class ElixirUnaryOperationImpl extends ASTWrapperPsiElement implements El
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnaryOperation(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ElixirAtom getAtom() {
-    return findChildByClass(ElixirAtom.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCharListHeredoc getCharListHeredoc() {
-    return findChildByClass(ElixirCharListHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirSigil getSigil() {
-    return findChildByClass(ElixirSigil.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringHeredoc getStringHeredoc() {
-    return findChildByClass(ElixirStringHeredoc.class);
   }
 
 }

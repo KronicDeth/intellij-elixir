@@ -11,6 +11,7 @@ public interface ElixirTypes {
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
@@ -18,6 +19,7 @@ public interface ElixirTypes {
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType UNARY_OPERATION = new ElixirElementType("UNARY_OPERATION");
+  IElementType VALUE = new ElixirElementType("VALUE");
 
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
@@ -90,6 +92,9 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
       }
+      else if (type == EXPRESSION) {
+        return new ElixirExpressionImpl(node);
+      }
       else if (type == HAT_OPERATION) {
         return new ElixirHatOperationImpl(node);
       }
@@ -110,6 +115,9 @@ public interface ElixirTypes {
       }
       else if (type == UNARY_OPERATION) {
         return new ElixirUnaryOperationImpl(node);
+      }
+      else if (type == VALUE) {
+        return new ElixirValueImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

@@ -5,6 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirUnaryOperation extends ElixirExpression {
+public interface ElixirExpression extends PsiElement {
 
 }
