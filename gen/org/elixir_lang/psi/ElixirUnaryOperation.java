@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirUnaryOperation extends ElixirExpression {
 
+  @Nullable
+  ElixirExpression getExpression();
+
 }

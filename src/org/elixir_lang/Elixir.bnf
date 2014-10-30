@@ -5,8 +5,6 @@
   extends("atom|(binary|unary)Operation|value")=expression
   extends("(addition|hat|multiplication)Operation")=binaryOperation
 
-  name("unaryOperation")="`not`, `~~~`, `!`, `+`, `-`, `^`, Atom, Char Token, Number, Heredoc, or Sigil"
-
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
@@ -29,8 +27,7 @@ elixirFile ::= EOL* (expressionList EOL*)?
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
    is interpreted as unaryOperation */
-left additionOperation ::= DUAL_OPERATOR EOL* multiplicationOperationList
-private additionOperationList ::= multiplicationOperationList additionOperation*
+additionOperation ::= expression DUAL_OPERATOR EOL* expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 fake binaryOperation ::= expression + {
   methods = [
@@ -44,10 +41,16 @@ charList ::= CHAR_LIST_PROMOTER
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
-expression ::= additionOperationList
+/* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
+   operators.
+   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
+expression ::= additionOperation |
+               multiplicationOperation |
+               hatOperation |
+               unaryOperation |
+               value
 private expressionList ::= expression (EOL+ expression)*
-left hatOperation ::= EOL* HAT_OPERATOR EOL* unaryOperationList
-private hatOperationList ::= unaryOperationList hatOperation*
+hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -95,8 +98,7 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
-left multiplicationOperation ::= EOL* MULTIPLICATION_OPERATOR EOL* hatOperationList
-private multiplicationOperationList ::= hatOperationList multiplicationOperation*
+multiplicationOperation ::= expression EOL* MULTIPLICATION_OPERATOR EOL* expression
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |
@@ -122,7 +124,5 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation | value
-// list is just operation because operation is not associative
-private unaryOperationList ::= unaryOperation
+unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
 value ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc

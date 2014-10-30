@@ -6,6 +6,7 @@ import com.intellij.lang.PsiBuilder.Marker;
 import com.intellij.openapi.diagnostic.Logger;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.lang.LighterASTNode;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
@@ -21,7 +22,7 @@ public class ElixirParser implements PsiParser {
     builder_ = adapt_builder_(root_, builder_, this, EXTENDS_SETS_);
     Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
     if (root_ == ADDITION_OPERATION) {
-      result_ = additionOperation(builder_, 0);
+      result_ = expression(builder_, 0, -1);
     }
     else if (root_ == ATOM) {
       result_ = atom(builder_, 0);
@@ -33,16 +34,16 @@ public class ElixirParser implements PsiParser {
       result_ = charListHeredoc(builder_, 0);
     }
     else if (root_ == EXPRESSION) {
-      result_ = expression(builder_, 0);
+      result_ = expression(builder_, 0, -1);
     }
     else if (root_ == HAT_OPERATION) {
-      result_ = hatOperation(builder_, 0);
+      result_ = expression(builder_, 0, 1);
     }
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
     else if (root_ == MULTIPLICATION_OPERATION) {
-      result_ = multiplicationOperation(builder_, 0);
+      result_ = expression(builder_, 0, 0);
     }
     else if (root_ == SIGIL) {
       result_ = sigil(builder_, 0);
@@ -74,56 +75,6 @@ public class ElixirParser implements PsiParser {
     create_token_set_(ADDITION_OPERATION, ATOM, EXPRESSION, HAT_OPERATION,
       MULTIPLICATION_OPERATION, UNARY_OPERATION, VALUE),
   };
-
-  /* ********************************************************** */
-  // DUAL_OPERATOR EOL* multiplicationOperationList
-  public static boolean additionOperation(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "additionOperation")) return false;
-    if (!nextTokenIs(builder_, DUAL_OPERATOR)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _LEFT_, null);
-    result_ = consumeToken(builder_, DUAL_OPERATOR);
-    result_ = result_ && additionOperation_1(builder_, level_ + 1);
-    result_ = result_ && multiplicationOperationList(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, ADDITION_OPERATION, result_, false, null);
-    return result_;
-  }
-
-  // EOL*
-  private static boolean additionOperation_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "additionOperation_1")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "additionOperation_1", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // multiplicationOperationList additionOperation*
-  static boolean additionOperationList(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "additionOperationList")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = multiplicationOperationList(builder_, level_ + 1);
-    result_ = result_ && additionOperationList_1(builder_, level_ + 1);
-    exit_section_(builder_, marker_, null, result_);
-    return result_;
-  }
-
-  // additionOperation*
-  private static boolean additionOperationList_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "additionOperationList_1")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!additionOperation(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "additionOperationList_1", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
 
   /* ********************************************************** */
   // COLON (ATOM_FRAGMENT | quote)
@@ -236,23 +187,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // additionOperationList
-  public static boolean expression(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "expression")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<expression>");
-    result_ = additionOperationList(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, EXPRESSION, result_, false, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
   // expression (EOL+ expression)*
   static boolean expressionList(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "expressionList")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = expression(builder_, level_ + 1);
+    result_ = expression(builder_, level_ + 1, -1);
     result_ = result_ && expressionList_1(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
@@ -276,7 +216,7 @@ public class ElixirParser implements PsiParser {
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = expressionList_1_0_0(builder_, level_ + 1);
-    result_ = result_ && expression(builder_, level_ + 1);
+    result_ = result_ && expression(builder_, level_ + 1, -1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -295,69 +235,6 @@ public class ElixirParser implements PsiParser {
     }
     exit_section_(builder_, marker_, null, result_);
     return result_;
-  }
-
-  /* ********************************************************** */
-  // EOL* HAT_OPERATOR EOL* unaryOperationList
-  public static boolean hatOperation(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "hatOperation")) return false;
-    if (!nextTokenIs(builder_, "<hat operation>", EOL, HAT_OPERATOR)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _LEFT_, "<hat operation>");
-    result_ = hatOperation_0(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, HAT_OPERATOR);
-    result_ = result_ && hatOperation_2(builder_, level_ + 1);
-    result_ = result_ && unaryOperationList(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, HAT_OPERATION, result_, false, null);
-    return result_;
-  }
-
-  // EOL*
-  private static boolean hatOperation_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "hatOperation_0")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "hatOperation_0", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  // EOL*
-  private static boolean hatOperation_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "hatOperation_2")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "hatOperation_2", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // unaryOperationList hatOperation*
-  static boolean hatOperationList(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "hatOperationList")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = unaryOperationList(builder_, level_ + 1);
-    result_ = result_ && hatOperationList_1(builder_, level_ + 1);
-    exit_section_(builder_, marker_, null, result_);
-    return result_;
-  }
-
-  // hatOperation*
-  private static boolean hatOperationList_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "hatOperationList_1")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!hatOperation(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "hatOperationList_1", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -983,69 +860,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* MULTIPLICATION_OPERATOR EOL* hatOperationList
-  public static boolean multiplicationOperation(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "multiplicationOperation")) return false;
-    if (!nextTokenIs(builder_, "<multiplication operation>", EOL, MULTIPLICATION_OPERATOR)) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _LEFT_, "<multiplication operation>");
-    result_ = multiplicationOperation_0(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, MULTIPLICATION_OPERATOR);
-    result_ = result_ && multiplicationOperation_2(builder_, level_ + 1);
-    result_ = result_ && hatOperationList(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, MULTIPLICATION_OPERATION, result_, false, null);
-    return result_;
-  }
-
-  // EOL*
-  private static boolean multiplicationOperation_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "multiplicationOperation_0")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "multiplicationOperation_0", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  // EOL*
-  private static boolean multiplicationOperation_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "multiplicationOperation_2")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "multiplicationOperation_2", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // hatOperationList multiplicationOperation*
-  static boolean multiplicationOperationList(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "multiplicationOperationList")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = hatOperationList(builder_, level_ + 1);
-    result_ = result_ && multiplicationOperationList_1(builder_, level_ + 1);
-    exit_section_(builder_, marker_, null, result_);
-    return result_;
-  }
-
-  // multiplicationOperation*
-  private static boolean multiplicationOperationList_1(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "multiplicationOperationList_1")) return false;
-    int pos_ = current_position_(builder_);
-    while (true) {
-      if (!multiplicationOperation(builder_, level_ + 1)) break;
-      if (!empty_element_parsed_guard_(builder_, "multiplicationOperationList_1", pos_)) break;
-      pos_ = current_position_(builder_);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
   // charList | string
   static boolean quote(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "quote")) return false;
@@ -1137,25 +951,172 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation | value
-  public static boolean unaryOperation(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "unaryOperation")) return false;
+  // Expression root: expression
+  // Operator priority table:
+  // 0: BINARY(additionOperation)
+  // 1: BINARY(multiplicationOperation)
+  // 2: BINARY(hatOperation)
+  // 3: PREFIX(unaryOperation)
+  // 4: ATOM(value)
+  public static boolean expression(PsiBuilder builder_, int level_, int priority_) {
+    if (!recursion_guard_(builder_, level_, "expression")) return false;
+    addVariant(builder_, "<expression>");
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<`not`, `~~~`, `!`, `+`, `-`, `^`, Atom, Char Token, Number, Heredoc, or Sigil>");
-    result_ = unaryOperation_0(builder_, level_ + 1);
+    boolean pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<expression>");
+    result_ = unaryOperation(builder_, level_ + 1);
     if (!result_) result_ = value(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, UNARY_OPERATION, result_, false, null);
+    pinned_ = result_;
+    result_ = result_ && expression_0(builder_, level_ + 1, priority_);
+    exit_section_(builder_, level_, marker_, null, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  public static boolean expression_0(PsiBuilder builder_, int level_, int priority_) {
+    if (!recursion_guard_(builder_, level_, "expression_0")) return false;
+    boolean result_ = true;
+    while (true) {
+      Marker left_marker_ = (Marker) builder_.getLatestDoneMarker();
+      if (!invalid_left_marker_guard_(builder_, left_marker_, "expression_0")) return false;
+      Marker marker_ = builder_.mark();
+      if (priority_ < 0 && additionOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 0));
+        marker_.drop();
+        left_marker_.precede().done(ADDITION_OPERATION);
+      }
+      else if (priority_ < 1 && multiplicationOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 1));
+        marker_.drop();
+        left_marker_.precede().done(MULTIPLICATION_OPERATION);
+      }
+      else if (priority_ < 2 && hatOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 2));
+        marker_.drop();
+        left_marker_.precede().done(HAT_OPERATION);
+      }
+      else {
+        exit_section_(builder_, marker_, null, false);
+        break;
+      }
+    }
     return result_;
   }
 
-  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* unaryOperation
+  // DUAL_OPERATOR EOL*
+  private static boolean additionOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperation_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokenSmart(builder_, DUAL_OPERATOR);
+    result_ = result_ && additionOperation_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean additionOperation_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "additionOperation_0_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "additionOperation_0_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL* MULTIPLICATION_OPERATOR EOL*
+  private static boolean multiplicationOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "multiplicationOperation_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = multiplicationOperation_0_0(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, MULTIPLICATION_OPERATOR);
+    result_ = result_ && multiplicationOperation_0_2(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean multiplicationOperation_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "multiplicationOperation_0_0")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "multiplicationOperation_0_0", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean multiplicationOperation_0_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "multiplicationOperation_0_2")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "multiplicationOperation_0_2", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL* HAT_OPERATOR EOL*
+  private static boolean hatOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperation_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = hatOperation_0_0(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, HAT_OPERATOR);
+    result_ = result_ && hatOperation_0_2(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean hatOperation_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperation_0_0")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "hatOperation_0_0", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean hatOperation_0_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "hatOperation_0_2")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "hatOperation_0_2", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  public static boolean unaryOperation(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "unaryOperation")) return false;
+    if (!nextTokenIsFast(builder_, DUAL_OPERATOR, UNARY_OPERATOR)) return false;
+    boolean result_;
+    boolean pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, null);
+    result_ = unaryOperation_0(builder_, level_ + 1);
+    pinned_ = result_;
+    result_ = pinned_ && expression(builder_, level_, 3);
+    exit_section_(builder_, level_, marker_, UNARY_OPERATION, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
   private static boolean unaryOperation_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "unaryOperation_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = unaryOperation_0_0(builder_, level_ + 1);
     result_ = result_ && unaryOperation_0_1(builder_, level_ + 1);
-    result_ = result_ && unaryOperation(builder_, level_ + 1);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -1165,8 +1126,8 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "unaryOperation_0_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeToken(builder_, DUAL_OPERATOR);
-    if (!result_) result_ = consumeToken(builder_, UNARY_OPERATOR);
+    result_ = consumeTokenSmart(builder_, DUAL_OPERATOR);
+    if (!result_) result_ = consumeTokenSmart(builder_, UNARY_OPERATOR);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
@@ -1176,28 +1137,21 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(builder_, level_, "unaryOperation_0_1")) return false;
     int pos_ = current_position_(builder_);
     while (true) {
-      if (!consumeToken(builder_, EOL)) break;
+      if (!consumeTokenSmart(builder_, EOL)) break;
       if (!empty_element_parsed_guard_(builder_, "unaryOperation_0_1", pos_)) break;
       pos_ = current_position_(builder_);
     }
     return true;
   }
 
-  /* ********************************************************** */
-  // unaryOperation
-  static boolean unaryOperationList(PsiBuilder builder_, int level_) {
-    return unaryOperation(builder_, level_ + 1);
-  }
-
-  /* ********************************************************** */
   // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
   public static boolean value(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "value")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<value>");
     result_ = atom(builder_, level_ + 1);
-    if (!result_) result_ = consumeToken(builder_, CHAR_TOKEN);
-    if (!result_) result_ = consumeToken(builder_, NUMBER);
+    if (!result_) result_ = consumeTokenSmart(builder_, CHAR_TOKEN);
+    if (!result_) result_ = consumeTokenSmart(builder_, NUMBER);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
     if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = sigil(builder_, level_ + 1);

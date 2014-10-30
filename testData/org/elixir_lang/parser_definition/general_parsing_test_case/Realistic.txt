@@ -1,5 +1,5 @@
 Elixir File(0,900)
-  PsiErrorElement:<`not`, `~~~`, `!`, `+`, `-`, `^`, Atom, Char Token, Number, Heredoc, or Sigil> or ElixirTokenType.EOL expected, got 'd'(0,1)
+  PsiErrorElement:<expression>, <value> or ElixirTokenType.EOL expected, got 'd'(0,1)
     PsiElement(BAD_CHARACTER)('d')(0,1)
   PsiElement(DUMMY_BLOCK)(1,236)
     PsiElement(DUMMY_BLOCK)(1,12)

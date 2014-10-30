@@ -21,4 +21,10 @@ public class ElixirUnaryOperationImpl extends ElixirExpressionImpl implements El
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public ElixirExpression getExpression() {
+    return findChildByClass(ElixirExpression.class);
+  }
+
 }
