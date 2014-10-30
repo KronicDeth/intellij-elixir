@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(binary|unary)Operation|value")=expression
-  extends("(addition|hat|multiplication)Operation")=binaryOperation
+  extends("(addition|hat|multiplication|two)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -44,7 +44,8 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-expression ::= additionOperation |
+expression ::= twoOperation |
+               additionOperation |
                multiplicationOperation |
                hatOperation |
                unaryOperation |
@@ -124,5 +125,6 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
+twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
 unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
 value ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc

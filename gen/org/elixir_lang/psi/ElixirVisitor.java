@@ -55,6 +55,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTwoOperation(@NotNull ElixirTwoOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitUnaryOperation(@NotNull ElixirUnaryOperation o) {
     visitExpression(o);
   }

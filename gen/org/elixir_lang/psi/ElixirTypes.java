@@ -19,6 +19,7 @@ public interface ElixirTypes {
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType TWO_OPERATION = new ElixirElementType("TWO_OPERATION");
   IElementType UNARY_OPERATION = new ElixirElementType("UNARY_OPERATION");
   IElementType VALUE = new ElixirElementType("VALUE");
 
@@ -74,6 +75,7 @@ public interface ElixirTypes {
   IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("STRING_SIGIL_TERMINATOR");
   IElementType STRING_TERMINATOR = new ElixirTokenType("STRING_TERMINATOR");
   IElementType TILDE = new ElixirTokenType("TILDE");
+  IElementType TWO_OPERATOR = new ElixirTokenType("TWO_OPERATOR");
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
@@ -117,6 +119,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == TWO_OPERATION) {
+        return new ElixirTwoOperationImpl(node);
       }
       else if (type == UNARY_OPERATION) {
         return new ElixirUnaryOperationImpl(node);
