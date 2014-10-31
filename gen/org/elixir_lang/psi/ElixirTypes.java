@@ -17,6 +17,7 @@ public interface ElixirTypes {
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
+  IElementType RELATIONAL_OPERATION = new ElixirElementType("RELATIONAL_OPERATION");
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
@@ -61,6 +62,7 @@ public interface ElixirTypes {
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("REGEX_HEREDOC_TERMINATOR");
   IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
   IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
+  IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("SIGIL_HEREDOC_PROMOTER");
   IElementType SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("SIGIL_HEREDOC_TERMINATOR");
@@ -115,6 +117,9 @@ public interface ElixirTypes {
       }
       else if (type == MULTIPLICATION_OPERATION) {
         return new ElixirMultiplicationOperationImpl(node);
+      }
+      else if (type == RELATIONAL_OPERATION) {
+        return new ElixirRelationalOperationImpl(node);
       }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);

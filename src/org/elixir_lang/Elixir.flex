@@ -135,12 +135,15 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
                            "|>" |
                            "~>"
+TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
+                                ">="
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          ".." |
                          "<>"
 
 TWO_TOKEN_OPERATOR = {TWO_TOKEN_ARROW_OPERATOR} |
+                     {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
                      "!=" |
                      "&&" |
@@ -161,18 +164,19 @@ ONE_TOKEN_DUAL_OPERATOR = "+" |
                           "-"
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
                                     "/"
+ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
+                                ">"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                     {ONE_TOKEN_RELATIONAL_OPERATOR} |
                      {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
                      "&" |
                      "." |
-                     "<" |
                      "=" |
-                     ">" |
                      "@" |
                      "|"
 
@@ -182,6 +186,8 @@ ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
+RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
+                      {ONE_TOKEN_RELATIONAL_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
@@ -394,6 +400,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {RELATIONAL_OPERATOR}                { return ElixirTypes.RELATIONAL_OPERATOR; }
   {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
                                          return ElixirTypes.TILDE; }
