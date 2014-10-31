@@ -60,7 +60,13 @@ public class InterpolationTest extends TokenTest {
                         { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
                         { ";", ElixirTypes.EOL, INITIAL_STATE, true },
+                        { "<<<", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "<<~", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "<>", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
+                        { "<|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "<~", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "<~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { ">>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "? ", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "?\\a", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "?\\xa", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
@@ -82,7 +88,10 @@ public class InterpolationTest extends TokenTest {
                         { "\t", TokenType.WHITE_SPACE, INITIAL_STATE, true },
                         { "^", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
+                        { "~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "~>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
                 }
         );

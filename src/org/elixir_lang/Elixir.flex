@@ -112,45 +112,48 @@ import org.elixir_lang.psi.ElixirTypes;
 
 FOUR_TOKEN_OPERATOR = "<<>>"
 
+THREE_TOKEN_ARROW_OPERATOR = "<<<" |
+                             "<<~" |
+                             "<|>" |
+                             "<~>" |
+                             ">>>" |
+                             "~>>"
 THREE_TOKEN_HAT_OPERATOR = "^^^"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
 
-THREE_TOKEN_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
+THREE_TOKEN_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
+                       {THREE_TOKEN_UNARY_OPERATOR} |
                        {THREE_TOKEN_HAT_OPERATOR} |
                        "!==" |
                        "%{}" |
                        "&&&" |
                        "..." |
-                       "<<<" |
-                       "<<~" |
-                       "<|>" |
-                       "<~>" |
                        "===" |
-                       ">>>" |
-                       "|||" |
-                       "~>>"
+                       "|||"
 
+TWO_TOKEN_ARROW_OPERATOR = "<~" |
+                           "|>" |
+                           "~>"
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          ".." |
                          "<>"
-TWO_TOKEN_OPERATOR = {TWO_TOKEN_TWO_OPERATOR} |
+
+TWO_TOKEN_OPERATOR = {TWO_TOKEN_ARROW_OPERATOR} |
+                     {TWO_TOKEN_TWO_OPERATOR} |
                      "!=" |
                      "&&" |
                      "->" |
                      "::" |
                      "<-" |
                      "<=" |
-                     "<~" |
                      "==" |
                      "=~" |
                      ">=" |
                      "\\\\" |
                      "{}" |
-                     "|>" |
-                     "||" |
-                     "~>"
+                     "||"
 
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
@@ -173,6 +176,8 @@ ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
                      "@" |
                      "|"
 
+ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
+                 {TWO_TOKEN_ARROW_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
@@ -378,6 +383,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
+  {ARROW_OPERATOR}                     { return ElixirTypes.ARROW_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                         { return ElixirTypes.CHAR_TOKEN; }
