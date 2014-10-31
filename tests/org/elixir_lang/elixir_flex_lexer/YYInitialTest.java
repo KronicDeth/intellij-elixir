@@ -44,6 +44,8 @@ public class YYInitialTest extends TokenTest {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
                         { "!", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "!=", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "!==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "", null, INITIAL_STATE, true },
                         { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
@@ -69,6 +71,9 @@ public class YYInitialTest extends TokenTest {
                         { "<|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "<~", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "<~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "===", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "=~", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },

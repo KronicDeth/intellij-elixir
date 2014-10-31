@@ -31,6 +31,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitComparisonOperation(@NotNull ElixirComparisonOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitExpression(@NotNull ElixirExpression o) {
     visitPsiElement(o);
   }

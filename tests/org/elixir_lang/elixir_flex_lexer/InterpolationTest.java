@@ -45,6 +45,8 @@ public class InterpolationTest extends TokenTest {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, INITIAL_STATE, true },
                         { "!", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "!=", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "!==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
@@ -68,6 +70,9 @@ public class InterpolationTest extends TokenTest {
                         { "<|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "<~", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "<~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "===", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "=~", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
@@ -96,7 +101,7 @@ public class InterpolationTest extends TokenTest {
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
                         { "~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
-                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
+                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                 }
         );
     }

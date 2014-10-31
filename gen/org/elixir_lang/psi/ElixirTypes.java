@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType COMPARISON_OPERATION = new ElixirElementType("COMPARISON_OPERATION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
@@ -39,6 +40,7 @@ public interface ElixirTypes {
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
+  IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
@@ -105,6 +107,9 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
+      }
+      else if (type == COMPARISON_OPERATION) {
+        return new ElixirComparisonOperationImpl(node);
       }
       else if (type == EXPRESSION) {
         return new ElixirExpressionImpl(node);
