@@ -9,6 +9,7 @@ import org.elixir_lang.psi.impl.*;
 public interface ElixirTypes {
 
   IElementType ADDITION_OPERATION = new ElixirElementType("ADDITION_OPERATION");
+  IElementType AND_OPERATION = new ElixirElementType("AND_OPERATION");
   IElementType ARROW_OPERATION = new ElixirElementType("ARROW_OPERATION");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
@@ -26,6 +27,7 @@ public interface ElixirTypes {
   IElementType UNARY_OPERATION = new ElixirElementType("UNARY_OPERATION");
   IElementType VALUE = new ElixirElementType("VALUE");
 
+  IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
@@ -95,6 +97,9 @@ public interface ElixirTypes {
       IElementType type = node.getElementType();
        if (type == ADDITION_OPERATION) {
         return new ElixirAdditionOperationImpl(node);
+      }
+      else if (type == AND_OPERATION) {
+        return new ElixirAndOperationImpl(node);
       }
       else if (type == ARROW_OPERATION) {
         return new ElixirArrowOperationImpl(node);

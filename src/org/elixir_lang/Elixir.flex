@@ -112,6 +112,8 @@ import org.elixir_lang.psi.ElixirTypes;
 
 FOUR_TOKEN_OPERATOR = "<<>>"
 
+THREE_TOKEN_AND_OPERATOR = "&&&" |
+                           "and"
 THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<<~" |
                              "<|>" |
@@ -124,15 +126,16 @@ THREE_TOKEN_HAT_OPERATOR = "^^^"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
 
-THREE_TOKEN_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
+THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
+                       {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        {THREE_TOKEN_HAT_OPERATOR} |
                        "%{}" |
-                       "&&&" |
                        "..." |
                        "|||"
 
+TWO_TOKEN_AND_OPERATOR = "&&"
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
                            "|>" |
                            "~>"
@@ -146,7 +149,8 @@ TWO_TOKEN_TWO_OPERATOR = "++" |
                          ".." |
                          "<>"
 
-TWO_TOKEN_OPERATOR = {TWO_TOKEN_ARROW_OPERATOR} |
+TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
+                     {TWO_TOKEN_ARROW_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
@@ -180,6 +184,8 @@ ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
                      "@" |
                      "|"
 
+AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
+               {TWO_TOKEN_AND_OPERATOR}
 ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
@@ -391,6 +397,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
+  {AND_OPERATOR}                       { return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                     { return ElixirTypes.ARROW_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }

@@ -11,6 +11,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitBinaryOperation(o);
   }
 
+  public void visitAndOperation(@NotNull ElixirAndOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitArrowOperation(@NotNull ElixirArrowOperation o) {
     visitBinaryOperation(o);
   }

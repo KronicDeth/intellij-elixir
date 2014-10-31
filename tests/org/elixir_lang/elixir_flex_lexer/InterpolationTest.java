@@ -48,6 +48,8 @@ public class InterpolationTest extends TokenTest {
                         { "!=", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "!==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "#", ElixirTypes.COMMENT, INITIAL_STATE, true },
+                        { "&&", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},
+                        { "&&&", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
                         { "+", ElixirTypes.DUAL_OPERATOR, INITIAL_STATE, true},
@@ -96,12 +98,13 @@ public class InterpolationTest extends TokenTest {
                         { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "\t", TokenType.WHITE_SPACE, INITIAL_STATE, true },
                         { "^", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "and", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},
                         { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
                         { "~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
-                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
+                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
                 }
         );
     }

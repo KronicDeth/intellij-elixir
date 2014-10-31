@@ -8,6 +8,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testAnd() {
+        doTest(true);
+    }
+
     public void testArrow() {
         doTest(true);
     }
