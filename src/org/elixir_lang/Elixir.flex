@@ -150,10 +150,8 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_ARROW_OPERATOR} |
                      "->" |
                      "::" |
                      "<-" |
-                     "<=" |
                      "==" |
                      "=~" |
-                     ">=" |
                      "\\\\" |
                      "{}" |
                      "||"
