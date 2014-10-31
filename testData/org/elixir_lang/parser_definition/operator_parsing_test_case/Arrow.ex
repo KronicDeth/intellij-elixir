@@ -18,7 +18,7 @@
 'b'
 
 # left associative
-# should parse as ('a' <<< ('b' >>> 'c'))
+# should parse as (('a' <<< 'b') >>> 'c')
 'a' <<< 'b' >>> 'c'
 
 # arrowOperation(unaryOperation(value))
