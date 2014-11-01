@@ -24,6 +24,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testMatch() {
+        doTest(true);
+    }
+
     public void testMultiplication() {
         doTest(true);
     }

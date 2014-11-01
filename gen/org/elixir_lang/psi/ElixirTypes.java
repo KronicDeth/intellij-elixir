@@ -18,6 +18,7 @@ public interface ElixirTypes {
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
+  IElementType MATCH_OPERATION = new ElixirElementType("MATCH_OPERATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
   IElementType OR_OPERATION = new ElixirElementType("OR_OPERATION");
   IElementType RELATIONAL_OPERATION = new ElixirElementType("RELATIONAL_OPERATION");
@@ -60,6 +61,7 @@ public interface ElixirTypes {
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
+  IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
@@ -126,6 +128,9 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
+      }
+      else if (type == MATCH_OPERATION) {
+        return new ElixirMatchOperationImpl(node);
       }
       else if (type == MULTIPLICATION_OPERATION) {
         return new ElixirMultiplicationOperationImpl(node);

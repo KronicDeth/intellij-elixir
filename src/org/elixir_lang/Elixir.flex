@@ -168,6 +168,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
 ONE_TOKEN_DUAL_OPERATOR = "+" |
                           "-"
+ONE_TOKEN_MATCH_OPERATOR = "="
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
                                     "/"
 ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
@@ -176,13 +177,13 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
+                     {ONE_TOKEN_MATCH_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
                      {ONE_TOKEN_RELATIONAL_OPERATOR} |
                      {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
                      "&" |
                      "." |
-                     "=" |
                      "@" |
                      "|"
 
@@ -195,6 +196,7 @@ DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
+MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
               {TWO_TOKEN_OR_OPERATOR}
@@ -413,6 +415,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DUAL_OPERATOR}                      { return ElixirTypes.DUAL_OPERATOR; }
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
+  {MATCH_OPERATOR}                     { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
   {RELATIONAL_OPERATOR}                { return ElixirTypes.RELATIONAL_OPERATOR; }
