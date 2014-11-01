@@ -418,7 +418,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {CHAR_TOKEN}                         { return ElixirTypes.CHAR_TOKEN; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
      and ':' being leftover */
-  {COLON} / {TYPE_OPERATOR}      { pushAndBegin(ATOM_START);
+  {COLON} / {TYPE_OPERATOR}            { pushAndBegin(ATOM_START);
                                          return ElixirTypes.COLON; }
   // Must be after `{COLON} / {TYPE_OPERATOR}`, so that 3 ':' are consumed before 1.
   {TYPE_OPERATOR}                      { return ElixirTypes.TYPE_OPERATOR; }
