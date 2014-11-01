@@ -75,6 +75,7 @@ public class InterpolationTest extends TokenTest {
                         { "=", ElixirTypes.MATCH_OPERATOR, INITIAL_STATE, true },
                         { "==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "===", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
+                        { "=>", ElixirTypes.ASSOCIATION_OPERATOR, INITIAL_STATE, true },
                         { "=~", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },

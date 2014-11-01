@@ -11,6 +11,7 @@ public interface ElixirTypes {
   IElementType ADDITION_OPERATION = new ElixirElementType("ADDITION_OPERATION");
   IElementType AND_OPERATION = new ElixirElementType("AND_OPERATION");
   IElementType ARROW_OPERATION = new ElixirElementType("ARROW_OPERATION");
+  IElementType ASSOCIATION_OPERATION = new ElixirElementType("ASSOCIATION_OPERATION");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -31,6 +32,7 @@ public interface ElixirTypes {
 
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
+  IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("CHAR_LIST_HEREDOC_PROMOTER");
@@ -107,6 +109,9 @@ public interface ElixirTypes {
       }
       else if (type == ARROW_OPERATION) {
         return new ElixirArrowOperationImpl(node);
+      }
+      else if (type == ASSOCIATION_OPERATION) {
+        return new ElixirAssociationOperationImpl(node);
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);

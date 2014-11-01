@@ -140,6 +140,7 @@ TWO_TOKEN_AND_OPERATOR = "&&"
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
                            "|>" |
                            "~>"
+TWO_TOKEN_ASSOCIATION_OPERATOR = "=>"
 TWO_TOKEN_COMPARISON_OPERATOR = "!=" |
                                 "==" |
                                 "=~"
@@ -154,6 +155,7 @@ TWO_TOKEN_TWO_OPERATOR = "++" |
 
 TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
+                     {TWO_TOKEN_ASSOCIATION_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
                      {TWO_TOKEN_OR_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
@@ -191,6 +193,7 @@ AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
 ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
+ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
@@ -405,6 +408,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <YYINITIAL, INTERPOLATION> {
   {AND_OPERATOR}                       { return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                     { return ElixirTypes.ARROW_OPERATOR; }
+  {ASSOCIATION_OPERATOR}               { return ElixirTypes.ASSOCIATION_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                         { return ElixirTypes.CHAR_TOKEN; }
