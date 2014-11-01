@@ -14,6 +14,10 @@ when
 # should parse as 0o3 when (0x3 when 0b11)
 0o3 when 0x3 when 0b11
 
+# whenOperation(atOperation(value))
+# should parse as (@0x1) when (@0x2)
+@0x1 when @0x2
+
 # whenOperation(unaryOperation(value))
 # should parse as 0x1 when (~~~0x1)
 0x1 when ~~~0x1

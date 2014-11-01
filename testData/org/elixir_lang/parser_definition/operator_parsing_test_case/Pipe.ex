@@ -14,6 +14,10 @@
 # should parse as 0o3 | (0x3 |0b11)
 0o3 | 0x3 | 0b11
 
+# pipeOperation(atOperation(value))
+# should parse as (@0x1) | (@0x2)
+@0x1 | @0x2
+
 # pipeOperation(unaryOperation(value))
 # should parse as 0x1 | (~~~0x1)
 0x1 | ~~~0x1

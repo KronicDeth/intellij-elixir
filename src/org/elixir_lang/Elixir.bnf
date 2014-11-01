@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(binary|capture|unary)Operation|value")=expression
+  extends("atom|(at|binary|capture|unary)Operation|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -32,6 +32,7 @@ andOperation ::= expression EOL* AND_OPERATOR EOL* expression
 arrowOperation ::= expression EOL* ARROW_OPERATOR EOL* expression
 associationOperation ::= expression EOL* ASSOCIATION_OPERATOR EOL* expression { rightAssociative = true }
 atom ::= COLON (ATOM_FRAGMENT | quote)
+atOperation ::= AT_OPERATOR EOL* expression
 fake binaryOperation ::= expression + {
   methods = [
     left = "/expr[0]"  // will be @NotNull as far as we have "+" in the expression
@@ -66,6 +67,7 @@ expression ::= captureOperation |
                multiplicationOperation |
                hatOperation |
                unaryOperation |
+               atOperation |
                value
 private expressionList ::= expression (EOL+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression

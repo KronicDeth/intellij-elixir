@@ -20,6 +20,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testAt() {
+        doTest(true);
+    }
+
     public void testCapture() {
         doTest(true);
     }

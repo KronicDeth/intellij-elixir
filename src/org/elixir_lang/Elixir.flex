@@ -170,6 +170,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      "->" |
                      "{}"
 
+ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
@@ -184,7 +185,8 @@ ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
 ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 
-ONE_TOKEN_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR} |
+ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
+                     {ONE_TOKEN_CAPTURE_OPERATOR} |
                      {ONE_TOKEN_DUAL_OPERATOR} |
                      {ONE_TOKEN_MATCH_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
@@ -192,14 +194,14 @@ ONE_TOKEN_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR} |
                      {ONE_TOKEN_RELATIONAL_OPERATOR} |
                      {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
-                     "." |
-                     "@"
+                     "."
 
 AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
 ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
 ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
+AT_OPERATOR = {ONE_TOKEN_AT_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
@@ -420,6 +422,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {AND_OPERATOR}                       { return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                     { return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}               { return ElixirTypes.ASSOCIATION_OPERATOR; }
+  {AT_OPERATOR}                        { return ElixirTypes.AT_OPERATOR; }
   {CAPTURE_OPERATOR}                   { return ElixirTypes.CAPTURE_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }

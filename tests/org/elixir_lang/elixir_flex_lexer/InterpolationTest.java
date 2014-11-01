@@ -83,6 +83,7 @@ public class InterpolationTest extends TokenTest {
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "@", ElixirTypes.AT_OPERATOR, INITIAL_STATE, true },
                         { "? ", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "?\\a", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "?\\xa", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },

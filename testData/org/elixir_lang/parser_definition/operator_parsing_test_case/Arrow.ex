@@ -21,6 +21,10 @@
 # should parse as (('a' <<< 'b') >>> 'c')
 'a' <<< 'b' >>> 'c'
 
+# arrowOperation(atOperation(value))
+# should parse as (@0x1) |> (@0x2)
+@0x1 |> @0x2
+
 # arrowOperation(unaryOperation(value))
 # should parse as 'a' |> (^'b')
 'a' |> ^'b'

@@ -84,6 +84,7 @@ public class YYInitialTest extends TokenTest {
                         { ">", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">=", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { ">>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
+                        { "@", ElixirTypes.AT_OPERATOR, INITIAL_STATE, true },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "\"\"\"",ElixirTypes.STRING_HEREDOC_PROMOTER,ElixirFlexLexer.GROUP_HEREDOC_START, true },
                         { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },

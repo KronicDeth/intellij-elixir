@@ -23,6 +23,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitBinaryOperation(o);
   }
 
+  public void visitAtOperation(@NotNull ElixirAtOperation o) {
+    visitExpression(o);
+  }
+
   public void visitAtom(@NotNull ElixirAtom o) {
     visitExpression(o);
   }

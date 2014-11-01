@@ -18,6 +18,10 @@
 # should parse as ('a' == 'b') !== :true
 'a' == 'b' !== :true
 
+# comparisonOperation(atOperation(value))
+# should parse as (@0x1) != (@0x2)
+@0x1 != @0x2
+
 # comparisonOperation(unaryOperation(value))
 # should parse as 0x1 != (~~~0x1)
 0x1 != ~~~0x1

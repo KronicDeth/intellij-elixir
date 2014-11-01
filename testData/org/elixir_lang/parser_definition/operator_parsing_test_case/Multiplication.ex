@@ -16,6 +16,10 @@
 # should parse as (0x1 / 0x2) * 0x3
 0x1 / 0x2 * 0x3
 
+# multiplicationOperation(atOperation(value))
+# should parse as (@0x1) * (@0x2)
+@0x1 * @0x2
+
 #
 # multiplicationOperation(unaryOperation(value))
 #

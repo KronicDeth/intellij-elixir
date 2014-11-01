@@ -14,6 +14,10 @@
 &:foo
 &:bar
 
+# associationOperation(atOperation(value))
+# should parse as &(@0x1)
+&@0x1
+
 # captureOperation(unaryOperation(value))
 # should parse as &(~~~0x1)
 &~~~:foo

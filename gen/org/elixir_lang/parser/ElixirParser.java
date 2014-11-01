@@ -33,6 +33,9 @@ public class ElixirParser implements PsiParser {
     else if (root_ == ASSOCIATION_OPERATION) {
       result_ = expression(builder_, 0, 4);
     }
+    else if (root_ == AT_OPERATION) {
+      result_ = atOperation(builder_, 0);
+    }
     else if (root_ == ATOM) {
       result_ = atom(builder_, 0);
     }
@@ -112,10 +115,11 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ADDITION_OPERATION, AND_OPERATION, ARROW_OPERATION, ASSOCIATION_OPERATION,
-      ATOM, CAPTURE_OPERATION, COMPARISON_OPERATION, EXPRESSION,
-      HAT_OPERATION, IN_MATCH_OPERATION, MATCH_OPERATION, MULTIPLICATION_OPERATION,
-      OR_OPERATION, PIPE_OPERATION, RELATIONAL_OPERATION, TWO_OPERATION,
-      TYPE_OPERATION, UNARY_OPERATION, VALUE, WHEN_OPERATION),
+      ATOM, AT_OPERATION, CAPTURE_OPERATION, COMPARISON_OPERATION,
+      EXPRESSION, HAT_OPERATION, IN_MATCH_OPERATION, MATCH_OPERATION,
+      MULTIPLICATION_OPERATION, OR_OPERATION, PIPE_OPERATION, RELATIONAL_OPERATION,
+      TWO_OPERATION, TYPE_OPERATION, UNARY_OPERATION, VALUE,
+      WHEN_OPERATION),
   };
 
   /* ********************************************************** */
@@ -1012,7 +1016,8 @@ public class ElixirParser implements PsiParser {
   // 14: BINARY(multiplicationOperation)
   // 15: BINARY(hatOperation)
   // 16: PREFIX(unaryOperation)
-  // 17: ATOM(value)
+  // 17: PREFIX(atOperation)
+  // 18: ATOM(value)
   public static boolean expression(PsiBuilder builder_, int level_, int priority_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     addVariant(builder_, "<expression>");
@@ -1021,6 +1026,7 @@ public class ElixirParser implements PsiParser {
     Marker marker_ = enter_section_(builder_, level_, _NONE_, "<expression>");
     result_ = captureOperation(builder_, level_ + 1);
     if (!result_) result_ = unaryOperation(builder_, level_ + 1);
+    if (!result_) result_ = atOperation(builder_, level_ + 1);
     if (!result_) result_ = value(builder_, level_ + 1);
     pinned_ = result_;
     result_ = result_ && expression_0(builder_, level_ + 1, priority_);
@@ -1723,6 +1729,42 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!consumeTokenSmart(builder_, EOL)) break;
       if (!empty_element_parsed_guard_(builder_, "unaryOperation_0_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  public static boolean atOperation(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "atOperation")) return false;
+    if (!nextTokenIsFast(builder_, AT_OPERATOR)) return false;
+    boolean result_;
+    boolean pinned_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, null);
+    result_ = atOperation_0(builder_, level_ + 1);
+    pinned_ = result_;
+    result_ = pinned_ && expression(builder_, level_, 17);
+    exit_section_(builder_, level_, marker_, AT_OPERATION, result_, pinned_, null);
+    return result_ || pinned_;
+  }
+
+  // AT_OPERATOR EOL*
+  private static boolean atOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "atOperation_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokenSmart(builder_, AT_OPERATOR);
+    result_ = result_ && atOperation_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean atOperation_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "atOperation_0_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "atOperation_0_1", pos_)) break;
       pos_ = current_position_(builder_);
     }
     return true;
