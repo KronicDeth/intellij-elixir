@@ -60,6 +60,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testWhen() {
+        doTest(true);
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/operator_parsing_test_case";

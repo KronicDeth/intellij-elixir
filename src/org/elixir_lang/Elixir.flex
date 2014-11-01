@@ -110,7 +110,9 @@ import org.elixir_lang.psi.ElixirTypes;
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
  */
 
-FOUR_TOKEN_OPERATOR = "<<>>"
+FOUR_TOKEN_WHEN_OPERATOR = "when"
+FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_WHEN_OPERATOR} |
+                      "<<>>"
 
 THREE_TOKEN_AND_OPERATOR = "&&&" |
                            "and"
@@ -212,6 +214,7 @@ TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
 TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
+WHEN_OPERATOR = {FOUR_TOKEN_WHEN_OPERATOR}
 
 // OPERATOR is from longest to shortest so longest match wins
 OPERATOR = {FOUR_TOKEN_OPERATOR} |
@@ -439,6 +442,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {TILDE}                              { pushAndBegin(SIGIL);
                                          return ElixirTypes.TILDE; }
   {TWO_OPERATOR}                       { return ElixirTypes.TWO_OPERATOR; }
+  {WHEN_OPERATOR}                      { return ElixirTypes.WHEN_OPERATOR; }
   {QUOTE_HEREDOC_PROMOTER}             { startQuote(yytext());
                                          return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by

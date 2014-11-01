@@ -31,6 +31,7 @@ public interface ElixirTypes {
   IElementType TYPE_OPERATION = new ElixirElementType("TYPE_OPERATION");
   IElementType UNARY_OPERATION = new ElixirElementType("UNARY_OPERATION");
   IElementType VALUE = new ElixirElementType("VALUE");
+  IElementType WHEN_OPERATION = new ElixirElementType("WHEN_OPERATION");
 
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
@@ -96,6 +97,7 @@ public interface ElixirTypes {
   IElementType TYPE_OPERATOR = new ElixirTokenType("TYPE_OPERATOR");
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
+  IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
   IElementType WORDS_HEREDOC_TERMINATOR = new ElixirTokenType("WORDS_HEREDOC_TERMINATOR");
@@ -173,6 +175,9 @@ public interface ElixirTypes {
       }
       else if (type == VALUE) {
         return new ElixirValueImpl(node);
+      }
+      else if (type == WHEN_OPERATION) {
+        return new ElixirWhenOperationImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }
