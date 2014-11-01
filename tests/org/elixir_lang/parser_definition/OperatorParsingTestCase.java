@@ -40,6 +40,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testPipe() {
+        doTest(true);
+    }
+
     public void testRelational() {
         doTest(true);
     }

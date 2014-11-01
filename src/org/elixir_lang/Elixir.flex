@@ -173,6 +173,7 @@ ONE_TOKEN_DUAL_OPERATOR = "+" |
 ONE_TOKEN_MATCH_OPERATOR = "="
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
                                     "/"
+ONE_TOKEN_PIPE_OPERATOR = "|"
 ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
                                 ">"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
@@ -181,13 +182,13 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR} |
                      {ONE_TOKEN_MATCH_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                     {ONE_TOKEN_PIPE_OPERATOR} |
                      {ONE_TOKEN_RELATIONAL_OPERATOR} |
                      {ONE_TOKEN_UNARY_OPERATOR} |
                      "%" |
                      "&" |
                      "." |
-                     "@" |
-                     "|"
+                     "@"
 
 AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
@@ -203,6 +204,7 @@ MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
               {TWO_TOKEN_OR_OPERATOR}
+PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
@@ -422,6 +424,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {MATCH_OPERATOR}                     { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
+  {PIPE_OPERATOR}                      { return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                { return ElixirTypes.RELATIONAL_OPERATOR; }
   {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
