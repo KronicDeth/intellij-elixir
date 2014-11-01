@@ -28,6 +28,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testInMatch() {
+        doTest(true);
+    }
+
     public void testMatch() {
         doTest(true);
     }

@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(binary|unary)Operation|value")=expression
-  extends("(addition|and|arrow|association|comparison|hat|match|multiplication|or|pipe|relational|two|type|when)Operation")=binaryOperation
+  extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -48,7 +48,8 @@ comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-expression ::= whenOperation |
+expression ::= inMatchOperation |
+               whenOperation |
                typeOperation |
                pipeOperation |
                associationOperation |
@@ -66,6 +67,7 @@ expression ::= whenOperation |
                value
 private expressionList ::= expression (EOL+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
+inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL

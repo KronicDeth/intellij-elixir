@@ -146,6 +146,8 @@ TWO_TOKEN_ASSOCIATION_OPERATOR = "=>"
 TWO_TOKEN_COMPARISON_OPERATOR = "!=" |
                                 "==" |
                                 "=~"
+TWO_TOKEN_IN_MATCH_OPERATOR = "<-" |
+                              "\\\\"
 TWO_TOKEN_OR_OPERATOR = "or" |
                         "||"
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
@@ -160,13 +162,12 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
                      {TWO_TOKEN_ASSOCIATION_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
+                     {TWO_TOKEN_IN_MATCH_OPERATOR} |
                      {TWO_TOKEN_OR_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
                      {TWO_TOKEN_TYPE_OPERATOR} |
                      "->" |
-                     "<-" |
-                     "\\\\" |
                      "{}"
 
 /* Dual because they have a dual role as unary operators and binary operators
@@ -203,6 +204,7 @@ DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
+IN_MATCH_OPERATOR = {TWO_TOKEN_IN_MATCH_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
@@ -433,6 +435,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DUAL_OPERATOR}                      { return ElixirTypes.DUAL_OPERATOR; }
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
+  {IN_MATCH_OPERATOR}                  { return ElixirTypes.IN_MATCH_OPERATOR; }
   {MATCH_OPERATOR}                     { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
