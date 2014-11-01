@@ -152,6 +152,7 @@ TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          ".." |
                          "<>"
+TWO_TOKEN_TYPE_OPERATOR = "::"
 
 TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
@@ -160,8 +161,8 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_OR_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
+                     {TWO_TOKEN_TYPE_OPERATOR} |
                      "->" |
-                     "::" |
                      "<-" |
                      "\\\\" |
                      "{}"
@@ -208,6 +209,7 @@ PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
+TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
 
@@ -414,6 +416,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                         { return ElixirTypes.CHAR_TOKEN; }
+  /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
+     and ':' being leftover */
+  {COLON} / {TYPE_OPERATOR}      { pushAndBegin(ATOM_START);
+                                         return ElixirTypes.COLON; }
+  // Must be after `{COLON} / {TYPE_OPERATOR}`, so that 3 ':' are consumed before 1.
+  {TYPE_OPERATOR}                      { return ElixirTypes.TYPE_OPERATOR; }
+  // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
   {COLON}                              { pushAndBegin(ATOM_START);
                                          return ElixirTypes.COLON; }
   {COMMENT}                            { return ElixirTypes.COMMENT; }

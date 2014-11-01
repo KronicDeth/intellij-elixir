@@ -52,6 +52,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testType() {
+        doTest(true);
+    }
+
     public void testUnary() {
         doTest(true);
     }

@@ -63,6 +63,7 @@ public class InterpolationTest extends TokenTest {
                         { "0o01234567", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
+                        { "::", ElixirTypes.TYPE_OPERATOR, INITIAL_STATE, true },
                         { ";", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "<", ElixirTypes.RELATIONAL_OPERATOR, INITIAL_STATE, true },
                         { "<<<", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },

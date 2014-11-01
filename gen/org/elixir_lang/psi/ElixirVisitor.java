@@ -91,6 +91,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitBinaryOperation(o);
   }
 
+  public void visitTypeOperation(@NotNull ElixirTypeOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitUnaryOperation(@NotNull ElixirUnaryOperation o) {
     visitExpression(o);
   }
