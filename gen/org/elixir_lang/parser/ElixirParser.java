@@ -1,16 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.openapi.diagnostic.Logger;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.lang.LighterASTNode;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -22,13 +22,13 @@ public class ElixirParser implements PsiParser {
     builder_ = adapt_builder_(root_, builder_, this, EXTENDS_SETS_);
     Marker marker_ = enter_section_(builder_, 0, _COLLAPSE_, null);
     if (root_ == ADDITION_OPERATION) {
-      result_ = expression(builder_, 0, 4);
+      result_ = expression(builder_, 0, 5);
     }
     else if (root_ == AND_OPERATION) {
-      result_ = expression(builder_, 0, -1);
+      result_ = expression(builder_, 0, 0);
     }
     else if (root_ == ARROW_OPERATION) {
-      result_ = expression(builder_, 0, 2);
+      result_ = expression(builder_, 0, 3);
     }
     else if (root_ == ATOM) {
       result_ = atom(builder_, 0);
@@ -40,22 +40,25 @@ public class ElixirParser implements PsiParser {
       result_ = charListHeredoc(builder_, 0);
     }
     else if (root_ == COMPARISON_OPERATION) {
-      result_ = expression(builder_, 0, 0);
+      result_ = expression(builder_, 0, 1);
     }
     else if (root_ == EXPRESSION) {
       result_ = expression(builder_, 0, -1);
     }
     else if (root_ == HAT_OPERATION) {
-      result_ = expression(builder_, 0, 6);
+      result_ = expression(builder_, 0, 7);
     }
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
     else if (root_ == MULTIPLICATION_OPERATION) {
-      result_ = expression(builder_, 0, 5);
+      result_ = expression(builder_, 0, 6);
+    }
+    else if (root_ == OR_OPERATION) {
+      result_ = expression(builder_, 0, -1);
     }
     else if (root_ == RELATIONAL_OPERATION) {
-      result_ = expression(builder_, 0, 1);
+      result_ = expression(builder_, 0, 2);
     }
     else if (root_ == SIGIL) {
       result_ = sigil(builder_, 0);
@@ -67,7 +70,7 @@ public class ElixirParser implements PsiParser {
       result_ = stringHeredoc(builder_, 0);
     }
     else if (root_ == TWO_OPERATION) {
-      result_ = expression(builder_, 0, 3);
+      result_ = expression(builder_, 0, 4);
     }
     else if (root_ == UNARY_OPERATION) {
       result_ = unaryOperation(builder_, 0);
@@ -89,7 +92,8 @@ public class ElixirParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ADDITION_OPERATION, AND_OPERATION, ARROW_OPERATION, ATOM,
       COMPARISON_OPERATION, EXPRESSION, HAT_OPERATION, MULTIPLICATION_OPERATION,
-      RELATIONAL_OPERATION, TWO_OPERATION, UNARY_OPERATION, VALUE),
+      OR_OPERATION, RELATIONAL_OPERATION, TWO_OPERATION, UNARY_OPERATION,
+      VALUE),
   };
 
   /* ********************************************************** */
@@ -969,16 +973,17 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // Expression root: expression
   // Operator priority table:
-  // 0: BINARY(andOperation)
-  // 1: BINARY(comparisonOperation)
-  // 2: BINARY(relationalOperation)
-  // 3: BINARY(arrowOperation)
-  // 4: BINARY(twoOperation)
-  // 5: BINARY(additionOperation)
-  // 6: BINARY(multiplicationOperation)
-  // 7: BINARY(hatOperation)
-  // 8: PREFIX(unaryOperation)
-  // 9: ATOM(value)
+  // 0: BINARY(orOperation)
+  // 1: BINARY(andOperation)
+  // 2: BINARY(comparisonOperation)
+  // 3: BINARY(relationalOperation)
+  // 4: BINARY(arrowOperation)
+  // 5: BINARY(twoOperation)
+  // 6: BINARY(additionOperation)
+  // 7: BINARY(multiplicationOperation)
+  // 8: BINARY(hatOperation)
+  // 9: PREFIX(unaryOperation)
+  // 10: ATOM(value)
   public static boolean expression(PsiBuilder builder_, int level_, int priority_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     addVariant(builder_, "<expression>");
@@ -1000,43 +1005,48 @@ public class ElixirParser implements PsiParser {
       Marker left_marker_ = (Marker) builder_.getLatestDoneMarker();
       if (!invalid_left_marker_guard_(builder_, left_marker_, "expression_0")) return false;
       Marker marker_ = builder_.mark();
-      if (priority_ < 0 && andOperation_0(builder_, level_ + 1)) {
+      if (priority_ < 0 && orOperation_0(builder_, level_ + 1)) {
         result_ = report_error_(builder_, expression(builder_, level_, 0));
+        marker_.drop();
+        left_marker_.precede().done(OR_OPERATION);
+      }
+      else if (priority_ < 1 && andOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 1));
         marker_.drop();
         left_marker_.precede().done(AND_OPERATION);
       }
-      else if (priority_ < 1 && comparisonOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 1));
+      else if (priority_ < 2 && comparisonOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 2));
         marker_.drop();
         left_marker_.precede().done(COMPARISON_OPERATION);
       }
-      else if (priority_ < 2 && relationalOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 2));
+      else if (priority_ < 3 && relationalOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 3));
         marker_.drop();
         left_marker_.precede().done(RELATIONAL_OPERATION);
       }
-      else if (priority_ < 3 && arrowOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 3));
+      else if (priority_ < 4 && arrowOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 4));
         marker_.drop();
         left_marker_.precede().done(ARROW_OPERATION);
       }
-      else if (priority_ < 4 && twoOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 3));
+      else if (priority_ < 5 && twoOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 4));
         marker_.drop();
         left_marker_.precede().done(TWO_OPERATION);
       }
-      else if (priority_ < 5 && additionOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 5));
+      else if (priority_ < 6 && additionOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 6));
         marker_.drop();
         left_marker_.precede().done(ADDITION_OPERATION);
       }
-      else if (priority_ < 6 && multiplicationOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 6));
+      else if (priority_ < 7 && multiplicationOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 7));
         marker_.drop();
         left_marker_.precede().done(MULTIPLICATION_OPERATION);
       }
-      else if (priority_ < 7 && hatOperation_0(builder_, level_ + 1)) {
-        result_ = report_error_(builder_, expression(builder_, level_, 7));
+      else if (priority_ < 8 && hatOperation_0(builder_, level_ + 1)) {
+        result_ = report_error_(builder_, expression(builder_, level_, 8));
         marker_.drop();
         left_marker_.precede().done(HAT_OPERATION);
       }
@@ -1046,6 +1056,42 @@ public class ElixirParser implements PsiParser {
       }
     }
     return result_;
+  }
+
+  // EOL* OR_OPERATOR EOL*
+  private static boolean orOperation_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "orOperation_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = orOperation_0_0(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, OR_OPERATOR);
+    result_ = result_ && orOperation_0_2(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean orOperation_0_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "orOperation_0_0")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "orOperation_0_0", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean orOperation_0_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "orOperation_0_2")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeTokenSmart(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "orOperation_0_2", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
   }
 
   // EOL* AND_OPERATOR EOL*
@@ -1331,7 +1377,7 @@ public class ElixirParser implements PsiParser {
     Marker marker_ = enter_section_(builder_, level_, _NONE_, null);
     result_ = unaryOperation_0(builder_, level_ + 1);
     pinned_ = result_;
-    result_ = pinned_ && expression(builder_, level_, 8);
+    result_ = pinned_ && expression(builder_, level_, 9);
     exit_section_(builder_, level_, marker_, UNARY_OPERATION, result_, pinned_, null);
     return result_ || pinned_;
   }

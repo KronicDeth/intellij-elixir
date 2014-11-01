@@ -28,6 +28,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testOr() {
+        doTest(true);
+    }
+
     public void testRelational() {
         doTest(true);
     }

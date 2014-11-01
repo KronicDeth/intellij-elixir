@@ -122,6 +122,7 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "~>>"
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
+THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_HAT_OPERATOR = "^^^"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
@@ -129,11 +130,11 @@ THREE_TOKEN_UNARY_OPERATOR = "not" |
 THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
+                       {THREE_TOKEN_OR_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        {THREE_TOKEN_HAT_OPERATOR} |
                        "%{}" |
-                       "..." |
-                       "|||"
+                       "..."
 
 TWO_TOKEN_AND_OPERATOR = "&&"
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
@@ -142,6 +143,8 @@ TWO_TOKEN_ARROW_OPERATOR = "<~" |
 TWO_TOKEN_COMPARISON_OPERATOR = "!=" |
                                 "==" |
                                 "=~"
+TWO_TOKEN_OR_OPERATOR = "or" |
+                        "||"
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_TWO_OPERATOR = "++" |
@@ -152,15 +155,14 @@ TWO_TOKEN_TWO_OPERATOR = "++" |
 TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
+                     {TWO_TOKEN_OR_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
-                     "&&" |
                      "->" |
                      "::" |
                      "<-" |
                      "\\\\" |
-                     "{}" |
-                     "||"
+                     "{}"
 
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
@@ -194,6 +196,8 @@ COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
+OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
+              {TWO_TOKEN_OR_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
@@ -410,6 +414,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
   {RELATIONAL_OPERATOR}                { return ElixirTypes.RELATIONAL_OPERATOR; }
   {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
