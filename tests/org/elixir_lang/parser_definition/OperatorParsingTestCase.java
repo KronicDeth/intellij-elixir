@@ -12,11 +12,11 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testAssociation() {
+    public void testArrow() {
         doTest(true);
     }
 
-    public void testArrow() {
+    public void testAssociation() {
         doTest(true);
     }
 
