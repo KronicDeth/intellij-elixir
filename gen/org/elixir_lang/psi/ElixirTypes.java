@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType ARROW_OPERATION = new ElixirElementType("ARROW_OPERATION");
   IElementType ASSOCIATION_OPERATION = new ElixirElementType("ASSOCIATION_OPERATION");
   IElementType ATOM = new ElixirElementType("ATOM");
+  IElementType CAPTURE_OPERATION = new ElixirElementType("CAPTURE_OPERATION");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType COMPARISON_OPERATION = new ElixirElementType("COMPARISON_OPERATION");
@@ -38,6 +39,7 @@ public interface ElixirTypes {
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
+  IElementType CAPTURE_OPERATOR = new ElixirTokenType("CAPTURE_OPERATOR");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("CHAR_LIST_HEREDOC_PROMOTER");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_HEREDOC_TERMINATOR");
@@ -123,6 +125,9 @@ public interface ElixirTypes {
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
+      }
+      else if (type == CAPTURE_OPERATION) {
+        return new ElixirCaptureOperationImpl(node);
       }
       else if (type == CHAR_LIST) {
         return new ElixirCharListImpl(node);

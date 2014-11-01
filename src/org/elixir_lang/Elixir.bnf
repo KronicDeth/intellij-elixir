@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(binary|unary)Operation|value")=expression
+  extends("atom|(binary|capture|unary)Operation|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -38,6 +38,7 @@ fake binaryOperation ::= expression + {
     right = "/expr[1]" // "expr" is the name of the auto-calculated child property (singular or list)
   ]
 }
+captureOperation ::= CAPTURE_OPERATOR EOL* expression
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -48,7 +49,8 @@ comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-expression ::= inMatchOperation |
+expression ::= captureOperation |
+               inMatchOperation |
                whenOperation |
                typeOperation |
                pipeOperation |

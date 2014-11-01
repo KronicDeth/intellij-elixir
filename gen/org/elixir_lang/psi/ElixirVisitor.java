@@ -31,6 +31,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitCaptureOperation(@NotNull ElixirCaptureOperation o) {
+    visitExpression(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
     visitPsiElement(o);
   }
