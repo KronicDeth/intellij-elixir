@@ -60,6 +60,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testStab() {
+        doTest(true);
+    }
+
     public void testTwo() {
         doTest(true);
     }

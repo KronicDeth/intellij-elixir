@@ -91,6 +91,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitStabOperation(@NotNull ElixirStabOperation o) {
+    visitBinaryOperation(o);
+  }
+
   public void visitString(@NotNull ElixirString o) {
     visitPsiElement(o);
   }

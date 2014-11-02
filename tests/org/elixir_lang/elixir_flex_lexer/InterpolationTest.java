@@ -57,6 +57,7 @@ public class InterpolationTest extends TokenTest {
                         { "++", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
                         { "-", ElixirTypes.DUAL_OPERATOR, INITIAL_STATE, true},
                         { "--", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
+                        { "->", ElixirTypes.STAB_OPERATOR, INITIAL_STATE, true },
                         { "..", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
                         { "001234567", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { "0X0123456789abcdefABCDEF", ElixirTypes.NUMBER, INITIAL_STATE, true },

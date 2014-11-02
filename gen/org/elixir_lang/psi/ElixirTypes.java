@@ -28,6 +28,7 @@ public interface ElixirTypes {
   IElementType PIPE_OPERATION = new ElixirElementType("PIPE_OPERATION");
   IElementType RELATIONAL_OPERATION = new ElixirElementType("RELATIONAL_OPERATION");
   IElementType SIGIL = new ElixirElementType("SIGIL");
+  IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType TWO_OPERATION = new ElixirElementType("TWO_OPERATION");
@@ -89,6 +90,7 @@ public interface ElixirTypes {
   IElementType SIGIL_MODIFIER = new ElixirTokenType("SIGIL_MODIFIER");
   IElementType SIGIL_PROMOTER = new ElixirTokenType("SIGIL_PROMOTER");
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("SIGIL_TERMINATOR");
+  IElementType STAB_OPERATOR = new ElixirTokenType("STAB_OPERATOR");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
   IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("STRING_HEREDOC_PROMOTER");
   IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_HEREDOC_TERMINATOR");
@@ -172,6 +174,9 @@ public interface ElixirTypes {
       }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);
+      }
+      else if (type == STAB_OPERATION) {
+        return new ElixirStabOperationImpl(node);
       }
       else if (type == STRING) {
         return new ElixirStringImpl(node);

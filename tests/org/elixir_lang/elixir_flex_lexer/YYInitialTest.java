@@ -57,6 +57,7 @@ public class YYInitialTest extends TokenTest {
                         { "++", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
                         { "-", ElixirTypes.DUAL_OPERATOR, INITIAL_STATE, true},
                         { "--", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
+                        { "->", ElixirTypes.STAB_OPERATOR, INITIAL_STATE, true },
                         { "..", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
                         { "001234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
                         { "0B10", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
