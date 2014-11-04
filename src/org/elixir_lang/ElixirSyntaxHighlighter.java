@@ -52,6 +52,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.NUMBER
     );
 
+    public static final TextAttributesKey OPERATION_SIGN = createTextAttributesKey(
+            "ELIXIR_OPERATION_SIGN",
+            DefaultLanguageHighlighterColors.OPERATION_SIGN
+    );
+
     public static final TextAttributesKey SIGIL = createTextAttributesKey(
             "ELIXIR_SIGIL",
             // Based on color used for Regular expression's boundaries in Ruby
@@ -76,6 +81,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
+    private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
@@ -100,6 +106,26 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
             ElixirTypes.INTERPOLATION_END
+    );
+    private static final TokenSet OPERATION_SIGNS = TokenSet.create(
+            ElixirTypes.AND_OPERATOR,
+            ElixirTypes.ARROW_OPERATOR,
+            ElixirTypes.ASSOCIATION_OPERATOR,
+            ElixirTypes.AT_OPERATOR,
+            ElixirTypes.CAPTURE_OPERATOR,
+            ElixirTypes.COMPARISON_OPERATOR,
+            ElixirTypes.DUAL_OPERATOR,
+            ElixirTypes.HAT_OPERATOR,
+            ElixirTypes.IN_MATCH_OPERATOR,
+            ElixirTypes.MULTIPLICATION_OPERATOR,
+            ElixirTypes.OR_OPERATOR,
+            ElixirTypes.PIPE_OPERATOR,
+            ElixirTypes.RELATIONAL_OPERATOR,
+            ElixirTypes.STAB_OPERATOR,
+            ElixirTypes.TWO_OPERATOR,
+            ElixirTypes.TYPE_OPERATOR,
+            ElixirTypes.UNARY_OPERATOR,
+            ElixirTypes.WHEN_OPERATOR
     );
     // @todo Highlight each type of sigil separately and group char list and string with non-sigil versions
     private static final TokenSet SIGILS = TokenSet.create(
@@ -164,6 +190,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return EXPRESSION_SUBSTITUTION_MARK_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
+        } else if (OPERATION_SIGNS.contains(tokenType)) {
+            return OPERATION_SIGN_KEYS;
         } else if (SIGILS.contains(tokenType)) {
             return SIGIL_KEYS;
         } else if (STRINGS.contains(tokenType)) {
