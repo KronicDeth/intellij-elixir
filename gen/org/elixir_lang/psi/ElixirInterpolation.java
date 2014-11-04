@@ -8,21 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
-  List<ElixirAtom> getAtomList();
-
-  @NotNull
-  List<ElixirCharList> getCharListList();
-
-  @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
-
-  @NotNull
-  List<ElixirSigil> getSigilList();
-
-  @NotNull
-  List<ElixirString> getStringList();
-
-  @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  List<ElixirExpression> getExpressionList();
 
 }

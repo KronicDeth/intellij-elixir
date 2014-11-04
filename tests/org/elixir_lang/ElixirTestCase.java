@@ -14,6 +14,7 @@ public class ElixirTestCase extends TestCase {
 
         suite.addTestSuite(org.elixir_lang.parser_definition.AtomParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.GeneralParsingTestCase.class);
+        suite.addTestSuite(org.elixir_lang.parser_definition.OperatorParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.SigilParsingTestCase.class);
         suite.addTestSuite(CharListHeredocParsingTestCase.class);
         suite.addTestSuite(CharListParsingTestCase.class);

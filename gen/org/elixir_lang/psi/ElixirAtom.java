@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirAtom extends PsiElement {
+public interface ElixirAtom extends ElixirExpression {
 
   @Nullable
   ElixirCharList getCharList();

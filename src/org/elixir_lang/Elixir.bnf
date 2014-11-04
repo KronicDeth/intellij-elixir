@@ -2,6 +2,8 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends("atom|(at|binary|capture|unary)Operation|value")=expression
+  extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -23,13 +25,54 @@ elixirFile ::= EOL* (expressionList EOL*)?
 
 // In alphabetical order
 
+/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
+   is interpreted as unaryOperation */
+additionOperation ::= expression DUAL_OPERATOR EOL* expression
+andOperation ::= expression EOL* AND_OPERATOR EOL* expression
+arrowOperation ::= expression EOL* ARROW_OPERATOR EOL* expression
+associationOperation ::= expression EOL* ASSOCIATION_OPERATOR EOL* expression { rightAssociative = true }
 atom ::= COLON (ATOM_FRAGMENT | quote)
+atOperation ::= AT_OPERATOR EOL* expression
+fake binaryOperation ::= expression + {
+  methods = [
+    left = "/expr[0]"  // will be @NotNull as far as we have "+" in the expression
+    right = "/expr[1]" // "expr" is the name of the auto-calculated child property (singular or list)
+  ]
+}
+captureOperation ::= CAPTURE_OPERATOR EOL* expression
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
+comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+/* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
+   operators.
+   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
+expression ::= stabOperation |
+               captureOperation |
+               inMatchOperation |
+               whenOperation |
+               typeOperation |
+               pipeOperation |
+               associationOperation |
+               matchOperation |
+               orOperation |
+               andOperation |
+               comparisonOperation |
+               relationalOperation |
+               arrowOperation |
+               twoOperation |
+               additionOperation |
+               multiplicationOperation |
+               hatOperation |
+               unaryOperation |
+               atOperation |
+               value
+private expressionList ::= expression (EOL+ expression)*
+hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
+inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -54,6 +97,7 @@ private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -76,14 +120,12 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
+matchOperation ::= expression EOL* MATCH_OPERATOR EOL* expression { rightAssociative = true }
+multiplicationOperation ::= expression EOL* MULTIPLICATION_OPERATOR EOL* expression
+orOperation ::= expression EOL* OR_OPERATOR EOL* expression
+pipeOperation ::= expression EOL* PIPE_OPERATOR EOL* expression { rightAssociative = true }
 private quote ::= (charList | string)
-stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringBody
-                  STRING_HEREDOC_TERMINATOR
-private expression ::= (atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc)
-// allow multiple EOLs to separate expressions to handle lines comments
-private expressionList ::= expression (EOL+ expression)*
-interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+relationalOperation ::= expression EOL* RELATIONAL_OPERATOR EOL* expression
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |
           interpolatedHeredocRegex |
@@ -102,6 +144,15 @@ sigil ::= interpolatedCharListSigil |
           literalSigil |
           literalStringSigil |
           literalWords
+stabOperation ::= expression EOL* STAB_OPERATOR EOL* expression { rightAssociative = true }
 string ::= STRING_PROMOTER
            interpolatedStringBody
            STRING_TERMINATOR
+stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
+                  interpolatedStringBody
+                  STRING_HEREDOC_TERMINATOR
+twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
+typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
+unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
+value ::= atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }
