@@ -48,6 +48,10 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testNumber() {
+        doTest(true);
+    }
+
     public void testNoEOLAtEOF() {
         doTest(true);
     }
