@@ -315,6 +315,15 @@ INTERPOLATION_START = "#{"
 INTERPOLATION_END = "}"
 
 /*
+ * Floats
+ */
+
+DECIMAL_MARK = "."
+EXPONENT_MARK = [Ee]
+EXPONENT_SIGN = [+-]
+DECIMAL_FLOAT = {DECIMAL_INTEGER} {DECIMAL_MARK} {DECIMAL_INTEGER} ({EXPONENT_MARK} {EXPONENT_SIGN}? {DECIMAL_INTEGER})?
+
+/*
  *
  *  Quotes
  *
@@ -450,6 +459,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COMMENT}                            { return ElixirTypes.COMMENT; }
   {COMPARISON_OPERATOR}                { return ElixirTypes.COMPARISON_OPERATOR; }
   {DUAL_OPERATOR}                      { return ElixirTypes.DUAL_OPERATOR; }
+  {DECIMAL_FLOAT}                      { return ElixirTypes.NUMBER; }
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR}                  { return ElixirTypes.IN_MATCH_OPERATOR; }
