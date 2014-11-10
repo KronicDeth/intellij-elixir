@@ -21,6 +21,7 @@
             <li><code>;</code> is recognized as EOL. <code>\r\n</code> and <code>\n</code> style EOL can be escaped with <code>\</code> and will be treated as whitespace.</li>
             <li>Operator arity, associativity, and precedence</li>
             <li>Decimal integers and floats</li>
+            <li>Identifiers (variable, function, and macro names)</li>
           </ul>
         </li>
         <li>
