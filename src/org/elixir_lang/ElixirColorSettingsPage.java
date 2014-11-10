@@ -26,6 +26,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
+            new AttributesDescriptor("Identifier", ElixirSyntaxHighlighter.IDENTIFIER),
             new AttributesDescriptor("Number", ElixirSyntaxHighlighter.NUMBER),
             new AttributesDescriptor("Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
