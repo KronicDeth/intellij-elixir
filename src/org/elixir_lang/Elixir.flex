@@ -307,6 +307,16 @@ OCTAL_INTEGER = {OCTAL_INTEGER_PREFIX} [0-7]+
 
 INTEGER = {BINARY_INTEGER} | {DECIMAL_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
+
+/*
+ * Identifiers
+ */
+
+IDENTIFIER_END = [?!]
+IDENTIFIER_MIDDLE = [0-9a-zA-Z_]
+IDENTIFIER_START = [a-z_]
+IDENTIFIER = {IDENTIFIER_START} {IDENTIFIER_MIDDLE}* {IDENTIFIER_END}?
+
 /*
  * Interpolation
  */
@@ -461,19 +471,23 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DUAL_OPERATOR}                      { return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                      { return ElixirTypes.NUMBER; }
   {HAT_OPERATOR}                       { return ElixirTypes.HAT_OPERATOR; }
+  // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
+  // Must be before {IDENTIFIER} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
+  // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {WHEN_OPERATOR}                      { return ElixirTypes.WHEN_OPERATOR; }
+  {IDENTIFIER}                         { return ElixirTypes.IDENTIFIER; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR}                  { return ElixirTypes.IN_MATCH_OPERATOR; }
   {MATCH_OPERATOR}                     { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
-  {OR_OPERATOR}                        { return ElixirTypes.OR_OPERATOR; }
   {PIPE_OPERATOR}                      { return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                { return ElixirTypes.RELATIONAL_OPERATOR; }
   {STAB_OPERATOR}                      { return ElixirTypes.STAB_OPERATOR; }
-  {UNARY_OPERATOR}                     { return ElixirTypes.UNARY_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
                                          return ElixirTypes.TILDE; }
   {TWO_OPERATOR}                       { return ElixirTypes.TWO_OPERATOR; }
-  {WHEN_OPERATOR}                      { return ElixirTypes.WHEN_OPERATOR; }
   {QUOTE_HEREDOC_PROMOTER}             { startQuote(yytext());
                                          return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by

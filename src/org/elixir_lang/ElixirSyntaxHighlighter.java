@@ -47,6 +47,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.PARENTHESES
     );
 
+    public static final TextAttributesKey IDENTIFIER = createTextAttributesKey(
+            "ELIXIR_IDENTIFIER",
+            DefaultLanguageHighlighterColors.IDENTIFIER
+    );
+
     public static final TextAttributesKey NUMBER = createTextAttributesKey(
             "ELIXIR_NUMBER",
             DefaultLanguageHighlighterColors.NUMBER
@@ -80,6 +85,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
+    private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
     private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
     private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
@@ -188,6 +194,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return COMMENT_KEYS;
         } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {
             return EXPRESSION_SUBSTITUTION_MARK_KEYS;
+        } else if (tokenType.equals(ElixirTypes.IDENTIFIER)) {
+            return IDENTIFIER_KEYS;
         } else if (tokenType.equals(ElixirTypes.NUMBER)) {
             return NUMBER_KEYS;
         } else if (OPERATION_SIGNS.contains(tokenType)) {

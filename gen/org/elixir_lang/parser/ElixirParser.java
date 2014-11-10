@@ -1815,7 +1815,7 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | quote | sigil | stringHeredoc
+  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | quote | sigil | stringHeredoc
   public static boolean value(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "value")) return false;
     boolean result_;
@@ -1824,6 +1824,7 @@ public class ElixirParser implements PsiParser {
     if (!result_) result_ = consumeTokenSmart(builder_, CHAR_TOKEN);
     if (!result_) result_ = consumeTokenSmart(builder_, NUMBER);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
     if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = sigil(builder_, level_ + 1);
     if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
