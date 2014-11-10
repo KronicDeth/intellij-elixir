@@ -22,6 +22,7 @@
             <li>Operator arity, associativity, and precedence</li>
             <li>Decimal integers and floats</li>
             <li>Identifiers (variable, function, and macro names)</li>
+            <li><code>...</code> identifier</li>
           </ul>
         </li>
         <li>
