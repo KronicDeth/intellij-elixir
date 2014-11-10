@@ -59,6 +59,7 @@ public interface ElixirTypes {
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
+  IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_REGEX_SIGIL_NAME");
   IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_SIGIL_NAME");

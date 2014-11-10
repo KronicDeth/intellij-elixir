@@ -4,10 +4,6 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 8/3/14.
  */
 public class GeneralParsingTestCase extends ParsingTestCase {
-    public void testBadCharacterPrefix() {
-        doTest(true);
-    }
-
     public void testBlankPrefix() {
         doTest(true);
     }
