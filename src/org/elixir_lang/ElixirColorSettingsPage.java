@@ -20,6 +20,7 @@ import static com.intellij.openapi.util.io.FileUtil.loadTextAndClose;
  */
 public class ElixirColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
+            new AttributesDescriptor("Alias", ElixirSyntaxHighlighter.ALIAS),
             new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
             new AttributesDescriptor("Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN),

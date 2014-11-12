@@ -315,7 +315,16 @@ INTEGER = {BINARY_INTEGER} | {DECIMAL_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_
 IDENTIFIER_END = [?!]
 IDENTIFIER_MIDDLE = [0-9a-zA-Z_]
 IDENTIFIER_START = [a-z_]
-IDENTIFIER = ({IDENTIFIER_START} {IDENTIFIER_MIDDLE}* {IDENTIFIER_END}? | "...")
+IDENTIFIER_HEAD = {IDENTIFIER_START}
+IDENTIFIER_TAIL = {IDENTIFIER_MIDDLE}* {IDENTIFIER_END}?
+IDENTIFIER = ({IDENTIFIER_HEAD} {IDENTIFIER_TAIL}  | "...")
+
+/*
+ * Aliases
+ */
+
+ALIAS_HEAD = [A-Z]
+ALIAS = {ALIAS_HEAD} {IDENTIFIER_TAIL}
 
 /*
  * Interpolation
@@ -452,6 +461,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {AND_OPERATOR}                       { return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                     { return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}               { return ElixirTypes.ASSOCIATION_OPERATOR; }
+  {ALIAS}                              { return ElixirTypes.ALIAS; }
   {AT_OPERATOR}                        { return ElixirTypes.AT_OPERATOR; }
   {CAPTURE_OPERATOR}                   { return ElixirTypes.CAPTURE_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
