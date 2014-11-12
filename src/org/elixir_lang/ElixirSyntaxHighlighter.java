@@ -17,6 +17,11 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by luke.imhoff on 8/2/14.
  */
 public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
+    static final TextAttributesKey ALIAS = createTextAttributesKey(
+            "ELIXIR_ALIAS",
+            DefaultLanguageHighlighterColors.CLASS_NAME
+    );
+
     static final TextAttributesKey ATOM = createTextAttributesKey(
             "ELIXIR_ATOM",
             DefaultLanguageHighlighterColors.INSTANCE_FIELD
@@ -78,6 +83,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
     );
 
+    private static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
@@ -182,7 +188,9 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        if (ATOMS.contains(tokenType)) {
+        if (tokenType.equals(ElixirTypes.ALIAS)) {
+            return ALIAS_KEYS;
+        } else if (ATOMS.contains(tokenType)) {
             return ATOM_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
