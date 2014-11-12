@@ -23,6 +23,7 @@
             <li>Decimal integers and floats</li>
             <li>Identifiers (variable, function, and macro names)</li>
             <li><code>...</code> identifier</li>
+            <li>Aliases (module names)</li>
           </ul>
         </li>
         <li>
