@@ -37,6 +37,7 @@ public interface ElixirTypes {
   IElementType VALUE = new ElixirElementType("VALUE");
   IElementType WHEN_OPERATION = new ElixirElementType("WHEN_OPERATION");
 
+  IElementType ALIAS = new ElixirTokenType("ALIAS");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");

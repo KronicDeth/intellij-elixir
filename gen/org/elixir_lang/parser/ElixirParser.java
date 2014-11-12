@@ -1815,12 +1815,13 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | quote | sigil | stringHeredoc
+  // ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | quote | sigil | stringHeredoc
   public static boolean value(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "value")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<value>");
-    result_ = atom(builder_, level_ + 1);
+    result_ = consumeTokenSmart(builder_, ALIAS);
+    if (!result_) result_ = atom(builder_, level_ + 1);
     if (!result_) result_ = consumeTokenSmart(builder_, CHAR_TOKEN);
     if (!result_) result_ = consumeTokenSmart(builder_, NUMBER);
     if (!result_) result_ = charListHeredoc(builder_, level_ + 1);

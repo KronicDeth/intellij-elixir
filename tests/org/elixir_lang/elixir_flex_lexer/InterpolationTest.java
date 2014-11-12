@@ -106,6 +106,7 @@ public class InterpolationTest extends TokenTest {
                         { "?\\x{89}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "?\\x{8}", ElixirTypes.CHAR_TOKEN, INITIAL_STATE, true },
                         { "@", ElixirTypes.AT_OPERATOR, INITIAL_STATE, true },
+                        { "Enum", ElixirTypes.ALIAS, INITIAL_STATE, true },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "\"\"\"", ElixirTypes.STRING_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
                         { "\\;", TokenType.BAD_CHARACTER, INITIAL_STATE, false },
