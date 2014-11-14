@@ -124,18 +124,19 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "~>>"
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
-THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_HAT_OPERATOR = "^^^"
+THREE_TOKEN_MAP_OPERATOR = "%{}"
+THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
 
 THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
+                       {THREE_TOKEN_HAT_OPERATOR} |
+                       {THREE_TOKEN_MAP_OPERATOR} |
                        {THREE_TOKEN_OR_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
-                       {THREE_TOKEN_HAT_OPERATOR} |
-                       "%{}" |
                        "..."
 
 TWO_TOKEN_AND_OPERATOR = "&&"
@@ -210,6 +211,7 @@ COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 IN_MATCH_OPERATOR = {TWO_TOKEN_IN_MATCH_OPERATOR}
+MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
@@ -494,6 +496,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {IDENTIFIER}                         { return ElixirTypes.IDENTIFIER; }
   {INTEGER}                            { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR}                  { return ElixirTypes.IN_MATCH_OPERATOR; }
+  {MAP_OPERATOR}                       { return ElixirTypes.MAP_OPERATOR; }
   {MATCH_OPERATOR}                     { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}            { return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {PIPE_OPERATOR}                      { return ElixirTypes.PIPE_OPERATOR; }
