@@ -47,8 +47,8 @@ public class FragmentTest extends TokenTest {
                         { ";", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
                         { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
-                        { "\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
-                        { "\r\n", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
+                        { "\n", ElixirTypes.EOL, INITIAL_STATE },
+                        { "\r\n", ElixirTypes.EOL, INITIAL_STATE },
                         { "_", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
                         { "a", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY }
                 }

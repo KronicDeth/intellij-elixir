@@ -278,6 +278,9 @@ CHAR_TOKEN = "?" ({VALID_ESCAPE_SEQUENCE} | .)
  * White Space
  */
 
+HORIZONTAL_SPACE = [ \t]
+VERTICAL_SPACE = [\n\r]
+SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
 
 /*
@@ -471,6 +474,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
      and ':' being leftover */
   {COLON} / {TYPE_OPERATOR}            { pushAndBegin(ATOM_START);
                                          return ElixirTypes.COLON; }
+  {COLON} / {SPACE}                    { return ElixirTypes.COLON; }
   // Must be after `{COLON} / {TYPE_OPERATOR}`, so that 3 ':' are consumed before 1.
   {TYPE_OPERATOR}                      { return ElixirTypes.TYPE_OPERATOR; }
   // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
