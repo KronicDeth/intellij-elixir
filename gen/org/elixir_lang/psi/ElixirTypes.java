@@ -22,6 +22,7 @@ public interface ElixirTypes {
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_MATCH_OPERATION = new ElixirElementType("IN_MATCH_OPERATION");
+  IElementType KEYWORD_IDENTIFIER = new ElixirElementType("KEYWORD_IDENTIFIER");
   IElementType MATCH_OPERATION = new ElixirElementType("MATCH_OPERATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
   IElementType OR_OPERATION = new ElixirElementType("OR_OPERATION");
@@ -158,6 +159,9 @@ public interface ElixirTypes {
       }
       else if (type == IN_MATCH_OPERATION) {
         return new ElixirInMatchOperationImpl(node);
+      }
+      else if (type == KEYWORD_IDENTIFIER) {
+        return new ElixirKeywordIdentifierImpl(node);
       }
       else if (type == MATCH_OPERATION) {
         return new ElixirMatchOperationImpl(node);

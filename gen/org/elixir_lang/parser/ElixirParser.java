@@ -63,6 +63,9 @@ public class ElixirParser implements PsiParser {
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
+    else if (root_ == KEYWORD_IDENTIFIER) {
+      result_ = keywordIdentifier(builder_, 0);
+    }
     else if (root_ == MATCH_OPERATION) {
       result_ = expression(builder_, 0, 6);
     }
@@ -119,10 +122,10 @@ public class ElixirParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ADDITION_OPERATION, AND_OPERATION, ARROW_OPERATION, ASSOCIATION_OPERATION,
       ATOM, AT_OPERATION, CAPTURE_OPERATION, COMPARISON_OPERATION,
-      EXPRESSION, HAT_OPERATION, IN_MATCH_OPERATION, MATCH_OPERATION,
-      MULTIPLICATION_OPERATION, OR_OPERATION, PIPE_OPERATION, RELATIONAL_OPERATION,
-      STAB_OPERATION, TWO_OPERATION, TYPE_OPERATION, UNARY_OPERATION,
-      VALUE, WHEN_OPERATION),
+      EXPRESSION, HAT_OPERATION, IN_MATCH_OPERATION, KEYWORD_IDENTIFIER,
+      MATCH_OPERATION, MULTIPLICATION_OPERATION, OR_OPERATION, PIPE_OPERATION,
+      RELATIONAL_OPERATION, STAB_OPERATION, TWO_OPERATION, TYPE_OPERATION,
+      UNARY_OPERATION, VALUE, WHEN_OPERATION),
   };
 
   /* ********************************************************** */
@@ -1021,7 +1024,8 @@ public class ElixirParser implements PsiParser {
   // 16: BINARY(hatOperation)
   // 17: PREFIX(unaryOperation)
   // 18: PREFIX(atOperation)
-  // 19: ATOM(value)
+  // 19: ATOM(keywordIdentifier)
+  // 20: ATOM(value)
   public static boolean expression(PsiBuilder builder_, int level_, int priority_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     addVariant(builder_, "<expression>");
@@ -1031,6 +1035,7 @@ public class ElixirParser implements PsiParser {
     result_ = captureOperation(builder_, level_ + 1);
     if (!result_) result_ = unaryOperation(builder_, level_ + 1);
     if (!result_) result_ = atOperation(builder_, level_ + 1);
+    if (!result_) result_ = keywordIdentifier(builder_, level_ + 1);
     if (!result_) result_ = value(builder_, level_ + 1);
     pinned_ = result_;
     result_ = result_ && expression_0(builder_, level_ + 1, priority_);
@@ -1813,6 +1818,17 @@ public class ElixirParser implements PsiParser {
       pos_ = current_position_(builder_);
     }
     return true;
+  }
+
+  // ALIAS COLON
+  public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
+    if (!nextTokenIsFast(builder_, ALIAS)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeTokens(builder_, 0, ALIAS, COLON);
+    exit_section_(builder_, marker_, KEYWORD_IDENTIFIER, result_);
+    return result_;
   }
 
   // ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | quote | sigil | stringHeredoc

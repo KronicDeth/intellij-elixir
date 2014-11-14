@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|value")=expression
+  extends("atom|(at|binary|capture|unary)Operation|keywordIdentifier|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -69,6 +69,8 @@ expression ::= stabOperation |
                hatOperation |
                unaryOperation |
                atOperation |
+               // TODO remove from expressions once containers are implemented
+               keywordIdentifier |
                value
 private expressionList ::= expression (EOL+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
@@ -98,6 +100,7 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+keywordIdentifier ::= ALIAS COLON
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
