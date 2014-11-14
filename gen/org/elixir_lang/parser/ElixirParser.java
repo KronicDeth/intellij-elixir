@@ -1820,14 +1820,26 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // ALIAS COLON
+  // (ALIAS | IDENTIFIER) COLON
   public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
-    if (!nextTokenIsFast(builder_, ALIAS)) return false;
+    if (!nextTokenIsFast(builder_, ALIAS, IDENTIFIER)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<keyword identifier>");
+    result_ = keywordIdentifier_0(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, COLON);
+    exit_section_(builder_, level_, marker_, KEYWORD_IDENTIFIER, result_, false, null);
+    return result_;
+  }
+
+  // ALIAS | IDENTIFIER
+  private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokens(builder_, 0, ALIAS, COLON);
-    exit_section_(builder_, marker_, KEYWORD_IDENTIFIER, result_);
+    result_ = consumeTokenSmart(builder_, ALIAS);
+    if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
+    exit_section_(builder_, marker_, null, result_);
     return result_;
   }
 
