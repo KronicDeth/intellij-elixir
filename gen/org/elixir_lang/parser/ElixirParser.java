@@ -1,16 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.openapi.diagnostic.Logger;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.lang.LighterASTNode;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -1820,7 +1820,7 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // (ALIAS | BIT_STRING_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR) COLON
+  // (ALIAS | COMPARISON_OPERATOR | BIT_STRING_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR) COLON
   public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
     boolean result_;
@@ -1831,12 +1831,13 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // ALIAS | BIT_STRING_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR
+  // ALIAS | COMPARISON_OPERATOR | BIT_STRING_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR
   private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeTokenSmart(builder_, ALIAS);
+    if (!result_) result_ = consumeTokenSmart(builder_, COMPARISON_OPERATOR);
     if (!result_) result_ = consumeTokenSmart(builder_, BIT_STRING_OPERATOR);
     if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
     if (!result_) result_ = consumeTokenSmart(builder_, MAP_OPERATOR);
