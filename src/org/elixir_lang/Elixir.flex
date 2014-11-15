@@ -154,6 +154,7 @@ TWO_TOKEN_OR_OPERATOR = "or" |
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
+TWO_TOKEN_TUPLE_OPERATOR = "{}"
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          ".." |
@@ -168,9 +169,9 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_OR_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
+                     {TWO_TOKEN_TUPLE_OPERATOR} |
                      {TWO_TOKEN_TWO_OPERATOR} |
-                     {TWO_TOKEN_TYPE_OPERATOR} |
-                     "{}"
+                     {TWO_TOKEN_TYPE_OPERATOR}
 
 ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
@@ -220,6 +221,7 @@ PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
+TUPLE_OPERATOR = {TWO_TOKEN_TUPLE_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
 TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
 UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
@@ -504,6 +506,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {STAB_OPERATOR}                      { return ElixirTypes.STAB_OPERATOR; }
   {TILDE}                              { pushAndBegin(SIGIL);
                                          return ElixirTypes.TILDE; }
+  {TUPLE_OPERATOR}                     { return ElixirTypes.TUPLE_OPERATOR; }
   {TWO_OPERATOR}                       { return ElixirTypes.TWO_OPERATOR; }
   {QUOTE_HEREDOC_PROMOTER}             { startQuote(yytext());
                                          return promoterType(); }

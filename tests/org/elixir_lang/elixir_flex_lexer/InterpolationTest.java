@@ -133,6 +133,7 @@ public class InterpolationTest extends TokenTest {
                         { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "or", ElixirTypes.OR_OPERATOR, INITIAL_STATE, true },
                         { "when", ElixirTypes.WHEN_OPERATOR, INITIAL_STATE, true },
+                        { "{}", ElixirTypes.TUPLE_OPERATOR, INITIAL_STATE, true },
                         { "|", ElixirTypes.PIPE_OPERATOR, INITIAL_STATE, true },
                         { "|>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "||", ElixirTypes.OR_OPERATOR, INITIAL_STATE, true },

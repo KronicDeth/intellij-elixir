@@ -68,6 +68,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testTuple() {
+        doTest(true);
+    }
+
     public void testTwo() {
         doTest(true);
     }

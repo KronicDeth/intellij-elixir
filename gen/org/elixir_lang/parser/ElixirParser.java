@@ -1843,7 +1843,7 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc
+  // ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
   public static boolean value(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "value")) return false;
     boolean result_;
@@ -1858,6 +1858,7 @@ public class ElixirParser implements PsiParser {
     if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = sigil(builder_, level_ + 1);
     if (!result_) result_ = stringHeredoc(builder_, level_ + 1);
+    if (!result_) result_ = consumeTokenSmart(builder_, TUPLE_OPERATOR);
     exit_section_(builder_, level_, marker_, VALUE, result_, false, null);
     return result_;
   }
