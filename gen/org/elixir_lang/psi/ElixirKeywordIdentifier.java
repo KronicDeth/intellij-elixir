@@ -7,4 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirKeywordIdentifier extends ElixirExpression {
 
+  @Nullable
+  ElixirCharList getCharList();
+
+  @Nullable
+  ElixirString getString();
+
 }

@@ -21,4 +21,16 @@ public class ElixirKeywordIdentifierImpl extends ElixirExpressionImpl implements
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
+  }
+
 }
