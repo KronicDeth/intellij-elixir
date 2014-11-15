@@ -110,9 +110,10 @@ import org.elixir_lang.psi.ElixirTypes;
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
  */
 
+FOUR_TOKEN_BITSTRING_OPERATOR = "<<>>"
 FOUR_TOKEN_WHEN_OPERATOR = "when"
-FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_WHEN_OPERATOR} |
-                      "<<>>"
+FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
+                      {FOUR_TOKEN_WHEN_OPERATOR}
 
 THREE_TOKEN_AND_OPERATOR = "&&&" |
                            "and"
@@ -205,6 +206,7 @@ ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
 ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
 AT_OPERATOR = {ONE_TOKEN_AT_OPERATOR}
+BIT_STRING_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
@@ -470,6 +472,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ASSOCIATION_OPERATOR}               { return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                              { return ElixirTypes.ALIAS; }
   {AT_OPERATOR}                        { return ElixirTypes.AT_OPERATOR; }
+  {BIT_STRING_OPERATOR}                { return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR}                   { return ElixirTypes.CAPTURE_OPERATOR; }
   {EOL}                                { return ElixirTypes.EOL; }
   {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }

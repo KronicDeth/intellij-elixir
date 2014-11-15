@@ -24,6 +24,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testBitString() {
+        doTest(true);
+    }
+
     public void testCapture() {
         doTest(true);
     }

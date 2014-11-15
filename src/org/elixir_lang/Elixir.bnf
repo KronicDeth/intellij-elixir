@@ -157,5 +157,5 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
 twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
 typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
 unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
-value ::= ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
+value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
 whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }
