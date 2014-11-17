@@ -512,6 +512,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {STAB_OPERATOR}                        { return ElixirTypes.STAB_OPERATOR; }
   {TILDE}                                { pushAndBegin(SIGIL);
                                            return ElixirTypes.TILDE; }
+  {TUPLE_OPERATOR} / {COLON}{SPACE}      { return ElixirTypes.OPERATOR_KEYWORD; }
   {TUPLE_OPERATOR}                       { return ElixirTypes.TUPLE_OPERATOR; }
   {TWO_OPERATOR}                         { return ElixirTypes.TWO_OPERATOR; }
   {QUOTE_HEREDOC_PROMOTER}               { startQuote(yytext());

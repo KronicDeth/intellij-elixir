@@ -1820,7 +1820,7 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote | TUPLE_OPERATOR) COLON
+  // (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
   public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
     boolean result_;
@@ -1831,7 +1831,7 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote | TUPLE_OPERATOR
+  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote
   private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
     boolean result_;
@@ -1840,7 +1840,6 @@ public class ElixirParser implements PsiParser {
     if (!result_) result_ = consumeTokenSmart(builder_, OPERATOR_KEYWORD);
     if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
     if (!result_) result_ = quote(builder_, level_ + 1);
-    if (!result_) result_ = consumeTokenSmart(builder_, TUPLE_OPERATOR);
     exit_section_(builder_, marker_, null, result_);
     return result_;
   }
