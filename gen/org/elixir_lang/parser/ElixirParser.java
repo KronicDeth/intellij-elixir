@@ -1820,7 +1820,7 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // (ALIAS | BIT_STRING_OPERATOR | COMPARISON_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR) COLON
+  // (ALIAS | BIT_STRING_OPERATOR | OPERATOR_KEYWORD | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR) COLON
   public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
     boolean result_;
@@ -1831,14 +1831,14 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // ALIAS | BIT_STRING_OPERATOR | COMPARISON_OPERATOR | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR
+  // ALIAS | BIT_STRING_OPERATOR | OPERATOR_KEYWORD | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR
   private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_);
     result_ = consumeTokenSmart(builder_, ALIAS);
     if (!result_) result_ = consumeTokenSmart(builder_, BIT_STRING_OPERATOR);
-    if (!result_) result_ = consumeTokenSmart(builder_, COMPARISON_OPERATOR);
+    if (!result_) result_ = consumeTokenSmart(builder_, OPERATOR_KEYWORD);
     if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
     if (!result_) result_ = consumeTokenSmart(builder_, MAP_OPERATOR);
     if (!result_) result_ = quote(builder_, level_ + 1);
