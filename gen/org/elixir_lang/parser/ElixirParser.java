@@ -1,16 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.openapi.diagnostic.Logger;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.lang.LighterASTNode;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -1820,7 +1820,7 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR) COLON
+  // (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote | TUPLE_OPERATOR) COLON
   public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
     boolean result_;
@@ -1831,7 +1831,7 @@ public class ElixirParser implements PsiParser {
     return result_;
   }
 
-  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | MAP_OPERATOR | quote | TUPLE_OPERATOR
+  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote | TUPLE_OPERATOR
   private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
     boolean result_;
@@ -1839,7 +1839,6 @@ public class ElixirParser implements PsiParser {
     result_ = consumeTokenSmart(builder_, ALIAS);
     if (!result_) result_ = consumeTokenSmart(builder_, OPERATOR_KEYWORD);
     if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
-    if (!result_) result_ = consumeTokenSmart(builder_, MAP_OPERATOR);
     if (!result_) result_ = quote(builder_, level_ + 1);
     if (!result_) result_ = consumeTokenSmart(builder_, TUPLE_OPERATOR);
     exit_section_(builder_, marker_, null, result_);
