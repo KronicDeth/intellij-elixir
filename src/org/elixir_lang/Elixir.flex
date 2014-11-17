@@ -467,6 +467,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
+  {AND_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {AND_OPERATOR}                         { return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                       { return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                 { return ElixirTypes.ASSOCIATION_OPERATOR; }
