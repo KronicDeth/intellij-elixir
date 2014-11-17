@@ -500,6 +500,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {OR_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                          { return ElixirTypes.OR_OPERATOR; }
+  {UNARY_OPERATOR} / {COLON}{SPACE}      { return ElixirTypes.OPERATOR_KEYWORD; }
   // Must be before {IDENTIFIER} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                       { return ElixirTypes.UNARY_OPERATOR; }
   // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
