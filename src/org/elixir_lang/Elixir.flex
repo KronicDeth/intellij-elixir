@@ -495,6 +495,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COMPARISON_OPERATOR}                  { return ElixirTypes.COMPARISON_OPERATOR; }
   {DUAL_OPERATOR}                        { return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                        { return ElixirTypes.NUMBER; }
+  {HAT_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {HAT_OPERATOR}                         { return ElixirTypes.HAT_OPERATOR; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                          { return ElixirTypes.OR_OPERATOR; }
