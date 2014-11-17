@@ -469,6 +469,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <YYINITIAL, INTERPOLATION> {
   {AND_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {AND_OPERATOR}                         { return ElixirTypes.AND_OPERATOR; }
+  {ARROW_OPERATOR} / {COLON}{SPACE}      { return ElixirTypes.OPERATOR_KEYWORD; }
   {ARROW_OPERATOR}                       { return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                 { return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                { return ElixirTypes.ALIAS; }
