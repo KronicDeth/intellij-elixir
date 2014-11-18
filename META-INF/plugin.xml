@@ -24,6 +24,7 @@
             <li>Identifiers (variable, function, and macro names)</li>
             <li><code>...</code> identifier</li>
             <li>Aliases (module names)</li>
+            <li>Keyword Identifiers</li>
           </ul>
         </li>
         <li>
