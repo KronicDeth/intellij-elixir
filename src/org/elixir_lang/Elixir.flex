@@ -474,6 +474,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ASSOCIATION_OPERATOR} / {COLON}{SPACE} { return ElixirTypes.OPERATOR_KEYWORD; }
   {ASSOCIATION_OPERATOR}                  { return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                 { return ElixirTypes.ALIAS; }
+  {AT_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.OPERATOR_KEYWORD; }
   {AT_OPERATOR}                           { return ElixirTypes.AT_OPERATOR; }
   {BIT_STRING_OPERATOR} / {COLON}{SPACE}  { return ElixirTypes.OPERATOR_KEYWORD; }
   {BIT_STRING_OPERATOR}                   { return ElixirTypes.BIT_STRING_OPERATOR; }
