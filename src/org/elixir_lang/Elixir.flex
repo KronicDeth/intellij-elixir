@@ -496,6 +496,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COMMENT}                               { return ElixirTypes.COMMENT; }
   {COMPARISON_OPERATOR} / {COLON}{SPACE}  { return ElixirTypes.OPERATOR_KEYWORD; }
   {COMPARISON_OPERATOR}                   { return ElixirTypes.COMPARISON_OPERATOR; }
+  {DUAL_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {DUAL_OPERATOR}                         { return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                         { return ElixirTypes.NUMBER; }
   {HAT_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
