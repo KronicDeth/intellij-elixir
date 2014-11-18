@@ -527,6 +527,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {RELATIONAL_OPERATOR}                      { return ElixirTypes.RELATIONAL_OPERATOR; }
   {STAB_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
   {STAB_OPERATOR}                            { return ElixirTypes.STAB_OPERATOR; }
+  {STRUCT_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
   {STRUCT_OPERATOR}                          { return ElixirTypes.STRUCT_OPERATOR; }
   {TILDE}                                    { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE; }
