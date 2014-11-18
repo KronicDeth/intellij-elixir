@@ -515,6 +515,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {IN_MATCH_OPERATOR}                     { return ElixirTypes.IN_MATCH_OPERATOR; }
   {MAP_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
   {MAP_OPERATOR}                          { return ElixirTypes.MAP_OPERATOR; }
+  {MATCH_OPERATOR} / {COLON}{SPACE}       { return ElixirTypes.OPERATOR_KEYWORD; }
   {MATCH_OPERATOR}                        { return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}               { return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {PIPE_OPERATOR}                         { return ElixirTypes.PIPE_OPERATOR; }
