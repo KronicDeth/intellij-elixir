@@ -66,3 +66,4 @@ identifier:
 ^:
 |:
 
+# comment to given trailing `<one token operator>:` a space
