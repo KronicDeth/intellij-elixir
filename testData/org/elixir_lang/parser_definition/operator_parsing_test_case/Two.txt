@@ -157,7 +157,7 @@ Elixir File(0,644)
           ElixirValueImpl(VALUE)(427,429)
             PsiElement(ElixirTokenType.CHAR_TOKEN)('?a')(427,429)
         PsiElement(ElixirTokenType.TWO_OPERATOR)('..')(429,431)
-        PsiErrorElement:<expression> or <value> expected, got '^^^'(431,431)
+        PsiErrorElement:<expression> expected, got '^^^'(431,431)
           <empty list>
       PsiElement(ElixirTokenType.HAT_OPERATOR)('^^^')(431,434)
       ElixirValueImpl(VALUE)(434,436)

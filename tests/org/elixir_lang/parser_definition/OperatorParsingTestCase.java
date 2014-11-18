@@ -24,6 +24,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testBitString() {
+        doTest(true);
+    }
+
     public void testCapture() {
         doTest(true);
     }
@@ -37,6 +41,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testInMatch() {
+        doTest(true);
+    }
+
+    public void testMap() {
         doTest(true);
     }
 
@@ -61,6 +69,14 @@ public class OperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testStab() {
+        doTest(true);
+    }
+
+    public void testStruct() {
+        doTest(true);
+    }
+
+    public void testTuple() {
         doTest(true);
     }
 

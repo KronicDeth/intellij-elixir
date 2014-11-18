@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|value")=expression
+  extends("atom|(at|binary|capture|unary)Operation|keywordIdentifier|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -16,6 +16,8 @@
 
   tokens = [
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    // TODO remove once containers are available for `{}` after alias for empty structs
+    STRUCT_OPERATOR = "%"
   ]
 }
 
@@ -69,6 +71,8 @@ expression ::= stabOperation |
                hatOperation |
                unaryOperation |
                atOperation |
+               // TODO remove from expressions once containers are implemented
+               keywordIdentifier |
                value
 private expressionList ::= expression (EOL+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
@@ -98,6 +102,7 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+keywordIdentifier ::= (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -154,5 +159,5 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
 twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
 typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
 unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
-value ::= ALIAS | atom | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | quote | sigil | stringHeredoc
+value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
 whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }
