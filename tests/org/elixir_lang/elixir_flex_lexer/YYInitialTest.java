@@ -48,6 +48,7 @@ public class YYInitialTest extends TokenTest {
                         { "!==", ElixirTypes.COMPARISON_OPERATOR, INITIAL_STATE, true },
                         { "", null, INITIAL_STATE, true },
                         { "#", ElixirTypes.COMMENT, ElixirFlexLexer.YYINITIAL, true },
+                        { "%", ElixirTypes.STRUCT_OPERATOR, INITIAL_STATE, true },
                         { "%{}", ElixirTypes.MAP_OPERATOR, INITIAL_STATE, true },
                         { "&", ElixirTypes.CAPTURE_OPERATOR, INITIAL_STATE, true },
                         { "&&", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},
@@ -132,7 +133,7 @@ public class YYInitialTest extends TokenTest {
                         { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL, true },
                         { "~>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
                         { "~>>", ElixirTypes.ARROW_OPERATOR, INITIAL_STATE, true },
-                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true}
+                        { "~~~", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true }
                 }
         );
     }

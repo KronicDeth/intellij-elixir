@@ -72,6 +72,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testStruct() {
+        doTest(true);
+    }
+
     public void testTuple() {
         doTest(true);
     }

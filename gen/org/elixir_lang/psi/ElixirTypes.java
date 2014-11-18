@@ -106,6 +106,7 @@ public interface ElixirTypes {
   IElementType STRING_SIGIL_PROMOTER = new ElixirTokenType("STRING_SIGIL_PROMOTER");
   IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("STRING_SIGIL_TERMINATOR");
   IElementType STRING_TERMINATOR = new ElixirTokenType("STRING_TERMINATOR");
+  IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
   IElementType TILDE = new ElixirTokenType("TILDE");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("TUPLE_OPERATOR");
   IElementType TWO_OPERATOR = new ElixirTokenType("TWO_OPERATOR");
