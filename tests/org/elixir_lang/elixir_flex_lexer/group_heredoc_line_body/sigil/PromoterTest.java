@@ -27,7 +27,7 @@ public abstract class PromoterTest extends TokenTest {
     public static Collection<Object[]> generateData(IElementType fragmentType) {
         return Arrays.asList(
                 new Object[][] {
-                        { ";", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
+                        { ";", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY },
                         { "\n", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
                         { "\r\n", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
                         { "a", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY }

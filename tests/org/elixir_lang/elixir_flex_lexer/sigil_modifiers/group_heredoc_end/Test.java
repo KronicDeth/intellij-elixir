@@ -33,7 +33,7 @@ public abstract class Test extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                         { " ", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL },
-                        { ";", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
+                        { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL },
                         { "A", ElixirTypes.ALIAS, ElixirFlexLexer.YYINITIAL },
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },
                         { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL },

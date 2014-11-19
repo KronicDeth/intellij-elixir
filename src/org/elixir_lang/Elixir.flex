@@ -253,6 +253,11 @@ COLON = :
 
 HEXADECIMAL_DIGIT = [A-Fa-f0-9]
 
+/*
+ * EOE (End of Expression)
+ */
+
+SEMICOLON = ";"
 
 /*
  * EOL
@@ -524,6 +529,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {PIPE_OPERATOR}                            { return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
   {RELATIONAL_OPERATOR}                      { return ElixirTypes.RELATIONAL_OPERATOR; }
+  {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
   {STAB_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
   {STAB_OPERATOR}                            { return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
