@@ -33,6 +33,7 @@
             <li>Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated.</li>
             <li>Comments do not consume EOL, so trailing comments don't cause error parsing expression on following line.</li>
             <li>Sigil modifiers now work on groups in addition to heredocs.</li>
+            <li><code>;</code> is separate from <code>EOL</code> and either or both can separate expressions, but only <code>EOL</code> can separate operators and operands for operations</li>
           </ul>
          </li>
       </ul>
