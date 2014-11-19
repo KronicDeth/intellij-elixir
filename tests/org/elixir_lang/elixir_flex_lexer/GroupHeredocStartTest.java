@@ -42,7 +42,7 @@ public class GroupHeredocStartTest extends TokenTest {
     )
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
-                        {";", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
+                        {";", TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START },
                         {"\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
                         {"\r\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
                         {"a", TokenType.BAD_CHARACTER, ElixirFlexLexer.GROUP_HEREDOC_START }

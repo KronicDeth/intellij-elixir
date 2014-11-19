@@ -1,5 +1,6 @@
 Elixir File(0,16)
   PsiComment(ElixirTokenType.COMMENT)('# empty tuple')(0,13)
-  PsiElement(ElixirTokenType.EOL)('\n')(13,14)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(13,14)
+    PsiElement(ElixirTokenType.EOL)('\n')(13,14)
   ElixirValueImpl(VALUE)(14,16)
     PsiElement(ElixirTokenType.TUPLE_OPERATOR)('{}')(14,16)

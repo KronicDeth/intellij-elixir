@@ -47,7 +47,7 @@ public class AtomBodyTest extends TokenTest {
                         { " ", TokenType.WHITE_SPACE, INITIAL_STATE },
                         { "!", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
                         { "0", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
-                        { ";", ElixirTypes.EOL, INITIAL_STATE },
+                        { ";", ElixirTypes.SEMICOLON, INITIAL_STATE },
                         { "?", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
                         { "@", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
                         { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },

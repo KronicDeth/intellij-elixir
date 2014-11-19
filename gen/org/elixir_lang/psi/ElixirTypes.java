@@ -18,6 +18,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType COMPARISON_OPERATION = new ElixirElementType("COMPARISON_OPERATION");
+  IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
@@ -90,6 +91,7 @@ public interface ElixirTypes {
   IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
   IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");
+  IElementType SEMICOLON = new ElixirTokenType(";");
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("SIGIL_HEREDOC_PROMOTER");
   IElementType SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("SIGIL_HEREDOC_TERMINATOR");
@@ -152,6 +154,9 @@ public interface ElixirTypes {
       }
       else if (type == COMPARISON_OPERATION) {
         return new ElixirComparisonOperationImpl(node);
+      }
+      else if (type == END_OF_EXPRESSION) {
+        return new ElixirEndOfExpressionImpl(node);
       }
       else if (type == EXPRESSION) {
         return new ElixirExpressionImpl(node);
