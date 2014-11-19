@@ -258,8 +258,7 @@ HEXADECIMAL_DIGIT = [A-Fa-f0-9]
  * EOL
  */
 
-CONTROL_EOL = \n|\r\n
-EOL = {CONTROL_EOL} | ;
+EOL = \n|\r\n
 
 /*
  * Escape Sequences
@@ -270,11 +269,11 @@ ESCAPE = "\\"
 ESCAPED_CHARACTER = {ESCAPE} .
 ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
                          {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
-ESCAPED_CONTROL_EOL = {ESCAPE} {CONTROL_EOL}
+ESCAPED_EOL = {ESCAPE} {EOL}
 
 VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
                         {ESCAPED_CHARACTER} |
-                        {ESCAPED_CONTROL_EOL}
+                        {ESCAPED_EOL}
 
 /*
  * Char tokens
@@ -483,7 +482,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {CAPTURE_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {CAPTURE_OPERATOR}                         { return ElixirTypes.CAPTURE_OPERATOR; }
   {EOL}                                      { return ElixirTypes.EOL; }
-  {ESCAPED_CONTROL_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
+  {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                               { return ElixirTypes.CHAR_TOKEN; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
      and ':' being leftover */
