@@ -1,5 +1,6 @@
 Elixir File(0,23)
   PsiComment(ElixirTokenType.COMMENT)('# empty bit string')(0,18)
-  PsiElement(ElixirTokenType.EOL)('\n')(18,19)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(18,19)
+    PsiElement(ElixirTokenType.EOL)('\n')(18,19)
   ElixirValueImpl(VALUE)(19,23)
     PsiElement(ElixirTokenType.BIT_STRING_OPERATOR)('<<>>')(19,23)

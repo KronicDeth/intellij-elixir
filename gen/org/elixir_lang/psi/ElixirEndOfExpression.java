@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirInterpolation extends PsiElement {
-
-  @NotNull
-  List<ElixirEndOfExpression> getEndOfExpressionList();
-
-  @NotNull
-  List<ElixirExpression> getExpressionList();
+public interface ElixirEndOfExpression extends PsiElement {
 
 }

@@ -25,7 +25,7 @@
 
 // expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
 // lines
-elixirFile ::= EOL* (expressionList EOL*)?
+elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 // In alphabetical order
 
@@ -51,6 +51,8 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+// Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
+endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
@@ -76,7 +78,7 @@ expression ::= stabOperation |
                // TODO remove from expressions once containers are implemented
                keywordIdentifier |
                value
-private expressionList ::= expression (EOL+ expression)*
+private expressionList ::= expression (endOfExpression+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
 inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
