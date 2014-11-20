@@ -25,6 +25,7 @@
             <li><code>...</code> identifier</li>
             <li>Aliases (module names)</li>
             <li>Keyword Identifiers</li>
+            <li>Empty Parentheses</li>
           </ul>
         </li>
         <li>
