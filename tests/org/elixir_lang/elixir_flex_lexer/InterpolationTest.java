@@ -55,6 +55,7 @@ public class InterpolationTest extends TokenTest {
                         { "&&&", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP, true },
                         { "'''", ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER, ElixirFlexLexer.GROUP_HEREDOC_START, true },
+                        { ")", ElixirTypes.CLOSING_PARENTHESIS, INITIAL_STATE, true },
                         { "+", ElixirTypes.DUAL_OPERATOR, INITIAL_STATE, true},
                         { "++", ElixirTypes.TWO_OPERATOR, INITIAL_STATE, true},
                         { "-", ElixirTypes.DUAL_OPERATOR, INITIAL_STATE, true},

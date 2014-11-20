@@ -15,6 +15,8 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
+    CLOSING_PARENTHESIS = ")"
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
