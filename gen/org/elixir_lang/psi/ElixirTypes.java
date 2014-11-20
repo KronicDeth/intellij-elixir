@@ -18,6 +18,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType COMPARISON_OPERATION = new ElixirElementType("COMPARISON_OPERATION");
+  IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
@@ -156,6 +157,9 @@ public interface ElixirTypes {
       }
       else if (type == COMPARISON_OPERATION) {
         return new ElixirComparisonOperationImpl(node);
+      }
+      else if (type == EMPTY_PARENTHESES) {
+        return new ElixirEmptyParenthesesImpl(node);
       }
       else if (type == END_OF_EXPRESSION) {
         return new ElixirEndOfExpressionImpl(node);

@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|keywordIdentifier|value")=expression
+  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -55,6 +55,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
@@ -81,7 +82,8 @@ expression ::= stabOperation |
                atOperation |
                // TODO remove from expressions once containers are implemented
                keywordIdentifier |
-               value
+               value |
+               emptyParentheses
 private expressionList ::= expression (endOfExpression+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
 inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
