@@ -2,7 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|keywordIdentifier|value")=expression
+  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
   extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
@@ -15,7 +15,11 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
+    CLOSING_PARENTHESIS = ")"
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
+    OPENING_PARENTHESIS = "("
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
     // TODO remove once containers are available for `{}` after alias for empty structs
@@ -51,6 +55,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
@@ -77,7 +82,8 @@ expression ::= stabOperation |
                atOperation |
                // TODO remove from expressions once containers are implemented
                keywordIdentifier |
-               value
+               value |
+               emptyParentheses
 private expressionList ::= expression (endOfExpression+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
 inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression

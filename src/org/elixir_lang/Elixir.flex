@@ -358,6 +358,13 @@ EXPONENT_SIGN = [+-]
 DECIMAL_FLOAT = {DECIMAL_INTEGER} {DECIMAL_MARK} {DECIMAL_INTEGER} ({EXPONENT_MARK} {EXPONENT_SIGN}? {DECIMAL_INTEGER})?
 
 /*
+ * Parentheses
+ */
+
+CLOSING_PARENTHESIS = ")"
+OPENING_PARENTHESIS = "("
+
+/*
  *
  *  Quotes
  *
@@ -486,6 +493,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {BIT_STRING_OPERATOR}                      { return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {CAPTURE_OPERATOR}                         { return ElixirTypes.CAPTURE_OPERATOR; }
+  {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
   {EOL}                                      { return ElixirTypes.EOL; }
   {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                               { return ElixirTypes.CHAR_TOKEN; }
@@ -507,6 +515,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
   {HAT_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
   {HAT_OPERATOR}                             { return ElixirTypes.HAT_OPERATOR; }
+  {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
   {OR_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.OPERATOR_KEYWORD; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { return ElixirTypes.OR_OPERATOR; }

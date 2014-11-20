@@ -18,6 +18,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType COMPARISON_OPERATION = new ElixirElementType("COMPARISON_OPERATION");
+  IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
@@ -57,6 +58,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
+  IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
@@ -82,6 +84,7 @@ public interface ElixirTypes {
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
+  IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OPERATOR_KEYWORD = new ElixirTokenType("OPERATOR_KEYWORD");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
@@ -154,6 +157,9 @@ public interface ElixirTypes {
       }
       else if (type == COMPARISON_OPERATION) {
         return new ElixirComparisonOperationImpl(node);
+      }
+      else if (type == EMPTY_PARENTHESES) {
+        return new ElixirEmptyParenthesesImpl(node);
       }
       else if (type == END_OF_EXPRESSION) {
         return new ElixirEndOfExpressionImpl(node);
