@@ -83,6 +83,7 @@ public interface ElixirTypes {
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
+  IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OPERATOR_KEYWORD = new ElixirTokenType("OPERATOR_KEYWORD");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
