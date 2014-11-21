@@ -180,6 +180,7 @@ ONE_TOKEN_CAPTURE_OPERATOR = "&"
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
 ONE_TOKEN_DUAL_OPERATOR = "+" |
                           "-"
+ONE_TOKEN_IN_OPERATOR = "in"
 ONE_TOKEN_MATCH_OPERATOR = "="
 ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
                                     "/"
@@ -193,6 +194,7 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                      {ONE_TOKEN_CAPTURE_OPERATOR} |
                      {ONE_TOKEN_DUAL_OPERATOR} |
+                     {ONE_TOKEN_IN_OPERATOR} |
                      {ONE_TOKEN_MATCH_OPERATOR} |
                      {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
                      {ONE_TOKEN_PIPE_OPERATOR} |
@@ -215,6 +217,7 @@ COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
 HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 IN_MATCH_OPERATOR = {TWO_TOKEN_IN_MATCH_OPERATOR}
+IN_OPERATOR = {ONE_TOKEN_IN_OPERATOR}
 MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
@@ -516,6 +519,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HAT_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
   {HAT_OPERATOR}                             { return ElixirTypes.HAT_OPERATOR; }
   {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
+  // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {IN_OPERATOR}                              { return ElixirTypes.IN_OPERATOR; }
   {OR_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.OPERATOR_KEYWORD; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { return ElixirTypes.OR_OPERATOR; }

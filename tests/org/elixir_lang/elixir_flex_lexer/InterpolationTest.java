@@ -134,6 +134,7 @@ public class InterpolationTest extends TokenTest {
                         { "identifier", ElixirTypes.IDENTIFIER, INITIAL_STATE, true },
                         { "identifier9", ElixirTypes.IDENTIFIER, INITIAL_STATE, true },
                         { "identifier?", ElixirTypes.IDENTIFIER, INITIAL_STATE, true },
+                        { "in", ElixirTypes.IN_OPERATOR, INITIAL_STATE, true },
                         { "not", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "or", ElixirTypes.OR_OPERATOR, INITIAL_STATE, true },
                         { "when", ElixirTypes.WHEN_OPERATOR, INITIAL_STATE, true },
