@@ -62,6 +62,7 @@ public interface ElixirTypes {
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType("COLON");
+  IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");

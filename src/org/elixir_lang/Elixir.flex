@@ -253,6 +253,12 @@ ATOM_START = [a-zA-Z_]
 COLON = :
 
 /*
+ * Containers
+ */
+
+COMMA = ","
+
+/*
  * Digits
  */
 
@@ -512,6 +518,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be after {TYPE_OPERATOR}, so that 1 ':' is consumed after 2
   {COLON}                                    { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON; }
+  {COMMA}                                    { return ElixirTypes.COMMA; }
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
   {COMPARISON_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
   {COMPARISON_OPERATOR}                      { return ElixirTypes.COMPARISON_OPERATOR; }
