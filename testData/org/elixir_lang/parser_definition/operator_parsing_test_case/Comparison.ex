@@ -42,6 +42,10 @@
 # should parse as (0x1..0x2) == (0x1..0x2)
 0x1..0x2 == 0x1..0x2
 
+# comparisonOperation(inOperation(identifier))
+# should parse (a in b) == (c in d)
+a in b == c in d
+
 # comparisonOperation(arrowOperation(value))
 # should parse as ('a' |> 'b') == ('a' |> 'b')
 'a' |> 'b' == 'a' |> 'b'

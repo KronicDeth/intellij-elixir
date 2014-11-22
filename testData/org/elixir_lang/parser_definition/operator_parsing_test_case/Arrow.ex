@@ -44,3 +44,7 @@
 # arrowOperation(twoOperation(value))
 # should parse as (0x1..0x2) |> 'a'
 0x1..0x2 |> 'a'
+
+# arrowOperation(inOperation(identifier))
+# should parse as (a in b) |> (c in d)
+a in b |> c in d

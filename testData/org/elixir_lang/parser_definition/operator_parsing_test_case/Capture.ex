@@ -38,6 +38,10 @@
 # should parse as &(0x3..0x4)
 &0x3..0x4
 
+# captureOperation(inOperation(identifier))
+# should parse as &(a in b)
+&a in b
+
 # captureOperation(arrowOperation(value))
 # should parse as &('c' |> 'd')
 &'c' |> 'd'

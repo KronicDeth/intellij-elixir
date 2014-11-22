@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
-  extends("(addition|and|arrow|association|comparison|hat|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
+  extends("(addition|and|arrow|association|comparison|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -18,6 +18,7 @@
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    IN_OPERATOR = "in"
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
     // TOO remove once SEMICOLON is used in endOfExpression rule
@@ -74,6 +75,7 @@ expression ::= stabOperation |
                comparisonOperation |
                relationalOperation |
                arrowOperation |
+               inOperation |
                twoOperation |
                additionOperation |
                multiplicationOperation |
@@ -87,6 +89,7 @@ expression ::= stabOperation |
 private expressionList ::= expression (endOfExpression+ expression)*
 hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
 inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
+inOperation ::= expression EOL* IN_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL

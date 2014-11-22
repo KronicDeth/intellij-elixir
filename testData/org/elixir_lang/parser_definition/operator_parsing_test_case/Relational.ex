@@ -41,6 +41,10 @@
 # should parse as (0x1..0x3) < (0x1..0x4)
 0x1..0x3 < 0x1..0x4
 
+# relationalOperation(inOperation(identifier))
+# should parse as (a in b) < (c in d)
+a in b < c in d
+
 # relationalOperation(arrowOperation(value))
 # should parse as (0x1 |> 0x2) > 0x3
 0x1 |> 0x2 > 0x3

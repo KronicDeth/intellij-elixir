@@ -38,6 +38,10 @@
 # should parse as (0x1..0x2) = (0x3..0x4)
 0x1..0x2 = 0x3..0x4
 
+# matchOperation(inOperation(identifier))
+# should parse as (a in b) = (c in d)
+a in b = c in d
+
 # matchOperation(arrowOperation(value))
 # should parse as ('a' |> 'b') = ('c' |> 'd')
 'a' |> 'b' = 'c' |> 'd'

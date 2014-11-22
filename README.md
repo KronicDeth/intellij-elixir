@@ -33,6 +33,7 @@ Syntax highlighting for the following tokens:
   * Capture (`&`)
   * Comparison (`==`, `!=`, `=~`, `===`, and `!==`)
   * Hat (`^^^`)
+  * In (`in`)
   * In Match (`<-` and `\\`)
   * Match (`=`)
   * Multiplication (`*` and `/`)

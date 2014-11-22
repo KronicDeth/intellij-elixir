@@ -24,6 +24,7 @@ public interface ElixirTypes {
   IElementType HAT_OPERATION = new ElixirElementType("HAT_OPERATION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_MATCH_OPERATION = new ElixirElementType("IN_MATCH_OPERATION");
+  IElementType IN_OPERATION = new ElixirElementType("IN_OPERATION");
   IElementType KEYWORD_IDENTIFIER = new ElixirElementType("KEYWORD_IDENTIFIER");
   IElementType MATCH_OPERATION = new ElixirElementType("MATCH_OPERATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
@@ -74,6 +75,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
+  IElementType IN_OPERATOR = new ElixirTokenType("in");
   IElementType LITERAL = new ElixirTokenType("literal");
   IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("LITERAL_CHAR_LIST_SIGIL_NAME");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
@@ -175,6 +177,9 @@ public interface ElixirTypes {
       }
       else if (type == IN_MATCH_OPERATION) {
         return new ElixirInMatchOperationImpl(node);
+      }
+      else if (type == IN_OPERATION) {
+        return new ElixirInOperationImpl(node);
       }
       else if (type == KEYWORD_IDENTIFIER) {
         return new ElixirKeywordIdentifierImpl(node);
