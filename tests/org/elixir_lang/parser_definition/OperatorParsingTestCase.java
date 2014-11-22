@@ -36,6 +36,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testDot() {
+        doTest(true);
+    }
+
     public void testHat() {
         doTest(true);
     }

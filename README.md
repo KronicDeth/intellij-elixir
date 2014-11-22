@@ -32,6 +32,7 @@ Syntax highlighting for the following tokens:
   * At (`@`)
   * Capture (`&`)
   * Comparison (`==`, `!=`, `=~`, `===`, and `!==`)
+  * Dot (`.`)
   * Hat (`^^^`)
   * In (`in`)
   * In Match (`<-` and `\\`)

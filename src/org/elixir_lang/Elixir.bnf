@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
-  extends("(addition|and|arrow|association|comparison|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
+  extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -18,6 +18,7 @@
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    DOT_OPERATOR = "."
     IN_OPERATOR = "in"
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
@@ -56,6 +57,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+dotOperation ::= expression EOL* DOT_OPERATOR EOL* expression
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
@@ -81,6 +83,7 @@ expression ::= stabOperation |
                multiplicationOperation |
                hatOperation |
                unaryOperation |
+               dotOperation |
                atOperation |
                // TODO remove from expressions once containers are implemented
                keywordIdentifier |
