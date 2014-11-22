@@ -176,6 +176,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
 
 ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
+ONE_TOKEN_DOT_OPERATOR = "."
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
 ONE_TOKEN_DUAL_OPERATOR = "+" |
@@ -193,6 +194,7 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
 
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                      {ONE_TOKEN_CAPTURE_OPERATOR} |
+                     {ONE_TOKEN_DOT_OPERATOR} |
                      {ONE_TOKEN_DUAL_OPERATOR} |
                      {ONE_TOKEN_IN_OPERATOR} |
                      {ONE_TOKEN_MATCH_OPERATOR} |
@@ -200,8 +202,7 @@ ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                      {ONE_TOKEN_PIPE_OPERATOR} |
                      {ONE_TOKEN_RELATIONAL_OPERATOR} |
                      {ONE_TOKEN_STRUCT_OPERATOR} |
-                     {ONE_TOKEN_UNARY_OPERATOR} |
-                     "."
+                     {ONE_TOKEN_UNARY_OPERATOR}
 
 AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
@@ -211,6 +212,7 @@ ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
 AT_OPERATOR = {ONE_TOKEN_AT_OPERATOR}
 BIT_STRING_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
+DOT_OPERATOR = {ONE_TOKEN_DOT_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
@@ -513,6 +515,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
   {COMPARISON_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
   {COMPARISON_OPERATOR}                      { return ElixirTypes.COMPARISON_OPERATOR; }
+  {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
   {DUAL_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
   {DUAL_OPERATOR}                            { return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }

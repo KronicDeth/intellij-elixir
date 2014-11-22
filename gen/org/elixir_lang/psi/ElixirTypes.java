@@ -63,6 +63,7 @@ public interface ElixirTypes {
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
+  IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");

@@ -18,6 +18,7 @@
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    DOT_OPERATOR = "."
     IN_OPERATOR = "in"
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
