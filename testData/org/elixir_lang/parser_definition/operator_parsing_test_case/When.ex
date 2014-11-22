@@ -38,6 +38,10 @@ when
 # should parse as (0x1..0x2) when (0x3..0x4)
 0x1..0x2 when 0x3..0x4
 
+# whenOperation(inOperation(identifier))
+# should parse as (a in b) when (c in d)
+a in b when c in d
+
 # whenOperation(arrowOperation(value))
 # should parse as ('a' |> 'b') when ('c' |> 'd')
 'a' |> 'b' when 'c' |> 'd'
