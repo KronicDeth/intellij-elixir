@@ -4,6 +4,7 @@
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
   extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
+  extends("list")=value
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -122,6 +123,7 @@ private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESC
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
 keywordIdentifier ::= (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
+list ::= OPENING_BRACKET EOL* CLOSING_BRACKET
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -178,5 +180,5 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
 twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
 typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
 unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
-value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
+value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | list| NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
 whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }
