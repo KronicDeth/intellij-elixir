@@ -117,6 +117,7 @@ public class YYInitialTest extends TokenTest {
                         { "\n", ElixirTypes.EOL, ElixirFlexLexer.YYINITIAL, true },
                         { "\r\n", ElixirTypes.EOL, INITIAL_STATE, true },
                         { "\t", TokenType.WHITE_SPACE, ElixirFlexLexer.YYINITIAL, true },
+                        { "]", ElixirTypes.CLOSING_BRACKET, INITIAL_STATE, true },
                         { "^", ElixirTypes.UNARY_OPERATOR, INITIAL_STATE, true},
                         { "_identifier", ElixirTypes.IDENTIFIER, INITIAL_STATE, true },
                         { "and", ElixirTypes.AND_OPERATOR, INITIAL_STATE, true},

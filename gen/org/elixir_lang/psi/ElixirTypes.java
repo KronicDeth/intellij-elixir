@@ -60,6 +60,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
+  IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMA = new ElixirTokenType(",");

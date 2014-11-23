@@ -369,6 +369,12 @@ EXPONENT_SIGN = [+-]
 DECIMAL_FLOAT = {DECIMAL_INTEGER} {DECIMAL_MARK} {DECIMAL_INTEGER} ({EXPONENT_MARK} {EXPONENT_SIGN}? {DECIMAL_INTEGER})?
 
 /*
+ * List
+ */
+
+CLOSING_BRACKET = "]"
+
+/*
  * Parentheses
  */
 
@@ -504,6 +510,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {BIT_STRING_OPERATOR}                      { return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
   {CAPTURE_OPERATOR}                         { return ElixirTypes.CAPTURE_OPERATOR; }
+  {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
   {EOL}                                      { return ElixirTypes.EOL; }
   {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
