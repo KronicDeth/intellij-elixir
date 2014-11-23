@@ -4,6 +4,10 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 11/22/14.
  */
 public class ListParsingTestCase extends ParsingTestCase {
+    public void testAliasWhitespaceColon() {
+        doTest(true);
+    }
+
     public void testEmpty() {
         doTest(true);
     }

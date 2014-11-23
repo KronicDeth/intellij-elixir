@@ -504,6 +504,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ARROW_OPERATOR}                           { return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR} / {COLON}{SPACE}    { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {ASSOCIATION_OPERATOR}                     { return ElixirTypes.ASSOCIATION_OPERATOR; }
+  {ALIAS} / {COLON}{SPACE}                   { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {ALIAS}                                    { return ElixirTypes.ALIAS; }
   {AT_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {AT_OPERATOR}                              { return ElixirTypes.AT_OPERATOR; }
