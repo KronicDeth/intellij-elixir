@@ -373,6 +373,7 @@ DECIMAL_FLOAT = {DECIMAL_INTEGER} {DECIMAL_MARK} {DECIMAL_INTEGER} ({EXPONENT_MA
  */
 
 CLOSING_BRACKET = "]"
+OPENING_BRACKET = "["
 
 /*
  * Parentheses
@@ -535,6 +536,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
   {HAT_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
   {HAT_OPERATOR}                             { return ElixirTypes.HAT_OPERATOR; }
+  {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
   {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { return ElixirTypes.IN_OPERATOR; }

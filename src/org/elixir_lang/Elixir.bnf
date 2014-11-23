@@ -22,6 +22,7 @@
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DOT_OPERATOR = "."
     IN_OPERATOR = "in"
+    OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
     // TOO remove once SEMICOLON is used in endOfExpression rule
