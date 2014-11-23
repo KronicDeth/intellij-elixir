@@ -717,13 +717,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER | KEYWORD_KEY_LITERAL | quote
+  // KEYWORD_KEY_LITERAL | quote
   public static boolean keywordKey(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordKey")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<keyword key>");
-    result_ = consumeToken(builder_, IDENTIFIER);
-    if (!result_) result_ = consumeToken(builder_, KEYWORD_KEY_LITERAL);
+    result_ = consumeToken(builder_, KEYWORD_KEY_LITERAL);
     if (!result_) result_ = quote(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, KEYWORD_KEY, result_, false, null);
     return result_;

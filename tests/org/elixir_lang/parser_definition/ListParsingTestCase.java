@@ -12,6 +12,10 @@ public class ListParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testIdentifierWhitespaceColon() {
+        doTest(true);
+    }
+
     public void testKeywordKey() {
         doTest(true);
     }

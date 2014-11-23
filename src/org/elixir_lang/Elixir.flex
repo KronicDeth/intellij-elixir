@@ -549,6 +549,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {UNARY_OPERATOR}                           { return ElixirTypes.UNARY_OPERATOR; }
   // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { return ElixirTypes.WHEN_OPERATOR; }
+  {IDENTIFIER} / {COLON}{SPACE}              { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {IDENTIFIER}                               { return ElixirTypes.IDENTIFIER; }
   {INTEGER}                                  { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR} / {COLON}{SPACE}       { return ElixirTypes.KEYWORD_KEY_LITERAL; }
