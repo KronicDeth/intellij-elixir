@@ -83,7 +83,15 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitKeywordIdentifier(@NotNull ElixirKeywordIdentifier o) {
+  public void visitKeywordKey(@NotNull ElixirKeywordKey o) {
+    visitAtom(o);
+  }
+
+  public void visitKeywordPair(@NotNull ElixirKeywordPair o) {
+    visitExpression(o);
+  }
+
+  public void visitKeywordValue(@NotNull ElixirKeywordValue o) {
     visitExpression(o);
   }
 

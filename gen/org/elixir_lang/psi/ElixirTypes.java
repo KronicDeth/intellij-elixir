@@ -26,7 +26,9 @@ public interface ElixirTypes {
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_MATCH_OPERATION = new ElixirElementType("IN_MATCH_OPERATION");
   IElementType IN_OPERATION = new ElixirElementType("IN_OPERATION");
-  IElementType KEYWORD_IDENTIFIER = new ElixirElementType("KEYWORD_IDENTIFIER");
+  IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
+  IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
+  IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
   IElementType MATCH_OPERATION = new ElixirElementType("MATCH_OPERATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
@@ -190,8 +192,14 @@ public interface ElixirTypes {
       else if (type == IN_OPERATION) {
         return new ElixirInOperationImpl(node);
       }
-      else if (type == KEYWORD_IDENTIFIER) {
-        return new ElixirKeywordIdentifierImpl(node);
+      else if (type == KEYWORD_KEY) {
+        return new ElixirKeywordKeyImpl(node);
+      }
+      else if (type == KEYWORD_PAIR) {
+        return new ElixirKeywordPairImpl(node);
+      }
+      else if (type == KEYWORD_VALUE) {
+        return new ElixirKeywordValueImpl(node);
       }
       else if (type == LIST) {
         return new ElixirListImpl(node);

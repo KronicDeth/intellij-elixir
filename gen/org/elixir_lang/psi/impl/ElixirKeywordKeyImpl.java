@@ -10,21 +10,27 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
+public class ElixirKeywordKeyImpl extends ElixirAtomImpl implements ElixirKeywordKey {
 
-  public ElixirListImpl(ASTNode node) {
+  public ElixirKeywordKeyImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitList(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitKeywordKey(this);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public List<ElixirExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
+  @Nullable
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
   }
 
 }

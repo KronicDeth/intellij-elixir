@@ -2,7 +2,8 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
+  extends("keywordKey")=atom
+  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keyword(Pair|Value)|value")=expression
   extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
   extends("list")=value
 
@@ -61,6 +62,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+private containerExpression ::= emptyParentheses
 dotOperation ::= expression EOL* DOT_OPERATOR EOL* expression
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
@@ -89,8 +91,6 @@ expression ::= stabOperation |
                unaryOperation |
                dotOperation |
                atOperation |
-               // TODO remove from expressions once containers are implemented
-               keywordIdentifier |
                value |
                emptyParentheses
 private expressionList ::= expression (endOfExpression+ expression)*
@@ -122,8 +122,10 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-keywordIdentifier ::= (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
-list ::= OPENING_BRACKET EOL* CLOSING_BRACKET
+keywordKey ::= (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote)
+keywordPair ::=  keywordKey COLON keywordValue
+keywordValue ::= containerExpression
+list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL

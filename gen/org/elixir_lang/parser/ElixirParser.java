@@ -75,8 +75,14 @@ public class ElixirParser implements PsiParser {
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
-    else if (root_ == KEYWORD_IDENTIFIER) {
-      result_ = keywordIdentifier(builder_, 0);
+    else if (root_ == KEYWORD_KEY) {
+      result_ = keywordKey(builder_, 0);
+    }
+    else if (root_ == KEYWORD_PAIR) {
+      result_ = keywordPair(builder_, 0);
+    }
+    else if (root_ == KEYWORD_VALUE) {
+      result_ = keywordValue(builder_, 0);
     }
     else if (root_ == LIST) {
       result_ = list(builder_, 0);
@@ -135,13 +141,15 @@ public class ElixirParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(ATOM, KEYWORD_KEY),
     create_token_set_(ADDITION_OPERATION, AND_OPERATION, ARROW_OPERATION, ASSOCIATION_OPERATION,
       ATOM, AT_OPERATION, CAPTURE_OPERATION, COMPARISON_OPERATION,
       DOT_OPERATION, EMPTY_PARENTHESES, EXPRESSION, HAT_OPERATION,
-      IN_MATCH_OPERATION, IN_OPERATION, KEYWORD_IDENTIFIER, LIST,
-      MATCH_OPERATION, MULTIPLICATION_OPERATION, OR_OPERATION, PIPE_OPERATION,
-      RELATIONAL_OPERATION, STAB_OPERATION, TWO_OPERATION, TYPE_OPERATION,
-      UNARY_OPERATION, VALUE, WHEN_OPERATION),
+      IN_MATCH_OPERATION, IN_OPERATION, KEYWORD_KEY, KEYWORD_PAIR,
+      KEYWORD_VALUE, LIST, MATCH_OPERATION, MULTIPLICATION_OPERATION,
+      OR_OPERATION, PIPE_OPERATION, RELATIONAL_OPERATION, STAB_OPERATION,
+      TWO_OPERATION, TYPE_OPERATION, UNARY_OPERATION, VALUE,
+      WHEN_OPERATION),
     create_token_set_(LIST, VALUE),
   };
 
@@ -199,6 +207,12 @@ public class ElixirParser implements PsiParser {
     result_ = result_ && consumeToken(builder_, CHAR_LIST_HEREDOC_TERMINATOR);
     exit_section_(builder_, marker_, CHAR_LIST_HEREDOC, result_);
     return result_;
+  }
+
+  /* ********************************************************** */
+  // emptyParentheses
+  static boolean containerExpression(PsiBuilder builder_, int level_) {
+    return emptyParentheses(builder_, level_ + 1);
   }
 
   /* ********************************************************** */
@@ -703,7 +717,46 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET EOL* CLOSING_BRACKET
+  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote
+  public static boolean keywordKey(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordKey")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<keyword key>");
+    result_ = consumeToken(builder_, ALIAS);
+    if (!result_) result_ = consumeToken(builder_, OPERATOR_KEYWORD);
+    if (!result_) result_ = consumeToken(builder_, IDENTIFIER);
+    if (!result_) result_ = quote(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, KEYWORD_KEY, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // keywordKey COLON keywordValue
+  public static boolean keywordPair(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordPair")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<keyword pair>");
+    result_ = keywordKey(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, COLON);
+    result_ = result_ && keywordValue(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, KEYWORD_PAIR, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // containerExpression
+  public static boolean keywordValue(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordValue")) return false;
+    if (!nextTokenIs(builder_, OPENING_PARENTHESIS)) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, null);
+    result_ = containerExpression(builder_, level_ + 1);
+    exit_section_(builder_, level_, marker_, KEYWORD_VALUE, result_, false, null);
+    return result_;
+  }
+
+  /* ********************************************************** */
+  // OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
   public static boolean list(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "list")) return false;
     if (!nextTokenIs(builder_, OPENING_BRACKET)) return false;
@@ -711,6 +764,7 @@ public class ElixirParser implements PsiParser {
     Marker marker_ = enter_section_(builder_);
     result_ = consumeToken(builder_, OPENING_BRACKET);
     result_ = result_ && list_1(builder_, level_ + 1);
+    result_ = result_ && list_2(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, CLOSING_BRACKET);
     exit_section_(builder_, marker_, LIST, result_);
     return result_;
@@ -725,6 +779,68 @@ public class ElixirParser implements PsiParser {
       if (!empty_element_parsed_guard_(builder_, "list_1", pos_)) break;
       pos_ = current_position_(builder_);
     }
+    return true;
+  }
+
+  // (keywordPair (COMMA EOL* keywordPair)* COMMA?)?
+  private static boolean list_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2")) return false;
+    list_2_0(builder_, level_ + 1);
+    return true;
+  }
+
+  // keywordPair (COMMA EOL* keywordPair)* COMMA?
+  private static boolean list_2_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = keywordPair(builder_, level_ + 1);
+    result_ = result_ && list_2_0_1(builder_, level_ + 1);
+    result_ = result_ && list_2_0_2(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // (COMMA EOL* keywordPair)*
+  private static boolean list_2_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2_0_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!list_2_0_1_0(builder_, level_ + 1)) break;
+      if (!empty_element_parsed_guard_(builder_, "list_2_0_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // COMMA EOL* keywordPair
+  private static boolean list_2_0_1_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2_0_1_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = consumeToken(builder_, COMMA);
+    result_ = result_ && list_2_0_1_0_1(builder_, level_ + 1);
+    result_ = result_ && keywordPair(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // EOL*
+  private static boolean list_2_0_1_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2_0_1_0_1")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "list_2_0_1_0_1", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
+  }
+
+  // COMMA?
+  private static boolean list_2_0_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "list_2_0_2")) return false;
+    consumeToken(builder_, COMMA);
     return true;
   }
 
@@ -1118,9 +1234,8 @@ public class ElixirParser implements PsiParser {
   // 18: PREFIX(unaryOperation)
   // 19: BINARY(dotOperation)
   // 20: PREFIX(atOperation)
-  // 21: ATOM(keywordIdentifier)
-  // 22: ATOM(value)
-  // 23: ATOM(emptyParentheses)
+  // 21: ATOM(value)
+  // 22: ATOM(emptyParentheses)
   public static boolean expression(PsiBuilder builder_, int level_, int priority_) {
     if (!recursion_guard_(builder_, level_, "expression")) return false;
     addVariant(builder_, "<expression>");
@@ -1130,7 +1245,6 @@ public class ElixirParser implements PsiParser {
     result_ = captureOperation(builder_, level_ + 1);
     if (!result_) result_ = unaryOperation(builder_, level_ + 1);
     if (!result_) result_ = atOperation(builder_, level_ + 1);
-    if (!result_) result_ = keywordIdentifier(builder_, level_ + 1);
     if (!result_) result_ = value(builder_, level_ + 1);
     if (!result_) result_ = emptyParentheses(builder_, level_ + 1);
     pinned_ = result_;
@@ -1996,30 +2110,6 @@ public class ElixirParser implements PsiParser {
       pos_ = current_position_(builder_);
     }
     return true;
-  }
-
-  // (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
-  public static boolean keywordIdentifier(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "keywordIdentifier")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<keyword identifier>");
-    result_ = keywordIdentifier_0(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, COLON);
-    exit_section_(builder_, level_, marker_, KEYWORD_IDENTIFIER, result_, false, null);
-    return result_;
-  }
-
-  // ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote
-  private static boolean keywordIdentifier_0(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "keywordIdentifier_0")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_);
-    result_ = consumeTokenSmart(builder_, ALIAS);
-    if (!result_) result_ = consumeTokenSmart(builder_, OPERATOR_KEYWORD);
-    if (!result_) result_ = consumeTokenSmart(builder_, IDENTIFIER);
-    if (!result_) result_ = quote(builder_, level_ + 1);
-    exit_section_(builder_, marker_, null, result_);
-    return result_;
   }
 
   // ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | list| NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
