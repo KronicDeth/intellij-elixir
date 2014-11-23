@@ -22,9 +22,21 @@ public class ElixirKeywordPairImpl extends ElixirExpressionImpl implements Elixi
   }
 
   @Override
+  @Nullable
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
+  }
+
+  @Override
   @NotNull
-  public List<ElixirExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
+  public ElixirExpression getExpression() {
+    return findNotNullChildByClass(ElixirExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
   }
 
 }

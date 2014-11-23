@@ -75,9 +75,6 @@ public class ElixirParser implements PsiParser {
     else if (root_ == INTERPOLATION) {
       result_ = interpolation(builder_, 0);
     }
-    else if (root_ == KEYWORD_KEY) {
-      result_ = keywordKey(builder_, 0);
-    }
     else if (root_ == KEYWORD_PAIR) {
       result_ = keywordPair(builder_, 0);
     }
@@ -141,15 +138,13 @@ public class ElixirParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(ATOM, KEYWORD_KEY),
     create_token_set_(ADDITION_OPERATION, AND_OPERATION, ARROW_OPERATION, ASSOCIATION_OPERATION,
       ATOM, AT_OPERATION, CAPTURE_OPERATION, COMPARISON_OPERATION,
       DOT_OPERATION, EMPTY_PARENTHESES, EXPRESSION, HAT_OPERATION,
-      IN_MATCH_OPERATION, IN_OPERATION, KEYWORD_KEY, KEYWORD_PAIR,
-      KEYWORD_VALUE, LIST, MATCH_OPERATION, MULTIPLICATION_OPERATION,
-      OR_OPERATION, PIPE_OPERATION, RELATIONAL_OPERATION, STAB_OPERATION,
-      TWO_OPERATION, TYPE_OPERATION, UNARY_OPERATION, VALUE,
-      WHEN_OPERATION),
+      IN_MATCH_OPERATION, IN_OPERATION, KEYWORD_PAIR, KEYWORD_VALUE,
+      LIST, MATCH_OPERATION, MULTIPLICATION_OPERATION, OR_OPERATION,
+      PIPE_OPERATION, RELATIONAL_OPERATION, STAB_OPERATION, TWO_OPERATION,
+      TYPE_OPERATION, UNARY_OPERATION, VALUE, WHEN_OPERATION),
     create_token_set_(LIST, VALUE),
   };
 
@@ -717,38 +712,47 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // KEYWORD_KEY_LITERAL | quote
-  public static boolean keywordKey(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "keywordKey")) return false;
-    boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<keyword key>");
-    result_ = consumeToken(builder_, KEYWORD_KEY_LITERAL);
-    if (!result_) result_ = quote(builder_, level_ + 1);
-    exit_section_(builder_, level_, marker_, KEYWORD_KEY, result_, false, null);
-    return result_;
-  }
-
-  /* ********************************************************** */
-  // keywordKey COLON EOL* keywordValue
+  // (KEYWORD_KEY_LITERAL COLON | quote KEYWORD_PAIR_COLON) EOL* keywordValue
   public static boolean keywordPair(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordPair")) return false;
     boolean result_;
-    Marker marker_ = enter_section_(builder_, level_, _NONE_, "<keyword pair>");
-    result_ = keywordKey(builder_, level_ + 1);
-    result_ = result_ && consumeToken(builder_, COLON);
-    result_ = result_ && keywordPair_2(builder_, level_ + 1);
+    Marker marker_ = enter_section_(builder_, level_, _COLLAPSE_, "<keyword pair>");
+    result_ = keywordPair_0(builder_, level_ + 1);
+    result_ = result_ && keywordPair_1(builder_, level_ + 1);
     result_ = result_ && keywordValue(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, KEYWORD_PAIR, result_, false, null);
     return result_;
   }
 
+  // KEYWORD_KEY_LITERAL COLON | quote KEYWORD_PAIR_COLON
+  private static boolean keywordPair_0(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordPair_0")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = parseTokens(builder_, 0, KEYWORD_KEY_LITERAL, COLON);
+    if (!result_) result_ = keywordPair_0_1(builder_, level_ + 1);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
+  // quote KEYWORD_PAIR_COLON
+  private static boolean keywordPair_0_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordPair_0_1")) return false;
+    boolean result_;
+    Marker marker_ = enter_section_(builder_);
+    result_ = quote(builder_, level_ + 1);
+    result_ = result_ && consumeToken(builder_, KEYWORD_PAIR_COLON);
+    exit_section_(builder_, marker_, null, result_);
+    return result_;
+  }
+
   // EOL*
-  private static boolean keywordPair_2(PsiBuilder builder_, int level_) {
-    if (!recursion_guard_(builder_, level_, "keywordPair_2")) return false;
+  private static boolean keywordPair_1(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordPair_1")) return false;
     int pos_ = current_position_(builder_);
     while (true) {
       if (!consumeToken(builder_, EOL)) break;
-      if (!empty_element_parsed_guard_(builder_, "keywordPair_2", pos_)) break;
+      if (!empty_element_parsed_guard_(builder_, "keywordPair_1", pos_)) break;
       pos_ = current_position_(builder_);
     }
     return true;

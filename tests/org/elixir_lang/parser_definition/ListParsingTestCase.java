@@ -8,6 +8,10 @@ public class ListParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testCharListWhitespaceColon() {
+        doTest(true);
+    }
+
     public void testEmpty() {
         doTest(true);
     }
@@ -25,6 +29,10 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordPair() {
+        doTest(true);
+    }
+
+    public void testStringWhitespaceColon() {
         doTest(true);
     }
 

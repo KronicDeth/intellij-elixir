@@ -488,6 +488,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
 %state INTERPOLATION
+%state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
 %state SIGIL
 %state SIGIL_MODIFIERS
@@ -579,7 +580,11 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
      {QUOTE_PROMOTER} */
-  {QUOTE_PROMOTER}                           { startQuote(yytext());
+  {QUOTE_PROMOTER}                           { /* return to KEYWORD_PAIR_MAYBE so that COLON after quote can be parsed
+                                                  as KEYWORD_PAIR_COLON to differentiate between valid `<quote><colon>`
+                                                  and invalid `<quote><space><colon>`. */
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               startQuote(yytext());
                                                return promoterType(); }
 }
 
@@ -701,6 +706,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {INTERPOLATION_END}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                 yybegin(stackFrame.getLastLexicalState());
                                 return ElixirTypes.INTERPOLATION_END; }
+}
+
+<KEYWORD_PAIR_MAYBE> {
+  {COLON} / {SPACE}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                              yybegin(stackFrame.getLastLexicalState());
+                              return ElixirTypes.KEYWORD_PAIR_COLON; }
+  {EOL}|.                   { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <NAMED_SIGIL> {

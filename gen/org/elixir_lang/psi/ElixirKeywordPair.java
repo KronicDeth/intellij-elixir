@@ -7,7 +7,13 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirKeywordPair extends ElixirExpression {
 
+  @Nullable
+  ElixirCharList getCharList();
+
   @NotNull
-  List<ElixirExpression> getExpressionList();
+  ElixirExpression getExpression();
+
+  @Nullable
+  ElixirString getString();
 
 }

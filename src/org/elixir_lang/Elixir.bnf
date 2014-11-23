@@ -2,7 +2,6 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("keywordKey")=atom
   extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keyword(Pair|Value)|value")=expression
   extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
   extends("list")=value
@@ -122,8 +121,7 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-keywordKey ::= (KEYWORD_KEY_LITERAL | quote)
-keywordPair ::=  keywordKey COLON EOL* keywordValue
+keywordPair ::=  (KEYWORD_KEY_LITERAL COLON | quote KEYWORD_PAIR_COLON) EOL* keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
