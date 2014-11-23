@@ -83,6 +83,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
+  IElementType KEYWORD_KEY_LITERAL = new ElixirTokenType("KEYWORD_KEY_LITERAL");
   IElementType LITERAL = new ElixirTokenType("literal");
   IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("LITERAL_CHAR_LIST_SIGIL_NAME");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
@@ -95,7 +96,6 @@ public interface ElixirTypes {
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
-  IElementType OPERATOR_KEYWORD = new ElixirTokenType("OPERATOR_KEYWORD");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");

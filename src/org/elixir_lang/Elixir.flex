@@ -498,18 +498,18 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
-  {AND_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
+  {AND_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {AND_OPERATOR}                             { return ElixirTypes.AND_OPERATOR; }
-  {ARROW_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.OPERATOR_KEYWORD; }
+  {ARROW_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {ARROW_OPERATOR}                           { return ElixirTypes.ARROW_OPERATOR; }
-  {ASSOCIATION_OPERATOR} / {COLON}{SPACE}    { return ElixirTypes.OPERATOR_KEYWORD; }
+  {ASSOCIATION_OPERATOR} / {COLON}{SPACE}    { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {ASSOCIATION_OPERATOR}                     { return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                    { return ElixirTypes.ALIAS; }
-  {AT_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.OPERATOR_KEYWORD; }
+  {AT_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {AT_OPERATOR}                              { return ElixirTypes.AT_OPERATOR; }
-  {BIT_STRING_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
+  {BIT_STRING_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {BIT_STRING_OPERATOR}                      { return ElixirTypes.BIT_STRING_OPERATOR; }
-  {CAPTURE_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.OPERATOR_KEYWORD; }
+  {CAPTURE_OPERATOR} / {COLON}{SPACE}        { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {CAPTURE_OPERATOR}                         { return ElixirTypes.CAPTURE_OPERATOR; }
   {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
@@ -528,50 +528,50 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.COLON; }
   {COMMA}                                    { return ElixirTypes.COMMA; }
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
-  {COMPARISON_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
+  {COMPARISON_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {COMPARISON_OPERATOR}                      { return ElixirTypes.COMPARISON_OPERATOR; }
   {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
-  {DUAL_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
+  {DUAL_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {DUAL_OPERATOR}                            { return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
-  {HAT_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
+  {HAT_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {HAT_OPERATOR}                             { return ElixirTypes.HAT_OPERATOR; }
   {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
   {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { return ElixirTypes.IN_OPERATOR; }
-  {OR_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.OPERATOR_KEYWORD; }
+  {OR_OPERATOR} / {COLON}{SPACE}             { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { return ElixirTypes.OR_OPERATOR; }
-  {UNARY_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.OPERATOR_KEYWORD; }
+  {UNARY_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   // Must be before {IDENTIFIER} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                           { return ElixirTypes.UNARY_OPERATOR; }
   // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { return ElixirTypes.WHEN_OPERATOR; }
   {IDENTIFIER}                               { return ElixirTypes.IDENTIFIER; }
   {INTEGER}                                  { return ElixirTypes.NUMBER; }
-  {IN_MATCH_OPERATOR} / {COLON}{SPACE}       { return ElixirTypes.OPERATOR_KEYWORD; }
+  {IN_MATCH_OPERATOR} / {COLON}{SPACE}       { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {IN_MATCH_OPERATOR}                        { return ElixirTypes.IN_MATCH_OPERATOR; }
-  {MAP_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
+  {MAP_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {MAP_OPERATOR}                             { return ElixirTypes.MAP_OPERATOR; }
-  {MATCH_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.OPERATOR_KEYWORD; }
+  {MATCH_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {MATCH_OPERATOR}                           { return ElixirTypes.MATCH_OPERATOR; }
-  {MULTIPLICATION_OPERATOR} / {COLON}{SPACE} { return ElixirTypes.OPERATOR_KEYWORD; }
+  {MULTIPLICATION_OPERATOR} / {COLON}{SPACE} { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {MULTIPLICATION_OPERATOR}                  { return ElixirTypes.MULTIPLICATION_OPERATOR; }
-  {PIPE_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
+  {PIPE_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {PIPE_OPERATOR}                            { return ElixirTypes.PIPE_OPERATOR; }
-  {RELATIONAL_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.OPERATOR_KEYWORD; }
+  {RELATIONAL_OPERATOR} / {COLON}{SPACE}     { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {RELATIONAL_OPERATOR}                      { return ElixirTypes.RELATIONAL_OPERATOR; }
   {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
-  {STAB_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.OPERATOR_KEYWORD; }
+  {STAB_OPERATOR} / {COLON}{SPACE}           { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {STAB_OPERATOR}                            { return ElixirTypes.STAB_OPERATOR; }
-  {STRUCT_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.OPERATOR_KEYWORD; }
+  {STRUCT_OPERATOR} / {COLON}{SPACE}         { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {STRUCT_OPERATOR}                          { return ElixirTypes.STRUCT_OPERATOR; }
   {TILDE}                                    { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE; }
-  {TUPLE_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.OPERATOR_KEYWORD; }
+  {TUPLE_OPERATOR} / {COLON}{SPACE}          { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {TUPLE_OPERATOR}                           { return ElixirTypes.TUPLE_OPERATOR; }
-  {TWO_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.OPERATOR_KEYWORD; }
+  {TWO_OPERATOR} / {COLON}{SPACE}            { return ElixirTypes.KEYWORD_KEY_LITERAL; }
   {TWO_OPERATOR}                             { return ElixirTypes.TWO_OPERATOR; }
   {QUOTE_HEREDOC_PROMOTER}                   { startQuote(yytext());
                                                return promoterType(); }
