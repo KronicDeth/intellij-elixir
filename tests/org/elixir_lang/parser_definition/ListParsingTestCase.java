@@ -12,6 +12,10 @@ public class ListParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testKeywordPair() {
+        doTest(true);
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/list_parsing_test_case";

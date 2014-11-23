@@ -731,16 +731,29 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // keywordKey COLON keywordValue
+  // keywordKey COLON EOL* keywordValue
   public static boolean keywordPair(PsiBuilder builder_, int level_) {
     if (!recursion_guard_(builder_, level_, "keywordPair")) return false;
     boolean result_;
     Marker marker_ = enter_section_(builder_, level_, _NONE_, "<keyword pair>");
     result_ = keywordKey(builder_, level_ + 1);
     result_ = result_ && consumeToken(builder_, COLON);
+    result_ = result_ && keywordPair_2(builder_, level_ + 1);
     result_ = result_ && keywordValue(builder_, level_ + 1);
     exit_section_(builder_, level_, marker_, KEYWORD_PAIR, result_, false, null);
     return result_;
+  }
+
+  // EOL*
+  private static boolean keywordPair_2(PsiBuilder builder_, int level_) {
+    if (!recursion_guard_(builder_, level_, "keywordPair_2")) return false;
+    int pos_ = current_position_(builder_);
+    while (true) {
+      if (!consumeToken(builder_, EOL)) break;
+      if (!empty_element_parsed_guard_(builder_, "keywordPair_2", pos_)) break;
+      pos_ = current_position_(builder_);
+    }
+    return true;
   }
 
   /* ********************************************************** */
