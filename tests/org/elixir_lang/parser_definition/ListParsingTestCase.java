@@ -12,6 +12,10 @@ public class ListParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testKeywordKeyEOLColon() {
+        doTest(true);
+    }
+
     public void testKeywordPair() {
         doTest(true);
     }
