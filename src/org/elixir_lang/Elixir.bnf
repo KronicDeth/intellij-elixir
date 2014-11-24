@@ -2,8 +2,10 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keywordIdentifier|value")=expression
+  extends("keywordKey")=atom
+  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keyword(Pair|Value)|value")=expression
   extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
+  extends("list")=value
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -15,11 +17,14 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
+    COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DOT_OPERATOR = "."
     IN_OPERATOR = "in"
+    OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
     // TOO remove once SEMICOLON is used in endOfExpression rule
@@ -57,6 +62,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
+private containerExpression ::= emptyParentheses
 dotOperation ::= expression EOL* DOT_OPERATOR EOL* expression
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
@@ -85,8 +91,6 @@ expression ::= stabOperation |
                unaryOperation |
                dotOperation |
                atOperation |
-               // TODO remove from expressions once containers are implemented
-               keywordIdentifier |
                value |
                emptyParentheses
 private expressionList ::= expression (endOfExpression+ expression)*
@@ -118,7 +122,35 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-keywordIdentifier ::= (ALIAS | OPERATOR_KEYWORD | IDENTIFIER | quote) COLON
+keywordKey ::= ALIAS |
+               AND_OPERATOR |
+               ARROW_OPERATOR |
+               ASSOCIATION_OPERATOR |
+               AT_OPERATOR |
+               BIT_STRING_OPERATOR |
+               CAPTURE_OPERATOR |
+               COMPARISON_OPERATOR |
+               DUAL_OPERATOR |
+               HAT_OPERATOR |
+               IDENTIFIER |
+               IN_MATCH_OPERATOR |
+               IN_OPERATOR |
+               MAP_OPERATOR |
+               MATCH_OPERATOR |
+               MULTIPLICATION_OPERATOR |
+               OR_OPERATOR |
+               PIPE_OPERATOR |
+               RELATIONAL_OPERATOR |
+               STAB_OPERATOR |
+               STRUCT_OPERATOR |
+               TUPLE_OPERATOR |
+               TWO_OPERATOR |
+               UNARY_OPERATOR |
+               WHEN_OPERATOR |
+               quote
+keywordPair ::=  keywordKey KEYWORD_PAIR_COLON EOL* keywordValue
+keywordValue ::= containerExpression
+list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -175,5 +207,5 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
 twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
 typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
 unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
-value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
+value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | list| NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
 whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }

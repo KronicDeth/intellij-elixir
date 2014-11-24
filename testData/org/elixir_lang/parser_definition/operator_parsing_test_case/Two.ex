@@ -27,7 +27,7 @@
 
 # twoOperation(hatOperation(value))
 # should parse as (^^^?a)..(^^^?z)
-^^^?a..^^^?z
+a^^^b..c^^^d
 
 # twoOperation(multiplicationOperation(value))
 # should parse as ('a' * 0x2) ++ ('b' * 0x3)

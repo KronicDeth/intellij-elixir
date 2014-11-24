@@ -26,7 +26,10 @@ public interface ElixirTypes {
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_MATCH_OPERATION = new ElixirElementType("IN_MATCH_OPERATION");
   IElementType IN_OPERATION = new ElixirElementType("IN_OPERATION");
-  IElementType KEYWORD_IDENTIFIER = new ElixirElementType("KEYWORD_IDENTIFIER");
+  IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
+  IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
+  IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
+  IElementType LIST = new ElixirElementType("LIST");
   IElementType MATCH_OPERATION = new ElixirElementType("MATCH_OPERATION");
   IElementType MULTIPLICATION_OPERATION = new ElixirElementType("MULTIPLICATION_OPERATION");
   IElementType OR_OPERATION = new ElixirElementType("OR_OPERATION");
@@ -60,8 +63,10 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
+  IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType("COLON");
+  IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
@@ -78,6 +83,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
+  IElementType KEYWORD_PAIR_COLON = new ElixirTokenType("KEYWORD_PAIR_COLON");
   IElementType LITERAL = new ElixirTokenType("literal");
   IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("LITERAL_CHAR_LIST_SIGIL_NAME");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
@@ -88,8 +94,8 @@ public interface ElixirTypes {
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
+  IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
-  IElementType OPERATOR_KEYWORD = new ElixirTokenType("OPERATOR_KEYWORD");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
@@ -186,8 +192,17 @@ public interface ElixirTypes {
       else if (type == IN_OPERATION) {
         return new ElixirInOperationImpl(node);
       }
-      else if (type == KEYWORD_IDENTIFIER) {
-        return new ElixirKeywordIdentifierImpl(node);
+      else if (type == KEYWORD_KEY) {
+        return new ElixirKeywordKeyImpl(node);
+      }
+      else if (type == KEYWORD_PAIR) {
+        return new ElixirKeywordPairImpl(node);
+      }
+      else if (type == KEYWORD_VALUE) {
+        return new ElixirKeywordValueImpl(node);
+      }
+      else if (type == LIST) {
+        return new ElixirListImpl(node);
       }
       else if (type == MATCH_OPERATION) {
         return new ElixirMatchOperationImpl(node);

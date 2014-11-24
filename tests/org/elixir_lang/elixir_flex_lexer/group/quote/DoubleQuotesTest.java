@@ -1,6 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer.group.quote;
 
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.psi.ElixirTypes;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -42,7 +43,7 @@ public class DoubleQuotesTest extends Test {
                Arrays.asList(
                        new Object[][] {
                                { "'", FRAGMENT_TYPE, LEXICAL_STATE },
-                               { "\"", ElixirTypes.STRING_TERMINATOR, INITIAL_STATE }
+                               { "\"", ElixirTypes.STRING_TERMINATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE }
                        }
                )
        );

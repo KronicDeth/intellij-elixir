@@ -36,10 +36,6 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testKeywordIdentifier() {
-        doTest(true);
-    }
-
     public void testMultipleNumbersOnLine() {
         doTest(true);
     }
