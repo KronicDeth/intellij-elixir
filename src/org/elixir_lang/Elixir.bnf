@@ -2,6 +2,7 @@
   parserClass="org.elixir_lang.parser.ElixirParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends("keywordKey")=atom
   extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keyword(Pair|Value)|value")=expression
   extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
   extends("list")=value
@@ -121,7 +122,33 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-keywordPair ::=  (KEYWORD_KEY_LITERAL COLON | quote KEYWORD_PAIR_COLON) EOL* keywordValue
+keywordKey ::= ALIAS |
+               AND_OPERATOR |
+               ARROW_OPERATOR |
+               ASSOCIATION_OPERATOR |
+               AT_OPERATOR |
+               BIT_STRING_OPERATOR |
+               CAPTURE_OPERATOR |
+               COMPARISON_OPERATOR |
+               DUAL_OPERATOR |
+               HAT_OPERATOR |
+               IDENTIFIER |
+               IN_MATCH_OPERATOR |
+               IN_OPERATOR |
+               MAP_OPERATOR |
+               MATCH_OPERATOR |
+               MULTIPLICATION_OPERATOR |
+               OR_OPERATOR |
+               PIPE_OPERATOR |
+               RELATIONAL_OPERATOR |
+               STAB_OPERATOR |
+               STRUCT_OPERATOR |
+               TUPLE_OPERATOR |
+               TWO_OPERATOR |
+               UNARY_OPERATOR |
+               WHEN_OPERATOR |
+               quote
+keywordPair ::=  keywordKey KEYWORD_PAIR_COLON EOL* keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
