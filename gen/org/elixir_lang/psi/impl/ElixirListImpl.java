@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirKeywordPair;
+import org.elixir_lang.psi.ElixirList;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
 
@@ -23,8 +24,8 @@ public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
 
   @Override
   @NotNull
-  public List<ElixirExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
+  public List<ElixirKeywordPair> getKeywordPairList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
   }
 
 }

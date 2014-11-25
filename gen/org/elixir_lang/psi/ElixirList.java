@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirList extends ElixirValue {
 
   @NotNull
-  List<ElixirExpression> getExpressionList();
+  List<ElixirKeywordPair> getKeywordPairList();
 
 }
