@@ -1,11 +1,17 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
 
-  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  extends("keywordKey")=atom
-  extends("atom|(at|binary|capture|unary)Operation|emptyParentheses|keyword(Pair|Value)|value")=expression
-  extends("(addition|and|arrow|association|comparison|dot|hat|in|inMatch|match|multiplication|or|pipe|relational|stab|two|type|when)Operation")=binaryOperation
-  extends("list")=value
+ extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  /*
+   * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
+   */
+
+  extends("emptyParentheses|matchedExpression")=expression
+  extends("charList(Heredoc)?|maxExpression|number.*Operation|list|sigil|string(Heredoc)?")=accessExpression
+  extends("accessExpression|dotIdentifier|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
+  extends("atom|dotAlias")=maxExpression
+  extends("dotIdentifier")=noParenthesesOneExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -38,65 +44,42 @@
 // lines
 elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
-// In alphabetical order
+/*
+ * In alphabetical order
+ */
 
-/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
-   is interpreted as unaryOperation */
-additionOperation ::= expression DUAL_OPERATOR EOL* expression
-andOperation ::= expression EOL* AND_OPERATOR EOL* expression
-arrowOperation ::= expression EOL* ARROW_OPERATOR EOL* expression
-associationOperation ::= expression EOL* ASSOCIATION_OPERATOR EOL* expression { rightAssociative = true }
+accessExpression ::= numberCaptureOperation |
+                     numberUnaryOperation |
+                     numberAtOperation |
+                     OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
+                     /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
+                        elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
+                     CHAR_TOKEN |
+                     NUMBER |
+                     list |
+                     binaryString |
+                     listString |
+                     sigil |
+                     maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
-atOperation ::= AT_OPERATOR EOL* expression
-fake binaryOperation ::= expression + {
-  methods = [
-    left = "/expr[0]"  // will be @NotNull as far as we have "+" in the expression
-    right = "/expr[1]" // "expr" is the name of the auto-calculated child property (singular or list)
-  ]
-}
-captureOperation ::= CAPTURE_OPERATOR EOL* expression
+private binaryString ::= string | stringHeredoc
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
-comparisonOperation ::= expression EOL* COMPARISON_OPERATOR EOL* expression
 private containerExpression ::= emptyParentheses
-dotOperation ::= expression EOL* DOT_OPERATOR EOL* expression
+// TODO fix left-recursion
+dotAlias ::= /*(matchedExpression EOL* DOT_OPERATOR EOL*)?*/ ALIAS
+// TODO fix left-recursion
+dotIdentifier ::= /*(matchedExpression EOL* DOT_OPERATOR EOL*)?*/ IDENTIFIER
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
-/* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
-   operators.
-   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-expression ::= stabOperation |
-               captureOperation |
-               inMatchOperation |
-               whenOperation |
-               typeOperation |
-               pipeOperation |
-               associationOperation |
-               matchOperation |
-               orOperation |
-               andOperation |
-               comparisonOperation |
-               relationalOperation |
-               arrowOperation |
-               inOperation |
-               twoOperation |
-               additionOperation |
-               multiplicationOperation |
-               hatOperation |
-               unaryOperation |
-               dotOperation |
-               atOperation |
-               value |
-               emptyParentheses
+expression ::= emptyParentheses |
+               matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
-hatOperation ::= expression EOL* HAT_OPERATOR EOL* expression
-inMatchOperation ::= expression EOL* IN_MATCH_OPERATOR EOL* expression
-inOperation ::= expression EOL* IN_OPERATOR EOL* expression
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -151,6 +134,7 @@ keywordKey ::= ALIAS |
 keywordPair ::=  keywordKey KEYWORD_PAIR_COLON EOL* keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
+private listString ::= charList | charListHeredoc
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -173,12 +157,64 @@ private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
-matchOperation ::= expression EOL* MATCH_OPERATOR EOL* expression { rightAssociative = true }
-multiplicationOperation ::= expression EOL* MULTIPLICATION_OPERATOR EOL* expression
-orOperation ::= expression EOL* OR_OPERATOR EOL* expression
-pipeOperation ::= expression EOL* PIPE_OPERATOR EOL* expression { rightAssociative = true }
+
+/* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
+   operators.
+   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
+matchedExpression ::= matchedExpressionCaptureOperation |
+                      matchedExpressionInMatchOperation |
+                      matchedExpressionWhenOperation |
+                      matchedExpressionTypeOperation |
+                      matchedExpressionPipeOperation |
+                      matchedExpressionMatchOperation |
+                      matchedExpressionOrOperation |
+                      matchedExpressionAndOperation |
+                      matchedExpressionComparisonOperation |
+                      matchedExpressionRelationalOperation |
+                      matchedExpressionArrowOperation |
+                      matchedExpressionInOperation |
+                      matchedExpressionTwoOperation |
+                      matchedExpressionAdditionOperation |
+                      matchedExpressionMultiplicationOperation |
+                      matchedExpressionHatOperation |
+                      matchedExpressionUnaryOperation |
+                      matchedExpressionAtOperation |
+                      noParenthesesOneExpression |
+                      accessExpression
+/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
+   is interpreted as unaryOperation */
+matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
+matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
+matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
+matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
+matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* matchedExpression
+matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
+matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
+matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
+matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
+matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
+matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
+matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
+matchedExpressionTwoOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
+matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
+
+maxExpression ::= atom |
+                  dotAlias
+noParenthesesOneExpression ::= dotIdentifier
+
+/*
+ * Number Operations - Used in accessExpression
+ */
+
+numberAtOperation ::= AT_OPERATOR EOL* NUMBER
+numberCaptureOperation ::= CAPTURE_OPERATOR EOL* NUMBER
+numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* NUMBER
+
 private quote ::= (charList | string)
-relationalOperation ::= expression EOL* RELATIONAL_OPERATOR EOL* expression
 sigil ::= interpolatedCharListSigil |
           interpolatedHeredocCharListSigil |
           interpolatedHeredocRegex |
@@ -197,15 +233,9 @@ sigil ::= interpolatedCharListSigil |
           literalSigil |
           literalStringSigil |
           literalWords
-stabOperation ::= expression EOL* STAB_OPERATOR EOL* expression { rightAssociative = true }
 string ::= STRING_PROMOTER
            interpolatedStringBody
            STRING_TERMINATOR
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
-twoOperation ::= expression EOL* TWO_OPERATOR EOL* expression { rightAssociative = true }
-typeOperation ::= expression EOL* TYPE_OPERATOR EOL* expression { rightAssociative = true }
-unaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* expression
-value ::= ALIAS | atom | BIT_STRING_OPERATOR | CHAR_TOKEN | list| NUMBER | charListHeredoc | IDENTIFIER | MAP_OPERATOR | quote | sigil | stringHeredoc | TUPLE_OPERATOR
-whenOperation ::= expression EOL* WHEN_OPERATOR EOL* expression { rightAssociative = true }

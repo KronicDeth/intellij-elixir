@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirKeywordValueImpl extends ElixirExpressionImpl implements ElixirKeywordValue {
+public class ElixirKeywordValueImpl extends ASTWrapperPsiElement implements ElixirKeywordValue {
 
   public ElixirKeywordValueImpl(ASTNode node) {
     super(node);
@@ -19,6 +20,12 @@ public class ElixirKeywordValueImpl extends ElixirExpressionImpl implements Elix
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitKeywordValue(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public ElixirEmptyParentheses getEmptyParentheses() {
+    return findNotNullChildByClass(ElixirEmptyParentheses.class);
   }
 
 }

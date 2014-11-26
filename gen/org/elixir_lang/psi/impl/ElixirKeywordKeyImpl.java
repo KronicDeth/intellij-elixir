@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirKeywordKeyImpl extends ElixirAtomImpl implements ElixirKeywordKey {
+public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements ElixirKeywordKey {
 
   public ElixirKeywordKeyImpl(ASTNode node) {
     super(node);
@@ -23,14 +24,8 @@ public class ElixirKeywordKeyImpl extends ElixirAtomImpl implements ElixirKeywor
 
   @Override
   @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
+  public ElixirAccessExpression getAccessExpression() {
+    return findChildByClass(ElixirAccessExpression.class);
   }
 
 }

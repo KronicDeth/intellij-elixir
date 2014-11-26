@@ -1,17 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirKeywordPair;
-import org.elixir_lang.psi.ElixirList;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import org.elixir_lang.psi.*;
 
-import java.util.List;
-
-public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
+public class ElixirListImpl extends ElixirAccessExpressionImpl implements ElixirList {
 
   public ElixirListImpl(ASTNode node) {
     super(node);

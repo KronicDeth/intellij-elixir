@@ -1,5 +1,5 @@
 Elixir File(0,29)
-  ElixirValueImpl(VALUE)(0,6)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,6)
     PsiElement(ElixirTokenType.NUMBER)('0x1234')(0,6)
   PsiWhiteSpace(' ')(6,7)
   PsiComment(ElixirTokenType.COMMENT)('# Comment after number')(7,29)

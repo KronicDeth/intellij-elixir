@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
+public class ElixirAtomImpl extends ElixirMaxExpressionImpl implements ElixirAtom {
 
   public ElixirAtomImpl(ASTNode node) {
     super(node);
@@ -23,14 +23,8 @@ public class ElixirAtomImpl extends ElixirExpressionImpl implements ElixirAtom {
 
   @Override
   @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
+  public ElixirAccessExpression getAccessExpression() {
+    return findChildByClass(ElixirAccessExpression.class);
   }
 
 }

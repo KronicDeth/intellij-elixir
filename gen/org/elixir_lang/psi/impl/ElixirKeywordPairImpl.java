@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirKeywordPairImpl extends ElixirExpressionImpl implements ElixirKeywordPair {
+public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements ElixirKeywordPair {
 
   public ElixirKeywordPairImpl(ASTNode node) {
     super(node);
@@ -23,8 +24,14 @@ public class ElixirKeywordPairImpl extends ElixirExpressionImpl implements Elixi
 
   @Override
   @NotNull
-  public List<ElixirExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
+  public ElixirKeywordKey getKeywordKey() {
+    return findNotNullChildByClass(ElixirKeywordKey.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirKeywordValue getKeywordValue() {
+    return findNotNullChildByClass(ElixirKeywordValue.class);
   }
 
 }
