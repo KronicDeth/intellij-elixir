@@ -1,3 +1,3 @@
 Elixir File(0,10)
-  ElixirValueImpl(VALUE)(0,10)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,10)
     PsiElement(ElixirTokenType.NUMBER)('0xdeadbeaf')(0,10)

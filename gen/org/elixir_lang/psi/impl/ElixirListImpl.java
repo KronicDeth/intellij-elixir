@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
+public class ElixirListImpl extends ElixirAccessExpressionImpl implements ElixirList {
 
   public ElixirListImpl(ASTNode node) {
     super(node);
@@ -23,8 +23,8 @@ public class ElixirListImpl extends ElixirValueImpl implements ElixirList {
 
   @Override
   @NotNull
-  public List<ElixirExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
+  public List<ElixirKeywordPair> getKeywordPairList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
   }
 
 }

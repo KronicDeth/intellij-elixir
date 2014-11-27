@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirAtom extends ElixirExpression {
+public interface ElixirAtom extends ElixirMaxExpression {
 
   @Nullable
-  ElixirCharList getCharList();
-
-  @Nullable
-  ElixirString getString();
+  ElixirAccessExpression getAccessExpression();
 
 }

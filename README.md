@@ -26,6 +26,7 @@ Syntax highlighting for the following tokens:
 * [Keyword Lists](http://elixir-lang.org/getting_started/7.html#7.1-keyword-lists)
   * Keyword Keys - Aliases, identifiers, quotes, or operators when followed immediately by a colon and horizontal or vertical space.
   * Keyword Values *PARTIAL SUPPORT* - Only empty parentheses (`()`).
+* [Matched Expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L113-L122), in other words, expression without `do` and with parentheses.
 * [Operators](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L343-L424) with [arity, associativity, and precedence](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71):
   * Addition (`+` and `-`)
   * And (`&&`, `&&&`, and `and`)

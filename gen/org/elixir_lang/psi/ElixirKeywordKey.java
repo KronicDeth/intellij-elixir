@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirKeywordKey extends ElixirAtom {
+public interface ElixirKeywordKey extends PsiElement {
 
   @Nullable
-  ElixirCharList getCharList();
-
-  @Nullable
-  ElixirString getString();
+  ElixirAccessExpression getAccessExpression();
 
 }

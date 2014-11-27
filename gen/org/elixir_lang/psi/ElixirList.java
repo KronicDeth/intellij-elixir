@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirList extends ElixirValue {
+public interface ElixirList extends ElixirAccessExpression {
 
   @NotNull
-  List<ElixirExpression> getExpressionList();
+  List<ElixirKeywordPair> getKeywordPairList();
 
 }

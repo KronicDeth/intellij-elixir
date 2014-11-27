@@ -5,9 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirKeywordPair extends ElixirExpression {
+public interface ElixirKeywordPair extends PsiElement {
 
   @NotNull
-  List<ElixirExpression> getExpressionList();
+  ElixirKeywordKey getKeywordKey();
+
+  @NotNull
+  ElixirKeywordValue getKeywordValue();
 
 }

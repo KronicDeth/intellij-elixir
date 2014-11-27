@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements ElixirStringHeredoc {
+public class ElixirStringHeredocImpl extends ElixirAccessExpressionImpl implements ElixirStringHeredoc {
 
   public ElixirStringHeredocImpl(ASTNode node) {
     super(node);
