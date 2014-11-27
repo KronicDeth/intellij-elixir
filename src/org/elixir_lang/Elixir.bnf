@@ -69,8 +69,6 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 private containerExpression ::= emptyParentheses
-// TODO fix left-recursion
-dotAlias ::= /*(matchedExpression EOL* DOT_OPERATOR EOL*)?*/ ALIAS
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
@@ -203,7 +201,7 @@ matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matche
 matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
 
 maxExpression ::= atom |
-                  dotAlias
+                  ALIAS
 //noParenthesesOneExpression ::= dotIdentifier
 
 /*

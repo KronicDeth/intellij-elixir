@@ -23,10 +23,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
-  public void visitDotAlias(@NotNull ElixirDotAlias o) {
-    visitMaxExpression(o);
-  }
-
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitExpression(o);
   }

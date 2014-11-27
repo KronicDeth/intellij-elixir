@@ -12,7 +12,6 @@ public interface ElixirTypes {
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
-  IElementType DOT_ALIAS = new ElixirElementType("DOT_ALIAS");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
@@ -154,9 +153,6 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
-      }
-      else if (type == DOT_ALIAS) {
-        return new ElixirDotAliasImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
