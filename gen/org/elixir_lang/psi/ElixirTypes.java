@@ -13,10 +13,10 @@ public interface ElixirTypes {
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType DOT_ALIAS = new ElixirElementType("DOT_ALIAS");
-  IElementType DOT_IDENTIFIER = new ElixirElementType("DOT_IDENTIFIER");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
+  IElementType IDENTIFIER_EXPRESSION = new ElixirElementType("IDENTIFIER_EXPRESSION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
@@ -29,6 +29,7 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_AT_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_AT_OPERATION");
   IElementType MATCHED_EXPRESSION_CAPTURE_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_CAPTURE_OPERATION");
   IElementType MATCHED_EXPRESSION_COMPARISON_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_COMPARISON_OPERATION");
+  IElementType MATCHED_EXPRESSION_DOT_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_DOT_OPERATION");
   IElementType MATCHED_EXPRESSION_HAT_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_HAT_OPERATION");
   IElementType MATCHED_EXPRESSION_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_IN_MATCH_OPERATION");
   IElementType MATCHED_EXPRESSION_IN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_IN_OPERATION");
@@ -42,7 +43,6 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_UNARY_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_UNARY_OPERATION");
   IElementType MATCHED_EXPRESSION_WHEN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_WHEN_OPERATION");
   IElementType MAX_EXPRESSION = new ElixirElementType("MAX_EXPRESSION");
-  IElementType NO_PARENTHESES_ONE_EXPRESSION = new ElixirElementType("NO_PARENTHESES_ONE_EXPRESSION");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
   IElementType NUMBER_UNARY_OPERATION = new ElixirElementType("NUMBER_UNARY_OPERATION");
@@ -158,9 +158,6 @@ public interface ElixirTypes {
       else if (type == DOT_ALIAS) {
         return new ElixirDotAliasImpl(node);
       }
-      else if (type == DOT_IDENTIFIER) {
-        return new ElixirDotIdentifierImpl(node);
-      }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
       }
@@ -169,6 +166,9 @@ public interface ElixirTypes {
       }
       else if (type == EXPRESSION) {
         return new ElixirExpressionImpl(node);
+      }
+      else if (type == IDENTIFIER_EXPRESSION) {
+        return new ElixirIdentifierExpressionImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
@@ -205,6 +205,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_EXPRESSION_COMPARISON_OPERATION) {
         return new ElixirMatchedExpressionComparisonOperationImpl(node);
+      }
+      else if (type == MATCHED_EXPRESSION_DOT_OPERATION) {
+        return new ElixirMatchedExpressionDotOperationImpl(node);
       }
       else if (type == MATCHED_EXPRESSION_HAT_OPERATION) {
         return new ElixirMatchedExpressionHatOperationImpl(node);
@@ -244,9 +247,6 @@ public interface ElixirTypes {
       }
       else if (type == MAX_EXPRESSION) {
         return new ElixirMaxExpressionImpl(node);
-      }
-      else if (type == NO_PARENTHESES_ONE_EXPRESSION) {
-        return new ElixirNoParenthesesOneExpressionImpl(node);
       }
       else if (type == NUMBER_AT_OPERATION) {
         return new ElixirNumberAtOperationImpl(node);

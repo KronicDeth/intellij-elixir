@@ -9,9 +9,8 @@
 
   extends("emptyParentheses|matchedExpression")=expression
   extends("charList(Heredoc)?|maxExpression|number.*Operation|list|sigil|string(Heredoc)?")=accessExpression
-  extends("accessExpression|dotIdentifier|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
+  extends("accessExpression|identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
   extends("atom|dotAlias")=maxExpression
-  extends("dotIdentifier")=noParenthesesOneExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -72,14 +71,13 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
 private containerExpression ::= emptyParentheses
 // TODO fix left-recursion
 dotAlias ::= /*(matchedExpression EOL* DOT_OPERATOR EOL*)?*/ ALIAS
-// TODO fix left-recursion
-dotIdentifier ::= /*(matchedExpression EOL* DOT_OPERATOR EOL*)?*/ IDENTIFIER
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
+identifierExpression ::= IDENTIFIER
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -178,8 +176,9 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionMultiplicationOperation |
                       matchedExpressionHatOperation |
                       matchedExpressionUnaryOperation |
+                      matchedExpressionDotOperation |
                       matchedExpressionAtOperation |
-                      noParenthesesOneExpression |
+                      identifierExpression |
                       accessExpression
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
    is interpreted as unaryOperation */
@@ -189,9 +188,10 @@ matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* m
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
 matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* matchedExpression
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
+matchedExpressionDotOperation ::= matchedExpression EOL* DOT_OPERATOR EOL* matchedExpression
 matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
-matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
 matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
+matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
 matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
 matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
@@ -204,7 +204,7 @@ matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* mat
 
 maxExpression ::= atom |
                   dotAlias
-noParenthesesOneExpression ::= dotIdentifier
+//noParenthesesOneExpression ::= dotIdentifier
 
 /*
  * Number Operations - Used in accessExpression

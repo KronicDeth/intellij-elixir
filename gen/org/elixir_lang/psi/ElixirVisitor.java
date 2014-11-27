@@ -27,10 +27,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMaxExpression(o);
   }
 
-  public void visitDotIdentifier(@NotNull ElixirDotIdentifier o) {
-    visitMatchedExpression(o);
-  }
-
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitExpression(o);
   }
@@ -41,6 +37,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitExpression(@NotNull ElixirExpression o) {
     visitPsiElement(o);
+  }
+
+  public void visitIdentifierExpression(@NotNull ElixirIdentifierExpression o) {
+    visitMatchedExpression(o);
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
@@ -88,6 +88,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedExpressionComparisonOperation(@NotNull ElixirMatchedExpressionComparisonOperation o) {
+    visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionDotOperation(@NotNull ElixirMatchedExpressionDotOperation o) {
     visitMatchedExpression(o);
   }
 
@@ -141,10 +145,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMaxExpression(@NotNull ElixirMaxExpression o) {
     visitAccessExpression(o);
-  }
-
-  public void visitNoParenthesesOneExpression(@NotNull ElixirNoParenthesesOneExpression o) {
-    visitMatchedExpression(o);
   }
 
   public void visitNumberAtOperation(@NotNull ElixirNumberAtOperation o) {

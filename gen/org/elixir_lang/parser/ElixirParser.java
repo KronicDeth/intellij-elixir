@@ -37,9 +37,6 @@ public class ElixirParser implements PsiParser {
     else if (t == DOT_ALIAS) {
       r = dotAlias(b, 0);
     }
-    else if (t == DOT_IDENTIFIER) {
-      r = dotIdentifier(b, 0);
-    }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
     }
@@ -48,6 +45,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == EXPRESSION) {
       r = expression(b, 0);
+    }
+    else if (t == IDENTIFIER_EXPRESSION) {
+      r = identifierExpression(b, 0);
     }
     else if (t == INTERPOLATION) {
       r = interpolation(b, 0);
@@ -84,6 +84,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == MATCHED_EXPRESSION_COMPARISON_OPERATION) {
       r = matchedExpression(b, 0, 7);
+    }
+    else if (t == MATCHED_EXPRESSION_DOT_OPERATION) {
+      r = matchedExpression(b, 0, 16);
     }
     else if (t == MATCHED_EXPRESSION_HAT_OPERATION) {
       r = matchedExpression(b, 0, 14);
@@ -124,9 +127,6 @@ public class ElixirParser implements PsiParser {
     else if (t == MAX_EXPRESSION) {
       r = maxExpression(b, 0);
     }
-    else if (t == NO_PARENTHESES_ONE_EXPRESSION) {
-      r = noParenthesesOneExpression(b, 0);
-    }
     else if (t == NUMBER_AT_OPERATION) {
       r = numberAtOperation(b, 0);
     }
@@ -162,22 +162,22 @@ public class ElixirParser implements PsiParser {
       NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL, STRING,
       STRING_HEREDOC),
     create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      DOT_ALIAS, DOT_IDENTIFIER, LIST, MATCHED_EXPRESSION,
+      DOT_ALIAS, IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION,
       MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
-      MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION,
-      MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION,
-      MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION,
-      MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NO_PARENTHESES_ONE_EXPRESSION,
+      MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION,
+      MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
+      MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
+      MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION,
       NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL,
       STRING, STRING_HEREDOC),
     create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      DOT_ALIAS, DOT_IDENTIFIER, EMPTY_PARENTHESES, EXPRESSION,
+      DOT_ALIAS, EMPTY_PARENTHESES, EXPRESSION, IDENTIFIER_EXPRESSION,
       LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION,
       MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION,
-      MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION,
-      MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
-      MAX_EXPRESSION, NO_PARENTHESES_ONE_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
+      MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION,
+      MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
+      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
+      MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
       NUMBER_UNARY_OPERATION, SIGIL, STRING, STRING_HEREDOC),
   };
 
@@ -265,18 +265,6 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, ALIAS);
     exit_section_(b, m, DOT_ALIAS, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // IDENTIFIER
-  public static boolean dotIdentifier(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "dotIdentifier")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    exit_section_(b, m, DOT_IDENTIFIER, r);
     return r;
   }
 
@@ -1510,9 +1498,10 @@ public class ElixirParser implements PsiParser {
   // 14: BINARY(matchedExpressionMultiplicationOperation)
   // 15: BINARY(matchedExpressionHatOperation)
   // 16: PREFIX(matchedExpressionUnaryOperation)
-  // 17: PREFIX(matchedExpressionAtOperation)
-  // 18: ATOM(noParenthesesOneExpression)
-  // 19: ATOM(accessExpression)
+  // 17: BINARY(matchedExpressionDotOperation)
+  // 18: PREFIX(matchedExpressionAtOperation)
+  // 19: ATOM(identifierExpression)
+  // 20: ATOM(accessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "matchedExpression")) return false;
     addVariant(b, "<matched expression>");
@@ -1521,7 +1510,7 @@ public class ElixirParser implements PsiParser {
     r = matchedExpressionCaptureOperation(b, l + 1);
     if (!r) r = matchedExpressionUnaryOperation(b, l + 1);
     if (!r) r = matchedExpressionAtOperation(b, l + 1);
-    if (!r) r = noParenthesesOneExpression(b, l + 1);
+    if (!r) r = identifierExpression(b, l + 1);
     if (!r) r = accessExpression(b, l + 1);
     p = r;
     r = r && matchedExpression_0(b, l + 1, g);
@@ -1593,6 +1582,10 @@ public class ElixirParser implements PsiParser {
       else if (g < 15 && matchedExpressionHatOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 15);
         exit_section_(b, l, m, MATCHED_EXPRESSION_HAT_OPERATION, r, true, null);
+      }
+      else if (g < 17 && matchedExpressionDotOperation_0(b, l + 1)) {
+        r = matchedExpression(b, l, 17);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_DOT_OPERATION, r, true, null);
       }
       else {
         exit_section_(b, l, m, null, false, false, null);
@@ -2210,6 +2203,42 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
+  // EOL* DOT_OPERATOR EOL*
+  private static boolean matchedExpressionDotOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionDotOperation_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpressionDotOperation_0_0(b, l + 1);
+    r = r && consumeToken(b, DOT_OPERATOR);
+    r = r && matchedExpressionDotOperation_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean matchedExpressionDotOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionDotOperation_0_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionDotOperation_0_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean matchedExpressionDotOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionDotOperation_0_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionDotOperation_0_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
   public static boolean matchedExpressionAtOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionAtOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
@@ -2217,7 +2246,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedExpressionAtOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 17);
+    r = p && matchedExpression(b, l, 18);
     exit_section_(b, l, m, MATCHED_EXPRESSION_AT_OPERATION, r, p, null);
     return r || p;
   }
@@ -2245,14 +2274,14 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // dotIdentifier
-  public static boolean noParenthesesOneExpression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesOneExpression")) return false;
+  // IDENTIFIER
+  public static boolean identifierExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "identifierExpression")) return false;
     if (!nextTokenIsFast(b, IDENTIFIER)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, null);
-    r = dotIdentifier(b, l + 1);
-    exit_section_(b, l, m, NO_PARENTHESES_ONE_EXPRESSION, r, false, null);
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, IDENTIFIER);
+    exit_section_(b, m, IDENTIFIER_EXPRESSION, r);
     return r;
   }
 
