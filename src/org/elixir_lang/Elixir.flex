@@ -411,6 +411,12 @@ QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER
 QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
 
 /*
+ * Regular Keywords
+ */
+
+FN = "fn"
+
+/*
  *
  *  Sigils
  *
@@ -537,6 +543,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DUAL_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
+  {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.FN; }
   {HAT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.HAT_OPERATOR; }
   {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
