@@ -28,7 +28,11 @@
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DOT_OPERATOR = "."
+    END = "end"
+    FALSE = "false"
+    FN = "fn"
     IN_OPERATOR = "in"
+    NIL = "nil"
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
@@ -36,6 +40,7 @@
     SEMICOLON = ";"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
+    TRUE = "true"
   ]
 }
 
@@ -59,6 +64,9 @@ accessExpression ::= numberCaptureOperation |
                      binaryString |
                      listString |
                      sigil |
+                     FALSE |
+                     NIL |
+                     TRUE |
                      maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 private binaryString ::= string | stringHeredoc

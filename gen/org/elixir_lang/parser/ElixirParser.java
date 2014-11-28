@@ -2281,6 +2281,9 @@ public class ElixirParser implements PsiParser {
   //                      binaryString |
   //                      listString |
   //                      sigil |
+  //                      FALSE |
+  //                      NIL |
+  //                      TRUE |
   //                      maxExpression
   public static boolean accessExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
@@ -2296,6 +2299,9 @@ public class ElixirParser implements PsiParser {
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);
     if (!r) r = sigil(b, l + 1);
+    if (!r) r = consumeTokenSmart(b, FALSE);
+    if (!r) r = consumeTokenSmart(b, NIL);
+    if (!r) r = consumeTokenSmart(b, TRUE);
     if (!r) r = maxExpression(b, l + 1);
     exit_section_(b, l, m, ACCESS_EXPRESSION, r, false, null);
     return r;
