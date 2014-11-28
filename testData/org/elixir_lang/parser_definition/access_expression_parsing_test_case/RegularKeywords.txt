@@ -1,0 +1,6 @@
+Elixir File(0,29)
+  PsiComment(ElixirTokenType.COMMENT)('# accessExpression(TRUE)')(0,24)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(24,25)
+    PsiElement(ElixirTokenType.EOL)('\n')(24,25)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(25,29)
+    PsiElement(ElixirTokenType.true)('true')(25,29)

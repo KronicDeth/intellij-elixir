@@ -62,6 +62,7 @@ accessExpression ::= numberCaptureOperation |
                      binaryString |
                      listString |
                      sigil |
+                     TRUE |
                      maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 private binaryString ::= string | stringHeredoc
