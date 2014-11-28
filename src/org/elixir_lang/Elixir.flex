@@ -416,6 +416,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
 
 END = "end"
 FN = "fn"
+TRUE = "true"
 
 /*
  *
@@ -558,6 +559,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_OPERATOR; }
+  // Must be before {IDENTIFIER} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.TRUE; }
   // Must be before {IDENTIFIER} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
