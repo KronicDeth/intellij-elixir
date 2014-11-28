@@ -414,6 +414,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  * Regular Keywords
  */
 
+END = "end"
 FN = "fn"
 
 /*
@@ -522,6 +523,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
   {EOL}                                      { return ElixirTypes.EOL; }
+  {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.END; }
   {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
   {CHAR_TOKEN}                               { return ElixirTypes.CHAR_TOKEN; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'

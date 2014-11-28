@@ -28,6 +28,7 @@
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DOT_OPERATOR = "."
+    END = "end"
     FN = "fn"
     IN_OPERATOR = "in"
     OPENING_BRACKET = "["
