@@ -415,6 +415,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  */
 
 END = "end"
+FALSE = "false"
 FN = "fn"
 TRUE = "true"
 
@@ -547,6 +548,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DUAL_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DUAL_OPERATOR; }
   {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
+  {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FN; }
   {HAT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);

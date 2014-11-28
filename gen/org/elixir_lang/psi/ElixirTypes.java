@@ -77,6 +77,7 @@ public interface ElixirTypes {
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
+  IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
