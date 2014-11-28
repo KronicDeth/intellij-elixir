@@ -49,6 +49,7 @@ Syntax highlighting for the following tokens:
   * Type (`::`)
   * Unary (`+`, `-`, `!`, `^`, `not`, and `~~~`)
   * When (`when`)
+* [Regular Keywords](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L963-L968) (`end`, `false`, `fn`, `nil`, and `true`)
 * [Sigils](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`~`)
   * CharList Sigils (`~c` and `~C`)
   * Regex Sigils (`~r` and `~R`)
