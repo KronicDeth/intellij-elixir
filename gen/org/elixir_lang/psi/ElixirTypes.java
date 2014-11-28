@@ -100,6 +100,7 @@ public interface ElixirTypes {
   IElementType MAP_OPERATOR = new ElixirTokenType("MAP_OPERATOR");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
+  IElementType NIL = new ElixirTokenType("nil");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");

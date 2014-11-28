@@ -141,6 +141,7 @@ public class InterpolationTest extends TokenTest {
                         { "identifier9", ElixirTypes.IDENTIFIER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "identifier?", ElixirTypes.IDENTIFIER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "in", ElixirTypes.IN_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                        { "nil", ElixirTypes.NIL, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "not", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "or", ElixirTypes.OR_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "true", ElixirTypes.TRUE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },

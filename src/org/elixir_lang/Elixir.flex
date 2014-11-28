@@ -417,6 +417,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
 END = "end"
 FALSE = "false"
 FN = "fn"
+NIL = "nil"
 TRUE = "true"
 
 /*
@@ -559,6 +560,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_OPERATOR; }
+  // Must be before {IDENTIFIER} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.NIL; }
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_OPERATOR; }

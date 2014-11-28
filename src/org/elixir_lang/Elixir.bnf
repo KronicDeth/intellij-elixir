@@ -32,6 +32,7 @@
     FALSE = "false"
     FN = "fn"
     IN_OPERATOR = "in"
+    NIL = "nil"
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
