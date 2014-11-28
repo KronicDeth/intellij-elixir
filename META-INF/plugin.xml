@@ -30,6 +30,7 @@
             <li>Dot Operator</li>
             <li>Keyword Lists</li>
             <li>Matched Expressions</li>
+            <li>Regular Keywords (<code>end</code>, <code>false</code>, <code>fn</code>, <code>nil</code>, and <code>true</code>)
           </ul>
         </li>
         <li>
