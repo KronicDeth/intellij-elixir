@@ -33,8 +33,9 @@
     END = "end"
     FALSE = "false"
     FN = "fn"
+    HEXADECIMAL_INTEGER_BASE = "x"
     IN_OPERATOR = "in"
-    INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9"+
+    INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
     NIL = "nil"
     OBSOLETE_BINARY_INTEGER_BASE = "B"
@@ -48,6 +49,7 @@
     TRUE = "true"
     UNKNOWN_INTEGER_BASE = "regexp:A-Zac-z"
     VALID_BINARY_DIGITS = "regexp:[01]+"
+    VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
   ]
 }
 
@@ -68,6 +70,7 @@ accessExpression ::= numberCaptureOperation |
                      CHAR_TOKEN |
                      NUMBER |
                      binaryNumber |
+                     hexadecimalNumber |
                      unknownBaseNumber |
                      list |
                      binaryString |
@@ -79,7 +82,6 @@ accessExpression ::= numberCaptureOperation |
                      maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryNumber ::= BASE_INTEGER_PREFIX (BINARY_INTEGER_BASE | OBSOLETE_BINARY_INTEGER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
-unknownBaseNumber ::= BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
@@ -94,6 +96,7 @@ endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
+hexadecimalNumber ::= BASE_INTEGER_PREFIX HEXADECIMAL_INTEGER_BASE (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
 identifierExpression ::= IDENTIFIER
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
@@ -256,3 +259,5 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
+
+unknownBaseNumber ::= BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }

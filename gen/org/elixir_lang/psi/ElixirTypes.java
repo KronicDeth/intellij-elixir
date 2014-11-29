@@ -16,6 +16,7 @@ public interface ElixirTypes {
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
+  IElementType HEXADECIMAL_NUMBER = new ElixirElementType("HEXADECIMAL_NUMBER");
   IElementType IDENTIFIER_EXPRESSION = new ElixirElementType("IDENTIFIER_EXPRESSION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
@@ -84,6 +85,7 @@ public interface ElixirTypes {
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
+  IElementType HEXADECIMAL_INTEGER_BASE = new ElixirTokenType("x");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_REGEX_SIGIL_NAME");
@@ -93,6 +95,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("INVALID_BINARY_DIGITS");
+  IElementType INVALID_HEXADECIMAL_DIGITS = new ElixirTokenType("INVALID_HEXADECIMAL_DIGITS");
   IElementType INVALID_UNKNOWN_BASE_DIGITS = new ElixirTokenType("INVALID_UNKNOWN_BASE_DIGITS");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
@@ -146,6 +149,7 @@ public interface ElixirTypes {
   IElementType UNKNOWN_INTEGER_BASE = new ElixirTokenType("UNKNOWN_INTEGER_BASE");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
+  IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
   IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
@@ -179,6 +183,9 @@ public interface ElixirTypes {
       }
       else if (type == EXPRESSION) {
         return new ElixirExpressionImpl(node);
+      }
+      else if (type == HEXADECIMAL_NUMBER) {
+        return new ElixirHexadecimalNumberImpl(node);
       }
       else if (type == IDENTIFIER_EXPRESSION) {
         return new ElixirIdentifierExpressionImpl(node);

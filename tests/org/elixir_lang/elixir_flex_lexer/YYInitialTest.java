@@ -71,7 +71,7 @@ public class YYInitialTest extends TokenTest {
                         { "0X0123456789abcdefABCDEF", ElixirTypes.BASE_INTEGER_PREFIX, ElixirFlexLexer.BASE_INTEGER_BASE, false },
                         { "0b10", ElixirTypes.BASE_INTEGER_PREFIX, ElixirFlexLexer.BASE_INTEGER_BASE, false },
                         { "0o01234567", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
-                        { "0x0123456789abcdefABCDEF", ElixirTypes.NUMBER, ElixirFlexLexer.YYINITIAL, true },
+                        { "0x0123456789abcdefABCDEF", ElixirTypes.BASE_INTEGER_PREFIX, ElixirFlexLexer.BASE_INTEGER_BASE, false },
                         { "1.", ElixirTypes.NUMBER, INITIAL_STATE, false },
                         { "1.0", ElixirTypes.NUMBER, INITIAL_STATE, true },
                         { "1.0e+1", ElixirTypes.NUMBER, INITIAL_STATE, true },

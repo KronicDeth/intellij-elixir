@@ -39,6 +39,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitHexadecimalNumber(@NotNull ElixirHexadecimalNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitIdentifierExpression(@NotNull ElixirIdentifierExpression o) {
     visitMatchedExpression(o);
   }
