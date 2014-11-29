@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -27,6 +28,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == ATOM) {
       r = atom(b, 0);
+    }
+    else if (t == BINARY_NUMBER) {
+      r = binaryNumber(b, 0);
     }
     else if (t == CHAR_LIST) {
       r = charList(b, 0);
@@ -142,6 +146,9 @@ public class ElixirParser implements PsiParser {
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
     }
+    else if (t == UNKNOWN_BASE_NUMBER) {
+      r = unknownBaseNumber(b, 0);
+    }
     else {
       r = parse_root_(t, b, 0);
     }
@@ -154,27 +161,29 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ATOM, MAX_EXPRESSION),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      LIST, MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
-      NUMBER_UNARY_OPERATION, SIGIL, STRING, STRING_HEREDOC),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION,
-      MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION,
-      MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION,
-      MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION,
-      MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION,
-      MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION,
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, LIST, MAX_EXPRESSION, NUMBER_AT_OPERATION,
       NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL, STRING,
-      STRING_HEREDOC),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      EMPTY_PARENTHESES, EXPRESSION, IDENTIFIER_EXPRESSION, LIST,
-      MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION,
-      MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION,
-      MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION,
-      MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
-      MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION,
-      SIGIL, STRING, STRING_HEREDOC),
+      STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION,
+      MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
+      MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION,
+      MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
+      MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
+      MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION,
+      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL,
+      STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, EMPTY_PARENTHESES, EXPRESSION, IDENTIFIER_EXPRESSION,
+      LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION,
+      MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION,
+      MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION,
+      MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
+      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
+      MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
+      NUMBER_UNARY_OPERATION, SIGIL, STRING, STRING_HEREDOC,
+      UNKNOWN_BASE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -197,6 +206,46 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, ATOM_FRAGMENT);
     if (!r) r = quote(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_INTEGER_PREFIX BINARY_INTEGER_BASE (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  public static boolean binaryNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryNumber")) return false;
+    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, BASE_INTEGER_PREFIX, BINARY_INTEGER_BASE);
+    r = r && binaryNumber_2(b, l + 1);
+    exit_section_(b, m, BINARY_NUMBER, r);
+    return r;
+  }
+
+  // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  private static boolean binaryNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = binaryNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!binaryNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "binaryNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+  private static boolean binaryNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_BINARY_DIGITS);
+    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1463,6 +1512,35 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+
+  public static boolean unknownBaseNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseNumber")) return false;
+    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, BASE_INTEGER_PREFIX, UNKNOWN_INTEGER_BASE);
+    r = r && unknownBaseNumber_2(b, l + 1);
+    exit_section_(b, m, UNKNOWN_BASE_NUMBER, r);
+    return r;
+  }
+
+  // INVALID_UNKNOWN_BASE_DIGITS+
+  private static boolean unknownBaseNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS);
+    int c = current_position_(b);
+    while (r) {
+      if (!consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS)) break;
+      if (!empty_element_parsed_guard_(b, "unknownBaseNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // Expression root: matchedExpression
   // Operator priority table:
   // 0: PREFIX(matchedExpressionCaptureOperation)
@@ -2277,6 +2355,8 @@ public class ElixirParser implements PsiParser {
   //                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
   //                      CHAR_TOKEN |
   //                      NUMBER |
+  //                      binaryNumber |
+  //                      unknownBaseNumber |
   //                      list |
   //                      binaryString |
   //                      listString |
@@ -2295,6 +2375,8 @@ public class ElixirParser implements PsiParser {
     if (!r) r = accessExpression_3(b, l + 1);
     if (!r) r = consumeTokenSmart(b, CHAR_TOKEN);
     if (!r) r = consumeTokenSmart(b, NUMBER);
+    if (!r) r = binaryNumber(b, l + 1);
+    if (!r) r = unknownBaseNumber(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);

@@ -15,6 +15,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMaxExpression(o);
   }
 
+  public void visitBinaryNumber(@NotNull ElixirBinaryNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
     visitAccessExpression(o);
   }
@@ -164,6 +168,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
+    visitAccessExpression(o);
+  }
+
+  public void visitUnknownBaseNumber(@NotNull ElixirUnknownBaseNumber o) {
     visitAccessExpression(o);
   }
 

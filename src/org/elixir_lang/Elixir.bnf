@@ -8,7 +8,7 @@
    */
 
   extends("emptyParentheses|matchedExpression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|list|sigil|string(Heredoc)?")=accessExpression
+  extends("charList(Heredoc)?|maxExpression|number.*Operation|.*Number|list|sigil|string(Heredoc)?")=accessExpression
   extends("accessExpression|identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
   extends("atom|dotAlias")=maxExpression
 
@@ -22,6 +22,8 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    BASE_INTEGER_PREFIX = "0"
+    BINARY_INTEGER_BASE = "b"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
@@ -32,6 +34,8 @@
     FALSE = "false"
     FN = "fn"
     IN_OPERATOR = "in"
+    INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9"+
+    INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
     NIL = "nil"
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
@@ -41,6 +45,8 @@
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
     TRUE = "true"
+    UNKNOWN_INTEGER_BASE = "regexp:A-Zac-z"
+    VALID_BINARY_DIGITS = "regexp:[01]+"
   ]
 }
 
@@ -60,6 +66,8 @@ accessExpression ::= numberCaptureOperation |
                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
                      CHAR_TOKEN |
                      NUMBER |
+                     binaryNumber |
+                     unknownBaseNumber |
                      list |
                      binaryString |
                      listString |
@@ -69,6 +77,8 @@ accessExpression ::= numberCaptureOperation |
                      TRUE |
                      maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
+binaryNumber ::= BASE_INTEGER_PREFIX BINARY_INTEGER_BASE (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+unknownBaseNumber ::= BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+
 private binaryString ::= string | stringHeredoc
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody

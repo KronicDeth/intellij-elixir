@@ -317,9 +317,11 @@ COMMENT = "#" [^\r\n]*
  */
 
 BASE_INTEGER_PREFIX = "0"
+BASE_INTEGER_BASE = [A-Za-z]
 
-BINARY_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "b"
-BINARY_INTEGER = {BINARY_INTEGER_PREFIX} [01]+
+BINARY_INTEGER_BASE = "b"
+VALID_BINARY_DIGITS = [01]+
+INVALID_BINARY_DIGITS = [A-Za-z2-9]+
 
 DIGIT = [0-9]
 DECIMAL_SEPARATOR = "_"
@@ -331,7 +333,9 @@ HEXADECIMAL_INTEGER = {HEXADECIMAL_INTEGER_PREFIX} {HEXADECIMAL_DIGIT}+
 OCTAL_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "o"
 OCTAL_INTEGER = {OCTAL_INTEGER_PREFIX} [0-7]+
 
-INTEGER = {BINARY_INTEGER} | {DECIMAL_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
+INVALID_UNKNOWN_BASE_DIGITS = [A-Za-z0-9]+
+
+INTEGER = {DECIMAL_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
 
 
 /*
@@ -492,6 +496,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 %state ATOM_BODY
 %state ATOM_START
+%state BASE_INTEGER_BASE
+%state BINARY_INTEGER
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
@@ -502,6 +508,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state NAMED_SIGIL
 %state SIGIL
 %state SIGIL_MODIFIERS
+%state UNKNOWN_BASE_INTEGER
 
 %%
 
@@ -519,6 +526,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.ALIAS; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
+  // Must be before {BASE_INTEGER_PREFIX} / {BASE_INTEGER_BASE} so that hexadecimal and octal don't match that pattern.
+  {INTEGER}                                  { return ElixirTypes.NUMBER; }
+  {BASE_INTEGER_PREFIX} / {BASE_INTEGER_BASE} { pushAndBegin(BASE_INTEGER_BASE);
+                                                return ElixirTypes.BASE_INTEGER_PREFIX; }
   {BIT_STRING_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -577,7 +588,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.WHEN_OPERATOR; }
   {IDENTIFIER}                               { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER; }
-  {INTEGER}                                  { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
   {MAP_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -643,6 +653,20 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                      yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT; }
   {EOL}            { return TokenType.BAD_CHARACTER; }
+}
+
+<BASE_INTEGER_BASE> {
+  {BINARY_INTEGER_BASE} { yybegin(BINARY_INTEGER);
+                          return ElixirTypes.BINARY_INTEGER_BASE; }
+  {BASE_INTEGER_BASE}   { yybegin(UNKNOWN_BASE_INTEGER);
+                          return ElixirTypes.UNKNOWN_INTEGER_BASE; }
+}
+
+<BINARY_INTEGER> {
+  {INVALID_BINARY_DIGITS} { return ElixirTypes.INVALID_BINARY_DIGITS; }
+  {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
+  {EOL}|.                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                            handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <GROUP,
@@ -761,6 +785,12 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
   {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<UNKNOWN_BASE_INTEGER> {
+  {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
+  {EOL}|.                       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                  handleInState(stackFrame.getLastLexicalState()); }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states
