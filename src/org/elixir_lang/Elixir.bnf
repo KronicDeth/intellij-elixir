@@ -78,7 +78,7 @@ accessExpression ::= numberCaptureOperation |
                      maxExpression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryNumber ::= BASE_INTEGER_PREFIX BINARY_INTEGER_BASE (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
-unknownBaseNumber ::= BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+
+unknownBaseNumber ::= BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
