@@ -215,12 +215,13 @@ public class ElixirParser implements PsiParser {
   public static boolean binaryNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryNumber")) return false;
     if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, BASE_INTEGER_PREFIX, BINARY_INTEGER_BASE);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, BINARY_INTEGER_BASE);
+    p = r; // pin = 2
     r = r && binaryNumber_2(b, l + 1);
-    exit_section_(b, m, BINARY_NUMBER, r);
-    return r;
+    exit_section_(b, l, m, BINARY_NUMBER, r, p, null);
+    return r || p;
   }
 
   // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
