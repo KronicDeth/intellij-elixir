@@ -320,6 +320,7 @@ BASE_INTEGER_PREFIX = "0"
 BASE_INTEGER_BASE = [A-Za-z]
 
 BINARY_INTEGER_BASE = "b"
+OBSOLETE_BINARY_INTEGER_BASE = "B"
 VALID_BINARY_DIGITS = [01]+
 INVALID_BINARY_DIGITS = [A-Za-z2-9]+
 
@@ -656,10 +657,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <BASE_INTEGER_BASE> {
-  {BINARY_INTEGER_BASE} { yybegin(BINARY_INTEGER);
-                          return ElixirTypes.BINARY_INTEGER_BASE; }
-  {BASE_INTEGER_BASE}   { yybegin(UNKNOWN_BASE_INTEGER);
-                          return ElixirTypes.UNKNOWN_INTEGER_BASE; }
+  {BINARY_INTEGER_BASE}          { yybegin(BINARY_INTEGER);
+                                   return ElixirTypes.BINARY_INTEGER_BASE; }
+  {OBSOLETE_BINARY_INTEGER_BASE} { yybegin(BINARY_INTEGER);
+                                   return ElixirTypes.OBSOLETE_BINARY_INTEGER_BASE; }
+  // Must be after any specific integer bases
+  {BASE_INTEGER_BASE}            { yybegin(UNKNOWN_BASE_INTEGER);
+                                   return ElixirTypes.UNKNOWN_INTEGER_BASE; }
 }
 
 <BINARY_INTEGER> {

@@ -210,17 +210,29 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX BINARY_INTEGER_BASE (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  // BASE_INTEGER_PREFIX (BINARY_INTEGER_BASE | OBSOLETE_BINARY_INTEGER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
   public static boolean binaryNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryNumber")) return false;
     if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, BINARY_INTEGER_BASE);
+    r = consumeToken(b, BASE_INTEGER_PREFIX);
+    r = r && binaryNumber_1(b, l + 1);
     p = r; // pin = 2
     r = r && binaryNumber_2(b, l + 1);
     exit_section_(b, l, m, BINARY_NUMBER, r, p, null);
     return r || p;
+  }
+
+  // BINARY_INTEGER_BASE | OBSOLETE_BINARY_INTEGER_BASE
+  private static boolean binaryNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryNumber_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, BINARY_INTEGER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_BINARY_INTEGER_BASE);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+

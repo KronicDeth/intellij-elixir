@@ -41,7 +41,7 @@ public class BaseIntegerBaseTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                 { "A", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
-                { "B", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
+                { "B", ElixirTypes.OBSOLETE_BINARY_INTEGER_BASE, ElixirFlexLexer.BINARY_INTEGER },
                 { "C", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "D", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "E", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
