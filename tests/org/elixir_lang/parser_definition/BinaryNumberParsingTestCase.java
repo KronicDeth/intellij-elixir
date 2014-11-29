@@ -8,6 +8,14 @@ public class BinaryNumberParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testObsoleteNoDigits() {
+        doTest(true);
+    }
+
+    public void testObsoleteValid() {
+        doTest(true);
+    }
+
     public void testValid() {
         doTest(true);
     }
