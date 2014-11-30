@@ -27,6 +27,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitDecimalNumber(@NotNull ElixirDecimalNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitExpression(o);
   }

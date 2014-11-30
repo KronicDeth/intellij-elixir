@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType BINARY_NUMBER = new ElixirElementType("BINARY_NUMBER");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
@@ -79,6 +80,7 @@ public interface ElixirTypes {
   IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
+  IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType END = new ElixirTokenType("end");
@@ -96,6 +98,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("INVALID_BINARY_DIGITS");
+  IElementType INVALID_DECIMAL_DIGITS = new ElixirTokenType("INVALID_DECIMAL_DIGITS");
   IElementType INVALID_HEXADECIMAL_DIGITS = new ElixirTokenType("INVALID_HEXADECIMAL_DIGITS");
   IElementType INVALID_OCTAL_DIGITS = new ElixirTokenType("INVALID_OCTAL_DIGITS");
   IElementType INVALID_UNKNOWN_BASE_DIGITS = new ElixirTokenType("INVALID_UNKNOWN_BASE_DIGITS");
@@ -152,6 +155,7 @@ public interface ElixirTypes {
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
   IElementType UNKNOWN_INTEGER_BASE = new ElixirTokenType("UNKNOWN_INTEGER_BASE");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
+  IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("VALID_DECIMAL_DIGITS");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
   IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
   IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("VALID_OCTAL_DIGITS");
@@ -179,6 +183,9 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
+      }
+      else if (type == DECIMAL_NUMBER) {
+        return new ElixirDecimalNumberImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);

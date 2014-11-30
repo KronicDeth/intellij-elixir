@@ -29,6 +29,7 @@
     CLOSING_PARENTHESIS = ")"
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    DECIMAL_SEPARATOR = "_"
     DOT_OPERATOR = "."
     END = "end"
     FALSE = "false"
@@ -72,6 +73,7 @@ accessExpression ::= numberCaptureOperation |
                      CHAR_TOKEN |
                      NUMBER |
                      binaryNumber |
+                     decimalNumber |
                      hexadecimalNumber |
                      octalNumber |
                      unknownBaseNumber |
@@ -93,6 +95,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 private containerExpression ::= emptyParentheses
+decimalNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
