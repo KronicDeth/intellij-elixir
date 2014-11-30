@@ -237,7 +237,7 @@ numberAtOperation ::= AT_OPERATOR EOL* NUMBER
 numberCaptureOperation ::= CAPTURE_OPERATOR EOL* NUMBER
 numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* NUMBER
 
-octalNumber ::= BASE_INTEGER_PREFIX OCTAL_INTEGER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+octalNumber ::= BASE_INTEGER_PREFIX OCTAL_INTEGER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
 
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
