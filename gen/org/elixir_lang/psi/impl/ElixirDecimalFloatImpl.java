@@ -10,21 +10,21 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirNumberAtOperationImpl extends ElixirAccessExpressionImpl implements ElixirNumberAtOperation {
+public class ElixirDecimalFloatImpl extends ElixirDecimalNumberImpl implements ElixirDecimalFloat {
 
-  public ElixirNumberAtOperationImpl(ASTNode node) {
+  public ElixirDecimalFloatImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNumberAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDecimalFloat(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public ElixirNumber getNumber() {
-    return findNotNullChildByClass(ElixirNumber.class);
+  public List<ElixirDecimalWholeNumber> getDecimalWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDecimalWholeNumber.class);
   }
 
 }

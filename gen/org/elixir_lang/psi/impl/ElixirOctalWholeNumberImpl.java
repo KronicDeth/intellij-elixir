@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirOctalWholeNumberImpl extends ElixirAccessExpressionImpl implements ElixirOctalWholeNumber {
+public class ElixirOctalWholeNumberImpl extends ElixirNumberImpl implements ElixirOctalWholeNumber {
 
   public ElixirOctalWholeNumberImpl(ASTNode node) {
     super(node);

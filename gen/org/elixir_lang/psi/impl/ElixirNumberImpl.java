@@ -10,21 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirNumberAtOperationImpl extends ElixirAccessExpressionImpl implements ElixirNumberAtOperation {
+public class ElixirNumberImpl extends ElixirAccessExpressionImpl implements ElixirNumber {
 
-  public ElixirNumberAtOperationImpl(ASTNode node) {
+  public ElixirNumberImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNumberAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNumber(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public ElixirNumber getNumber() {
-    return findNotNullChildByClass(ElixirNumber.class);
   }
 
 }

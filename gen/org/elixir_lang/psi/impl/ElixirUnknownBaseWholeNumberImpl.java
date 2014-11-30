@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirUnknownBaseWholeNumberImpl extends ElixirAccessExpressionImpl implements ElixirUnknownBaseWholeNumber {
+public class ElixirUnknownBaseWholeNumberImpl extends ElixirNumberImpl implements ElixirUnknownBaseWholeNumber {
 
   public ElixirUnknownBaseWholeNumberImpl(ASTNode node) {
     super(node);

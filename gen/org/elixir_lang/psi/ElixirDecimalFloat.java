@@ -5,6 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirDecimalWholeNumber extends ElixirNumber {
+public interface ElixirDecimalFloat extends ElixirDecimalNumber {
+
+  @NotNull
+  List<ElixirDecimalWholeNumber> getDecimalWholeNumberList();
 
 }

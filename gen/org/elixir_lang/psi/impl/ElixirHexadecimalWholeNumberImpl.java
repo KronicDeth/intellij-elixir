@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirHexadecimalWholeNumberImpl extends ElixirAccessExpressionImpl implements ElixirHexadecimalWholeNumber {
+public class ElixirHexadecimalWholeNumberImpl extends ElixirNumberImpl implements ElixirHexadecimalWholeNumber {
 
   public ElixirHexadecimalWholeNumberImpl(ASTNode node) {
     super(node);

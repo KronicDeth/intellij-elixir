@@ -5,6 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirHexadecimalWholeNumber extends ElixirAccessExpression {
+public interface ElixirHexadecimalWholeNumber extends ElixirNumber {
 
 }

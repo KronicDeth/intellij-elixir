@@ -376,9 +376,6 @@ INTERPOLATION_END = "}"
 
 DECIMAL_MARK = "."
 EXPONENT_MARK = [Ee]
-EXPONENT_SIGN = [+-]
-DECIMAL_WHOLE_NUMBER = {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? ({INVALID_DECIMAL_DIGITS} | {VALID_DECIMAL_DIGITS}))*
-DECIMAL_FLOAT = {DECIMAL_WHOLE_NUMBER} {DECIMAL_MARK} {DECIMAL_WHOLE_NUMBER} ({EXPONENT_MARK} {EXPONENT_SIGN}? {DECIMAL_WHOLE_NUMBER})?
 
 /*
  * List
@@ -506,6 +503,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state ATOM_START
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
+%state DECIMAL_EXPONENT
+%state DECIMAL_EXPONENT_SIGN
+%state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
 %state GROUP
 %state GROUP_HEREDOC_END
@@ -568,7 +568,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
   {DUAL_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DUAL_OPERATOR; }
-  {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
   {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -689,7 +688,25 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
+<DECIMAL_EXPONENT_SIGN> {
+  {DUAL_OPERATOR} { yybegin(DECIMAL_EXPONENT);
+                    return ElixirTypes.DUAL_OPERATOR; }
+  {EOL}|.         { handleInState(DECIMAL_EXPONENT); }
+}
+
+<DECIMAL_FRACTION> {
+  {EXPONENT_MARK} { yybegin(DECIMAL_EXPONENT_SIGN);
+                    return ElixirTypes.EXPONENT_MARK; }
+}
+
 <DECIMAL_WHOLE_NUMBER> {
+  {DECIMAL_MARK} { yybegin(DECIMAL_FRACTION);
+                   return ElixirTypes.DECIMAL_MARK; }
+}
+
+<DECIMAL_EXPONENT,
+ DECIMAL_FRACTION,
+ DECIMAL_WHOLE_NUMBER> {
   {DECIMAL_SEPARATOR}      { return ElixirTypes.DECIMAL_SEPARATOR; }
   {INVALID_DECIMAL_DIGITS} { return ElixirTypes.INVALID_DECIMAL_DIGITS; }
   {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }

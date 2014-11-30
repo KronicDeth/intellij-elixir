@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirNumberCaptureOperation extends ElixirAccessExpression {
 
+  @NotNull
+  ElixirNumber getNumber();
+
 }

@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirDecimalWholeNumberImpl extends ElixirAccessExpressionImpl implements ElixirDecimalWholeNumber {
+public class ElixirDecimalWholeNumberImpl extends ElixirNumberImpl implements ElixirDecimalWholeNumber {
 
   public ElixirDecimalWholeNumberImpl(ASTNode node) {
     super(node);

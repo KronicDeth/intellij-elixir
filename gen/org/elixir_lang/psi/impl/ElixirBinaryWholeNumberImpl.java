@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirBinaryWholeNumberImpl extends ElixirAccessExpressionImpl implements ElixirBinaryWholeNumber {
+public class ElixirBinaryWholeNumberImpl extends ElixirNumberImpl implements ElixirBinaryWholeNumber {
 
   public ElixirBinaryWholeNumberImpl(ASTNode node) {
     super(node);

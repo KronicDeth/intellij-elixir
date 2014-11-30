@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirNumberUnaryOperation extends ElixirAccessExpression {
 
+  @NotNull
+  ElixirNumber getNumber();
+
 }

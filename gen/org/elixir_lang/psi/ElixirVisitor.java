@@ -16,7 +16,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
-    visitAccessExpression(o);
+    visitNumber(o);
   }
 
   public void visitCharList(@NotNull ElixirCharList o) {
@@ -27,8 +27,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
+    visitDecimalNumber(o);
+  }
+
+  public void visitDecimalNumber(@NotNull ElixirDecimalNumber o) {
+    visitNumber(o);
+  }
+
   public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
-    visitAccessExpression(o);
+    visitNumber(o);
   }
 
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
@@ -44,7 +52,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
-    visitAccessExpression(o);
+    visitNumber(o);
   }
 
   public void visitIdentifierExpression(@NotNull ElixirIdentifierExpression o) {
@@ -155,6 +163,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitNumber(@NotNull ElixirNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitNumberAtOperation(@NotNull ElixirNumberAtOperation o) {
     visitAccessExpression(o);
   }
@@ -168,7 +180,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
-    visitAccessExpression(o);
+    visitNumber(o);
   }
 
   public void visitSigil(@NotNull ElixirSigil o) {
@@ -184,7 +196,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
-    visitAccessExpression(o);
+    visitNumber(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {
