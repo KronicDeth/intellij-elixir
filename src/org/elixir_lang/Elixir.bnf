@@ -96,7 +96,7 @@ endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
-hexadecimalNumber ::= BASE_INTEGER_PREFIX HEXADECIMAL_INTEGER_BASE (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+hexadecimalNumber ::= BASE_INTEGER_PREFIX HEXADECIMAL_INTEGER_BASE (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 identifierExpression ::= IDENTIFIER
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*

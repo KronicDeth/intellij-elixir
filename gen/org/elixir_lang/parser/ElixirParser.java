@@ -1,15 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -515,12 +514,13 @@ public class ElixirParser implements PsiParser {
   public static boolean hexadecimalNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalNumber")) return false;
     if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, BASE_INTEGER_PREFIX, HEXADECIMAL_INTEGER_BASE);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, HEXADECIMAL_INTEGER_BASE);
+    p = r; // pin = 2
     r = r && hexadecimalNumber_2(b, l + 1);
-    exit_section_(b, m, HEXADECIMAL_NUMBER, r);
-    return r;
+    exit_section_(b, l, m, HEXADECIMAL_NUMBER, r, p, null);
+    return r || p;
   }
 
   // (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
