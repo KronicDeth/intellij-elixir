@@ -80,7 +80,7 @@ public class BaseIntegerBaseTest extends TokenTest {
                 { "l", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "m", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "n", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
-                { "o", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
+                { "o", ElixirTypes.OCTAL_INTEGER_BASE, ElixirFlexLexer.OCTAL_INTEGER },
                 { "p", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "q", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },
                 { "r", ElixirTypes.UNKNOWN_INTEGER_BASE, ElixirFlexLexer.UNKNOWN_BASE_INTEGER },

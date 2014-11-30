@@ -139,6 +139,9 @@ public class ElixirParser implements PsiParser {
     else if (t == NUMBER_UNARY_OPERATION) {
       r = numberUnaryOperation(b, 0);
     }
+    else if (t == OCTAL_NUMBER) {
+      r = octalNumber(b, 0);
+    }
     else if (t == SIGIL) {
       r = sigil(b, 0);
     }
@@ -165,8 +168,8 @@ public class ElixirParser implements PsiParser {
     create_token_set_(ATOM, MAX_EXPRESSION),
     create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
       CHAR_LIST_HEREDOC, HEXADECIMAL_NUMBER, LIST, MAX_EXPRESSION,
-      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL,
-      STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
     create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
       CHAR_LIST_HEREDOC, HEXADECIMAL_NUMBER, IDENTIFIER_EXPRESSION, LIST,
       MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION,
@@ -175,7 +178,8 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION,
       MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
       MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+      OCTAL_NUMBER, SIGIL, STRING, STRING_HEREDOC,
+      UNKNOWN_BASE_NUMBER),
     create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
       CHAR_LIST_HEREDOC, EMPTY_PARENTHESES, EXPRESSION, HEXADECIMAL_NUMBER,
       IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION,
@@ -184,8 +188,8 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION,
       MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION,
       MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION,
-      NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL, STRING,
-      STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+      NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_NUMBER, SIGIL,
+      STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -1489,6 +1493,46 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // BASE_INTEGER_PREFIX OCTAL_INTEGER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  public static boolean octalNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalNumber")) return false;
+    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, BASE_INTEGER_PREFIX, OCTAL_INTEGER_BASE);
+    r = r && octalNumber_2(b, l + 1);
+    exit_section_(b, m, OCTAL_NUMBER, r);
+    return r;
+  }
+
+  // (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  private static boolean octalNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = octalNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!octalNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "octalNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
+  private static boolean octalNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_OCTAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_OCTAL_DIGITS);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // charList | string
   static boolean quote(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "quote")) return false;
@@ -2426,6 +2470,7 @@ public class ElixirParser implements PsiParser {
   //                      NUMBER |
   //                      binaryNumber |
   //                      hexadecimalNumber |
+  //                      octalNumber |
   //                      unknownBaseNumber |
   //                      list |
   //                      binaryString |
@@ -2447,6 +2492,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeTokenSmart(b, NUMBER);
     if (!r) r = binaryNumber(b, l + 1);
     if (!r) r = hexadecimalNumber(b, l + 1);
+    if (!r) r = octalNumber(b, l + 1);
     if (!r) r = unknownBaseNumber(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);

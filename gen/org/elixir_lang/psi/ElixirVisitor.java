@@ -163,6 +163,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitOctalNumber(@NotNull ElixirOctalNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitSigil(@NotNull ElixirSigil o) {
     visitAccessExpression(o);
   }

@@ -47,6 +47,7 @@ public interface ElixirTypes {
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
   IElementType NUMBER_UNARY_OPERATION = new ElixirElementType("NUMBER_UNARY_OPERATION");
+  IElementType OCTAL_NUMBER = new ElixirElementType("OCTAL_NUMBER");
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
@@ -96,6 +97,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("INVALID_BINARY_DIGITS");
   IElementType INVALID_HEXADECIMAL_DIGITS = new ElixirTokenType("INVALID_HEXADECIMAL_DIGITS");
+  IElementType INVALID_OCTAL_DIGITS = new ElixirTokenType("INVALID_OCTAL_DIGITS");
   IElementType INVALID_UNKNOWN_BASE_DIGITS = new ElixirTokenType("INVALID_UNKNOWN_BASE_DIGITS");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
@@ -113,6 +115,7 @@ public interface ElixirTypes {
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType OBSOLETE_BINARY_INTEGER_BASE = new ElixirTokenType("B");
   IElementType OBSOLETE_HEXADECIMAL_INTEGER_BASE = new ElixirTokenType("X");
+  IElementType OCTAL_INTEGER_BASE = new ElixirTokenType("o");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
@@ -151,6 +154,7 @@ public interface ElixirTypes {
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
   IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
+  IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("VALID_OCTAL_DIGITS");
   IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
@@ -277,6 +281,9 @@ public interface ElixirTypes {
       }
       else if (type == NUMBER_UNARY_OPERATION) {
         return new ElixirNumberUnaryOperationImpl(node);
+      }
+      else if (type == OCTAL_NUMBER) {
+        return new ElixirOctalNumberImpl(node);
       }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);

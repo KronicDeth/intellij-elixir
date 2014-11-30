@@ -333,12 +333,13 @@ OBSOLETE_HEXADECIMAL_INTEGER_BASE = "X"
 VALID_HEXADECIMAL_DIGITS = {HEXADECIMAL_DIGIT}+
 INVALID_HEXADECIMAL_DIGITS = [G-Zg-z]+
 
-OCTAL_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "o"
-OCTAL_INTEGER = {OCTAL_INTEGER_PREFIX} [0-7]+
+OCTAL_INTEGER_BASE = "o"
+VALID_OCTAL_DIGITS = [0-7]+
+INVALID_OCTAL_DIGITS = [A-Za-z8-9]+
 
 INVALID_UNKNOWN_BASE_DIGITS = [A-Za-z0-9]+
 
-INTEGER = {DECIMAL_INTEGER} | {OCTAL_INTEGER}
+INTEGER = {DECIMAL_INTEGER}
 
 
 /*
@@ -510,6 +511,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
+%state OCTAL_INTEGER
 %state SIGIL
 %state SIGIL_MODIFIERS
 %state UNKNOWN_BASE_INTEGER
@@ -668,6 +670,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                    return ElixirTypes.OBSOLETE_BINARY_INTEGER_BASE; }
   {OBSOLETE_HEXADECIMAL_INTEGER_BASE} { yybegin(HEXADECIMAL_INTEGER);
                                         return ElixirTypes.OBSOLETE_HEXADECIMAL_INTEGER_BASE; }
+  {OCTAL_INTEGER_BASE}           { yybegin(OCTAL_INTEGER);
+                                   return ElixirTypes.OCTAL_INTEGER_BASE; }
   // Must be after any specific integer bases
   {BASE_INTEGER_BASE}            { yybegin(UNKNOWN_BASE_INTEGER);
                                    return ElixirTypes.UNKNOWN_INTEGER_BASE; }
@@ -790,6 +794,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_PROMOTER}         { setPromoter(yytext());
                              yybegin(GROUP);
                              return promoterType(); }
+}
+
+<OCTAL_INTEGER> {
+  {INVALID_OCTAL_DIGITS} { return ElixirTypes.INVALID_OCTAL_DIGITS; }
+  {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
+  {EOL}|.                { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                           handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <SIGIL> {
