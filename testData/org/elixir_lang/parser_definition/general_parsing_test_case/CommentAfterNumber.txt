@@ -1,5 +1,5 @@
 Elixir File(0,29)
-  ElixirHexadecimalNumberImpl(HEXADECIMAL_NUMBER)(0,6)
+  ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(0,6)
     PsiElement(ElixirTokenType.0)('0')(0,1)
     PsiElement(ElixirTokenType.x)('x')(1,2)
     PsiElement(ElixirTokenType.VALID_HEXADECIMAL_DIGITS)('1234')(2,6)

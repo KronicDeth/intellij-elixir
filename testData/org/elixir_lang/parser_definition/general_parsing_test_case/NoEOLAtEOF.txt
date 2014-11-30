@@ -1,5 +1,5 @@
 Elixir File(0,10)
-  ElixirHexadecimalNumberImpl(HEXADECIMAL_NUMBER)(0,10)
+  ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(0,10)
     PsiElement(ElixirTokenType.0)('0')(0,1)
     PsiElement(ElixirTokenType.x)('x')(1,2)
     PsiElement(ElixirTokenType.VALID_HEXADECIMAL_DIGITS)('deadbeaf')(2,10)

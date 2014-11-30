@@ -15,7 +15,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMaxExpression(o);
   }
 
-  public void visitBinaryNumber(@NotNull ElixirBinaryNumber o) {
+  public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
     visitAccessExpression(o);
   }
 
@@ -27,7 +27,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
-  public void visitDecimalNumber(@NotNull ElixirDecimalNumber o) {
+  public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
     visitAccessExpression(o);
   }
 
@@ -43,7 +43,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitHexadecimalNumber(@NotNull ElixirHexadecimalNumber o) {
+  public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
     visitAccessExpression(o);
   }
 
@@ -167,7 +167,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
-  public void visitOctalNumber(@NotNull ElixirOctalNumber o) {
+  public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
     visitAccessExpression(o);
   }
 
@@ -183,7 +183,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
-  public void visitUnknownBaseNumber(@NotNull ElixirUnknownBaseNumber o) {
+  public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitAccessExpression(o);
   }
 

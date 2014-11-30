@@ -1,8 +1,0 @@
-Elixir File(0,98)
-  PsiComment(ElixirTokenType.COMMENT)('# all invalid unknown base digits')(0,33)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(33,34)
-    PsiElement(ElixirTokenType.EOL)('\n')(33,34)
-  ElixirUnknownBaseNumberImpl(UNKNOWN_BASE_NUMBER)(34,98)
-    PsiElement(ElixirTokenType.0)('0')(34,35)
-    PsiElement(ElixirTokenType.UNKNOWN_INTEGER_BASE)('z')(35,36)
-    PsiElement(ElixirTokenType.INVALID_UNKNOWN_BASE_DIGITS)('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')(36,98)

@@ -28,8 +28,8 @@ public class ElixirParser implements PsiParser {
     else if (t == ATOM) {
       r = atom(b, 0);
     }
-    else if (t == BINARY_NUMBER) {
-      r = binaryNumber(b, 0);
+    else if (t == BINARY_WHOLE_NUMBER) {
+      r = binaryWholeNumber(b, 0);
     }
     else if (t == CHAR_LIST) {
       r = charList(b, 0);
@@ -37,8 +37,8 @@ public class ElixirParser implements PsiParser {
     else if (t == CHAR_LIST_HEREDOC) {
       r = charListHeredoc(b, 0);
     }
-    else if (t == DECIMAL_NUMBER) {
-      r = decimalNumber(b, 0);
+    else if (t == DECIMAL_WHOLE_NUMBER) {
+      r = decimalWholeNumber(b, 0);
     }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
@@ -49,8 +49,8 @@ public class ElixirParser implements PsiParser {
     else if (t == EXPRESSION) {
       r = expression(b, 0);
     }
-    else if (t == HEXADECIMAL_NUMBER) {
-      r = hexadecimalNumber(b, 0);
+    else if (t == HEXADECIMAL_WHOLE_NUMBER) {
+      r = hexadecimalWholeNumber(b, 0);
     }
     else if (t == IDENTIFIER_EXPRESSION) {
       r = identifierExpression(b, 0);
@@ -142,8 +142,8 @@ public class ElixirParser implements PsiParser {
     else if (t == NUMBER_UNARY_OPERATION) {
       r = numberUnaryOperation(b, 0);
     }
-    else if (t == OCTAL_NUMBER) {
-      r = octalNumber(b, 0);
+    else if (t == OCTAL_WHOLE_NUMBER) {
+      r = octalWholeNumber(b, 0);
     }
     else if (t == SIGIL) {
       r = sigil(b, 0);
@@ -154,8 +154,8 @@ public class ElixirParser implements PsiParser {
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
     }
-    else if (t == UNKNOWN_BASE_NUMBER) {
-      r = unknownBaseNumber(b, 0);
+    else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
+      r = unknownBaseWholeNumber(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -169,31 +169,31 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ATOM, MAX_EXPRESSION),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
-      CHAR_LIST_HEREDOC, DECIMAL_NUMBER, HEXADECIMAL_NUMBER, LIST,
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, LIST,
       MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION,
-      OCTAL_NUMBER, SIGIL, STRING, STRING_HEREDOC,
-      UNKNOWN_BASE_NUMBER),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
-      CHAR_LIST_HEREDOC, DECIMAL_NUMBER, HEXADECIMAL_NUMBER, IDENTIFIER_EXPRESSION,
+      OCTAL_WHOLE_NUMBER, SIGIL, STRING, STRING_HEREDOC,
+      UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION,
       LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION,
       MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION,
       MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION,
       MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
       MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
       MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
-      NUMBER_UNARY_OPERATION, OCTAL_NUMBER, SIGIL, STRING,
-      STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_NUMBER, CHAR_LIST,
-      CHAR_LIST_HEREDOC, DECIMAL_NUMBER, EMPTY_PARENTHESES, EXPRESSION,
-      HEXADECIMAL_NUMBER, IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION,
+      NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL, STRING,
+      STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_WHOLE_NUMBER, EMPTY_PARENTHESES, EXPRESSION,
+      HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION,
       MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
       MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION,
       MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
       MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
       MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION,
-      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_NUMBER),
+      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -221,59 +221,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX (BINARY_INTEGER_BASE | OBSOLETE_BINARY_INTEGER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
-  public static boolean binaryNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "binaryNumber")) return false;
-    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, BASE_INTEGER_PREFIX);
-    r = r && binaryNumber_1(b, l + 1);
-    p = r; // pin = 2
-    r = r && binaryNumber_2(b, l + 1);
-    exit_section_(b, l, m, BINARY_NUMBER, r, p, null);
-    return r || p;
-  }
-
-  // BINARY_INTEGER_BASE | OBSOLETE_BINARY_INTEGER_BASE
-  private static boolean binaryNumber_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "binaryNumber_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, BINARY_INTEGER_BASE);
-    if (!r) r = consumeToken(b, OBSOLETE_BINARY_INTEGER_BASE);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
-  private static boolean binaryNumber_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "binaryNumber_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = binaryNumber_2_0(b, l + 1);
-    int c = current_position_(b);
-    while (r) {
-      if (!binaryNumber_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "binaryNumber_2", c)) break;
-      c = current_position_(b);
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
-  private static boolean binaryNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "binaryNumber_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_BINARY_DIGITS);
-    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // string | stringHeredoc
   static boolean binaryString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryString")) return false;
@@ -282,6 +229,59 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = string(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  public static boolean binaryWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeToken(b, BASE_WHOLE_NUMBER_PREFIX);
+    r = r && binaryWholeNumber_1(b, l + 1);
+    p = r; // pin = 2
+    r = r && binaryWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, BINARY_WHOLE_NUMBER, r, p, null);
+    return r || p;
+  }
+
+  // BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE
+  private static boolean binaryWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, BINARY_WHOLE_NUMBER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_BINARY_WHOLE_NUMBER_BASE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  private static boolean binaryWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = binaryWholeNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!binaryWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "binaryWholeNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+  private static boolean binaryWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_BINARY_DIGITS);
+    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -326,50 +326,50 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
-  public static boolean decimalNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber")) return false;
+  public static boolean decimalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber")) return false;
     if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, VALID_DECIMAL_DIGITS);
-    r = r && decimalNumber_1(b, l + 1);
-    exit_section_(b, m, DECIMAL_NUMBER, r);
+    r = r && decimalWholeNumber_1(b, l + 1);
+    exit_section_(b, m, DECIMAL_WHOLE_NUMBER, r);
     return r;
   }
 
   // ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
-  private static boolean decimalNumber_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber_1")) return false;
+  private static boolean decimalWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!decimalNumber_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "decimalNumber_1", c)) break;
+      if (!decimalWholeNumber_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "decimalWholeNumber_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // {DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS)
-  private static boolean decimalNumber_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber_1_0")) return false;
+  private static boolean decimalWholeNumber_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = decimalNumber_1_0_0(b, l + 1);
-    r = r && decimalNumber_1_0_1(b, l + 1);
+    r = decimalWholeNumber_1_0_0(b, l + 1);
+    r = r && decimalWholeNumber_1_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // {DECIMAL_SEPARATOR}?
-  private static boolean decimalNumber_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber_1_0_0")) return false;
+  private static boolean decimalWholeNumber_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_0")) return false;
     consumeToken(b, DECIMAL_SEPARATOR);
     return true;
   }
 
   // INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
-  private static boolean decimalNumber_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber_1_0_1")) return false;
+  private static boolean decimalWholeNumber_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, INVALID_DECIMAL_DIGITS);
@@ -572,41 +572,41 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX (HEXADECIMAL_INTEGER_BASE | OBSOLETE_HEXADECIMAL_INTEGER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
-  public static boolean hexadecimalNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hexadecimalNumber")) return false;
-    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+  // BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  public static boolean hexadecimalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeToken(b, BASE_INTEGER_PREFIX);
-    r = r && hexadecimalNumber_1(b, l + 1);
+    r = consumeToken(b, BASE_WHOLE_NUMBER_PREFIX);
+    r = r && hexadecimalWholeNumber_1(b, l + 1);
     p = r; // pin = 2
-    r = r && hexadecimalNumber_2(b, l + 1);
-    exit_section_(b, l, m, HEXADECIMAL_NUMBER, r, p, null);
+    r = r && hexadecimalWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, HEXADECIMAL_WHOLE_NUMBER, r, p, null);
     return r || p;
   }
 
-  // HEXADECIMAL_INTEGER_BASE | OBSOLETE_HEXADECIMAL_INTEGER_BASE
-  private static boolean hexadecimalNumber_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hexadecimalNumber_1")) return false;
+  // HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE
+  private static boolean hexadecimalWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, HEXADECIMAL_INTEGER_BASE);
-    if (!r) r = consumeToken(b, OBSOLETE_HEXADECIMAL_INTEGER_BASE);
+    r = consumeToken(b, HEXADECIMAL_WHOLE_NUMBER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
-  private static boolean hexadecimalNumber_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hexadecimalNumber_2")) return false;
+  private static boolean hexadecimalWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = hexadecimalNumber_2_0(b, l + 1);
+    r = hexadecimalWholeNumber_2_0(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!hexadecimalNumber_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "hexadecimalNumber_2", c)) break;
+      if (!hexadecimalWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "hexadecimalWholeNumber_2", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
@@ -614,8 +614,8 @@ public class ElixirParser implements PsiParser {
   }
 
   // INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
-  private static boolean hexadecimalNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hexadecimalNumber_2_0")) return false;
+  private static boolean hexadecimalWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, INVALID_HEXADECIMAL_DIGITS);
@@ -1551,29 +1551,29 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX OCTAL_INTEGER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
-  public static boolean octalNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "octalNumber")) return false;
-    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  public static boolean octalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, OCTAL_INTEGER_BASE);
+    r = consumeTokens(b, 2, BASE_WHOLE_NUMBER_PREFIX, OCTAL_WHOLE_NUMBER_BASE);
     p = r; // pin = 2
-    r = r && octalNumber_2(b, l + 1);
-    exit_section_(b, l, m, OCTAL_NUMBER, r, p, null);
+    r = r && octalWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, OCTAL_WHOLE_NUMBER, r, p, null);
     return r || p;
   }
 
   // (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
-  private static boolean octalNumber_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "octalNumber_2")) return false;
+  private static boolean octalWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = octalNumber_2_0(b, l + 1);
+    r = octalWholeNumber_2_0(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!octalNumber_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "octalNumber_2", c)) break;
+      if (!octalWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "octalWholeNumber_2", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
@@ -1581,8 +1581,8 @@ public class ElixirParser implements PsiParser {
   }
 
   // INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
-  private static boolean octalNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "octalNumber_2_0")) return false;
+  private static boolean octalWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, INVALID_OCTAL_DIGITS);
@@ -1683,29 +1683,29 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX UNKNOWN_INTEGER_BASE INVALID_UNKNOWN_BASE_DIGITS+
-  public static boolean unknownBaseNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unknownBaseNumber")) return false;
-    if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
+  // BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+
+  public static boolean unknownBaseWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, UNKNOWN_INTEGER_BASE);
+    r = consumeTokens(b, 2, BASE_WHOLE_NUMBER_PREFIX, UNKNOWN_WHOLE_NUMBER_BASE);
     p = r; // pin = 2
-    r = r && unknownBaseNumber_2(b, l + 1);
-    exit_section_(b, l, m, UNKNOWN_BASE_NUMBER, r, p, null);
+    r = r && unknownBaseWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, UNKNOWN_BASE_WHOLE_NUMBER, r, p, null);
     return r || p;
   }
 
   // INVALID_UNKNOWN_BASE_DIGITS+
-  private static boolean unknownBaseNumber_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unknownBaseNumber_2")) return false;
+  private static boolean unknownBaseWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS);
     int c = current_position_(b);
     while (r) {
       if (!consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS)) break;
-      if (!empty_element_parsed_guard_(b, "unknownBaseNumber_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "unknownBaseWholeNumber_2", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
@@ -2527,11 +2527,11 @@ public class ElixirParser implements PsiParser {
   //                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
   //                      CHAR_TOKEN |
   //                      NUMBER |
-  //                      binaryNumber |
-  //                      decimalNumber |
-  //                      hexadecimalNumber |
-  //                      octalNumber |
-  //                      unknownBaseNumber |
+  //                      binaryWholeNumber |
+  //                      decimalWholeNumber |
+  //                      hexadecimalWholeNumber |
+  //                      octalWholeNumber |
+  //                      unknownBaseWholeNumber |
   //                      list |
   //                      binaryString |
   //                      listString |
@@ -2550,11 +2550,11 @@ public class ElixirParser implements PsiParser {
     if (!r) r = accessExpression_3(b, l + 1);
     if (!r) r = consumeTokenSmart(b, CHAR_TOKEN);
     if (!r) r = consumeTokenSmart(b, NUMBER);
-    if (!r) r = binaryNumber(b, l + 1);
-    if (!r) r = decimalNumber(b, l + 1);
-    if (!r) r = hexadecimalNumber(b, l + 1);
-    if (!r) r = octalNumber(b, l + 1);
-    if (!r) r = unknownBaseNumber(b, l + 1);
+    if (!r) r = binaryWholeNumber(b, l + 1);
+    if (!r) r = decimalWholeNumber(b, l + 1);
+    if (!r) r = hexadecimalWholeNumber(b, l + 1);
+    if (!r) r = octalWholeNumber(b, l + 1);
+    if (!r) r = unknownBaseWholeNumber(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);
