@@ -329,6 +329,7 @@ DECIMAL_SEPARATOR = "_"
 DECIMAL_INTEGER = {DIGIT} ({DECIMAL_SEPARATOR}? {DIGIT})*
 
 HEXADECIMAL_INTEGER_BASE = "x"
+OBSOLETE_HEXADECIMAL_INTEGER_BASE = "X"
 VALID_HEXADECIMAL_DIGITS = {HEXADECIMAL_DIGIT}+
 INVALID_HEXADECIMAL_DIGITS = [G-Zg-z]+
 
@@ -665,6 +666,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                    return ElixirTypes.HEXADECIMAL_INTEGER_BASE; }
   {OBSOLETE_BINARY_INTEGER_BASE} { yybegin(BINARY_INTEGER);
                                    return ElixirTypes.OBSOLETE_BINARY_INTEGER_BASE; }
+  {OBSOLETE_HEXADECIMAL_INTEGER_BASE} { yybegin(HEXADECIMAL_INTEGER);
+                                        return ElixirTypes.OBSOLETE_HEXADECIMAL_INTEGER_BASE; }
   // Must be after any specific integer bases
   {BASE_INTEGER_BASE}            { yybegin(UNKNOWN_BASE_INTEGER);
                                    return ElixirTypes.UNKNOWN_INTEGER_BASE; }

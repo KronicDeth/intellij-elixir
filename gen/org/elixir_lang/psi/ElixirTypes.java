@@ -112,6 +112,7 @@ public interface ElixirTypes {
   IElementType NIL = new ElixirTokenType("nil");
   IElementType NUMBER = new ElixirTokenType("NUMBER");
   IElementType OBSOLETE_BINARY_INTEGER_BASE = new ElixirTokenType("B");
+  IElementType OBSOLETE_HEXADECIMAL_INTEGER_BASE = new ElixirTokenType("X");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");

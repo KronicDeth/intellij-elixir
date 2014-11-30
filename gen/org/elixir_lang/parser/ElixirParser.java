@@ -510,17 +510,29 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_INTEGER_PREFIX HEXADECIMAL_INTEGER_BASE (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  // BASE_INTEGER_PREFIX (HEXADECIMAL_INTEGER_BASE | OBSOLETE_HEXADECIMAL_INTEGER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
   public static boolean hexadecimalNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalNumber")) return false;
     if (!nextTokenIs(b, BASE_INTEGER_PREFIX)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeTokens(b, 2, BASE_INTEGER_PREFIX, HEXADECIMAL_INTEGER_BASE);
+    r = consumeToken(b, BASE_INTEGER_PREFIX);
+    r = r && hexadecimalNumber_1(b, l + 1);
     p = r; // pin = 2
     r = r && hexadecimalNumber_2(b, l + 1);
     exit_section_(b, l, m, HEXADECIMAL_NUMBER, r, p, null);
     return r || p;
+  }
+
+  // HEXADECIMAL_INTEGER_BASE | OBSOLETE_HEXADECIMAL_INTEGER_BASE
+  private static boolean hexadecimalNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalNumber_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, HEXADECIMAL_INTEGER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_HEXADECIMAL_INTEGER_BASE);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
