@@ -2,7 +2,7 @@
 
 ## v0.2.0
 * Enhancements
- * [#73](https://github.com/KronicDeth/intellij-elixir/pull/17) - [@KronicDeth](https://github.com/KronicDeth)
+ * [#73](https://github.com/KronicDeth/intellij-elixir/pull/73) - [@KronicDeth](https://github.com/KronicDeth)
    * New attributes for parts of numbers on Color Settings Page
      * Binary, Decimal, Hexadecimal, and Octal Digits
      * Decimal Exponent, Mark, and Separator
@@ -16,7 +16,7 @@
    * Any digit, 0-9, A-Z, or a-z will be parsed as invalid for invalid whole number based numbers
    * Recovery for non-decimal whole numbers if the prefix is given, but no digits are given
 * Incompatible Changes
- * [#73](https://github.com/KronicDeth/intellij-elixir/pull/17): Number attribute has been removed from Color Settings page - [@KronicDeth](https://github.com/KronicDeth)
+ * [#73](https://github.com/KronicDeth/intellij-elixir/pull/73): Number attribute has been removed from Color Settings page - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.1.4
 
