@@ -38,7 +38,7 @@
             </li>
             <li>Any digit, 0-9, A-Z, or a-z will be parsed as invalid for invalid whole number based numbers</li>
             <li>Recovery for non-decimal whole numbers if the prefix is given, but no digits are given</li>
-          <ul>
+          </ul>
         </li>
         <li>
           <p>Incompatible Changes</p>
