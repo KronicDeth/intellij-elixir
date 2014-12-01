@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.2.0
+* Enhancements
+ * [#73](https://github.com/KronicDeth/intellij-elixir/pull/17) - [@KronicDeth](https://github.com/KronicDeth)
+   * New attributes for parts of numbers on Color Settings Page
+     * Binary, Decimal, Hexadecimal, and Octal Digits
+     * Decimal Exponent, Mark, and Separator
+     * Invalid Binary, Decimal, Hexadecimal, and Octal Digits
+       * 2-9, A-Z, and a-z will be parsed as invalid binary digits
+       * 8-9, A-Z, and a-z will be parsed as invalid octal digits
+       * G-Z and g-z will be parsed as invalid hexadecimal digits
+     * Non-Decimal Base Prefix
+       * Any letter other than b, o, or x, in either case, will be recognized as an invalid whole number base
+     * Obsolete Non-Decimal Base Prefix (`B` for binary and `X` for hexadecimal)
+   * Any digit, 0-9, A-Z, or a-z will be parsed as invalid for invalid whole number based numbers
+   * Recovery for non-decimal whole numbers if the prefix is given, but no digits are given
+* Incompatible Changes
+ * [#73](https://github.com/KronicDeth/intellij-elixir/pull/17): Number attribute has been removed from Color Settings page - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v0.1.4
 
 * Enhancements
@@ -24,7 +42,7 @@
  * [#17](https://github.com/KronicDeth/intellij-elixir/pull/17): Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated. - [@KronicDeth](https://github.com/KronicDeth)
  * [#24](https://github.com/KronicDeth/intellij-elixir/pull/24): Comments do not consume EOL, so trailing comments don't cause error parsing expression on following line. - [@KronicDeth](https://github.com/KronicDeth)
  * [#36](https://github.com/KronicDeth/intellij-elixir/pull/36): Sigil modifiers now work on groups in addition to heredocs. - [@KronicDeth](https://github.com/KronicDeth)
- * [#47](https://github.com/KronicDeth/intellij-elixir/pull/47): `;` is separate from `EOL` and either or both can separate expressions, but only `EOL` can separate operators and operands for operations - [@KronicDeth](https://github.com/KronicDeth)
+ * [#47](https://github.com/KronicDeth/intellij-elixir/pull/47): `;` is separate from `EOL` and either or both can separate expressions, but only `EOL` can separate operators and operands for operations - [@KronicDeth](https://github.com/KronicDeth) 
 
 ## v0.1.3
 

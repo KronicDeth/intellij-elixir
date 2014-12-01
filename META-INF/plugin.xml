@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.1.4</version>
+  <version>0.2.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,44 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v0.2.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>New attributes for parts of numbers on Color Settings Page</p>
+              <ul>
+                <li>Binary, Decimal, Hexadecimal, and Octal Digits</li>
+                <li>Decimal Exponent, Mark, and Separator</li>
+                <li>
+                  <p>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</p>
+                  <ul>
+                    <li>2-9, A-Z, and a-z will be parsed as invalid binary digits</li>
+                    <li>8-9, A-Z, and a-z will be parsed as invalid octal digits</li>
+                    <li>G-Z and g-z will be parsed as invalid hexadecimal digits</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Non-Decimal Base Prefix</p>
+                  <ul>
+                    <li>Any letter other than b, o, or x, in either case, will be recognized as an invalid whole number base</li>
+                  </ul>
+                </li>
+                <li>Obsolete Non-Decimal Base Prefix (<code>B</code> for binary and <code>X</code> for hexadecimal)</li>
+              </ul>
+            </li>
+            <li>Any digit, 0-9, A-Z, or a-z will be parsed as invalid for invalid whole number based numbers</li>
+            <li>Recovery for non-decimal whole numbers if the prefix is given, but no digits are given</li>
+          <ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>Recovery for non-decimal whole numbers if the prefix is given, but no digits are given</li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.1.4</h1>
       <ul>
         <li>
