@@ -28,11 +28,23 @@ public class ElixirParser implements PsiParser {
     else if (t == ATOM) {
       r = atom(b, 0);
     }
+    else if (t == BINARY_WHOLE_NUMBER) {
+      r = binaryWholeNumber(b, 0);
+    }
     else if (t == CHAR_LIST) {
       r = charList(b, 0);
     }
     else if (t == CHAR_LIST_HEREDOC) {
       r = charListHeredoc(b, 0);
+    }
+    else if (t == DECIMAL_FLOAT) {
+      r = decimalFloat(b, 0);
+    }
+    else if (t == DECIMAL_NUMBER) {
+      r = decimalNumber(b, 0);
+    }
+    else if (t == DECIMAL_WHOLE_NUMBER) {
+      r = decimalWholeNumber(b, 0);
     }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
@@ -42,6 +54,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == EXPRESSION) {
       r = expression(b, 0);
+    }
+    else if (t == HEXADECIMAL_WHOLE_NUMBER) {
+      r = hexadecimalWholeNumber(b, 0);
     }
     else if (t == IDENTIFIER_EXPRESSION) {
       r = identifierExpression(b, 0);
@@ -124,6 +139,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MAX_EXPRESSION) {
       r = maxExpression(b, 0);
     }
+    else if (t == NUMBER) {
+      r = number(b, 0);
+    }
     else if (t == NUMBER_AT_OPERATION) {
       r = numberAtOperation(b, 0);
     }
@@ -133,6 +151,9 @@ public class ElixirParser implements PsiParser {
     else if (t == NUMBER_UNARY_OPERATION) {
       r = numberUnaryOperation(b, 0);
     }
+    else if (t == OCTAL_WHOLE_NUMBER) {
+      r = octalWholeNumber(b, 0);
+    }
     else if (t == SIGIL) {
       r = sigil(b, 0);
     }
@@ -141,6 +162,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
+    }
+    else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
+      r = unknownBaseWholeNumber(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -154,27 +178,36 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ATOM, MAX_EXPRESSION),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      LIST, MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION,
-      NUMBER_UNARY_OPERATION, SIGIL, STRING, STRING_HEREDOC),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION,
-      MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION,
-      MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION,
-      MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION,
-      MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION,
-      MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER_AT_OPERATION,
-      NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, SIGIL, STRING,
-      STRING_HEREDOC),
-    create_token_set_(ACCESS_EXPRESSION, ATOM, CHAR_LIST, CHAR_LIST_HEREDOC,
-      EMPTY_PARENTHESES, EXPRESSION, IDENTIFIER_EXPRESSION, LIST,
-      MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION,
-      MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION,
-      MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION,
-      MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
-      MAX_EXPRESSION, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION,
-      SIGIL, STRING, STRING_HEREDOC),
+    create_token_set_(DECIMAL_FLOAT, DECIMAL_NUMBER),
+    create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
+      HEXADECIMAL_WHOLE_NUMBER, NUMBER, OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
+      HEXADECIMAL_WHOLE_NUMBER, LIST, MAX_EXPRESSION, NUMBER,
+      NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
+      HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION,
+      MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
+      MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION,
+      MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
+      MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
+      MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION,
+      NUMBER, NUMBER_AT_OPERATION, NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION,
+      OCTAL_WHOLE_NUMBER, SIGIL, STRING, STRING_HEREDOC,
+      UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ACCESS_EXPRESSION, ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST,
+      CHAR_LIST_HEREDOC, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
+      EMPTY_PARENTHESES, EXPRESSION, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION,
+      LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION,
+      MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION,
+      MATCHED_EXPRESSION_DOT_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION,
+      MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
+      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
+      MATCHED_EXPRESSION_WHEN_OPERATION, MAX_EXPRESSION, NUMBER, NUMBER_AT_OPERATION,
+      NUMBER_CAPTURE_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL,
+      STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -215,6 +248,59 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  public static boolean binaryWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeToken(b, BASE_WHOLE_NUMBER_PREFIX);
+    r = r && binaryWholeNumber_1(b, l + 1);
+    p = r; // pin = 2
+    r = r && binaryWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, BINARY_WHOLE_NUMBER, r, p, null);
+    return r || p;
+  }
+
+  // BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE
+  private static boolean binaryWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, BINARY_WHOLE_NUMBER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_BINARY_WHOLE_NUMBER_BASE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  private static boolean binaryWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = binaryWholeNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!binaryWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "binaryWholeNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+  private static boolean binaryWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryWholeNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_BINARY_DIGITS);
+    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // CHAR_LIST_PROMOTER
   //              interpolatedCharListBody
   //              CHAR_LIST_TERMINATOR
@@ -250,6 +336,115 @@ public class ElixirParser implements PsiParser {
   // emptyParentheses
   static boolean containerExpression(PsiBuilder b, int l) {
     return emptyParentheses(b, l + 1);
+  }
+
+  /* ********************************************************** */
+  // decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+  public static boolean decimalFloat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloat")) return false;
+    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = decimalWholeNumber(b, l + 1);
+    r = r && consumeToken(b, DECIMAL_MARK);
+    r = r && decimalWholeNumber(b, l + 1);
+    r = r && decimalFloat_3(b, l + 1);
+    exit_section_(b, m, DECIMAL_FLOAT, r);
+    return r;
+  }
+
+  // (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+  private static boolean decimalFloat_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloat_3")) return false;
+    decimalFloat_3_0(b, l + 1);
+    return true;
+  }
+
+  // EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber
+  private static boolean decimalFloat_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloat_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EXPONENT_MARK);
+    r = r && decimalFloat_3_0_1(b, l + 1);
+    r = r && decimalWholeNumber(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // DUAL_OPERATOR?
+  private static boolean decimalFloat_3_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloat_3_0_1")) return false;
+    consumeToken(b, DUAL_OPERATOR);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // decimalFloat |
+  //                   decimalWholeNumber
+  public static boolean decimalNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalNumber")) return false;
+    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _COLLAPSE_, null);
+    r = decimalFloat(b, l + 1);
+    if (!r) r = decimalWholeNumber(b, l + 1);
+    exit_section_(b, l, m, DECIMAL_NUMBER, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
+  public static boolean decimalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber")) return false;
+    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, VALID_DECIMAL_DIGITS);
+    r = r && decimalWholeNumber_1(b, l + 1);
+    exit_section_(b, m, DECIMAL_WHOLE_NUMBER, r);
+    return r;
+  }
+
+  // ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
+  private static boolean decimalWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!decimalWholeNumber_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "decimalWholeNumber_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // {DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS)
+  private static boolean decimalWholeNumber_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = decimalWholeNumber_1_0_0(b, l + 1);
+    r = r && decimalWholeNumber_1_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // {DECIMAL_SEPARATOR}?
+  private static boolean decimalWholeNumber_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_0")) return false;
+    consumeToken(b, DECIMAL_SEPARATOR);
+    return true;
+  }
+
+  // INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
+  private static boolean decimalWholeNumber_1_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_DECIMAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_DECIMAL_DIGITS);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -441,6 +636,59 @@ public class ElixirParser implements PsiParser {
       if (!empty_element_parsed_guard_(b, "expressionList_1_0_0", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  public static boolean hexadecimalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeToken(b, BASE_WHOLE_NUMBER_PREFIX);
+    r = r && hexadecimalWholeNumber_1(b, l + 1);
+    p = r; // pin = 2
+    r = r && hexadecimalWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, HEXADECIMAL_WHOLE_NUMBER, r, p, null);
+    return r || p;
+  }
+
+  // HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE
+  private static boolean hexadecimalWholeNumber_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, HEXADECIMAL_WHOLE_NUMBER_BASE);
+    if (!r) r = consumeToken(b, OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  private static boolean hexadecimalWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = hexadecimalWholeNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!hexadecimalWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "hexadecimalWholeNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
+  private static boolean hexadecimalWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_HEXADECIMAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_HEXADECIMAL_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1283,7 +1531,27 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // AT_OPERATOR EOL* NUMBER
+  // binaryWholeNumber |
+  //            decimalNumber |
+  //            hexadecimalWholeNumber |
+  //            octalWholeNumber |
+  //            unknownBaseWholeNumber
+  public static boolean number(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "number")) return false;
+    if (!nextTokenIs(b, "<number>", BASE_WHOLE_NUMBER_PREFIX, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _COLLAPSE_, "<number>");
+    r = binaryWholeNumber(b, l + 1);
+    if (!r) r = decimalNumber(b, l + 1);
+    if (!r) r = hexadecimalWholeNumber(b, l + 1);
+    if (!r) r = octalWholeNumber(b, l + 1);
+    if (!r) r = unknownBaseWholeNumber(b, l + 1);
+    exit_section_(b, l, m, NUMBER, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // AT_OPERATOR EOL* number
   public static boolean numberAtOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numberAtOperation")) return false;
     if (!nextTokenIs(b, AT_OPERATOR)) return false;
@@ -1291,7 +1559,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, AT_OPERATOR);
     r = r && numberAtOperation_1(b, l + 1);
-    r = r && consumeToken(b, NUMBER);
+    r = r && number(b, l + 1);
     exit_section_(b, m, NUMBER_AT_OPERATION, r);
     return r;
   }
@@ -1309,7 +1577,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // CAPTURE_OPERATOR EOL* NUMBER
+  // CAPTURE_OPERATOR EOL* number
   public static boolean numberCaptureOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numberCaptureOperation")) return false;
     if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
@@ -1317,7 +1585,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, CAPTURE_OPERATOR);
     r = r && numberCaptureOperation_1(b, l + 1);
-    r = r && consumeToken(b, NUMBER);
+    r = r && number(b, l + 1);
     exit_section_(b, m, NUMBER_CAPTURE_OPERATION, r);
     return r;
   }
@@ -1335,15 +1603,15 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* NUMBER
+  // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
   public static boolean numberUnaryOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numberUnaryOperation")) return false;
     if (!nextTokenIs(b, "<number unary operation>", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<number unary operation>");
+    Marker m = enter_section_(b, l, _COLLAPSE_, "<number unary operation>");
     r = numberUnaryOperation_0(b, l + 1);
     r = r && numberUnaryOperation_1(b, l + 1);
-    r = r && consumeToken(b, NUMBER);
+    r = r && number(b, l + 1);
     exit_section_(b, l, m, NUMBER_UNARY_OPERATION, r, false, null);
     return r;
   }
@@ -1369,6 +1637,47 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  public static boolean octalWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 2, BASE_WHOLE_NUMBER_PREFIX, OCTAL_WHOLE_NUMBER_BASE);
+    p = r; // pin = 2
+    r = r && octalWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, OCTAL_WHOLE_NUMBER, r, p, null);
+    return r || p;
+  }
+
+  // (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  private static boolean octalWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = octalWholeNumber_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!octalWholeNumber_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "octalWholeNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
+  private static boolean octalWholeNumber_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalWholeNumber_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_OCTAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_OCTAL_DIGITS);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1459,6 +1768,36 @@ public class ElixirParser implements PsiParser {
     r = r && interpolatedStringBody(b, l + 1);
     r = r && consumeToken(b, STRING_HEREDOC_TERMINATOR);
     exit_section_(b, m, STRING_HEREDOC, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+
+  public static boolean unknownBaseWholeNumber(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseWholeNumber")) return false;
+    if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 2, BASE_WHOLE_NUMBER_PREFIX, UNKNOWN_WHOLE_NUMBER_BASE);
+    p = r; // pin = 2
+    r = r && unknownBaseWholeNumber_2(b, l + 1);
+    exit_section_(b, l, m, UNKNOWN_BASE_WHOLE_NUMBER, r, p, null);
+    return r || p;
+  }
+
+  // INVALID_UNKNOWN_BASE_DIGITS+
+  private static boolean unknownBaseWholeNumber_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseWholeNumber_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS);
+    int c = current_position_(b);
+    while (r) {
+      if (!consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS)) break;
+      if (!empty_element_parsed_guard_(b, "unknownBaseWholeNumber_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -2276,7 +2615,7 @@ public class ElixirParser implements PsiParser {
   //                      /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
   //                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
   //                      CHAR_TOKEN |
-  //                      NUMBER |
+  //                      number |
   //                      list |
   //                      binaryString |
   //                      listString |
@@ -2294,7 +2633,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = numberAtOperation(b, l + 1);
     if (!r) r = accessExpression_3(b, l + 1);
     if (!r) r = consumeTokenSmart(b, CHAR_TOKEN);
-    if (!r) r = consumeTokenSmart(b, NUMBER);
+    if (!r) r = number(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);

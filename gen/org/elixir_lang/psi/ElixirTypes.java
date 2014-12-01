@@ -10,11 +10,16 @@ public interface ElixirTypes {
 
   IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ATOM = new ElixirElementType("ATOM");
+  IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
+  IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
+  IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType EXPRESSION = new ElixirElementType("EXPRESSION");
+  IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType IDENTIFIER_EXPRESSION = new ElixirElementType("IDENTIFIER_EXPRESSION");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
@@ -42,12 +47,15 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_UNARY_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_UNARY_OPERATION");
   IElementType MATCHED_EXPRESSION_WHEN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_WHEN_OPERATION");
   IElementType MAX_EXPRESSION = new ElixirElementType("MAX_EXPRESSION");
+  IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
   IElementType NUMBER_UNARY_OPERATION = new ElixirElementType("NUMBER_UNARY_OPERATION");
+  IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
 
   IElementType ALIAS = new ElixirTokenType("ALIAS");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
@@ -55,6 +63,8 @@ public interface ElixirTypes {
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType AT_OPERATOR = new ElixirTokenType("AT_OPERATOR");
+  IElementType BASE_WHOLE_NUMBER_PREFIX = new ElixirTokenType("0");
+  IElementType BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("b");
   IElementType BIT_STRING_OPERATOR = new ElixirTokenType("BIT_STRING_OPERATOR");
   IElementType CAPTURE_OPERATOR = new ElixirTokenType("CAPTURE_OPERATOR");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
@@ -73,13 +83,17 @@ public interface ElixirTypes {
   IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
+  IElementType DECIMAL_MARK = new ElixirTokenType("DECIMAL_MARK");
+  IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
+  IElementType EXPONENT_MARK = new ElixirTokenType("EXPONENT_MARK");
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
+  IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_REGEX_SIGIL_NAME");
@@ -88,6 +102,11 @@ public interface ElixirTypes {
   IElementType INTERPOLATING_WORDS_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_WORDS_SIGIL_NAME");
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
+  IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("INVALID_BINARY_DIGITS");
+  IElementType INVALID_DECIMAL_DIGITS = new ElixirTokenType("INVALID_DECIMAL_DIGITS");
+  IElementType INVALID_HEXADECIMAL_DIGITS = new ElixirTokenType("INVALID_HEXADECIMAL_DIGITS");
+  IElementType INVALID_OCTAL_DIGITS = new ElixirTokenType("INVALID_OCTAL_DIGITS");
+  IElementType INVALID_UNKNOWN_BASE_DIGITS = new ElixirTokenType("INVALID_UNKNOWN_BASE_DIGITS");
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("IN_MATCH_OPERATOR");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
   IElementType KEYWORD_PAIR_COLON = new ElixirTokenType("KEYWORD_PAIR_COLON");
@@ -101,7 +120,9 @@ public interface ElixirTypes {
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NIL = new ElixirTokenType("nil");
-  IElementType NUMBER = new ElixirTokenType("NUMBER");
+  IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");
+  IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
+  IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
@@ -136,7 +157,12 @@ public interface ElixirTypes {
   IElementType TWO_OPERATOR = new ElixirTokenType("TWO_OPERATOR");
   IElementType TYPE_OPERATOR = new ElixirTokenType("TYPE_OPERATOR");
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
+  IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("UNKNOWN_WHOLE_NUMBER_BASE");
+  IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
+  IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("VALID_DECIMAL_DIGITS");
   IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
+  IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
+  IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("VALID_OCTAL_DIGITS");
   IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
@@ -153,11 +179,23 @@ public interface ElixirTypes {
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
       }
+      else if (type == BINARY_WHOLE_NUMBER) {
+        return new ElixirBinaryWholeNumberImpl(node);
+      }
       else if (type == CHAR_LIST) {
         return new ElixirCharListImpl(node);
       }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
+      }
+      else if (type == DECIMAL_FLOAT) {
+        return new ElixirDecimalFloatImpl(node);
+      }
+      else if (type == DECIMAL_NUMBER) {
+        return new ElixirDecimalNumberImpl(node);
+      }
+      else if (type == DECIMAL_WHOLE_NUMBER) {
+        return new ElixirDecimalWholeNumberImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
@@ -167,6 +205,9 @@ public interface ElixirTypes {
       }
       else if (type == EXPRESSION) {
         return new ElixirExpressionImpl(node);
+      }
+      else if (type == HEXADECIMAL_WHOLE_NUMBER) {
+        return new ElixirHexadecimalWholeNumberImpl(node);
       }
       else if (type == IDENTIFIER_EXPRESSION) {
         return new ElixirIdentifierExpressionImpl(node);
@@ -249,6 +290,9 @@ public interface ElixirTypes {
       else if (type == MAX_EXPRESSION) {
         return new ElixirMaxExpressionImpl(node);
       }
+      else if (type == NUMBER) {
+        return new ElixirNumberImpl(node);
+      }
       else if (type == NUMBER_AT_OPERATION) {
         return new ElixirNumberAtOperationImpl(node);
       }
@@ -258,6 +302,9 @@ public interface ElixirTypes {
       else if (type == NUMBER_UNARY_OPERATION) {
         return new ElixirNumberUnaryOperationImpl(node);
       }
+      else if (type == OCTAL_WHOLE_NUMBER) {
+        return new ElixirOctalWholeNumberImpl(node);
+      }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);
       }
@@ -266,6 +313,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == UNKNOWN_BASE_WHOLE_NUMBER) {
+        return new ElixirUnknownBaseWholeNumberImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

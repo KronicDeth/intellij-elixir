@@ -313,26 +313,37 @@ WHITE_SPACE=[\ \t\f]
 COMMENT = "#" [^\r\n]*
 
 /*
- *   Integers
+ *
+ *   Whole Numbers
+ *
  */
 
-BASE_INTEGER_PREFIX = "0"
-
-BINARY_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "b"
-BINARY_INTEGER = {BINARY_INTEGER_PREFIX} [01]+
-
-DIGIT = [0-9]
+VALID_DECIMAL_DIGITS = [0-9]+
+INVALID_DECIMAL_DIGITS = [A-Za-z]+
 DECIMAL_SEPARATOR = "_"
-DECIMAL_INTEGER = {DIGIT} ({DECIMAL_SEPARATOR}? {DIGIT})*
 
-HEXADECIMAL_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "x"
-HEXADECIMAL_INTEGER = {HEXADECIMAL_INTEGER_PREFIX} {HEXADECIMAL_DIGIT}+
+/*
+ * Non-Base-10
+ */
 
-OCTAL_INTEGER_PREFIX = {BASE_INTEGER_PREFIX} "o"
-OCTAL_INTEGER = {OCTAL_INTEGER_PREFIX} [0-7]+
+BASE_WHOLE_NUMBER_PREFIX = "0"
+BASE_WHOLE_NUMBER_BASE = [A-Za-z]
 
-INTEGER = {BINARY_INTEGER} | {DECIMAL_INTEGER} | {HEXADECIMAL_INTEGER} | {OCTAL_INTEGER}
+BINARY_WHOLE_NUMBER_BASE = "b"
+OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
+VALID_BINARY_DIGITS = [01]+
+INVALID_BINARY_DIGITS = [A-Za-z2-9]+
 
+HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
+OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
+VALID_HEXADECIMAL_DIGITS = {HEXADECIMAL_DIGIT}+
+INVALID_HEXADECIMAL_DIGITS = [G-Zg-z]+
+
+OCTAL_WHOLE_NUMBER_BASE = "o"
+VALID_OCTAL_DIGITS = [0-7]+
+INVALID_OCTAL_DIGITS = [A-Za-z8-9]+
+
+INVALID_UNKNOWN_BASE_DIGITS = [A-Za-z0-9]+
 
 /*
  * Identifiers
@@ -365,8 +376,6 @@ INTERPOLATION_END = "}"
 
 DECIMAL_MARK = "."
 EXPONENT_MARK = [Ee]
-EXPONENT_SIGN = [+-]
-DECIMAL_FLOAT = {DECIMAL_INTEGER} {DECIMAL_MARK} {DECIMAL_INTEGER} ({EXPONENT_MARK} {EXPONENT_SIGN}? {DECIMAL_INTEGER})?
 
 /*
  * List
@@ -492,16 +501,25 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 %state ATOM_BODY
 %state ATOM_START
+%state BASE_WHOLE_NUMBER_BASE
+%state BINARY_WHOLE_NUMBER
+%state DECIMAL_EXPONENT
+%state DECIMAL_EXPONENT_SIGN
+%state DECIMAL_FRACTION
+%state DECIMAL_WHOLE_NUMBER
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
+%state HEXADECIMAL_WHOLE_NUMBER
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
+%state OCTAL_WHOLE_NUMBER
 %state SIGIL
 %state SIGIL_MODIFIERS
+%state UNKNOWN_BASE_WHOLE_NUMBER
 
 %%
 
@@ -519,6 +537,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.ALIAS; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
+  {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
+                                                          return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
   {BIT_STRING_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -548,7 +568,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
   {DUAL_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DUAL_OPERATOR; }
-  {DECIMAL_FLOAT}                            { return ElixirTypes.NUMBER; }
   {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -577,7 +596,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.WHEN_OPERATOR; }
   {IDENTIFIER}                               { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER; }
-  {INTEGER}                                  { return ElixirTypes.NUMBER; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
   {MAP_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -601,6 +619,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.TUPLE_OPERATOR; }
   {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR; }
+  {VALID_DECIMAL_DIGITS}                     { pushAndBegin(DECIMAL_WHOLE_NUMBER);
+                                               return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {QUOTE_HEREDOC_PROMOTER}                   { startQuote(yytext());
                                                return promoterType(); }
   /* MUST be after {QUOTE_HEREDOC_PROMOTER} for <BODY, INTERPOLATION> as {QUOTE_HEREDOC_PROMOTER} is prefixed by
@@ -643,6 +663,55 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                      yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT; }
   {EOL}            { return TokenType.BAD_CHARACTER; }
+}
+
+<BASE_WHOLE_NUMBER_BASE> {
+  {BINARY_WHOLE_NUMBER_BASE}               { yybegin(BINARY_WHOLE_NUMBER);
+                                             return ElixirTypes.BINARY_WHOLE_NUMBER_BASE; }
+  {HEXADECIMAL_WHOLE_NUMBER_BASE}          { yybegin(HEXADECIMAL_WHOLE_NUMBER);
+                                             return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
+  {OBSOLETE_BINARY_WHOLE_NUMBER_BASE}      { yybegin(BINARY_WHOLE_NUMBER);
+                                             return ElixirTypes.OBSOLETE_BINARY_WHOLE_NUMBER_BASE; }
+  {OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_WHOLE_NUMBER);
+                                             return ElixirTypes.OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE; }
+  {OCTAL_WHOLE_NUMBER_BASE}                { yybegin(OCTAL_WHOLE_NUMBER);
+                                             return ElixirTypes.OCTAL_WHOLE_NUMBER_BASE; }
+  // Must be after any specific integer bases
+  {BASE_WHOLE_NUMBER_BASE}                 { yybegin(UNKNOWN_BASE_WHOLE_NUMBER);
+                                             return ElixirTypes.UNKNOWN_WHOLE_NUMBER_BASE; }
+}
+
+<BINARY_WHOLE_NUMBER> {
+  {INVALID_BINARY_DIGITS} { return ElixirTypes.INVALID_BINARY_DIGITS; }
+  {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
+  {EOL}|.                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                            handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<DECIMAL_EXPONENT_SIGN> {
+  {DUAL_OPERATOR} { yybegin(DECIMAL_EXPONENT);
+                    return ElixirTypes.DUAL_OPERATOR; }
+  {EOL}|.         { handleInState(DECIMAL_EXPONENT); }
+}
+
+<DECIMAL_FRACTION> {
+  {EXPONENT_MARK} { yybegin(DECIMAL_EXPONENT_SIGN);
+                    return ElixirTypes.EXPONENT_MARK; }
+}
+
+<DECIMAL_WHOLE_NUMBER> {
+  {DECIMAL_MARK} { yybegin(DECIMAL_FRACTION);
+                   return ElixirTypes.DECIMAL_MARK; }
+}
+
+<DECIMAL_EXPONENT,
+ DECIMAL_FRACTION,
+ DECIMAL_WHOLE_NUMBER> {
+  {DECIMAL_SEPARATOR}      { return ElixirTypes.DECIMAL_SEPARATOR; }
+  {INVALID_DECIMAL_DIGITS} { return ElixirTypes.INVALID_DECIMAL_DIGITS; }
+  {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }
+  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <GROUP,
@@ -724,6 +793,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
           return ElixirTypes.EOL; }
 }
 
+<HEXADECIMAL_WHOLE_NUMBER> {
+  {INVALID_HEXADECIMAL_DIGITS} { return ElixirTypes.INVALID_HEXADECIMAL_DIGITS; }
+  {VALID_HEXADECIMAL_DIGITS}   { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+  {EOL}|.                      { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 handleInState(stackFrame.getLastLexicalState()); }
+}
+
 /* Only rules for <INTERPOLATON>, but not <YYINITIAL> go here.
    @note must be after <YYINITIAL, INTERPOLATION> so that BAD_CHARACTER doesn't match a single ' ' instead of
      {WHITE_SPACE}+. */
@@ -750,6 +826,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              return promoterType(); }
 }
 
+<OCTAL_WHOLE_NUMBER> {
+  {INVALID_OCTAL_DIGITS} { return ElixirTypes.INVALID_OCTAL_DIGITS; }
+  {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
+  {EOL}|.                { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                           handleInState(stackFrame.getLastLexicalState()); }
+}
+
 <SIGIL> {
   {SIGIL_NAME}               { nameSigil(yytext());
                                yybegin(NAMED_SIGIL);
@@ -761,6 +844,12 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
   {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<UNKNOWN_BASE_WHOLE_NUMBER> {
+  {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
+  {EOL}|.                       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                  handleInState(stackFrame.getLastLexicalState()); }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states

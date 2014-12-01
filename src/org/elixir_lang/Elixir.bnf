@@ -8,9 +8,11 @@
    */
 
   extends("emptyParentheses|matchedExpression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|list|sigil|string(Heredoc)?")=accessExpression
+  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=accessExpression
+  extends("decimal(Float|WholeNUmber)")=decimalNumber
   extends("accessExpression|identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
   extends("atom|dotAlias")=maxExpression
+  extends("(.*Whole|decimal)Number")=number
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -22,17 +24,27 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    BASE_WHOLE_NUMBER_PREFIX = "0"
+    BINARY_WHOLE_NUMBER_BASE = "b"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    DECIMAL_MARK = "."
+    DECIMAL_SEPARATOR = "_"
     DOT_OPERATOR = "."
     END = "end"
     FALSE = "false"
     FN = "fn"
+    HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
     IN_OPERATOR = "in"
+    INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
+    INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
     NIL = "nil"
+    OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
+    OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
+    OCTAL_WHOLE_NUMBER_BASE = "o"
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
@@ -41,6 +53,9 @@
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
     TRUE = "true"
+    UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
+    VALID_BINARY_DIGITS = "regexp:[01]+"
+    VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
   ]
 }
 
@@ -59,7 +74,7 @@ accessExpression ::= numberCaptureOperation |
                      /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
                      CHAR_TOKEN |
-                     NUMBER |
+                     number |
                      list |
                      binaryString |
                      listString |
@@ -68,7 +83,9 @@ accessExpression ::= numberCaptureOperation |
                      NIL |
                      TRUE |
                      maxExpression
+
 atom ::= COLON (ATOM_FRAGMENT | quote)
+binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
@@ -77,12 +94,18 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
 private containerExpression ::= emptyParentheses
+decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+decimalWholeNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
+// decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+decimalNumber ::= decimalFloat |
+                  decimalWholeNumber
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
+hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 identifierExpression ::= IDENTIFIER
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
@@ -212,13 +235,20 @@ maxExpression ::= atom |
                   ALIAS
 //noParenthesesOneExpression ::= dotIdentifier
 
+number ::= binaryWholeNumber |
+           decimalNumber |
+           hexadecimalWholeNumber |
+           octalWholeNumber |
+           unknownBaseWholeNumber
 /*
  * Number Operations - Used in accessExpression
  */
 
-numberAtOperation ::= AT_OPERATOR EOL* NUMBER
-numberCaptureOperation ::= CAPTURE_OPERATOR EOL* NUMBER
-numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* NUMBER
+numberAtOperation ::= AT_OPERATOR EOL* number
+numberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
+numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
+
+octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
 
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
@@ -245,3 +275,5 @@ string ::= STRING_PROMOTER
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
+
+unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }

@@ -21,4 +21,10 @@ public class ElixirNumberUnaryOperationImpl extends ElixirAccessExpressionImpl i
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public ElixirNumber getNumber() {
+    return findNotNullChildByClass(ElixirNumber.class);
+  }
+
 }

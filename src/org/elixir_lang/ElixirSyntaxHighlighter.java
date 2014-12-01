@@ -47,6 +47,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.LINE_COMMENT
     );
 
+    public static final TextAttributesKey DECIMAL = createTextAttributesKey(
+            "ELIXIR_DECIMAL",
+            DefaultLanguageHighlighterColors.NUMBER
+    );
+
     public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
             "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
             DefaultLanguageHighlighterColors.PARENTHESES
@@ -57,9 +62,14 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.IDENTIFIER
     );
 
-    public static final TextAttributesKey NUMBER = createTextAttributesKey(
-            "ELIXIR_NUMBER",
-            DefaultLanguageHighlighterColors.NUMBER
+    public static final TextAttributesKey INVALID_DIGIT = createTextAttributesKey(
+            "ELIXIR_INVALID_DIGIT",
+            HighlighterColors.BAD_CHARACTER
+    );
+
+    public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
+            "ELIXIR_OBSOLETE_WHOLE_NUMBER_BASE",
+            HighlighterColors.BAD_CHARACTER
     );
 
     public static final TextAttributesKey OPERATION_SIGN = createTextAttributesKey(
@@ -78,9 +88,19 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.STRING
     );
 
+    public static final TextAttributesKey VALID_DIGIT = createTextAttributesKey(
+            "ELIXIR_VALID_DIGIT",
+            DefaultLanguageHighlighterColors.NUMBER
+    );
+
     public static final TextAttributesKey VALID_ESCAPE_SEQUENCE = createTextAttributesKey(
             "ELIXIR_VALID_ESCAPE_SEQUENCE",
             DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+    );
+
+    public static final TextAttributesKey WHOLE_NUMBER_BASE = createTextAttributesKey(
+            "ELIXIR_WHOLE_NUMBER_BASE",
+            DefaultLanguageHighlighterColors.NUMBER
     );
 
     private static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
@@ -89,14 +109,18 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
+    private static final TextAttributesKey[] DECIMAL_KEYS = new TextAttributesKey[]{DECIMAL};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
     private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
-    private static final TextAttributesKey[] NUMBER_KEYS = new TextAttributesKey[]{NUMBER};
+    private static final TextAttributesKey[] INVALID_DIGITS_KEYS = new TextAttributesKey[]{INVALID_DIGIT};
+    private static final TextAttributesKey[] OBSOLETE_WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{OBSOLETE_WHOLE_NUMBER_BASE};
     private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
+    private static final TextAttributesKey[] VALID_DIGITS_KEYS = new TextAttributesKey[]{VALID_DIGIT};
     private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
+    private static final TextAttributesKey[] WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{WHOLE_NUMBER_BASE};
 
     private static final TokenSet ATOMS = TokenSet.create(
             ElixirTypes.COLON,
@@ -115,9 +139,25 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.INTERPOLATING_CHAR_LIST_SIGIL_NAME,
             ElixirTypes.LITERAL_CHAR_LIST_SIGIL_NAME
     );
+    private static final TokenSet DECIMAL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.DECIMAL_MARK,
+            ElixirTypes.DECIMAL_SEPARATOR,
+            ElixirTypes.EXPONENT_MARK
+    );
     private static final TokenSet EXPRESSION_SUBSTITUTION_MARKS =  TokenSet.create(
             ElixirTypes.INTERPOLATION_START,
             ElixirTypes.INTERPOLATION_END
+    );
+    private static final TokenSet INVALID_DIGITS_TOKEN_SET = TokenSet.create(
+            ElixirTypes.INVALID_BINARY_DIGITS,
+            ElixirTypes.INVALID_DECIMAL_DIGITS,
+            ElixirTypes.INVALID_HEXADECIMAL_DIGITS,
+            ElixirTypes.INVALID_OCTAL_DIGITS,
+            ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS
+    );
+    private static final TokenSet OBSOLETE_WHOLE_NUMBER_BASE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.OBSOLETE_BINARY_WHOLE_NUMBER_BASE,
+            ElixirTypes.OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE
     );
     private static final TokenSet OPERATION_SIGNS = TokenSet.create(
             ElixirTypes.AND_OPERATOR,
@@ -179,6 +219,19 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.STRING_SIGIL_TERMINATOR,
             ElixirTypes.STRING_TERMINATOR
     );
+    private static final TokenSet VALID_DIGITS_TOKEN_SET = TokenSet.create(
+            ElixirTypes.VALID_BINARY_DIGITS,
+            ElixirTypes.VALID_DECIMAL_DIGITS,
+            ElixirTypes.VALID_DECIMAL_DIGITS,
+            ElixirTypes.VALID_HEXADECIMAL_DIGITS,
+            ElixirTypes.VALID_OCTAL_DIGITS
+    );
+    private static final TokenSet WHOLE_NUMBER_BASE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.BASE_WHOLE_NUMBER_PREFIX,
+            ElixirTypes.BINARY_WHOLE_NUMBER_BASE,
+            ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE,
+            ElixirTypes.OCTAL_WHOLE_NUMBER_BASE
+    );
 
     @NotNull
     @Override
@@ -201,20 +254,28 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return CHAR_TOKEN_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMENT)) {
             return COMMENT_KEYS;
+        } else if (DECIMAL_TOKEN_SET.contains(tokenType)) {
+            return DECIMAL_KEYS;
         } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {
             return EXPRESSION_SUBSTITUTION_MARK_KEYS;
         } else if (tokenType.equals(ElixirTypes.IDENTIFIER)) {
             return IDENTIFIER_KEYS;
-        } else if (tokenType.equals(ElixirTypes.NUMBER)) {
-            return NUMBER_KEYS;
+        } else if (INVALID_DIGITS_TOKEN_SET.contains(tokenType)) {
+            return INVALID_DIGITS_KEYS;
+        } else if (OBSOLETE_WHOLE_NUMBER_BASE_TOKEN_SET.contains(tokenType)) {
+            return OBSOLETE_WHOLE_NUMBER_BASE_KEYS;
         } else if (OPERATION_SIGNS.contains(tokenType)) {
             return OPERATION_SIGN_KEYS;
         } else if (SIGILS.contains(tokenType)) {
             return SIGIL_KEYS;
         } else if (STRINGS.contains(tokenType)) {
             return STRING_KEYS;
+        } else if (VALID_DIGITS_TOKEN_SET.contains(tokenType)) {
+            return VALID_DIGITS_KEYS;
         } else if (tokenType.equals(ElixirTypes.VALID_ESCAPE_SEQUENCE)) {
             return VALID_ESCAPE_SEQUENCE_KEYS;
+        } else if (WHOLE_NUMBER_BASE_TOKEN_SET.contains(tokenType)) {
+            return WHOLE_NUMBER_BASE_KEYS;
         } else {
             return EMPTY_KEYS;
         }

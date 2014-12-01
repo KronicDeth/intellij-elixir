@@ -15,12 +15,28 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMaxExpression(o);
   }
 
+  public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
+    visitNumber(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
     visitAccessExpression(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
     visitAccessExpression(o);
+  }
+
+  public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
+    visitDecimalNumber(o);
+  }
+
+  public void visitDecimalNumber(@NotNull ElixirDecimalNumber o) {
+    visitNumber(o);
+  }
+
+  public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
+    visitNumber(o);
   }
 
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
@@ -33,6 +49,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitExpression(@NotNull ElixirExpression o) {
     visitPsiElement(o);
+  }
+
+  public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
+    visitNumber(o);
   }
 
   public void visitIdentifierExpression(@NotNull ElixirIdentifierExpression o) {
@@ -143,6 +163,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitNumber(@NotNull ElixirNumber o) {
+    visitAccessExpression(o);
+  }
+
   public void visitNumberAtOperation(@NotNull ElixirNumberAtOperation o) {
     visitAccessExpression(o);
   }
@@ -155,6 +179,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAccessExpression(o);
   }
 
+  public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
+    visitNumber(o);
+  }
+
   public void visitSigil(@NotNull ElixirSigil o) {
     visitAccessExpression(o);
   }
@@ -165,6 +193,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitAccessExpression(o);
+  }
+
+  public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
+    visitNumber(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {
