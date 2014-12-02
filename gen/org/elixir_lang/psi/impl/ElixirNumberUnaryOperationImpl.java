@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirNumberUnaryOperationImpl extends ElixirAccessExpressionImpl implements ElixirNumberUnaryOperation {
+public class ElixirNumberUnaryOperationImpl extends ElixirMatchedExpressionAccessExpressionImpl implements ElixirNumberUnaryOperation {
 
   public ElixirNumberUnaryOperationImpl(ASTNode node) {
     super(node);

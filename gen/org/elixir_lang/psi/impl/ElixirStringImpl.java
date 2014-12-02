@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirStringImpl extends ElixirAccessExpressionImpl implements ElixirString {
+public class ElixirStringImpl extends ElixirMatchedExpressionAccessExpressionImpl implements ElixirString {
 
   public ElixirStringImpl(ASTNode node) {
     super(node);

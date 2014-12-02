@@ -8,10 +8,10 @@
    */
 
   extends("emptyParentheses|matchedExpression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=accessExpression
+  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
   extends("decimal(Float|WholeNUmber)")=decimalNumber
-  extends("accessExpression|identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
-  extends("atom|dotAlias")=maxExpression
+  extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
+  extends("atom|dotAlias")=matchedExpressionMaxExpression
   extends("(.*Whole|decimal)Number")=number
 
   psiClassPrefix="Elixir"
@@ -66,23 +66,6 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 /*
  * In alphabetical order
  */
-
-accessExpression ::= numberCaptureOperation |
-                     numberUnaryOperation |
-                     numberAtOperation |
-                     OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
-                     /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
-                        elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
-                     CHAR_TOKEN |
-                     number |
-                     list |
-                     binaryString |
-                     listString |
-                     sigil |
-                     FALSE |
-                     NIL |
-                     TRUE |
-                     maxExpression
 
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
@@ -205,10 +188,29 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionMultiplicationOperation |
                       matchedExpressionHatOperation |
                       matchedExpressionUnaryOperation |
-                      matchedExpressionDotOperation |
+                      matchedExpressionDotAlias |
+                      matchedExpressionDotIdentifier |
                       matchedExpressionAtOperation |
                       identifierExpression |
-                      accessExpression
+                      matchedExpressionAccessExpression
+// Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
+matchedExpressionAccessExpression ::= numberCaptureOperation |
+                                      numberUnaryOperation |
+                                      numberAtOperation |
+                                      OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
+                                      /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
+                                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
+                                      CHAR_TOKEN |
+                                      number |
+                                      list |
+                                      binaryString |
+                                      listString |
+                                      sigil |
+                                      FALSE |
+                                      NIL |
+                                      TRUE |
+                                      matchedExpressionMaxExpression
+
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
    is interpreted as unaryOperation */
 matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
@@ -217,11 +219,16 @@ matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* m
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
 matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* matchedExpression
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
-matchedExpressionDotOperation ::= matchedExpression EOL* DOT_OPERATOR EOL* matchedExpression
+matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
+matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
 matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
 matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
 matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
 matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
+/* Specialized for matchedExpression to eliminate left-recursion from max_expr when dot_alias is a child instead of
+   matchedExpressionDotAlias being a direct child of matchedExpression */
+matchedExpressionMaxExpression ::= atom |
+                                   ALIAS
 matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
 matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
 matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
@@ -230,9 +237,6 @@ matchedExpressionTwoOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* match
 matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
 matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
-
-maxExpression ::= atom |
-                  ALIAS
 //noParenthesesOneExpression ::= dotIdentifier
 
 number ::= binaryWholeNumber |

@@ -10,15 +10,21 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl implements ElixirAccessExpression {
+public class ElixirMatchedExpressionDotIdentifierImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedExpressionDotIdentifier {
 
-  public ElixirAccessExpressionImpl(ASTNode node) {
+  public ElixirMatchedExpressionDotIdentifierImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAccessExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedExpressionDotIdentifier(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findNotNullChildByClass(ElixirMatchedExpression.class);
   }
 
 }

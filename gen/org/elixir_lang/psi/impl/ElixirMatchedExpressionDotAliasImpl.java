@@ -10,15 +10,21 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirMaxExpressionImpl extends ElixirAccessExpressionImpl implements ElixirMaxExpression {
+public class ElixirMatchedExpressionDotAliasImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedExpressionDotAlias {
 
-  public ElixirMaxExpressionImpl(ASTNode node) {
+  public ElixirMatchedExpressionDotAliasImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMaxExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedExpressionDotAlias(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findNotNullChildByClass(ElixirMatchedExpression.class);
   }
 
 }

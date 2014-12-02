@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirString extends ElixirAccessExpression {
+public interface ElixirString extends ElixirMatchedExpressionAccessExpression {
 
   @NotNull
   List<ElixirInterpolation> getInterpolationList();

@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirNumberCaptureOperationImpl extends ElixirAccessExpressionImpl implements ElixirNumberCaptureOperation {
+public class ElixirNumberCaptureOperationImpl extends ElixirMatchedExpressionAccessExpressionImpl implements ElixirNumberCaptureOperation {
 
   public ElixirNumberCaptureOperationImpl(ASTNode node) {
     super(node);

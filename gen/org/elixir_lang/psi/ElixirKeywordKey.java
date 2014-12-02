@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirKeywordKey extends PsiElement {
 
   @Nullable
-  ElixirAccessExpression getAccessExpression();
+  ElixirMatchedExpression getMatchedExpression();
 
 }
