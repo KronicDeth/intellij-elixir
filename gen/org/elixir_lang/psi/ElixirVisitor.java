@@ -15,6 +15,18 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitNumber(o);
   }
 
+  public void visitCallArgumentsNoParenthesesKeywords(@NotNull ElixirCallArgumentsNoParenthesesKeywords o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCallArgumentsNoParenthesesKeywordsExpression(@NotNull ElixirCallArgumentsNoParenthesesKeywordsExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCallArgumentsNoParenthesesMany(@NotNull ElixirCallArgumentsNoParenthesesMany o) {
+    visitPsiElement(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
     visitMatchedExpressionAccessExpression(o);
   }
@@ -165,6 +177,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedExpressionWhenOperation(@NotNull ElixirMatchedExpressionWhenOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
+    visitExpression(o);
   }
 
   public void visitNumber(@NotNull ElixirNumber o) {

@@ -7,7 +7,7 @@
    * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
    */
 
-  extends("emptyParentheses|matchedExpression")=expression
+  extends("emptyParentheses|(matched|noParentheses)Expression")=expression
   extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
   extends("decimal(Float|WholeNUmber)")=decimalNumber
   extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
@@ -70,6 +70,12 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
+private callArgumentsNoParenthesesExpression ::= matchedExpression |
+                                                 emptyParentheses
+callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
+callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
+callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords
+private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -86,6 +92,10 @@ emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
+               /* Must be before matchedExpression because noParenthesesExpression is
+                  `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer than
+                  `matchedExpressionDotIdentifier` in matchedExpression. */
+               noParenthesesExpression |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
@@ -141,7 +151,8 @@ keywordKey ::= ALIAS |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
-keywordPair ::=  keywordKey KEYWORD_PAIR_COLON EOL* keywordValue
+private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
+keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private listString ::= charList | charListHeredoc
@@ -237,6 +248,11 @@ matchedExpressionTwoOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* match
 matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
 matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
+
+/* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
+   interpreted as taking no arguments. */
+noParenthesesExpression ::= (matchedExpressionDotIdentifier | identifierExpression) callArgumentsNoParenthesesManyStrict
+
 //noParenthesesOneExpression ::= dotIdentifier
 
 number ::= binaryWholeNumber |

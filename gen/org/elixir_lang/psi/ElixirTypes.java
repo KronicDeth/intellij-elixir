@@ -10,6 +10,9 @@ public interface ElixirTypes {
 
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
+  IElementType CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS");
+  IElementType CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION");
+  IElementType CALL_ARGUMENTS_NO_PARENTHESES_MANY = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_MANY");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
@@ -48,6 +51,7 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_TYPE_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_TYPE_OPERATION");
   IElementType MATCHED_EXPRESSION_UNARY_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_UNARY_OPERATION");
   IElementType MATCHED_EXPRESSION_WHEN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_WHEN_OPERATION");
+  IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
@@ -180,6 +184,15 @@ public interface ElixirTypes {
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
       }
+      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS) {
+        return new ElixirCallArgumentsNoParenthesesKeywordsImpl(node);
+      }
+      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION) {
+        return new ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl(node);
+      }
+      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_MANY) {
+        return new ElixirCallArgumentsNoParenthesesManyImpl(node);
+      }
       else if (type == CHAR_LIST) {
         return new ElixirCharListImpl(node);
       }
@@ -293,6 +306,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_EXPRESSION_WHEN_OPERATION) {
         return new ElixirMatchedExpressionWhenOperationImpl(node);
+      }
+      else if (type == NO_PARENTHESES_EXPRESSION) {
+        return new ElixirNoParenthesesExpressionImpl(node);
       }
       else if (type == NUMBER) {
         return new ElixirNumberImpl(node);
