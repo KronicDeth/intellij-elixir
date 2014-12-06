@@ -34,4 +34,10 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
   }
 
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
+  }
+
 }

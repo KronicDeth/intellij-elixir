@@ -97,6 +97,9 @@
     <internalFileTemplate name="Elixir Module"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+    <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
+                     implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
+                     level="ERROR" shortName="NoParenthesesManyStrict"/>
   </extensions>
 
   <application-components>

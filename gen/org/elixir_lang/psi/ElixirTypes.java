@@ -52,6 +52,7 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_UNARY_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_UNARY_OPERATION");
   IElementType MATCHED_EXPRESSION_WHEN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_WHEN_OPERATION");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
+  IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER = new ElixirElementType("NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER");
   IElementType NO_PARENTHESES_QUALIFIER = new ElixirElementType("NO_PARENTHESES_QUALIFIER");
   IElementType NO_PARENTHESES_QUALIFIER_AT_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_AT_OPERATION");
@@ -316,6 +317,9 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesExpressionImpl(node);
+      }
+      else if (type == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
+        return new ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(node);
       }
       else if (type == NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER) {
         return new ElixirNoParenthesesMaybeQualifiedIdentifierImpl(node);

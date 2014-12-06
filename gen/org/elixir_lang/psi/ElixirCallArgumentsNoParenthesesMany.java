@@ -13,4 +13,7 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
   @NotNull
   List<ElixirExpression> getExpressionList();
 
+  @NotNull
+  List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
+
 }

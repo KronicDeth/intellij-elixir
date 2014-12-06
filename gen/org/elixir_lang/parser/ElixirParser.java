@@ -154,6 +154,9 @@ public class ElixirParser implements PsiParser {
     else if (t == NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesExpression(b, 0);
     }
+    else if (t == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
+      r = noParenthesesManyStrictNoParenthesesExpression(b, 0);
+    }
     else if (t == NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER) {
       r = noParenthesesMaybeQualifiedIdentifier(b, 0);
     }
@@ -387,32 +390,40 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedExpression !KEYWORD_PAIR_COLON |
-  //                                                  emptyParentheses
+  // emptyParentheses |
+  //                                                  /* Must be before matchedExpression because noParenthesesExpression is
+  //                                                     `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
+  //                                                     which is longer than `matchedExpressionDotIdentifier` in
+  //                                                     matchedExpression. */
+  //                                                  /* This will be marked as an error by
+  //                                                     {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+  //                                                  noParenthesesManyStrictNoParenthesesExpression |
+  //                                                  matchedExpression !KEYWORD_PAIR_COLON
   static boolean callArgumentsNoParenthesesExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "callArgumentsNoParenthesesExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = callArgumentsNoParenthesesExpression_0(b, l + 1);
-    if (!r) r = emptyParentheses(b, l + 1);
+    r = emptyParentheses(b, l + 1);
+    if (!r) r = noParenthesesManyStrictNoParenthesesExpression(b, l + 1);
+    if (!r) r = callArgumentsNoParenthesesExpression_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // matchedExpression !KEYWORD_PAIR_COLON
-  private static boolean callArgumentsNoParenthesesExpression_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "callArgumentsNoParenthesesExpression_0")) return false;
+  private static boolean callArgumentsNoParenthesesExpression_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "callArgumentsNoParenthesesExpression_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedExpression(b, l + 1, -1);
-    r = r && callArgumentsNoParenthesesExpression_0_1(b, l + 1);
+    r = r && callArgumentsNoParenthesesExpression_2_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !KEYWORD_PAIR_COLON
-  private static boolean callArgumentsNoParenthesesExpression_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "callArgumentsNoParenthesesExpression_0_1")) return false;
+  private static boolean callArgumentsNoParenthesesExpression_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "callArgumentsNoParenthesesExpression_2_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !consumeToken(b, KEYWORD_PAIR_COLON);
@@ -1821,6 +1832,17 @@ public class ElixirParser implements PsiParser {
     r = noParenthesesMaybeQualifiedIdentifier(b, l + 1);
     r = r && callArgumentsNoParenthesesManyStrict(b, l + 1);
     exit_section_(b, l, m, NO_PARENTHESES_EXPRESSION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // noParenthesesExpression
+  public static boolean noParenthesesManyStrictNoParenthesesExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyStrictNoParenthesesExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<no parentheses many strict no parentheses expression>");
+    r = noParenthesesExpression(b, l + 1);
+    exit_section_(b, l, m, NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION, r, false, null);
     return r;
   }
 

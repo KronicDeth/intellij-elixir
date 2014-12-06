@@ -23,15 +23,21 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirExpression getExpression() {
-    return findNotNullChildByClass(ElixirExpression.class);
+    return findChildByClass(ElixirExpression.class);
   }
 
   @Override
   @NotNull
   public ElixirKeywordKey getKeywordKey() {
     return findNotNullChildByClass(ElixirKeywordKey.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
+    return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
 }

@@ -183,6 +183,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
+    visitPsiElement(o);
+  }
+
   public void visitNoParenthesesMaybeQualifiedIdentifier(@NotNull ElixirNoParenthesesMaybeQualifiedIdentifier o) {
     visitPsiElement(o);
   }

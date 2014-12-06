@@ -1,0 +1,35 @@
+<html>
+<body>
+Detects when compiler will throw <code>unexpected comma. Parentheses are required to solve ambiguity in nested calls</code>
+<!-- tooltip end -->
+Function calls with multiple arguments without parentheses cannot take as arguments functions with multiple arguments
+without parentheses because which functional gets which arguments is unclear as in the following example:
+<pre>
+<code>
+outer_function first_outer_argument,
+               # second argument is another function call without parentheses, but with multiple arguments
+               inner_function first_inner_argument,
+               ambiguous_keyword_key: ambiguous_keyword_value
+</code>
+</pre>
+To fix the ambiguity if <code>first_inner_keyword_key: first_inner_keyword_value</code> should be associated, add
+parentheses around the inner function's arguments:
+<pre>
+<code>
+# keywords are for inner function
+outer_function first_outer_argument
+               inner_function(
+                 first_inner_argument
+                 ambiguous_keyword_key: ambiguous_keyword_value
+               )
+
+# keywords are for outer function
+outer_function first_outer_argument
+               inner_function(
+                 first_inner_argument
+               ),
+               ambiguous_keyword_key: ambiguous_keyword_value
+</code>
+</pre>
+</body>
+</html>

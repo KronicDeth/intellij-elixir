@@ -7,10 +7,13 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiElement {
 
-  @NotNull
+  @Nullable
   ElixirExpression getExpression();
 
   @NotNull
   ElixirKeywordKey getKeywordKey();
+
+  @Nullable
+  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
 }

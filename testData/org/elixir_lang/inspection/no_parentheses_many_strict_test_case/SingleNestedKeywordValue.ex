@@ -4,5 +4,5 @@
 first_function first_positional,
                # `second_function second_position, ambiguous_keyword_key: ambigious_keyword_value` is the errant
                # nested noParenthesesExpression, but the actual error will appear on the first `,`.
-               first_keyword_key: second_function second_positional,
+               first_keyword_key: second_function second_positional<error descr="unexpected comma.  Parentheses are required to solve ambiguity in nested calls.">,</error>
                   ambiguous_keyword_key: ambiguous_keyword_value

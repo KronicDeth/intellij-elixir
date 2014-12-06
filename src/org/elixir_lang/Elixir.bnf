@@ -73,8 +73,15 @@ private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-private callArgumentsNoParenthesesExpression ::= matchedExpression !KEYWORD_PAIR_COLON |
-                                                 emptyParentheses
+private callArgumentsNoParenthesesExpression ::= emptyParentheses |
+                                                 /* Must be before matchedExpression because noParenthesesExpression is
+                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
+                                                    which is longer than `matchedExpressionDotIdentifier` in
+                                                    matchedExpression. */
+                                                 /* This will be marked as an error by
+                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                                                 noParenthesesManyStrictNoParenthesesExpression |
+                                                 matchedExpression !KEYWORD_PAIR_COLON
 callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
 callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
 /* 1. (positional, keywords)
@@ -265,6 +272,11 @@ matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* mat
 /* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
    interpreted as taking no arguments. */
 noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
+/* Special class for wrapping noParenthesesExpression so that
+   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
+   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
+   ElixirNoParenthesesExpressions. */
+noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesExpression
 noParenthesesMaybeQualifiedIdentifier ::= noParenthesesQualifier* IDENTIFIER
 noParenthesesQualifier ::= noParenthesesQualifierHead noParenthesesQualifierTail*
 noParenthesesQualifierAtOperation ::= AT_OPERATOR EOL* noParenthesesQualifierHead
