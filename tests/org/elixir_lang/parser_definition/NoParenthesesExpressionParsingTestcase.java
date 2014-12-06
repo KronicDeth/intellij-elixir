@@ -33,11 +33,19 @@ public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testPositionalsWithoutKeywords() {
+    public void testPositionalEOLComma() {
         doTest(true);
     }
 
-    public void testPositionalEOLComma() {
+    public void testPositionalsEOLComma() {
+        doTest(true);
+    }
+
+    public void testPositionalsWithKeywords() {
+        doTest(true);
+    }
+
+    public void testPositionalsWithoutKeywords() {
         doTest(true);
     }
 

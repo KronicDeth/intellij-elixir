@@ -71,12 +71,17 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)+
-private callArgumentsNoParenthesesExpression ::= matchedExpression |
+/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
+   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
+private callArgumentsNoParenthesesExpression ::= matchedExpression !KEYWORD_PAIR_COLON |
                                                  emptyParentheses
 callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
 callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
+/* 1. (positional, keywords)
+   2. (positional, positional)
+   3. (positional, positional, keywords) */
 callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords |
-                                   callArgumentsNoParenthesesCommaExpression
+                                   callArgumentsNoParenthesesCommaExpression (COMMA EOL* callArgumentsNoParenthesesKeywords)?
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
