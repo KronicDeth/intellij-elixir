@@ -336,7 +336,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)*
+  // matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)+
   static boolean callArgumentsNoParenthesesCommaExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "callArgumentsNoParenthesesCommaExpression")) return false;
     boolean r;
@@ -347,16 +347,20 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // (COMMA EOL* callArgumentsNoParenthesesExpression)*
+  // (COMMA EOL* callArgumentsNoParenthesesExpression)+
   private static boolean callArgumentsNoParenthesesCommaExpression_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "callArgumentsNoParenthesesCommaExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = callArgumentsNoParenthesesCommaExpression_1_0(b, l + 1);
     int c = current_position_(b);
-    while (true) {
+    while (r) {
       if (!callArgumentsNoParenthesesCommaExpression_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "callArgumentsNoParenthesesCommaExpression_1", c)) break;
       c = current_position_(b);
     }
-    return true;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // COMMA EOL* callArgumentsNoParenthesesExpression

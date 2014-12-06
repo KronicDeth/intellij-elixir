@@ -1,6 +1,3 @@
-# single positional
-identifier first_positional
-
 # second positional is matchedExpression
 identifier first_positional, second_positional
 
