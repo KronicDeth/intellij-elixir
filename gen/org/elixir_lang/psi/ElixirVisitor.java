@@ -183,6 +183,30 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitNoParenthesesMaybeQualifiedIdentifier(@NotNull ElixirNoParenthesesMaybeQualifiedIdentifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifier(@NotNull ElixirNoParenthesesQualifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierAtOperation(@NotNull ElixirNoParenthesesQualifierAtOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberAtOperation(@NotNull ElixirNoParenthesesQualifierNumberAtOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberCaptureOperation(@NotNull ElixirNoParenthesesQualifierNumberCaptureOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberUnaryOperation(@NotNull ElixirNoParenthesesQualifierNumberUnaryOperation o) {
+    visitPsiElement(o);
+  }
+
   public void visitNumber(@NotNull ElixirNumber o) {
     visitMatchedExpressionAccessExpression(o);
   }

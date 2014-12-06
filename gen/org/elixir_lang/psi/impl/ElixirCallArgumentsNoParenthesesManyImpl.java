@@ -23,15 +23,15 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords() {
-    return findNotNullChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
+    return findChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
   }
 
   @Override
   @NotNull
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+  public List<ElixirExpression> getExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirExpression.class);
   }
 
 }

@@ -52,6 +52,12 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_UNARY_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_UNARY_OPERATION");
   IElementType MATCHED_EXPRESSION_WHEN_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_WHEN_OPERATION");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
+  IElementType NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER = new ElixirElementType("NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER");
+  IElementType NO_PARENTHESES_QUALIFIER = new ElixirElementType("NO_PARENTHESES_QUALIFIER");
+  IElementType NO_PARENTHESES_QUALIFIER_AT_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_AT_OPERATION");
+  IElementType NO_PARENTHESES_QUALIFIER_NUMBER_AT_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_AT_OPERATION");
+  IElementType NO_PARENTHESES_QUALIFIER_NUMBER_CAPTURE_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_CAPTURE_OPERATION");
+  IElementType NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
@@ -99,6 +105,7 @@ public interface ElixirTypes {
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
+  IElementType IDENTIFER = new ElixirTokenType("IDENTIFER");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_REGEX_SIGIL_NAME");
@@ -309,6 +316,24 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesExpressionImpl(node);
+      }
+      else if (type == NO_PARENTHESES_MAYBE_QUALIFIED_IDENTIFIER) {
+        return new ElixirNoParenthesesMaybeQualifiedIdentifierImpl(node);
+      }
+      else if (type == NO_PARENTHESES_QUALIFIER) {
+        return new ElixirNoParenthesesQualifierImpl(node);
+      }
+      else if (type == NO_PARENTHESES_QUALIFIER_AT_OPERATION) {
+        return new ElixirNoParenthesesQualifierAtOperationImpl(node);
+      }
+      else if (type == NO_PARENTHESES_QUALIFIER_NUMBER_AT_OPERATION) {
+        return new ElixirNoParenthesesQualifierNumberAtOperationImpl(node);
+      }
+      else if (type == NO_PARENTHESES_QUALIFIER_NUMBER_CAPTURE_OPERATION) {
+        return new ElixirNoParenthesesQualifierNumberCaptureOperationImpl(node);
+      }
+      else if (type == NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION) {
+        return new ElixirNoParenthesesQualifierNumberUnaryOperationImpl(node);
       }
       else if (type == NUMBER) {
         return new ElixirNumberImpl(node);

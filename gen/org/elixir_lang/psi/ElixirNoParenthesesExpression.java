@@ -11,6 +11,6 @@ public interface ElixirNoParenthesesExpression extends ElixirExpression {
   ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
 
   @NotNull
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier();
 
 }

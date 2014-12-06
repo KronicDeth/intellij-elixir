@@ -29,8 +29,8 @@ public class ElixirNoParenthesesExpressionImpl extends ElixirExpressionImpl impl
 
   @Override
   @NotNull
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+  public ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier() {
+    return findNotNullChildByClass(ElixirNoParenthesesMaybeQualifiedIdentifier.class);
   }
 
 }

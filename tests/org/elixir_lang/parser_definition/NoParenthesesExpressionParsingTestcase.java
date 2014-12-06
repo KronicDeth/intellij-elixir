@@ -1,6 +1,10 @@
 package org.elixir_lang.parser_definition;
 
 public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
+    public void testCharTokenNumber() {
+        doTest(true);
+    }
+
     public void testFunction() {
         doTest(true);
     }
@@ -26,6 +30,10 @@ public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
     }
 
     public void testPositional() {
+        doTest(true);
+    }
+
+    public void testPositionalsWithoutKeywords() {
         doTest(true);
     }
 

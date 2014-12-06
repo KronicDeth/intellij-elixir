@@ -70,11 +70,13 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
+private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)*
 private callArgumentsNoParenthesesExpression ::= matchedExpression |
                                                  emptyParentheses
 callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
 callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
-callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords
+callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords |
+                                   callArgumentsNoParenthesesCommaExpression
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
@@ -249,9 +251,53 @@ matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* mat
 matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
 matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
 
+/* Cannot use `(matchedExpressionDotIdentifier | identifierExpression)` as matchedExpression will be used in place of
+   matchedExpressionDotIdentifier in generated parser. I'm not sure, but it may be due to matchedExpression being the
+   expression root of matchedExpressionDotIdentifier */
+/* Cannot use `(matchedExpression EOL* DOT_OPERATOR EOL*)? IDENTIFIER` because unlike in matchedExpression, this pattern
+   from matchedExpressionDotIdentifier will have the first matchedExpression parse as a matchedExpressionDotIdentifier
+   because calling into matchedExpression does not handle the precedence starting point correctly. */
 /* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
    interpreted as taking no arguments. */
-noParenthesesExpression ::= (matchedExpressionDotIdentifier | identifierExpression) callArgumentsNoParenthesesManyStrict
+noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
+noParenthesesMaybeQualifiedIdentifier ::= noParenthesesQualifier* IDENTIFIER
+noParenthesesQualifier ::= noParenthesesQualifierHead noParenthesesQualifierTail*
+noParenthesesQualifierAtOperation ::= AT_OPERATOR EOL* noParenthesesQualifierHead
+private noParenthesesQualifierHead ::= (
+                                noParenthesesQualifierAtOperation |
+                                noParenthesesQualifierNumberCaptureOperation |
+                                noParenthesesQualifierNumberUnaryOperation |
+                                noParenthesesQualifierNumberAtOperation |
+                                OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
+                                CHAR_TOKEN |
+                                number |
+                                list |
+                                binaryString |
+                                listString |
+                                sigil |
+                                FALSE |
+                                NIL |
+                                TRUE |
+                                atom |
+                                ALIAS |
+                                IDENTIFER
+                               ) EOL* DOT_OPERATOR EOL* &(noParenthesesQualifierTail | IDENTIFIER)
+noParenthesesQualifierNumberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
+noParenthesesQualifierNumberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
+noParenthesesQualifierNumberAtOperation ::= AT_OPERATOR EOL* number
+
+// The second through second-to-last part of the qualifier is anything that can be treated as an Alias or identifier
+private noParenthesesQualifierTail ::= (
+                                binaryString |
+                                listString |
+                                sigil |
+                                FALSE |
+                                NIL |
+                                TRUE |
+                                atom |
+                                ALIAS |
+                                IDENTIFIER
+                               ) EOL* DOT_OPERATOR EOL &(noParenthesesQualifierTail | IDENTIFIER)
 
 //noParenthesesOneExpression ::= dotIdentifier
 
