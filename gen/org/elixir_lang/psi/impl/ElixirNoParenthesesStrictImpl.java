@@ -23,9 +23,15 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @NotNull
+  @Nullable
+  public ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords() {
+    return findChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
-    return findNotNullChildByClass(ElixirEmptyParentheses.class);
+    return findChildByClass(ElixirEmptyParentheses.class);
   }
 
 }

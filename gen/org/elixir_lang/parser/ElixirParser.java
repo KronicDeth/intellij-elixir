@@ -2261,14 +2261,28 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // emptyParentheses
+  // emptyParentheses |
+  //                         OPENING_PARENTHESIS callArgumentsNoParenthesesKeywords CLOSING_PARENTHESIS
   public static boolean noParenthesesStrict(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesStrict")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = emptyParentheses(b, l + 1);
+    if (!r) r = noParenthesesStrict_1(b, l + 1);
     exit_section_(b, m, NO_PARENTHESES_STRICT, r);
+    return r;
+  }
+
+  // OPENING_PARENTHESIS callArgumentsNoParenthesesKeywords CLOSING_PARENTHESIS
+  private static boolean noParenthesesStrict_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesStrict_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_PARENTHESIS);
+    r = r && callArgumentsNoParenthesesKeywords(b, l + 1);
+    r = r && consumeToken(b, CLOSING_PARENTHESIS);
+    exit_section_(b, m, null, r);
     return r;
   }
 

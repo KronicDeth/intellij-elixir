@@ -12,6 +12,12 @@ public class NoParenthesesManyTestCase extends LightCodeInsightFixtureTestCase {
         myFixture.checkHighlighting();
     }
 
+    public void testFunctionSpaceKeywordsInParentheses() {
+        myFixture.configureByFiles("FunctionSpaceKeywordsInParentheses.ex");
+        myFixture.enableInspections(NoParenthesesStrict.class);
+        myFixture.checkHighlighting();
+    }
+
     @Override
     protected String getTestDataPath() {
         return System.getenv("INTELLIJ_ELIXIR_PATH") + "/testData/org/elixir_lang/inspection/no_parentheses_strict_test_case";
