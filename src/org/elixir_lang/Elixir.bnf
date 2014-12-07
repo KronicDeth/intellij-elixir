@@ -278,7 +278,10 @@ noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsN
    ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
    rule classes. */
 noParenthesesStrict ::= emptyParentheses |
-                        OPENING_PARENTHESIS callArgumentsNoParenthesesKeywords CLOSING_PARENTHESIS
+                        OPENING_PARENTHESIS (
+                                             callArgumentsNoParenthesesKeywords |
+                                             callArgumentsNoParenthesesMany
+                                            ) CLOSING_PARENTHESIS
 /* Special class for wrapping noParenthesesExpression so that
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
    ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid

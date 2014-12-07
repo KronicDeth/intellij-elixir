@@ -1,6 +1,6 @@
 package org.elixir_lang.parser_definition;
 
-public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
+public class NoParenthesesExpressionParsingTestCase extends ParsingTestCase {
     public void testCharTokenNumber() {
         doTest(true);
     }
@@ -18,6 +18,14 @@ public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
     }
 
     public void testFunctionSpaceKeywordsInParentheses() {
+        doTest(true);
+    }
+
+    public void testFunctionSpacePositionalsAndKeywordsInParentheses() {
+        doTest(true);
+    }
+
+    public void testFunctionSpacePositionalsInParentheses() {
         doTest(true);
     }
 

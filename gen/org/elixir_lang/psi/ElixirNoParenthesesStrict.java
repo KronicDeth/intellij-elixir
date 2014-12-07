@@ -11,6 +11,9 @@ public interface ElixirNoParenthesesStrict extends PsiElement {
   ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords();
 
   @Nullable
+  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
+
+  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
 }
