@@ -211,6 +211,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
+    visitPsiElement(o);
+  }
+
   public void visitNumber(@NotNull ElixirNumber o) {
     visitMatchedExpressionAccessExpression(o);
   }

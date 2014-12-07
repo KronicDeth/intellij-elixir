@@ -1,0 +1,26 @@
+<html>
+<body>
+Detects when compiler will throw <code>unexpected parenthesis. If you are making a function call, do not insert spaces
+in between the function name and the opening parentheses.</code>.
+<!-- tooltip end -->
+Function calls with space between the function name and the parentheses cannot distinguish between function calls
+with parentheses, but with an accidental space before the <code>(</code> and function calls without parentheses where
+the first positional argument is in parentheses.
+<pre>
+<code>
+function ()
+</code>
+</pre>
+To fix the ambiguity remove the space or add outer parentheses without the space if the first argument should be
+<code>()</code>:
+<pre>
+<code>
+# extra space, no arguments to function
+function()
+
+# first argument is `()`
+function(())
+</code>
+</pre>
+</body>
+</html>

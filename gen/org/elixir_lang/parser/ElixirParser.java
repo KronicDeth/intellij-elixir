@@ -175,6 +175,9 @@ public class ElixirParser implements PsiParser {
     else if (t == NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION) {
       r = noParenthesesQualifierNumberUnaryOperation(b, 0);
     }
+    else if (t == NO_PARENTHESES_STRICT) {
+      r = noParenthesesStrict(b, 0);
+    }
     else if (t == NUMBER) {
       r = number(b, 0);
     }
@@ -572,9 +575,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // callArgumentsNoParenthesesMany
+  // callArgumentsNoParenthesesMany |
+  //                                                  noParenthesesStrict
   static boolean callArgumentsNoParenthesesManyStrict(PsiBuilder b, int l) {
-    return callArgumentsNoParenthesesMany(b, l + 1);
+    if (!recursion_guard_(b, l, "callArgumentsNoParenthesesManyStrict")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = callArgumentsNoParenthesesMany(b, l + 1);
+    if (!r) r = noParenthesesStrict(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -2247,6 +2257,18 @@ public class ElixirParser implements PsiParser {
     r = noParenthesesQualifierTail(b, l + 1);
     if (!r) r = consumeToken(b, IDENTIFIER);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // emptyParentheses
+  public static boolean noParenthesesStrict(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesStrict")) return false;
+    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = emptyParentheses(b, l + 1);
+    exit_section_(b, m, NO_PARENTHESES_STRICT, r);
     return r;
   }
 

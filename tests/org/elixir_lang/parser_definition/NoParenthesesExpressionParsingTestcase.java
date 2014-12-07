@@ -13,6 +13,10 @@ public class NoParenthesesExpressionParsingTestcase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testFunctionSpaceEmptyParentheses() {
+        doTest(true);
+    }
+
     public void testKeywords() {
         doTest(true);
     }

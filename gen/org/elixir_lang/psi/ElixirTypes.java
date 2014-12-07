@@ -59,6 +59,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_QUALIFIER_NUMBER_AT_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_AT_OPERATION");
   IElementType NO_PARENTHESES_QUALIFIER_NUMBER_CAPTURE_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_CAPTURE_OPERATION");
   IElementType NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION = new ElixirElementType("NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION");
+  IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
   IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
@@ -338,6 +339,9 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_QUALIFIER_NUMBER_UNARY_OPERATION) {
         return new ElixirNoParenthesesQualifierNumberUnaryOperationImpl(node);
+      }
+      else if (type == NO_PARENTHESES_STRICT) {
+        return new ElixirNoParenthesesStrictImpl(node);
       }
       else if (type == NUMBER) {
         return new ElixirNumberImpl(node);

@@ -22,15 +22,21 @@ public class ElixirNoParenthesesExpressionImpl extends ElixirExpressionImpl impl
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany() {
-    return findNotNullChildByClass(ElixirCallArgumentsNoParenthesesMany.class);
+    return findChildByClass(ElixirCallArgumentsNoParenthesesMany.class);
   }
 
   @Override
   @NotNull
   public ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier() {
     return findNotNullChildByClass(ElixirNoParenthesesMaybeQualifiedIdentifier.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesStrict getNoParenthesesStrict() {
+    return findChildByClass(ElixirNoParenthesesStrict.class);
   }
 
 }
