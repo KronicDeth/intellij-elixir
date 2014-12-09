@@ -503,6 +503,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state ATOM_START
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
+%state CALL_OR_KEYWORD_PAIR_MAYBE
 %state DECIMAL_EXPONENT
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
@@ -594,7 +595,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
-  {IDENTIFIER}                               { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {IDENTIFIER}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
@@ -686,6 +687,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {VALID_BINARY_DIGITS}   { return ElixirTypes.VALID_BINARY_DIGITS; }
   {EOL}|.                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                             handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<CALL_OR_KEYWORD_PAIR_MAYBE> {
+  {OPENING_PARENTHESIS} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                          handleInState(stackFrame.getLastLexicalState());
+                          // zero-width token
+                          return ElixirTypes.CALL; }
+  {EOL}|.               { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <DECIMAL_EXPONENT_SIGN> {
