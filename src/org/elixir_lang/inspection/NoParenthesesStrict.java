@@ -4,6 +4,7 @@ import com.intellij.codeInspection.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import org.elixir_lang.local_quick_fix.RemoveSpaceInFrontOfNoParenthesesStrict;
 import org.elixir_lang.psi.ElixirNoParenthesesStrict;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -48,12 +49,16 @@ public class NoParenthesesStrict extends LocalInspectionTool {
                     @Override
                     public void visitElement(PsiElement element) {
                         if (element instanceof ElixirNoParenthesesStrict) {
+                            LocalQuickFix localQuickFix = new RemoveSpaceInFrontOfNoParenthesesStrict(
+                                    element.getParent()
+                            );
                             problemsHolder.registerProblem(
                                     element,
                                     "unexpected parenthesis. If you are making a " +
                                     "function call, do not insert spaces in between the function name and the " +
                                     "opening parentheses.",
-                                    ProblemHighlightType.ERROR
+                                    ProblemHighlightType.ERROR,
+                                    localQuickFix
                             );
                         }
                         super.visitElement(element);
