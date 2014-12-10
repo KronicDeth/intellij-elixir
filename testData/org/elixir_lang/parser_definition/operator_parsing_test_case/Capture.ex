@@ -66,10 +66,6 @@
 # should parse as &(0x2 = 0x2)
 &0x2 = 0x2
 
-# captureOperation(associationOperation(value))
-# should parse as &(0x3 => 0x4)
-&0x3 => 0x4
-
 # captureOperation(pipeOperation(value))
 # should parse as &(0x3 | 0x4)
 &0x3 | 0x4
@@ -85,3 +81,20 @@
 # captureOperation(inMatchOperation(value))
 # should parse as &(0x3 <- 0x4)
 &0x3 <- 0x4
+
+#
+# captureOptions(noParenthesesExpression)
+#
+
+# should parse as &(function(positional, key: value))
+&function positional, key: value
+
+# should parse as &(function(first, second))
+&function first, second
+
+# should parse as &(function(first, second, key: value))
+&function first, second, key: value
+
+# captureOperation(associationOperation(value))
+# should parse as &(0x3 => 0x4)
+&0x3 => 0x4

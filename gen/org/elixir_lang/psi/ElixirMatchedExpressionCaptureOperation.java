@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirMatchedExpressionCaptureOperation extends ElixirMatchedExpression {
 
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  @NotNull
+  ElixirExpression getExpression();
 
 }

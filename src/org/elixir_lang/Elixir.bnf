@@ -244,7 +244,8 @@ matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matc
 matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
 matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* matchedExpression
+// noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
+matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (noParenthesesExpression | matchedExpression)
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
 matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
 matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
