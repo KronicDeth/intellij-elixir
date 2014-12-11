@@ -1,15 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -182,9 +181,6 @@ public class ElixirParser implements PsiParser {
     else if (t == NUMBER) {
       r = number(b, 0);
     }
-    else if (t == NUMBER_AT_OPERATION) {
-      r = numberAtOperation(b, 0);
-    }
     else if (t == NUMBER_UNARY_OPERATION) {
       r = numberUnaryOperation(b, 0);
     }
@@ -220,9 +216,8 @@ public class ElixirParser implements PsiParser {
       HEXADECIMAL_WHOLE_NUMBER, NUMBER, OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
     create_token_set_(BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC, DECIMAL_FLOAT,
       DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, LIST,
-      MATCHED_EXPRESSION_ACCESS_EXPRESSION, NUMBER, NUMBER_AT_OPERATION, NUMBER_UNARY_OPERATION,
-      OCTAL_WHOLE_NUMBER, SIGIL, STRING, STRING_HEREDOC,
-      UNKNOWN_BASE_WHOLE_NUMBER),
+      MATCHED_EXPRESSION_ACCESS_EXPRESSION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
     create_token_set_(ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC,
       DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER,
       IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ACCESS_EXPRESSION,
@@ -231,9 +226,8 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
       MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
       MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
-      MATCHED_EXPRESSION_WHEN_OPERATION, NUMBER, NUMBER_AT_OPERATION, NUMBER_UNARY_OPERATION,
-      OCTAL_WHOLE_NUMBER, SIGIL, STRING, STRING_HEREDOC,
-      UNKNOWN_BASE_WHOLE_NUMBER),
+      MATCHED_EXPRESSION_WHEN_OPERATION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
     create_token_set_(ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC,
       DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, EMPTY_PARENTHESES,
       EXPRESSION, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST,
@@ -243,8 +237,8 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
       MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
       MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, NO_PARENTHESES_EXPRESSION,
-      NUMBER, NUMBER_AT_OPERATION, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+      NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL,
+      STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -2322,32 +2316,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // AT_OPERATOR EOL* number
-  public static boolean numberAtOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "numberAtOperation")) return false;
-    if (!nextTokenIs(b, AT_OPERATOR)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, AT_OPERATOR);
-    r = r && numberAtOperation_1(b, l + 1);
-    r = r && number(b, l + 1);
-    exit_section_(b, m, NUMBER_AT_OPERATION, r);
-    return r;
-  }
-
-  // EOL*
-  private static boolean numberAtOperation_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "numberAtOperation_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "numberAtOperation_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
   // (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
   public static boolean numberUnaryOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numberUnaryOperation")) return false;
@@ -3399,7 +3367,6 @@ public class ElixirParser implements PsiParser {
   }
 
   // numberUnaryOperation |
-  //                                       numberAtOperation |
   //                                       OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
   //                                       /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
   //                                          elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
@@ -3418,8 +3385,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, "<matched expression access expression>");
     r = numberUnaryOperation(b, l + 1);
-    if (!r) r = numberAtOperation(b, l + 1);
-    if (!r) r = matchedExpressionAccessExpression_2(b, l + 1);
+    if (!r) r = matchedExpressionAccessExpression_1(b, l + 1);
     if (!r) r = consumeTokenSmart(b, CHAR_TOKEN);
     if (!r) r = number(b, l + 1);
     if (!r) r = list(b, l + 1);
@@ -3435,38 +3401,38 @@ public class ElixirParser implements PsiParser {
   }
 
   // OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS
-  private static boolean matchedExpressionAccessExpression_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_2")) return false;
+  private static boolean matchedExpressionAccessExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, OPENING_PARENTHESIS);
-    r = r && matchedExpressionAccessExpression_2_1(b, l + 1);
+    r = r && matchedExpressionAccessExpression_1_1(b, l + 1);
     r = r && consumeToken(b, SEMICOLON);
-    r = r && matchedExpressionAccessExpression_2_3(b, l + 1);
+    r = r && matchedExpressionAccessExpression_1_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionAccessExpression_2_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_2_1")) return false;
+  private static boolean matchedExpressionAccessExpression_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_1_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAccessExpression_2_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionAccessExpression_1_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionAccessExpression_2_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_2_3")) return false;
+  private static boolean matchedExpressionAccessExpression_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAccessExpression_1_3")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAccessExpression_2_3", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionAccessExpression_1_3", c)) break;
       c = current_position_(b);
     }
     return true;

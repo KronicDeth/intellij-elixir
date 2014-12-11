@@ -158,6 +158,7 @@ TWO_TOKEN_STAB_OPERATOR = "->"
 TWO_TOKEN_TUPLE_OPERATOR = "{}"
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
+                         "--" |
                          ".." |
                          "<>"
 TWO_TOKEN_TYPE_OPERATOR = "::"

@@ -222,7 +222,6 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionAccessExpression
 // Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
 matchedExpressionAccessExpression ::= numberUnaryOperation |
-                                      numberAtOperation |
                                       OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
                                       /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
                                          elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
@@ -338,7 +337,6 @@ number ::= binaryWholeNumber |
  * Number Operations - Used in accessExpression
  */
 
-numberAtOperation ::= AT_OPERATOR EOL* number
 numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
 
 octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
