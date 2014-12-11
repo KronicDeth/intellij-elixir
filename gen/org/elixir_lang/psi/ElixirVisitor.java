@@ -223,10 +223,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpressionAccessExpression(o);
   }
 
-  public void visitNumberCaptureOperation(@NotNull ElixirNumberCaptureOperation o) {
-    visitMatchedExpressionAccessExpression(o);
-  }
-
   public void visitNumberUnaryOperation(@NotNull ElixirNumberUnaryOperation o) {
     visitMatchedExpressionAccessExpression(o);
   }

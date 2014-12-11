@@ -62,7 +62,6 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType NUMBER_AT_OPERATION = new ElixirElementType("NUMBER_AT_OPERATION");
-  IElementType NUMBER_CAPTURE_OPERATION = new ElixirElementType("NUMBER_CAPTURE_OPERATION");
   IElementType NUMBER_UNARY_OPERATION = new ElixirElementType("NUMBER_UNARY_OPERATION");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType SIGIL = new ElixirElementType("SIGIL");
@@ -349,9 +348,6 @@ public interface ElixirTypes {
       }
       else if (type == NUMBER_AT_OPERATION) {
         return new ElixirNumberAtOperationImpl(node);
-      }
-      else if (type == NUMBER_CAPTURE_OPERATION) {
-        return new ElixirNumberCaptureOperationImpl(node);
       }
       else if (type == NUMBER_UNARY_OPERATION) {
         return new ElixirNumberUnaryOperationImpl(node);

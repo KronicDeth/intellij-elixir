@@ -221,8 +221,7 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       identifierExpression |
                       matchedExpressionAccessExpression
 // Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
-matchedExpressionAccessExpression ::= numberCaptureOperation |
-                                      numberUnaryOperation |
+matchedExpressionAccessExpression ::= numberUnaryOperation |
                                       numberAtOperation |
                                       OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
                                       /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
@@ -245,7 +244,7 @@ matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* match
 matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
 // noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (noParenthesesExpression | matchedExpression)
+matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | noParenthesesExpression | matchedExpression)
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
 matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
 matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
@@ -340,7 +339,6 @@ number ::= binaryWholeNumber |
  */
 
 numberAtOperation ::= AT_OPERATOR EOL* number
-numberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
 numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
 
 octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
