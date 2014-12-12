@@ -217,6 +217,7 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionUnaryOperation |
                       matchedExpressionDotAlias |
                       matchedExpressionDotIdentifier |
+                      matchedExpressionNoParenthesesExpressionAtOperation |
                       matchedExpressionAtOperation |
                       identifierExpression |
                       matchedExpressionAccessExpression
@@ -256,6 +257,7 @@ matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* m
 matchedExpressionMaxExpression ::= atom |
                                    ALIAS
 matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
+matchedExpressionNoParenthesesExpressionAtOperation ::= AT_OPERATOR EOL* noParenthesesExpression
 matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
 matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression

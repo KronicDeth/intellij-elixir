@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -130,6 +131,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_EXPRESSION_MULTIPLICATION_OPERATION) {
       r = matchedExpression(b, 0, 13);
     }
+    else if (t == MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION) {
+      r = matchedExpressionNoParenthesesExpressionAtOperation(b, 0);
+    }
     else if (t == MATCHED_EXPRESSION_OR_OPERATION) {
       r = matchedExpression(b, 0, 5);
     }
@@ -224,10 +228,11 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
       MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER,
       MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
-      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
-      MATCHED_EXPRESSION_WHEN_OPERATION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_OR_OPERATION,
+      MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION,
+      MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, NUMBER, NUMBER_UNARY_OPERATION,
+      OCTAL_WHOLE_NUMBER, SIGIL, STRING, STRING_HEREDOC,
+      UNKNOWN_BASE_WHOLE_NUMBER),
     create_token_set_(ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC,
       DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, EMPTY_PARENTHESES,
       EXPRESSION, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST,
@@ -235,10 +240,10 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION,
       MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION,
       MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION, MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION,
-      MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION,
-      MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION, NO_PARENTHESES_EXPRESSION,
-      NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL,
-      STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+      MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_OPERATION,
+      MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
+      NO_PARENTHESES_EXPRESSION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
+      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -2536,9 +2541,10 @@ public class ElixirParser implements PsiParser {
   // 16: PREFIX(matchedExpressionUnaryOperation)
   // 17: POSTFIX(matchedExpressionDotAlias)
   // 18: POSTFIX(matchedExpressionDotIdentifier)
-  // 19: PREFIX(matchedExpressionAtOperation)
-  // 20: ATOM(identifierExpression)
-  // 21: ATOM(matchedExpressionAccessExpression)
+  // 19: ATOM(matchedExpressionNoParenthesesExpressionAtOperation)
+  // 20: PREFIX(matchedExpressionAtOperation)
+  // 21: ATOM(identifierExpression)
+  // 22: ATOM(matchedExpressionAccessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "matchedExpression")) return false;
     addVariant(b, "<matched expression>");
@@ -2546,6 +2552,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, "<matched expression>");
     r = matchedExpressionCaptureOperation(b, l + 1);
     if (!r) r = matchedExpressionUnaryOperation(b, l + 1);
+    if (!r) r = matchedExpressionNoParenthesesExpressionAtOperation(b, l + 1);
     if (!r) r = matchedExpressionAtOperation(b, l + 1);
     if (!r) r = identifierExpression(b, l + 1);
     if (!r) r = matchedExpressionAccessExpression(b, l + 1);
@@ -3320,6 +3327,31 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
+  // AT_OPERATOR EOL* noParenthesesExpression
+  public static boolean matchedExpressionNoParenthesesExpressionAtOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionNoParenthesesExpressionAtOperation")) return false;
+    if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, AT_OPERATOR);
+    r = r && matchedExpressionNoParenthesesExpressionAtOperation_1(b, l + 1);
+    r = r && noParenthesesExpression(b, l + 1);
+    exit_section_(b, m, MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean matchedExpressionNoParenthesesExpressionAtOperation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionNoParenthesesExpressionAtOperation_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeTokenSmart(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionNoParenthesesExpressionAtOperation_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
   public static boolean matchedExpressionAtOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionAtOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
@@ -3327,7 +3359,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedExpressionAtOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 19);
+    r = p && matchedExpression(b, l, 20);
     exit_section_(b, l, m, MATCHED_EXPRESSION_AT_OPERATION, r, p, null);
     return r || p;
   }

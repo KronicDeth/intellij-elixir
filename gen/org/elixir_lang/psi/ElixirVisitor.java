@@ -151,6 +151,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionNoParenthesesExpressionAtOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionAtOperation o) {
+    visitMatchedExpression(o);
+  }
+
   public void visitMatchedExpressionOrOperation(@NotNull ElixirMatchedExpressionOrOperation o) {
     visitMatchedExpression(o);
   }

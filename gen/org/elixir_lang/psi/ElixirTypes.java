@@ -44,6 +44,7 @@ public interface ElixirTypes {
   IElementType MATCHED_EXPRESSION_MATCH_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_MATCH_OPERATION");
   IElementType MATCHED_EXPRESSION_MAX_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION_MAX_EXPRESSION");
   IElementType MATCHED_EXPRESSION_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_MULTIPLICATION_OPERATION");
+  IElementType MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION");
   IElementType MATCHED_EXPRESSION_OR_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_OR_OPERATION");
   IElementType MATCHED_EXPRESSION_PIPE_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_PIPE_OPERATION");
   IElementType MATCHED_EXPRESSION_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_EXPRESSION_RELATIONAL_OPERATION");
@@ -293,6 +294,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_EXPRESSION_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedExpressionMultiplicationOperationImpl(node);
+      }
+      else if (type == MATCHED_EXPRESSION_NO_PARENTHESES_EXPRESSION_AT_OPERATION) {
+        return new ElixirMatchedExpressionNoParenthesesExpressionAtOperationImpl(node);
       }
       else if (type == MATCHED_EXPRESSION_OR_OPERATION) {
         return new ElixirMatchedExpressionOrOperationImpl(node);
