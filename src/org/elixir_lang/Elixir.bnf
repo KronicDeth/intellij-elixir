@@ -198,7 +198,8 @@ private literalWordsBody ::= WORDS_FRAGMENT*
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-matchedExpression ::= matchedExpressionCaptureOperation |
+matchedExpression ::= matchedExpressionNoParenthesesExpressionCaptureOperation |
+                      matchedExpressionCaptureOperation |
                       matchedExpressionInMatchOperation |
                       matchedExpressionWhenOperation |
                       matchedExpressionTypeOperation |
@@ -244,7 +245,8 @@ matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* match
 matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
 // noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | noParenthesesExpression | matchedExpression)
+matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
+matchedExpressionNoParenthesesExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* noParenthesesExpression
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
 matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
 matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER

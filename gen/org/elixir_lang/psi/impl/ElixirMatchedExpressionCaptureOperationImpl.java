@@ -23,8 +23,8 @@ public class ElixirMatchedExpressionCaptureOperationImpl extends ElixirMatchedEx
 
   @Override
   @NotNull
-  public ElixirExpression getExpression() {
-    return findNotNullChildByClass(ElixirExpression.class);
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findNotNullChildByClass(ElixirMatchedExpression.class);
   }
 
 }
