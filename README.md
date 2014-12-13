@@ -101,7 +101,6 @@ around the inner function's arguments:
 
 ```elixir
 # keywords are for inner function
-
 outer_function first_outer_argument
                inner_function(
                  first_inner_argument
