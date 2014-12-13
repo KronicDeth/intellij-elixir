@@ -210,6 +210,24 @@ function(first_positional, second_positional)
   </figcaption>
 </figure>
 
+### Quick Fixes
+
+Quick Fixes are changes IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
+
+#### Remove space in front of ambiguous parentheses
+
+If a set of parentheses is marked as ambiguous then the space before it can be removed to disambiguate the parentheses
+with Alt+Enter. (Will vary based on keymap.)
+
+<figure>
+  <img alt="Remove spaces before ambiguous parentheses" src="/screenshots/local_quick_fix/Remove%20Spaces%20Before%20Ambiguous%20Parentheses.gif?raw=true"/>
+  <br/>
+  <figcaption>
+    Hitting Alt+Enter on ambiguous parentheses error will bring up the Local Quick Fix,
+    "Remove spaces between function name and parentheses".  Hit Enter to accept and remove the space.
+  </figcaption>
+</figure>
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
