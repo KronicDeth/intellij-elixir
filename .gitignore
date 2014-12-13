@@ -4,3 +4,5 @@
 /out
 # old lexer generated from Elixir.flex
 src/org/elixir_lang/ElixirFlexLexer.java~
+# OS X thumbnail store
+.DS_Store
