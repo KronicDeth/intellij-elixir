@@ -140,6 +140,76 @@ outer_function first_outer_argument
   </figcaption>
 </figure>
 
+#### Ambiguous parentheses
+
+Detects when compiler will throw `unexpected parenthesis. If you are making a function call, do not insert spaces in between the function name and the opening parentheses`. 
+Function calls with space between the function name and the parentheses cannot distinguish between function calls with
+parentheses, but with an accidental space before the `(` and function calls without parentheses where the first
+positional argument is in parentheses.
+
+##### Empty Parentheses
+```elixir
+function ()
+```
+
+To fix the ambiguity remove the space or add outer parentheses without the space if the first argument should be `()`:
+```elixir
+# extra space, no arguments to function
+function()
+
+# first argument is `()`
+function(())
+```
+
+##### Keywords in Parentheses
+```elixir
+function (key: value)
+```
+
+Keywords inside parentheses is not valid, so the only way to fix this is to remove the space
+
+```elixir
+function(key: value)
+```
+
+##### Positional arguments in Parentheses
+
+```elixir
+function (first_positional, second_positional)
+```
+
+A list of positional arguments in parenthenses is not valid, so the only way to fix this is to remove the space
+
+```elixir
+function(first_positional, second_positional)
+```
+
+<figure>
+  <img alt="Ambiguous parentheses preferences" src="/screenshots/inspection/elixir/ambiguous_parentheses/preferences.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Preferences &gt; Inspections &gt; Elixir &gt; Ambiguous parentheses
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Ambiguous parentheses error" src="/screenshots/inspection/elixir/ambiguous_parentheses/error.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Ambiguous parentheses inspection marks the error on the parenthetical group surrounded by the parentheses that are
+    ambiguous due to the preceding space.
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Ambiguous parentheses" src="/screenshots/inspection/elixir/ambiguous_parentheses/inspection.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Mousing over the parenthetical group marked as an error in red (or over ther red square in the right gutter) will
+    show the inspection describing the error.
+  </figcaption>
+</figure>
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
