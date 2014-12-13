@@ -76,7 +76,13 @@ allows the grammar because they contain correctable errors:
 * [No Parentheses expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125), which
   are function calls with neither parentheses nor `do` blocks that have either (1) a positional argument and keyword
   arguments OR (2) two or more positional arguments with optional keyword arguments.
- 
+
+### Inspections
+
+Inspections mark sections of code with warnings and errors.  They can be customized from the Preferences > Inspections > Elixir.
+
+![Elixir Inspections](/screenshots/inspection/Elixir.png?raw=true "Elixir Inspections")
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
