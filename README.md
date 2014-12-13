@@ -118,6 +118,7 @@ outer_function first_outer_argument
 
 <figure>
   <img alt="Ambiguous nested calls preferences" src="/screenshots/inspection/elixir/ambiguous_nested_calls/preferences.png?raw=true"/>
+  <br/>
   <figcaption>
     Preferences &gt; Inspections &gt; Elixir &gt; Ambiguous nested calls
   </figcaption>
@@ -125,6 +126,7 @@ outer_function first_outer_argument
 
 <figure>
   <img alt="Ambiguous nested calls error" src="/screenshots/inspection/elixir/ambiguous_nested_calls/error.png?raw=true"/>
+  <br/>
   <figcaption>
     Ambiguous nested call inspection marks the error on the comma that causes the ambiguity.
   </figcaption>
@@ -132,6 +134,7 @@ outer_function first_outer_argument
 
 <figure>
   <img alt="Ambiguous nested calls inspection" src="/screenshots/inspection/elixir/ambiguous_nested_calls/error.png?raw=true"/>
+  <br/>
   <figcaption>
     Mousing over the comma marked as an error in red (or over ther red square in the right gutter) will show the inspection
     describing the error.
