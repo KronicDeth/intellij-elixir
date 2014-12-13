@@ -133,7 +133,7 @@ outer_function first_outer_argument
 </figure>
 
 <figure>
-  <img alt="Ambiguous nested calls inspection" src="/screenshots/inspection/elixir/ambiguous_nested_calls/error.png?raw=true"/>
+  <img alt="Ambiguous nested calls inspection" src="/screenshots/inspection/elixir/ambiguous_nested_calls/inspection.png?raw=true"/>
   <br/>
   <figcaption>
     Mousing over the comma marked as an error in red (or over ther red square in the right gutter) will show the inspection
