@@ -108,6 +108,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testUnaryNoParenthesesExpression() {
+        doTest(true);
+    }
+
     public void testWhen() {
         doTest(true);
     }
