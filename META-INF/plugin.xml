@@ -9,6 +9,28 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>Next Release</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Function calls with neither parentheses nor <code>do</code> blocks that have at least 2 arguments: a
+              positional argument and keyword arguments or 2 or more positional argument(s) followed by optional keyword
+              arguments.
+            </li>
+            <li>Inspection that marks errors for ambiguous commas</li>
+            <li>Inspection that marks errors for ambiguous parentheses</li>
+            <li>Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.</li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Right hand-side of dot_alias and dot_identifier was translated incorrectly. Only Aliases and Identifiers are allowed now.</li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.2.0</h1>
       <ul>
         <li>
