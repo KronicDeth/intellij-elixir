@@ -135,7 +135,7 @@ outer_function first_outer_argument
   <img alt="Ambiguous nested calls inspection" src="/screenshots/inspection/elixir/ambiguous_nested_calls/inspection.png?raw=true"/>
   <br/>
   <figcaption>
-    Mousing over the comma marked as an error in red (or over ther red square in the right gutter) will show the inspection
+    Mousing over the comma marked as an error in red (or over the red square in the right gutter) will show the inspection
     describing the error.
   </figcaption>
 </figure>
@@ -205,7 +205,7 @@ function(first_positional, second_positional)
   <img alt="Ambiguous parentheses" src="/screenshots/inspection/elixir/ambiguous_parentheses/inspection.png?raw=true"/>
   <br/>
   <figcaption>
-    Mousing over the parenthetical group marked as an error in red (or over ther red square in the right gutter) will
+    Mousing over the parenthetical group marked as an error in red (or over the red square in the right gutter) will
     show the inspection describing the error.
   </figcaption>
 </figure>
