@@ -8,6 +8,7 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
+  IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS");
@@ -189,7 +190,10 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ATOM) {
+       if (type == ADJACENT_EXPRESSION) {
+        return new ElixirAdjacentExpressionImpl(node);
+      }
+      else if (type == ATOM) {
         return new ElixirAtomImpl(node);
       }
       else if (type == BINARY_WHOLE_NUMBER) {
