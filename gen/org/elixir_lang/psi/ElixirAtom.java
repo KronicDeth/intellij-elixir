@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirAtom extends ElixirMaxExpression {
+public interface ElixirAtom extends ElixirMatchedExpressionMaxExpression {
 
   @Nullable
-  ElixirAccessExpression getAccessExpression();
+  ElixirMatchedExpression getMatchedExpression();
 
 }

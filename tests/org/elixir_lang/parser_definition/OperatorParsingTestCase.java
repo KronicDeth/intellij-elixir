@@ -24,11 +24,19 @@ public class OperatorParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testAtNoParenthesesExpression() {
+        doTest(true);
+    }
+
     public void testBitString() {
         doTest(true);
     }
 
     public void testCapture() {
+        doTest(true);
+    }
+
+    public void testCaptureNumber() {
         doTest(true);
     }
 
@@ -97,6 +105,10 @@ public class OperatorParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnary() {
+        doTest(true);
+    }
+
+    public void testUnaryNoParenthesesExpression() {
         doTest(true);
     }
 

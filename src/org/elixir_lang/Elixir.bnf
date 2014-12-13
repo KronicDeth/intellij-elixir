@@ -7,11 +7,11 @@
    * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
    */
 
-  extends("emptyParentheses|matchedExpression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=accessExpression
+  extends("emptyParentheses|(matched|noParentheses)Expression")=expression
+  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
   extends("decimal(Float|WholeNUmber)")=decimalNumber
-  extends("accessExpression|identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
-  extends("atom|dotAlias")=maxExpression
+  extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
+  extends("atom|dotAlias")=matchedExpressionMaxExpression
   extends("(.*Whole|decimal)Number")=number
 
   psiClassPrefix="Elixir"
@@ -26,6 +26,7 @@
   tokens = [
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
+    CALL = ""
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
@@ -67,26 +68,30 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
  * In alphabetical order
  */
 
-accessExpression ::= numberCaptureOperation |
-                     numberUnaryOperation |
-                     numberAtOperation |
-                     OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
-                     /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
-                        elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
-                     CHAR_TOKEN |
-                     number |
-                     list |
-                     binaryString |
-                     listString |
-                     sigil |
-                     FALSE |
-                     NIL |
-                     TRUE |
-                     maxExpression
-
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
+private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)+
+/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
+   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
+private callArgumentsNoParenthesesExpression ::= emptyParentheses |
+                                                 /* Must be before matchedExpression because noParenthesesExpression is
+                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
+                                                    which is longer than `matchedExpressionDotIdentifier` in
+                                                    matchedExpression. */
+                                                 /* This will be marked as an error by
+                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                                                 noParenthesesManyStrictNoParenthesesExpression |
+                                                 matchedExpression !KEYWORD_PAIR_COLON
+callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
+callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
+/* 1. (positional, keywords)
+   2. (positional, positional)
+   3. (positional, positional, keywords) */
+callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords |
+                                   callArgumentsNoParenthesesCommaExpression (COMMA EOL* callArgumentsNoParenthesesKeywords)?
+private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
+                                                 noParenthesesStrict
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -103,6 +108,10 @@ emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= EOL* SEMICOLON EOL* | EOL
 expression ::= emptyParentheses |
+               /* Must be before matchedExpression because noParenthesesExpression is
+                  `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer than
+                  `matchedExpressionDotIdentifier` in matchedExpression. */
+               noParenthesesExpression |
                matchedExpression
 private expressionList ::= expression (endOfExpression+ expression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
@@ -158,7 +167,8 @@ keywordKey ::= ALIAS |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
-keywordPair ::=  keywordKey KEYWORD_PAIR_COLON EOL* keywordValue
+private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
+keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
 private listString ::= charList | charListHeredoc
@@ -188,7 +198,8 @@ private literalWordsBody ::= WORDS_FRAGMENT*
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-matchedExpression ::= matchedExpressionCaptureOperation |
+matchedExpression ::= matchedExpressionNoParenthesesExpressionCaptureOperation |
+                      matchedExpressionCaptureOperation |
                       matchedExpressionInMatchOperation |
                       matchedExpressionWhenOperation |
                       matchedExpressionTypeOperation |
@@ -204,25 +215,53 @@ matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionAdditionOperation |
                       matchedExpressionMultiplicationOperation |
                       matchedExpressionHatOperation |
+                      matchedExpressionNoParenthesesExpressionUnaryOperation |
                       matchedExpressionUnaryOperation |
-                      matchedExpressionDotOperation |
+                      matchedExpressionDotAlias |
+                      matchedExpressionDotIdentifier |
+                      matchedExpressionNoParenthesesExpressionAtOperation |
                       matchedExpressionAtOperation |
                       identifierExpression |
-                      accessExpression
+                      matchedExpressionAccessExpression
+// Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
+matchedExpressionAccessExpression ::= numberUnaryOperation |
+                                      OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
+                                      /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
+                                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
+                                      CHAR_TOKEN |
+                                      number |
+                                      list |
+                                      binaryString |
+                                      listString |
+                                      sigil |
+                                      FALSE |
+                                      NIL |
+                                      TRUE |
+                                      matchedExpressionMaxExpression
+
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
    is interpreted as unaryOperation */
 matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
 matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
 matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* matchedExpression
+// noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
+matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
+matchedExpressionNoParenthesesExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* noParenthesesExpression
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
-matchedExpressionDotOperation ::= matchedExpression EOL* DOT_OPERATOR EOL* matchedExpression
+matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
+matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
 matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
 matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
 matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
 matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
+/* Specialized for matchedExpression to eliminate left-recursion from max_expr when dot_alias is a child instead of
+   matchedExpressionDotAlias being a direct child of matchedExpression */
+matchedExpressionMaxExpression ::= atom |
+                                   ALIAS
 matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
+matchedExpressionNoParenthesesExpressionAtOperation ::= AT_OPERATOR EOL* noParenthesesExpression
+matchedExpressionNoParenthesesExpressionUnaryOperation ::= UNARY_OPERATOR EOL* noParenthesesExpression
 matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
 matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
@@ -231,8 +270,68 @@ matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* mat
 matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
 matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
 
-maxExpression ::= atom |
-                  ALIAS
+/* Cannot use `(matchedExpressionDotIdentifier | identifierExpression)` as matchedExpression will be used in place of
+   matchedExpressionDotIdentifier in generated parser. I'm not sure, but it may be due to matchedExpression being the
+   expression root of matchedExpressionDotIdentifier */
+/* Cannot use `(matchedExpression EOL* DOT_OPERATOR EOL*)? IDENTIFIER` because unlike in matchedExpression, this pattern
+   from matchedExpressionDotIdentifier will have the first matchedExpression parse as a matchedExpressionDotIdentifier
+   because calling into matchedExpression does not handle the precedence starting point correctly. */
+/* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
+   interpreted as taking no arguments. */
+noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
+/* Special class for wrapping rules so that
+   {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
+   ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
+   rule classes. */
+noParenthesesStrict ::= emptyParentheses |
+                        OPENING_PARENTHESIS (
+                                             callArgumentsNoParenthesesKeywords |
+                                             callArgumentsNoParenthesesMany
+                                            ) CLOSING_PARENTHESIS
+/* Special class for wrapping noParenthesesExpression so that
+   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
+   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
+   ElixirNoParenthesesExpressions. */
+noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesExpression
+noParenthesesMaybeQualifiedIdentifier ::= noParenthesesQualifier* IDENTIFIER
+noParenthesesQualifier ::= noParenthesesQualifierHead noParenthesesQualifierTail*
+noParenthesesQualifierAtOperation ::= AT_OPERATOR EOL* noParenthesesQualifierHead
+private noParenthesesQualifierHead ::= (
+                                noParenthesesQualifierAtOperation |
+                                noParenthesesQualifierNumberCaptureOperation |
+                                noParenthesesQualifierNumberUnaryOperation |
+                                noParenthesesQualifierNumberAtOperation |
+                                OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
+                                CHAR_TOKEN |
+                                number |
+                                list |
+                                binaryString |
+                                listString |
+                                sigil |
+                                FALSE |
+                                NIL |
+                                TRUE |
+                                atom |
+                                ALIAS |
+                                IDENTIFER
+                               ) EOL* DOT_OPERATOR EOL* &(noParenthesesQualifierTail | IDENTIFIER)
+noParenthesesQualifierNumberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
+noParenthesesQualifierNumberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
+noParenthesesQualifierNumberAtOperation ::= AT_OPERATOR EOL* number
+
+// The second through second-to-last part of the qualifier is anything that can be treated as an Alias or identifier
+private noParenthesesQualifierTail ::= (
+                                binaryString |
+                                listString |
+                                sigil |
+                                FALSE |
+                                NIL |
+                                TRUE |
+                                atom |
+                                ALIAS |
+                                IDENTIFIER
+                               ) EOL* DOT_OPERATOR EOL &(noParenthesesQualifierTail | IDENTIFIER)
+
 //noParenthesesOneExpression ::= dotIdentifier
 
 number ::= binaryWholeNumber |
@@ -244,8 +343,6 @@ number ::= binaryWholeNumber |
  * Number Operations - Used in accessExpression
  */
 
-numberAtOperation ::= AT_OPERATOR EOL* number
-numberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
 numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
 
 octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }

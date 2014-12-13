@@ -12,6 +12,7 @@ public class ElixirTestCase extends TestCase {
     public static TestSuite suite() {
         TestSuite suite = new TestSuite();
 
+        suite.addTestSuite(org.elixir_lang.inspection.NoParenthesesManyStrictTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.AtomParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.GeneralParsingTestCase.class);
         suite.addTestSuite(org.elixir_lang.parser_definition.ListParsingTestCase.class);

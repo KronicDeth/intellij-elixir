@@ -7,24 +7,32 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
-  public void visitAccessExpression(@NotNull ElixirAccessExpression o) {
-    visitMatchedExpression(o);
-  }
-
   public void visitAtom(@NotNull ElixirAtom o) {
-    visitMaxExpression(o);
+    visitMatchedExpressionMaxExpression(o);
   }
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
     visitNumber(o);
   }
 
+  public void visitCallArgumentsNoParenthesesKeywords(@NotNull ElixirCallArgumentsNoParenthesesKeywords o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCallArgumentsNoParenthesesKeywordsExpression(@NotNull ElixirCallArgumentsNoParenthesesKeywordsExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCallArgumentsNoParenthesesMany(@NotNull ElixirCallArgumentsNoParenthesesMany o) {
+    visitPsiElement(o);
+  }
+
   public void visitCharList(@NotNull ElixirCharList o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
@@ -76,11 +84,15 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitList(@NotNull ElixirList o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitMatchedExpression(@NotNull ElixirMatchedExpression o) {
     visitExpression(o);
+  }
+
+  public void visitMatchedExpressionAccessExpression(@NotNull ElixirMatchedExpressionAccessExpression o) {
+    visitMatchedExpression(o);
   }
 
   public void visitMatchedExpressionAdditionOperation(@NotNull ElixirMatchedExpressionAdditionOperation o) {
@@ -107,7 +119,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
-  public void visitMatchedExpressionDotOperation(@NotNull ElixirMatchedExpressionDotOperation o) {
+  public void visitMatchedExpressionDotAlias(@NotNull ElixirMatchedExpressionDotAlias o) {
+    visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionDotIdentifier(@NotNull ElixirMatchedExpressionDotIdentifier o) {
     visitMatchedExpression(o);
   }
 
@@ -127,7 +143,23 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionMaxExpression(@NotNull ElixirMatchedExpressionMaxExpression o) {
+    visitMatchedExpression(o);
+  }
+
   public void visitMatchedExpressionMultiplicationOperation(@NotNull ElixirMatchedExpressionMultiplicationOperation o) {
+    visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionNoParenthesesExpressionAtOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionAtOperation o) {
+    visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionNoParenthesesExpressionCaptureOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionCaptureOperation o) {
+    visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionNoParenthesesExpressionUnaryOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionUnaryOperation o) {
     visitMatchedExpression(o);
   }
 
@@ -159,24 +191,48 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
-  public void visitMaxExpression(@NotNull ElixirMaxExpression o) {
-    visitAccessExpression(o);
+  public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesMaybeQualifiedIdentifier(@NotNull ElixirNoParenthesesMaybeQualifiedIdentifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifier(@NotNull ElixirNoParenthesesQualifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierAtOperation(@NotNull ElixirNoParenthesesQualifierAtOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberAtOperation(@NotNull ElixirNoParenthesesQualifierNumberAtOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberCaptureOperation(@NotNull ElixirNoParenthesesQualifierNumberCaptureOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesQualifierNumberUnaryOperation(@NotNull ElixirNoParenthesesQualifierNumberUnaryOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
+    visitPsiElement(o);
   }
 
   public void visitNumber(@NotNull ElixirNumber o) {
-    visitAccessExpression(o);
-  }
-
-  public void visitNumberAtOperation(@NotNull ElixirNumberAtOperation o) {
-    visitAccessExpression(o);
-  }
-
-  public void visitNumberCaptureOperation(@NotNull ElixirNumberCaptureOperation o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitNumberUnaryOperation(@NotNull ElixirNumberUnaryOperation o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
@@ -184,15 +240,15 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitSigil(@NotNull ElixirSigil o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitString(@NotNull ElixirString o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
-    visitAccessExpression(o);
+    visitMatchedExpressionAccessExpression(o);
   }
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {

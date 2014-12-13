@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirNumberUnaryOperation extends ElixirAccessExpression {
+public interface ElixirNumberUnaryOperation extends ElixirMatchedExpressionAccessExpression {
 
   @NotNull
   ElixirNumber getNumber();
