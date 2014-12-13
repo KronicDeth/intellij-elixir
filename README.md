@@ -83,6 +83,61 @@ Inspections mark sections of code with warnings and errors.  They can be customi
 
 ![Elixir Inspections](/screenshots/inspection/Elixir.png?raw=true "Elixir Inspections")
 
+#### Ambiguous nested calls 
+
+Detects when compiler will throw `unexpected comma. Parentheses are required to solve ambiguity in nested calls`.
+Function calls with multiple arguments without parentheses cannot take as arguments functions with multiple arguments
+without parentheses because which functional gets which arguments is unclear as in the following example:
+
+```elixir
+outer_function first_outer_argument,
+               # second argument is another function call without parentheses, but with multiple arguments
+               inner_function first_inner_argument,
+               ambiguous_keyword_key: ambiguous_keyword_value
+```
+
+To fix the ambiguity if `first_inner_keyword_key: first_inner_keyword_value` should be associated, add parentheses
+around the inner function's arguments:
+
+```elixir
+# keywords are for inner function
+
+outer_function first_outer_argument
+               inner_function(
+                 first_inner_argument
+                 ambiguous_keyword_key: ambiguous_keyword_value
+               )
+
+# keywords are for outer function
+outer_function first_outer_argument
+               inner_function(
+                 first_inner_argument
+               ),
+               ambiguous_keyword_key: ambiguous_keyword_value
+```
+
+<figure>
+  ![Ambiguous nested calls preferences](/screenshots/inspection/elixir/ambiguous_nested_calls/preferences.png?raw=true "Ambiguous nested calls preferences")
+  <figcaption>
+    Preferences &gt; Inspections &gt; Elixir &gt; Ambiguous nested calls
+  </figcaption>
+</figure>
+
+<figure>
+  ![Ambiguous nested calls error](/screenshots/inspection/elixir/ambiguous_nested_calls/error.png?raw=true "Ambiguous nested calls error")
+  <figcaption>
+    Ambiguous nested call inspection marks the error on the comma that causes the ambiguity.
+  </figcaption>
+</figure>
+
+<figure>
+  ![Ambiguous nested calls inspection](/screenshots/inspection/elixir/ambiguous_nested_calls/error.png?raw=true "Ambiguous nested calls inspection")
+  <figcaption>
+    Mousing over the comma marked as an error in red (or over ther red square in the right gutter) will show the inspection
+    describing the error.
+  </figcaption>
+</figure>
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
