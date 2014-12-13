@@ -212,7 +212,7 @@ function(first_positional, second_positional)
 
 ### Quick Fixes
 
-Quick Fixes are changes IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
+Quick Fixes are actions IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
 
 #### Remove space in front of ambiguous parentheses
 
