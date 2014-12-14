@@ -4,6 +4,7 @@ import com.intellij.codeInspection.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import org.elixir_lang.local_quick_fix.AddNewline;
 import org.elixir_lang.local_quick_fix.AddSemicolon;
 import org.elixir_lang.psi.ElixirAdjacentExpression;
 import org.jetbrains.annotations.Nls;
@@ -48,14 +49,17 @@ public class MissingEndOfExpression extends LocalInspectionTool {
                             final PsiElement startElement = element.getPrevSibling();
                             final PsiElement endElement = element;
 
-                            LocalQuickFix localQuickFix = new AddSemicolon(startElement, (ElixirAdjacentExpression) endElement);
+                            LocalQuickFix addNewline = new AddNewline(startElement, (ElixirAdjacentExpression) endElement);
+                            LocalQuickFix addSemicolon = new AddSemicolon(startElement, (ElixirAdjacentExpression) endElement);
+
                             ProblemDescriptor problemDesription = manager.createProblemDescriptor(
                                     element.getPrevSibling(),
                                     element,
                                     "Missing `;` or new line.",
                                     ProblemHighlightType.ERROR,
                                     isOnTheFly,
-                                    localQuickFix
+                                    addNewline,
+                                    addSemicolon
                             );
 
                             problemsHolder.registerProblem(problemDesription);
