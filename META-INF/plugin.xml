@@ -22,6 +22,9 @@
             <li>Inspection that marks errors for ambiguous commas</li>
             <li>Inspection that marks errors for ambiguous parentheses</li>
             <li>Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.</li>
+            <li>Inspection that marks errors for missing end-of-expressions (`;` and newlines) between expressions.</li>
+            <li>Quick Fix to insert `;` for missing end-of-expression.</li>
+            <li>Quick Fix to insert newline for missing end-of-expression.</li>
           </ul>
         </li>
         <li>

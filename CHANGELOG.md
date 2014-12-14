@@ -7,6 +7,10 @@
     * Inspection that marks errors for ambiguous commas
     * Inspection that marks errors for ambiguous parentheses
     * Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.
+  * [#75](https://github.com/KronicDeth/intellij-elixir/pull/75) - [@KronicDeth](https://github.com/KronicDeth)
+    * Inspection that marks errors for missing end-of-expressions (`;` and newlines) between expressions.
+    * Quick Fix to insert `;` for missing end-of-expression.
+    * Quick Fix to insert newline for missing end-of-expression.
 * Bug Fixes
   * [#74](https://github.com/KronicDeth/intellij-elixir/pull/74) - Right hand-side of `dot_alias` and `dot_identifier`
     was translated incorrectly. Only Aliases and Identifiers are allowed now. [@KronicDeth](https://github.com/KronicDeth)
