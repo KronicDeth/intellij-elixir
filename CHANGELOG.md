@@ -4,17 +4,8 @@
 * Enchancements
   * [#74](https://github.com/KronicDeth/intellij-elixir/pull/74) - [@KronicDeth](https://github.com/KronicDeth)
     * Function calls with neither parentheses nor `do` blocks that have at least 2 arguments: a positional argument and keyword arguments or 2 or more positional argument(s) followed by optional keyword arguments.
-    * Inspection that marks errors for ambiguous commas, such as in 
-```elixir
-   outer_function first_outer_argument,
-                  # second argument is another function call without parentheses, but with multiple arguments
-                  inner_function first_inner_argument,
-                  ambiguous_keyword_key: ambiguous_keyword_value
-```
-    * Inspection that marks errors for ambiguous parentheses, such as in 
-```elixir
-   function ()
-```    
+    * Inspection that marks errors for ambiguous commas
+    * Inspection that marks errors for ambiguous parentheses
     * Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.
 * Bug Fixes
   * [#74](https://github.com/KronicDeth/intellij-elixir/pull/74) - Right hand-side of `dot_alias` and `dot_identifier`
