@@ -24,6 +24,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirAdjacentExpression> getAdjacentExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAdjacentExpression.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirEndOfExpression> getEndOfExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
   }

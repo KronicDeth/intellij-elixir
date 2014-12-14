@@ -68,6 +68,8 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
  * In alphabetical order
  */
 
+// an expression in an expressionList that is NOT preceded by endOfExpression(s)
+adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
@@ -113,7 +115,7 @@ expression ::= emptyParentheses |
                   `matchedExpressionDotIdentifier` in matchedExpression. */
                noParenthesesExpression |
                matchedExpression
-private expressionList ::= expression (endOfExpression+ expression)*
+private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 identifierExpression ::= IDENTIFIER
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR

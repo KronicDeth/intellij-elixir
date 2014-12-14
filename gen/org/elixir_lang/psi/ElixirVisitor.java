@@ -7,6 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
+  public void visitAdjacentExpression(@NotNull ElixirAdjacentExpression o) {
+    visitPsiElement(o);
+  }
+
   public void visitAtom(@NotNull ElixirAtom o) {
     visitMatchedExpressionMaxExpression(o);
   }

@@ -125,6 +125,9 @@
     <localInspection displayName="Ambiguous parentheses" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesStrict" language="Elixir"
                      level="ERROR" shortName="NoParenthesesStrict"/>
+    <localInspection displayName="Missing End-of-Expression" enabledByDefault="true" groupName="Elixir"
+                     implementationClass="org.elixir_lang.inspection.MissingEndOfExpression" language="Elixir"
+                     level="ERROR" shortName="MissingEndOfExpression"/>
   </extensions>
 
   <application-components>

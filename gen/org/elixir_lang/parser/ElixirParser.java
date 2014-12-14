@@ -22,7 +22,10 @@ public class ElixirParser implements PsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ATOM) {
+    if (t == ADJACENT_EXPRESSION) {
+      r = adjacentExpression(b, 0);
+    }
+    else if (t == ATOM) {
       r = atom(b, 0);
     }
     else if (t == BINARY_WHOLE_NUMBER) {
@@ -251,6 +254,17 @@ public class ElixirParser implements PsiParser {
       NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL, STRING,
       STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
   };
+
+  /* ********************************************************** */
+  // expression
+  public static boolean adjacentExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "adjacentExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<adjacent expression>");
+    r = expression(b, l + 1);
+    exit_section_(b, l, m, ADJACENT_EXPRESSION, r, false, null);
+    return r;
+  }
 
   /* ********************************************************** */
   // COLON (ATOM_FRAGMENT | quote)
@@ -884,7 +898,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // expression (endOfExpression+ expression)*
+  // expression (endOfExpression+ expression | adjacentExpression)*
   static boolean expressionList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList")) return false;
     boolean r;
@@ -895,7 +909,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // (endOfExpression+ expression)*
+  // (endOfExpression+ expression | adjacentExpression)*
   private static boolean expressionList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList_1")) return false;
     int c = current_position_(b);
@@ -907,27 +921,38 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // endOfExpression+ expression
+  // endOfExpression+ expression | adjacentExpression
   private static boolean expressionList_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = expressionList_1_0_0(b, l + 1);
+    if (!r) r = adjacentExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // endOfExpression+ expression
+  private static boolean expressionList_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionList_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = expressionList_1_0_0_0(b, l + 1);
     r = r && expression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // endOfExpression+
-  private static boolean expressionList_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expressionList_1_0_0")) return false;
+  private static boolean expressionList_1_0_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionList_1_0_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = endOfExpression(b, l + 1);
     int c = current_position_(b);
     while (r) {
       if (!endOfExpression(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "expressionList_1_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "expressionList_1_0_0_0", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);

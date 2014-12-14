@@ -210,9 +210,53 @@ function(first_positional, second_positional)
   </figcaption>
 </figure>
 
+#### Missing End-of-Expression
+
+End-of-expressions (`;` or new lines) missing between expressions.
+
+<figure>
+  <img alt="Missing End-of-Expression" src="/screenshots/inspection/elixir/missing_end_of_expression/preferences.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Preferences &gt; Inspections &gt; Elixir &gt; Missing End-of-Expression
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Missing End-of-Expression error" src="/screenshots/inspection/elixir/missing_end_of_expression/error.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Missing end-of-expression inspection marks the error over the two expressions that should be separated by either a
+    `;` or new line. 
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Missing End-of-Expression inspection" src="/screenshots/inspection/elixir/ambiguous_parentheses/inspection.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Mousing over the expressions marked as an error in red (or over the red square in the right gutter) will
+    show the inspection describing the error.
+  </figcaption>
+</figure>
+
 ### Quick Fixes
 
 Quick Fixes are actions IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
+
+#### Add End-of-Expression
+
+If an end-of-expression is missing, it can be added as a `;` or a newline with Alt+Enter.  (Will vary based on keymap.)
+
+<figure>
+  <img alt="Add `;` or newline between expressions" src="/screenshots/local_quick_fix/Add%20End-of-Expression.gif?raw=true"/>
+  <br/>
+  <figcaption>
+    Hitting Alt+Enter on missing end-of-expression will bring up the Local Quick Fixes,
+    "Add `;` for missing end-of-expression" and "Add newline for the missing end-of-expression".  Select the
+    end-of-expression, hit enter to accept and add the missing end-of-expression.
+  </figcaption>
+</figure>
 
 #### Remove space in front of ambiguous parentheses
 
