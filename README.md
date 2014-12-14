@@ -215,11 +215,11 @@ function(first_positional, second_positional)
 End-of-expressions (`;` or new lines) missing between expressions.
 
 <figure>
-  <img alt="Missing End-of-Expression" src="/screenshots/inspections/elixir/missing_end_of_expression/preferences.png?raw=true"/>
+  <img alt="Missing End-of-Expression" src="/screenshots/inspection/elixir/missing_end_of_expression/preferences.png?raw=true"/>
   <br/>
-  <figcaption>>
+  <figcaption>
     Preferences &gt; Inspections &gt; Elixir &gt; Missing End-of-Expression
-  </figcaption
+  </figcaption>
 </figure>
 
 <figure>
