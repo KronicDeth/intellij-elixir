@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirMatchedExpressionNoParenthesesExpressionCaptureOperation extends ElixirMatchedExpression {
+public interface ElixirMatchedExpressionPipeNoParenthesesExpressionOperation extends ElixirNoParenthesesExpression {
 
   @NotNull
-  ElixirNoParenthesesExpression getNoParenthesesExpression();
+  List<ElixirExpression> getExpressionList();
 
 }

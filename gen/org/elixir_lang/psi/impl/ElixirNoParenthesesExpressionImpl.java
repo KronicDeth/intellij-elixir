@@ -28,9 +28,9 @@ public class ElixirNoParenthesesExpressionImpl extends ElixirExpressionImpl impl
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier() {
-    return findNotNullChildByClass(ElixirNoParenthesesMaybeQualifiedIdentifier.class);
+    return findChildByClass(ElixirNoParenthesesMaybeQualifiedIdentifier.class);
   }
 
   @Override

@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirMatchedExpressionNoParenthesesExpressionAtOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedExpressionNoParenthesesExpressionAtOperation {
+public class ElixirUnaryNoParenthesesExpressionOperationImpl extends ElixirNoParenthesesExpressionImpl implements ElixirUnaryNoParenthesesExpressionOperation {
 
-  public ElixirMatchedExpressionNoParenthesesExpressionAtOperationImpl(ASTNode node) {
+  public ElixirUnaryNoParenthesesExpressionOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedExpressionNoParenthesesExpressionAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnaryNoParenthesesExpressionOperation(this);
     else super.accept(visitor);
   }
 

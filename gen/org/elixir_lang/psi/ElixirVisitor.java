@@ -11,6 +11,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAtNoParenthesesExpressionOperation(@NotNull ElixirAtNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitAtom(@NotNull ElixirAtom o) {
     visitMatchedExpressionMaxExpression(o);
   }
@@ -29,6 +33,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitCallArgumentsNoParenthesesMany(@NotNull ElixirCallArgumentsNoParenthesesMany o) {
     visitPsiElement(o);
+  }
+
+  public void visitCaptureNoParenthesesExpressionOperation(@NotNull ElixirCaptureNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitCharList(@NotNull ElixirCharList o) {
@@ -99,12 +107,24 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionAdditionNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionAdditionNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionAdditionOperation(@NotNull ElixirMatchedExpressionAdditionOperation o) {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionAndNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionAndNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionAndOperation(@NotNull ElixirMatchedExpressionAndOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionArrowNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionArrowNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionArrowOperation(@NotNull ElixirMatchedExpressionArrowOperation o) {
@@ -119,6 +139,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionComparisonNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionComparisonNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionComparisonOperation(@NotNull ElixirMatchedExpressionComparisonOperation o) {
     visitMatchedExpression(o);
   }
@@ -131,16 +155,32 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionHatNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionHatNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionHatOperation(@NotNull ElixirMatchedExpressionHatOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionInMatchNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionInMatchNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionInMatchOperation(@NotNull ElixirMatchedExpressionInMatchOperation o) {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionInNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionInNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionInOperation(@NotNull ElixirMatchedExpressionInOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionMatchNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionMatchNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionMatchOperation(@NotNull ElixirMatchedExpressionMatchOperation o) {
@@ -151,36 +191,48 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionMultiplicationNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionMultiplicationNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionMultiplicationOperation(@NotNull ElixirMatchedExpressionMultiplicationOperation o) {
     visitMatchedExpression(o);
   }
 
-  public void visitMatchedExpressionNoParenthesesExpressionAtOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionAtOperation o) {
-    visitMatchedExpression(o);
-  }
-
-  public void visitMatchedExpressionNoParenthesesExpressionCaptureOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionCaptureOperation o) {
-    visitMatchedExpression(o);
-  }
-
-  public void visitMatchedExpressionNoParenthesesExpressionUnaryOperation(@NotNull ElixirMatchedExpressionNoParenthesesExpressionUnaryOperation o) {
-    visitMatchedExpression(o);
+  public void visitMatchedExpressionOrNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionOrNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionOrOperation(@NotNull ElixirMatchedExpressionOrOperation o) {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionPipeNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionPipeNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionPipeOperation(@NotNull ElixirMatchedExpressionPipeOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionRelationalNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionRelationalNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionRelationalOperation(@NotNull ElixirMatchedExpressionRelationalOperation o) {
     visitMatchedExpression(o);
   }
 
+  public void visitMatchedExpressionTwoNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionTwoNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
+  }
+
   public void visitMatchedExpressionTwoOperation(@NotNull ElixirMatchedExpressionTwoOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionTypeNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionTypeNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionTypeOperation(@NotNull ElixirMatchedExpressionTypeOperation o) {
@@ -189,6 +241,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedExpressionUnaryOperation(@NotNull ElixirMatchedExpressionUnaryOperation o) {
     visitMatchedExpression(o);
+  }
+
+  public void visitMatchedExpressionWhenNoParenthesesExpressionOperation(@NotNull ElixirMatchedExpressionWhenNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitMatchedExpressionWhenOperation(@NotNull ElixirMatchedExpressionWhenOperation o) {
@@ -253,6 +309,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitMatchedExpressionAccessExpression(o);
+  }
+
+  public void visitUnaryNoParenthesesExpressionOperation(@NotNull ElixirUnaryNoParenthesesExpressionOperation o) {
+    visitNoParenthesesExpression(o);
   }
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {

@@ -10,6 +10,9 @@
   extends("emptyParentheses|(matched|noParentheses)Expression")=expression
   extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
   extends("decimal(Float|WholeNUmber)")=decimalNumber
+  /* Must be before `extends(...)=matchedExpression` because `matchedExpression.*` will match operations that begin with
+     `matchedExpression`, but end with `NoParenthesesExpressionOperation`. */
+  extends(".*NoParenthesesExpressionOperation")=noParenthesesExpression
   extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
   extends("atom|dotAlias")=matchedExpressionMaxExpression
   extends("(.*Whole|decimal)Number")=number
@@ -200,8 +203,7 @@ private literalWordsBody ::= WORDS_FRAGMENT*
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-matchedExpression ::= matchedExpressionNoParenthesesExpressionCaptureOperation |
-                      matchedExpressionCaptureOperation |
+matchedExpression ::= matchedExpressionCaptureOperation |
                       matchedExpressionInMatchOperation |
                       matchedExpressionWhenOperation |
                       matchedExpressionTypeOperation |
@@ -217,11 +219,9 @@ matchedExpression ::= matchedExpressionNoParenthesesExpressionCaptureOperation |
                       matchedExpressionAdditionOperation |
                       matchedExpressionMultiplicationOperation |
                       matchedExpressionHatOperation |
-                      matchedExpressionNoParenthesesExpressionUnaryOperation |
                       matchedExpressionUnaryOperation |
                       matchedExpressionDotAlias |
                       matchedExpressionDotIdentifier |
-                      matchedExpressionNoParenthesesExpressionAtOperation |
                       matchedExpressionAtOperation |
                       identifierExpression |
                       matchedExpressionAccessExpression
@@ -249,7 +249,6 @@ matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* m
 matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
 // noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
 matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
-matchedExpressionNoParenthesesExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* noParenthesesExpression
 matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
 matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
 matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
@@ -262,8 +261,6 @@ matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* m
 matchedExpressionMaxExpression ::= atom |
                                    ALIAS
 matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
-matchedExpressionNoParenthesesExpressionAtOperation ::= AT_OPERATOR EOL* noParenthesesExpression
-matchedExpressionNoParenthesesExpressionUnaryOperation ::= UNARY_OPERATOR EOL* noParenthesesExpression
 matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
 matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
 matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
@@ -280,7 +277,44 @@ matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* mat
    because calling into matchedExpression does not handle the precedence starting point correctly. */
 /* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
    interpreted as taking no arguments. */
-noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
+noParenthesesExpression ::= captureNoParenthesesExpressionOperation |
+                            matchedExpressionInMatchNoParenthesesExpressionOperation |
+                            matchedExpressionWhenNoParenthesesExpressionOperation |
+                            matchedExpressionTypeNoParenthesesExpressionOperation |
+                            matchedExpressionPipeNoParenthesesExpressionOperation |
+                            matchedExpressionMatchNoParenthesesExpressionOperation |
+                            matchedExpressionOrNoParenthesesExpressionOperation |
+                            matchedExpressionAndNoParenthesesExpressionOperation |
+                            matchedExpressionComparisonNoParenthesesExpressionOperation |
+                            matchedExpressionRelationalNoParenthesesExpressionOperation |
+                            matchedExpressionArrowNoParenthesesExpressionOperation |
+                            matchedExpressionInNoParenthesesExpressionOperation |
+                            matchedExpressionTwoNoParenthesesExpressionOperation |
+                            matchedExpressionAdditionNoParenthesesExpressionOperation |
+                            matchedExpressionMultiplicationNoParenthesesExpressionOperation |
+                            matchedExpressionHatNoParenthesesExpressionOperation |
+                            unaryNoParenthesesExpressionOperation |
+                            atNoParenthesesExpressionOperation |
+                            noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
+atNoParenthesesExpressionOperation ::= AT_OPERATOR EOL* noParenthesesExpression
+captureNoParenthesesExpressionOperation ::= CAPTURE_OPERATOR EOL* noParenthesesExpression
+matchedExpressionAdditionNoParenthesesExpressionOperation ::= matchedExpression EOL* DUAL_OPERATOR EOL* noParenthesesExpression
+matchedExpressionAndNoParenthesesExpressionOperation ::= matchedExpression EOL* AND_OPERATOR EOL* noParenthesesExpression
+matchedExpressionArrowNoParenthesesExpressionOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* noParenthesesExpression
+matchedExpressionComparisonNoParenthesesExpressionOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* noParenthesesExpression
+matchedExpressionHatNoParenthesesExpressionOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* noParenthesesExpression
+matchedExpressionInMatchNoParenthesesExpressionOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* noParenthesesExpression
+matchedExpressionInNoParenthesesExpressionOperation ::= matchedExpression EOL* IN_OPERATOR EOL* noParenthesesExpression
+matchedExpressionMatchNoParenthesesExpressionOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* noParenthesesExpression { rightAssociative = true }
+matchedExpressionMultiplicationNoParenthesesExpressionOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* noParenthesesExpression
+matchedExpressionOrNoParenthesesExpressionOperation ::= matchedExpression EOL* OR_OPERATOR EOL* noParenthesesExpression
+matchedExpressionPipeNoParenthesesExpressionOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* noParenthesesExpression { rightAssociative = true }
+matchedExpressionRelationalNoParenthesesExpressionOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* noParenthesesExpression
+matchedExpressionTwoNoParenthesesExpressionOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* noParenthesesExpression { rightAssociative = true }
+matchedExpressionTypeNoParenthesesExpressionOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* noParenthesesExpression { rightAssociative = true }
+matchedExpressionWhenNoParenthesesExpressionOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* noParenthesesExpression { rightAssociative = true }
+unaryNoParenthesesExpressionOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* noParenthesesExpression
+
 /* Special class for wrapping rules so that
    {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
    ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid

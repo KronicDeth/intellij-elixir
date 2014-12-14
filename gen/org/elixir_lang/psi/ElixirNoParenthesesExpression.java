@@ -10,7 +10,7 @@ public interface ElixirNoParenthesesExpression extends ElixirExpression {
   @Nullable
   ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
 
-  @NotNull
+  @Nullable
   ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier();
 
   @Nullable
