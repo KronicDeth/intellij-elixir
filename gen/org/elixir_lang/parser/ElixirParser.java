@@ -25,6 +25,9 @@ public class ElixirParser implements PsiParser {
     if (t == ADJACENT_EXPRESSION) {
       r = adjacentExpression(b, 0);
     }
+    else if (t == AT_MATCHED_EXPRESSION_OPERATION) {
+      r = atMatchedExpressionOperation(b, 0);
+    }
     else if (t == AT_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = atNoParenthesesExpressionOperation(b, 0);
     }
@@ -42,6 +45,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == CALL_ARGUMENTS_NO_PARENTHESES_MANY) {
       r = callArgumentsNoParenthesesMany(b, 0);
+    }
+    else if (t == CAPTURE_MATCHED_EXPRESSION_OPERATION) {
+      r = captureMatchedExpressionOperation(b, 0);
     }
     else if (t == CAPTURE_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = captureNoParenthesesExpressionOperation(b, 0);
@@ -97,35 +103,29 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_EXPRESSION_ACCESS_EXPRESSION) {
       r = matchedExpressionAccessExpression(b, 0);
     }
+    else if (t == MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 12);
+    }
     else if (t == MATCHED_EXPRESSION_ADDITION_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionAdditionNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_ADDITION_OPERATION) {
-      r = matchedExpression(b, 0, 12);
+    else if (t == MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 6);
     }
     else if (t == MATCHED_EXPRESSION_AND_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionAndNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_AND_OPERATION) {
-      r = matchedExpression(b, 0, 6);
+    else if (t == MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 9);
     }
     else if (t == MATCHED_EXPRESSION_ARROW_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionArrowNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_ARROW_OPERATION) {
-      r = matchedExpression(b, 0, 9);
-    }
-    else if (t == MATCHED_EXPRESSION_AT_OPERATION) {
-      r = matchedExpressionAtOperation(b, 0);
-    }
-    else if (t == MATCHED_EXPRESSION_CAPTURE_OPERATION) {
-      r = matchedExpressionCaptureOperation(b, 0);
+    else if (t == MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 7);
     }
     else if (t == MATCHED_EXPRESSION_COMPARISON_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionComparisonNoParenthesesExpressionOperation(b, 0);
-    }
-    else if (t == MATCHED_EXPRESSION_COMPARISON_OPERATION) {
-      r = matchedExpression(b, 0, 7);
     }
     else if (t == MATCHED_EXPRESSION_DOT_ALIAS) {
       r = matchedExpression(b, 0, 16);
@@ -133,77 +133,74 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_EXPRESSION_DOT_IDENTIFIER) {
       r = matchedExpression(b, 0, 17);
     }
+    else if (t == MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 14);
+    }
     else if (t == MATCHED_EXPRESSION_HAT_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionHatNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_HAT_OPERATION) {
-      r = matchedExpression(b, 0, 14);
+    else if (t == MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 0);
     }
     else if (t == MATCHED_EXPRESSION_IN_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionInMatchNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_IN_MATCH_OPERATION) {
-      r = matchedExpression(b, 0, 0);
+    else if (t == MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 10);
     }
     else if (t == MATCHED_EXPRESSION_IN_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionInNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_IN_OPERATION) {
-      r = matchedExpression(b, 0, 10);
+    else if (t == MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 4);
     }
     else if (t == MATCHED_EXPRESSION_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionMatchNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_MATCH_OPERATION) {
-      r = matchedExpression(b, 0, 4);
-    }
     else if (t == MATCHED_EXPRESSION_MAX_EXPRESSION) {
       r = matchedExpressionMaxExpression(b, 0);
+    }
+    else if (t == MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 13);
     }
     else if (t == MATCHED_EXPRESSION_MULTIPLICATION_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionMultiplicationNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_MULTIPLICATION_OPERATION) {
-      r = matchedExpression(b, 0, 13);
+    else if (t == MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 5);
     }
     else if (t == MATCHED_EXPRESSION_OR_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionOrNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_OR_OPERATION) {
-      r = matchedExpression(b, 0, 5);
+    else if (t == MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 3);
     }
     else if (t == MATCHED_EXPRESSION_PIPE_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionPipeNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_PIPE_OPERATION) {
-      r = matchedExpression(b, 0, 3);
+    else if (t == MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 8);
     }
     else if (t == MATCHED_EXPRESSION_RELATIONAL_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionRelationalNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_RELATIONAL_OPERATION) {
-      r = matchedExpression(b, 0, 8);
+    else if (t == MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 11);
     }
     else if (t == MATCHED_EXPRESSION_TWO_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionTwoNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_TWO_OPERATION) {
-      r = matchedExpression(b, 0, 11);
+    else if (t == MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 2);
     }
     else if (t == MATCHED_EXPRESSION_TYPE_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionTypeNoParenthesesExpressionOperation(b, 0);
     }
-    else if (t == MATCHED_EXPRESSION_TYPE_OPERATION) {
-      r = matchedExpression(b, 0, 2);
-    }
-    else if (t == MATCHED_EXPRESSION_UNARY_OPERATION) {
-      r = matchedExpressionUnaryOperation(b, 0);
+    else if (t == MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION) {
+      r = matchedExpression(b, 0, 1);
     }
     else if (t == MATCHED_EXPRESSION_WHEN_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = matchedExpressionWhenNoParenthesesExpressionOperation(b, 0);
-    }
-    else if (t == MATCHED_EXPRESSION_WHEN_OPERATION) {
-      r = matchedExpression(b, 0, 1);
     }
     else if (t == NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesExpression(b, 0);
@@ -250,6 +247,9 @@ public class ElixirParser implements PsiParser {
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
     }
+    else if (t == UNARY_MATCHED_EXPRESSION_OPERATION) {
+      r = unaryMatchedExpressionOperation(b, 0);
+    }
     else if (t == UNARY_NO_PARENTHESES_EXPRESSION_OPERATION) {
       r = unaryNoParenthesesExpressionOperation(b, 0);
     }
@@ -271,40 +271,41 @@ public class ElixirParser implements PsiParser {
     create_token_set_(DECIMAL_FLOAT, DECIMAL_NUMBER),
     create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
       HEXADECIMAL_WHOLE_NUMBER, NUMBER, OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
-    create_token_set_(BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC, DECIMAL_FLOAT,
-      DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, LIST,
-      MATCHED_EXPRESSION_ACCESS_EXPRESSION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC,
+      DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER,
+      LIST, MATCHED_EXPRESSION_ACCESS_EXPRESSION, MATCHED_EXPRESSION_MAX_EXPRESSION, NUMBER,
+      NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL, STRING,
+      STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
     create_token_set_(AT_NO_PARENTHESES_EXPRESSION_OPERATION, CAPTURE_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ADDITION_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_NO_PARENTHESES_EXPRESSION_OPERATION,
       MATCHED_EXPRESSION_ARROW_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION,
       MATCHED_EXPRESSION_IN_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_NO_PARENTHESES_EXPRESSION_OPERATION,
       MATCHED_EXPRESSION_PIPE_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_RELATIONAL_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_NO_PARENTHESES_EXPRESSION_OPERATION,
       MATCHED_EXPRESSION_WHEN_NO_PARENTHESES_EXPRESSION_OPERATION, NO_PARENTHESES_EXPRESSION, UNARY_NO_PARENTHESES_EXPRESSION_OPERATION),
-    create_token_set_(ATOM, BINARY_WHOLE_NUMBER, CHAR_LIST, CHAR_LIST_HEREDOC,
-      DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER,
-      IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ACCESS_EXPRESSION,
-      MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION,
-      MATCHED_EXPRESSION_CAPTURE_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER,
-      MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION,
-      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION,
-      MATCHED_EXPRESSION_WHEN_OPERATION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNKNOWN_BASE_WHOLE_NUMBER),
-    create_token_set_(ATOM, AT_NO_PARENTHESES_EXPRESSION_OPERATION, BINARY_WHOLE_NUMBER, CAPTURE_NO_PARENTHESES_EXPRESSION_OPERATION,
+    create_token_set_(ATOM, AT_MATCHED_EXPRESSION_OPERATION, BINARY_WHOLE_NUMBER, CAPTURE_MATCHED_EXPRESSION_OPERATION,
       CHAR_LIST, CHAR_LIST_HEREDOC, DECIMAL_FLOAT, DECIMAL_NUMBER,
-      DECIMAL_WHOLE_NUMBER, EMPTY_PARENTHESES, EXPRESSION, HEXADECIMAL_WHOLE_NUMBER,
-      IDENTIFIER_EXPRESSION, LIST, MATCHED_EXPRESSION, MATCHED_EXPRESSION_ACCESS_EXPRESSION,
-      MATCHED_EXPRESSION_ADDITION_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ADDITION_OPERATION, MATCHED_EXPRESSION_AND_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_OPERATION,
-      MATCHED_EXPRESSION_ARROW_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_OPERATION, MATCHED_EXPRESSION_AT_OPERATION, MATCHED_EXPRESSION_CAPTURE_OPERATION,
-      MATCHED_EXPRESSION_COMPARISON_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_OPERATION, MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER,
-      MATCHED_EXPRESSION_HAT_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_OPERATION, MATCHED_EXPRESSION_IN_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_OPERATION,
-      MATCHED_EXPRESSION_IN_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_OPERATION, MATCHED_EXPRESSION_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_OPERATION,
-      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, MATCHED_EXPRESSION_OR_NO_PARENTHESES_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_OR_OPERATION, MATCHED_EXPRESSION_PIPE_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_OPERATION, MATCHED_EXPRESSION_RELATIONAL_NO_PARENTHESES_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_RELATIONAL_OPERATION, MATCHED_EXPRESSION_TWO_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_OPERATION, MATCHED_EXPRESSION_TYPE_NO_PARENTHESES_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_TYPE_OPERATION, MATCHED_EXPRESSION_UNARY_OPERATION, MATCHED_EXPRESSION_WHEN_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_OPERATION,
-      NO_PARENTHESES_EXPRESSION, NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER,
-      SIGIL, STRING, STRING_HEREDOC, UNARY_NO_PARENTHESES_EXPRESSION_OPERATION,
+      DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST,
+      MATCHED_EXPRESSION, MATCHED_EXPRESSION_ACCESS_EXPRESSION, MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER,
+      MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION,
+      NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL,
+      STRING, STRING_HEREDOC, UNARY_MATCHED_EXPRESSION_OPERATION, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(ATOM, AT_MATCHED_EXPRESSION_OPERATION, AT_NO_PARENTHESES_EXPRESSION_OPERATION, BINARY_WHOLE_NUMBER,
+      CAPTURE_MATCHED_EXPRESSION_OPERATION, CAPTURE_NO_PARENTHESES_EXPRESSION_OPERATION, CHAR_LIST, CHAR_LIST_HEREDOC,
+      DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER, EMPTY_PARENTHESES,
+      EXPRESSION, HEXADECIMAL_WHOLE_NUMBER, IDENTIFIER_EXPRESSION, LIST,
+      MATCHED_EXPRESSION, MATCHED_EXPRESSION_ACCESS_EXPRESSION, MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ADDITION_NO_PARENTHESES_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_NO_PARENTHESES_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_DOT_ALIAS, MATCHED_EXPRESSION_DOT_IDENTIFIER,
+      MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_IN_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_NO_PARENTHESES_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_MAX_EXPRESSION, MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_OR_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_RELATIONAL_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_TYPE_NO_PARENTHESES_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_NO_PARENTHESES_EXPRESSION_OPERATION, NO_PARENTHESES_EXPRESSION,
+      NUMBER, NUMBER_UNARY_OPERATION, OCTAL_WHOLE_NUMBER, SIGIL,
+      STRING, STRING_HEREDOC, UNARY_MATCHED_EXPRESSION_OPERATION, UNARY_NO_PARENTHESES_EXPRESSION_OPERATION,
       UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
@@ -3326,26 +3327,26 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // Expression root: matchedExpression
   // Operator priority table:
-  // 0: ATOM(matchedExpressionCaptureOperation)
-  // 1: BINARY(matchedExpressionInMatchOperation)
-  // 2: BINARY(matchedExpressionWhenOperation)
-  // 3: BINARY(matchedExpressionTypeOperation)
-  // 4: BINARY(matchedExpressionPipeOperation)
-  // 5: BINARY(matchedExpressionMatchOperation)
-  // 6: BINARY(matchedExpressionOrOperation)
-  // 7: BINARY(matchedExpressionAndOperation)
-  // 8: BINARY(matchedExpressionComparisonOperation)
-  // 9: BINARY(matchedExpressionRelationalOperation)
-  // 10: BINARY(matchedExpressionArrowOperation)
-  // 11: BINARY(matchedExpressionInOperation)
-  // 12: BINARY(matchedExpressionTwoOperation)
-  // 13: BINARY(matchedExpressionAdditionOperation)
-  // 14: BINARY(matchedExpressionMultiplicationOperation)
-  // 15: BINARY(matchedExpressionHatOperation)
-  // 16: PREFIX(matchedExpressionUnaryOperation)
+  // 0: ATOM(captureMatchedExpressionOperation)
+  // 1: BINARY(matchedExpressionInMatchMatchedExpressionOperation)
+  // 2: BINARY(matchedExpressionWhenMatchedExpressionOperation)
+  // 3: BINARY(matchedExpressionTypeMatchedExpressionOperation)
+  // 4: BINARY(matchedExpressionPipeMatchedExpressionOperation)
+  // 5: BINARY(matchedExpressionMatchMatchedExpressionOperation)
+  // 6: BINARY(matchedExpressionOrMatchedExpressionOperation)
+  // 7: BINARY(matchedExpressionAndMatchedExpressionOperation)
+  // 8: BINARY(matchedExpressionComparisonMatchedExpressionOperation)
+  // 9: BINARY(matchedExpressionRelationalMatchedExpressionOperation)
+  // 10: BINARY(matchedExpressionArrowMatchedExpressionOperation)
+  // 11: BINARY(matchedExpressionInMatchedExpressionOperation)
+  // 12: BINARY(matchedExpressionTwoMatchedExpressionOperation)
+  // 13: BINARY(matchedExpressionAdditionMatchedExpressionOperation)
+  // 14: BINARY(matchedExpressionMultiplicationMatchedExpressionOperation)
+  // 15: BINARY(matchedExpressionHatMatchedExpressionOperation)
+  // 16: PREFIX(unaryMatchedExpressionOperation)
   // 17: POSTFIX(matchedExpressionDotAlias)
   // 18: POSTFIX(matchedExpressionDotIdentifier)
-  // 19: PREFIX(matchedExpressionAtOperation)
+  // 19: PREFIX(atMatchedExpressionOperation)
   // 20: ATOM(identifierExpression)
   // 21: ATOM(matchedExpressionAccessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
@@ -3353,9 +3354,9 @@ public class ElixirParser implements PsiParser {
     addVariant(b, "<matched expression>");
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, "<matched expression>");
-    r = matchedExpressionCaptureOperation(b, l + 1);
-    if (!r) r = matchedExpressionUnaryOperation(b, l + 1);
-    if (!r) r = matchedExpressionAtOperation(b, l + 1);
+    r = captureMatchedExpressionOperation(b, l + 1);
+    if (!r) r = unaryMatchedExpressionOperation(b, l + 1);
+    if (!r) r = atMatchedExpressionOperation(b, l + 1);
     if (!r) r = identifierExpression(b, l + 1);
     if (!r) r = matchedExpressionAccessExpression(b, l + 1);
     p = r;
@@ -3369,65 +3370,65 @@ public class ElixirParser implements PsiParser {
     boolean r = true;
     while (true) {
       Marker m = enter_section_(b, l, _LEFT_, null);
-      if (g < 1 && matchedExpressionInMatchOperation_0(b, l + 1)) {
+      if (g < 1 && matchedExpressionInMatchMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 1);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_IN_MATCH_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 2 && matchedExpressionWhenOperation_0(b, l + 1)) {
+      else if (g < 2 && matchedExpressionWhenMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 1);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_WHEN_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 3 && matchedExpressionTypeOperation_0(b, l + 1)) {
+      else if (g < 3 && matchedExpressionTypeMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 2);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_TYPE_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 4 && matchedExpressionPipeOperation_0(b, l + 1)) {
+      else if (g < 4 && matchedExpressionPipeMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 3);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_PIPE_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 5 && matchedExpressionMatchOperation_0(b, l + 1)) {
+      else if (g < 5 && matchedExpressionMatchMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 4);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_MATCH_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 6 && matchedExpressionOrOperation_0(b, l + 1)) {
+      else if (g < 6 && matchedExpressionOrMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 6);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_OR_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 7 && matchedExpressionAndOperation_0(b, l + 1)) {
+      else if (g < 7 && matchedExpressionAndMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 7);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_AND_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 8 && matchedExpressionComparisonOperation_0(b, l + 1)) {
+      else if (g < 8 && matchedExpressionComparisonMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 8);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_COMPARISON_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 9 && matchedExpressionRelationalOperation_0(b, l + 1)) {
+      else if (g < 9 && matchedExpressionRelationalMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 9);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_RELATIONAL_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 10 && matchedExpressionArrowOperation_0(b, l + 1)) {
+      else if (g < 10 && matchedExpressionArrowMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 10);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_ARROW_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 11 && matchedExpressionInOperation_0(b, l + 1)) {
+      else if (g < 11 && matchedExpressionInMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 11);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_IN_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 12 && matchedExpressionTwoOperation_0(b, l + 1)) {
+      else if (g < 12 && matchedExpressionTwoMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 11);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_TWO_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 13 && matchedExpressionAdditionOperation_0(b, l + 1)) {
+      else if (g < 13 && matchedExpressionAdditionMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 13);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_ADDITION_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 14 && matchedExpressionMultiplicationOperation_0(b, l + 1)) {
+      else if (g < 14 && matchedExpressionMultiplicationMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 14);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_MULTIPLICATION_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
-      else if (g < 15 && matchedExpressionHatOperation_0(b, l + 1)) {
+      else if (g < 15 && matchedExpressionHatMatchedExpressionOperation_0(b, l + 1)) {
         r = matchedExpression(b, l, 15);
-        exit_section_(b, l, m, MATCHED_EXPRESSION_HAT_OPERATION, r, true, null);
+        exit_section_(b, l, m, MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION, r, true, null);
       }
       else if (g < 17 && matchedExpressionDotAlias_0(b, l + 1)) {
         r = true;
@@ -3446,33 +3447,33 @@ public class ElixirParser implements PsiParser {
   }
 
   // CAPTURE_OPERATOR EOL* (number | matchedExpression)
-  public static boolean matchedExpressionCaptureOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionCaptureOperation")) return false;
+  public static boolean captureMatchedExpressionOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureMatchedExpressionOperation")) return false;
     if (!nextTokenIsFast(b, CAPTURE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, CAPTURE_OPERATOR);
-    r = r && matchedExpressionCaptureOperation_1(b, l + 1);
-    r = r && matchedExpressionCaptureOperation_2(b, l + 1);
-    exit_section_(b, m, MATCHED_EXPRESSION_CAPTURE_OPERATION, r);
+    r = r && captureMatchedExpressionOperation_1(b, l + 1);
+    r = r && captureMatchedExpressionOperation_2(b, l + 1);
+    exit_section_(b, m, CAPTURE_MATCHED_EXPRESSION_OPERATION, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionCaptureOperation_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionCaptureOperation_1")) return false;
+  private static boolean captureMatchedExpressionOperation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureMatchedExpressionOperation_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionCaptureOperation_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "captureMatchedExpressionOperation_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // number | matchedExpression
-  private static boolean matchedExpressionCaptureOperation_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionCaptureOperation_2")) return false;
+  private static boolean captureMatchedExpressionOperation_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureMatchedExpressionOperation_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = number(b, l + 1);
@@ -3482,558 +3483,558 @@ public class ElixirParser implements PsiParser {
   }
 
   // EOL* IN_MATCH_OPERATOR EOL*
-  private static boolean matchedExpressionInMatchOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInMatchOperation_0")) return false;
+  private static boolean matchedExpressionInMatchMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionInMatchOperation_0_0(b, l + 1);
+    r = matchedExpressionInMatchMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, IN_MATCH_OPERATOR);
-    r = r && matchedExpressionInMatchOperation_0_2(b, l + 1);
+    r = r && matchedExpressionInMatchMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionInMatchOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInMatchOperation_0_0")) return false;
+  private static boolean matchedExpressionInMatchMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionInMatchOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInMatchOperation_0_2")) return false;
+  private static boolean matchedExpressionInMatchMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* WHEN_OPERATOR EOL*
-  private static boolean matchedExpressionWhenOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionWhenOperation_0")) return false;
+  private static boolean matchedExpressionWhenMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionWhenMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionWhenOperation_0_0(b, l + 1);
+    r = matchedExpressionWhenMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, WHEN_OPERATOR);
-    r = r && matchedExpressionWhenOperation_0_2(b, l + 1);
+    r = r && matchedExpressionWhenMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionWhenOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionWhenOperation_0_0")) return false;
+  private static boolean matchedExpressionWhenMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionWhenMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionWhenOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionWhenMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionWhenOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionWhenOperation_0_2")) return false;
+  private static boolean matchedExpressionWhenMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionWhenMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionWhenOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionWhenMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* TYPE_OPERATOR EOL*
-  private static boolean matchedExpressionTypeOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTypeOperation_0")) return false;
+  private static boolean matchedExpressionTypeMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTypeMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionTypeOperation_0_0(b, l + 1);
+    r = matchedExpressionTypeMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, TYPE_OPERATOR);
-    r = r && matchedExpressionTypeOperation_0_2(b, l + 1);
+    r = r && matchedExpressionTypeMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionTypeOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTypeOperation_0_0")) return false;
+  private static boolean matchedExpressionTypeMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTypeMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionTypeOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionTypeMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionTypeOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTypeOperation_0_2")) return false;
+  private static boolean matchedExpressionTypeMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTypeMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionTypeOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionTypeMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* PIPE_OPERATOR EOL*
-  private static boolean matchedExpressionPipeOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionPipeOperation_0")) return false;
+  private static boolean matchedExpressionPipeMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionPipeMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionPipeOperation_0_0(b, l + 1);
+    r = matchedExpressionPipeMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, PIPE_OPERATOR);
-    r = r && matchedExpressionPipeOperation_0_2(b, l + 1);
+    r = r && matchedExpressionPipeMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionPipeOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionPipeOperation_0_0")) return false;
+  private static boolean matchedExpressionPipeMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionPipeMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionPipeOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionPipeMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionPipeOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionPipeOperation_0_2")) return false;
+  private static boolean matchedExpressionPipeMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionPipeMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionPipeOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionPipeMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* MATCH_OPERATOR EOL*
-  private static boolean matchedExpressionMatchOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMatchOperation_0")) return false;
+  private static boolean matchedExpressionMatchMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMatchMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionMatchOperation_0_0(b, l + 1);
+    r = matchedExpressionMatchMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, MATCH_OPERATOR);
-    r = r && matchedExpressionMatchOperation_0_2(b, l + 1);
+    r = r && matchedExpressionMatchMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionMatchOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMatchOperation_0_0")) return false;
+  private static boolean matchedExpressionMatchMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMatchMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionMatchOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionMatchMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionMatchOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMatchOperation_0_2")) return false;
+  private static boolean matchedExpressionMatchMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMatchMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionMatchOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionMatchMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* OR_OPERATOR EOL*
-  private static boolean matchedExpressionOrOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionOrOperation_0")) return false;
+  private static boolean matchedExpressionOrMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionOrMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionOrOperation_0_0(b, l + 1);
+    r = matchedExpressionOrMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, OR_OPERATOR);
-    r = r && matchedExpressionOrOperation_0_2(b, l + 1);
+    r = r && matchedExpressionOrMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionOrOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionOrOperation_0_0")) return false;
+  private static boolean matchedExpressionOrMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionOrMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionOrOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionOrMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionOrOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionOrOperation_0_2")) return false;
+  private static boolean matchedExpressionOrMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionOrMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionOrOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionOrMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* AND_OPERATOR EOL*
-  private static boolean matchedExpressionAndOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAndOperation_0")) return false;
+  private static boolean matchedExpressionAndMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAndMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionAndOperation_0_0(b, l + 1);
+    r = matchedExpressionAndMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, AND_OPERATOR);
-    r = r && matchedExpressionAndOperation_0_2(b, l + 1);
+    r = r && matchedExpressionAndMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionAndOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAndOperation_0_0")) return false;
+  private static boolean matchedExpressionAndMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAndMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAndOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionAndMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionAndOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAndOperation_0_2")) return false;
+  private static boolean matchedExpressionAndMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAndMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAndOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionAndMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* COMPARISON_OPERATOR EOL*
-  private static boolean matchedExpressionComparisonOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionComparisonOperation_0")) return false;
+  private static boolean matchedExpressionComparisonMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionComparisonMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionComparisonOperation_0_0(b, l + 1);
+    r = matchedExpressionComparisonMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, COMPARISON_OPERATOR);
-    r = r && matchedExpressionComparisonOperation_0_2(b, l + 1);
+    r = r && matchedExpressionComparisonMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionComparisonOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionComparisonOperation_0_0")) return false;
+  private static boolean matchedExpressionComparisonMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionComparisonMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionComparisonOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionComparisonMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionComparisonOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionComparisonOperation_0_2")) return false;
+  private static boolean matchedExpressionComparisonMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionComparisonMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionComparisonOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionComparisonMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* RELATIONAL_OPERATOR EOL*
-  private static boolean matchedExpressionRelationalOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionRelationalOperation_0")) return false;
+  private static boolean matchedExpressionRelationalMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionRelationalMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionRelationalOperation_0_0(b, l + 1);
+    r = matchedExpressionRelationalMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, RELATIONAL_OPERATOR);
-    r = r && matchedExpressionRelationalOperation_0_2(b, l + 1);
+    r = r && matchedExpressionRelationalMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionRelationalOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionRelationalOperation_0_0")) return false;
+  private static boolean matchedExpressionRelationalMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionRelationalMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionRelationalOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionRelationalMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionRelationalOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionRelationalOperation_0_2")) return false;
+  private static boolean matchedExpressionRelationalMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionRelationalMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionRelationalOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionRelationalMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* ARROW_OPERATOR EOL*
-  private static boolean matchedExpressionArrowOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionArrowOperation_0")) return false;
+  private static boolean matchedExpressionArrowMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionArrowMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionArrowOperation_0_0(b, l + 1);
+    r = matchedExpressionArrowMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, ARROW_OPERATOR);
-    r = r && matchedExpressionArrowOperation_0_2(b, l + 1);
+    r = r && matchedExpressionArrowMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionArrowOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionArrowOperation_0_0")) return false;
+  private static boolean matchedExpressionArrowMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionArrowMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionArrowOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionArrowMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionArrowOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionArrowOperation_0_2")) return false;
+  private static boolean matchedExpressionArrowMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionArrowMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionArrowOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionArrowMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* IN_OPERATOR EOL*
-  private static boolean matchedExpressionInOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInOperation_0")) return false;
+  private static boolean matchedExpressionInMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionInOperation_0_0(b, l + 1);
+    r = matchedExpressionInMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, IN_OPERATOR);
-    r = r && matchedExpressionInOperation_0_2(b, l + 1);
+    r = r && matchedExpressionInMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionInOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInOperation_0_0")) return false;
+  private static boolean matchedExpressionInMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionInOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionInOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionInOperation_0_2")) return false;
+  private static boolean matchedExpressionInMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionInMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionInOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionInMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* TWO_OPERATOR EOL*
-  private static boolean matchedExpressionTwoOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTwoOperation_0")) return false;
+  private static boolean matchedExpressionTwoMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTwoMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionTwoOperation_0_0(b, l + 1);
+    r = matchedExpressionTwoMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, TWO_OPERATOR);
-    r = r && matchedExpressionTwoOperation_0_2(b, l + 1);
+    r = r && matchedExpressionTwoMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionTwoOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTwoOperation_0_0")) return false;
+  private static boolean matchedExpressionTwoMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTwoMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionTwoOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionTwoMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionTwoOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionTwoOperation_0_2")) return false;
+  private static boolean matchedExpressionTwoMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionTwoMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionTwoOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionTwoMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // DUAL_OPERATOR EOL*
-  private static boolean matchedExpressionAdditionOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAdditionOperation_0")) return false;
+  private static boolean matchedExpressionAdditionMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAdditionMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, DUAL_OPERATOR);
-    r = r && matchedExpressionAdditionOperation_0_1(b, l + 1);
+    r = r && matchedExpressionAdditionMatchedExpressionOperation_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionAdditionOperation_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAdditionOperation_0_1")) return false;
+  private static boolean matchedExpressionAdditionMatchedExpressionOperation_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionAdditionMatchedExpressionOperation_0_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAdditionOperation_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionAdditionMatchedExpressionOperation_0_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* MULTIPLICATION_OPERATOR EOL*
-  private static boolean matchedExpressionMultiplicationOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationOperation_0")) return false;
+  private static boolean matchedExpressionMultiplicationMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionMultiplicationOperation_0_0(b, l + 1);
+    r = matchedExpressionMultiplicationMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, MULTIPLICATION_OPERATOR);
-    r = r && matchedExpressionMultiplicationOperation_0_2(b, l + 1);
+    r = r && matchedExpressionMultiplicationMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionMultiplicationOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationOperation_0_0")) return false;
+  private static boolean matchedExpressionMultiplicationMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionMultiplicationOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionMultiplicationMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionMultiplicationOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationOperation_0_2")) return false;
+  private static boolean matchedExpressionMultiplicationMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionMultiplicationMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionMultiplicationOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionMultiplicationMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL* HAT_OPERATOR EOL*
-  private static boolean matchedExpressionHatOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionHatOperation_0")) return false;
+  private static boolean matchedExpressionHatMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionHatMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionHatOperation_0_0(b, l + 1);
+    r = matchedExpressionHatMatchedExpressionOperation_0_0(b, l + 1);
     r = r && consumeToken(b, HAT_OPERATOR);
-    r = r && matchedExpressionHatOperation_0_2(b, l + 1);
+    r = r && matchedExpressionHatMatchedExpressionOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionHatOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionHatOperation_0_0")) return false;
+  private static boolean matchedExpressionHatMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionHatMatchedExpressionOperation_0_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionHatOperation_0_0", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionHatMatchedExpressionOperation_0_0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // EOL*
-  private static boolean matchedExpressionHatOperation_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionHatOperation_0_2")) return false;
+  private static boolean matchedExpressionHatMatchedExpressionOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedExpressionHatMatchedExpressionOperation_0_2")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionHatOperation_0_2", c)) break;
+      if (!empty_element_parsed_guard_(b, "matchedExpressionHatMatchedExpressionOperation_0_2", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
-  public static boolean matchedExpressionUnaryOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionUnaryOperation")) return false;
+  public static boolean unaryMatchedExpressionOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMatchedExpressionOperation")) return false;
     if (!nextTokenIsFast(b, DUAL_OPERATOR, UNARY_OPERATOR)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = matchedExpressionUnaryOperation_0(b, l + 1);
+    r = unaryMatchedExpressionOperation_0(b, l + 1);
     p = r;
     r = p && matchedExpression(b, l, 16);
-    exit_section_(b, l, m, MATCHED_EXPRESSION_UNARY_OPERATION, r, p, null);
+    exit_section_(b, l, m, UNARY_MATCHED_EXPRESSION_OPERATION, r, p, null);
     return r || p;
   }
 
   // (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
-  private static boolean matchedExpressionUnaryOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionUnaryOperation_0")) return false;
+  private static boolean unaryMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpressionUnaryOperation_0_0(b, l + 1);
-    r = r && matchedExpressionUnaryOperation_0_1(b, l + 1);
+    r = unaryMatchedExpressionOperation_0_0(b, l + 1);
+    r = r && unaryMatchedExpressionOperation_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // DUAL_OPERATOR | UNARY_OPERATOR
-  private static boolean matchedExpressionUnaryOperation_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionUnaryOperation_0_0")) return false;
+  private static boolean unaryMatchedExpressionOperation_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMatchedExpressionOperation_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, DUAL_OPERATOR);
@@ -4043,12 +4044,12 @@ public class ElixirParser implements PsiParser {
   }
 
   // EOL*
-  private static boolean matchedExpressionUnaryOperation_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionUnaryOperation_0_1")) return false;
+  private static boolean unaryMatchedExpressionOperation_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryMatchedExpressionOperation_0_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionUnaryOperation_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "unaryMatchedExpressionOperation_0_1", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -4128,36 +4129,36 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  public static boolean matchedExpressionAtOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAtOperation")) return false;
+  public static boolean atMatchedExpressionOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atMatchedExpressionOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = matchedExpressionAtOperation_0(b, l + 1);
+    r = atMatchedExpressionOperation_0(b, l + 1);
     p = r;
     r = p && matchedExpression(b, l, 19);
-    exit_section_(b, l, m, MATCHED_EXPRESSION_AT_OPERATION, r, p, null);
+    exit_section_(b, l, m, AT_MATCHED_EXPRESSION_OPERATION, r, p, null);
     return r || p;
   }
 
   // AT_OPERATOR EOL*
-  private static boolean matchedExpressionAtOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAtOperation_0")) return false;
+  private static boolean atMatchedExpressionOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atMatchedExpressionOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, AT_OPERATOR);
-    r = r && matchedExpressionAtOperation_0_1(b, l + 1);
+    r = r && atMatchedExpressionOperation_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // EOL*
-  private static boolean matchedExpressionAtOperation_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedExpressionAtOperation_0_1")) return false;
+  private static boolean atMatchedExpressionOperation_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atMatchedExpressionOperation_0_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeTokenSmart(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "matchedExpressionAtOperation_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "atMatchedExpressionOperation_0_1", c)) break;
       c = current_position_(b);
     }
     return true;

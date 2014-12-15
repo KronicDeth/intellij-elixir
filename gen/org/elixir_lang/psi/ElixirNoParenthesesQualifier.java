@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface ElixirNoParenthesesQualifier extends PsiElement {
 
   @NotNull
-  List<ElixirMatchedExpression> getMatchedExpressionList();
+  List<ElixirMatchedExpressionAccessExpression> getMatchedExpressionAccessExpressionList();
 
   @Nullable
   ElixirNoParenthesesQualifierAtOperation getNoParenthesesQualifierAtOperation();

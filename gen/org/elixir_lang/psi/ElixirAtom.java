@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirAtom extends ElixirMatchedExpressionMaxExpression {
 
   @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirMatchedExpressionAccessExpression getMatchedExpressionAccessExpression();
 
 }

@@ -8,12 +8,12 @@
    */
 
   extends("emptyParentheses|(matched|noParentheses)Expression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
+  extends("charList(Heredoc)?|matchedExpressionMaxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
   extends("decimal(Float|WholeNUmber)")=decimalNumber
   /* Must be before `extends(...)=matchedExpression` because `matchedExpression.*` will match operations that begin with
      `matchedExpression`, but end with `NoParenthesesExpressionOperation`. */
   extends(".*NoParenthesesExpressionOperation")=noParenthesesExpression
-  extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
+  extends("identifierExpression|matchedExpression(AccessExpression|Dot(Alias|Identifier))|.*MatchedExpressionOperation|noParenthesesOneExpression")=matchedExpression
   extends("atom|dotAlias")=matchedExpressionMaxExpression
   extends("(.*Whole|decimal)Number")=number
 
@@ -203,26 +203,26 @@ private literalWordsBody ::= WORDS_FRAGMENT*
 /* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
    operators.
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-matchedExpression ::= matchedExpressionCaptureOperation |
-                      matchedExpressionInMatchOperation |
-                      matchedExpressionWhenOperation |
-                      matchedExpressionTypeOperation |
-                      matchedExpressionPipeOperation |
-                      matchedExpressionMatchOperation |
-                      matchedExpressionOrOperation |
-                      matchedExpressionAndOperation |
-                      matchedExpressionComparisonOperation |
-                      matchedExpressionRelationalOperation |
-                      matchedExpressionArrowOperation |
-                      matchedExpressionInOperation |
-                      matchedExpressionTwoOperation |
-                      matchedExpressionAdditionOperation |
-                      matchedExpressionMultiplicationOperation |
-                      matchedExpressionHatOperation |
-                      matchedExpressionUnaryOperation |
+matchedExpression ::= captureMatchedExpressionOperation |
+                      matchedExpressionInMatchMatchedExpressionOperation |
+                      matchedExpressionWhenMatchedExpressionOperation |
+                      matchedExpressionTypeMatchedExpressionOperation |
+                      matchedExpressionPipeMatchedExpressionOperation |
+                      matchedExpressionMatchMatchedExpressionOperation |
+                      matchedExpressionOrMatchedExpressionOperation |
+                      matchedExpressionAndMatchedExpressionOperation |
+                      matchedExpressionComparisonMatchedExpressionOperation |
+                      matchedExpressionRelationalMatchedExpressionOperation |
+                      matchedExpressionArrowMatchedExpressionOperation |
+                      matchedExpressionInMatchedExpressionOperation |
+                      matchedExpressionTwoMatchedExpressionOperation |
+                      matchedExpressionAdditionMatchedExpressionOperation |
+                      matchedExpressionMultiplicationMatchedExpressionOperation |
+                      matchedExpressionHatMatchedExpressionOperation |
+                      unaryMatchedExpressionOperation |
                       matchedExpressionDotAlias |
                       matchedExpressionDotIdentifier |
-                      matchedExpressionAtOperation |
+                      atMatchedExpressionOperation |
                       identifierExpression |
                       matchedExpressionAccessExpression
 // Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
@@ -243,31 +243,31 @@ matchedExpressionAccessExpression ::= numberUnaryOperation |
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
    is interpreted as unaryOperation */
-matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
-matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
-matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
-matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
+matchedExpressionAdditionMatchedExpressionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
+matchedExpressionAndMatchedExpressionOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
+matchedExpressionArrowMatchedExpressionOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
+atMatchedExpressionOperation ::= AT_OPERATOR EOL* matchedExpression
 // noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
-matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
+captureMatchedExpressionOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
+matchedExpressionComparisonMatchedExpressionOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
 matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
 matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
-matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
-matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
-matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
-matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionHatMatchedExpressionOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
+matchedExpressionInMatchMatchedExpressionOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
+matchedExpressionInMatchedExpressionOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
+matchedExpressionMatchMatchedExpressionOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
 /* Specialized for matchedExpression to eliminate left-recursion from max_expr when dot_alias is a child instead of
    matchedExpressionDotAlias being a direct child of matchedExpression */
 matchedExpressionMaxExpression ::= atom |
                                    ALIAS
-matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
-matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
-matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
-matchedExpressionTwoOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
-matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionMultiplicationMatchedExpressionOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
+matchedExpressionOrMatchedExpressionOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
+matchedExpressionPipeMatchedExpressionOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionRelationalMatchedExpressionOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
+matchedExpressionTwoMatchedExpressionOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* matchedExpression { rightAssociative = true }
+matchedExpressionTypeMatchedExpressionOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
+unaryMatchedExpressionOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
+matchedExpressionWhenMatchedExpressionOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
 
 /* Cannot use `(matchedExpressionDotIdentifier | identifierExpression)` as matchedExpression will be used in place of
    matchedExpressionDotIdentifier in generated parser. I'm not sure, but it may be due to matchedExpression being the

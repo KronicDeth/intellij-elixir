@@ -24,8 +24,8 @@ public class ElixirNoParenthesesQualifierImpl extends ASTWrapperPsiElement imple
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirMatchedExpressionAccessExpression> getMatchedExpressionAccessExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpressionAccessExpression.class);
   }
 
   @Override
