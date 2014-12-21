@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirList extends ElixirMatchedExpressionAccessExpression {
+public interface ElixirList extends PsiElement {
 
   @NotNull
   List<ElixirKeywordPair> getKeywordPairList();

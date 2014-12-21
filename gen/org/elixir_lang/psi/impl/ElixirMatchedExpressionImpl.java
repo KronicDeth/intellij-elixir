@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirMatchedExpressionImpl extends ElixirExpressionImpl implements ElixirMatchedExpression {
+public class ElixirMatchedExpressionImpl extends ElixirAtMatchedExpressionOperationImpl implements ElixirMatchedExpression {
 
   public ElixirMatchedExpressionImpl(ASTNode node) {
     super(node);
@@ -19,6 +19,18 @@ public class ElixirMatchedExpressionImpl extends ElixirExpressionImpl implements
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedExpression(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAccessExpression getAccessExpression() {
+    return findChildByClass(ElixirAccessExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
+    return findChildByClass(ElixirNoParenthesesOneExpression.class);
   }
 
 }

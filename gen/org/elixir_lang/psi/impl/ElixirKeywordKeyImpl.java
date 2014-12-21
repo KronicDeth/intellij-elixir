@@ -24,8 +24,14 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
 
   @Override
   @Nullable
-  public ElixirMatchedExpressionAccessExpression getMatchedExpressionAccessExpression() {
-    return findChildByClass(ElixirMatchedExpressionAccessExpression.class);
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
   }
 
 }

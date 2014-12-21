@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface ElixirKeywordKey extends PsiElement {
 
   @Nullable
-  ElixirMatchedExpressionAccessExpression getMatchedExpressionAccessExpression();
+  ElixirCharList getCharList();
+
+  @Nullable
+  ElixirString getString();
 
 }

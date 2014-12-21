@@ -24,8 +24,8 @@ public class ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl extends AS
 
   @Override
   @NotNull
-  public ElixirNoParenthesesExpression getNoParenthesesExpression() {
-    return findNotNullChildByClass(ElixirNoParenthesesExpression.class);
+  public ElixirNoParenthesesCall getNoParenthesesCall() {
+    return findNotNullChildByClass(ElixirNoParenthesesCall.class);
   }
 
 }

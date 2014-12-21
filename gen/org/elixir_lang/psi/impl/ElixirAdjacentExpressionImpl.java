@@ -23,9 +23,15 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
-  @NotNull
-  public ElixirExpression getExpression() {
-    return findNotNullChildByClass(ElixirExpression.class);
+  @Nullable
+  public ElixirCaptureMatchedExpressionOperation getCaptureMatchedExpressionOperation() {
+    return findChildByClass(ElixirCaptureMatchedExpressionOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirCaptureTailExpressionOperation getCaptureTailExpressionOperation() {
+    return findChildByClass(ElixirCaptureTailExpressionOperation.class);
   }
 
 }

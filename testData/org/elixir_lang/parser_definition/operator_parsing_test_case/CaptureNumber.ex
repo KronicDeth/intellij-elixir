@@ -1,10 +1,54 @@
-# Capturing numbers have higher precedence than any matchedExpression*Operation
+# Capturing numbers have higher precedence than any *Operation
 
-# should parse as &(A + (&B))
+#
+# Top-level
+#
+
+# &(+(A, &(B)))
 &A + &B
 
-# should parse as &(a + (&b)
+# &(+(a, &(b)))
 &a + &b
 
-# should parse as (&1) + (&2)
+# +(&(1), &(2))
 &1 + &2
+
+#
+# Nested under &
+#
+
+# &(&(+(A, &(B))))
+& &A + &B
+
+# &(&(+(a, &(b)))
+& &a + &b
+
+# &(+(&(1), &(2)))
+& &1 + &2
+
+
+#
+# Nested under unary
+#
+
+# -(&(+(A, &(B))))
+- &A + &B
+
+# -(&(+(a, &(b))))
+- &a + &b
+
+# +(-(&(1)), &(2))
+- &1 + &2
+
+#
+# Nested under @
+#
+
+# @(&(+(A, &(B))))
+@&A + &B
+
+# @(&(+(a, &(b))))
+@&a + &b
+
+# +(@(&(1)), &(2))
+@&1 + &2

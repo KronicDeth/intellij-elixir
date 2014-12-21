@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCaptureMatchedExpressionOperationImpl extends ElixirMatchedExpressionImpl implements ElixirCaptureMatchedExpressionOperation {
+public class ElixirCaptureMatchedExpressionOperationImpl extends ASTWrapperPsiElement implements ElixirCaptureMatchedExpressionOperation {
 
   public ElixirCaptureMatchedExpressionOperationImpl(ASTNode node) {
     super(node);
@@ -22,9 +23,15 @@ public class ElixirCaptureMatchedExpressionOperationImpl extends ElixirMatchedEx
   }
 
   @Override
+  @Nullable
+  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
+    return findChildByClass(ElixirCapturePrefixOperator.class);
+  }
+
+  @Override
   @NotNull
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+  public ElixirMatchedExpressionInMatchMatchedExpressionOperation getMatchedExpressionInMatchMatchedExpressionOperation() {
+    return findNotNullChildByClass(ElixirMatchedExpressionInMatchMatchedExpressionOperation.class);
   }
 
 }

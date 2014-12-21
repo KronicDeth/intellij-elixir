@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirNumberImpl extends ElixirMatchedExpressionAccessExpressionImpl implements ElixirNumber {
+public class ElixirNumberImpl extends ASTWrapperPsiElement implements ElixirNumber {
 
   public ElixirNumberImpl(ASTNode node) {
     super(node);

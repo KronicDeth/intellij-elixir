@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirMatchedExpressionTypeMatchedExpressionOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedExpressionTypeMatchedExpressionOperation {
+public class ElixirMatchedExpressionTypeMatchedExpressionOperationImpl extends ElixirMatchedExpressionWhenMatchedExpressionOperationImpl implements ElixirMatchedExpressionTypeMatchedExpressionOperation {
 
   public ElixirMatchedExpressionTypeMatchedExpressionOperationImpl(ASTNode node) {
     super(node);
@@ -23,8 +23,14 @@ public class ElixirMatchedExpressionTypeMatchedExpressionOperationImpl extends E
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirMatchedExpressionTypeMatchedExpressionOperation> getMatchedExpressionTypeMatchedExpressionOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpressionTypeMatchedExpressionOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirTypeInfixOperator getTypeInfixOperator() {
+    return findChildByClass(ElixirTypeInfixOperator.class);
   }
 
 }

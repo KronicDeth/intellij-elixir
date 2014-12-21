@@ -11,9 +11,12 @@ public interface ElixirInterpolation extends PsiElement {
   List<ElixirAdjacentExpression> getAdjacentExpressionList();
 
   @NotNull
-  List<ElixirEndOfExpression> getEndOfExpressionList();
+  List<ElixirCaptureMatchedExpressionOperation> getCaptureMatchedExpressionOperationList();
 
   @NotNull
-  List<ElixirExpression> getExpressionList();
+  List<ElixirCaptureTailExpressionOperation> getCaptureTailExpressionOperationList();
+
+  @NotNull
+  List<ElixirEndOfExpression> getEndOfExpressionList();
 
 }

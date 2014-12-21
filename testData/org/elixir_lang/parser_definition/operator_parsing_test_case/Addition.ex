@@ -15,23 +15,101 @@
 0x2
 
 # left associative
-# should parse as (0x1 - 0x2) + 0x3
+# +(-(0x1, 0x2), 0x3)
 0x1 - 0x2 + 0x3
 
-# additionOperation(atOperation(value))
-# should parse as (@0x1) - (@0x2)
-@0x1 - @0x2
-
-# additionOperation(unaryOperation(value))
-# should parse as 0x1 - (-0x2)
-0x1 - -0x2
-
-# additionOperation(hatOperation(value))
-# should parse as (0x1 ^^^ 0x2) + (0x3 ^^^ 0x4)
-0x1 ^^^ 0x2 + 0x3 ^^^ 0x4
-
-# additionOperation(multiplicationOperation(value))
-# should parse as (0x1 * 0x2) + (0x3 / 0x4)
+# +(*(0x1, 0x2), /(0x3, 0x4))
 0x1 * 0x2 + 0x3 / 0x4
 
+# +(^^^(0x1, 0x2), ^^^(0x3, 0x4))
+0x1 ^^^ 0x2 + 0x3 ^^^ 0x4
 
+# -(1, -(2))
+1 - -2
+
+# +(1, +(2))
+1 + +2
+
+# +(1, not(2))
+1 + not 2
+
+# +(1, ~~~(2))
+1 + ~~~2
+
+# +(1, !(2))
+1 + !2
+
+# +(1, ^(2)
+1 + ^2
+
+# +(.(A, B), .(C, D))
+A.B + C.D
+
+# +(.(A, b), .(C, d))
+A.b + C.d
+
+# +(@(a), @(b))
+@a + @b
+
+# +(a, b)
+a + b
+
+# +(@(?a), @(?b))
+?a + ?b
+
+# +(@(1), @(2))
+@1 + @2
+
+# +(&(?a), &(?b))
+&?a + &?b
+
+# +(&(1), &(2))
+&1 + &2
+
+# +(!(?a), ^(?b))
+!?a + ^?b
+
+# +(not(?a), ~~~(?b))
+not ?a + ~~~?b
+
+# +(!(1), ^(2))
+!1 + ^2
+
+# +(not(1), ~~~(2))
+not 1 + ~~~2
+
+# +((;), (;))
+(;) + (;)
+
+# +(?a, ?b)
+?a + ?b
+
+# +(1, 2)
+1 + 2
+
+# +([key1: ()], [key2: ()])
+[key1: ()] + [key2: ()]
+
+# +("a", "b")
+"a" + "b"
+
+# +('a', 'b')
+'a' + 'b'
+
+# +(~r{a}, ~r{b})
+~r{a} + ~r{b}
+
+# +(false, false)
+false + false
+
+# +(true, true)
+true + true
+
+# +(nil, nil)
+nil + nil
+
+# +(:a, :b)
+:a + :b
+
+# +(A, B)
+A + B

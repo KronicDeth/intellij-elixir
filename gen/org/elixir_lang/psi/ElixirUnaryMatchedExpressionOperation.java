@@ -5,9 +5,15 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirUnaryMatchedExpressionOperation extends ElixirMatchedExpression {
+public interface ElixirUnaryMatchedExpressionOperation extends ElixirMatchedExpressionHatMatchedExpressionOperation {
 
   @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirCaptureMatchedExpressionPrefixOperation getCaptureMatchedExpressionPrefixOperation();
+
+  @Nullable
+  ElixirMatchedExpressionHatMatchedExpressionOperation getMatchedExpressionHatMatchedExpressionOperation();
+
+  @Nullable
+  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
 
 }

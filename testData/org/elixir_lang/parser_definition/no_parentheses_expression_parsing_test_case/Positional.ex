@@ -74,7 +74,7 @@ identifier (;), first_keyword_key: first_keyword_value
 identifier ?a, first_keyword_key: first_keyword_value
 
 # number
-identifier 1e-1, first_keyword_key: first_keyword_value
+identifier 1.0e-1, first_keyword_key: first_keyword_value
 
 # list
 identifier [], first_keyword_key: first_keyword_value

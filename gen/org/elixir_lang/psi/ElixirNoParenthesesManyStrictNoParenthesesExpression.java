@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirNoParenthesesManyStrictNoParenthesesExpression extends PsiElement {
 
   @NotNull
-  ElixirNoParenthesesExpression getNoParenthesesExpression();
+  ElixirNoParenthesesCall getNoParenthesesCall();
 
 }

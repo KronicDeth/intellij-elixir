@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirEmptyParenthesesImpl extends ElixirExpressionImpl implements ElixirEmptyParentheses {
+public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements ElixirEmptyParentheses {
 
   public ElixirEmptyParenthesesImpl(ASTNode node) {
     super(node);
