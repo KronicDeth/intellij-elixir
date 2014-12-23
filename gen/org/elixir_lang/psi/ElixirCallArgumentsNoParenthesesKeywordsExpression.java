@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
-  ElixirCaptureMatchedExpressionOperation getCaptureMatchedExpressionOperation();
+  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();

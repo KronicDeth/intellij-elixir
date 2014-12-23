@@ -7,10 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirAdjacentExpression extends PsiElement {
 
-  @Nullable
-  ElixirCaptureMatchedExpressionOperation getCaptureMatchedExpressionOperation();
-
-  @Nullable
-  ElixirCaptureTailExpressionOperation getCaptureTailExpressionOperation();
+  @NotNull
+  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
 }

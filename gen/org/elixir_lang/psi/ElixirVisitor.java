@@ -31,16 +31,24 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAtExpressionOperation(@NotNull ElixirAtExpressionOperation o) {
+    visitUnaryExpressionOperation(o);
+  }
+
+  public void visitAtExpressionPrefixOperation(@NotNull ElixirAtExpressionPrefixOperation o) {
+    visitAtExpressionOperation(o);
+  }
+
   public void visitAtMatchedExpressionOperation(@NotNull ElixirAtMatchedExpressionOperation o) {
-    visitUnaryMatchedExpressionOperation(o);
+    visitAtExpressionOperation(o);
+  }
+
+  public void visitAtMatchedExpressionPrefixOperation(@NotNull ElixirAtMatchedExpressionPrefixOperation o) {
+    visitAtMatchedExpressionOperation(o);
   }
 
   public void visitAtPrefixOperator(@NotNull ElixirAtPrefixOperator o) {
     visitPsiElement(o);
-  }
-
-  public void visitAtTailExpressionOperation(@NotNull ElixirAtTailExpressionOperation o) {
-    visitUnaryTailExpressionOperation(o);
   }
 
   public void visitAtom(@NotNull ElixirAtom o) {
@@ -67,23 +75,23 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitCaptureMatchedExpressionOperation(@NotNull ElixirCaptureMatchedExpressionOperation o) {
+  public void visitCaptureExpressionOperation(@NotNull ElixirCaptureExpressionOperation o) {
     visitPsiElement(o);
+  }
+
+  public void visitCaptureExpressionPrefixOperation(@NotNull ElixirCaptureExpressionPrefixOperation o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCaptureMatchedExpressionOperation(@NotNull ElixirCaptureMatchedExpressionOperation o) {
+    visitCaptureExpressionOperation(o);
   }
 
   public void visitCaptureMatchedExpressionPrefixOperation(@NotNull ElixirCaptureMatchedExpressionPrefixOperation o) {
-    visitPsiElement(o);
+    visitCaptureMatchedExpressionOperation(o);
   }
 
   public void visitCapturePrefixOperator(@NotNull ElixirCapturePrefixOperator o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCaptureTailExpressionOperation(@NotNull ElixirCaptureTailExpressionOperation o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCaptureTailExpressionPrefixOperation(@NotNull ElixirCaptureTailExpressionPrefixOperation o) {
     visitPsiElement(o);
   }
 
@@ -167,124 +175,124 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAtMatchedExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionAdditionMatchedExpressionOperation(@NotNull ElixirMatchedExpressionAdditionMatchedExpressionOperation o) {
-    visitMatchedExpressionTwoMatchedExpressionOperation(o);
+  public void visitMatchedExpressionAdditionExpressionOperation(@NotNull ElixirMatchedExpressionAdditionExpressionOperation o) {
+    visitMatchedExpressionTwoExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionAdditionTailExpressionOperation(@NotNull ElixirMatchedExpressionAdditionTailExpressionOperation o) {
-    visitMatchedExpressionTwoTailExpressionOperation(o);
+  public void visitMatchedExpressionAdditionMatchedExpressionOperation(@NotNull ElixirMatchedExpressionAdditionMatchedExpressionOperation o) {
+    visitMatchedExpressionAdditionExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionAndExpressionOperation(@NotNull ElixirMatchedExpressionAndExpressionOperation o) {
+    visitMatchedExpressionOrExpressionOperation(o);
   }
 
   public void visitMatchedExpressionAndMatchedExpressionOperation(@NotNull ElixirMatchedExpressionAndMatchedExpressionOperation o) {
-    visitMatchedExpressionOrMatchedExpressionOperation(o);
+    visitMatchedExpressionAndExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionAndTailExpressionOperation(@NotNull ElixirMatchedExpressionAndTailExpressionOperation o) {
-    visitMatchedExpressionOrTailExpressionOperation(o);
+  public void visitMatchedExpressionArrowExpressionOperation(@NotNull ElixirMatchedExpressionArrowExpressionOperation o) {
+    visitMatchedExpressionRelationalExpressionOperation(o);
   }
 
   public void visitMatchedExpressionArrowMatchedExpressionOperation(@NotNull ElixirMatchedExpressionArrowMatchedExpressionOperation o) {
-    visitMatchedExpressionRelationalMatchedExpressionOperation(o);
+    visitMatchedExpressionArrowExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionArrowTailExpressionOperation(@NotNull ElixirMatchedExpressionArrowTailExpressionOperation o) {
-    visitMatchedExpressionRelationalTailExpressionOperation(o);
+  public void visitMatchedExpressionComparisonExpressionOperation(@NotNull ElixirMatchedExpressionComparisonExpressionOperation o) {
+    visitMatchedExpressionAndExpressionOperation(o);
   }
 
   public void visitMatchedExpressionComparisonMatchedExpressionOperation(@NotNull ElixirMatchedExpressionComparisonMatchedExpressionOperation o) {
-    visitMatchedExpressionAndMatchedExpressionOperation(o);
+    visitMatchedExpressionComparisonExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionComparisonTailExpressionOperation(@NotNull ElixirMatchedExpressionComparisonTailExpressionOperation o) {
-    visitMatchedExpressionAndTailExpressionOperation(o);
+  public void visitMatchedExpressionHatExpressionOperation(@NotNull ElixirMatchedExpressionHatExpressionOperation o) {
+    visitMatchedExpressionMultiplicationExpressionOperation(o);
   }
 
   public void visitMatchedExpressionHatMatchedExpressionOperation(@NotNull ElixirMatchedExpressionHatMatchedExpressionOperation o) {
-    visitMatchedExpressionMultiplicationMatchedExpressionOperation(o);
+    visitMatchedExpressionHatExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionHatTailExpressionOperation(@NotNull ElixirMatchedExpressionHatTailExpressionOperation o) {
-    visitMatchedExpressionMultiplicationTailExpressionOperation(o);
+  public void visitMatchedExpressionInExpressionOperation(@NotNull ElixirMatchedExpressionInExpressionOperation o) {
+    visitMatchedExpressionArrowExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionInMatchExpressionOperation(@NotNull ElixirMatchedExpressionInMatchExpressionOperation o) {
+    visitCaptureExpressionOperation(o);
   }
 
   public void visitMatchedExpressionInMatchMatchedExpressionOperation(@NotNull ElixirMatchedExpressionInMatchMatchedExpressionOperation o) {
-    visitCaptureMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionInMatchTailExpressionOperation(@NotNull ElixirMatchedExpressionInMatchTailExpressionOperation o) {
-    visitCaptureTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionInMatchedExpressionOperation(@NotNull ElixirMatchedExpressionInMatchedExpressionOperation o) {
-    visitMatchedExpressionArrowMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionInTailExpressionOperation(@NotNull ElixirMatchedExpressionInTailExpressionOperation o) {
-    visitMatchedExpressionArrowTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionMatchMatchedExpressionOperation(@NotNull ElixirMatchedExpressionMatchMatchedExpressionOperation o) {
-    visitMatchedExpressionPipeMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionMatchTailExpressionOperation(@NotNull ElixirMatchedExpressionMatchTailExpressionOperation o) {
-    visitMatchedExpressionPipeTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionMultiplicationMatchedExpressionOperation(@NotNull ElixirMatchedExpressionMultiplicationMatchedExpressionOperation o) {
-    visitMatchedExpressionAdditionMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionMultiplicationTailExpressionOperation(@NotNull ElixirMatchedExpressionMultiplicationTailExpressionOperation o) {
-    visitMatchedExpressionAdditionTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionOrMatchedExpressionOperation(@NotNull ElixirMatchedExpressionOrMatchedExpressionOperation o) {
-    visitMatchedExpressionMatchMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionOrTailExpressionOperation(@NotNull ElixirMatchedExpressionOrTailExpressionOperation o) {
-    visitMatchedExpressionMatchTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionPipeMatchedExpressionOperation(@NotNull ElixirMatchedExpressionPipeMatchedExpressionOperation o) {
-    visitMatchedExpressionTypeMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionPipeTailExpressionOperation(@NotNull ElixirMatchedExpressionPipeTailExpressionOperation o) {
-    visitMatchedExpressionTypeTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionRelationalMatchedExpressionOperation(@NotNull ElixirMatchedExpressionRelationalMatchedExpressionOperation o) {
-    visitMatchedExpressionComparisonMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionRelationalTailExpressionOperation(@NotNull ElixirMatchedExpressionRelationalTailExpressionOperation o) {
-    visitMatchedExpressionComparisonTailExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionTwoMatchedExpressionOperation(@NotNull ElixirMatchedExpressionTwoMatchedExpressionOperation o) {
     visitMatchedExpressionInMatchedExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionTwoTailExpressionOperation(@NotNull ElixirMatchedExpressionTwoTailExpressionOperation o) {
-    visitMatchedExpressionInTailExpressionOperation(o);
+  public void visitMatchedExpressionInMatchedExpressionOperation(@NotNull ElixirMatchedExpressionInMatchedExpressionOperation o) {
+    visitMatchedExpressionInExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionMatchExpressionOperation(@NotNull ElixirMatchedExpressionMatchExpressionOperation o) {
+    visitMatchedExpressionPipeExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionMatchMatchedExpressionOperation(@NotNull ElixirMatchedExpressionMatchMatchedExpressionOperation o) {
+    visitMatchedExpressionMatchExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionMultiplicationExpressionOperation(@NotNull ElixirMatchedExpressionMultiplicationExpressionOperation o) {
+    visitMatchedExpressionAdditionExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionMultiplicationMatchedExpressionOperation(@NotNull ElixirMatchedExpressionMultiplicationMatchedExpressionOperation o) {
+    visitMatchedExpressionMultiplicationExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionOrExpressionOperation(@NotNull ElixirMatchedExpressionOrExpressionOperation o) {
+    visitMatchedExpressionMatchExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionOrMatchedExpressionOperation(@NotNull ElixirMatchedExpressionOrMatchedExpressionOperation o) {
+    visitMatchedExpressionOrExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionPipeExpressionOperation(@NotNull ElixirMatchedExpressionPipeExpressionOperation o) {
+    visitMatchedExpressionTypeExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionPipeMatchedExpressionOperation(@NotNull ElixirMatchedExpressionPipeMatchedExpressionOperation o) {
+    visitMatchedExpressionPipeExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionRelationalExpressionOperation(@NotNull ElixirMatchedExpressionRelationalExpressionOperation o) {
+    visitMatchedExpressionComparisonExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionRelationalMatchedExpressionOperation(@NotNull ElixirMatchedExpressionRelationalMatchedExpressionOperation o) {
+    visitMatchedExpressionRelationalExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionTwoExpressionOperation(@NotNull ElixirMatchedExpressionTwoExpressionOperation o) {
+    visitMatchedExpressionInExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionTwoMatchedExpressionOperation(@NotNull ElixirMatchedExpressionTwoMatchedExpressionOperation o) {
+    visitMatchedExpressionTwoExpressionOperation(o);
+  }
+
+  public void visitMatchedExpressionTypeExpressionOperation(@NotNull ElixirMatchedExpressionTypeExpressionOperation o) {
+    visitMatchedExpressionWhenExpressionOperation(o);
   }
 
   public void visitMatchedExpressionTypeMatchedExpressionOperation(@NotNull ElixirMatchedExpressionTypeMatchedExpressionOperation o) {
-    visitMatchedExpressionWhenMatchedExpressionOperation(o);
+    visitMatchedExpressionTypeExpressionOperation(o);
   }
 
-  public void visitMatchedExpressionTypeTailExpressionOperation(@NotNull ElixirMatchedExpressionTypeTailExpressionOperation o) {
-    visitMatchedExpressionWhenTailExpressionOperation(o);
+  public void visitMatchedExpressionWhenExpressionOperation(@NotNull ElixirMatchedExpressionWhenExpressionOperation o) {
+    visitMatchedExpressionInMatchExpressionOperation(o);
   }
 
   public void visitMatchedExpressionWhenMatchedExpressionOperation(@NotNull ElixirMatchedExpressionWhenMatchedExpressionOperation o) {
-    visitMatchedExpressionInMatchMatchedExpressionOperation(o);
-  }
-
-  public void visitMatchedExpressionWhenTailExpressionOperation(@NotNull ElixirMatchedExpressionWhenTailExpressionOperation o) {
-    visitMatchedExpressionInMatchTailExpressionOperation(o);
+    visitMatchedExpressionWhenExpressionOperation(o);
   }
 
   public void visitMaxExpression(@NotNull ElixirMaxExpression o) {
@@ -352,7 +360,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitTailExpression(@NotNull ElixirTailExpression o) {
-    visitAtTailExpressionOperation(o);
+    visitAtExpressionOperation(o);
   }
 
   public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
@@ -367,23 +375,23 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitUnaryExpressionOperation(@NotNull ElixirUnaryExpressionOperation o) {
+    visitMatchedExpressionHatExpressionOperation(o);
+  }
+
+  public void visitUnaryExpressionPrefixOperation(@NotNull ElixirUnaryExpressionPrefixOperation o) {
+    visitUnaryExpressionOperation(o);
+  }
+
   public void visitUnaryMatchedExpressionOperation(@NotNull ElixirUnaryMatchedExpressionOperation o) {
-    visitMatchedExpressionHatMatchedExpressionOperation(o);
+    visitUnaryExpressionOperation(o);
   }
 
   public void visitUnaryMatchedExpressionPrefixOperation(@NotNull ElixirUnaryMatchedExpressionPrefixOperation o) {
-    visitPsiElement(o);
+    visitUnaryMatchedExpressionOperation(o);
   }
 
   public void visitUnaryPrefixOperator(@NotNull ElixirUnaryPrefixOperator o) {
-    visitPsiElement(o);
-  }
-
-  public void visitUnaryTailExpressionOperation(@NotNull ElixirUnaryTailExpressionOperation o) {
-    visitMatchedExpressionHatTailExpressionOperation(o);
-  }
-
-  public void visitUnaryTailExpressionPrefixOperation(@NotNull ElixirUnaryTailExpressionPrefixOperation o) {
     visitPsiElement(o);
   }
 

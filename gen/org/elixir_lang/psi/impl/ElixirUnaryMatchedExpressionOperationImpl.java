@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirUnaryMatchedExpressionOperationImpl extends ElixirMatchedExpressionHatMatchedExpressionOperationImpl implements ElixirUnaryMatchedExpressionOperation {
+public class ElixirUnaryMatchedExpressionOperationImpl extends ElixirUnaryExpressionOperationImpl implements ElixirUnaryMatchedExpressionOperation {
 
   public ElixirUnaryMatchedExpressionOperationImpl(ASTNode node) {
     super(node);
@@ -19,24 +19,6 @@ public class ElixirUnaryMatchedExpressionOperationImpl extends ElixirMatchedExpr
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnaryMatchedExpressionOperation(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCaptureMatchedExpressionPrefixOperation getCaptureMatchedExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureMatchedExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedExpressionHatMatchedExpressionOperation getMatchedExpressionHatMatchedExpressionOperation() {
-    return findChildByClass(ElixirMatchedExpressionHatMatchedExpressionOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
-    return findChildByClass(ElixirUnaryPrefixOperator.class);
   }
 
 }

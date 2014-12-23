@@ -19,7 +19,7 @@ Elixir File(0,78)
       ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(70,72)
         PsiElement(ElixirTokenType.0)('0')(70,71)
         PsiElement(ElixirTokenType.B)('B')(71,72)
-        PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <in>, <when>, <|>, <||, |||, or>, ElixirTokenType.DUAL_OPERATOR, ElixirTokenType.INVALID_BINARY_DIGITS or ElixirTokenType.VALID_BINARY_DIGITS expected, got ';'(72,72)
+        PsiErrorElement:<.>, ElixirTokenType.INVALID_BINARY_DIGITS or ElixirTokenType.VALID_BINARY_DIGITS expected, got ';'(72,72)
           <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(ElixirTokenType.;)(';')(72,73)

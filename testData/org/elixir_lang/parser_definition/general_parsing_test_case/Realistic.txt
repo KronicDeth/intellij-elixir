@@ -53,7 +53,7 @@ Elixir File(0,900)
       ElixirNoParenthesesOneExpressionImpl(NO_PARENTHESES_ONE_EXPRESSION)(158,163)
         ElixirQualifiedIdentifierImpl(QUALIFIED_IDENTIFIER)(158,163)
           PsiElement(ElixirTokenType.IDENTIFIER)('start')(158,163)
-  PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <adjacent expression>, <call arguments no parentheses many>, <end of expression>, <in>, <when>, <|>, <||, |||, or>, ElixirTokenType.(, ElixirTokenType., or ElixirTokenType.DUAL_OPERATOR expected, got ''(163,163)
+  PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <capture expression operation>, <end of expression>, <in>, <when>, <|>, <||, |||, or> or ElixirTokenType.DUAL_OPERATOR expected, got ''(163,163)
     <empty list>
   PsiElement(DUMMY_BLOCK)(163,544)
     PsiElement(DUMMY_BLOCK)(163,203)

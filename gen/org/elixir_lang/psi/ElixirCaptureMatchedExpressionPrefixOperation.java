@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCaptureMatchedExpressionPrefixOperation extends PsiElement {
+public interface ElixirCaptureMatchedExpressionPrefixOperation extends ElixirCaptureMatchedExpressionOperation {
+
+  @NotNull
+  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();
-
-  @NotNull
-  ElixirMatchedExpressionInMatchMatchedExpressionOperation getMatchedExpressionInMatchMatchedExpressionOperation();
 
 }

@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
 
-public class ElixirTailExpressionImpl extends ElixirAtTailExpressionOperationImpl implements ElixirTailExpression {
+public class ElixirTailExpressionImpl extends ElixirAtExpressionOperationImpl implements ElixirTailExpression {
 
   public ElixirTailExpressionImpl(ASTNode node) {
     super(node);

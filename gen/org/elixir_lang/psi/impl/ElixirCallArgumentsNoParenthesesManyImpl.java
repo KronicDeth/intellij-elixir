@@ -30,8 +30,8 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirCaptureMatchedExpressionOperation> getCaptureMatchedExpressionOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureMatchedExpressionOperation.class);
+  public List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureExpressionOperation.class);
   }
 
   @Override

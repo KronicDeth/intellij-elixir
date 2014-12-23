@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirTailExpression extends ElixirAtTailExpressionOperation {
+public interface ElixirTailExpression extends ElixirAtExpressionOperation {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();

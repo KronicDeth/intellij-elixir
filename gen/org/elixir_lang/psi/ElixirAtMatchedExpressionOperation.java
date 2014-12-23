@@ -5,18 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirAtMatchedExpressionOperation extends ElixirUnaryMatchedExpressionOperation {
-
-  @Nullable
-  ElixirAtPrefixOperator getAtPrefixOperator();
-
-  @Nullable
-  ElixirCaptureMatchedExpressionPrefixOperation getCaptureMatchedExpressionPrefixOperation();
-
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
-
-  @Nullable
-  ElixirUnaryMatchedExpressionPrefixOperation getUnaryMatchedExpressionPrefixOperation();
+public interface ElixirAtMatchedExpressionOperation extends ElixirAtExpressionOperation {
 
 }

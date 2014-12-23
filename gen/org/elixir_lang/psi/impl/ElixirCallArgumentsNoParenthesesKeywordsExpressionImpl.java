@@ -24,8 +24,8 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
-  public ElixirCaptureMatchedExpressionOperation getCaptureMatchedExpressionOperation() {
-    return findChildByClass(ElixirCaptureMatchedExpressionOperation.class);
+  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
+    return findChildByClass(ElixirCaptureExpressionOperation.class);
   }
 
   @Override
