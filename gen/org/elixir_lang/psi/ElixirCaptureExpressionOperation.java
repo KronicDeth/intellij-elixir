@@ -11,9 +11,6 @@ public interface ElixirCaptureExpressionOperation extends PsiElement {
   ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirCapturePrefixOperator getCapturePrefixOperator();
 
 }

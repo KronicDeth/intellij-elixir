@@ -29,12 +29,6 @@ public class ElixirMatchedExpressionWhenExpressionOperationImpl extends ElixirMa
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirWhenInfixOperator getWhenInfixOperator() {
     return findChildByClass(ElixirWhenInfixOperator.class);
   }

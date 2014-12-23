@@ -10,10 +10,7 @@ public interface ElixirAtExpressionPrefixOperation extends ElixirAtExpressionOpe
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
 
-  @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
-  ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation();
+  @NotNull
+  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
 }

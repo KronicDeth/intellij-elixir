@@ -29,12 +29,6 @@ public class ElixirMatchedExpressionPipeExpressionOperationImpl extends ElixirMa
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirPipeInfixOperator getPipeInfixOperator() {
     return findChildByClass(ElixirPipeInfixOperator.class);
   }

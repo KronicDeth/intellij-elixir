@@ -11,9 +11,6 @@ public interface ElixirMatchedExpressionTwoExpressionOperation extends ElixirMat
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirTwoInfixOperator getTwoInfixOperator();
 
 }

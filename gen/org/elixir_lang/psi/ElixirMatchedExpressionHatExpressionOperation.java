@@ -11,9 +11,6 @@ public interface ElixirMatchedExpressionHatExpressionOperation extends ElixirMat
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirHatInfixOperator getHatInfixOperator();
 
 }

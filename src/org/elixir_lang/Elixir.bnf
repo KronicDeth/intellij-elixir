@@ -202,7 +202,7 @@ captureExpressionOperation ::= nonNumericCapturePrefixOperator captureExpression
                                matchedExpressionInMatchExpressionOperation
 // unlike captureMatchedExpressionOperation, guarantees the capturePrefixOperator is present
 captureExpressionPrefixOperation ::= nonNumericCapturePrefixOperator captureExpressionOperand
-                                     { captureExpressionOperation }
+                                     { extends =  captureExpressionOperation }
 
 private captureMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionInMatchMatchedExpressionOperation
 captureMatchedExpressionOperation ::= nonNumericCapturePrefixOperator captureMatchedExpressionOperand |

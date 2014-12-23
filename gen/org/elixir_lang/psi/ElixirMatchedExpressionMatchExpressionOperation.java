@@ -11,9 +11,6 @@ public interface ElixirMatchedExpressionMatchExpressionOperation extends ElixirM
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirMatchInfixOperator getMatchInfixOperator();
 
 }

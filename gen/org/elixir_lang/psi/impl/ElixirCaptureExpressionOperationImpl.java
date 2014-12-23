@@ -30,12 +30,6 @@ public class ElixirCaptureExpressionOperationImpl extends ASTWrapperPsiElement i
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirCapturePrefixOperator getCapturePrefixOperator() {
     return findChildByClass(ElixirCapturePrefixOperator.class);
   }

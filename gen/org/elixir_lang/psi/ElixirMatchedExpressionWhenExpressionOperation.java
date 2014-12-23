@@ -11,9 +11,6 @@ public interface ElixirMatchedExpressionWhenExpressionOperation extends ElixirMa
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirWhenInfixOperator getWhenInfixOperator();
 
 }

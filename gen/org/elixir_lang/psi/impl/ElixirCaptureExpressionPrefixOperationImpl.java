@@ -8,10 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCaptureExpressionPrefixOperationImpl extends ASTWrapperPsiElement implements ElixirCaptureExpressionPrefixOperation {
+public class ElixirCaptureExpressionPrefixOperationImpl extends ElixirCaptureExpressionOperationImpl implements ElixirCaptureExpressionPrefixOperation {
 
   public ElixirCaptureExpressionPrefixOperationImpl(ASTNode node) {
     super(node);
@@ -24,14 +23,8 @@ public class ElixirCaptureExpressionPrefixOperationImpl extends ASTWrapperPsiEle
 
   @Override
   @NotNull
-  public List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureExpressionOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
+  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
+    return findNotNullChildByClass(ElixirCaptureExpressionOperation.class);
   }
 
   @Override

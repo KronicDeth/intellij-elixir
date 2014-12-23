@@ -80,7 +80,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCaptureExpressionPrefixOperation(@NotNull ElixirCaptureExpressionPrefixOperation o) {
-    visitPsiElement(o);
+    visitCaptureExpressionOperation(o);
   }
 
   public void visitCaptureMatchedExpressionOperation(@NotNull ElixirCaptureMatchedExpressionOperation o) {

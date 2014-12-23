@@ -29,12 +29,6 @@ public class ElixirMatchedExpressionInMatchExpressionOperationImpl extends Elixi
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirInMatchInfixOperator getInMatchInfixOperator() {
     return findChildByClass(ElixirInMatchInfixOperator.class);
   }

@@ -33,10 +33,4 @@ public class ElixirMatchedExpressionArrowExpressionOperationImpl extends ElixirM
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureExpressionOperation.class);
   }
 
-  @Override
-  @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
 }

@@ -11,9 +11,6 @@ public interface ElixirMatchedExpressionPipeExpressionOperation extends ElixirMa
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
   @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
   ElixirPipeInfixOperator getPipeInfixOperator();
 
 }

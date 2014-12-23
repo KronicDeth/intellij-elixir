@@ -13,7 +13,4 @@ public interface ElixirMatchedExpressionAdditionExpressionOperation extends Elix
   @NotNull
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
-  @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
 }

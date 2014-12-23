@@ -7,11 +7,8 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirUnaryExpressionPrefixOperation extends ElixirUnaryExpressionOperation {
 
-  @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
-  @Nullable
-  ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation();
+  @NotNull
+  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
 
   @NotNull
   ElixirUnaryPrefixOperator getUnaryPrefixOperator();

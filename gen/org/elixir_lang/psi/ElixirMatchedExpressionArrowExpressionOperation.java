@@ -13,7 +13,4 @@ public interface ElixirMatchedExpressionArrowExpressionOperation extends ElixirM
   @NotNull
   List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
 
-  @Nullable
-  ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation();
-
 }

@@ -22,15 +22,9 @@ public class ElixirUnaryExpressionPrefixOperationImpl extends ElixirUnaryExpress
   }
 
   @Override
-  @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation() {
-    return findChildByClass(ElixirMatchedExpressionHatExpressionOperation.class);
+  @NotNull
+  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
+    return findNotNullChildByClass(ElixirCaptureExpressionOperation.class);
   }
 
   @Override

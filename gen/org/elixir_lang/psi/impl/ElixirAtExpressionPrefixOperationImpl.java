@@ -28,15 +28,9 @@ public class ElixirAtExpressionPrefixOperationImpl extends ElixirAtExpressionOpe
   }
 
   @Override
-  @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation() {
-    return findChildByClass(ElixirMatchedExpressionHatExpressionOperation.class);
+  @NotNull
+  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
+    return findNotNullChildByClass(ElixirCaptureExpressionOperation.class);
   }
 
 }

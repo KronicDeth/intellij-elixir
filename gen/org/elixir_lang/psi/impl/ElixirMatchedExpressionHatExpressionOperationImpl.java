@@ -29,12 +29,6 @@ public class ElixirMatchedExpressionHatExpressionOperationImpl extends ElixirMat
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionPrefixOperation getCaptureExpressionPrefixOperation() {
-    return findChildByClass(ElixirCaptureExpressionPrefixOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirHatInfixOperator getHatInfixOperator() {
     return findChildByClass(ElixirHatInfixOperator.class);
   }
