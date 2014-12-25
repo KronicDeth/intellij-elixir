@@ -1,0 +1,2 @@
+# !(not(identifier))
+!not identifier
