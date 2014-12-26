@@ -28,7 +28,6 @@ public interface ElixirTypes {
   IElementType CAPTURE_EXPRESSION_OPERATION = new ElixirElementType("CAPTURE_EXPRESSION_OPERATION");
   IElementType CAPTURE_EXPRESSION_PREFIX_OPERATION = new ElixirElementType("CAPTURE_EXPRESSION_PREFIX_OPERATION");
   IElementType CAPTURE_MATCHED_EXPRESSION_OPERATION = new ElixirElementType("CAPTURE_MATCHED_EXPRESSION_OPERATION");
-  IElementType CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION = new ElixirElementType("CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -284,9 +283,6 @@ public interface ElixirTypes {
       }
       else if (type == CAPTURE_MATCHED_EXPRESSION_OPERATION) {
         return new ElixirCaptureMatchedExpressionOperationImpl(node);
-      }
-      else if (type == CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION) {
-        return new ElixirCaptureMatchedExpressionPrefixOperationImpl(node);
       }
       else if (type == CAPTURE_PREFIX_OPERATOR) {
         return new ElixirCapturePrefixOperatorImpl(node);

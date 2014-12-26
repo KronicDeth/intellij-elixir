@@ -204,13 +204,14 @@ captureExpressionOperation ::= nonNumericCapturePrefixOperator captureExpression
 captureExpressionPrefixOperation ::= nonNumericCapturePrefixOperator captureExpressionOperand
                                      { extends =  captureExpressionOperation }
 
-private captureMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionInMatchMatchedExpressionOperation
-captureMatchedExpressionOperation ::= captureMatchedExpressionPrefixOperation |
+/* NOTE: there is no such thing as a captureMatchedExpressionPrefixOperation because capture captures everything to the
+   right because it is a prefix operator.  Due to how *Expression*Operations are written,
+   captureExpressionPrefixOperation can safely be used as a MatchedExpression operation because
+   captureExpressionPrefixOperation will consume the rest of the expression and not cause an ambiguous comma or
+   parentheses scenario. */
+captureMatchedExpressionOperation ::= captureExpressionPrefixOperation |
                                       matchedExpressionInMatchMatchedExpressionOperation
                                       { extends = captureExpressionOperation }
-// unlike captureMatchedExpressionOperation, guarantees the capturePrefixOperator is present
-captureMatchedExpressionPrefixOperation ::= nonNumericCapturePrefixOperator captureMatchedExpressionOperand
-                                            { extends = captureMatchedExpressionOperation }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51)
 inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL* { name = "<-, \\\\" }
@@ -220,7 +221,7 @@ matchedExpressionInMatchExpressionOperation ::= matchedExpressionInMatchMatchedE
                                                 matchedExpressionInMatchExpressionOperand
                                                 { extends = captureExpressionOperation }
 
-private matchedExpressionInMatchMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionWhenMatchedExpressionOperation
+private matchedExpressionInMatchMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionWhenMatchedExpressionOperation
 matchedExpressionInMatchMatchedExpressionOperation ::= matchedExpressionInMatchMatchedExpressionOperand (inMatchInfixOperator matchedExpressionInMatchMatchedExpressionOperand)*
                                                        { extends = matchedExpressionInMatchedExpressionOperation }
 
@@ -232,7 +233,7 @@ matchedExpressionWhenExpressionOperation ::= matchedExpressionWhenMatchedExpress
                                              matchedExpressionWhenExpressionOperand
                                              { extends = matchedExpressionInMatchExpressionOperation }
 
-private matchedExpressionWhenMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionTypeMatchedExpressionOperation
+private matchedExpressionWhenMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTypeMatchedExpressionOperation
 matchedExpressionWhenMatchedExpressionOperation ::= matchedExpressionWhenMatchedExpressionOperand (whenInfixOperator matchedExpressionWhenMatchedExpressionOperation)?
                                                     { extends = matchedExpressionWhenExpressionOperation }
 
@@ -244,7 +245,7 @@ matchedExpressionTypeExpressionOperation ::= matchedExpressionTypeMatchedExpress
                                              matchedExpressionTypeExpressionOperand
                                              { extends = matchedExpressionWhenExpressionOperation }
 
-private matchedExpressionTypeMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionPipeMatchedExpressionOperation
+private matchedExpressionTypeMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionPipeMatchedExpressionOperation
 matchedExpressionTypeMatchedExpressionOperation ::= matchedExpressionTypeMatchedExpressionOperand (typeInfixOperator matchedExpressionTypeMatchedExpressionOperation)?
                                                     { extends = matchedExpressionTypeExpressionOperation }
 
@@ -256,7 +257,7 @@ matchedExpressionPipeExpressionOperation ::= matchedExpressionPipeMatchedExpress
                                              matchedExpressionPipeExpressionOperand
                                              { extends = matchedExpressionTypeExpressionOperation }
 
-private matchedExpressionPipeMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionMatchMatchedExpressionOperation
+private matchedExpressionPipeMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMatchMatchedExpressionOperation
 matchedExpressionPipeMatchedExpressionOperation ::= matchedExpressionPipeMatchedExpressionOperand (pipeInfixOperator matchedExpressionPipeMatchedExpressionOperation)?
                                                     { extends = matchedExpressionPipeExpressionOperation }
 
@@ -268,7 +269,7 @@ matchedExpressionMatchExpressionOperation ::= matchedExpressionMatchMatchedExpre
                                               matchedExpressionMatchExpressionOperand
                                               { extends = matchedExpressionPipeExpressionOperation }
 
-private matchedExpressionMatchMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionOrMatchedExpressionOperation
+private matchedExpressionMatchMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionOrMatchedExpressionOperation
 matchedExpressionMatchMatchedExpressionOperation ::= matchedExpressionMatchMatchedExpressionOperand (matchInfixOperator matchedExpressionMatchMatchedExpressionOperation)?
                                                      { extends = matchedExpressionMatchExpressionOperation }
 
@@ -280,7 +281,7 @@ matchedExpressionOrExpressionOperation ::= matchedExpressionOrMatchedExpressionO
                                            matchedExpressionOrExpressionOperand
                                            { extends = matchedExpressionMatchExpressionOperation }
 
-private matchedExpressionOrMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionAndMatchedExpressionOperation
+private matchedExpressionOrMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAndMatchedExpressionOperation
 matchedExpressionOrMatchedExpressionOperation ::= matchedExpressionOrMatchedExpressionOperand (orInfixOperator matchedExpressionOrMatchedExpressionOperand)*
                                                   { extends = matchedExpressionOrExpressionOperation }
 
@@ -292,7 +293,7 @@ matchedExpressionAndExpressionOperation ::= matchedExpressionAndMatchedExpressio
                                             matchedExpressionAndExpressionOperand
                                             { extends = matchedExpressionOrExpressionOperation }
 
-private matchedExpressionAndMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionComparisonMatchedExpressionOperation
+private matchedExpressionAndMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionComparisonMatchedExpressionOperation
 matchedExpressionAndMatchedExpressionOperation ::= matchedExpressionAndMatchedExpressionOperand (andInfixOperator matchedExpressionAndMatchedExpressionOperand)*
                                                    { extends = matchedExpressionAndExpressionOperation }
 
@@ -304,7 +305,7 @@ matchedExpressionComparisonExpressionOperation ::= matchedExpressionComparisonMa
                                                    matchedExpressionComparisonExpressionOperand
                                                    { extends = matchedExpressionAndExpressionOperation }
 
-private matchedExpressionComparisonMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionRelationalMatchedExpressionOperation
+private matchedExpressionComparisonMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionRelationalMatchedExpressionOperation
 matchedExpressionComparisonMatchedExpressionOperation ::= matchedExpressionComparisonMatchedExpressionOperand (comparisonInfixOperator matchedExpressionComparisonMatchedExpressionOperand)*
                                                           { extends = matchedExpressionComparisonExpressionOperation }
 
@@ -316,7 +317,7 @@ matchedExpressionRelationalExpressionOperation ::= matchedExpressionRelationalMa
                                                    matchedExpressionRelationalExpressionOperand
                                                    { extends = matchedExpressionComparisonExpressionOperation }
 
-private matchedExpressionRelationalMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionArrowMatchedExpressionOperation
+private matchedExpressionRelationalMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionArrowMatchedExpressionOperation
 matchedExpressionRelationalMatchedExpressionOperation ::= matchedExpressionRelationalMatchedExpressionOperand (relationalInfixOperator matchedExpressionRelationalMatchedExpressionOperand)*
                                                           { extends = matchedExpressionRelationalExpressionOperation }
 
@@ -328,7 +329,7 @@ matchedExpressionArrowExpressionOperation ::= matchedExpressionArrowMatchedExpre
                                               matchedExpressionArrowExpressionOperand
                                               { extends = matchedExpressionRelationalExpressionOperation }
 
-private matchedExpressionArrowMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionInMatchedExpressionOperation
+private matchedExpressionArrowMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionInMatchedExpressionOperation
 matchedExpressionArrowMatchedExpressionOperation ::= matchedExpressionArrowMatchedExpressionOperand (arrowInfixOperator matchedExpressionArrowMatchedExpressionOperand)*
                                                      { extends = matchedExpressionArrowExpressionOperation }
 
@@ -340,7 +341,7 @@ matchedExpressionInExpressionOperation ::= matchedExpressionInMatchedExpressionO
                                            matchedExpressionInExpressionOperand
                                            { extends = matchedExpressionArrowExpressionOperation }
 
-private matchedExpressionInMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionTwoMatchedExpressionOperation
+private matchedExpressionInMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTwoMatchedExpressionOperation
 matchedExpressionInMatchedExpressionOperation ::= matchedExpressionInMatchedExpressionOperand (inInfixOperator matchedExpressionInMatchedExpressionOperand)*
                                                   { extends = matchedExpressionInExpressionOperation }
 
@@ -352,7 +353,7 @@ matchedExpressionTwoExpressionOperation ::= matchedExpressionTwoMatchedExpressio
                                             matchedExpressionTwoExpressionOperand
                                             { extends = matchedExpressionInExpressionOperation }
 
-private matchedExpressionTwoMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionAdditionMatchedExpressionOperation
+private matchedExpressionTwoMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAdditionMatchedExpressionOperation
 matchedExpressionTwoMatchedExpressionOperation ::= matchedExpressionTwoMatchedExpressionOperand (twoInfixOperator matchedExpressionTwoMatchedExpressionOperation)?
                                                    { extends = matchedExpressionTwoExpressionOperation }
 
@@ -366,7 +367,7 @@ matchedExpressionAdditionExpressionOperation ::= matchedExpressionAdditionMatche
                                                  matchedExpressionAdditionExpressionOperand
                                                  { extends = matchedExpressionTwoExpressionOperation }
 
-private matchedExpressionAdditionMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionMultiplicationMatchedExpressionOperation                                         
+private matchedExpressionAdditionMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMultiplicationMatchedExpressionOperation
 /* used both here and in noParenthesesOneExpression to disambiguate `IDENTIFIER captureMatchedExpressionOperation` from
    `IDENTIFIER DUAL_OPERATOR EOL* matchedExpressionMultiplicationMatchedExpressionOperation` */
 private matchedExpressionAdditionMatchedExpressionOperationTail ::= additionInfixOperator matchedExpressionAdditionMatchedExpressionOperand
@@ -381,7 +382,7 @@ matchedExpressionMultiplicationExpressionOperation ::= matchedExpressionMultipli
                                                        matchedExpressionMultiplicationExpressionOperand
                                                        { extends = matchedExpressionAdditionExpressionOperation }
 
-private matchedExpressionMultiplicationMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | matchedExpressionHatMatchedExpressionOperation
+private matchedExpressionMultiplicationMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionHatMatchedExpressionOperation
 matchedExpressionMultiplicationMatchedExpressionOperation ::= matchedExpressionMultiplicationMatchedExpressionOperand (multiplicationInfixOperator matchedExpressionMultiplicationMatchedExpressionOperand)*
                                                               { extends = matchedExpressionMultiplicationExpressionOperation }
 
@@ -393,7 +394,7 @@ matchedExpressionHatExpressionOperation ::= matchedExpressionHatMatchedExpressio
                                             matchedExpressionHatExpressionOperand
                                             { extends = matchedExpressionMultiplicationExpressionOperation }
 
-private matchedExpressionHatMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | unaryMatchedExpressionOperation
+private matchedExpressionHatMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionOperation
 matchedExpressionHatMatchedExpressionOperation ::= matchedExpressionHatMatchedExpressionOperand (hatInfixOperator matchedExpressionHatMatchedExpressionOperand)*
                                                    { extends = matchedExpressionHatExpressionOperation }
 
@@ -414,7 +415,7 @@ unaryExpressionPrefixOperation ::= unaryPrefixOperator unaryExpressionOperand { 
 /*
  # Must include prefix operations of higher precedence as prefix operations are allowed to be nested without parentheses just due to the nature of prefixing.
  */
-private unaryMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionOperation
+private unaryMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionOperation
 unaryMatchedExpressionOperation ::= unaryMatchedExpressionPrefixOperation |
                                     atMatchedExpressionOperation
                                     { extends = unaryExpressionOperation }
@@ -433,7 +434,7 @@ atExpressionPrefixOperation ::= atPrefixOperator atExpressionOperand { extends =
 /*
  # Must include prefix operations of higher precedence as prefix operations are allowed to be nested without parentheses just due to the nature of prefixing.
  */
-private atMatchedExpressionOperand ::= captureMatchedExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionPrefixOperation | matchedExpression
+private atMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionPrefixOperation | matchedExpression
 atMatchedExpressionOperation ::= atMatchedExpressionPrefixOperation |
                                  matchedExpression
                                  { extends = atExpressionOperation }

@@ -82,9 +82,6 @@ public class ElixirParser implements PsiParser {
     else if (t == CAPTURE_MATCHED_EXPRESSION_OPERATION) {
       r = captureMatchedExpressionOperation(b, 0);
     }
-    else if (t == CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION) {
-      r = captureMatchedExpressionPrefixOperation(b, 0);
-    }
     else if (t == CAPTURE_PREFIX_OPERATOR) {
       r = capturePrefixOperator(b, 0);
     }
@@ -332,7 +329,6 @@ public class ElixirParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ATOM, MAX_EXPRESSION),
     create_token_set_(DECIMAL_FLOAT, DECIMAL_NUMBER),
-    create_token_set_(CAPTURE_MATCHED_EXPRESSION_OPERATION, CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION),
     create_token_set_(MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION),
     create_token_set_(UNARY_MATCHED_EXPRESSION_OPERATION, UNARY_MATCHED_EXPRESSION_PREFIX_OPERATION),
     create_token_set_(AT_MATCHED_EXPRESSION_OPERATION, AT_MATCHED_EXPRESSION_PREFIX_OPERATION, MATCHED_EXPRESSION),
@@ -450,16 +446,16 @@ public class ElixirParser implements PsiParser {
       MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION, TAIL_EXPRESSION,
       UNARY_EXPRESSION_OPERATION, UNARY_EXPRESSION_PREFIX_OPERATION, UNARY_MATCHED_EXPRESSION_OPERATION, UNARY_MATCHED_EXPRESSION_PREFIX_OPERATION),
     create_token_set_(AT_EXPRESSION_OPERATION, AT_EXPRESSION_PREFIX_OPERATION, AT_MATCHED_EXPRESSION_OPERATION, AT_MATCHED_EXPRESSION_PREFIX_OPERATION,
-      CAPTURE_EXPRESSION_OPERATION, CAPTURE_EXPRESSION_PREFIX_OPERATION, CAPTURE_MATCHED_EXPRESSION_OPERATION, CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION,
-      MATCHED_EXPRESSION, MATCHED_EXPRESSION_ADDITION_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_RELATIONAL_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_EXPRESSION_OPERATION,
-      MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION, TAIL_EXPRESSION,
-      UNARY_EXPRESSION_OPERATION, UNARY_EXPRESSION_PREFIX_OPERATION, UNARY_MATCHED_EXPRESSION_OPERATION, UNARY_MATCHED_EXPRESSION_PREFIX_OPERATION),
+      CAPTURE_EXPRESSION_OPERATION, CAPTURE_EXPRESSION_PREFIX_OPERATION, CAPTURE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION,
+      MATCHED_EXPRESSION_ADDITION_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ADDITION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_EXPRESSION_OPERATION, MATCHED_EXPRESSION_AND_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_ARROW_EXPRESSION_OPERATION, MATCHED_EXPRESSION_ARROW_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_EXPRESSION_OPERATION, MATCHED_EXPRESSION_COMPARISON_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_HAT_EXPRESSION_OPERATION, MATCHED_EXPRESSION_HAT_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_IN_MATCH_EXPRESSION_OPERATION, MATCHED_EXPRESSION_IN_MATCH_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MATCH_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_MULTIPLICATION_EXPRESSION_OPERATION, MATCHED_EXPRESSION_MULTIPLICATION_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_EXPRESSION_OPERATION, MATCHED_EXPRESSION_OR_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_PIPE_EXPRESSION_OPERATION, MATCHED_EXPRESSION_PIPE_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_RELATIONAL_EXPRESSION_OPERATION, MATCHED_EXPRESSION_RELATIONAL_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_TWO_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TWO_MATCHED_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_EXPRESSION_OPERATION, MATCHED_EXPRESSION_TYPE_MATCHED_EXPRESSION_OPERATION,
+      MATCHED_EXPRESSION_WHEN_EXPRESSION_OPERATION, MATCHED_EXPRESSION_WHEN_MATCHED_EXPRESSION_OPERATION, TAIL_EXPRESSION, UNARY_EXPRESSION_OPERATION,
+      UNARY_EXPRESSION_PREFIX_OPERATION, UNARY_MATCHED_EXPRESSION_OPERATION, UNARY_MATCHED_EXPRESSION_PREFIX_OPERATION),
   };
 
   /* ********************************************************** */
@@ -675,12 +671,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionPrefixOperation | matchedExpression
+  // captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionPrefixOperation | matchedExpression
   static boolean atMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = unaryMatchedExpressionPrefixOperation(b, l + 1);
     if (!r) r = atMatchedExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1);
@@ -1087,40 +1083,15 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionInMatchMatchedExpressionOperation
-  static boolean captureMatchedExpressionOperand(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "captureMatchedExpressionOperand")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
-    if (!r) r = matchedExpressionInMatchMatchedExpressionOperation(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation |
+  // captureExpressionPrefixOperation |
   //                                       matchedExpressionInMatchMatchedExpressionOperation
   public static boolean captureMatchedExpressionOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "captureMatchedExpressionOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, "<capture matched expression operation>");
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionInMatchMatchedExpressionOperation(b, l + 1);
     exit_section_(b, l, m, CAPTURE_MATCHED_EXPRESSION_OPERATION, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // nonNumericCapturePrefixOperator captureMatchedExpressionOperand
-  public static boolean captureMatchedExpressionPrefixOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "captureMatchedExpressionPrefixOperation")) return false;
-    if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = nonNumericCapturePrefixOperator(b, l + 1);
-    r = r && captureMatchedExpressionOperand(b, l + 1);
-    exit_section_(b, m, CAPTURE_MATCHED_EXPRESSION_PREFIX_OPERATION, r);
     return r;
   }
 
@@ -2769,12 +2740,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionMultiplicationMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionMultiplicationMatchedExpressionOperation
   static boolean matchedExpressionAdditionMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionAdditionMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionMultiplicationMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -2872,12 +2843,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionComparisonMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionComparisonMatchedExpressionOperation
   static boolean matchedExpressionAndMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionAndMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionComparisonMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -2973,12 +2944,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionInMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionInMatchedExpressionOperation
   static boolean matchedExpressionArrowMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionArrowMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionInMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3074,12 +3045,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionRelationalMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionRelationalMatchedExpressionOperation
   static boolean matchedExpressionComparisonMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionComparisonMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionRelationalMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3175,12 +3146,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | unaryMatchedExpressionOperation
+  // captureExpressionPrefixOperation | unaryMatchedExpressionOperation
   static boolean matchedExpressionHatMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionHatMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = unaryMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3330,12 +3301,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionWhenMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionWhenMatchedExpressionOperation
   static boolean matchedExpressionInMatchMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionInMatchMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionWhenMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3377,12 +3348,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionTwoMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionTwoMatchedExpressionOperation
   static boolean matchedExpressionInMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionInMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionTwoMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3478,12 +3449,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionOrMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionOrMatchedExpressionOperation
   static boolean matchedExpressionMatchMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionMatchMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionOrMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3574,12 +3545,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionHatMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionHatMatchedExpressionOperation
   static boolean matchedExpressionMultiplicationMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionMultiplicationMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionHatMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3675,12 +3646,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionAndMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionAndMatchedExpressionOperation
   static boolean matchedExpressionOrMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionOrMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionAndMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3776,12 +3747,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionMatchMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionMatchMatchedExpressionOperation
   static boolean matchedExpressionPipeMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionPipeMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionMatchMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3872,12 +3843,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionArrowMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionArrowMatchedExpressionOperation
   static boolean matchedExpressionRelationalMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionRelationalMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionArrowMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3979,12 +3950,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionAdditionMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionAdditionMatchedExpressionOperation
   static boolean matchedExpressionTwoMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionTwoMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionAdditionMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -4075,12 +4046,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionPipeMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionPipeMatchedExpressionOperation
   static boolean matchedExpressionTypeMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionTypeMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionPipeMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -4171,12 +4142,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | matchedExpressionTypeMatchedExpressionOperation
+  // captureExpressionPrefixOperation | matchedExpressionTypeMatchedExpressionOperation
   static boolean matchedExpressionWhenMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedExpressionWhenMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionTypeMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -4884,12 +4855,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // captureMatchedExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionOperation
+  // captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionOperation
   static boolean unaryMatchedExpressionOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryMatchedExpressionOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = captureMatchedExpressionPrefixOperation(b, l + 1);
+    r = captureExpressionPrefixOperation(b, l + 1);
     if (!r) r = unaryMatchedExpressionPrefixOperation(b, l + 1);
     if (!r) r = atMatchedExpressionOperation(b, l + 1);
     exit_section_(b, m, null, r);
