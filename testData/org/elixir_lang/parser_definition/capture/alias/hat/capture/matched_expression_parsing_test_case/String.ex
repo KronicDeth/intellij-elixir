@@ -1,0 +1,2 @@
+# &(^^^(Alias, &("string"))
+&Alias ^^^ &"string"

@@ -1,0 +1,2 @@
+# &(^^^(Alias, &(nil))
+&Alias ^^^ &nil

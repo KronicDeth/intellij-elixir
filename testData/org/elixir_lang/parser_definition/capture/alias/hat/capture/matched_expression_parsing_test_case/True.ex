@@ -1,0 +1,2 @@
+# &(^^^(Alias, &(true)))
+&Alias ^^^ &true
