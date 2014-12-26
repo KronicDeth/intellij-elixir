@@ -48,7 +48,7 @@ public class PrefixOperationParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
-    public void testOpeningParenthesisSemicolonClosingParenthesesis() {
+    public void testOpeningParenthesisSemicolonClosingParenthesis() {
         doTest(true);
     }
 
