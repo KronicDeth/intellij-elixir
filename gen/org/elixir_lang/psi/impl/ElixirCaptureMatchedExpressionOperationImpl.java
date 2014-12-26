@@ -21,16 +21,4 @@ public class ElixirCaptureMatchedExpressionOperationImpl extends ElixirCaptureEx
     else super.accept(visitor);
   }
 
-  @Override
-  @Nullable
-  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
-    return findChildByClass(ElixirCaptureExpressionOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
-    return findChildByClass(ElixirCapturePrefixOperator.class);
-  }
-
 }

@@ -7,10 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirCaptureMatchedExpressionOperation extends ElixirCaptureExpressionOperation {
 
-  @Nullable
-  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
-
-  @Nullable
-  ElixirCapturePrefixOperator getCapturePrefixOperator();
-
 }

@@ -1099,26 +1099,15 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // nonNumericCapturePrefixOperator captureMatchedExpressionOperand |
+  // captureMatchedExpressionPrefixOperation |
   //                                       matchedExpressionInMatchMatchedExpressionOperation
   public static boolean captureMatchedExpressionOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "captureMatchedExpressionOperation")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, "<capture matched expression operation>");
-    r = captureMatchedExpressionOperation_0(b, l + 1);
+    r = captureMatchedExpressionPrefixOperation(b, l + 1);
     if (!r) r = matchedExpressionInMatchMatchedExpressionOperation(b, l + 1);
     exit_section_(b, l, m, CAPTURE_MATCHED_EXPRESSION_OPERATION, r, false, null);
-    return r;
-  }
-
-  // nonNumericCapturePrefixOperator captureMatchedExpressionOperand
-  private static boolean captureMatchedExpressionOperation_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "captureMatchedExpressionOperation_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = nonNumericCapturePrefixOperator(b, l + 1);
-    r = r && captureMatchedExpressionOperand(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
