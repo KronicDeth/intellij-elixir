@@ -1,0 +1,5 @@
+# &('''CharList\nHeredoc''')
+&'''
+ CharList
+ Heredoc
+ '''
