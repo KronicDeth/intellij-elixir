@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface ElixirAdjacentExpression extends PsiElement {
 
   @NotNull
-  ElixirCaptureExpressionOperation getCaptureExpressionOperation();
+  ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation();
 
 }

@@ -189,7 +189,7 @@ private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROM
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
 
-private expressionRoot ::= captureExpressionOperation
+private expressionRoot ::= matchedExpressionHatExpressionOperation
 private matchedExpressionRoot ::= captureMatchedExpressionOperation
 
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)

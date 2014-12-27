@@ -24,8 +24,8 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
-    return findNotNullChildByClass(ElixirCaptureExpressionOperation.class);
+  public ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation() {
+    return findNotNullChildByClass(ElixirMatchedExpressionHatExpressionOperation.class);
   }
 
 }
