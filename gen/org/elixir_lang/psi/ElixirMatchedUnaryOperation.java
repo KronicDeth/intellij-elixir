@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiElement {
+public interface ElixirMatchedUnaryOperation extends PsiElement {
 
   @Nullable
   ElixirAccessExpression getAccessExpression();
@@ -13,14 +13,8 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
-  @NotNull
-  ElixirKeywordKey getKeywordKey();
-
   @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
-
-  @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
@@ -32,9 +26,9 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
-  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
-
-  @Nullable
   ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+
+  @NotNull
+  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
 
 }

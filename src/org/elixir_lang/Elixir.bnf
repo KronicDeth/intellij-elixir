@@ -50,6 +50,7 @@
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
     TRUE = "true"
+    TYPE_OPERATOR = "::"
     UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
     VALID_BINARY_DIGITS = "regexp:[01]+"
     VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
@@ -69,7 +70,7 @@ adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote) { extends = maxExpression }
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
-private callArgumentsNoParenthesesCommaExpression ::= matchedExpressionRoot (infixComma callArgumentsNoParenthesesExpression)+
+private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
@@ -81,13 +82,13 @@ private callArgumentsNoParenthesesExpression ::= emptyParentheses |
                                                  /* This will be marked as an error by
                                                     {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
                                                  noParenthesesManyStrictNoParenthesesExpression |
-                                                 matchedExpressionRoot !KEYWORD_PAIR_COLON
+                                                 matchedNonNumericCaptureExpression !KEYWORD_PAIR_COLON
 callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (infixComma callArgumentsNoParenthesesKeywordsExpression)*
 callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
-callArgumentsNoParenthesesMany ::= matchedExpressionRoot infixComma callArgumentsNoParenthesesKeywords |
+callArgumentsNoParenthesesMany ::= matchedNonNumericCaptureExpression infixComma callArgumentsNoParenthesesKeywords |
                                    callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
                                                  noParenthesesStrict
@@ -107,7 +108,7 @@ emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= infixSemicolon | EOL
 private infixSemicolon ::= EOL* SEMICOLON EOL*
-private expression ::= expressionRoot
+private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
@@ -189,257 +190,31 @@ private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROM
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
 
-private expressionRoot ::= matchedExpressionHatExpressionOperation
-private matchedExpressionRoot ::= captureMatchedExpressionOperation
-
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
 capturePrefixOperator ::= CAPTURE_OPERATOR EOL* { name = "&" }
-// captureCharTokenOrNumberOperation has higher precedence, so make sure this doesn't match it
-private nonNumericCapturePrefixOperator ::= capturePrefixOperator !charTokenOrNumber
-
-private captureExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionInMatchExpressionOperation
-captureExpressionOperation ::= nonNumericCapturePrefixOperator captureExpressionOperand |
-                               matchedExpressionInMatchExpressionOperation
-// unlike captureMatchedExpressionOperation, guarantees the capturePrefixOperator is present
-captureExpressionPrefixOperation ::= nonNumericCapturePrefixOperator captureExpressionOperand
-                                     { extends =  captureExpressionOperation }
-
-/* NOTE: there is no such thing as a captureMatchedExpressionPrefixOperation because capture captures everything to the
-   right because it is a prefix operator.  Due to how *Expression*Operations are written,
-   captureExpressionPrefixOperation can safely be used as a MatchedExpression operation because
-   captureExpressionPrefixOperation will consume the rest of the expression and not cause an ambiguous comma or
-   parentheses scenario. */
-captureMatchedExpressionOperation ::= captureExpressionPrefixOperation |
-                                      matchedExpressionInMatchMatchedExpressionOperation
-                                      { extends = captureExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51)
-inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL* { name = "<-, \\\\" }
-
-private matchedExpressionInMatchExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionWhenExpressionOperation
-matchedExpressionInMatchExpressionOperation ::= matchedExpressionInMatchMatchedExpressionOperation (inMatchInfixOperator matchedExpressionInMatchExpressionOperand)? |
-                                                matchedExpressionInMatchExpressionOperand
-                                                { extends = captureExpressionOperation }
-
-private matchedExpressionInMatchMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionWhenMatchedExpressionOperation
-matchedExpressionInMatchMatchedExpressionOperation ::= matchedExpressionInMatchMatchedExpressionOperand (inMatchInfixOperator matchedExpressionInMatchMatchedExpressionOperand)*
-                                                       { extends = matchedExpressionInMatchedExpressionOperation }
-
-// right-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L52)
-whenInfixOperator ::= EOL* WHEN_OPERATOR EOL* { name = "when" }
-
-private matchedExpressionWhenExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTypeExpressionOperation
-matchedExpressionWhenExpressionOperation ::= matchedExpressionWhenMatchedExpressionOperation (whenInfixOperator matchedExpressionWhenExpressionOperation)? |
-                                             matchedExpressionWhenExpressionOperand
-                                             { extends = matchedExpressionInMatchExpressionOperation }
-
-private matchedExpressionWhenMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTypeMatchedExpressionOperation
-matchedExpressionWhenMatchedExpressionOperation ::= matchedExpressionWhenMatchedExpressionOperand (whenInfixOperator matchedExpressionWhenMatchedExpressionOperation)?
-                                                    { extends = matchedExpressionWhenExpressionOperation }
-
-// right-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L53)
-typeInfixOperator ::= EOL* TYPE_OPERATOR EOL* { name = "::" }
-
-private matchedExpressionTypeExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionPipeExpressionOperation
-matchedExpressionTypeExpressionOperation ::= matchedExpressionTypeMatchedExpressionOperation (typeInfixOperator matchedExpressionTypeExpressionOperation)? |
-                                             matchedExpressionTypeExpressionOperand
-                                             { extends = matchedExpressionWhenExpressionOperation }
-
-private matchedExpressionTypeMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionPipeMatchedExpressionOperation
-matchedExpressionTypeMatchedExpressionOperation ::= matchedExpressionTypeMatchedExpressionOperand (typeInfixOperator matchedExpressionTypeMatchedExpressionOperation)?
-                                                    { extends = matchedExpressionTypeExpressionOperation }
-
-// right-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L54)
-pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL* { name = "|" }
-
-private matchedExpressionPipeExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMatchExpressionOperation
-matchedExpressionPipeExpressionOperation ::= matchedExpressionPipeMatchedExpressionOperation (pipeInfixOperator matchedExpressionPipeExpressionOperation)? |
-                                             matchedExpressionPipeExpressionOperand
-                                             { extends = matchedExpressionTypeExpressionOperation }
-
-private matchedExpressionPipeMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMatchMatchedExpressionOperation
-matchedExpressionPipeMatchedExpressionOperation ::= matchedExpressionPipeMatchedExpressionOperand (pipeInfixOperator matchedExpressionPipeMatchedExpressionOperation)?
-                                                    { extends = matchedExpressionPipeExpressionOperation }
-
-// right-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L56)
-matchInfixOperator ::= EOL* MATCH_OPERATOR EOL* { name = "=" }
-
-private matchedExpressionMatchExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionOrExpressionOperation
-matchedExpressionMatchExpressionOperation ::= matchedExpressionMatchMatchedExpressionOperation (matchInfixOperator matchedExpressionOrExpressionOperation)? |
-                                              matchedExpressionMatchExpressionOperand
-                                              { extends = matchedExpressionPipeExpressionOperation }
-
-private matchedExpressionMatchMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionOrMatchedExpressionOperation
-matchedExpressionMatchMatchedExpressionOperation ::= matchedExpressionMatchMatchedExpressionOperand (matchInfixOperator matchedExpressionMatchMatchedExpressionOperation)?
-                                                     { extends = matchedExpressionMatchExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57)
-orInfixOperator ::= EOL* OR_OPERATOR EOL* { name = "||, |||, or" }
-
-private matchedExpressionOrExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAndExpressionOperation
-matchedExpressionOrExpressionOperation ::= matchedExpressionOrMatchedExpressionOperation (orInfixOperator matchedExpressionOrExpressionOperand)? |
-                                           matchedExpressionOrExpressionOperand
-                                           { extends = matchedExpressionMatchExpressionOperation }
-
-private matchedExpressionOrMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAndMatchedExpressionOperation
-matchedExpressionOrMatchedExpressionOperation ::= matchedExpressionOrMatchedExpressionOperand (orInfixOperator matchedExpressionOrMatchedExpressionOperand)*
-                                                  { extends = matchedExpressionOrExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58)
-andInfixOperator ::= EOL* AND_OPERATOR EOL* { name = "&&, &&&, and" }
-
-private matchedExpressionAndExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionComparisonExpressionOperation
-matchedExpressionAndExpressionOperation ::= matchedExpressionAndMatchedExpressionOperation (andInfixOperator matchedExpressionAndExpressionOperand)? |
-                                            matchedExpressionAndExpressionOperand
-                                            { extends = matchedExpressionOrExpressionOperation }
-
-private matchedExpressionAndMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionComparisonMatchedExpressionOperation
-matchedExpressionAndMatchedExpressionOperation ::= matchedExpressionAndMatchedExpressionOperand (andInfixOperator matchedExpressionAndMatchedExpressionOperand)*
-                                                   { extends = matchedExpressionAndExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59)
-comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL* { name = "!=, ==, =~, !==, ===" }
-
-private matchedExpressionComparisonExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionRelationalExpressionOperation
-matchedExpressionComparisonExpressionOperation ::= matchedExpressionComparisonMatchedExpressionOperation (comparisonInfixOperator matchedExpressionComparisonExpressionOperand)? |
-                                                   matchedExpressionComparisonExpressionOperand
-                                                   { extends = matchedExpressionAndExpressionOperation }
-
-private matchedExpressionComparisonMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionRelationalMatchedExpressionOperation
-matchedExpressionComparisonMatchedExpressionOperation ::= matchedExpressionComparisonMatchedExpressionOperand (comparisonInfixOperator matchedExpressionComparisonMatchedExpressionOperand)*
-                                                          { extends = matchedExpressionComparisonExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L60)
-relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL* { name = "<, >, <=, >=" }
-
-private matchedExpressionRelationalExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionArrowExpressionOperation
-matchedExpressionRelationalExpressionOperation ::= matchedExpressionRelationalMatchedExpressionOperation (relationalInfixOperator matchedExpressionRelationalExpressionOperand)? |
-                                                   matchedExpressionRelationalExpressionOperand
-                                                   { extends = matchedExpressionComparisonExpressionOperation }
-
-private matchedExpressionRelationalMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionArrowMatchedExpressionOperation
-matchedExpressionRelationalMatchedExpressionOperation ::= matchedExpressionRelationalMatchedExpressionOperand (relationalInfixOperator matchedExpressionRelationalMatchedExpressionOperand)*
-                                                          { extends = matchedExpressionRelationalExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61)
-arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL* { name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>" }
-
-private matchedExpressionArrowExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionInExpressionOperation
-matchedExpressionArrowExpressionOperation ::= matchedExpressionArrowMatchedExpressionOperation (arrowInfixOperator matchedExpressionArrowExpressionOperand)? |
-                                              matchedExpressionArrowExpressionOperand
-                                              { extends = matchedExpressionRelationalExpressionOperation }
-
-private matchedExpressionArrowMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionInMatchedExpressionOperation
-matchedExpressionArrowMatchedExpressionOperation ::= matchedExpressionArrowMatchedExpressionOperand (arrowInfixOperator matchedExpressionArrowMatchedExpressionOperand)*
-                                                     { extends = matchedExpressionArrowExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62)
-inInfixOperator ::= EOL* IN_OPERATOR EOL* { name = "in" }
-
-private matchedExpressionInExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTwoExpressionOperation
-matchedExpressionInExpressionOperation ::= matchedExpressionInMatchedExpressionOperation (inInfixOperator matchedExpressionInExpressionOperand)? |
-                                           matchedExpressionInExpressionOperand
-                                           { extends = matchedExpressionArrowExpressionOperation }
-
-private matchedExpressionInMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionTwoMatchedExpressionOperation
-matchedExpressionInMatchedExpressionOperation ::= matchedExpressionInMatchedExpressionOperand (inInfixOperator matchedExpressionInMatchedExpressionOperand)*
-                                                  { extends = matchedExpressionInExpressionOperation }
-
-// right-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63)
-twoInfixOperator ::= EOL* TWO_OPERATOR EOL* { name = "++, --, .., <>" }
-
-private matchedExpressionTwoExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAdditionExpressionOperation
-matchedExpressionTwoExpressionOperation ::= matchedExpressionTwoMatchedExpressionOperation (twoInfixOperator matchedExpressionTwoExpressionOperand)? |
-                                            matchedExpressionTwoExpressionOperand
-                                            { extends = matchedExpressionInExpressionOperation }
-
-private matchedExpressionTwoMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionAdditionMatchedExpressionOperation
-matchedExpressionTwoMatchedExpressionOperation ::= matchedExpressionTwoMatchedExpressionOperand (twoInfixOperator matchedExpressionTwoMatchedExpressionOperation)?
-                                                   { extends = matchedExpressionTwoExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L64)
-/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
-   is interpreted as captureOperation */
-additionInfixOperator ::= DUAL_OPERATOR EOL* { name = "+, -" }
-
-private matchedExpressionAdditionExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMultiplicationExpressionOperation
-matchedExpressionAdditionExpressionOperation ::= matchedExpressionAdditionMatchedExpressionOperation (additionInfixOperator matchedExpressionAdditionExpressionOperand)? |
-                                                 matchedExpressionAdditionExpressionOperand
-                                                 { extends = matchedExpressionTwoExpressionOperation }
-
-private matchedExpressionAdditionMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionMultiplicationMatchedExpressionOperation
-/* used both here and in noParenthesesOneExpression to disambiguate `IDENTIFIER captureMatchedExpressionOperation` from
-   `IDENTIFIER DUAL_OPERATOR EOL* matchedExpressionMultiplicationMatchedExpressionOperation` */
-private matchedExpressionAdditionMatchedExpressionOperationTail ::= additionInfixOperator matchedExpressionAdditionMatchedExpressionOperand
-matchedExpressionAdditionMatchedExpressionOperation ::= matchedExpressionAdditionMatchedExpressionOperand matchedExpressionAdditionMatchedExpressionOperationTail*
-                                                        { extends = matchedExpressionAdditionExpressionOperation }
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
-multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL* { name = "*, /" }
-
-private matchedExpressionMultiplicationExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionHatExpressionOperation
-matchedExpressionMultiplicationExpressionOperation ::= matchedExpressionMultiplicationMatchedExpressionOperation (multiplicationInfixOperator matchedExpressionMultiplicationExpressionOperand)? |
-                                                       matchedExpressionMultiplicationExpressionOperand
-                                                       { extends = matchedExpressionAdditionExpressionOperation }
-
-private matchedExpressionMultiplicationMatchedExpressionOperand ::= captureExpressionPrefixOperation | matchedExpressionHatMatchedExpressionOperation
-matchedExpressionMultiplicationMatchedExpressionOperation ::= matchedExpressionMultiplicationMatchedExpressionOperand (multiplicationInfixOperator matchedExpressionMultiplicationMatchedExpressionOperand)*
-                                                              { extends = matchedExpressionMultiplicationExpressionOperation }
+private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
+private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
+private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
+matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
 hatInfixOperator ::= EOL* HAT_OPERATOR EOL* { name = "^^^" }
 
-private matchedExpressionHatExpressionOperand ::= captureExpressionPrefixOperation | unaryExpressionOperation
-matchedExpressionHatExpressionOperation ::= matchedExpressionHatMatchedExpressionOperation (hatInfixOperator matchedExpressionHatExpressionOperand)? |
-                                            matchedExpressionHatExpressionOperand
-                                            { extends = matchedExpressionMultiplicationExpressionOperation }
-
-private matchedExpressionHatMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionOperation
-matchedExpressionHatMatchedExpressionOperation ::= matchedExpressionHatMatchedExpressionOperand (hatInfixOperator matchedExpressionHatMatchedExpressionOperand)*
-                                                   { extends = matchedExpressionHatExpressionOperation }
+private matchedHatExpression ::= matchedHatOperand matchedHatOperation*
+private matchedHatOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression
+left matchedHatOperation ::= hatInfixOperator matchedHatOperand
 
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67)
 unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* { name = "+, -, !, ^, not, ~~~" }
-
-/*
- * Must include prefix operations of higher precedence as prefix operations are allowed to be nested without parentheses
- * just due to the nature of prefixing.
- */
-private unaryExpressionOperand ::= captureExpressionPrefixOperation | unaryExpressionPrefixOperation | atExpressionOperation
-unaryExpressionOperation ::= unaryExpressionPrefixOperation |
-                             atExpressionOperation
-                             { extends = matchedExpressionHatExpressionOperation }
-// unlike unaryMatchedExpressionOperation, guarantees the unaryPrefixOperator is present
-unaryExpressionPrefixOperation ::= unaryPrefixOperator unaryExpressionOperand { extends = unaryExpressionOperation }
-
-/*
- # Must include prefix operations of higher precedence as prefix operations are allowed to be nested without parentheses just due to the nature of prefixing.
- */
-private unaryMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionOperation
-unaryMatchedExpressionOperation ::= unaryMatchedExpressionPrefixOperation |
-                                    atMatchedExpressionOperation
-                                    { extends = unaryExpressionOperation }
-// unlike unaryMatchedExpressionOperation, guarantees the unaryPrefixOperator is present
-unaryMatchedExpressionPrefixOperation ::= unaryPrefixOperator unaryMatchedExpressionOperand { extends = unaryMatchedExpressionOperation }
+private matchedUnaryExpression ::= matchedUnaryOperation | matchedUnaryOperand
+private matchedUnaryOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | matchedAtExpression
+matchedUnaryOperation ::= unaryPrefixOperator matchedUnaryOperand
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
 atPrefixOperator ::= AT_OPERATOR EOL* { name = "@" }
-
-private atExpressionOperand ::= captureExpressionPrefixOperation | unaryExpressionPrefixOperation | atExpressionPrefixOperation | tailExpression
-atExpressionOperation ::= atExpressionPrefixOperation |
-                          tailExpression
-                          { extends = unaryExpressionOperation }
-atExpressionPrefixOperation ::= atPrefixOperator atExpressionOperand { extends = atExpressionOperation }
-
-/*
- # Must include prefix operations of higher precedence as prefix operations are allowed to be nested without parentheses just due to the nature of prefixing.
- */
-private atMatchedExpressionOperand ::= captureExpressionPrefixOperation | unaryMatchedExpressionPrefixOperation | atMatchedExpressionPrefixOperation | matchedExpression
-atMatchedExpressionOperation ::= atMatchedExpressionPrefixOperation |
-                                 matchedExpression
-                                 { extends = atExpressionOperation }
-atMatchedExpressionPrefixOperation ::= atPrefixOperator atMatchedExpressionOperand
-                                       { extends = atMatchedExpressionOperation }
+private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
+private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | tailExpression | matchedExpression
+matchedAtOperation ::= atPrefixOperator matchedAtOperand
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
 infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
@@ -448,7 +223,7 @@ private headQualifier ::= atPrefixOperator (ALIAS | IDENTIFIER) |
                           captureCharTokenOrNumberOperation |
                           unaryCharTokenOrNumberOperation |
                           OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-                          charTokenOrNumber |
+                          numeric |
                           list |
                           sigil |
                           atom
@@ -464,19 +239,17 @@ private middleQualifier ::= binaryString |
                            ALIAS
 qualifiedAlias ::= qualifier ALIAS
 
-matchedExpression ::= noParenthesesOneExpression |
-                      accessExpression
-                      { extends = atMatchedExpressionOperation }
-tailExpression ::= emptyParentheses |
-                   noParenthesesCall
-                   { extends = atExpressionOperation }
+private matchedExpression ::= noParenthesesOneExpression |
+                              accessExpression
+private tailExpression ::= emptyParentheses |
+                           noParenthesesCall
 
 noParenthesesOneExpression ::= qualifiedIdentifier !callArgumentsNoParenthesesManyStrict
 accessExpression ::= atCharTokenOrNumberOperation |
                      captureCharTokenOrNumberOperation |
                      unaryCharTokenOrNumberOperation |
                      OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-                     charTokenOrNumber |
+                     numeric |
                      list |
                      binaryString |
                      listString |
@@ -487,13 +260,13 @@ accessExpression ::= atCharTokenOrNumberOperation |
                      maxExpression
 noParenthesesCall ::= qualifiedIdentifier callArgumentsNoParenthesesManyStrict
 
-atCharTokenOrNumberOperation ::= atPrefixOperator charTokenOrNumber
-captureCharTokenOrNumberOperation ::= capturePrefixOperator charTokenOrNumber
-unaryCharTokenOrNumberOperation ::= unaryPrefixOperator charTokenOrNumber
+atCharTokenOrNumberOperation ::= atPrefixOperator numeric
+captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
+unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
 
 /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's NUMBER and CHAR_TOKEN. */
-private charTokenOrNumber ::= CHAR_TOKEN | number
+private numeric ::= CHAR_TOKEN | number
 
 maxExpression ::= qualifiedAlias |
                   // Must be after qualifiedAlias because atom can start qualifiedAlias

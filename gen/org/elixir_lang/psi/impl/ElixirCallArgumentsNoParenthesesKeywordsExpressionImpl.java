@@ -24,8 +24,8 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
-  public ElixirCaptureExpressionOperation getCaptureExpressionOperation() {
-    return findChildByClass(ElixirCaptureExpressionOperation.class);
+  public ElixirAccessExpression getAccessExpression() {
+    return findChildByClass(ElixirAccessExpression.class);
   }
 
   @Override
@@ -42,8 +42,44 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
+  public ElixirMatchedAtOperation getMatchedAtOperation() {
+    return findChildByClass(ElixirMatchedAtOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedHatOperation getMatchedHatOperation() {
+    return findChildByClass(ElixirMatchedHatOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedUnaryOperation getMatchedUnaryOperation() {
+    return findChildByClass(ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesCall getNoParenthesesCall() {
+    return findChildByClass(ElixirNoParenthesesCall.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
     return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
+    return findChildByClass(ElixirNoParenthesesOneExpression.class);
   }
 
 }

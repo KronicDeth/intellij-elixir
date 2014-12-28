@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implements ElixirAdjacentExpression {
+public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedUnaryOperation {
 
-  public ElixirAdjacentExpressionImpl(ASTNode node) {
+  public ElixirMatchedUnaryOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAdjacentExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedUnaryOperation(this);
     else super.accept(visitor);
   }
 
@@ -38,12 +38,6 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedHatOperation getMatchedHatOperation() {
-    return findChildByClass(ElixirMatchedHatOperation.class);
   }
 
   @Override
@@ -68,6 +62,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
     return findChildByClass(ElixirNoParenthesesOneExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
+    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
   }
 
 }

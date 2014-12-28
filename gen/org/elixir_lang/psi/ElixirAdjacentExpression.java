@@ -7,7 +7,28 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirAdjacentExpression extends PsiElement {
 
-  @NotNull
-  ElixirMatchedExpressionHatExpressionOperation getMatchedExpressionHatExpressionOperation();
+  @Nullable
+  ElixirAccessExpression getAccessExpression();
+
+  @Nullable
+  ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirMatchedAtOperation getMatchedAtOperation();
+
+  @Nullable
+  ElixirMatchedHatOperation getMatchedHatOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+
+  @Nullable
+  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+
+  @Nullable
+  ElixirNoParenthesesCall getNoParenthesesCall();
+
+  @Nullable
+  ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
 
 }

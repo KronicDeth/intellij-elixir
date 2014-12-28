@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implements ElixirAdjacentExpression {
+public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericCaptureOperation {
 
-  public ElixirAdjacentExpressionImpl(ASTNode node) {
+  public ElixirMatchedNonNumericCaptureOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAdjacentExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericCaptureOperation(this);
     else super.accept(visitor);
   }
 
@@ -26,6 +26,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirAccessExpression getAccessExpression() {
     return findChildByClass(ElixirAccessExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
+    return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
   }
 
   @Override

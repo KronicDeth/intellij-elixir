@@ -8,12 +8,33 @@ import com.intellij.psi.PsiElement;
 public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
+  List<ElixirAccessExpression> getAccessExpressionList();
+
+  @NotNull
   List<ElixirAdjacentExpression> getAdjacentExpressionList();
 
   @NotNull
-  List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList();
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
   List<ElixirEndOfExpression> getEndOfExpressionList();
+
+  @NotNull
+  List<ElixirMatchedAtOperation> getMatchedAtOperationList();
+
+  @NotNull
+  List<ElixirMatchedHatOperation> getMatchedHatOperationList();
+
+  @NotNull
+  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
+
+  @NotNull
+  List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
+
+  @NotNull
+  List<ElixirNoParenthesesCall> getNoParenthesesCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
 
 }

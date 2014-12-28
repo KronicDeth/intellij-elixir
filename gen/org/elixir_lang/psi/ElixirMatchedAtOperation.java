@@ -5,22 +5,16 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiElement {
+public interface ElixirMatchedAtOperation extends PsiElement {
 
   @Nullable
   ElixirAccessExpression getAccessExpression();
 
+  @NotNull
+  ElixirAtPrefixOperator getAtPrefixOperator();
+
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
-
-  @NotNull
-  ElixirKeywordKey getKeywordKey();
-
-  @Nullable
-  ElixirMatchedAtOperation getMatchedAtOperation();
-
-  @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
@@ -30,9 +24,6 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
 
   @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
-
-  @Nullable
-  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
   @Nullable
   ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();

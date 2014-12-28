@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiElement implements ElixirCallArgumentsNoParenthesesMany {
+public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedHatOperation {
 
-  public ElixirCallArgumentsNoParenthesesManyImpl(ASTNode node) {
+  public ElixirMatchedHatOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCallArgumentsNoParenthesesMany(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedHatOperation(this);
     else super.accept(visitor);
   }
 
@@ -29,15 +29,15 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @Nullable
-  public ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords() {
-    return findChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
+  public ElixirHatInfixOperator getHatInfixOperator() {
+    return findNotNullChildByClass(ElixirHatInfixOperator.class);
   }
 
   @Override
@@ -47,9 +47,9 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @NotNull
-  public List<ElixirMatchedHatOperation> getMatchedHatOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatOperation.class);
+  @Nullable
+  public ElixirMatchedHatOperation getMatchedHatOperation() {
+    return findChildByClass(ElixirMatchedHatOperation.class);
   }
 
   @Override
@@ -68,12 +68,6 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   @NotNull
   public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
   @Override

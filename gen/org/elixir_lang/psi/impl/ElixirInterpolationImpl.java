@@ -24,20 +24,62 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirAccessExpression> getAccessExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAccessExpression.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirAdjacentExpression> getAdjacentExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAdjacentExpression.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirCaptureExpressionOperation> getCaptureExpressionOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureExpressionOperation.class);
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
 
   @Override
   @NotNull
   public List<ElixirEndOfExpression> getEndOfExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedAtOperation> getMatchedAtOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedAtOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedHatOperation> getMatchedHatOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesOneExpression.class);
   }
 
 }

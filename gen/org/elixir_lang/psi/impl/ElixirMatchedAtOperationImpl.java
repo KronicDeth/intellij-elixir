@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implements ElixirAdjacentExpression {
+public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedAtOperation {
 
-  public ElixirAdjacentExpressionImpl(ASTNode node) {
+  public ElixirMatchedAtOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAdjacentExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedAtOperation(this);
     else super.accept(visitor);
   }
 
@@ -29,21 +29,15 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
+  @NotNull
+  public ElixirAtPrefixOperator getAtPrefixOperator() {
+    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+  }
+
+  @Override
   @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedAtOperation getMatchedAtOperation() {
-    return findChildByClass(ElixirMatchedAtOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedHatOperation getMatchedHatOperation() {
-    return findChildByClass(ElixirMatchedHatOperation.class);
   }
 
   @Override
