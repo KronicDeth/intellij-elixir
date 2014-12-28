@@ -1,0 +1,7 @@
+Elixir File(0,8)
+  PsiComment(ElixirTokenType.COMMENT)('# nil')(0,5)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(5,6)
+    PsiElement(ElixirTokenType.EOL)('\n')(5,6)
+  ElixirEmptyParenthesesImpl(EMPTY_PARENTHESES)(6,8)
+    PsiElement(ElixirTokenType.()('(')(6,7)
+    PsiElement(ElixirTokenType.))(')')(7,8)
