@@ -8,7 +8,6 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
-  IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType AT_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("AT_CHAR_TOKEN_OR_NUMBER_OPERATION");
@@ -173,10 +172,7 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ACCESS_EXPRESSION) {
-        return new ElixirAccessExpressionImpl(node);
-      }
-      else if (type == ADJACENT_EXPRESSION) {
+       if (type == ADJACENT_EXPRESSION) {
         return new ElixirAdjacentExpressionImpl(node);
       }
       else if (type == ATOM) {

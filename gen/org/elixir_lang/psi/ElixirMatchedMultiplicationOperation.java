@@ -8,10 +8,22 @@ import com.intellij.psi.PsiElement;
 public interface ElixirMatchedMultiplicationOperation extends PsiElement {
 
   @NotNull
-  List<ElixirAccessExpression> getAccessExpressionList();
+  List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
+
+  @NotNull
+  List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
+
+  @NotNull
+  List<ElixirCharList> getCharListList();
+
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
+
+  @NotNull
+  List<ElixirList> getListList();
 
   @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
@@ -29,6 +41,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
+  List<ElixirMaxExpression> getMaxExpressionList();
+
+  @NotNull
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
   @NotNull
@@ -36,5 +51,20 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
 
   @NotNull
   List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+
+  @NotNull
+  List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirSigil> getSigilList();
+
+  @NotNull
+  List<ElixirString> getStringList();
+
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
+
+  @NotNull
+  List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
 
 }

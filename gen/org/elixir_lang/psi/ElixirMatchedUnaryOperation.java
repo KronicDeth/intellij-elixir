@@ -8,10 +8,22 @@ import com.intellij.psi.PsiElement;
 public interface ElixirMatchedUnaryOperation extends PsiElement {
 
   @Nullable
-  ElixirAccessExpression getAccessExpression();
+  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+
+  @Nullable
+  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+
+  @Nullable
+  ElixirCharList getCharList();
+
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirList getList();
 
   @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
@@ -23,10 +35,28 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
+  ElixirMaxExpression getMaxExpression();
+
+  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
   ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+
+  @Nullable
+  ElixirNumber getNumber();
+
+  @Nullable
+  ElixirSigil getSigil();
+
+  @Nullable
+  ElixirString getString();
+
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
+
+  @Nullable
+  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
 
   @NotNull
   ElixirUnaryPrefixOperator getUnaryPrefixOperator();

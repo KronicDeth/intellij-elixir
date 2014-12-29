@@ -8,13 +8,25 @@ import com.intellij.psi.PsiElement;
 public interface ElixirMatchedHatOperation extends PsiElement {
 
   @NotNull
-  List<ElixirAccessExpression> getAccessExpressionList();
+  List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
+
+  @NotNull
+  List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
+
+  @NotNull
+  List<ElixirCharList> getCharListList();
+
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
   ElixirHatInfixOperator getHatInfixOperator();
+
+  @NotNull
+  List<ElixirList> getListList();
 
   @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
@@ -29,9 +41,27 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
+  List<ElixirMaxExpression> getMaxExpressionList();
+
+  @NotNull
   List<ElixirNoParenthesesCall> getNoParenthesesCallList();
 
   @NotNull
   List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+
+  @NotNull
+  List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirSigil> getSigilList();
+
+  @NotNull
+  List<ElixirString> getStringList();
+
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
+
+  @NotNull
+  List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
 
 }

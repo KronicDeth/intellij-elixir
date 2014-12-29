@@ -22,10 +22,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ACCESS_EXPRESSION) {
-      r = accessExpression(b, 0);
-    }
-    else if (t == ADJACENT_EXPRESSION) {
+    if (t == ADJACENT_EXPRESSION) {
       r = adjacentExpression(b, 0);
     }
     else if (t == AT_CHAR_TOKEN_OR_NUMBER_OPERATION) {
@@ -182,22 +179,22 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // atCharTokenOrNumberOperation |
-  //                      captureCharTokenOrNumberOperation |
-  //                      unaryCharTokenOrNumberOperation |
-  //                      OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-  //                      numeric |
-  //                      list |
-  //                      binaryString |
-  //                      listString |
-  //                      sigil |
-  //                      FALSE |
-  //                      NIL |
-  //                      TRUE |
-  //                      maxExpression
-  public static boolean accessExpression(PsiBuilder b, int l) {
+  //                              captureCharTokenOrNumberOperation |
+  //                              unaryCharTokenOrNumberOperation |
+  //                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
+  //                              numeric |
+  //                              list |
+  //                              binaryString |
+  //                              listString |
+  //                              sigil |
+  //                              FALSE |
+  //                              NIL |
+  //                              TRUE |
+  //                              maxExpression
+  static boolean accessExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<access expression>");
+    Marker m = enter_section_(b);
     r = atCharTokenOrNumberOperation(b, l + 1);
     if (!r) r = captureCharTokenOrNumberOperation(b, l + 1);
     if (!r) r = unaryCharTokenOrNumberOperation(b, l + 1);
@@ -211,7 +208,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, NIL);
     if (!r) r = consumeToken(b, TRUE);
     if (!r) r = maxExpression(b, l + 1);
-    exit_section_(b, l, m, ACCESS_EXPRESSION, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 

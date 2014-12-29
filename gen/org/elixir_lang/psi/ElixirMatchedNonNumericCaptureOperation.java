@@ -8,13 +8,25 @@ import com.intellij.psi.PsiElement;
 public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
 
   @Nullable
-  ElixirAccessExpression getAccessExpression();
+  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+
+  @Nullable
+  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();
 
   @Nullable
+  ElixirCharList getCharList();
+
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
+
+  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirList getList();
 
   @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
@@ -32,9 +44,27 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
+  ElixirMaxExpression getMaxExpression();
+
+  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
   ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+
+  @Nullable
+  ElixirNumber getNumber();
+
+  @Nullable
+  ElixirSigil getSigil();
+
+  @Nullable
+  ElixirString getString();
+
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
+
+  @Nullable
+  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
 
 }

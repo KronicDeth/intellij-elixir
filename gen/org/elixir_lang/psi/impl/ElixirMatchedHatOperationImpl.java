@@ -24,8 +24,26 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirAccessExpression> getAccessExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAccessExpression.class);
+  public List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtCharTokenOrNumberOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureCharTokenOrNumberOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirCharList> getCharListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirCharListHeredoc> getCharListHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
   }
 
   @Override
@@ -38,6 +56,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
   @NotNull
   public ElixirHatInfixOperator getHatInfixOperator() {
     return findNotNullChildByClass(ElixirHatInfixOperator.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirList> getListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirList.class);
   }
 
   @Override
@@ -66,6 +90,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirMaxExpression> getMaxExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMaxExpression.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
   }
@@ -74,6 +104,36 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
   @NotNull
   public List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesOneExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNumber> getNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirSigil> getSigilList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigil.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirString> getStringList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirStringHeredoc> getStringHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryCharTokenOrNumberOperation.class);
   }
 
 }

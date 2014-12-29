@@ -24,8 +24,26 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
-  public ElixirAccessExpression getAccessExpression() {
-    return findChildByClass(ElixirAccessExpression.class);
+  public ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation() {
+    return findChildByClass(ElixirAtCharTokenOrNumberOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
+    return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirCharList getCharList() {
+    return findChildByClass(ElixirCharList.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
@@ -38,6 +56,12 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
   @NotNull
   public ElixirKeywordKey getKeywordKey() {
     return findNotNullChildByClass(ElixirKeywordKey.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirList getList() {
+    return findChildByClass(ElixirList.class);
   }
 
   @Override
@@ -72,6 +96,12 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
+  public ElixirMaxExpression getMaxExpression() {
+    return findChildByClass(ElixirMaxExpression.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNoParenthesesCall getNoParenthesesCall() {
     return findChildByClass(ElixirNoParenthesesCall.class);
   }
@@ -86,6 +116,36 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
   @Nullable
   public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
     return findChildByClass(ElixirNoParenthesesOneExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNumber getNumber() {
+    return findChildByClass(ElixirNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirSigil getSigil() {
+    return findChildByClass(ElixirSigil.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirString getString() {
+    return findChildByClass(ElixirString.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
+    return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
   }
 
 }

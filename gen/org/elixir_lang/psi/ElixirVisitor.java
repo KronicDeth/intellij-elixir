@@ -7,10 +7,6 @@ import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
-  public void visitAccessExpression(@NotNull ElixirAccessExpression o) {
-    visitPsiElement(o);
-  }
-
   public void visitAdjacentExpression(@NotNull ElixirAdjacentExpression o) {
     visitPsiElement(o);
   }

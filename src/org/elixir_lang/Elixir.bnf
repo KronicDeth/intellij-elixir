@@ -250,19 +250,19 @@ private tailExpression ::= emptyParentheses |
                            noParenthesesCall
 
 noParenthesesOneExpression ::= qualifiedIdentifier !callArgumentsNoParenthesesManyStrict
-accessExpression ::= atCharTokenOrNumberOperation |
-                     captureCharTokenOrNumberOperation |
-                     unaryCharTokenOrNumberOperation |
-                     OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-                     numeric |
-                     list |
-                     binaryString |
-                     listString |
-                     sigil |
-                     FALSE |
-                     NIL |
-                     TRUE |
-                     maxExpression
+private accessExpression ::= atCharTokenOrNumberOperation |
+                             captureCharTokenOrNumberOperation |
+                             unaryCharTokenOrNumberOperation |
+                             OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
+                             numeric |
+                             list |
+                             binaryString |
+                             listString |
+                             sigil |
+                             FALSE |
+                             NIL |
+                             TRUE |
+                             maxExpression
 noParenthesesCall ::= qualifiedIdentifier callArgumentsNoParenthesesManyStrict
 
 atCharTokenOrNumberOperation ::= atPrefixOperator numeric

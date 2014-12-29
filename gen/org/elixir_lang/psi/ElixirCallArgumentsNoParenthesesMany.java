@@ -8,13 +8,25 @@ import com.intellij.psi.PsiElement;
 public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
 
   @NotNull
-  List<ElixirAccessExpression> getAccessExpressionList();
+  List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
 
   @Nullable
   ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords();
 
   @NotNull
+  List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
+
+  @NotNull
+  List<ElixirCharList> getCharListList();
+
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
+
+  @NotNull
+  List<ElixirList> getListList();
 
   @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
@@ -32,6 +44,9 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
+  List<ElixirMaxExpression> getMaxExpressionList();
+
+  @NotNull
   List<ElixirNoParenthesesCall> getNoParenthesesCallList();
 
   @NotNull
@@ -39,5 +54,20 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
 
   @NotNull
   List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+
+  @NotNull
+  List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirSigil> getSigilList();
+
+  @NotNull
+  List<ElixirString> getStringList();
+
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
+
+  @NotNull
+  List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
 
 }
