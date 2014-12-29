@@ -1,0 +1,7 @@
+Elixir File(0,23)
+  PsiComment(ElixirTokenType.COMMENT)('# identifier')(0,12)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(12,13)
+    PsiElement(ElixirTokenType.EOL)('\n')(12,13)
+  ElixirNoParenthesesOneExpressionImpl(NO_PARENTHESES_ONE_EXPRESSION)(13,23)
+    ElixirQualifiedIdentifierImpl(QUALIFIED_IDENTIFIER)(13,23)
+      PsiElement(ElixirTokenType.IDENTIFIER)('identifier')(13,23)
