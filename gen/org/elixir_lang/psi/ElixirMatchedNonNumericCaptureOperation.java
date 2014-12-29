@@ -23,6 +23,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
+  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable

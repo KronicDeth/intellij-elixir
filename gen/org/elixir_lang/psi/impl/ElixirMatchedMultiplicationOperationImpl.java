@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements ElixirInterpolation {
+public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedMultiplicationOperation {
 
-  public ElixirInterpolationImpl(ASTNode node) {
+  public ElixirMatchedMultiplicationOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedMultiplicationOperation(this);
     else super.accept(visitor);
   }
 
@@ -30,20 +30,8 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirAdjacentExpression> getAdjacentExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAdjacentExpression.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirEndOfExpression> getEndOfExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
   }
 
   @Override
@@ -59,9 +47,9 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedMultiplicationOperation.class);
+  @Nullable
+  public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationOperation.class);
   }
 
   @Override
@@ -74,6 +62,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
+    return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
   }
 
   @Override

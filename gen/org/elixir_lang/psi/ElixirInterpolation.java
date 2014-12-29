@@ -26,6 +26,9 @@ public interface ElixirInterpolation extends PsiElement {
   List<ElixirMatchedHatOperation> getMatchedHatOperationList();
 
   @NotNull
+  List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList();
+
+  @NotNull
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull

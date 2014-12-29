@@ -106,6 +106,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_HAT_OPERATION) {
       r = matchedHatOperation(b, 0);
     }
+    else if (t == MATCHED_MULTIPLICATION_OPERATION) {
+      r = matchedMultiplicationOperation(b, 0);
+    }
     else if (t == MATCHED_NON_NUMERIC_CAPTURE_OPERATION) {
       r = matchedNonNumericCaptureOperation(b, 0);
     }
@@ -114,6 +117,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == MAX_EXPRESSION) {
       r = maxExpression(b, 0);
+    }
+    else if (t == MULTIPLICATION_INFIX_OPERATOR) {
+      r = multiplicationInfixOperator(b, 0);
     }
     else if (t == NO_PARENTHESES_CALL) {
       r = noParenthesesCall(b, 0);
@@ -2077,6 +2083,55 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // matchedMultiplicationOperand matchedMultiplicationOperation*
+  static boolean matchedMultiplicationExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedMultiplicationExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedMultiplicationOperand(b, l + 1);
+    r = r && matchedMultiplicationExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedMultiplicationOperation*
+  private static boolean matchedMultiplicationExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedMultiplicationExpression_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!matchedMultiplicationOperation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "matchedMultiplicationExpression_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation | matchedHatExpression
+  static boolean matchedMultiplicationOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedMultiplicationOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedHatExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // multiplicationInfixOperator matchedMultiplicationOperand
+  public static boolean matchedMultiplicationOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedMultiplicationOperation")) return false;
+    if (!nextTokenIs(b, "<matched multiplication operation>", EOL, MULTIPLICATION_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched multiplication operation>");
+    r = multiplicationInfixOperator(b, l + 1);
+    r = r && matchedMultiplicationOperand(b, l + 1);
+    exit_section_(b, l, m, MATCHED_MULTIPLICATION_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
   static boolean matchedNonNumericCaptureExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureExpression")) return false;
@@ -2089,13 +2144,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureOperation | matchedHatExpression
+  // matchedNonNumericCaptureOperation | matchedMultiplicationExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedHatExpression(b, l + 1);
+    if (!r) r = matchedMultiplicationExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2186,6 +2241,44 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, ALIAS);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* MULTIPLICATION_OPERATOR EOL*
+  public static boolean multiplicationInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "multiplicationInfixOperator")) return false;
+    if (!nextTokenIs(b, "<*, />", EOL, MULTIPLICATION_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<*, />");
+    r = multiplicationInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, MULTIPLICATION_OPERATOR);
+    r = r && multiplicationInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, MULTIPLICATION_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean multiplicationInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "multiplicationInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "multiplicationInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean multiplicationInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "multiplicationInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "multiplicationInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */

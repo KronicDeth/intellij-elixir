@@ -119,6 +119,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
+    visitPsiElement(o);
+  }
+
   public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
     visitPsiElement(o);
   }
@@ -128,6 +132,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMaxExpression(@NotNull ElixirMaxExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
     visitPsiElement(o);
   }
 

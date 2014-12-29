@@ -23,6 +23,9 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
+  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
