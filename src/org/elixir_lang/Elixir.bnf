@@ -14,6 +14,7 @@
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
   psiImplPackage="org.elixir_lang.psi.impl"
+  psiImplUtilClass="org.elixir_lang.psi.impl.ElixirPsiImplUtil"
 
   elementTypeHolderClass="org.elixir_lang.psi.ElixirTypes"
   elementTypeClass="org.elixir_lang.psi.ElixirElementType"
@@ -67,7 +68,7 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
 adjacentExpression ::= expression
-atom ::= COLON (ATOM_FRAGMENT | quote) { extends = maxExpression }
+atom ::= COLON (ATOM_FRAGMENT | quote) { extends = maxExpression methods = [quote] }
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+

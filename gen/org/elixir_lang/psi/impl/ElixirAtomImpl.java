@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirAtomImpl extends ElixirMaxExpressionImpl implements ElixirAtom {
 
@@ -31,6 +32,10 @@ public class ElixirAtomImpl extends ElixirMaxExpressionImpl implements ElixirAto
   @Nullable
   public ElixirString getString() {
     return findChildByClass(ElixirString.class);
+  }
+
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }
