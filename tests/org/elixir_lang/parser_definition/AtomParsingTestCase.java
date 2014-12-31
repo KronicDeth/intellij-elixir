@@ -1,9 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.*;
-import com.intellij.openapi.fileEditor.impl.LoadTextUtil;
 import com.intellij.psi.FileViewProvider;
-import com.intellij.testFramework.LightVirtualFile;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirFile;
@@ -34,18 +32,10 @@ public class AtomParsingTestCase extends ParsingTestCase {
     }
 
     protected void assertQuotedCorrectly() {
-        String name = getTestName(false);
+        final String text = myFile.getText();
+        final FileViewProvider fileViewProvider = myFile.getViewProvider();
+
         try {
-            String text = loadFile(name + "." + myFileExt);
-            myFile = createPsiFile(name, text);
-            ensureParsed(myFile);
-            assertEquals("light virtual file text mismatch", text, ((LightVirtualFile)myFile.getVirtualFile()).getContent().toString());
-            assertEquals("virtual file text mismatch", text, LoadTextUtil.loadText(myFile.getVirtualFile()));
-
-            final FileViewProvider fileViewProvider = myFile.getViewProvider();
-            assertEquals("doc text mismatch", text, fileViewProvider.getDocument().getText());
-            assertEquals("psi text mismatch", text, myFile.getText());
-
             ElixirFile root = (ElixirFile) fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
 
             OtpErlangObject quoted = ElixirPsiImplUtil.quote(root);
