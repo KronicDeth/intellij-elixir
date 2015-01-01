@@ -15,6 +15,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Quoter.assertQuotedCorrectly(myFile);
     }
 
+    protected void doParsingAndQuoting() {
+        doTest(true);
+        assertQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/parser_definition";

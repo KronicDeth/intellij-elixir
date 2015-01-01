@@ -9,8 +9,7 @@ public class AtomParsingTestCase extends ParsingTestCase {
     }
 
     public void testLiteral() {
-        doTest(true);
-        assertQuotedCorrectly();
+        doParsingAndQuoting();
     }
 
     public void testOperator() {
