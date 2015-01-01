@@ -13,7 +13,7 @@ public class AtomParsingTestCase extends ParsingTestCase {
     }
 
     public void testOperator() {
-        doTest(true);
+        doParsingAndQuoting();
     }
 
     public void testSingleQuoted() {
