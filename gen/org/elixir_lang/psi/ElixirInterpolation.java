@@ -1,11 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import org.jetbrains.annotations.NotNull;
 
-public interface ElixirInterpolation extends PsiElement {
+import java.util.List;
+
+public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirAdjacentExpression> getAdjacentExpressionList();
@@ -69,5 +70,8 @@ public interface ElixirInterpolation extends PsiElement {
 
   @NotNull
   List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

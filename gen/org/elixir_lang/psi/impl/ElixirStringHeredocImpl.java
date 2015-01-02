@@ -1,15 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import org.elixir_lang.psi.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import org.elixir_lang.psi.ElixirInterpolatedStringBody;
+import org.elixir_lang.psi.ElixirStringHeredoc;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.jetbrains.annotations.NotNull;
 
 public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements ElixirStringHeredoc {
 
@@ -24,8 +22,8 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirInterpolation> getInterpolationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
+    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
   }
 
 }

@@ -5,26 +5,29 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirInterpolatedStringBody;
-import org.elixir_lang.psi.ElixirString;
+import org.elixir_lang.psi.ElixirInterpolation;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirStringImpl extends ASTWrapperPsiElement implements ElixirString {
+import java.util.List;
 
-  public ElixirStringImpl(ASTNode node) {
+public class ElixirInterpolatedStringBodyImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringBody {
+
+  public ElixirInterpolatedStringBodyImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedStringBody(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }
 
   @NotNull

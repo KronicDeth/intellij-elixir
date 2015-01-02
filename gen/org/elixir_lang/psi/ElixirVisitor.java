@@ -21,6 +21,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitAtom(@NotNull ElixirAtom o) {
     visitMaxExpression(o);
+    // visitQuotable(o);
   }
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
@@ -87,8 +88,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {
+    visitQuotable(o);
+  }
+
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitKeywordKey(@NotNull ElixirKeywordKey o) {
@@ -172,7 +177,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitString(@NotNull ElixirString o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
@@ -189,6 +194,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitNumber(o);
+  }
+
+  public void visitQuotable(@NotNull Quotable o) {
+    visitElement(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

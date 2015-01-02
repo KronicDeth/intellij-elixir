@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -81,6 +82,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == INFIX_DOT_OPERATOR) {
       r = infixDotOperator(b, 0);
+    }
+    else if (t == INTERPOLATED_STRING_BODY) {
+      r = interpolatedStringBody(b, 0);
     }
     else if (t == INTERPOLATION) {
       r = interpolation(b, 0);
@@ -1421,14 +1425,16 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-  static boolean interpolatedStringBody(PsiBuilder b, int l) {
+  public static boolean interpolatedStringBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<interpolated string body>");
     int c = current_position_(b);
     while (true) {
       if (!interpolatedStringBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "interpolatedStringBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, INTERPOLATED_STRING_BODY, true, false, null);
     return true;
   }
 

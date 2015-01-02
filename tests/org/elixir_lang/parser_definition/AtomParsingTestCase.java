@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class AtomParsingTestCase extends ParsingTestCase {
     public void testDoubleQuoted() {
-        doTest(true);
+        doParsingAndQuoting();
     }
 
     public void testLiteral() {

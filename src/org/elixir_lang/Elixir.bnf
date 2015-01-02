@@ -1,7 +1,7 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
 
- extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   /*
    * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
@@ -68,7 +68,8 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
 adjacentExpression ::= expression
-atom ::= COLON (ATOM_FRAGMENT | quote) { extends = maxExpression methods = [quote] }
+atom ::= COLON (ATOM_FRAGMENT | quote)
+         { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
@@ -134,9 +135,11 @@ private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | VALID_ESCAPE
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS |
                AND_OPERATOR |
                ARROW_OPERATOR |
@@ -327,7 +330,7 @@ sigil ::= interpolatedCharListSigil |
           literalWords
 string ::= STRING_PROMOTER
            interpolatedStringBody
-           STRING_TERMINATOR
+           STRING_TERMINATOR { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR

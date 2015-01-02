@@ -79,6 +79,12 @@ public class Quoter {
         return new OtpErlangBinary(bytes);
     }
 
+    @NotNull
+    public static String javaString(@NotNull OtpErlangBinary elixirString) {
+        byte[] bytes = elixirString.binaryValue();
+        return new String(bytes, Charset.forName("UTF-8"));
+    }
+
     public static OtpErlangTuple quote(@NotNull String code) throws IOException, OtpErlangExit, OtpErlangDecodeException {
         final OtpNode otpNode = IntellijElixir.getLocalNode();
         final OtpMbox otpMbox = otpNode.createMbox();
