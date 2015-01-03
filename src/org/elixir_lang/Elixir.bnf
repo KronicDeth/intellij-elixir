@@ -97,6 +97,7 @@ private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany 
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
+             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     interpolatedCharListBody
                     CHAR_LIST_HEREDOC_TERMINATOR
@@ -114,7 +115,8 @@ private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                              interpolatedCharListBody
                                              CHAR_LIST_SIGIL_HEREDOC_TERMINATOR

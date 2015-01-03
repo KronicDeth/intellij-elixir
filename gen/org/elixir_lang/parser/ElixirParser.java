@@ -83,6 +83,9 @@ public class ElixirParser implements PsiParser {
     else if (t == INFIX_DOT_OPERATOR) {
       r = infixDotOperator(b, 0);
     }
+    else if (t == INTERPOLATED_CHAR_LIST_BODY) {
+      r = interpolatedCharListBody(b, 0);
+    }
     else if (t == INTERPOLATED_STRING_BODY) {
       r = interpolatedStringBody(b, 0);
     }
@@ -1163,14 +1166,16 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-  static boolean interpolatedCharListBody(PsiBuilder b, int l) {
+  public static boolean interpolatedCharListBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedCharListBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<interpolated char list body>");
     int c = current_position_(b);
     while (true) {
       if (!interpolatedCharListBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "interpolatedCharListBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, INTERPOLATED_CHAR_LIST_BODY, true, false, null);
     return true;
   }
 

@@ -10,6 +10,9 @@ import java.util.List;
 public interface ElixirSigil extends PsiElement {
 
   @Nullable
+  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

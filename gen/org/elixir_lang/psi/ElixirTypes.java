@@ -28,6 +28,7 @@ public interface ElixirTypes {
   IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType INFIX_DOT_OPERATOR = new ElixirElementType("INFIX_DOT_OPERATOR");
+  IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
   IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
@@ -232,6 +233,9 @@ public interface ElixirTypes {
       }
       else if (type == INFIX_DOT_OPERATOR) {
         return new ElixirInfixDotOperatorImpl(node);
+      }
+      else if (type == INTERPOLATED_CHAR_LIST_BODY) {
+        return new ElixirInterpolatedCharListBodyImpl(node);
       }
       else if (type == INTERPOLATED_STRING_BODY) {
         return new ElixirInterpolatedStringBodyImpl(node);

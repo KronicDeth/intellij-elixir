@@ -17,7 +17,7 @@ public class AtomParsingTestCase extends ParsingTestCase {
     }
 
     public void testSingleQuoted() {
-        doTest(true);
+        doParsingAndQuoting();
     }
 
     @Override

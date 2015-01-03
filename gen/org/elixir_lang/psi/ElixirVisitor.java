@@ -49,7 +49,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCharList(@NotNull ElixirCharList o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
@@ -86,6 +86,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitInfixDotOperator(@NotNull ElixirInfixDotOperator o) {
     visitPsiElement(o);
+  }
+
+  public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
+    visitQuotable(o);
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {

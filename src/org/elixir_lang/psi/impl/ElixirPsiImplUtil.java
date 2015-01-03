@@ -21,6 +21,7 @@ import static org.elixir_lang.intellij_elixir.Quoter.javaString;
 public class ElixirPsiImplUtil {
 
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
+    public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
 
     @Contract(pure = true)
     @NotNull
@@ -85,7 +86,24 @@ public class ElixirPsiImplUtil {
         ElixirCharList charList = atom.getCharList();
 
         if (charList != null) {
-            throw new NotImplementedException("Cannot quote CharList in atom yet");
+            OtpErlangObject quotedCharList = charList.quote();
+
+            if (quotedCharList instanceof OtpErlangString) {
+                final String atomText = ((OtpErlangString) quotedCharList).stringValue();
+                quoted = new OtpErlangAtom(atomText);
+            } else {
+                final OtpErlangTuple quotedStringToCharListCall = (OtpErlangTuple) quotedCharList;
+                final OtpErlangList quotedStringToCharListArguments = (OtpErlangList) quotedStringToCharListCall.elementAt(2);
+                final OtpErlangObject binaryConstruction = quotedStringToCharListArguments.getHead();
+
+                quoted = quotedFunctionCall(
+                        "erlang",
+                        "binary_to_atom",
+                        (OtpErlangList) quotedStringToCharListCall.elementAt(1),
+                        binaryConstruction,
+                        UTF_8
+                );
+            }
         } else {
             ElixirString string = atom.getString();
 
@@ -101,7 +119,7 @@ public class ElixirPsiImplUtil {
                             "binary_to_atom",
                             metadata(string),
                             quotedString,
-                            new OtpErlangAtom("utf8")
+                            UTF_8
                     );
                 }
             } else {
@@ -115,6 +133,14 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirCharList charList) {
+        ElixirInterpolatedCharListBody interpolatedCharListBody = charList.getInterpolatedCharListBody();
+
+        return interpolatedCharListBody.quote();
     }
 
     public static OtpErlangObject quote(ElixirFile file) {
@@ -139,6 +165,69 @@ public class ElixirPsiImplUtil {
         );
 
         return block(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirInterpolatedCharListBody interpolatedCharListBody) {
+        ASTNode interpolatedStringBodyNode = interpolatedCharListBody.getNode();
+
+        ASTNode[] children = interpolatedStringBodyNode.getChildren(null);
+        OtpErlangObject quoted;
+
+        if (children.length == 1) {
+            ASTNode child = children[0];
+
+            if (child.getElementType() == ElixirTypes.CHAR_LIST_FRAGMENT) {
+                final String text = child.getText();
+                quoted = new OtpErlangString(text);
+            } else {
+                throw new NotImplementedException("Can't quote ElixirInterpolatedCharListBody with one child that isn't a CHAR_LIST_FRAGMENT");
+            }
+        } else {
+            OtpErlangList interpolatedCharListBodyMetadata = metadata(interpolatedCharListBody);
+            List<OtpErlangObject> quotedCharListList = new LinkedList<OtpErlangObject>();
+            StringBuilder stringAccumulator = null;
+
+            for (ASTNode child : children) {
+                IElementType elementType = child.getElementType();
+
+                if (elementType == ElixirTypes.CHAR_LIST_FRAGMENT) {
+                    if (stringAccumulator == null) {
+                        stringAccumulator = new StringBuilder("");
+                    }
+
+                    stringAccumulator.append(child.getText());
+                } else if (elementType == ElixirTypes.INTERPOLATION) {
+                    if (stringAccumulator != null) {
+                        quotedCharListList.add(elixirString(stringAccumulator.toString()));
+                        stringAccumulator = null;
+                    }
+
+                    ElixirInterpolation childElement = (ElixirInterpolation) child.getPsi();
+                    quotedCharListList.add(childElement.quote());
+                } else {
+                    throw new NotImplementedException("Can quote only CHAR_LIST_FRAGMENT and INTERPOLATION");
+                }
+            }
+
+            if (stringAccumulator != null) {
+                quotedCharListList.add(elixirString(stringAccumulator.toString()));
+            }
+
+            OtpErlangObject[] quotedStringElements = new OtpErlangObject[quotedCharListList.size()];
+            quotedCharListList.toArray(quotedStringElements);
+
+            OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", interpolatedCharListBodyMetadata, quotedStringElements);
+            quoted = quotedFunctionCall(
+                    "String",
+                    "to_char_list",
+                    interpolatedCharListBodyMetadata,
+                    binaryConstruction
+            );
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
