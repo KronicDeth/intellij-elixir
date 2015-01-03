@@ -1,15 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import com.intellij.lang.PsiParser;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -34,6 +33,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == ATOM) {
       r = atom(b, 0);
+    }
+    else if (t == BINARY_DIGITS) {
+      r = binaryDigits(b, 0);
     }
     else if (t == BINARY_WHOLE_NUMBER) {
       r = binaryWholeNumber(b, 0);
@@ -305,6 +307,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+  public static boolean binaryDigits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "binaryDigits")) return false;
+    if (!nextTokenIs(b, "<binary digits>", INVALID_BINARY_DIGITS, VALID_BINARY_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<binary digits>");
+    r = consumeToken(b, INVALID_BINARY_DIGITS);
+    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
+    exit_section_(b, l, m, BINARY_DIGITS, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // string | stringHeredoc
   static boolean binaryString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryString")) return false;
@@ -318,7 +333,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  // BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits+
   public static boolean binaryWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryWholeNumber")) return false;
     if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
@@ -343,29 +358,18 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+
+  // binaryDigits+
   private static boolean binaryWholeNumber_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = binaryWholeNumber_2_0(b, l + 1);
+    r = binaryDigits(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!binaryWholeNumber_2_0(b, l + 1)) break;
+      if (!binaryDigits(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "binaryWholeNumber_2", c)) break;
       c = current_position_(b);
     }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
-  private static boolean binaryWholeNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "binaryWholeNumber_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_BINARY_DIGITS);
-    if (!r) r = consumeToken(b, VALID_BINARY_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }

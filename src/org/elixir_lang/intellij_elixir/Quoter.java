@@ -54,7 +54,7 @@ public class Quoter {
                 assertEquals("code mismatch", text, receivedText);
 
                 OtpErlangAtom quotedKey = new OtpErlangAtom("quoted");
-                OtpErlangTuple receivedQuoted = (OtpErlangTuple) map.get(quotedKey);
+                OtpErlangObject receivedQuoted = map.get(quotedKey);
 
                 ElixirFile root = (ElixirFile) fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
                 OtpErlangObject quoted = ElixirPsiImplUtil.quote(root);

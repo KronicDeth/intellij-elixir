@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirBinaryWholeNumberImpl extends ElixirNumberImpl implements ElixirBinaryWholeNumber {
 
@@ -19,6 +20,17 @@ public class ElixirBinaryWholeNumberImpl extends ElixirNumberImpl implements Eli
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryWholeNumber(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirBinaryDigits> getBinaryDigitsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBinaryDigits.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

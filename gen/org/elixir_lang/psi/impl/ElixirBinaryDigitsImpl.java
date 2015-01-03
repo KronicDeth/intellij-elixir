@@ -12,21 +12,27 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public class ElixirStringImpl extends ASTWrapperPsiElement implements ElixirString {
+public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements ElixirBinaryDigits {
 
-  public ElixirStringImpl(ASTNode node) {
+  public ElixirBinaryDigitsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryDigits(this);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
+  @Nullable
+  public PsiElement getInvalidBinaryDigits() {
+    return findChildByType(INVALID_BINARY_DIGITS);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getValidBinaryDigits() {
+    return findChildByType(VALID_BINARY_DIGITS);
   }
 
   @NotNull

@@ -70,7 +70,11 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
          { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
+
+binaryDigits ::= INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits+
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 2 }
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*

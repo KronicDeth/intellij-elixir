@@ -137,6 +137,32 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBinaryDigits binaryDigits) {
+        final String text = binaryDigits.getText();
+        long value = Long.parseLong(text, 2);
+
+        return new OtpErlangLong(value);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
+        List<ElixirBinaryDigits> binaryDigitsList = binaryWholeNumber.getBinaryDigitsList();
+        final int size = binaryDigitsList.size();
+        OtpErlangObject quoted;
+
+        if (size == 1) {
+            ElixirBinaryDigits binaryDigits = binaryDigitsList.get(0);
+            quoted = binaryDigits.quote();
+        } else {
+            throw new NotImplementedException();
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCharList charList) {
         ElixirInterpolatedCharListBody interpolatedCharListBody = charList.getInterpolatedCharListBody();
 
@@ -148,18 +174,24 @@ public class ElixirPsiImplUtil {
 
         file.acceptChildren(
                 new PsiElementVisitor() {
-                    public void visitAtom(@NotNull ElixirAtom atom) {
-                        final OtpErlangObject quotedAtom = atom.quote();
-                        quotedChildren.add(quotedAtom);
-                    }
-
                     @Override
                     public void visitElement(PsiElement element) {
-                        if (element instanceof ElixirAtom) {
-                            visitAtom((ElixirAtom) element);
+                        if (element instanceof Quotable) {
+                            visitQuotable((Quotable) element);
+                        } else if (element instanceof ElixirEndOfExpression) {
+                            // ignore
+                        } else if (element instanceof PsiComment) {
+                            // ignore
+                        } else {
+                            throw new NotImplementedException("Don't know how to visit " + element);
                         }
 
                         super.visitElement(element);
+                    }
+
+                    public void visitQuotable(@NotNull Quotable child) {
+                        final OtpErlangObject quotedChild = child.quote();
+                        quotedChildren.add(quotedChild);
                     }
                 }
         );

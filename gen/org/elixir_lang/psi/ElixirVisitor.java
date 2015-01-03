@@ -24,8 +24,13 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
+  public void visitBinaryDigits(@NotNull ElixirBinaryDigits o) {
+    visitQuotable(o);
+  }
+
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
     visitNumber(o);
+    // visitQuotable(o);
   }
 
   public void visitCallArgumentsNoParenthesesKeywords(@NotNull ElixirCallArgumentsNoParenthesesKeywords o) {

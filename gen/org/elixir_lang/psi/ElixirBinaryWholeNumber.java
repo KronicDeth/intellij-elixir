@@ -4,7 +4,14 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirBinaryWholeNumber extends ElixirNumber {
+public interface ElixirBinaryWholeNumber extends ElixirNumber, Quotable {
+
+  @NotNull
+  List<ElixirBinaryDigits> getBinaryDigitsList();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

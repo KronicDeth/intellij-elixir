@@ -6,10 +6,13 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirInterpolatedStringBody extends Quotable {
+public interface ElixirBinaryDigits extends Quotable {
 
-  @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  @Nullable
+  PsiElement getInvalidBinaryDigits();
+
+  @Nullable
+  PsiElement getValidBinaryDigits();
 
   @NotNull
   OtpErlangObject quote();
