@@ -13,7 +13,7 @@ public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testObsoleteInvalidAndValidDigits() {

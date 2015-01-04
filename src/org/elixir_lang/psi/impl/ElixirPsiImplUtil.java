@@ -24,6 +24,11 @@ import static org.elixir_lang.intellij_elixir.Quoter.javaString;
  */
 public class ElixirPsiImplUtil {
 
+    public static final Class[] UNQUOTED_TYPES = new Class[]{
+            ElixirEndOfExpression.class,
+            PsiComment.class,
+            PsiWhiteSpace.class
+    };
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
 
@@ -63,6 +68,23 @@ public class ElixirPsiImplUtil {
         };
 
         return new OtpErlangTuple(elements);
+    }
+
+    /*
+     * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
+     *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
+     */
+    public static boolean isUnquoted(PsiElement element) {
+        boolean unquoted = false;
+
+        for (Class unquotedType : UNQUOTED_TYPES) {
+            if (unquotedType.isInstance(element)) {
+                unquoted = true;
+                break;
+            }
+        }
+
+        return unquoted;
     }
 
     /* Returns the 0-indexed line number for the element */
@@ -212,11 +234,7 @@ public class ElixirPsiImplUtil {
                     public void visitElement(PsiElement element) {
                         if (element instanceof Quotable) {
                             visitQuotable((Quotable) element);
-                        } else if (element instanceof ElixirEndOfExpression) {
-                            // ignore
-                        } else if (element instanceof PsiComment) {
-                            // ignore
-                        } else {
+                        } else if (!isUnquoted(element)) {
                             throw new NotImplementedException("Don't know how to visit " + element);
                         }
 
