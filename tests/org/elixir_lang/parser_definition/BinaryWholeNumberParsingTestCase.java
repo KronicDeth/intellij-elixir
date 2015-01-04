@@ -16,11 +16,19 @@ public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
         doTest(true);
     }
 
+    public void testObsoleteInvalidAndValidDigits() {
+        doTest(true);
+    }
+
+    public void testObsoleteInvalidDigits() {
+        doTest(true);
+    }
+
     public void testObsoleteNoDigits() {
         doTest(true);
     }
 
-    public void testObsoleteValid() {
+    public void testObsoleteValidDigits() {
         doTest(true);
     }
 

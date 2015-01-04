@@ -1,0 +1,2 @@
+# all invalid binary digits
+0BABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz23456789
