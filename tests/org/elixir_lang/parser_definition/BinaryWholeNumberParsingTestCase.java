@@ -29,7 +29,7 @@ public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testObsoleteValidDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testValidDigits() {

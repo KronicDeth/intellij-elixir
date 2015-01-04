@@ -1,7 +1,7 @@
 Elixir File(0,7)
-  ElixirMatchedExpressionImpl(MATCHED_EXPRESSION)(0,7)
-    ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,7)
-      ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,7)
-        PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER)(''''')(0,3)
-        PsiElement(ElixirTokenType.EOL)('\n')(3,4)
-        PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_TERMINATOR)(''''')(4,7)
+  ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,7)
+    PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER)(''''')(0,3)
+    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
+    ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(4,4)
+      <empty list>
+    PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_TERMINATOR)(''''')(4,7)
