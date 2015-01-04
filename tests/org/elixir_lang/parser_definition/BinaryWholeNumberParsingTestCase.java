@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
     public void testInvalidAndValidDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testInvalidDigits() {
@@ -33,7 +33,7 @@ public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testValidDigits() {
-        doParsingAndQuoting();
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

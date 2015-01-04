@@ -1,12 +1,8 @@
 package org.elixir_lang.intellij_elixir;
 
 import com.ericsson.otp.erlang.*;
-import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.IntellijElixir;
-import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,12 +28,31 @@ public class Quoter {
         );
     }
 
-    public static void assertQuotedCorrectly(PsiFile file) {
+    public static void assertError(PsiFile file) {
         final String text = file.getText();
-        final FileViewProvider fileViewProvider = file.getViewProvider();
 
         try {
+            OtpErlangTuple quotedMessage = Quoter.quote(text);
+            Quoter.assertMessageReceived(quotedMessage);
 
+            OtpErlangAtom status = (OtpErlangAtom) quotedMessage.elementAt(0);
+            String statusString = status.atomValue();
+
+            assertEquals(statusString, "error");
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (OtpErlangDecodeException e) {
+            throw new RuntimeException(e);
+        } catch (OtpErlangExit e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void assertQuotedCorrectly(PsiFile file) {
+        final String text = file.getText();
+
+        try {
             OtpErlangTuple quotedMessage = Quoter.quote(text);
             Quoter.assertMessageReceived(quotedMessage);
 
@@ -56,12 +71,17 @@ public class Quoter {
                 OtpErlangAtom quotedKey = new OtpErlangAtom("quoted");
                 OtpErlangObject receivedQuoted = map.get(quotedKey);
 
-                ElixirFile root = (ElixirFile) fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
-                OtpErlangObject quoted = ElixirPsiImplUtil.quote(root);
+                OtpErlangObject quoted = ElixirPsiImplUtil.quote(file);
 
                 assertEquals(receivedQuoted, quoted);
             } else if (statusString.equals("error")) {
-              throw new NotImplementedException();
+                OtpErlangTuple error = (OtpErlangTuple) quotedMessage.elementAt(1);
+
+                throw new AssertionError(
+                        "intellij_elixir return an error, "
+                                + error
+                                + ", use assertQuotesAroundError if error is expect in Elixir natively, but not in intellij-elixir plugin"
+                );
             }
         }
         catch (IOException e) {

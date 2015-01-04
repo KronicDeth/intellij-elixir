@@ -6,11 +6,15 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import org.apache.commons.lang.NotImplementedException;
+import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.elixir_lang.intellij_elixir.Quoter.elixirString;
 import static org.elixir_lang.intellij_elixir.Quoter.javaString;
@@ -147,15 +151,45 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
+        ASTNode[] childNodes = binaryWholeNumber.getNode().getChildren(null);
+
+        int validBinaryDigitsCount = 0;
+        int invalidBinaryDigitsCount = 0;
+
+        for (ASTNode childNode : childNodes) {
+            IElementType elementType = childNode.getElementType();
+
+            if (elementType == ElixirTypes.INVALID_BINARY_DIGITS) {
+                invalidBinaryDigitsCount++;
+            } else if (elementType == ElixirTypes.VALID_BINARY_DIGITS) {
+                validBinaryDigitsCount++;
+            }
+        }
+
         List<ElixirBinaryDigits> binaryDigitsList = binaryWholeNumber.getBinaryDigitsList();
-        final int size = binaryDigitsList.size();
         OtpErlangObject quoted;
 
-        if (size == 1) {
+        if (invalidBinaryDigitsCount == 0 && validBinaryDigitsCount == 1) {
             ElixirBinaryDigits binaryDigits = binaryDigitsList.get(0);
             quoted = binaryDigits.quote();
         } else {
-            throw new NotImplementedException();
+            /* 0 elements is invalid in native Elixir and can be emulated as String.to_integer("", 2) while
+               2 elements implies at least one element is INVALID_BINARY_DIGITS which is invalid in native Elixir and
+               can be emulated as String.to_integer(<all-digits>, 2) so that it raises an ArgumentError on the invalid
+               binary digits */
+            StringBuilder stringAccumulator = new StringBuilder();
+
+            for (ElixirBinaryDigits binaryDigits : binaryDigitsList) {
+                stringAccumulator.append(binaryDigits.getText());
+            }
+
+            quoted = quotedFunctionCall(
+                    "String",
+                    "to_integer",
+                    metadata(binaryWholeNumber),
+                    elixirString(stringAccumulator.toString()),
+                    new OtpErlangLong(2)
+            );
         }
 
         return quoted;
@@ -366,6 +400,15 @@ public class ElixirPsiImplUtil {
         }
 
         return quote(quotableChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(PsiFile file) {
+        final FileViewProvider fileViewProvider = file.getViewProvider();
+        final ElixirFile root = (ElixirFile) fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
+
+        return ElixirPsiImplUtil.quote(root);
     }
 
     @Contract(pure = true)
