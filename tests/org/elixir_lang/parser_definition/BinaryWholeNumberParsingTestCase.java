@@ -9,7 +9,7 @@ public class BinaryWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testInvalidDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testNoDigits() {
