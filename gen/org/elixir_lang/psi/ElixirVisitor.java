@@ -58,7 +58,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {

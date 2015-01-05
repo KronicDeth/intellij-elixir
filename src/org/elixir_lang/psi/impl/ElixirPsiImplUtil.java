@@ -225,6 +225,14 @@ public class ElixirPsiImplUtil {
         return interpolatedCharListBody.quote();
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirCharListHeredoc charListHeredoc) {
+        ElixirInterpolatedCharListBody interpolatedCharListBody = charListHeredoc.getInterpolatedCharListBody();
+
+        return interpolatedCharListBody.quote();
+    }
+
     public static OtpErlangObject quote(ElixirFile file) {
         final Deque<OtpErlangObject> quotedChildren = new LinkedList<OtpErlangObject>();
 
@@ -259,7 +267,12 @@ public class ElixirPsiImplUtil {
         ASTNode[] children = interpolatedStringBodyNode.getChildren(null);
         OtpErlangObject quoted;
 
-        if (children.length == 1) {
+        final int childCount = children.length;
+
+        if (childCount == 0) {
+            // an empty CharList is just an empty list
+            quoted = new OtpErlangList();
+        } else if (childCount == 1) {
             ASTNode child = children[0];
 
             if (child.getElementType() == ElixirTypes.CHAR_LIST_FRAGMENT) {

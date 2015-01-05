@@ -13,7 +13,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testMinimal() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testWhitespaceEndPrefix() {
