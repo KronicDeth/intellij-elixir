@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -60,6 +61,15 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == CHAR_LIST_HEREDOC) {
       r = charListHeredoc(b, 0);
+    }
+    else if (t == CHAR_LIST_HEREDOC_LINE) {
+      r = charListHeredocLine(b, 0);
+    }
+    else if (t == CHAR_LIST_HEREDOC_LINE_WHITESPACE) {
+      r = charListHeredocLineWhitespace(b, 0);
+    }
+    else if (t == CHAR_LIST_HEREDOC_PREFIX) {
+      r = charListHeredocPrefix(b, 0);
     }
     else if (t == DECIMAL_FLOAT) {
       r = decimalFloat(b, 0);
@@ -625,18 +635,64 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // CHAR_LIST_HEREDOC_PROMOTER EOL
-  //                     interpolatedCharListBody
-  //                     CHAR_LIST_HEREDOC_TERMINATOR
+  //                     charListHeredocLine*
+  //                     charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
   public static boolean charListHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "charListHeredoc")) return false;
     if (!nextTokenIs(b, CHAR_LIST_HEREDOC_PROMOTER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, CHAR_LIST_HEREDOC_PROMOTER, EOL);
-    r = r && interpolatedCharListBody(b, l + 1);
+    r = r && charListHeredoc_2(b, l + 1);
+    r = r && charListHeredocPrefix(b, l + 1);
     r = r && consumeToken(b, CHAR_LIST_HEREDOC_TERMINATOR);
     exit_section_(b, m, CHAR_LIST_HEREDOC, r);
     return r;
+  }
+
+  // charListHeredocLine*
+  private static boolean charListHeredoc_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charListHeredoc_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!charListHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "charListHeredoc_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // charListHeredocLineWhitespace interpolatedCharListBody EOL
+  public static boolean charListHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charListHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<char list heredoc line>");
+    r = charListHeredocLineWhitespace(b, l + 1);
+    r = r && interpolatedCharListBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, CHAR_LIST_HEREDOC_LINE, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // HEREDOC_LINE_WHITE_SPACE?
+  public static boolean charListHeredocLineWhitespace(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charListHeredocLineWhitespace")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<char list heredoc line whitespace>");
+    consumeToken(b, HEREDOC_LINE_WHITE_SPACE);
+    exit_section_(b, l, m, CHAR_LIST_HEREDOC_LINE_WHITESPACE, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // HEREDOC_PREFIX_WHITE_SPACE?
+  public static boolean charListHeredocPrefix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charListHeredocPrefix")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<char list heredoc prefix>");
+    consumeToken(b, HEREDOC_PREFIX_WHITE_SPACE);
+    exit_section_(b, l, m, CHAR_LIST_HEREDOC_PREFIX, true, false, null);
+    return true;
   }
 
   /* ********************************************************** */

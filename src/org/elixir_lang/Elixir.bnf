@@ -103,9 +103,12 @@ charList ::= CHAR_LIST_PROMOTER
              CHAR_LIST_TERMINATOR
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
-                    interpolatedCharListBody
-                    CHAR_LIST_HEREDOC_TERMINATOR
+                    charListHeredocLine*
+                    charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+charListHeredocLine ::= charListHeredocLineWhitespace interpolatedCharListBody EOL { methods = [quote] }
+charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessWhitespace] }
+charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
 private containerExpression ::= emptyParentheses
 decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
 decimalWholeNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*

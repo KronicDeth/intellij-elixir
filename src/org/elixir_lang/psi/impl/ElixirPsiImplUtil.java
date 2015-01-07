@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.tree.IElementType;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
@@ -11,10 +12,7 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.elixirString;
 import static org.elixir_lang.intellij_elixir.Quoter.javaString;
@@ -228,9 +226,72 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCharListHeredoc charListHeredoc) {
-        ElixirInterpolatedCharListBody interpolatedCharListBody = charListHeredoc.getInterpolatedCharListBody();
+        ElixirCharListHeredocPrefix charListHeredocPrefix = charListHeredoc.getCharListHeredocPrefix();
+        int prefixLength = charListHeredocPrefix.getTextLength();
+        Deque<ASTNode> alignedNodeDeque = new LinkedList<ASTNode>();
+        List<ElixirCharListHeredocLine> charListHeredocLineList = charListHeredoc.getCharListHeredocLineList();
 
-        return interpolatedCharListBody.quote();
+        for (ElixirCharListHeredocLine line : charListHeredocLineList) {
+            queueChildNodes(line, prefixLength, alignedNodeDeque);
+        }
+
+        Queue<ASTNode> mergedNodeQueue = mergeCharListFragments(alignedNodeDeque, charListHeredoc.getManager());
+        ASTNode[] mergedNodes = new ASTNode[mergedNodeQueue.size()];
+        mergedNodeQueue.toArray(mergedNodes);
+
+        return quotedInterpolatedCharListBodyChildNodes(charListHeredoc, mergedNodes);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirCharListHeredocLine charListHeredocLine, int prefixLength) {
+        ElixirCharListHeredocLineWhitespace charListHeredocLineWhitespace = charListHeredocLine.getCharListHeredocLineWhitespace();
+        ASTNode excessWhitespace = charListHeredocLineWhitespace.excessWhitespace(prefixLength);
+        ElixirInterpolatedCharListBody interpolatedCharListBody = charListHeredocLine.getInterpolatedCharListBody();
+        ASTNode[] directChildNodes = childNodes(interpolatedCharListBody);
+        ASTNode[] accumulatedChildNodes;
+
+        if (excessWhitespace != null) {
+            accumulatedChildNodes = new ASTNode[directChildNodes.length + 1];
+            accumulatedChildNodes[0] = excessWhitespace;
+
+            for (int i = 0; i < directChildNodes.length; i++) {
+                accumulatedChildNodes[i + 1] = directChildNodes[i];
+            }
+        } else {
+            accumulatedChildNodes = directChildNodes;
+        }
+
+        return quotedInterpolatedCharListBodyChildNodes(interpolatedCharListBody, accumulatedChildNodes);
+    }
+
+    /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
+     * consumed by prefixLength.
+     *
+     * @return null if prefixLength is greater than or equal to text length of charListHeredcoLineWhitespace.
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static ASTNode excessWhitespace(@NotNull final ElixirCharListHeredocLineWhitespace charListHeredocLineWhitespace, int prefixLength) {
+        int availableLength = charListHeredocLineWhitespace.getTextLength();
+        int excessLength = availableLength - prefixLength;
+        ASTNode excessWhitespaceASTNode = null;
+
+        if (excessLength > 0) {
+            char[] excessWhitespaceChars = new char[excessLength];
+            Arrays.fill(excessWhitespaceChars, ' ');
+            String excessWhitespaceString = new String(excessWhitespaceChars);
+            excessWhitespaceASTNode = Factory.createSingleLeafElement(
+                    ElixirTypes.CHAR_LIST_FRAGMENT,
+                    excessWhitespaceString,
+                    0,
+                    excessLength,
+                    null,
+                    charListHeredocLineWhitespace.getManager()
+            );
+        }
+
+        return excessWhitespaceASTNode;
     }
 
     public static OtpErlangObject quote(ElixirFile file) {
@@ -262,9 +323,23 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirInterpolatedCharListBody interpolatedCharListBody) {
-        ASTNode interpolatedStringBodyNode = interpolatedCharListBody.getNode();
+        return quotedInterpolatedCharListBodyChildNodes(interpolatedCharListBody);
 
-        ASTNode[] children = interpolatedStringBodyNode.getChildren(null);
+    }
+
+    protected static ASTNode[] childNodes(ElixirInterpolatedCharListBody interpolatedCharListBody) {
+        ASTNode interpolatedStringBodyNode = interpolatedCharListBody.getNode();
+        return interpolatedStringBodyNode.getChildren(null);
+    }
+
+    protected static OtpErlangObject quotedInterpolatedCharListBodyChildNodes(ElixirInterpolatedCharListBody interpolatedCharListBody) {
+        return quotedInterpolatedCharListBodyChildNodes(
+                interpolatedCharListBody,
+                childNodes(interpolatedCharListBody)
+        );
+    }
+
+    protected static OtpErlangObject quotedInterpolatedCharListBodyChildNodes(PsiElement anchor, ASTNode... children) {
         OtpErlangObject quoted;
 
         final int childCount = children.length;
@@ -282,7 +357,7 @@ public class ElixirPsiImplUtil {
                 throw new NotImplementedException("Can't quote ElixirInterpolatedCharListBody with one child that isn't a CHAR_LIST_FRAGMENT");
             }
         } else {
-            OtpErlangList interpolatedCharListBodyMetadata = metadata(interpolatedCharListBody);
+            OtpErlangList interpolatedCharListBodyMetadata = metadata(anchor);
             List<OtpErlangObject> quotedCharListList = new LinkedList<OtpErlangObject>();
             StringBuilder stringAccumulator = null;
 
@@ -323,7 +398,6 @@ public class ElixirPsiImplUtil {
                     binaryConstruction
             );
         }
-
         return quoted;
     }
 
@@ -500,5 +574,69 @@ public class ElixirPsiImplUtil {
                         quotedArguments(arguments)
                 }
         );
+    }
+
+    @NotNull
+    private static Queue<ASTNode> mergeCharListFragments(@NotNull Deque<ASTNode> unmergedNodes, @NotNull PsiManager manager) {
+        Queue<ASTNode> mergedNodes = new LinkedList<ASTNode>();
+        StringBuilder fragmentStringBuilder = null;
+
+        for (ASTNode unmergedNode : unmergedNodes) {
+            if (unmergedNode.getElementType() == ElixirTypes.CHAR_LIST_FRAGMENT) {
+                if (fragmentStringBuilder == null) {
+                    fragmentStringBuilder = new StringBuilder();
+                }
+
+                String fragment = unmergedNode.getText();
+                fragmentStringBuilder.append(fragment);
+            } else {
+                addMergeCharListFragments(mergedNodes, fragmentStringBuilder, manager);
+                fragmentStringBuilder = null;
+                mergedNodes.add(unmergedNode);
+            }
+        }
+
+        addMergeCharListFragments(mergedNodes, fragmentStringBuilder, manager);
+
+        return mergedNodes;
+    }
+
+    private static void addMergeCharListFragments(@NotNull Queue<ASTNode> mergedNodes, StringBuilder fragmentStringBuilder, PsiManager manager) {
+        if (fragmentStringBuilder != null) {
+            ASTNode charListFragment = Factory.createSingleLeafElement(
+                    ElixirTypes.CHAR_LIST_FRAGMENT,
+                    fragmentStringBuilder.toString(),
+                    0,
+                    fragmentStringBuilder.length(),
+                    null,
+                    manager
+            );
+            mergedNodes.add(charListFragment);
+        }
+    }
+
+
+    @NotNull
+    private static void queueChildNodes(@NotNull ElixirCharListHeredocLine line, int prefixLength, @NotNull Queue<ASTNode> heredocDescendentNodes) {
+        ElixirCharListHeredocLineWhitespace charListHeredocLineWhitespace = line.getCharListHeredocLineWhitespace();
+
+        ASTNode excessWhitespace = charListHeredocLineWhitespace.excessWhitespace(prefixLength);
+
+        if (excessWhitespace != null) {
+            heredocDescendentNodes.add(excessWhitespace);
+        }
+
+        ElixirInterpolatedCharListBody interpolatedCharListBody = line.getInterpolatedCharListBody();
+        Collections.addAll(heredocDescendentNodes, childNodes(interpolatedCharListBody));
+
+        ASTNode eolNode = Factory.createSingleLeafElement(
+                ElixirTypes.CHAR_LIST_FRAGMENT,
+                "\n",
+                0,
+                1,
+                null,
+                line.getManager()
+        );
+        heredocDescendentNodes.add(eolNode);
     }
 }

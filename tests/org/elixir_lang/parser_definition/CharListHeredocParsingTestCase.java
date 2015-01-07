@@ -17,7 +17,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

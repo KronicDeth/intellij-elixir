@@ -61,6 +61,18 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitCharListHeredocLine(@NotNull ElixirCharListHeredocLine o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCharListHeredocLineWhitespace(@NotNull ElixirCharListHeredocLineWhitespace o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCharListHeredocPrefix(@NotNull ElixirCharListHeredocPrefix o) {
+    visitPsiElement(o);
+  }
+
   public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
     visitDecimalNumber(o);
   }

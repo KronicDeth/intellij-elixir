@@ -21,6 +21,9 @@ public interface ElixirTypes {
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
+  IElementType CHAR_LIST_HEREDOC_LINE_WHITESPACE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE_WHITESPACE");
+  IElementType CHAR_LIST_HEREDOC_PREFIX = new ElixirElementType("CHAR_LIST_HEREDOC_PREFIX");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
@@ -95,6 +98,8 @@ public interface ElixirTypes {
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
+  IElementType HEREDOC_LINE_WHITE_SPACE = new ElixirTokenType("HEREDOC_LINE_WHITE_SPACE");
+  IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("HEREDOC_PREFIX_WHITE_SPACE");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
@@ -213,6 +218,15 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
+      }
+      else if (type == CHAR_LIST_HEREDOC_LINE) {
+        return new ElixirCharListHeredocLineImpl(node);
+      }
+      else if (type == CHAR_LIST_HEREDOC_LINE_WHITESPACE) {
+        return new ElixirCharListHeredocLineWhitespaceImpl(node);
+      }
+      else if (type == CHAR_LIST_HEREDOC_PREFIX) {
+        return new ElixirCharListHeredocPrefixImpl(node);
       }
       else if (type == DECIMAL_FLOAT) {
         return new ElixirDecimalFloatImpl(node);
