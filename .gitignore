@@ -3,6 +3,9 @@
 /.idea/workspace.xml
 # build output
 /out
+# JFlex generator download
+JFlex.jar
+idea-flex.skeleton
 # old lexer generated from Elixir.flex
 src/org/elixir_lang/ElixirFlexLexer.java~
 # OS X thumbnail store
