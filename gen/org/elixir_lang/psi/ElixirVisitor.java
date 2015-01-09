@@ -89,11 +89,23 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitEnclosedHexadecimalEscapeSequence(@NotNull ElixirEnclosedHexadecimalEscapeSequence o) {
+    visitEscapedHexadecimalDigits(o);
+  }
+
   public void visitEndOfExpression(@NotNull ElixirEndOfExpression o) {
     visitPsiElement(o);
   }
 
+  public void visitEscapedCharacter(@NotNull ElixirEscapedCharacter o) {
+    visitEscapeSequence(o);
+  }
+
   public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitHexadecimalEscapeSequence(@NotNull ElixirHexadecimalEscapeSequence o) {
     visitPsiElement(o);
   }
 
@@ -185,6 +197,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitNumber(o);
   }
 
+  public void visitOpenHexadecimalEscapeSequence(@NotNull ElixirOpenHexadecimalEscapeSequence o) {
+    visitEscapedHexadecimalDigits(o);
+  }
+
   public void visitQualifiedAlias(@NotNull ElixirQualifiedAlias o) {
     visitPsiElement(o);
   }
@@ -215,6 +231,14 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitNumber(o);
+  }
+
+  public void visitEscapeSequence(@NotNull EscapeSequence o) {
+    visitElement(o);
+  }
+
+  public void visitEscapedHexadecimalDigits(@NotNull EscapedHexadecimalDigits o) {
+    visitElement(o);
   }
 
   public void visitQuotable(@NotNull Quotable o) {

@@ -28,8 +28,11 @@ public interface ElixirTypes {
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
+  IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
+  IElementType ESCAPED_CHARACTER = new ElixirElementType("ESCAPED_CHARACTER");
   IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
+  IElementType HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType INFIX_DOT_OPERATOR = new ElixirElementType("INFIX_DOT_OPERATOR");
   IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
@@ -52,6 +55,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
+  IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType QUALIFIED_ALIAS = new ElixirElementType("QUALIFIED_ALIAS");
   IElementType QUALIFIED_IDENTIFIER = new ElixirElementType("QUALIFIED_IDENTIFIER");
   IElementType SIGIL = new ElixirElementType("SIGIL");
@@ -83,6 +87,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
+  IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType("COLON");
   IElementType COMMA = new ElixirTokenType(",");
@@ -94,6 +99,8 @@ public interface ElixirTypes {
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
+  IElementType ESCAPE = new ElixirTokenType("ESCAPE");
+  IElementType ESCAPED_CHARACTER_TOKEN = new ElixirTokenType("ESCAPED_CHARACTER_TOKEN");
   IElementType EXPONENT_MARK = new ElixirTokenType("EXPONENT_MARK");
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
@@ -131,6 +138,7 @@ public interface ElixirTypes {
   IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
+  IElementType OPENING_CURLY = new ElixirTokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
@@ -167,7 +175,6 @@ public interface ElixirTypes {
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("UNKNOWN_WHOLE_NUMBER_BASE");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
   IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("VALID_DECIMAL_DIGITS");
-  IElementType VALID_ESCAPE_SEQUENCE = new ElixirTokenType("VALID_ESCAPE_SEQUENCE");
   IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
   IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("VALID_OCTAL_DIGITS");
   IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
@@ -240,11 +247,20 @@ public interface ElixirTypes {
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
       }
+      else if (type == ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE) {
+        return new ElixirEnclosedHexadecimalEscapeSequenceImpl(node);
+      }
       else if (type == END_OF_EXPRESSION) {
         return new ElixirEndOfExpressionImpl(node);
       }
+      else if (type == ESCAPED_CHARACTER) {
+        return new ElixirEscapedCharacterImpl(node);
+      }
       else if (type == HAT_INFIX_OPERATOR) {
         return new ElixirHatInfixOperatorImpl(node);
+      }
+      else if (type == HEXADECIMAL_ESCAPE_SEQUENCE) {
+        return new ElixirHexadecimalEscapeSequenceImpl(node);
       }
       else if (type == HEXADECIMAL_WHOLE_NUMBER) {
         return new ElixirHexadecimalWholeNumberImpl(node);
@@ -311,6 +327,9 @@ public interface ElixirTypes {
       }
       else if (type == OCTAL_WHOLE_NUMBER) {
         return new ElixirOctalWholeNumberImpl(node);
+      }
+      else if (type == OPEN_HEXADECIMAL_ESCAPE_SEQUENCE) {
+        return new ElixirOpenHexadecimalEscapeSequenceImpl(node);
       }
       else if (type == QUALIFIED_ALIAS) {
         return new ElixirQualifiedAliasImpl(node);

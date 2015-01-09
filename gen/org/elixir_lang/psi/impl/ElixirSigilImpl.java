@@ -23,6 +23,18 @@ public class ElixirSigilImpl extends ASTWrapperPsiElement implements ElixirSigil
   }
 
   @Override
+  @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  }
+
+  @Override
   @Nullable
   public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
     return findChildByClass(ElixirInterpolatedCharListBody.class);

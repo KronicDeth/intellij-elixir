@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -107,6 +108,29 @@ public class Quoter {
         byte[] actualBytes = actualElixirString.binaryValue();
 
         return new String(actualBytes, Charset.forName("UTF-8"));
+    }
+
+    @NotNull
+    public static OtpErlangList elixirCharList(@NotNull final List<Integer> codePointList) {
+        OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
+
+        int i = 0;
+        for (int codePoint : codePointList) {
+            erlangCodePoints[i++] = new OtpErlangLong(codePoint);
+        }
+
+        return new OtpErlangList(erlangCodePoints);
+    }
+
+    @NotNull
+    public static OtpErlangBinary elixirString(@NotNull final List<Integer> codePointList) {
+        StringBuilder stringAccumulator = new StringBuilder();
+
+        for (int codePoint : codePointList) {
+            stringAccumulator.appendCodePoint(codePoint);
+        }
+
+        return elixirString(stringAccumulator.toString());
     }
 
     @NotNull

@@ -105,6 +105,13 @@ import org.elixir_lang.psi.ElixirTypes;
 %}
 
 /*
+ * Curly / Tuple
+ */
+
+OPENING_CURLY = "{"
+CLOSING_CURLY = "}"
+
+/*
  * Operator
  *
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
@@ -126,7 +133,7 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_HAT_OPERATOR = "^^^"
-THREE_TOKEN_MAP_OPERATOR = "%{}"
+THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
@@ -155,7 +162,7 @@ TWO_TOKEN_OR_OPERATOR = "or" |
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
-TWO_TOKEN_TUPLE_OPERATOR = "{}"
+TWO_TOKEN_TUPLE_OPERATOR = {OPENING_CURLY} {CLOSING_CURLY}
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          "--" |
@@ -283,13 +290,13 @@ EOL = \n|\r\n
 
 ESCAPE = "\\"
 
-ESCAPED_CHARACTER = {ESCAPE} .
+ESCAPED_CHARACTER_TOKEN = {ESCAPE} .
 ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
                          {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
 ESCAPED_EOL = {ESCAPE} {EOL}
 
 VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
-                        {ESCAPED_CHARACTER} |
+                        {ESCAPED_CHARACTER_TOKEN} |
                         {ESCAPED_EOL}
 
 /*
@@ -509,11 +516,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
+%state ESCAPE_SEQUENCE
+%state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
+%state HEXADECIMAL_ESCAPE_SEQUENCE
 %state HEXADECIMAL_WHOLE_NUMBER
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
@@ -724,6 +734,21 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
+<ESCAPE_SEQUENCE> {
+  {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
+                                    return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
+  .                               { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                    yybegin(stackFrame.getLastLexicalState());
+                                    return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
+}
+
+<EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE> {
+  {CLOSING_CURLY}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             yybegin(stackFrame.getLastLexicalState());
+                             return ElixirTypes.CLOSING_CURLY; }
+  {HEXADECIMAL_DIGIT}{1,6} { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+}
+
 <GROUP,
  GROUP_HEREDOC_LINE_BODY> {
   {INTERPOLATION_START}   {
@@ -734,9 +759,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              return fragmentType();
                             }
                           }
-  {VALID_ESCAPE_SEQUENCE} {
+  {ESCAPE}                {
                             if (isInterpolating()) {
-                              return ElixirTypes.VALID_ESCAPE_SEQUENCE;
+                              pushAndBegin(ESCAPE_SEQUENCE);
+                              return ElixirTypes.ESCAPE;
                             } else {
                               return fragmentType();
                             }
@@ -805,6 +831,16 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <GROUP_HEREDOC_START> {
   {EOL} { yybegin(GROUP_HEREDOC_LINE_START);
           return ElixirTypes.EOL; }
+}
+
+<HEXADECIMAL_ESCAPE_SEQUENCE> {
+  {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
+                             return ElixirTypes.OPENING_CURLY; }
+  {HEXADECIMAL_DIGIT}{1,2} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             yybegin(stackFrame.getLastLexicalState());
+                             return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <HEXADECIMAL_WHOLE_NUMBER> {

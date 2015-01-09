@@ -25,6 +25,18 @@ public class ElixirInterpolatedStringBodyImpl extends ASTWrapperPsiElement imple
 
   @Override
   @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirInterpolation> getInterpolationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }

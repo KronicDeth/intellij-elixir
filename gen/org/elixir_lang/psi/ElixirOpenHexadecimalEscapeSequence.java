@@ -5,6 +5,11 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCharListHeredocPrefix extends PsiElement {
+public interface ElixirOpenHexadecimalEscapeSequence extends EscapedHexadecimalDigits {
+
+  @NotNull
+  PsiElement getValidHexadecimalDigits();
+
+  int codePoint();
 
 }

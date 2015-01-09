@@ -272,8 +272,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return STRING_KEYS;
         } else if (VALID_DIGITS_TOKEN_SET.contains(tokenType)) {
             return VALID_DIGITS_KEYS;
-        } else if (tokenType.equals(ElixirTypes.VALID_ESCAPE_SEQUENCE)) {
-            return VALID_ESCAPE_SEQUENCE_KEYS;
         } else if (WHOLE_NUMBER_BASE_TOKEN_SET.contains(tokenType)) {
             return WHOLE_NUMBER_BASE_KEYS;
         } else {

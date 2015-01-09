@@ -9,6 +9,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 public interface ElixirInterpolatedStringBody extends Quotable {
 
   @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
+  @NotNull
   List<ElixirInterpolation> getInterpolationList();
 
   @NotNull

@@ -11,20 +11,19 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCharListHeredocLineWhitespaceImpl extends ASTWrapperPsiElement implements ElixirCharListHeredocLineWhitespace {
+public class ElixirEscapedCharacterImpl extends ASTWrapperPsiElement implements ElixirEscapedCharacter {
 
-  public ElixirCharListHeredocLineWhitespaceImpl(ASTNode node) {
+  public ElixirEscapedCharacterImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListHeredocLineWhitespace(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitEscapedCharacter(this);
     else super.accept(visitor);
   }
 
-  @Nullable
-  public ASTNode excessWhitespace(int prefixLength) {
-    return ElixirPsiImplUtil.excessWhitespace(this, prefixLength);
+  public int codePoint() {
+    return ElixirPsiImplUtil.codePoint(this);
   }
 
 }

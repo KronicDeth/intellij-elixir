@@ -7,6 +7,12 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirSigil extends PsiElement {
 
+  @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
   @Nullable
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
 

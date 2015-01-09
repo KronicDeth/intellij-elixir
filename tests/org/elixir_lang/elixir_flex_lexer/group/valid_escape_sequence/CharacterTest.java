@@ -52,7 +52,7 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public void validCharacterCode(CharSequence charSequence) throws IOException {
         reset(charSequence);
 
-        assertEquals(ElixirTypes.VALID_ESCAPE_SEQUENCE, flexLexer.advance());
+        assertEquals(ElixirTypes.ESCAPE, flexLexer.advance());
         assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
         assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
     };

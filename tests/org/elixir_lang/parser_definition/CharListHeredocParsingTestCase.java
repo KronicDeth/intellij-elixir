@@ -9,7 +9,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMinimal() {

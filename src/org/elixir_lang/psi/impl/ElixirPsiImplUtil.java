@@ -6,16 +6,17 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static org.elixir_lang.intellij_elixir.Quoter.elixirString;
-import static org.elixir_lang.intellij_elixir.Quoter.javaString;
+import static org.elixir_lang.intellij_elixir.Quoter.*;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -48,6 +49,123 @@ public class ElixirPsiImplUtil {
         }
 
         return asBlock;
+    }
+
+    // @return -1 if codePoint cannot be parsed.
+    public static int codePoint(@NotNull ElixirEscapedCharacter escapedCharacter) {
+        ASTNode[] escapedCharacterTokens = escapedCharacter
+                .getNode()
+                .getChildren(TokenSet.create(ElixirTypes.ESCAPED_CHARACTER_TOKEN));
+        int parsedCodePoint = -1;
+
+        if (escapedCharacterTokens.length == 1) {
+            ASTNode escapedCharacterToken = escapedCharacterTokens[0];
+            String formattedEscapedCharacter = escapedCharacterToken.getText();
+            int formattedCodePoint = formattedEscapedCharacter.codePointAt(0);
+
+            // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_interpolation.erl#L130-L142
+            switch (formattedCodePoint) {
+                case '0':
+                    parsedCodePoint = 0;
+                    break;
+                case 'a':
+                    parsedCodePoint = 7;
+                    break;
+                case 'b':
+                    parsedCodePoint = 8;
+                    break;
+                case 'd':
+                    parsedCodePoint = 127;
+                    break;
+                case 'e':
+                    parsedCodePoint = 27;
+                    break;
+                case 'f':
+                    parsedCodePoint = 12;
+                    break;
+                case 'n':
+                    parsedCodePoint = 10;
+                    break;
+                case 'r':
+                    parsedCodePoint = 13;
+                    break;
+                case 's':
+                    parsedCodePoint = 32;
+                    break;
+                case 't':
+                    parsedCodePoint = 9;
+                    break;
+                case 'v':
+                    parsedCodePoint = 11;
+                    break;
+                default:
+                    parsedCodePoint = formattedCodePoint;
+            }
+        }
+
+        return parsedCodePoint;
+    }
+
+    // @return -1 if codePoint cannot be parsed.
+    public static int codePoint(@NotNull EscapedHexadecimalDigits hexadecimalEscapeSequence) {
+        ASTNode[] validHexadecimalDigitsArray = hexadecimalEscapeSequence
+                .getNode()
+                .getChildren(
+                        TokenSet.create(ElixirTypes.VALID_HEXADECIMAL_DIGITS)
+                );
+        int parsedCodePoint = -1;
+
+        if (validHexadecimalDigitsArray.length == 1) {
+            ASTNode validHexadecimalDigits = validHexadecimalDigitsArray[0];
+            String formattedHexadecimalDigits = validHexadecimalDigits.getText();
+            parsedCodePoint = Integer.parseInt(formattedHexadecimalDigits, 16);
+        }
+
+        return parsedCodePoint;
+    }
+
+    // @return -1 if codePoint cannot be parsed.
+    public static int codePoint(@NotNull ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence) {
+        EscapedHexadecimalDigits escapedHexadecimalDigits = hexadecimalEscapeSequence.getEnclosedHexadecimalEscapeSequence();
+        int parsedCodePoint = -1;
+
+        if (escapedHexadecimalDigits == null) {
+            escapedHexadecimalDigits = hexadecimalEscapeSequence.getOpenHexadecimalEscapeSequence();
+        }
+
+        if (escapedHexadecimalDigits != null) {
+            parsedCodePoint = escapedHexadecimalDigits.codePoint();
+        }
+
+        return parsedCodePoint;
+    }
+
+    /*
+     * @todo use String.codePoints in Java 8 when IntelliJ is using it
+     * @see https://stackoverflow.com/questions/1527856/how-can-i-iterate-through-the-unicode-codepoints-of-a-java-string/21791059#21791059
+     */
+    public static Iterable<Integer> codePoints(final String string) {
+        return new Iterable<Integer>() {
+            public Iterator<Integer> iterator() {
+                return new Iterator<Integer>() {
+                    int nextIndex = 0;
+
+                    public boolean hasNext() {
+                        return nextIndex < string.length();
+                    }
+
+                    public Integer next() {
+                        int result = string.codePointAt(nextIndex);
+                        nextIndex += Character.charCount(result);
+                        return result;
+                    }
+
+                    public void remove() {
+                        throw new UnsupportedOperationException();
+                    }
+                };
+            }
+        };
     }
 
     public static Document document(PsiElement element) {
@@ -271,7 +389,7 @@ public class ElixirPsiImplUtil {
      * @return null if prefixLength is greater than or equal to text length of charListHeredcoLineWhitespace.
      */
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static ASTNode excessWhitespace(@NotNull final ElixirCharListHeredocLineWhitespace charListHeredocLineWhitespace, int prefixLength) {
         int availableLength = charListHeredocLineWhitespace.getTextLength();
         int excessLength = availableLength - prefixLength;
@@ -359,21 +477,41 @@ public class ElixirPsiImplUtil {
         } else {
             OtpErlangList interpolatedCharListBodyMetadata = metadata(anchor);
             List<OtpErlangObject> quotedCharListList = new LinkedList<OtpErlangObject>();
-            StringBuilder stringAccumulator = null;
+            List<Integer> codePointList = null;
 
             for (ASTNode child : children) {
                 IElementType elementType = child.getElementType();
 
                 if (elementType == ElixirTypes.CHAR_LIST_FRAGMENT) {
-                    if (stringAccumulator == null) {
-                        stringAccumulator = new StringBuilder("");
+                    if (codePointList == null) {
+                        codePointList = new LinkedList<Integer>();
                     }
 
-                    stringAccumulator.append(child.getText());
+                    for (Integer codePoint : codePoints(child.getText())) {
+                        codePointList.add(codePoint);
+                    }
+                } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
+                    if (codePointList == null) {
+                        codePointList = new LinkedList<Integer>();
+                    }
+
+                    ElixirEscapedCharacter escapedCharacter = (ElixirEscapedCharacter) child.getPsi();
+                    codePointList.add(
+                            escapedCharacter.codePoint()
+                    );
+                } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_SEQUENCE) {
+                    if (codePointList == null) {
+                        codePointList = new LinkedList<Integer>();
+                    }
+
+                    ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirHexadecimalEscapeSequence) child.getPsi();
+                    codePointList.add(
+                            hexadecimalEscapeSequence.codePoint()
+                    );
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
-                    if (stringAccumulator != null) {
-                        quotedCharListList.add(elixirString(stringAccumulator.toString()));
-                        stringAccumulator = null;
+                    if (codePointList != null) {
+                        quotedCharListList.add(elixirString(codePointList));
+                        codePointList = null;
                     }
 
                     ElixirInterpolation childElement = (ElixirInterpolation) child.getPsi();
@@ -383,21 +521,27 @@ public class ElixirPsiImplUtil {
                 }
             }
 
-            if (stringAccumulator != null) {
-                quotedCharListList.add(elixirString(stringAccumulator.toString()));
+            // can be represented as a pure Erlang string (Elixir CharList)
+            if (codePointList != null && quotedCharListList.isEmpty()) {
+                quoted = elixirCharList(codePointList);
+            } else {
+                if (codePointList != null) {
+                    quotedCharListList.add(elixirString(codePointList));
+                }
+
+                OtpErlangObject[] quotedStringElements = new OtpErlangObject[quotedCharListList.size()];
+                quotedCharListList.toArray(quotedStringElements);
+
+                OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", interpolatedCharListBodyMetadata, quotedStringElements);
+                quoted = quotedFunctionCall(
+                        "String",
+                        "to_char_list",
+                        interpolatedCharListBodyMetadata,
+                        binaryConstruction
+                );
             }
-
-            OtpErlangObject[] quotedStringElements = new OtpErlangObject[quotedCharListList.size()];
-            quotedCharListList.toArray(quotedStringElements);
-
-            OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", interpolatedCharListBodyMetadata, quotedStringElements);
-            quoted = quotedFunctionCall(
-                    "String",
-                    "to_char_list",
-                    interpolatedCharListBodyMetadata,
-                    binaryConstruction
-            );
         }
+
         return quoted;
     }
 

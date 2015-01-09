@@ -115,6 +115,17 @@ decimalWholeNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DEC
 // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
 decimalNumber ::= decimalFloat |
                   decimalWholeNumber
+private escapeSequence ::= hexadecimalEscapeSequence |
+                           /* Must be second so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                              ("\x") in hexadecimalEscapeSequence  */
+                           escapedCharacter
+hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence) { methods = [codePoint] pin = 2 }
+enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLOSING_CURLY
+                                      { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] pin = 1 }
+openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
+                                  { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] }
+escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
+                     { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= infixSemicolon | EOL
@@ -123,7 +134,7 @@ private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                              interpolatedCharListBody
@@ -141,13 +152,13 @@ private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_
                                      interpolatedWordsBody
                                      WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
+private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS |

@@ -11,20 +11,25 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCharListHeredocLineWhitespaceImpl extends ASTWrapperPsiElement implements ElixirCharListHeredocLineWhitespace {
+public class ElixirEnclosedHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement implements ElixirEnclosedHexadecimalEscapeSequence {
 
-  public ElixirCharListHeredocLineWhitespaceImpl(ASTNode node) {
+  public ElixirEnclosedHexadecimalEscapeSequenceImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListHeredocLineWhitespace(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitEnclosedHexadecimalEscapeSequence(this);
     else super.accept(visitor);
   }
 
+  @Override
   @Nullable
-  public ASTNode excessWhitespace(int prefixLength) {
-    return ElixirPsiImplUtil.excessWhitespace(this, prefixLength);
+  public PsiElement getValidHexadecimalDigits() {
+    return findChildByType(VALID_HEXADECIMAL_DIGITS);
+  }
+
+  public int codePoint() {
+    return ElixirPsiImplUtil.codePoint(this);
   }
 
 }
