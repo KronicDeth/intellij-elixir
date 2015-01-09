@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class CharListHeredocParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testEscapeSequences() {

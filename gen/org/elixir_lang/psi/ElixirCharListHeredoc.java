@@ -11,7 +11,7 @@ public interface ElixirCharListHeredoc extends Quotable {
   @NotNull
   List<ElixirCharListHeredocLine> getCharListHeredocLineList();
 
-  @NotNull
+  @Nullable
   ElixirCharListHeredocPrefix getCharListHeredocPrefix();
 
   @NotNull

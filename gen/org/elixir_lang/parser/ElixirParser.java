@@ -651,14 +651,15 @@ public class ElixirParser implements PsiParser {
   public static boolean charListHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "charListHeredoc")) return false;
     if (!nextTokenIs(b, CHAR_LIST_HEREDOC_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, CHAR_LIST_HEREDOC_PROMOTER, EOL);
-    r = r && charListHeredoc_2(b, l + 1);
-    r = r && charListHeredocPrefix(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_HEREDOC_TERMINATOR);
-    exit_section_(b, m, CHAR_LIST_HEREDOC, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 1, CHAR_LIST_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 1
+    r = r && report_error_(b, charListHeredoc_2(b, l + 1));
+    r = p && report_error_(b, charListHeredocPrefix(b, l + 1)) && r;
+    r = p && consumeToken(b, CHAR_LIST_HEREDOC_TERMINATOR) && r;
+    exit_section_(b, l, m, CHAR_LIST_HEREDOC, r, p, null);
+    return r || p;
   }
 
   // charListHeredocLine*

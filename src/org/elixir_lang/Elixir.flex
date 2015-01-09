@@ -829,8 +829,26 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <GROUP_HEREDOC_START> {
-  {EOL} { yybegin(GROUP_HEREDOC_LINE_START);
-          return ElixirTypes.EOL; }
+  // parse immediate terminator as a terminator and let parser handle errors for missing EOL
+  {GROUP_HEREDOC_TERMINATOR} {
+                               // Similar to GROUP_HEREDOC_END's GROUP_HEREDOC_TERMINATOR rule, but...
+                               if (isTerminator(yytext())) {
+                                 if (isSigil()) {
+                                   yybegin(SIGIL_MODIFIERS);
+                                   return terminatorType();
+                                 } else {
+                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                   yybegin(stackFrame.getLastLexicalState());
+                                   return stackFrame.terminatorType();
+                                 }
+                               } else {
+                                 /* ...returns BAD_CHARACTER instead of going to GROUP_HEREDOC_LINE_BODY when the wrong
+                                    type of terminator */
+                                 return TokenType.BAD_CHARACTER;
+                               }
+                             }
+  {EOL}                      { yybegin(GROUP_HEREDOC_LINE_START);
+                               return ElixirTypes.EOL; }
 }
 
 <HEXADECIMAL_ESCAPE_SEQUENCE> {

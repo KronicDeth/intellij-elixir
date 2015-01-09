@@ -30,9 +30,9 @@ public class ElixirCharListHeredocImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirCharListHeredocPrefix getCharListHeredocPrefix() {
-    return findNotNullChildByClass(ElixirCharListHeredocPrefix.class);
+    return findChildByClass(ElixirCharListHeredocPrefix.class);
   }
 
   @NotNull

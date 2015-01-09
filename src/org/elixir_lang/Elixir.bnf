@@ -105,7 +105,7 @@ charList ::= CHAR_LIST_PROMOTER
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     charListHeredocLine*
                     charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
-                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 1 }
 charListHeredocLine ::= charListHeredocLineWhitespace interpolatedCharListBody EOL { methods = [quote] }
 charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessWhitespace] }
 charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?

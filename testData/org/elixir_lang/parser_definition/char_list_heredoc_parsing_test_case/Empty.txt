@@ -1,6 +1,6 @@
 Elixir File(0,6)
-  PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER)(''''')(0,3)
-  PsiErrorElement:ElixirTokenType.EOL expected, got '''(3,4)
-    PsiElement(BAD_CHARACTER)(''')(3,4)
-  PsiElement(BAD_CHARACTER)(''')(4,5)
-  PsiElement(BAD_CHARACTER)(''')(5,6)
+  ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,6)
+    PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER)(''''')(0,3)
+    ElixirCharListHeredocPrefixImpl(CHAR_LIST_HEREDOC_PREFIX)(3,3)
+      <empty list>
+    PsiElement(ElixirTokenType.CHAR_LIST_HEREDOC_TERMINATOR)(''''')(3,6)
