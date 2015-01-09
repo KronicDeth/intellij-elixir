@@ -9,7 +9,7 @@ public class CharListParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testInterpolation() {
