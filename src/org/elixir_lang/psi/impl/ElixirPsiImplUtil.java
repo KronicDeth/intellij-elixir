@@ -201,11 +201,11 @@ public class ElixirPsiImplUtil {
         return new OtpErlangTuple(elements);
     }
 
-    public static boolean inBase(@NotNull final ElixirBinaryDigits binaryDigits) {
-        ASTNode child = binaryDigits.getNode().getFirstChildNode();
+    public static boolean inBase(@NotNull final Digits digits) {
+        ASTNode child = digits.getNode().getFirstChildNode();
         boolean inBase = false;
 
-        if (child.getElementType() == ElixirTypes.VALID_BINARY_DIGITS) {
+        if (child.getElementType() == digits.validElementType()) {
             inBase = true;
         }
 
@@ -747,7 +747,7 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static IElementType validDigitsElementType(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
+    public static IElementType validElementType(@NotNull ElixirBinaryDigits binaryDigits) {
         return ElixirTypes.VALID_BINARY_DIGITS;
     }
 

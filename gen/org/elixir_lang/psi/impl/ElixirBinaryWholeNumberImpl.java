@@ -1,17 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.Digits;
-import org.elixir_lang.psi.ElixirBinaryDigits;
-import org.elixir_lang.psi.ElixirBinaryWholeNumber;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirBinaryWholeNumberImpl extends ElixirNumberImpl implements ElixirBinaryWholeNumber {
 
