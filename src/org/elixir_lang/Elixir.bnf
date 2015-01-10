@@ -72,9 +72,17 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
          { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 binaryDigits ::= INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
-                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                 { implements = "org.elixir_lang.psi.Digits" methods = [inBase quote] }
 binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits+
-                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 2 }
+                     {
+                       implements = "org.elixir_lang.psi.WholeNumber"
+                       methods = [
+                         base
+                         digitsList
+                         quote
+                       ]
+                       pin = 2
+                     }
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*

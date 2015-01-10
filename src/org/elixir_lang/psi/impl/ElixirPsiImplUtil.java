@@ -33,6 +33,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
+        return 2;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject block(@NotNull final Deque<OtpErlangObject> quotedChildren) {
         OtpErlangObject asBlock;
         final int size = quotedChildren.size();
@@ -168,6 +174,15 @@ public class ElixirPsiImplUtil {
         };
     }
 
+    @NotNull
+    public static List<Digits> digitsList(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
+        List<Digits> digitsList = new LinkedList<Digits>();
+
+        digitsList.addAll(binaryWholeNumber.getBinaryDigitsList());
+
+        return digitsList;
+    }
+
     public static Document document(PsiElement element) {
         PsiFile containingFile = element.getContainingFile();
         FileViewProvider fileViewProvider = containingFile.getViewProvider();
@@ -184,6 +199,38 @@ public class ElixirPsiImplUtil {
         };
 
         return new OtpErlangTuple(elements);
+    }
+
+    public static boolean inBase(@NotNull final ElixirBinaryDigits binaryDigits) {
+        ASTNode child = binaryDigits.getNode().getFirstChildNode();
+        boolean inBase = false;
+
+        if (child.getElementType() == ElixirTypes.VALID_BINARY_DIGITS) {
+            inBase = true;
+        }
+
+        return inBase;
+    }
+
+    public static boolean inBase(@NotNull final List<Digits> digitsList) {
+        int validDigitsCount = 0;
+        int invalidDigitsCount = 0;
+
+        for (Digits digits : digitsList) {
+            if (digits.inBase()) {
+                validDigitsCount++;
+            } else {
+                invalidDigitsCount++;
+            }
+        }
+
+        boolean valid = false;
+
+        if (invalidDigitsCount == 0 && validDigitsCount == 1) {
+            valid = true;
+        }
+
+        return valid;
     }
 
     /*
@@ -284,53 +331,6 @@ public class ElixirPsiImplUtil {
         long value = Long.parseLong(text, 2);
 
         return new OtpErlangLong(value);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
-        ASTNode[] childNodes = binaryWholeNumber.getNode().getChildren(null);
-
-        int validBinaryDigitsCount = 0;
-        int invalidBinaryDigitsCount = 0;
-
-        for (ASTNode childNode : childNodes) {
-            IElementType elementType = childNode.getElementType();
-
-            if (elementType == ElixirTypes.INVALID_BINARY_DIGITS) {
-                invalidBinaryDigitsCount++;
-            } else if (elementType == ElixirTypes.VALID_BINARY_DIGITS) {
-                validBinaryDigitsCount++;
-            }
-        }
-
-        List<ElixirBinaryDigits> binaryDigitsList = binaryWholeNumber.getBinaryDigitsList();
-        OtpErlangObject quoted;
-
-        if (invalidBinaryDigitsCount == 0 && validBinaryDigitsCount == 1) {
-            ElixirBinaryDigits binaryDigits = binaryDigitsList.get(0);
-            quoted = binaryDigits.quote();
-        } else {
-            /* 0 elements is invalid in native Elixir and can be emulated as String.to_integer("", 2) while
-               2 elements implies at least one element is INVALID_BINARY_DIGITS which is invalid in native Elixir and
-               can be emulated as String.to_integer(<all-digits>, 2) so that it raises an ArgumentError on the invalid
-               binary digits */
-            StringBuilder stringAccumulator = new StringBuilder();
-
-            for (ElixirBinaryDigits binaryDigits : binaryDigitsList) {
-                stringAccumulator.append(binaryDigits.getText());
-            }
-
-            quoted = quotedFunctionCall(
-                    "String",
-                    "to_integer",
-                    metadata(binaryWholeNumber),
-                    elixirString(stringAccumulator.toString()),
-                    new OtpErlangLong(2)
-            );
-        }
-
-        return quoted;
     }
 
     @Contract(pure = true)
@@ -440,6 +440,41 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final WholeNumber wholeNumber) {
+        List<Digits> digitsList = wholeNumber.digitsList();
+
+        OtpErlangObject quoted;
+
+        if (inBase(digitsList)) {
+            Digits digits = digitsList.get(0);
+            quoted = digits.quote();
+        } else {
+            /* 0 elements is invalid in native Elixir and can be emulated as `String.to_integer("", base)` while
+               2 elements implies at least one element is invalidDigitsElementType which is invalid in native Elixir and
+               can be emulated as String.to_integer(<all-digits>, base) so that it raises an ArgumentError on the invalid
+               digits */
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (Digits digits : digitsList) {
+                stringBuilder.append(digits.getText());
+            }
+
+            quoted = quotedFunctionCall(
+                    "String",
+                    "to_integer",
+                    metadata(wholeNumber),
+                    elixirString(
+                            stringBuilder.toString()
+                    ),
+                    new OtpErlangLong(wholeNumber.base())
+            );
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirInterpolatedCharListBody interpolatedCharListBody) {
         return quotedInterpolatedCharListBodyChildNodes(interpolatedCharListBody);
 
@@ -465,15 +500,6 @@ public class ElixirPsiImplUtil {
         if (childCount == 0) {
             // an empty CharList is just an empty list
             quoted = new OtpErlangList();
-        } else if (childCount == 1) {
-            ASTNode child = children[0];
-
-            if (child.getElementType() == ElixirTypes.CHAR_LIST_FRAGMENT) {
-                final String text = child.getText();
-                quoted = new OtpErlangString(text);
-            } else {
-                throw new NotImplementedException("Can't quote ElixirInterpolatedCharListBody with one child that isn't a CHAR_LIST_FRAGMENT");
-            }
         } else {
             OtpErlangList interpolatedCharListBodyMetadata = metadata(anchor);
             List<OtpErlangObject> quotedCharListList = new LinkedList<OtpErlangObject>();
@@ -719,6 +745,15 @@ public class ElixirPsiImplUtil {
                 }
         );
     }
+
+    @NotNull
+    public static IElementType validDigitsElementType(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
+        return ElixirTypes.VALID_BINARY_DIGITS;
+    }
+
+    /*
+     * Private static methods
+     */
 
     @NotNull
     private static Queue<ASTNode> mergeCharListFragments(@NotNull Deque<ASTNode> unmergedNodes, @NotNull PsiManager manager) {

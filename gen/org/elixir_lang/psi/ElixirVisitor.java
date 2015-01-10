@@ -25,12 +25,12 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitBinaryDigits(@NotNull ElixirBinaryDigits o) {
-    visitQuotable(o);
+    visitDigits(o);
   }
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
     visitNumber(o);
-    // visitQuotable(o);
+    // visitWholeNumber(o);
   }
 
   public void visitCallArgumentsNoParenthesesKeywords(@NotNull ElixirCallArgumentsNoParenthesesKeywords o) {
@@ -231,6 +231,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitNumber(o);
+  }
+
+  public void visitDigits(@NotNull Digits o) {
+    visitElement(o);
   }
 
   public void visitEscapeSequence(@NotNull EscapeSequence o) {
