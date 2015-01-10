@@ -30,11 +30,18 @@ public class ElixirPsiImplUtil {
     };
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
+    public static final int BINARY_BASE = 2;
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryDigits binaryDigits) {
+        return BINARY_BASE;
+    }
 
     @Contract(pure = true)
     @NotNull
     public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
-        return 2;
+        return BINARY_BASE;
     }
 
     @Contract(pure = true)
@@ -270,6 +277,15 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final Digits digits) {
+        final String text = digits.getText();
+        long value = Long.parseLong(text, digits.base());
+
+        return new OtpErlangLong(value);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
         ElixirCharList charList = atom.getCharList();
@@ -322,15 +338,6 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirBinaryDigits binaryDigits) {
-        final String text = binaryDigits.getText();
-        long value = Long.parseLong(text, 2);
-
-        return new OtpErlangLong(value);
     }
 
     @Contract(pure = true)
