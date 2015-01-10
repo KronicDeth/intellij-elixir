@@ -13,7 +13,7 @@ public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testObsoleteValid() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testValid() {
