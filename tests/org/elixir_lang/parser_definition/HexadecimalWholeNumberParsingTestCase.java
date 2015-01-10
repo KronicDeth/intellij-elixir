@@ -16,6 +16,10 @@ public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testObsoleteInvalidAndValidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testObsoleteNoDigits() {
         assertParsedAndQuotedAroundError();
     }
