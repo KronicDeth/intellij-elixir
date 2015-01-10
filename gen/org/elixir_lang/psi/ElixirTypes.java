@@ -32,6 +32,7 @@ public interface ElixirTypes {
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType ESCAPED_CHARACTER = new ElixirElementType("ESCAPED_CHARACTER");
   IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
+  IElementType HEXADECIMAL_DIGITS = new ElixirElementType("HEXADECIMAL_DIGITS");
   IElementType HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType INFIX_DOT_OPERATOR = new ElixirElementType("INFIX_DOT_OPERATOR");
@@ -258,6 +259,9 @@ public interface ElixirTypes {
       }
       else if (type == HAT_INFIX_OPERATOR) {
         return new ElixirHatInfixOperatorImpl(node);
+      }
+      else if (type == HEXADECIMAL_DIGITS) {
+        return new ElixirHexadecimalDigitsImpl(node);
       }
       else if (type == HEXADECIMAL_ESCAPE_SEQUENCE) {
         return new ElixirHexadecimalEscapeSequenceImpl(node);

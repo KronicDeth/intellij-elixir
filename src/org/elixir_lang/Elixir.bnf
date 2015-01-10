@@ -140,7 +140,20 @@ endOfExpression ::= infixSemicolon | EOL
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
-hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
+
+hexadecimalDigits ::= INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
+                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
+                           {
+                             implements = "org.elixir_lang.psi.WholeNumber"
+                             methods = [
+                               base
+                               digitsList
+                               quote
+                             ]
+                             pin = 2
+                           }
+
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

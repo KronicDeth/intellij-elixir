@@ -105,12 +105,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitHexadecimalDigits(@NotNull ElixirHexadecimalDigits o) {
+    visitDigits(o);
+  }
+
   public void visitHexadecimalEscapeSequence(@NotNull ElixirHexadecimalEscapeSequence o) {
     visitPsiElement(o);
   }
 
   public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
     visitNumber(o);
+    // visitWholeNumber(o);
   }
 
   public void visitInfixDotOperator(@NotNull ElixirInfixDotOperator o) {

@@ -4,7 +4,20 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirHexadecimalWholeNumber extends ElixirNumber {
+public interface ElixirHexadecimalWholeNumber extends ElixirNumber, WholeNumber {
+
+  @NotNull
+  List<ElixirHexadecimalDigits> getHexadecimalDigitsList();
+
+  @NotNull
+  int base();
+
+  @NotNull
+  List<Digits> digitsList();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

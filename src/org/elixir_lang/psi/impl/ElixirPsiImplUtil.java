@@ -31,6 +31,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
+    public static final int HEXADECIMAL_BASE = 16;
 
     @Contract(pure = true)
     @NotNull
@@ -42,6 +43,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
         return BINARY_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirHexadecimalDigits hexadecimalDigits) {
+        return HEXADECIMAL_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
+        return HEXADECIMAL_BASE;
     }
 
     @Contract(pure = true)
@@ -186,6 +199,14 @@ public class ElixirPsiImplUtil {
         List<Digits> digitsList = new LinkedList<Digits>();
 
         digitsList.addAll(binaryWholeNumber.getBinaryDigitsList());
+
+        return digitsList;
+    }
+
+    @NotNull static List<Digits> digitsList(@NotNull ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
+        List<Digits> digitsList = new LinkedList<Digits>();
+
+        digitsList.addAll(hexadecimalWholeNumber.getHexadecimalDigitsList());
 
         return digitsList;
     }
@@ -754,8 +775,13 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static IElementType validElementType(@NotNull ElixirBinaryDigits binaryDigits) {
+    public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirBinaryDigits binaryDigits) {
         return ElixirTypes.VALID_BINARY_DIGITS;
+    }
+
+    @NotNull
+    public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirHexadecimalDigits hexadecimalDigits) {
+        return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
     }
 
     /*

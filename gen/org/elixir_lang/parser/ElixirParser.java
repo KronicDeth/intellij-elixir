@@ -94,6 +94,9 @@ public class ElixirParser implements PsiParser {
     else if (t == HAT_INFIX_OPERATOR) {
       r = hatInfixOperator(b, 0);
     }
+    else if (t == HEXADECIMAL_DIGITS) {
+      r = hexadecimalDigits(b, 0);
+    }
     else if (t == HEXADECIMAL_ESCAPE_SEQUENCE) {
       r = hexadecimalEscapeSequence(b, 0);
     }
@@ -1125,6 +1128,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
+  public static boolean hexadecimalDigits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalDigits")) return false;
+    if (!nextTokenIs(b, "<hexadecimal digits>", INVALID_HEXADECIMAL_DIGITS, VALID_HEXADECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<hexadecimal digits>");
+    r = consumeToken(b, INVALID_HEXADECIMAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_HEXADECIMAL_DIGITS);
+    exit_section_(b, l, m, HEXADECIMAL_DIGITS, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
   public static boolean hexadecimalEscapeSequence(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalEscapeSequence")) return false;
@@ -1150,7 +1166,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  // BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
   public static boolean hexadecimalWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalWholeNumber")) return false;
     if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
@@ -1175,29 +1191,18 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+
+  // hexadecimalDigits+
   private static boolean hexadecimalWholeNumber_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = hexadecimalWholeNumber_2_0(b, l + 1);
+    r = hexadecimalDigits(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!hexadecimalWholeNumber_2_0(b, l + 1)) break;
+      if (!hexadecimalDigits(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "hexadecimalWholeNumber_2", c)) break;
       c = current_position_(b);
     }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
-  private static boolean hexadecimalWholeNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hexadecimalWholeNumber_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_HEXADECIMAL_DIGITS);
-    if (!r) r = consumeToken(b, VALID_HEXADECIMAL_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }

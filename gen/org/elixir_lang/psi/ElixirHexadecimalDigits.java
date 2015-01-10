@@ -7,13 +7,10 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirBinaryDigits extends Digits {
+public interface ElixirHexadecimalDigits extends Digits {
 
   @Nullable
-  PsiElement getInvalidBinaryDigits();
-
-  @Nullable
-  PsiElement getValidBinaryDigits();
+  PsiElement getValidHexadecimalDigits();
 
   @NotNull
   int base();

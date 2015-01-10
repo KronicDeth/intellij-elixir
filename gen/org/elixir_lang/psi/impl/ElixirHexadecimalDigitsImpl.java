@@ -13,27 +13,21 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
 
-public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements ElixirBinaryDigits {
+public class ElixirHexadecimalDigitsImpl extends ASTWrapperPsiElement implements ElixirHexadecimalDigits {
 
-  public ElixirBinaryDigitsImpl(ASTNode node) {
+  public ElixirHexadecimalDigitsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryDigits(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHexadecimalDigits(this);
     else super.accept(visitor);
   }
 
   @Override
   @Nullable
-  public PsiElement getInvalidBinaryDigits() {
-    return findChildByType(INVALID_BINARY_DIGITS);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getValidBinaryDigits() {
-    return findChildByType(VALID_BINARY_DIGITS);
+  public PsiElement getValidHexadecimalDigits() {
+    return findChildByType(VALID_HEXADECIMAL_DIGITS);
   }
 
   @NotNull
