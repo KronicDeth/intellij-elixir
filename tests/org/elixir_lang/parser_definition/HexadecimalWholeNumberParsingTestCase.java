@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
     public void testNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testObsoleteNoDigits() {

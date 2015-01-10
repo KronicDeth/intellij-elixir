@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -300,9 +301,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final Digits digits) {
         final String text = digits.getText();
-        long value = Long.parseLong(text, digits.base());
+        final int base = digits.base();
+        OtpErlangLong quoted;
 
-        return new OtpErlangLong(value);
+        try {
+            long value = Long.parseLong(text, base);
+            quoted = new OtpErlangLong(value);
+        } catch (NumberFormatException exception) {
+            BigInteger value = new BigInteger(text, base);
+            quoted = new OtpErlangLong(value);
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
