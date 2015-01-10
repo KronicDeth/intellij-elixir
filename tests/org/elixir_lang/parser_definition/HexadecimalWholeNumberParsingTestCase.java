@@ -9,7 +9,7 @@ public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testObsoleteNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testObsoleteValid() {
