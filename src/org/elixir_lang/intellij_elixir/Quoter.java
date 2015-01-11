@@ -2,6 +2,7 @@ package org.elixir_lang.intellij_elixir;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.psi.PsiFile;
+import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.IntellijElixir;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.Contract;
@@ -111,15 +112,33 @@ public class Quoter {
     }
 
     @NotNull
-    public static OtpErlangList elixirCharList(@NotNull final List<Integer> codePointList) {
+    public static OtpErlangObject elixirCharList(@NotNull final List<Integer> codePointList) {
         OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
+        boolean isASCIIPrintable = true;
 
         int i = 0;
         for (int codePoint : codePointList) {
+            isASCIIPrintable = isASCIIPrintable && erlangPrintable(codePoint);
             erlangCodePoints[i++] = new OtpErlangLong(codePoint);
         }
 
-        return new OtpErlangList(erlangCodePoints);
+        OtpErlangList codePointErlangList = new OtpErlangList(erlangCodePoints);
+        OtpErlangObject charList;
+
+        /* JInterface will return an OtpErlangString in some case and an OtpErlangList in other.  Right now, I'm
+           assuming it works similar to the printing in `iex` and is based on whether the codePoint is printable, but
+           ASCII printable instead of Unicode printable since Erlang is ASCII/LATIN-1 based */
+        if (isASCIIPrintable)  {
+            try {
+                charList = new OtpErlangString(codePointErlangList);
+            } catch (OtpErlangException e) {
+                throw new NotImplementedException(e);
+            }
+        } else {
+            charList = codePointErlangList;
+        }
+
+        return charList;
     }
 
     @NotNull
@@ -137,6 +156,15 @@ public class Quoter {
     public static OtpErlangBinary elixirString(@NotNull String javaString) {
         final byte[] bytes = javaString.getBytes(Charset.forName("UTF-8"));
         return new OtpErlangBinary(bytes);
+    }
+
+    // `for codePoint <- 0..255, :io_lib.printable_list([codePoint]), do: IO.puts codePoint`
+    @Contract(pure = true)
+    public static boolean erlangPrintable(int codePoint) {
+        return (codePoint >= 8 && codePoint <= 13) ||
+                codePoint == 27 ||
+                (codePoint >= 32 && codePoint <= 126) ||
+                (codePoint >= 160 && codePoint <= 255);
     }
 
     @NotNull
