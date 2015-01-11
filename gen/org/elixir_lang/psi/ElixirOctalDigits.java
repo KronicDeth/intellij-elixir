@@ -5,19 +5,19 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
-public interface ElixirOctalWholeNumber extends ElixirNumber, WholeNumber {
-
-  @NotNull
-  List<ElixirOctalDigits> getOctalDigitsList();
+public interface ElixirOctalDigits extends Digits {
 
   @NotNull
   int base();
 
-  @NotNull
-  List<Digits> digitsList();
+  boolean inBase();
 
   @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  IElementType validElementType();
 
 }

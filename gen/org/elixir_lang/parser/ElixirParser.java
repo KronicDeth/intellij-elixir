@@ -163,6 +163,9 @@ public class ElixirParser implements PsiParser {
     else if (t == NUMBER) {
       r = number(b, 0);
     }
+    else if (t == OCTAL_DIGITS) {
+      r = octalDigits(b, 0);
+    }
     else if (t == OCTAL_WHOLE_NUMBER) {
       r = octalWholeNumber(b, 0);
     }
@@ -2578,7 +2581,20 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  // INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
+  public static boolean octalDigits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "octalDigits")) return false;
+    if (!nextTokenIs(b, "<octal digits>", INVALID_OCTAL_DIGITS, VALID_OCTAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<octal digits>");
+    r = consumeToken(b, INVALID_OCTAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_OCTAL_DIGITS);
+    exit_section_(b, l, m, OCTAL_DIGITS, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigits+
   public static boolean octalWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "octalWholeNumber")) return false;
     if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
@@ -2591,29 +2607,18 @@ public class ElixirParser implements PsiParser {
     return r || p;
   }
 
-  // (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+
+  // octalDigits+
   private static boolean octalWholeNumber_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "octalWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = octalWholeNumber_2_0(b, l + 1);
+    r = octalDigits(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!octalWholeNumber_2_0(b, l + 1)) break;
+      if (!octalDigits(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "octalWholeNumber_2", c)) break;
       c = current_position_(b);
     }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
-  private static boolean octalWholeNumber_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "octalWholeNumber_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_OCTAL_DIGITS);
-    if (!r) r = consumeToken(b, VALID_OCTAL_DIGITS);
     exit_section_(b, m, null, r);
     return r;
   }

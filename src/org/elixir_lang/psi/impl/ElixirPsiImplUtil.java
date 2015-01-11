@@ -32,6 +32,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
+    public static final int OCTAL_BASE = 8;
     public static final int HEXADECIMAL_BASE = 16;
 
     @Contract(pure = true)
@@ -56,6 +57,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static int base(@NotNull @SuppressWarnings("unused") final ElixirHexadecimalWholeNumber hexadecimalWholeNumber) {
         return HEXADECIMAL_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirOctalDigits octalDigits) {
+        return OCTAL_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirOctalWholeNumber octalWholeNumber) {
+        return OCTAL_BASE;
     }
 
     @Contract(pure = true)
@@ -208,6 +221,15 @@ public class ElixirPsiImplUtil {
         List<Digits> digitsList = new LinkedList<Digits>();
 
         digitsList.addAll(hexadecimalWholeNumber.getHexadecimalDigitsList());
+
+        return digitsList;
+    }
+
+    @NotNull
+    public static List<Digits> digitsList(@NotNull ElixirOctalWholeNumber octalWholeNumber) {
+        List<Digits> digitsList = new LinkedList<Digits>();
+
+        digitsList.addAll(octalWholeNumber.getOctalDigitsList());
 
         return digitsList;
     }
@@ -792,6 +814,11 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirHexadecimalDigits hexadecimalDigits) {
         return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
+    }
+
+    @NotNull
+    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirOctalDigits octalDigits) {
+        return ElixirTypes.VALID_OCTAL_DIGITS;
     }
 
     /*

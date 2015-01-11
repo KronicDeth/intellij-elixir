@@ -55,6 +55,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_ONE_EXPRESSION = new ElixirElementType("NO_PARENTHESES_ONE_EXPRESSION");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
+  IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType QUALIFIED_ALIAS = new ElixirElementType("QUALIFIED_ALIAS");
@@ -328,6 +329,9 @@ public interface ElixirTypes {
       }
       else if (type == NUMBER) {
         return new ElixirNumberImpl(node);
+      }
+      else if (type == OCTAL_DIGITS) {
+        return new ElixirOctalDigitsImpl(node);
       }
       else if (type == OCTAL_WHOLE_NUMBER) {
         return new ElixirOctalWholeNumberImpl(node);

@@ -198,8 +198,13 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
+    visitDigits(o);
+  }
+
   public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
     visitNumber(o);
+    // visitWholeNumber(o);
   }
 
   public void visitOpenHexadecimalEscapeSequence(@NotNull ElixirOpenHexadecimalEscapeSequence o) {
