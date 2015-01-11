@@ -63,13 +63,14 @@
 elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
- * In alphabetical order
+ *
+ * Base (Non-Decimal) Whole Numbers
+ *
  */
 
-// an expression in an expressionList that is NOT preceded by endOfExpression(s)
-adjacentExpression ::= expression
-atom ::= COLON (ATOM_FRAGMENT | quote)
-         { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+/*
+ * Binary (2)
+ */
 
 binaryDigits ::= INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
                  { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
@@ -83,6 +84,39 @@ binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOL
                        ]
                        pin = 2
                      }
+
+/*
+ * Hexadecimal (16)
+ */
+
+hexadecimalDigits ::= INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
+                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
+                           {
+                             implements = "org.elixir_lang.psi.WholeNumber"
+                             methods = [
+                               base
+                               digitsList
+                               quote
+                             ]
+                             pin = 2
+                           }
+
+/*
+ * Octal (8)
+ */
+
+octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
+
+/*
+ * In alphabetical order
+ */
+
+// an expression in an expressionList that is NOT preceded by endOfExpression(s)
+adjacentExpression ::= expression
+atom ::= COLON (ATOM_FRAGMENT | quote)
+         { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*
@@ -140,20 +174,6 @@ endOfExpression ::= infixSemicolon | EOL
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
-
-hexadecimalDigits ::= INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
-                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
-hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
-                           {
-                             implements = "org.elixir_lang.psi.WholeNumber"
-                             methods = [
-                               base
-                               digitsList
-                               quote
-                             ]
-                             pin = 2
-                           }
-
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -348,8 +368,6 @@ number ::= binaryWholeNumber |
 /*
  * Number Operations - Used in accessExpression
  */
-
-octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
 
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
