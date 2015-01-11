@@ -13,7 +13,7 @@ public class OctalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testValidDigits() {
