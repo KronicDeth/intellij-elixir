@@ -20,6 +20,10 @@ public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testObsoleteInvalidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testObsoleteNoDigits() {
         assertParsedAndQuotedAroundError();
     }
