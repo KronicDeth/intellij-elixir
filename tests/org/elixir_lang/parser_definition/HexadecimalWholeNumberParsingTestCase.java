@@ -32,8 +32,8 @@ public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testValid() {
-        doTest(true);
+    public void testValidDigits() {
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
