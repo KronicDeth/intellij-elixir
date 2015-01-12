@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
     public void testInvalidAndValidDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testInvalidDigits() {
