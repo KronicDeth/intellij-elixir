@@ -32,8 +32,9 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
-    public static final int OCTAL_BASE = 8;
+    public static final int DECIMAL_BASE = 10;
     public static final int HEXADECIMAL_BASE = 16;
+    public static final int OCTAL_BASE = 8;
 
     @Contract(pure = true)
     @NotNull
@@ -45,6 +46,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static int base(@SuppressWarnings("unused") @NotNull final ElixirBinaryWholeNumber binaryWholeNumber) {
         return BINARY_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirDecimalDigits decimalDigits) {
+        return DECIMAL_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirDecimalWholeNumber decimalWholeNumber) {
+        return DECIMAL_BASE;
     }
 
     @Contract(pure = true)
@@ -213,6 +226,15 @@ public class ElixirPsiImplUtil {
         List<Digits> digitsList = new LinkedList<Digits>();
 
         digitsList.addAll(binaryWholeNumber.getBinaryDigitsList());
+
+        return digitsList;
+    }
+
+    @NotNull
+    public static List<Digits> digitsList(@NotNull ElixirDecimalWholeNumber decimalWholeNumber) {
+        List<Digits> digitsList = new LinkedList<Digits>();
+
+        digitsList.addAll(decimalWholeNumber.getDecimalDigitsList());
 
         return digitsList;
     }
@@ -817,6 +839,12 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirBinaryDigits binaryDigits) {
         return ElixirTypes.VALID_BINARY_DIGITS;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirDecimalDigits decimalDigits) {
+        return ElixirTypes.VALID_DECIMAL_DIGITS;
     }
 
     @NotNull

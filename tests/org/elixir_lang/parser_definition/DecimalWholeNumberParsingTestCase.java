@@ -13,7 +13,7 @@ public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testValidDigits() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

@@ -64,6 +64,25 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
  *
+ * Whole Numbers
+ *
+ *
+ */
+
+decimalDigits ::= INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
+                  { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+decimalWholeNumber ::= decimalDigits (DECIMAL_SEPARATOR? decimalDigits)*
+                        {
+                          implements = "org.elixir_lang.psi.WholeNumber"
+                          methods = [
+                            base
+                            digitsList
+                            quote
+                          ]
+                        }
+
+/*
+ *
  * Base (Non-Decimal) Whole Numbers
  *
  */
@@ -164,7 +183,6 @@ charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessW
 charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
 private containerExpression ::= emptyParentheses
 decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
-decimalWholeNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
 // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
 decimalNumber ::= decimalFloat |
                   decimalWholeNumber

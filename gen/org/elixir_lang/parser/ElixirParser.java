@@ -70,6 +70,9 @@ public class ElixirParser implements PsiParser {
     else if (t == CHAR_LIST_HEREDOC_PREFIX) {
       r = charListHeredocPrefix(b, 0);
     }
+    else if (t == DECIMAL_DIGITS) {
+      r = decimalDigits(b, 0);
+    }
     else if (t == DECIMAL_FLOAT) {
       r = decimalFloat(b, 0);
     }
@@ -720,17 +723,30 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
+  public static boolean decimalDigits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalDigits")) return false;
+    if (!nextTokenIs(b, "<decimal digits>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<decimal digits>");
+    r = consumeToken(b, INVALID_DECIMAL_DIGITS);
+    if (!r) r = consumeToken(b, VALID_DECIMAL_DIGITS);
+    exit_section_(b, l, m, DECIMAL_DIGITS, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
   public static boolean decimalFloat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalFloat")) return false;
-    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    if (!nextTokenIs(b, "<decimal float>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, "<decimal float>");
     r = decimalWholeNumber(b, l + 1);
     r = r && consumeToken(b, DECIMAL_MARK);
     r = r && decimalWholeNumber(b, l + 1);
     r = r && decimalFloat_3(b, l + 1);
-    exit_section_(b, m, DECIMAL_FLOAT, r);
+    exit_section_(b, l, m, DECIMAL_FLOAT, r, false, null);
     return r;
   }
 
@@ -765,9 +781,9 @@ public class ElixirParser implements PsiParser {
   //                   decimalWholeNumber
   public static boolean decimalNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalNumber")) return false;
-    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    if (!nextTokenIs(b, "<decimal number>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, null);
+    Marker m = enter_section_(b, l, _COLLAPSE_, "<decimal number>");
     r = decimalFloat(b, l + 1);
     if (!r) r = decimalWholeNumber(b, l + 1);
     exit_section_(b, l, m, DECIMAL_NUMBER, r, false, null);
@@ -775,19 +791,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
+  // decimalDigits (DECIMAL_SEPARATOR? decimalDigits)*
   public static boolean decimalWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalWholeNumber")) return false;
-    if (!nextTokenIs(b, VALID_DECIMAL_DIGITS)) return false;
+    if (!nextTokenIs(b, "<decimal whole number>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, VALID_DECIMAL_DIGITS);
+    Marker m = enter_section_(b, l, _NONE_, "<decimal whole number>");
+    r = decimalDigits(b, l + 1);
     r = r && decimalWholeNumber_1(b, l + 1);
-    exit_section_(b, m, DECIMAL_WHOLE_NUMBER, r);
+    exit_section_(b, l, m, DECIMAL_WHOLE_NUMBER, r, false, null);
     return r;
   }
 
-  // ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
+  // (DECIMAL_SEPARATOR? decimalDigits)*
   private static boolean decimalWholeNumber_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalWholeNumber_1")) return false;
     int c = current_position_(b);
@@ -799,33 +815,22 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // {DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS)
+  // DECIMAL_SEPARATOR? decimalDigits
   private static boolean decimalWholeNumber_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalWholeNumber_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = decimalWholeNumber_1_0_0(b, l + 1);
-    r = r && decimalWholeNumber_1_0_1(b, l + 1);
+    r = r && decimalDigits(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // {DECIMAL_SEPARATOR}?
+  // DECIMAL_SEPARATOR?
   private static boolean decimalWholeNumber_1_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_0")) return false;
     consumeToken(b, DECIMAL_SEPARATOR);
     return true;
-  }
-
-  // INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
-  private static boolean decimalWholeNumber_1_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalWholeNumber_1_0_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_DECIMAL_DIGITS);
-    if (!r) r = consumeToken(b, VALID_DECIMAL_DIGITS);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -2556,7 +2561,6 @@ public class ElixirParser implements PsiParser {
   //            unknownBaseWholeNumber
   public static boolean number(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "number")) return false;
-    if (!nextTokenIs(b, "<number>", BASE_WHOLE_NUMBER_PREFIX, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, "<number>");
     r = binaryWholeNumber(b, l + 1);

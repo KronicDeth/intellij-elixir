@@ -8,24 +8,20 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
-public class ElixirDecimalWholeNumberImpl extends ElixirNumberImpl implements ElixirDecimalWholeNumber {
+public class ElixirDecimalDigitsImpl extends ASTWrapperPsiElement implements ElixirDecimalDigits {
 
-  public ElixirDecimalWholeNumberImpl(ASTNode node) {
+  public ElixirDecimalDigitsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDecimalWholeNumber(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDecimalDigits(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirDecimalDigits> getDecimalDigitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDecimalDigits.class);
   }
 
   @NotNull
@@ -33,14 +29,18 @@ public class ElixirDecimalWholeNumberImpl extends ElixirNumberImpl implements El
     return ElixirPsiImplUtil.base(this);
   }
 
-  @NotNull
-  public List<Digits> digitsList() {
-    return ElixirPsiImplUtil.digitsList(this);
+  public boolean inBase() {
+    return ElixirPsiImplUtil.inBase(this);
   }
 
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public IElementType validElementType() {
+    return ElixirPsiImplUtil.validElementType(this);
   }
 
 }

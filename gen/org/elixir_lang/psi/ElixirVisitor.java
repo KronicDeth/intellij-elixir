@@ -73,6 +73,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
+    visitDigits(o);
+  }
+
   public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
     visitDecimalNumber(o);
   }
@@ -83,6 +87,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
     visitNumber(o);
+    // visitWholeNumber(o);
   }
 
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {

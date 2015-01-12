@@ -24,6 +24,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
   IElementType CHAR_LIST_HEREDOC_LINE_WHITESPACE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE_WHITESPACE");
   IElementType CHAR_LIST_HEREDOC_PREFIX = new ElixirElementType("CHAR_LIST_HEREDOC_PREFIX");
+  IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
@@ -236,6 +237,9 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_HEREDOC_PREFIX) {
         return new ElixirCharListHeredocPrefixImpl(node);
+      }
+      else if (type == DECIMAL_DIGITS) {
+        return new ElixirDecimalDigitsImpl(node);
       }
       else if (type == DECIMAL_FLOAT) {
         return new ElixirDecimalFloatImpl(node);
