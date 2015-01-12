@@ -13,7 +13,7 @@ public class CharListParsingTestCase extends ParsingTestCase {
     }
 
     public void testInterpolation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultiline() {

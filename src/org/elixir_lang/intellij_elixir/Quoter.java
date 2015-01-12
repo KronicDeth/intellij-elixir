@@ -113,32 +113,78 @@ public class Quoter {
 
     @NotNull
     public static OtpErlangObject elixirCharList(@NotNull final List<Integer> codePointList) {
-        OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
-        boolean isASCIIPrintable = true;
+        OtpErlangList elixirCodePointList = elixirCodePointList(codePointList);
 
-        int i = 0;
-        for (int codePoint : codePointList) {
-            isASCIIPrintable = isASCIIPrintable && erlangPrintable(codePoint);
-            erlangCodePoints[i++] = new OtpErlangLong(codePoint);
-        }
-
-        OtpErlangList codePointErlangList = new OtpErlangList(erlangCodePoints);
+        return elixirCharList(elixirCodePointList);
+    }
+    
+    /*
+     * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
+     * points.
+     * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
+     * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
+     * of OtpErlangList and do the same.
+     */
+    @NotNull
+    public static OtpErlangObject elixirCharList(@NotNull final OtpErlangList erlangList) {
         OtpErlangObject charList;
 
         /* JInterface will return an OtpErlangString in some case and an OtpErlangList in other.  Right now, I'm
            assuming it works similar to the printing in `iex` and is based on whether the codePoint is printable, but
            ASCII printable instead of Unicode printable since Erlang is ASCII/LATIN-1 based */
-        if (isASCIIPrintable)  {
+        if (isErlangPrintable(erlangList))  {
             try {
-                charList = new OtpErlangString(codePointErlangList);
+                charList = new OtpErlangString(erlangList);
             } catch (OtpErlangException e) {
                 throw new NotImplementedException(e);
             }
         } else {
-            charList = codePointErlangList;
+            charList = erlangList;
         }
 
         return charList;
+    }
+
+    @NotNull
+    public static OtpErlangList elixirCodePointList(@NotNull final List<Integer> codePointList) {
+        OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
+
+        int i = 0;
+        for (int codePoint : codePointList) {
+            erlangCodePoints[i++] = new OtpErlangLong(codePoint);
+        }
+
+        return new OtpErlangList(erlangCodePoints);
+    }
+
+    public static boolean isErlangPrintable(@NotNull final OtpErlangList erlangList) {
+        boolean isErlangPrintable = true;
+
+        for (OtpErlangObject erlangObject : erlangList) {
+
+            if (erlangObject instanceof OtpErlangLong) {
+                OtpErlangLong erlangLong = (OtpErlangLong) erlangObject;
+
+                final int codePoint;
+
+                try {
+                    codePoint = erlangLong.intValue();
+                } catch (OtpErlangRangeException e) {
+                    isErlangPrintable = false;
+                    break;
+                }
+
+                if (!isErlangPrintable(codePoint)) {
+                    isErlangPrintable = false;
+                    break;
+                }
+            } else {
+                isErlangPrintable = false;
+                break;
+            }
+        }
+
+        return isErlangPrintable;
     }
 
     @NotNull
@@ -160,7 +206,7 @@ public class Quoter {
 
     // `for codePoint <- 0..255, :io_lib.printable_list([codePoint]), do: IO.puts codePoint`
     @Contract(pure = true)
-    public static boolean erlangPrintable(int codePoint) {
+    public static boolean isErlangPrintable(int codePoint) {
         return (codePoint >= 8 && codePoint <= 13) ||
                 codePoint == 27 ||
                 (codePoint >= 32 && codePoint <= 126) ||

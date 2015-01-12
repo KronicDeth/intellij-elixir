@@ -620,7 +620,7 @@ public class ElixirPsiImplUtil {
 
                 OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", interpolatedCharListBodyMetadata, quotedStringElements);
                 quoted = quotedFunctionCall(
-                        "String",
+                        "Elixir.String",
                         "to_char_list",
                         interpolatedCharListBodyMetadata,
                         binaryConstruction
@@ -765,7 +765,15 @@ public class ElixirPsiImplUtil {
         if (arguments.length == 0) {
             quoted = NIL;
         } else {
-            quoted = new OtpErlangList(arguments);
+            OtpErlangList erlangList = new OtpErlangList(arguments);
+            /*
+             * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
+             * points.
+             * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
+             * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
+             * of OtpErlangList and do the same.
+             */
+            quoted = elixirCharList(erlangList);
         }
 
         return quoted;
