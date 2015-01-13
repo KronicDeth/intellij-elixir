@@ -20,8 +20,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAtom(@NotNull ElixirAtom o) {
-    visitMaxExpression(o);
-    // visitQuotable(o);
+    visitQuotable(o);
   }
 
   public void visitBinaryDigits(@NotNull ElixirBinaryDigits o) {
@@ -175,10 +174,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitMaxExpression(@NotNull ElixirMaxExpression o) {
-    visitPsiElement(o);
-  }
-
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
     visitPsiElement(o);
   }
@@ -217,7 +212,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQualifiedAlias(@NotNull ElixirQualifiedAlias o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitQualifiedIdentifier(@NotNull ElixirQualifiedIdentifier o) {

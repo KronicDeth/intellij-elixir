@@ -15,6 +15,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
 
   @NotNull
+  List<ElixirAtom> getAtomList();
+
+  @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
 
   @NotNull
@@ -48,9 +51,6 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirMaxExpression> getMaxExpressionList();
-
-  @NotNull
   List<ElixirNoParenthesesCall> getNoParenthesesCallList();
 
   @NotNull
@@ -58,6 +58,9 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirSigil> getSigilList();

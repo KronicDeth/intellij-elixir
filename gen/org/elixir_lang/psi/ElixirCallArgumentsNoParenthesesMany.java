@@ -10,6 +10,9 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
   @NotNull
   List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
 
+  @NotNull
+  List<ElixirAtom> getAtomList();
+
   @Nullable
   ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords();
 
@@ -44,9 +47,6 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirMaxExpression> getMaxExpressionList();
-
-  @NotNull
   List<ElixirNoParenthesesCall> getNoParenthesesCallList();
 
   @NotNull
@@ -57,6 +57,9 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
 
   @NotNull
   List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirSigil> getSigilList();

@@ -29,6 +29,12 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   }
 
   @Override
+  @NotNull
+  public List<ElixirAtom> getAtomList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
+  }
+
+  @Override
   @Nullable
   public ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords() {
     return findChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
@@ -96,12 +102,6 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirMaxExpression> getMaxExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMaxExpression.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
   }
@@ -122,6 +122,12 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   @NotNull
   public List<ElixirNumber> getNumberList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirQualifiedAlias> getQualifiedAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQualifiedAlias.class);
   }
 
   @Override

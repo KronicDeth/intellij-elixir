@@ -11,6 +11,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
 
   @Nullable
+  ElixirAtom getAtom();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull
@@ -44,9 +47,6 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirMaxExpression getMaxExpression();
-
-  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
@@ -54,6 +54,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
 
   @Nullable
   ElixirNumber getNumber();
+
+  @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirSigil getSigil();

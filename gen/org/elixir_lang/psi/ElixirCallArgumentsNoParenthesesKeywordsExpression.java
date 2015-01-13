@@ -11,6 +11,9 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
 
   @Nullable
+  ElixirAtom getAtom();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @Nullable
@@ -44,9 +47,6 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirMaxExpression getMaxExpression();
-
-  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
@@ -57,6 +57,9 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
 
   @Nullable
   ElixirNumber getNumber();
+
+  @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirSigil getSigil();

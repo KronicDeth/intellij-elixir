@@ -49,7 +49,6 @@ public interface ElixirTypes {
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_UNARY_OPERATION = new ElixirElementType("MATCHED_UNARY_OPERATION");
-  IElementType MAX_EXPRESSION = new ElixirElementType("MAX_EXPRESSION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_CALL = new ElixirElementType("NO_PARENTHESES_CALL");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
@@ -312,9 +311,6 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_UNARY_OPERATION) {
         return new ElixirMatchedUnaryOperationImpl(node);
-      }
-      else if (type == MAX_EXPRESSION) {
-        return new ElixirMaxExpressionImpl(node);
       }
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);

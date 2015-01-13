@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirAtom extends ElixirMaxExpression, Quotable {
+public interface ElixirAtom extends Quotable {
 
   @Nullable
   ElixirCharList getCharList();

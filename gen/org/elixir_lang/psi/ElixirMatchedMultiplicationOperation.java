@@ -11,6 +11,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
 
   @NotNull
+  List<ElixirAtom> getAtomList();
+
+  @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
 
   @NotNull
@@ -41,9 +44,6 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirMaxExpression> getMaxExpressionList();
-
-  @NotNull
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
   @NotNull
@@ -54,6 +54,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
 
   @NotNull
   List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirSigil> getSigilList();

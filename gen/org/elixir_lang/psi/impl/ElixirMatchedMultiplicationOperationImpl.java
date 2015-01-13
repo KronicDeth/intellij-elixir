@@ -30,6 +30,12 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
+  public List<ElixirAtom> getAtomList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureCharTokenOrNumberOperation.class);
   }
@@ -90,12 +96,6 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirMaxExpression> getMaxExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMaxExpression.class);
-  }
-
-  @Override
-  @NotNull
   public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
     return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
   }
@@ -116,6 +116,12 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   @NotNull
   public List<ElixirNumber> getNumberList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirQualifiedAlias> getQualifiedAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQualifiedAlias.class);
   }
 
   @Override

@@ -11,6 +11,9 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
 
   @NotNull
+  List<ElixirAtom> getAtomList();
+
+  @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
 
   @NotNull
@@ -41,9 +44,6 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirMaxExpression> getMaxExpressionList();
-
-  @NotNull
   List<ElixirNoParenthesesCall> getNoParenthesesCallList();
 
   @NotNull
@@ -51,6 +51,9 @@ public interface ElixirMatchedHatOperation extends PsiElement {
 
   @NotNull
   List<ElixirNumber> getNumberList();
+
+  @NotNull
+  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirSigil> getSigilList();

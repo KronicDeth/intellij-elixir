@@ -14,6 +14,9 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
+  ElixirAtom getAtom();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @Nullable
@@ -35,9 +38,6 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirMaxExpression getMaxExpression();
-
-  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
@@ -45,6 +45,9 @@ public interface ElixirMatchedAtOperation extends PsiElement {
 
   @Nullable
   ElixirNumber getNumber();
+
+  @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirSigil getSigil();

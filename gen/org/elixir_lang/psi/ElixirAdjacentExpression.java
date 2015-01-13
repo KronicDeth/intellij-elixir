@@ -11,6 +11,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
 
   @Nullable
+  ElixirAtom getAtom();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @Nullable
@@ -41,9 +44,6 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirMaxExpression getMaxExpression();
-
-  @Nullable
   ElixirNoParenthesesCall getNoParenthesesCall();
 
   @Nullable
@@ -51,6 +51,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
 
   @Nullable
   ElixirNumber getNumber();
+
+  @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirSigil getSigil();

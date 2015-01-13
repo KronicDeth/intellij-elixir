@@ -4,8 +4,9 @@ package org.elixir_lang.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirQualifiedAlias extends PsiElement {
+public interface ElixirQualifiedAlias extends Quotable {
 
   @Nullable
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
@@ -45,5 +46,8 @@ public interface ElixirQualifiedAlias extends PsiElement {
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

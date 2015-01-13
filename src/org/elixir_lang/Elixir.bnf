@@ -145,7 +145,7 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
 adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
-         { extends = maxExpression implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private binaryString ::= string | stringHeredoc
 private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
@@ -338,6 +338,7 @@ private middleQualifier ::= binaryString |
                            IDENTIFIER |
                            ALIAS
 qualifiedAlias ::= qualifier ALIAS
+                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private matchedExpression ::= noParenthesesOneExpression |
                               accessExpression
@@ -368,9 +369,9 @@ unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
    Elixir.flex's NUMBER and CHAR_TOKEN. */
 private numeric ::= CHAR_TOKEN | number
 
-maxExpression ::= qualifiedAlias |
-                  // Must be after qualifiedAlias because atom can start qualifiedAlias
-                  atom
+private maxExpression ::= qualifiedAlias |
+                          // Must be after qualifiedAlias because atom can start qualifiedAlias
+                          atom
 
 /* Special class for wrapping rules so that
    {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for

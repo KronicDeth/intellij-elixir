@@ -330,12 +330,30 @@ public class ElixirPsiImplUtil {
         return document(element).getLineNumber(textOffset);
     }
 
+    public static OtpErlangTuple lineNumberKeywordTuple(PsiElement element) {
+        return keywordTuple(
+                "line",
+                // Elixir metadata lines are 1-indexed while getLineNumber is 0-indexed
+                lineNumber(element) + 1
+        );
+    }
+
     public static OtpErlangList metadata(PsiElement element) {
         final OtpErlangObject[] keywordListElements = {
-                keywordTuple(
-                        "line",
-                        // Elixir metadata lines are 1-indexed while getLineNumber is 0-indexed
-                        lineNumber(element) + 1)
+                lineNumberKeywordTuple(element)
+        };
+
+        return new OtpErlangList(keywordListElements);
+    }
+
+    /* TODO determine what counter means in Code.string_to_quoted("Foo")
+       {:ok, {:__aliases__, [counter: 0, line: 1], [:Foo]}} */
+    public static OtpErlangList metadata(PsiElement element, int counter) {
+        /* KeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
+           same order than detect a OtpErlangList is a KeywordList */
+        final OtpErlangObject[] keywordListElements = {
+                keywordTuple("counter", counter),
+                lineNumberKeywordTuple(element)
         };
 
         return new OtpErlangList(keywordListElements);
@@ -745,6 +763,36 @@ public class ElixirPsiImplUtil {
         ElixirInterpolatedStringBody interpolatedStringBody = string.getInterpolatedStringBody();
 
         return interpolatedStringBody.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirQualifiedAlias qualifiedAlias) {
+        ASTNode[] children = qualifiedAlias.getNode().getChildren(null);
+
+        if (children.length != 1) {
+            throw new NotImplementedException("Don't know how to quote qualifiedAlias with qualifier");
+        }
+
+        OtpErlangObject quoted;
+
+        ASTNode child = children[0];
+
+        IElementType elementType = child.getElementType();
+
+        if (elementType == ElixirTypes.ALIAS) {
+            quoted = quotedFunctionCall(
+                    "__aliases__",
+                    metadata(qualifiedAlias, 0),
+                    new OtpErlangAtom(
+                            child.getText()
+                    )
+            );
+        } else {
+            throw new NotImplementedException("Don't know how to quote non-Alias");
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)

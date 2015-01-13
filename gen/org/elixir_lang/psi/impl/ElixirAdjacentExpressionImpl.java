@@ -30,6 +30,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
     return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
   }
@@ -90,12 +96,6 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirMaxExpression getMaxExpression() {
-    return findChildByClass(ElixirMaxExpression.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirNoParenthesesCall getNoParenthesesCall() {
     return findChildByClass(ElixirNoParenthesesCall.class);
   }
@@ -110,6 +110,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirQualifiedAlias getQualifiedAlias() {
+    return findChildByClass(ElixirQualifiedAlias.class);
   }
 
   @Override

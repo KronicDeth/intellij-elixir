@@ -9,7 +9,8 @@ public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testInvalidDigits() {
-        doTest(true);
+        // No QuotedAroundError because InvalidDigits is valid Alias
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testValidDigits() {

@@ -145,9 +145,6 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_UNARY_OPERATION) {
       r = matchedUnaryOperation(b, 0);
     }
-    else if (t == MAX_EXPRESSION) {
-      r = maxExpression(b, 0);
-    }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
     }
@@ -210,7 +207,6 @@ public class ElixirParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(ATOM, MAX_EXPRESSION),
     create_token_set_(DECIMAL_FLOAT, DECIMAL_NUMBER),
     create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
       HEXADECIMAL_WHOLE_NUMBER, NUMBER, OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
@@ -2368,15 +2364,15 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // qualifiedAlias |
-  //                   // Must be after qualifiedAlias because atom can start qualifiedAlias
-  //                   atom
-  public static boolean maxExpression(PsiBuilder b, int l) {
+  //                           // Must be after qualifiedAlias because atom can start qualifiedAlias
+  //                           atom
+  static boolean maxExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxExpression")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, "<max expression>");
+    Marker m = enter_section_(b);
     r = qualifiedAlias(b, l + 1);
     if (!r) r = atom(b, l + 1);
-    exit_section_(b, l, m, MAX_EXPRESSION, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 
