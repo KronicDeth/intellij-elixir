@@ -13,7 +13,7 @@ public class StringParsingTestCase extends ParsingTestCase {
     }
 
     public void testInterpolation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     /* Tests that '#' for comments and '#' for interpolation are treated differently.  Covers bug reported in
