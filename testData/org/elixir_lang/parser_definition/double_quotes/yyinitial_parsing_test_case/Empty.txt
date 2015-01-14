@@ -1,6 +1,6 @@
 Elixir File(0,2)
-  ElixirMatchedExpressionImpl(MATCHED_EXPRESSION)(0,2)
-    ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
-      ElixirStringImpl(STRING)(0,2)
-        PsiElement(ElixirTokenType.STRING_PROMOTER)('"')(0,1)
-        PsiElement(ElixirTokenType.STRING_TERMINATOR)('"')(1,2)
+  ElixirStringImpl(STRING)(0,2)
+    PsiElement(ElixirTokenType.STRING_PROMOTER)('"')(0,1)
+    ElixirInterpolatedStringBodyImpl(INTERPOLATED_STRING_BODY)(1,1)
+      <empty list>
+    PsiElement(ElixirTokenType.STRING_TERMINATOR)('"')(1,2)
