@@ -64,6 +64,33 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
  *
+ * Quotes
+ *
+ */
+
+/*
+ * CharList
+ */
+
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
+                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+charList ::= CHAR_LIST_PROMOTER
+             interpolatedCharListBody
+             CHAR_LIST_TERMINATOR
+             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * String
+ */
+
+interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+string ::= STRING_PROMOTER
+           interpolatedStringBody
+           STRING_TERMINATOR { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ *
  * Whole Numbers
  *
  *
@@ -139,7 +166,9 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
                      }
 
 /*
+ *
  * In alphabetical order
+ *
  */
 
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
@@ -170,10 +199,6 @@ callArgumentsNoParenthesesMany ::= matchedNonNumericCaptureExpression infixComma
                                    callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
                                                  noParenthesesStrict
-charList ::= CHAR_LIST_PROMOTER
-             interpolatedCharListBody
-             CHAR_LIST_TERMINATOR
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     charListHeredocLine*
                     charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
@@ -204,8 +229,7 @@ private infixSemicolon ::= EOL* SEMICOLON EOL*
 private expression ::= matchedNonNumericCaptureExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                              interpolatedCharListBody
                                              CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
@@ -226,8 +250,6 @@ private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequen
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -418,9 +440,7 @@ sigil ::= interpolatedCharListSigil |
           literalSigil |
           literalStringSigil |
           literalWords
-string ::= STRING_PROMOTER
-           interpolatedStringBody
-           STRING_TERMINATOR { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   interpolatedStringBody
                   STRING_HEREDOC_TERMINATOR
