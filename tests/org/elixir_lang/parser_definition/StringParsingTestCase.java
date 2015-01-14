@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class StringParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEscapeSequences() {
