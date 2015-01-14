@@ -23,9 +23,6 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirCharListHeredoc getCharListHeredoc();
 
   @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
-
-  @Nullable
   ElixirList getList();
 
   @Nullable
@@ -44,10 +41,16 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirNoParenthesesCall getNoParenthesesCall();
+  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
 
   @Nullable
-  ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();

@@ -27,9 +27,6 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
-  List<ElixirEmptyParentheses> getEmptyParenthesesList();
-
-  @NotNull
   List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
@@ -51,10 +48,16 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirNoParenthesesCall> getNoParenthesesCallList();
+  List<ElixirNoParenthesesManyArgumentsQualifiedCall> getNoParenthesesManyArgumentsQualifiedCallList();
 
   @NotNull
-  List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+  List<ElixirNoParenthesesManyArgumentsUnqualifiedCall> getNoParenthesesManyArgumentsUnqualifiedCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();

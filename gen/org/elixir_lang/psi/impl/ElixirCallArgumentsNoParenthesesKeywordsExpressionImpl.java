@@ -102,20 +102,20 @@ public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTW
 
   @Override
   @Nullable
-  public ElixirNoParenthesesCall getNoParenthesesCall() {
-    return findChildByClass(ElixirNoParenthesesCall.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
     return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
   @Override
   @Nullable
-  public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
-    return findChildByClass(ElixirNoParenthesesOneExpression.class);
+  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
   }
 
   @Override

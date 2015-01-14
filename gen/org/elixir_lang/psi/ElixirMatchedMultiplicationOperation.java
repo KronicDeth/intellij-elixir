@@ -23,9 +23,6 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
-  List<ElixirEmptyParentheses> getEmptyParenthesesList();
-
-  @NotNull
   List<ElixirList> getListList();
 
   @NotNull
@@ -46,11 +43,17 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   @NotNull
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
-  @NotNull
-  List<ElixirNoParenthesesCall> getNoParenthesesCallList();
+  @Nullable
+  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
   @NotNull
-  List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+  List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();

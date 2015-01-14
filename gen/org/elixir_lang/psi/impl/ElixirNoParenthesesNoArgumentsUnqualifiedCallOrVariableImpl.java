@@ -11,21 +11,15 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirNoParenthesesOneExpressionImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesOneExpression {
+public class ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable {
 
-  public ElixirNoParenthesesOneExpressionImpl(ASTNode node) {
+  public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesOneExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesNoArgumentsUnqualifiedCallOrVariable(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public ElixirQualifiedIdentifier getQualifiedIdentifier() {
-    return findNotNullChildByClass(ElixirQualifiedIdentifier.class);
   }
 
 }

@@ -23,9 +23,15 @@ public class ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl extends AS
   }
 
   @Override
-  @NotNull
-  public ElixirNoParenthesesCall getNoParenthesesCall() {
-    return findNotNullChildByClass(ElixirNoParenthesesCall.class);
+  @Nullable
+  public ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
   }
 
 }

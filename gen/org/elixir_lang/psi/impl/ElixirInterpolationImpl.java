@@ -61,12 +61,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirEndOfExpression> getEndOfExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
   }
@@ -109,14 +103,26 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
+  public List<ElixirNoParenthesesManyArgumentsQualifiedCall> getNoParenthesesManyArgumentsQualifiedCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyArgumentsQualifiedCall.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesOneExpression.class);
+  public List<ElixirNoParenthesesManyArgumentsUnqualifiedCall> getNoParenthesesManyArgumentsUnqualifiedCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
   }
 
   @Override

@@ -7,7 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface ElixirNoParenthesesManyStrictNoParenthesesExpression extends PsiElement {
 
-  @NotNull
-  ElixirNoParenthesesCall getNoParenthesesCall();
+  @Nullable
+  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
 }

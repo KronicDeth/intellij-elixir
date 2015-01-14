@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirQualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirQualifiedIdentifier {
+public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsQualifiedCall {
 
-  public ElixirQualifiedIdentifierImpl(ASTNode node) {
+  public ElixirNoParenthesesManyArgumentsQualifiedCallImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitQualifiedIdentifier(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsQualifiedCall(this);
     else super.accept(visitor);
   }
 
@@ -30,14 +30,14 @@ public class ElixirQualifiedIdentifierImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
-  public ElixirAtPrefixOperator getAtPrefixOperator() {
-    return findChildByClass(ElixirAtPrefixOperator.class);
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
   }
 
   @Override
   @Nullable
-  public ElixirAtom getAtom() {
-    return findChildByClass(ElixirAtom.class);
+  public ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany() {
+    return findChildByClass(ElixirCallArgumentsNoParenthesesMany.class);
   }
 
   @Override
@@ -60,8 +60,8 @@ public class ElixirQualifiedIdentifierImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirInfixDotOperator> getInfixDotOperatorList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInfixDotOperator.class);
+  public ElixirInfixDotOperator getInfixDotOperator() {
+    return findNotNullChildByClass(ElixirInfixDotOperator.class);
   }
 
   @Override
@@ -72,8 +72,50 @@ public class ElixirQualifiedIdentifierImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirMatchedAtOperation getMatchedAtOperation() {
+    return findChildByClass(ElixirMatchedAtOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedUnaryOperation getMatchedUnaryOperation() {
+    return findChildByClass(ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesStrict getNoParenthesesStrict() {
+    return findChildByClass(ElixirNoParenthesesStrict.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirQualifiedAlias getQualifiedAlias() {
+    return findChildByClass(ElixirQualifiedAlias.class);
   }
 
   @Override

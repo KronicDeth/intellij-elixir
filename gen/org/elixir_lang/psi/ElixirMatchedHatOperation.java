@@ -23,9 +23,6 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
-  List<ElixirEmptyParentheses> getEmptyParenthesesList();
-
-  @NotNull
   ElixirHatInfixOperator getHatInfixOperator();
 
   @NotNull
@@ -43,11 +40,17 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   @NotNull
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
-  @NotNull
-  List<ElixirNoParenthesesCall> getNoParenthesesCallList();
+  @Nullable
+  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
   @NotNull
-  List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+  List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();

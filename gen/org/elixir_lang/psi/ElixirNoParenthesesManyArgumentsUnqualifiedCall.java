@@ -5,15 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirNoParenthesesCall extends PsiElement {
+public interface ElixirNoParenthesesManyArgumentsUnqualifiedCall extends PsiElement {
 
   @Nullable
   ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();
-
-  @NotNull
-  ElixirQualifiedIdentifier getQualifiedIdentifier();
 
 }

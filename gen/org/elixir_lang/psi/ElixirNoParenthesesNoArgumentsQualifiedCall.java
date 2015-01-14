@@ -5,13 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirQualifiedIdentifier extends PsiElement {
+public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement {
 
   @Nullable
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
-
-  @Nullable
-  ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
   ElixirAtom getAtom();
@@ -26,10 +23,25 @@ public interface ElixirQualifiedIdentifier extends PsiElement {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
-  List<ElixirInfixDotOperator> getInfixDotOperatorList();
+  ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
   ElixirList getList();
+
+  @Nullable
+  ElixirMatchedAtOperation getMatchedAtOperation();
+
+  @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+
+  @Nullable
+  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();

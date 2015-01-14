@@ -47,13 +47,13 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
 
   @NotNull
-  List<ElixirNoParenthesesCall> getNoParenthesesCallList();
-
-  @NotNull
   List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
 
   @NotNull
-  List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList();
+  List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList();
+
+  @NotNull
+  List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();

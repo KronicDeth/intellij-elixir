@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirNoParenthesesCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesCall {
+public class ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsUnqualifiedCall {
 
-  public ElixirNoParenthesesCallImpl(ASTNode node) {
+  public ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsUnqualifiedCall(this);
     else super.accept(visitor);
   }
 
@@ -32,12 +32,6 @@ public class ElixirNoParenthesesCallImpl extends ASTWrapperPsiElement implements
   @Nullable
   public ElixirNoParenthesesStrict getNoParenthesesStrict() {
     return findChildByClass(ElixirNoParenthesesStrict.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirQualifiedIdentifier getQualifiedIdentifier() {
-    return findNotNullChildByClass(ElixirQualifiedIdentifier.class);
   }
 
 }

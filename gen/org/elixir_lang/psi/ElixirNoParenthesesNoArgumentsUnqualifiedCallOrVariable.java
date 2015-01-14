@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirNoParenthesesOneExpression extends PsiElement {
-
-  @NotNull
-  ElixirQualifiedIdentifier getQualifiedIdentifier();
+public interface ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable extends PsiElement {
 
 }

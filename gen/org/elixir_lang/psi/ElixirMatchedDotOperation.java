@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirQualifiedAlias extends PsiElement {
+public interface ElixirMatchedDotOperation extends PsiElement {
 
   @Nullable
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
@@ -16,11 +16,11 @@ public interface ElixirQualifiedAlias extends PsiElement {
   @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
-  @Nullable
-  ElixirCharList getCharList();
+  @NotNull
+  List<ElixirCharList> getCharListList();
 
-  @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
   ElixirInfixDotOperator getInfixDotOperator();
@@ -49,11 +49,11 @@ public interface ElixirQualifiedAlias extends PsiElement {
   @Nullable
   ElixirSigil getSigil();
 
-  @Nullable
-  ElixirString getString();
+  @NotNull
+  List<ElixirString> getStringList();
 
-  @Nullable
-  ElixirStringHeredoc getStringHeredoc();
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();

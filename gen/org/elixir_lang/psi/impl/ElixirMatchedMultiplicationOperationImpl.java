@@ -54,12 +54,6 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirList> getListList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirList.class);
   }
@@ -101,15 +95,27 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @NotNull
-  public List<ElixirNoParenthesesCall> getNoParenthesesCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesCall.class);
+  @Nullable
+  public ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirNoParenthesesOneExpression> getNoParenthesesOneExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesOneExpression.class);
+  public List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
   }
 
   @Override

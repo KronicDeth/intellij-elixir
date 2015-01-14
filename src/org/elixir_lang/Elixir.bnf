@@ -63,6 +63,131 @@
 elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
+ * Expression List
+ */
+
+private infixSemicolon ::= EOL* SEMICOLON EOL*
+// Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
+endOfExpression ::= infixSemicolon | EOL
+private expression ::= noParenthesesManyArgumentsCall |
+                       matchedExpression
+private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
+
+/*
+ *
+ *
+ * Function Calls
+ *
+ *
+ */
+
+
+/* The Elixir native lexer converts Strings, CharLists and keywords (false, nil, true) to ALIAS/IDENTIFIER as needed.
+   Elixir.flex doesn't do that, so have to list those tokens/rules that would be converted to ALIAS/IDENTIFIER here */
+private matchedDotIdentifierOperand ::= IDENTIFIER |
+                                        FALSE |
+                                        NIL |
+                                        TRUE |
+                                        binaryString |
+                                        listString
+
+
+/*
+ *
+ * No Parentheses
+ *
+ */
+
+/*
+ * Many Arguments
+ */
+
+noParenthesesManyArgumentsUnqualifiedCall ::= IDENTIFIER callArgumentsNoParenthesesManyStrict
+
+private noParenthesesManyArgumentsQualifiedExpression ::= matchedDotExpression noParenthesesManyArgumentsQualifiedCall
+left noParenthesesManyArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand callArgumentsNoParenthesesManyStrict
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
+private noParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsQualifiedExpression | noParenthesesManyArgumentsUnqualifiedCall
+
+/*
+ * 0 Arguments
+ */
+
+left noParenthesesNoArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand
+noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
+
+/*
+ * Matched Expressions - ordered by outer-most (lowest precedence) to inner-most (highest precedence)
+ */
+
+private matchedExpression ::= matchedNonNumericCaptureExpression
+
+// non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
+capturePrefixOperator ::= CAPTURE_OPERATOR EOL* { name = "&" }
+private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
+private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
+private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation | matchedMultiplicationExpression
+matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator (noParenthesesManyArgumentsCall | matchedNonNumericCaptureOperand)
+
+// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
+multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL* { name = "*, /" }
+private matchedMultiplicationExpression ::= matchedMultiplicationLeftOperand matchedMultiplicationOperation*
+private matchedMultiplicationLeftOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
+private matchedMultiplicationRightOperand ::= noParenthesesManyArgumentsCall | matchedMultiplicationLeftOperand
+left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMultiplicationRightOperand
+
+// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
+hatInfixOperator ::= EOL* HAT_OPERATOR EOL* { name = "^^^" }
+private matchedHatExpression ::= matchedHatLeftOperand matchedHatOperation*
+private matchedHatLeftOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression
+private matchedHatRightOperand ::= noParenthesesManyArgumentsCall | matchedHatLeftOperand
+left matchedHatOperation ::= hatInfixOperator matchedHatRightOperand
+
+// non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67)
+unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* { name = "+, -, !, ^, not, ~~~" }
+private matchedUnaryExpression ::= matchedUnaryOperation | matchedUnaryOperand
+private matchedUnaryOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | matchedDotExpression
+matchedUnaryOperation ::= unaryPrefixOperator (noParenthesesManyArgumentsCall | matchedUnaryOperand)
+
+// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
+infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
+private matchedDotExpression ::= matchedDotLeftOperand (matchedDotOperation* matchedDotRightMostOperation)?
+private matchedDotLeftOperand ::= matchedAtExpression
+private matchedDotRightOperand ::= (
+                                    ALIAS |
+                                    IDENTIFIER |
+                                    FALSE |
+                                    NIL |
+                                    TRUE |
+                                    binaryString |
+                                    listString
+                                   ) &infixDotOperator
+left matchedDotOperation ::= infixDotOperator matchedDotRightOperand
+private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedCall | qualifiedAlias
+left qualifiedAlias ::= infixDotOperator ALIAS
+
+// non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
+atPrefixOperator ::= AT_OPERATOR EOL* { name = "@" }
+private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
+private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
+
+private accessExpression ::= atCharTokenOrNumberOperation |
+                             captureCharTokenOrNumberOperation |
+                             unaryCharTokenOrNumberOperation |
+                             OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
+                             numeric |
+                             list |
+                             binaryString |
+                             listString |
+                             sigil |
+                             FALSE |
+                             NIL |
+                             TRUE |
+                             atom
+
+/*
  *
  * Quotes
  *
@@ -177,7 +302,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private binaryString ::= string | stringHeredoc
-private callArgumentsNoParenthesesCommaExpression ::= matchedNonNumericCaptureExpression (infixComma callArgumentsNoParenthesesExpression)+
+private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
@@ -189,13 +314,13 @@ private callArgumentsNoParenthesesExpression ::= emptyParentheses |
                                                  /* This will be marked as an error by
                                                     {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
                                                  noParenthesesManyStrictNoParenthesesExpression |
-                                                 matchedNonNumericCaptureExpression !KEYWORD_PAIR_COLON
+                                                 matchedExpression !KEYWORD_PAIR_COLON
 callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (infixComma callArgumentsNoParenthesesKeywordsExpression)*
 callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
-callArgumentsNoParenthesesMany ::= matchedNonNumericCaptureExpression infixComma callArgumentsNoParenthesesKeywords |
+callArgumentsNoParenthesesMany ::= matchedExpression infixComma callArgumentsNoParenthesesKeywords |
                                    callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
                                                  noParenthesesStrict
@@ -223,11 +348,6 @@ openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
 escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
-// Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
-endOfExpression ::= infixSemicolon | EOL
-private infixSemicolon ::= EOL* SEMICOLON EOL*
-private expression ::= matchedNonNumericCaptureExpression
-private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 
 private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
@@ -307,82 +427,6 @@ private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROM
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
 private literalWordsBody ::= WORDS_FRAGMENT*
 
-// non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
-capturePrefixOperator ::= CAPTURE_OPERATOR EOL* { name = "&" }
-private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
-private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
-private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation | matchedMultiplicationExpression
-matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
-multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL* { name = "*, /" }
-private matchedMultiplicationExpression ::= matchedMultiplicationOperand matchedMultiplicationOperation*
-private matchedMultiplicationOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
-left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMultiplicationOperand
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
-hatInfixOperator ::= EOL* HAT_OPERATOR EOL* { name = "^^^" }
-private matchedHatExpression ::= matchedHatOperand matchedHatOperation*
-private matchedHatOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression
-left matchedHatOperation ::= hatInfixOperator matchedHatOperand
-
-// non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67)
-unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* { name = "+, -, !, ^, not, ~~~" }
-private matchedUnaryExpression ::= matchedUnaryOperation | matchedUnaryOperand
-private matchedUnaryOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | matchedAtExpression
-matchedUnaryOperation ::= unaryPrefixOperator matchedUnaryOperand
-
-// non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
-atPrefixOperator ::= AT_OPERATOR EOL* { name = "@" }
-private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
-private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | tailExpression | matchedExpression
-matchedAtOperation ::= atPrefixOperator matchedAtOperand
-
-// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
-infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
-private headQualifier ::= atPrefixOperator (ALIAS | IDENTIFIER) |
-                          atCharTokenOrNumberOperation |
-                          captureCharTokenOrNumberOperation |
-                          unaryCharTokenOrNumberOperation |
-                          OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-                          numeric |
-                          list |
-                          sigil |
-                          atom
-qualifiedIdentifier ::= qualifier IDENTIFIER
-private qualifier ::= (headQualifier infixDotOperator)? (middleQualifier infixDotOperator)*
-// TODO add operators
-private middleQualifier ::= binaryString |
-                           listString |
-                           FALSE |
-                           NIL |
-                           TRUE |
-                           IDENTIFIER |
-                           ALIAS
-qualifiedAlias ::= qualifier ALIAS
-                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-private matchedExpression ::= noParenthesesOneExpression |
-                              accessExpression
-private tailExpression ::= emptyParentheses |
-                           noParenthesesCall
-
-noParenthesesOneExpression ::= qualifiedIdentifier !callArgumentsNoParenthesesManyStrict
-private accessExpression ::= atCharTokenOrNumberOperation |
-                             captureCharTokenOrNumberOperation |
-                             unaryCharTokenOrNumberOperation |
-                             OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
-                             numeric |
-                             list |
-                             binaryString |
-                             listString |
-                             sigil |
-                             FALSE |
-                             NIL |
-                             TRUE |
-                             maxExpression
-noParenthesesCall ::= qualifiedIdentifier callArgumentsNoParenthesesManyStrict
-
 atCharTokenOrNumberOperation ::= atPrefixOperator numeric
 captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
 unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
@@ -390,10 +434,6 @@ unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
 /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's NUMBER and CHAR_TOKEN. */
 private numeric ::= CHAR_TOKEN | number
-
-private maxExpression ::= qualifiedAlias |
-                          // Must be after qualifiedAlias because atom can start qualifiedAlias
-                          atom
 
 /* Special class for wrapping rules so that
    {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
@@ -408,7 +448,7 @@ noParenthesesStrict ::= emptyParentheses |
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
    ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
    ElixirNoParenthesesCall. */
-noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesCall
+noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesManyArgumentsCall
 
 //noParenthesesOneExpression ::= dotIdentifier
 

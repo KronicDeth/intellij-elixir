@@ -26,9 +26,6 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirCharListHeredoc getCharListHeredoc();
 
   @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
-
-  @Nullable
   ElixirList getList();
 
   @Nullable
@@ -38,16 +35,16 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirNoParenthesesCall getNoParenthesesCall();
+  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
 
   @Nullable
-  ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirSigil getSigil();

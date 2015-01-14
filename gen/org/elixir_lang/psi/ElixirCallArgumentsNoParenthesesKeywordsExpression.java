@@ -47,13 +47,13 @@ public interface ElixirCallArgumentsNoParenthesesKeywordsExpression extends PsiE
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
-  ElixirNoParenthesesCall getNoParenthesesCall();
-
-  @Nullable
   ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
   @Nullable
-  ElixirNoParenthesesOneExpression getNoParenthesesOneExpression();
+  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();

@@ -60,12 +60,6 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }
@@ -102,14 +96,26 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
-  public ElixirNoParenthesesCall getNoParenthesesCall() {
-    return findChildByClass(ElixirNoParenthesesCall.class);
+  public ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsQualifiedCall.class);
   }
 
   @Override
   @Nullable
-  public ElixirNoParenthesesOneExpression getNoParenthesesOneExpression() {
-    return findChildByClass(ElixirNoParenthesesOneExpression.class);
+  public ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
   }
 
   @Override

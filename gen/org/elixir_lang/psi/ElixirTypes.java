@@ -45,21 +45,23 @@ public interface ElixirTypes {
   IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
   IElementType MATCHED_AT_OPERATION = new ElixirElementType("MATCHED_AT_OPERATION");
+  IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_UNARY_OPERATION = new ElixirElementType("MATCHED_UNARY_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
-  IElementType NO_PARENTHESES_CALL = new ElixirElementType("NO_PARENTHESES_CALL");
+  IElementType NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL");
+  IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
-  IElementType NO_PARENTHESES_ONE_EXPRESSION = new ElixirElementType("NO_PARENTHESES_ONE_EXPRESSION");
+  IElementType NO_PARENTHESES_NO_ARGUMENTS_QUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_NO_ARGUMENTS_QUALIFIED_CALL");
+  IElementType NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE = new ElixirElementType("NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType QUALIFIED_ALIAS = new ElixirElementType("QUALIFIED_ALIAS");
-  IElementType QUALIFIED_IDENTIFIER = new ElixirElementType("QUALIFIED_IDENTIFIER");
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
@@ -300,6 +302,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_AT_OPERATION) {
         return new ElixirMatchedAtOperationImpl(node);
       }
+      else if (type == MATCHED_DOT_OPERATION) {
+        return new ElixirMatchedDotOperationImpl(node);
+      }
       else if (type == MATCHED_HAT_OPERATION) {
         return new ElixirMatchedHatOperationImpl(node);
       }
@@ -315,14 +320,20 @@ public interface ElixirTypes {
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
       }
-      else if (type == NO_PARENTHESES_CALL) {
-        return new ElixirNoParenthesesCallImpl(node);
+      else if (type == NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL) {
+        return new ElixirNoParenthesesManyArgumentsQualifiedCallImpl(node);
+      }
+      else if (type == NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL) {
+        return new ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl(node);
       }
       else if (type == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(node);
       }
-      else if (type == NO_PARENTHESES_ONE_EXPRESSION) {
-        return new ElixirNoParenthesesOneExpressionImpl(node);
+      else if (type == NO_PARENTHESES_NO_ARGUMENTS_QUALIFIED_CALL) {
+        return new ElixirNoParenthesesNoArgumentsQualifiedCallImpl(node);
+      }
+      else if (type == NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE) {
+        return new ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(node);
       }
       else if (type == NO_PARENTHESES_STRICT) {
         return new ElixirNoParenthesesStrictImpl(node);
@@ -341,9 +352,6 @@ public interface ElixirTypes {
       }
       else if (type == QUALIFIED_ALIAS) {
         return new ElixirQualifiedAliasImpl(node);
-      }
-      else if (type == QUALIFIED_IDENTIFIER) {
-        return new ElixirQualifiedIdentifierImpl(node);
       }
       else if (type == SIGIL) {
         return new ElixirSigilImpl(node);

@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirQualifiedAlias extends PsiElement {
+public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElement {
 
   @Nullable
   ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
@@ -14,13 +14,16 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirAtom getAtom();
 
   @Nullable
+  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
-  @Nullable
-  ElixirCharList getCharList();
+  @NotNull
+  List<ElixirCharList> getCharListList();
 
-  @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
   ElixirInfixDotOperator getInfixDotOperator();
@@ -32,28 +35,34 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
-
-  @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
 
   @Nullable
+  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+
+  @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
+
+  @Nullable
+  ElixirNoParenthesesStrict getNoParenthesesStrict();
 
   @Nullable
   ElixirNumber getNumber();
 
   @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
+
+  @Nullable
   ElixirSigil getSigil();
 
-  @Nullable
-  ElixirString getString();
+  @NotNull
+  List<ElixirString> getStringList();
 
-  @Nullable
-  ElixirStringHeredoc getStringHeredoc();
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
