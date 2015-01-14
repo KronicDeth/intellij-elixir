@@ -1,14 +1,18 @@
-package org.elixir_lang.parser_definition.double_quotes;
+package org.elixir_lang.parser_definition;
 
 /**
- * Created by luke.imhoff on 8/8/14.
+ * Created by luke.imhoff on 8/7/14.
  */
-public class YYInitialParsingTestCase extends ParsingTestCase {
+public class StringParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
         doTest(true);
     }
 
     public void testEscapeSequences() {
+        doTest(true);
+    }
+
+    public void testInterpolation() {
         doTest(true);
     }
 
@@ -22,11 +26,8 @@ public class YYInitialParsingTestCase extends ParsingTestCase {
     public void testMultiline() {
         doTest(true);
     }
-    public void testWithInterpolation() {
-        doTest(true);
-    }
 
-    public void testWithNestedInterpolation() {
+    public void testNestedInterpolation() {
         doTest(true);
     }
 
@@ -36,6 +37,6 @@ public class YYInitialParsingTestCase extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/yyinitial_parsing_test_case";
+        return super.getTestDataPath() + "/string_parsing_test_case";
     }
 }
