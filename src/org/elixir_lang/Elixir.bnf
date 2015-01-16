@@ -158,23 +158,23 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
 
 /*
  *
- * Interpolating Sigil Heredocs
+ * Interpolated Sigil Heredocs
  *
  */
 
-private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+private interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                              interpolatedCharListBody
                                              CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                     interpolatedRegexBody
-                                     REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private interpolatedHeredocSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+private interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                                      interpolatedRegexBody
+                                      REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedSigilBody
                                      SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
-private interpolatedHeredocStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+private interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                            interpolatedStringBody
                                            STRING_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+private interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                                      interpolatedWordsBody
                                      WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 
@@ -182,16 +182,16 @@ private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_
  * Literal Sigil Heredocs
  */
 
-private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+private literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                 literalRegexBody
                                 REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+private literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                                 literalSigilBody
                                 SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+private literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                       literalStringBody
                                       STRING_SIGIL_HEREDOC_TERMINATOR
-private literalHeredocWords ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+private literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                                 literalWordsBody
                                 WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 
@@ -522,19 +522,19 @@ number ::= binaryWholeNumber |
 
 private quote ::= (charList | string)
 sigil ::= interpolatedCharListSigil |
-          interpolatedHeredocCharListSigil |
-          interpolatedHeredocRegex |
-          interpolatedHeredocSigil |
-          interpolatedHeredocStringSigil |
-          interpolatedHeredocWords |
+          interpolatedCharListSigilHeredoc |
+          interpolatedRegexHeredoc |
+          interpolatedSigilHeredoc |
+          interpolatedStringSigilHeredoc |
+          interpolatedWordsHeredoc |
           interpolatedRegex |
           interpolatedSigil |
           interpolatedStringSigil |
           literalCharListSigil |
-          literalHeredocRegex |
-          literalHeredocSigil |
-          literalHeredocStringSigil |
-          literalHeredocWords |
+          literalRegexHeredoc |
+          literalSigilHeredoc |
+          literalStringSigilHeredoc |
+          literalWordsHeredoc |
           literalRegex |
           literalSigil |
           literalStringSigil |
