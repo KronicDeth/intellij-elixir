@@ -107,6 +107,29 @@ private matchedDotIdentifierOperand ::= IDENTIFIER |
  * Many Arguments
  */
 
+private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (infixComma callArgumentsNoParenthesesExpression)+
+/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
+   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
+private callArgumentsNoParenthesesExpression ::= emptyParentheses |
+                                                 /* Must be before matchedExpression because noParenthesesExpression is
+                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
+                                                    which is longer than `matchedExpressionDotIdentifier` in
+                                                    matchedExpression. */
+                                                 /* This will be marked as an error by
+                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                                                 noParenthesesManyStrictNoParenthesesExpression |
+                                                 matchedExpression !KEYWORD_PAIR_COLON
+callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (infixComma callArgumentsNoParenthesesKeywordsExpression)*
+callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
+
+/* 1. (positional, keywords)
+   2. (positional, positional)
+   3. (positional, positional, keywords) */
+callArgumentsNoParenthesesMany ::= matchedExpression infixComma callArgumentsNoParenthesesKeywords |
+                                   callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
+private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
+                                                 noParenthesesStrict
+
 noParenthesesManyArgumentsUnqualifiedCall ::= IDENTIFIER callArgumentsNoParenthesesManyStrict
 
 private noParenthesesManyArgumentsQualifiedExpression ::= matchedDotExpression noParenthesesManyArgumentsQualifiedCall
@@ -393,28 +416,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private binaryString ::= string | stringHeredoc
-private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (infixComma callArgumentsNoParenthesesExpression)+
 private infixComma ::= COMMA EOL*
-/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
-   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-private callArgumentsNoParenthesesExpression ::= emptyParentheses |
-                                                 /* Must be before matchedExpression because noParenthesesExpression is
-                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
-                                                    which is longer than `matchedExpressionDotIdentifier` in
-                                                    matchedExpression. */
-                                                 /* This will be marked as an error by
-                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-                                                 noParenthesesManyStrictNoParenthesesExpression |
-                                                 matchedExpression !KEYWORD_PAIR_COLON
-callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (infixComma callArgumentsNoParenthesesKeywordsExpression)*
-callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
-/* 1. (positional, keywords)
-   2. (positional, positional)
-   3. (positional, positional, keywords) */
-callArgumentsNoParenthesesMany ::= matchedExpression infixComma callArgumentsNoParenthesesKeywords |
-                                   callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
-private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
-                                                 noParenthesesStrict
 
 private containerExpression ::= emptyParentheses
 decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
