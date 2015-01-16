@@ -63,7 +63,11 @@
 elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
+ *
+ *
  * Expression List
+ *
+ *
  */
 
 private infixSemicolon ::= EOL* SEMICOLON EOL*
@@ -119,7 +123,84 @@ left noParenthesesNoArgumentsQualifiedCall ::= infixDotOperator matchedDotIdenti
 noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
 
 /*
+ *
+ *
+ * Heredoc
+ *
+ *
+ */
+
+/*
+ *
+ * Quote Heredocs
+ *
+ */
+
+/*
+ * CharList
+ */
+
+charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
+                    charListHeredocLine*
+                    charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 1 }
+charListHeredocLine ::= charListHeredocLineWhitespace interpolatedCharListBody EOL { methods = [quote] }
+charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessWhitespace] }
+charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
+
+/*
+ * String
+ */
+
+stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
+                  interpolatedStringBody
+                  STRING_HEREDOC_TERMINATOR
+
+/*
+ *
+ * Interpolating Sigil Heredocs
+ *
+ */
+
+private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+                                             interpolatedCharListBody
+                                             CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
+private interpolatedHeredocRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                                     interpolatedRegexBody
+                                     REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private interpolatedHeredocSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+                                     interpolatedSigilBody
+                                     SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
+private interpolatedHeredocStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+                                           interpolatedStringBody
+                                           STRING_SIGIL_HEREDOC_TERMINATOR
+private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                                     interpolatedWordsBody
+                                     WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+
+/*
+ * Literal Sigil Heredocs
+ */
+
+private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                                literalRegexBody
+                                REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private literalHeredocSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+                                literalSigilBody
+                                SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+private literalHeredocStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+                                      literalStringBody
+                                      STRING_SIGIL_HEREDOC_TERMINATOR
+private literalHeredocWords ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                                literalWordsBody
+                                WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+
+/*
+ *
+ *
  * Matched Expressions - ordered by outer-most (lowest precedence) to inner-most (highest precedence)
+ *
+ *
  */
 
 private matchedExpression ::= matchedNonNumericCaptureExpression
@@ -193,7 +274,9 @@ alias ::= ALIAS_TOKEN
 
 /*
  *
+ *
  * Quotes
+ *
  *
  */
 
@@ -220,7 +303,9 @@ string ::= STRING_PROMOTER
 
 /*
  *
+ *
  * Whole Numbers
+ *
  *
  *
  */
@@ -296,7 +381,9 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
 
 /*
  *
+ *
  * In alphabetical order
+ *
  *
  */
 
@@ -328,13 +415,7 @@ callArgumentsNoParenthesesMany ::= matchedExpression infixComma callArgumentsNoP
                                    callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
 private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
                                                  noParenthesesStrict
-charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
-                    charListHeredocLine*
-                    charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
-                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 1 }
-charListHeredocLine ::= charListHeredocLineWhitespace interpolatedCharListBody EOL { methods = [quote] }
-charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessWhitespace] }
-charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
+
 private containerExpression ::= emptyParentheses
 decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
 // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
@@ -354,21 +435,7 @@ escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
 
-private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
-                                             interpolatedCharListBody
-                                             CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                     interpolatedRegexBody
-                                     REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private interpolatedHeredocSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                     interpolatedSigilBody
-                                     SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
-private interpolatedHeredocStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                           interpolatedStringBody
-                                           STRING_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                     interpolatedWordsBody
-                                     WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+
 private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
@@ -410,18 +477,6 @@ list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CL
 private listString ::= charList | charListHeredoc
 private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                literalRegexBody
-                                REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                literalSigilBody
-                                SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                      literalStringBody
-                                      STRING_SIGIL_HEREDOC_TERMINATOR
-private literalHeredocWords ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                literalWordsBody
-                                WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
 private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private literalRegexBody ::= REGEX_FRAGMENT*
 private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
@@ -484,9 +539,5 @@ sigil ::= interpolatedCharListSigil |
           literalSigil |
           literalStringSigil |
           literalWords
-
-stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringBody
-                  STRING_HEREDOC_TERMINATOR
 
 unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }
