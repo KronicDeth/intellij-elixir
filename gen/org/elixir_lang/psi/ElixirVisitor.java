@@ -11,6 +11,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitAlias(@NotNull ElixirAlias o) {
+    visitQuotable(o);
+  }
+
   public void visitAtCharTokenOrNumberOperation(@NotNull ElixirAtCharTokenOrNumberOperation o) {
     visitPsiElement(o);
   }

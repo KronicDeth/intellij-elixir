@@ -546,7 +546,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.ALIAS; }
+                                               return ElixirTypes.ALIAS_TOKEN; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);

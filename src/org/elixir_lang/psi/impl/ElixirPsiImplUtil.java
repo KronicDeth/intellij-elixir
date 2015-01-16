@@ -379,6 +379,16 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAlias alias) {
+        return quotedFunctionCall(
+                "__aliases__",
+                metadata(alias, 0),
+                new OtpErlangAtom(alias.getText())
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
         ElixirCharList charList = atom.getCharList();

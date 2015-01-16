@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -24,6 +25,9 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == ADJACENT_EXPRESSION) {
       r = adjacentExpression(b, 0);
+    }
+    else if (t == ALIAS) {
+      r = alias(b, 0);
     }
     else if (t == AT_CHAR_TOKEN_OR_NUMBER_OPERATION) {
       r = atCharTokenOrNumberOperation(b, 0);
@@ -231,7 +235,8 @@ public class ElixirParser implements PsiParser {
   //                              FALSE |
   //                              NIL |
   //                              TRUE |
-  //                              atom
+  //                              atom |
+  //                              alias
   static boolean accessExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
     boolean r;
@@ -249,6 +254,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, NIL);
     if (!r) r = consumeToken(b, TRUE);
     if (!r) r = atom(b, l + 1);
+    if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -273,6 +279,18 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, "<adjacent expression>");
     r = expression(b, l + 1);
     exit_section_(b, l, m, ADJACENT_EXPRESSION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ALIAS_TOKEN
+  public static boolean alias(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "alias")) return false;
+    if (!nextTokenIs(b, ALIAS_TOKEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, ALIAS_TOKEN);
+    exit_section_(b, m, ALIAS, r);
     return r;
   }
 
@@ -1616,7 +1634,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // ALIAS |
+  // ALIAS_TOKEN |
   //                AND_OPERATOR |
   //                ARROW_OPERATOR |
   //                ASSOCIATION_OPERATOR |
@@ -1646,7 +1664,7 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "keywordKey")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<keyword key>");
-    r = consumeToken(b, ALIAS);
+    r = consumeToken(b, ALIAS_TOKEN);
     if (!r) r = consumeToken(b, AND_OPERATOR);
     if (!r) r = consumeToken(b, ARROW_OPERATOR);
     if (!r) r = consumeToken(b, ASSOCIATION_OPERATOR);
@@ -2236,7 +2254,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // (
-  //                                     ALIAS |
+  //                                     ALIAS_TOKEN |
   //                                     IDENTIFIER |
   //                                     FALSE |
   //                                     NIL |
@@ -2254,7 +2272,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // ALIAS |
+  // ALIAS_TOKEN |
   //                                     IDENTIFIER |
   //                                     FALSE |
   //                                     NIL |
@@ -2265,7 +2283,7 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "matchedDotRightOperand_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, ALIAS);
+    r = consumeToken(b, ALIAS_TOKEN);
     if (!r) r = consumeToken(b, IDENTIFIER);
     if (!r) r = consumeToken(b, FALSE);
     if (!r) r = consumeToken(b, NIL);
@@ -2790,14 +2808,14 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // infixDotOperator ALIAS
+  // infixDotOperator ALIAS_TOKEN
   public static boolean qualifiedAlias(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "qualifiedAlias")) return false;
     if (!nextTokenIs(b, "<qualified alias>", DOT_OPERATOR, EOL)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _LEFT_, "<qualified alias>");
     r = infixDotOperator(b, l + 1);
-    r = r && consumeToken(b, ALIAS);
+    r = r && consumeToken(b, ALIAS_TOKEN);
     exit_section_(b, l, m, QUALIFIED_ALIAS, r, false, null);
     return r;
   }

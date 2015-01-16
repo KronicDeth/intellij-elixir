@@ -9,6 +9,7 @@ import org.elixir_lang.psi.impl.*;
 public interface ElixirTypes {
 
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
+  IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType AT_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("AT_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
@@ -69,7 +70,7 @@ public interface ElixirTypes {
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
 
-  IElementType ALIAS = new ElixirTokenType("ALIAS");
+  IElementType ALIAS_TOKEN = new ElixirTokenType("ALIAS_TOKEN");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
@@ -193,6 +194,9 @@ public interface ElixirTypes {
       IElementType type = node.getElementType();
        if (type == ADJACENT_EXPRESSION) {
         return new ElixirAdjacentExpressionImpl(node);
+      }
+      else if (type == ALIAS) {
+        return new ElixirAliasImpl(node);
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);

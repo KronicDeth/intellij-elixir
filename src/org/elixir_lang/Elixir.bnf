@@ -82,8 +82,8 @@ private expressionList ::= expression (endOfExpression+ expression | adjacentExp
  */
 
 
-/* The Elixir native lexer converts Strings, CharLists and keywords (false, nil, true) to ALIAS/IDENTIFIER as needed.
-   Elixir.flex doesn't do that, so have to list those tokens/rules that would be converted to ALIAS/IDENTIFIER here */
+/* The Elixir native lexer converts Strings, CharLists and keywords (false, nil, true) to ALIAS_TOKEN/IDENTIFIER as needed.
+   Elixir.flex doesn't do that, so have to list those tokens/rules that would be converted to ALIAS_TOKEN/IDENTIFIER here */
 private matchedDotIdentifierOperand ::= IDENTIFIER |
                                         FALSE |
                                         NIL |
@@ -155,7 +155,7 @@ infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
 private matchedDotExpression ::= matchedDotLeftOperand (matchedDotOperation* matchedDotRightMostOperation)?
 private matchedDotLeftOperand ::= matchedAtExpression
 private matchedDotRightOperand ::= (
-                                    ALIAS |
+                                    ALIAS_TOKEN |
                                     IDENTIFIER |
                                     FALSE |
                                     NIL |
@@ -165,7 +165,7 @@ private matchedDotRightOperand ::= (
                                    ) &infixDotOperator
 left matchedDotOperation ::= infixDotOperator matchedDotRightOperand
 private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedCall | qualifiedAlias
-left qualifiedAlias ::= infixDotOperator ALIAS
+left qualifiedAlias ::= infixDotOperator ALIAS_TOKEN
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
 atPrefixOperator ::= AT_OPERATOR EOL* { name = "@" }
@@ -185,7 +185,10 @@ private accessExpression ::= atCharTokenOrNumberOperation |
                              FALSE |
                              NIL |
                              TRUE |
-                             atom
+                             atom |
+                             alias
+alias ::= ALIAS_TOKEN
+          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  *
@@ -373,7 +376,7 @@ private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
 interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-keywordKey ::= ALIAS |
+keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
