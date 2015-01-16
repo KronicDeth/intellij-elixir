@@ -42,12 +42,6 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
-  public ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany() {
-    return findChildByClass(ElixirCallArgumentsNoParenthesesMany.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
     return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
   }
@@ -92,6 +86,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   @Nullable
   public ElixirMatchedUnaryOperation getMatchedUnaryOperation() {
     return findChildByClass(ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
+    return findChildByClass(ElixirNoParenthesesManyArguments.class);
   }
 
   @Override

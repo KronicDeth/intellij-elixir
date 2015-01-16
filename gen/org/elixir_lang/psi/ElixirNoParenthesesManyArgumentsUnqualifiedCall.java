@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface ElixirNoParenthesesManyArgumentsUnqualifiedCall extends PsiElement {
 
   @Nullable
-  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
+  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();

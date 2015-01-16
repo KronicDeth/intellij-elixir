@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiElement implements ElixirCallArgumentsNoParenthesesMany {
+public class ElixirNoParenthesesManyArgumentsImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArguments {
 
-  public ElixirCallArgumentsNoParenthesesManyImpl(ASTNode node) {
+  public ElixirNoParenthesesManyArgumentsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCallArgumentsNoParenthesesMany(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArguments(this);
     else super.accept(visitor);
   }
 
@@ -38,12 +38,6 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   @NotNull
   public List<ElixirAtom> getAtomList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords() {
-    return findChildByClass(ElixirCallArgumentsNoParenthesesKeywords.class);
   }
 
   @Override
@@ -104,6 +98,12 @@ public class ElixirCallArgumentsNoParenthesesManyImpl extends ASTWrapperPsiEleme
   @NotNull
   public List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedUnaryOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
   }
 
   @Override

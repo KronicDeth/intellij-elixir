@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
+public interface ElixirNoParenthesesManyArguments extends PsiElement {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -15,9 +15,6 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
 
   @NotNull
   List<ElixirAtom> getAtomList();
-
-  @Nullable
-  ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords();
 
   @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
@@ -48,6 +45,9 @@ public interface ElixirCallArgumentsNoParenthesesMany extends PsiElement {
 
   @NotNull
   List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
+
+  @Nullable
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
 
   @NotNull
   List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();

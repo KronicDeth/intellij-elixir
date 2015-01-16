@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface ElixirCallArgumentsNoParenthesesKeywords extends PsiElement {
+public interface ElixirNoParenthesesKeywords extends PsiElement {
 
   @NotNull
-  List<ElixirCallArgumentsNoParenthesesKeywordsExpression> getCallArgumentsNoParenthesesKeywordsExpressionList();
+  List<ElixirNoParenthesesKeywordsExpression> getNoParenthesesKeywordsExpressionList();
 
 }

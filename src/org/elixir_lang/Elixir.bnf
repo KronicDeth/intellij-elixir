@@ -107,36 +107,55 @@ private matchedDotIdentifierOperand ::= IDENTIFIER |
  * Many Arguments
  */
 
-private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (infixComma callArgumentsNoParenthesesExpression)+
+private noParenthesesCommaExpression ::= matchedExpression (infixComma noParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-private callArgumentsNoParenthesesExpression ::= emptyParentheses |
-                                                 /* Must be before matchedExpression because noParenthesesExpression is
-                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
-                                                    which is longer than `matchedExpressionDotIdentifier` in
-                                                    matchedExpression. */
-                                                 /* This will be marked as an error by
-                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-                                                 noParenthesesManyStrictNoParenthesesExpression |
-                                                 matchedExpression !KEYWORD_PAIR_COLON
-callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (infixComma callArgumentsNoParenthesesKeywordsExpression)*
-callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
+private noParenthesesExpression ::= emptyParentheses |
+                                    /* Must be before matchedExpression because noParenthesesExpression is
+                                       `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
+                                       which is longer than `matchedExpressionDotIdentifier` in
+                                       matchedExpression. */
+                                    /* This will be marked as an error by
+                                       {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                                    noParenthesesManyStrictNoParenthesesExpression |
+                                    matchedExpression !KEYWORD_PAIR_COLON
+/* Special class for wrapping noParenthesesCall so that
+   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
+   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
+   ElixirNoParenthesesCall. */
+noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesManyArgumentsCall
+/* Special class for wrapping rules so that
+   {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
+   ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
+   rule classes. */
+noParenthesesStrict ::= emptyParentheses |
+                        OPENING_PARENTHESIS (
+                                             noParenthesesKeywords |
+                                             noParenthesesManyArguments
+                                            ) CLOSING_PARENTHESIS
 
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
-callArgumentsNoParenthesesMany ::= matchedExpression infixComma callArgumentsNoParenthesesKeywords |
-                                   callArgumentsNoParenthesesCommaExpression (infixComma callArgumentsNoParenthesesKeywords)?
-private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
-                                                 noParenthesesStrict
+noParenthesesManyArguments ::= matchedExpression infixComma noParenthesesKeywords |
+                               noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
+private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
+                                             noParenthesesStrict
 
-noParenthesesManyArgumentsUnqualifiedCall ::= IDENTIFIER callArgumentsNoParenthesesManyStrict
+noParenthesesManyArgumentsUnqualifiedCall ::= IDENTIFIER noParenthesesManyArgumentsStrict
 
 private noParenthesesManyArgumentsQualifiedExpression ::= matchedDotExpression noParenthesesManyArgumentsQualifiedCall
-left noParenthesesManyArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand callArgumentsNoParenthesesManyStrict
+left noParenthesesManyArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand noParenthesesManyArgumentsStrict
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 private noParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsQualifiedExpression | noParenthesesManyArgumentsUnqualifiedCall
+
+/*
+ * 1+ Arguments
+ */
+
+noParenthesesKeywords ::= noParenthesesKeywordsExpression (infixComma noParenthesesKeywordsExpression)*
+noParenthesesKeywordsExpression ::= keywordKeyColonEOL noParenthesesExpression
 
 /*
  * 0 Arguments
@@ -495,21 +514,6 @@ unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
 /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's NUMBER and CHAR_TOKEN. */
 private numeric ::= CHAR_TOKEN | number
-
-/* Special class for wrapping rules so that
-   {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
-   ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
-   rule classes. */
-noParenthesesStrict ::= emptyParentheses |
-                        OPENING_PARENTHESIS (
-                                             callArgumentsNoParenthesesKeywords |
-                                             callArgumentsNoParenthesesMany
-                                            ) CLOSING_PARENTHESIS
-/* Special class for wrapping noParenthesesCall so that
-   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
-   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
-   ElixirNoParenthesesCall. */
-noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesManyArgumentsCall
 
 //noParenthesesOneExpression ::= dotIdentifier
 

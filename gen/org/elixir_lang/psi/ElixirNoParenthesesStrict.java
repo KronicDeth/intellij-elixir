@@ -8,12 +8,12 @@ import com.intellij.psi.PsiElement;
 public interface ElixirNoParenthesesStrict extends PsiElement {
 
   @Nullable
-  ElixirCallArgumentsNoParenthesesKeywords getCallArgumentsNoParenthesesKeywords();
-
-  @Nullable
-  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
-
-  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @Nullable
+  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
 }

@@ -11,14 +11,14 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElement implements ElixirCallArgumentsNoParenthesesKeywordsExpression {
+public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesKeywordsExpression {
 
-  public ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl(ASTNode node) {
+  public ElixirNoParenthesesKeywordsExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCallArgumentsNoParenthesesKeywordsExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesKeywordsExpression(this);
     else super.accept(visitor);
   }
 

@@ -17,9 +17,6 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirAtom getAtom();
 
   @Nullable
-  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
-
-  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull
@@ -42,6 +39,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
 
   @Nullable
   ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+
+  @Nullable
+  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();

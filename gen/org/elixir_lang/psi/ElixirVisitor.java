@@ -36,18 +36,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitWholeNumber(o);
   }
 
-  public void visitCallArgumentsNoParenthesesKeywords(@NotNull ElixirCallArgumentsNoParenthesesKeywords o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCallArgumentsNoParenthesesKeywordsExpression(@NotNull ElixirCallArgumentsNoParenthesesKeywordsExpression o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCallArgumentsNoParenthesesMany(@NotNull ElixirCallArgumentsNoParenthesesMany o) {
-    visitPsiElement(o);
-  }
-
   public void visitCaptureCharTokenOrNumberOperation(@NotNull ElixirCaptureCharTokenOrNumberOperation o) {
     visitPsiElement(o);
   }
@@ -183,6 +171,18 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesKeywords(@NotNull ElixirNoParenthesesKeywords o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesKeywordsExpression(@NotNull ElixirNoParenthesesKeywordsExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesManyArguments(@NotNull ElixirNoParenthesesManyArguments o) {
     visitPsiElement(o);
   }
 

@@ -11,21 +11,21 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCallArgumentsNoParenthesesKeywordsImpl extends ASTWrapperPsiElement implements ElixirCallArgumentsNoParenthesesKeywords {
+public class ElixirNoParenthesesKeywordsImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesKeywords {
 
-  public ElixirCallArgumentsNoParenthesesKeywordsImpl(ASTNode node) {
+  public ElixirNoParenthesesKeywordsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCallArgumentsNoParenthesesKeywords(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesKeywords(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public List<ElixirCallArgumentsNoParenthesesKeywordsExpression> getCallArgumentsNoParenthesesKeywordsExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCallArgumentsNoParenthesesKeywordsExpression.class);
+  public List<ElixirNoParenthesesKeywordsExpression> getNoParenthesesKeywordsExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesKeywordsExpression.class);
   }
 
 }

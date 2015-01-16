@@ -15,9 +15,6 @@ public interface ElixirTypes {
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
-  IElementType CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS");
-  IElementType CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION");
-  IElementType CALL_ARGUMENTS_NO_PARENTHESES_MANY = new ElixirElementType("CALL_ARGUMENTS_NO_PARENTHESES_MANY");
   IElementType CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
@@ -52,6 +49,9 @@ public interface ElixirTypes {
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_UNARY_OPERATION = new ElixirElementType("MATCHED_UNARY_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
+  IElementType NO_PARENTHESES_KEYWORDS = new ElixirElementType("NO_PARENTHESES_KEYWORDS");
+  IElementType NO_PARENTHESES_KEYWORDS_EXPRESSION = new ElixirElementType("NO_PARENTHESES_KEYWORDS_EXPRESSION");
+  IElementType NO_PARENTHESES_MANY_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS");
   IElementType NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL");
   IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
@@ -213,15 +213,6 @@ public interface ElixirTypes {
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
       }
-      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS) {
-        return new ElixirCallArgumentsNoParenthesesKeywordsImpl(node);
-      }
-      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_KEYWORDS_EXPRESSION) {
-        return new ElixirCallArgumentsNoParenthesesKeywordsExpressionImpl(node);
-      }
-      else if (type == CALL_ARGUMENTS_NO_PARENTHESES_MANY) {
-        return new ElixirCallArgumentsNoParenthesesManyImpl(node);
-      }
       else if (type == CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION) {
         return new ElixirCaptureCharTokenOrNumberOperationImpl(node);
       }
@@ -323,6 +314,15 @@ public interface ElixirTypes {
       }
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
+      }
+      else if (type == NO_PARENTHESES_KEYWORDS) {
+        return new ElixirNoParenthesesKeywordsImpl(node);
+      }
+      else if (type == NO_PARENTHESES_KEYWORDS_EXPRESSION) {
+        return new ElixirNoParenthesesKeywordsExpressionImpl(node);
+      }
+      else if (type == NO_PARENTHESES_MANY_ARGUMENTS) {
+        return new ElixirNoParenthesesManyArgumentsImpl(node);
       }
       else if (type == NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL) {
         return new ElixirNoParenthesesManyArgumentsQualifiedCallImpl(node);

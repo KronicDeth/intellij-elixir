@@ -24,8 +24,8 @@ public class ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl extends ASTWrap
 
   @Override
   @Nullable
-  public ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany() {
-    return findChildByClass(ElixirCallArgumentsNoParenthesesMany.class);
+  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
+    return findChildByClass(ElixirNoParenthesesManyArguments.class);
   }
 
   @Override
