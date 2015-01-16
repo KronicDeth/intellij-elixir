@@ -69,7 +69,8 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= infixSemicolon | EOL
-private expression ::= noParenthesesManyArgumentsCall |
+private expression ::= emptyParentheses |
+                       noParenthesesManyArgumentsCall |
                        matchedExpression
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 
