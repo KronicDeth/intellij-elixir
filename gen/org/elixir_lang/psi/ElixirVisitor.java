@@ -49,19 +49,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
-    visitQuotable(o);
+    visitHeredoc(o);
   }
 
   public void visitCharListHeredocLine(@NotNull ElixirCharListHeredocLine o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCharListHeredocLineWhitespace(@NotNull ElixirCharListHeredocLineWhitespace o) {
-    visitPsiElement(o);
-  }
-
-  public void visitCharListHeredocPrefix(@NotNull ElixirCharListHeredocPrefix o) {
-    visitPsiElement(o);
+    visitHeredocLine(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
@@ -101,6 +93,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitHeredocLinePrefix(@NotNull ElixirHeredocLinePrefix o) {
+    visitPsiElement(o);
+  }
+
+  public void visitHeredocPrefix(@NotNull ElixirHeredocPrefix o) {
+    visitPsiElement(o);
+  }
+
   public void visitHexadecimalDigits(@NotNull ElixirHexadecimalDigits o) {
     visitDigits(o);
   }
@@ -119,11 +119,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
-    visitQuotable(o);
+    visitInterpolatedBody(o);
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {
-    visitQuotable(o);
+    visitInterpolatedBody(o);
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
@@ -240,7 +240,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
-    visitPsiElement(o);
+    visitHeredoc(o);
+  }
+
+  public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
+    visitHeredocLine(o);
   }
 
   public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {
@@ -264,6 +268,18 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitEscapedHexadecimalDigits(@NotNull EscapedHexadecimalDigits o) {
+    visitElement(o);
+  }
+
+  public void visitHeredoc(@NotNull Heredoc o) {
+    visitElement(o);
+  }
+
+  public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitInterpolatedBody(@NotNull InterpolatedBody o) {
     visitElement(o);
   }
 

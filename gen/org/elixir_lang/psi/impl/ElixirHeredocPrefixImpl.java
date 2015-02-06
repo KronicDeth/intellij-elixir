@@ -11,20 +11,15 @@ import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 
-public class ElixirCharListHeredocLineWhitespaceImpl extends ASTWrapperPsiElement implements ElixirCharListHeredocLineWhitespace {
+public class ElixirHeredocPrefixImpl extends ASTWrapperPsiElement implements ElixirHeredocPrefix {
 
-  public ElixirCharListHeredocLineWhitespaceImpl(ASTNode node) {
+  public ElixirHeredocPrefixImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListHeredocLineWhitespace(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHeredocPrefix(this);
     else super.accept(visitor);
-  }
-
-  @Nullable
-  public ASTNode excessWhitespace(int prefixLength) {
-    return ElixirPsiImplUtil.excessWhitespace(this, prefixLength);
   }
 
 }

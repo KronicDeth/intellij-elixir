@@ -58,12 +58,6 @@ public class ElixirParser implements PsiParser {
     else if (t == CHAR_LIST_HEREDOC_LINE) {
       r = charListHeredocLine(b, 0);
     }
-    else if (t == CHAR_LIST_HEREDOC_LINE_WHITESPACE) {
-      r = charListHeredocLineWhitespace(b, 0);
-    }
-    else if (t == CHAR_LIST_HEREDOC_PREFIX) {
-      r = charListHeredocPrefix(b, 0);
-    }
     else if (t == DECIMAL_DIGITS) {
       r = decimalDigits(b, 0);
     }
@@ -90,6 +84,12 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == HAT_INFIX_OPERATOR) {
       r = hatInfixOperator(b, 0);
+    }
+    else if (t == HEREDOC_LINE_PREFIX) {
+      r = heredocLinePrefix(b, 0);
+    }
+    else if (t == HEREDOC_PREFIX) {
+      r = heredocPrefix(b, 0);
     }
     else if (t == HEXADECIMAL_DIGITS) {
       r = hexadecimalDigits(b, 0);
@@ -195,6 +195,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
+    }
+    else if (t == STRING_HEREDOC_LINE) {
+      r = stringHeredocLine(b, 0);
     }
     else if (t == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
       r = unaryCharTokenOrNumberOperation(b, 0);
@@ -480,7 +483,7 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // CHAR_LIST_HEREDOC_PROMOTER EOL
   //                     charListHeredocLine*
-  //                     charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
+  //                     heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
   public static boolean charListHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "charListHeredoc")) return false;
     if (!nextTokenIs(b, CHAR_LIST_HEREDOC_PROMOTER)) return false;
@@ -489,7 +492,7 @@ public class ElixirParser implements PsiParser {
     r = consumeTokens(b, 1, CHAR_LIST_HEREDOC_PROMOTER, EOL);
     p = r; // pin = 1
     r = r && report_error_(b, charListHeredoc_2(b, l + 1));
-    r = p && report_error_(b, charListHeredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && consumeToken(b, CHAR_LIST_HEREDOC_TERMINATOR) && r;
     exit_section_(b, l, m, CHAR_LIST_HEREDOC, r, p, null);
     return r || p;
@@ -508,36 +511,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // charListHeredocLineWhitespace interpolatedCharListBody EOL
+  // heredocLinePrefix interpolatedCharListBody EOL
   public static boolean charListHeredocLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "charListHeredocLine")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<char list heredoc line>");
-    r = charListHeredocLineWhitespace(b, l + 1);
+    r = heredocLinePrefix(b, l + 1);
     r = r && interpolatedCharListBody(b, l + 1);
     r = r && consumeToken(b, EOL);
     exit_section_(b, l, m, CHAR_LIST_HEREDOC_LINE, r, false, null);
     return r;
-  }
-
-  /* ********************************************************** */
-  // HEREDOC_LINE_WHITE_SPACE?
-  public static boolean charListHeredocLineWhitespace(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "charListHeredocLineWhitespace")) return false;
-    Marker m = enter_section_(b, l, _NONE_, "<char list heredoc line whitespace>");
-    consumeToken(b, HEREDOC_LINE_WHITE_SPACE);
-    exit_section_(b, l, m, CHAR_LIST_HEREDOC_LINE_WHITESPACE, true, false, null);
-    return true;
-  }
-
-  /* ********************************************************** */
-  // HEREDOC_PREFIX_WHITE_SPACE?
-  public static boolean charListHeredocPrefix(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "charListHeredocPrefix")) return false;
-    Marker m = enter_section_(b, l, _NONE_, "<char list heredoc prefix>");
-    consumeToken(b, HEREDOC_PREFIX_WHITE_SPACE);
-    exit_section_(b, l, m, CHAR_LIST_HEREDOC_PREFIX, true, false, null);
-    return true;
   }
 
   /* ********************************************************** */
@@ -904,6 +887,26 @@ public class ElixirParser implements PsiParser {
       if (!empty_element_parsed_guard_(b, "hatInfixOperator_2", c)) break;
       c = current_position_(b);
     }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // HEREDOC_LINE_WHITE_SPACE_TOKEN?
+  public static boolean heredocLinePrefix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "heredocLinePrefix")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<heredoc line prefix>");
+    consumeToken(b, HEREDOC_LINE_WHITE_SPACE_TOKEN);
+    exit_section_(b, l, m, HEREDOC_LINE_PREFIX, true, false, null);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // HEREDOC_PREFIX_WHITE_SPACE?
+  public static boolean heredocPrefix(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "heredocPrefix")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<heredoc prefix>");
+    consumeToken(b, HEREDOC_PREFIX_WHITE_SPACE);
+    exit_section_(b, l, m, HEREDOC_PREFIX, true, false, null);
     return true;
   }
 
@@ -2898,17 +2901,44 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // STRING_HEREDOC_PROMOTER EOL
-  //                   interpolatedStringBody
-  //                   STRING_HEREDOC_TERMINATOR
+  //                   stringHeredocLine*
+  //                   heredocPrefix STRING_HEREDOC_TERMINATOR
   public static boolean stringHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stringHeredoc")) return false;
     if (!nextTokenIs(b, STRING_HEREDOC_PROMOTER)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 1, STRING_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 1
+    r = r && report_error_(b, stringHeredoc_2(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && consumeToken(b, STRING_HEREDOC_TERMINATOR) && r;
+    exit_section_(b, l, m, STRING_HEREDOC, r, p, null);
+    return r || p;
+  }
+
+  // stringHeredocLine*
+  private static boolean stringHeredoc_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stringHeredoc_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!stringHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "stringHeredoc_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // heredocLinePrefix interpolatedStringBody EOL
+  public static boolean stringHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stringHeredocLine")) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, STRING_HEREDOC_PROMOTER, EOL);
+    Marker m = enter_section_(b, l, _NONE_, "<string heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
     r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_HEREDOC_TERMINATOR);
-    exit_section_(b, m, STRING_HEREDOC, r);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, STRING_HEREDOC_LINE, r, false, null);
     return r;
   }
 

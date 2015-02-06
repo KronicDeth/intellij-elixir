@@ -172,6 +172,9 @@ noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
  *
  */
 
+heredocLinePrefix ::= HEREDOC_LINE_WHITE_SPACE_TOKEN? { methods = [excessWhitespace] }
+heredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
+
 /*
  *
  * Quote Heredocs
@@ -184,19 +187,65 @@ noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
 
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     charListHeredocLine*
-                    charListHeredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
-                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] pin = 1 }
-charListHeredocLine ::= charListHeredocLineWhitespace interpolatedCharListBody EOL { methods = [quote] }
-charListHeredocLineWhitespace ::= HEREDOC_LINE_WHITE_SPACE? { methods = [excessWhitespace] }
-charListHeredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
+                    heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
+                    {
+                      implements = [
+                        "org.elixir_lang.psi.Heredoc"
+                      ]
+                      methods = [
+                        getFragmentType
+                        getHeredocLineList
+                        quote
+                        quoteBinary
+                        quoteEmpty
+                        quoteLiteral
+                      ]
+                      pin = 1
+                    }
+charListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.HeredocLine"
+                          ]
+                          methods = [
+                            getFragmentType
+                            getInterpolatedBody
+                            quote
+                          ]
+                        }
 
 /*
  * String
  */
 
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringBody
-                  STRING_HEREDOC_TERMINATOR
+                  stringHeredocLine*
+                  heredocPrefix STRING_HEREDOC_TERMINATOR
+                  {
+                    implements = [
+                      "org.elixir_lang.psi.Heredoc"
+                    ]
+                    methods = [
+                      getFragmentType
+                      getHeredocLineList
+                      quote
+                      quoteBinary
+                      quoteEmpty
+                      quoteLiteral
+                    ]
+                    pin = 1
+                  }
+stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
+                      {
+                        implements = [
+                          "org.elixir_lang.psi.HeredocLine"
+                        ]
+                        methods = [
+                          getFragmentType
+                          getInterpolatedBody
+                          quote
+                        ]
+                      }
 
 /*
  *
@@ -327,7 +376,16 @@ alias ::= ALIAS_TOKEN
  */
 
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                             {
+                               implements = "org.elixir_lang.psi.InterpolatedBody"
+                               methods = [
+                                 getFragmentType
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                               ]
+                             }
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -338,7 +396,16 @@ charList ::= CHAR_LIST_PROMOTER
  */
 
 interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                            {
+                              implements = "org.elixir_lang.psi.InterpolatedBody"
+                              methods = [
+                                getFragmentType
+                                quote
+                                quoteBinary
+                                quoteEmpty
+                                quoteLiteral
+                              ]
+                            }
 string ::= STRING_PROMOTER
            interpolatedStringBody
            STRING_TERMINATOR { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

@@ -13,14 +13,14 @@ import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
 
-public class ElixirCharListHeredocLineImpl extends ASTWrapperPsiElement implements ElixirCharListHeredocLine {
+public class ElixirStringHeredocLineImpl extends ASTWrapperPsiElement implements ElixirStringHeredocLine {
 
-  public ElixirCharListHeredocLineImpl(ASTNode node) {
+  public ElixirStringHeredocLineImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStringHeredocLine(this);
     else super.accept(visitor);
   }
 
@@ -32,8 +32,8 @@ public class ElixirCharListHeredocLineImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
-    return findNotNullChildByClass(ElixirInterpolatedCharListBody.class);
+  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
+    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
   }
 
   public IElementType getFragmentType() {

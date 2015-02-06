@@ -20,8 +20,6 @@ public interface ElixirTypes {
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
-  IElementType CHAR_LIST_HEREDOC_LINE_WHITESPACE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE_WHITESPACE");
-  IElementType CHAR_LIST_HEREDOC_PREFIX = new ElixirElementType("CHAR_LIST_HEREDOC_PREFIX");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
@@ -31,6 +29,8 @@ public interface ElixirTypes {
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType ESCAPED_CHARACTER = new ElixirElementType("ESCAPED_CHARACTER");
   IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
+  IElementType HEREDOC_LINE_PREFIX = new ElixirElementType("HEREDOC_LINE_PREFIX");
+  IElementType HEREDOC_PREFIX = new ElixirElementType("HEREDOC_PREFIX");
   IElementType HEXADECIMAL_DIGITS = new ElixirElementType("HEXADECIMAL_DIGITS");
   IElementType HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
@@ -66,6 +66,7 @@ public interface ElixirTypes {
   IElementType SIGIL = new ElixirElementType("SIGIL");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
@@ -110,7 +111,7 @@ public interface ElixirTypes {
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
   IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
-  IElementType HEREDOC_LINE_WHITE_SPACE = new ElixirTokenType("HEREDOC_LINE_WHITE_SPACE");
+  IElementType HEREDOC_LINE_WHITE_SPACE_TOKEN = new ElixirTokenType("HEREDOC_LINE_WHITE_SPACE_TOKEN");
   IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("HEREDOC_PREFIX_WHITE_SPACE");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
   IElementType IDENTIFIER = new ElixirTokenType("IDENTIFIER");
@@ -228,12 +229,6 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC_LINE) {
         return new ElixirCharListHeredocLineImpl(node);
       }
-      else if (type == CHAR_LIST_HEREDOC_LINE_WHITESPACE) {
-        return new ElixirCharListHeredocLineWhitespaceImpl(node);
-      }
-      else if (type == CHAR_LIST_HEREDOC_PREFIX) {
-        return new ElixirCharListHeredocPrefixImpl(node);
-      }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);
       }
@@ -260,6 +255,12 @@ public interface ElixirTypes {
       }
       else if (type == HAT_INFIX_OPERATOR) {
         return new ElixirHatInfixOperatorImpl(node);
+      }
+      else if (type == HEREDOC_LINE_PREFIX) {
+        return new ElixirHeredocLinePrefixImpl(node);
+      }
+      else if (type == HEREDOC_PREFIX) {
+        return new ElixirHeredocPrefixImpl(node);
       }
       else if (type == HEXADECIMAL_DIGITS) {
         return new ElixirHexadecimalDigitsImpl(node);
@@ -365,6 +366,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == STRING_HEREDOC_LINE) {
+        return new ElixirStringHeredocLineImpl(node);
       }
       else if (type == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
         return new ElixirUnaryCharTokenOrNumberOperationImpl(node);

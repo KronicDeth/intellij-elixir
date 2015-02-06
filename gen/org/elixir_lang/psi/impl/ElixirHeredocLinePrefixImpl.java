@@ -10,16 +10,22 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import com.intellij.psi.tree.IElementType;
 
-public class ElixirCharListHeredocPrefixImpl extends ASTWrapperPsiElement implements ElixirCharListHeredocPrefix {
+public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements ElixirHeredocLinePrefix {
 
-  public ElixirCharListHeredocPrefixImpl(ASTNode node) {
+  public ElixirHeredocLinePrefixImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListHeredocPrefix(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHeredocLinePrefix(this);
     else super.accept(visitor);
+  }
+
+  @Nullable
+  public ASTNode excessWhitespace(IElementType fragmentType, int prefixLength) {
+    return ElixirPsiImplUtil.excessWhitespace(this, fragmentType, prefixLength);
   }
 
 }

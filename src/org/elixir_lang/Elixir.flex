@@ -822,7 +822,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                               }
   {WHITE_SPACE}+                              {
                                                 yybegin(GROUP_HEREDOC_LINE_BODY);
-                                                return ElixirTypes.HEREDOC_LINE_WHITE_SPACE;
+                                                return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
                                               }
   {GROUP_HEREDOC_TERMINATOR}                  { handleInState(GROUP_HEREDOC_END); }
   {EOL}|.                                     { handleInState(GROUP_HEREDOC_LINE_BODY); }
