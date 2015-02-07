@@ -821,7 +821,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") ElixirInterpolatedStringBody interpolatedStringBody, List<Integer> codePointList) {
-        return elixirCharList(codePointList);
+        return elixirString(codePointList);
     }
 
     @Contract(pure = true)
