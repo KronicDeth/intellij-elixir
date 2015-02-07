@@ -24,15 +24,15 @@ public class StringParsingTestCase extends ParsingTestCase {
     }
 
     public void testMultiline() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNestedInterpolation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testWithoutInterpolation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
