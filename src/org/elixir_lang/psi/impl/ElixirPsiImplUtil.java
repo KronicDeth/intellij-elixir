@@ -418,8 +418,8 @@ public class ElixirPsiImplUtil {
             if (string != null) {
                 OtpErlangObject quotedString = string.quote();
 
-                if (quotedString instanceof OtpErlangBinary) {
-                    String atomText = javaString((OtpErlangBinary) quotedString);
+                if (quotedString instanceof OtpErlangString) {
+                    String atomText = ((OtpErlangString) quotedString).stringValue();
                     quoted = new OtpErlangAtom(atomText);
                 } else {
                     quoted = quotedFunctionCall(
