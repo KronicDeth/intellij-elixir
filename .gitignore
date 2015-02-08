@@ -1,5 +1,6 @@
 # user-specific project metadata
 /.idea/workspace.xml
+/.idea/shelf/
 # build output
 /out
 # old lexer generated from Elixir.flex
