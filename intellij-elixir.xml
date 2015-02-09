@@ -204,6 +204,7 @@
   <target name="clean" depends="clean.module.intellij-elixir" description="cleanup all"/>
   
   <target name="build.modules" depends="init, clean, plugin.build.jar.intellij-elixir" description="build all modules"/>
+  <target name="test.modules" depends="test.module.intellij-elixir" description="test all modules"/>
   
   <target name="all" depends="build.modules" description="build all"/>
 </project>

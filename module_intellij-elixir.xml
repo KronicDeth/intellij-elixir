@@ -128,9 +128,46 @@
     <delete dir="${intellij-elixir.output.dir}"/>
     <delete dir="${intellij-elixir.testoutput.dir}"/>
   </target>
-  
+
+  <path id="classpath.test">
+    <path refid="intellij-elixir.module.production.classpath"/>
+    <pathelement location="${intellij-elixir.output.dir}"/>
+    <pathelement location="${intellij-elixir.testoutput.dir}"/>
+    <pathelement location="${idea.home}/lib/guava-17.0.jar"/>
+  </path>
+
+  <property name="test" value="tests"/>
+
+  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir" description="test module">
+    <junit failureproperty="failure_found"
+           fork="yes"
+           forkmode="once"
+           haltonfailure="no"
+           printsummary="on"
+           showoutput="yes">
+      <classpath>
+        <path refid="classpath.test" />
+        <pathelement location="${test.build}"/>
+        <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest>
+        <fileset dir="${test}">
+          <include name="**/*Test*.java"/>
+          <exclude name="**/*TestCase.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <antcall target="check_test"/>
+  </target>
+
+  <target name="check_test" if="failure_found">
+    <fail message="Failures found"/>
+  </target>
+
   <property name="intellij-elixir.plugin.path.jar" value="${module.intellij-elixir.basedir}/intellij-elixir.zip"/>
-  
+
   <!-- Build archive for plugin 'intellij-elixir' -->
   <target name="plugin.build.jar.intellij-elixir" depends="compile.module.intellij-elixir" description="Build plugin archive for module &#39;intellij-elixir&#39;">
     <property name="tmp.dir.intellij-elixir" value="${module.intellij-elixir.basedir}/../temp"/>
