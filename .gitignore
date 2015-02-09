@@ -1,5 +1,8 @@
 # user-specific project metadata
 /.idea/workspace.xml
+/.idea/shelf/
+# ignore travis.sh output
+/idea-IC
 # build output
 /out
 # old lexer generated from Elixir.flex

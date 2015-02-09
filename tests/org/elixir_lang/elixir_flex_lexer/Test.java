@@ -2,6 +2,7 @@ package org.elixir_lang.elixir_flex_lexer;
 
 import org.elixir_lang.ElixirFlexLexer;
 import org.junit.Before;
+import org.junit.Ignore;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,6 +10,7 @@ import java.io.Reader;
 /**
  * Created by luke.imhoff on 9/28/14.
  */
+@Ignore("abstract")
 public abstract class Test {
     /*
      * Constants

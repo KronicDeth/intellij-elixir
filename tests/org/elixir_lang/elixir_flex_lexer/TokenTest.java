@@ -1,6 +1,7 @@
 package org.elixir_lang.elixir_flex_lexer;
 
 import com.intellij.psi.tree.IElementType;
+import org.junit.Ignore;
 
 import java.io.IOException;
 
@@ -10,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by luke.imhoff on 9/8/14.
  */
+@Ignore("abstract")
 public abstract class TokenTest extends Test {
     /*
      * Constants
