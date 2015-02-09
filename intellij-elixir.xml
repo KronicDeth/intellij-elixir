@@ -59,6 +59,9 @@
   <!-- JDK definitions -->
 
   <path id="jdk.classpath">
+    <fileset dir="${erlang.lib}">
+      <include name="jinterface-*/priv/OtpErlang.jar"/>
+    </fileset>
     <fileset dir="${idea.home}">
       <include name="lib/annotations.jar"/>
       <include name="lib/asm-all.jar"/>
