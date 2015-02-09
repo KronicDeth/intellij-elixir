@@ -5,7 +5,7 @@
   <property name="module.jdk.home.intellij-elixir" value="${project.jdk.home}"/>
   <property name="module.jdk.bin.intellij-elixir" value="${project.jdk.bin}"/>
   <property name="module.jdk.classpath.intellij-elixir" value="${project.jdk.classpath}"/>
-  
+
   <property name="compiler.args.intellij-elixir" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
   
   <property name="intellij-elixir.output.dir" value="${module.intellij-elixir.basedir}/out/production/intellij-elixir"/>

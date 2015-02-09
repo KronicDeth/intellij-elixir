@@ -3,7 +3,7 @@
 ./fetchIdea.sh
 
 # Run the tests
-ant -f intellij-elixir.xml -Didea.home=./idea-IC -Djdk.home.idea_ic-135.123=./idea-IC test.modules
+ant -f intellij-elixir.xml -Didea.home=./idea-IC -Djdk.bin=${JAVA_HOME}/bin test.modules
 
 # Was our build successful?
 stat=$?
