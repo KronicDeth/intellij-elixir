@@ -1,6 +1,9 @@
 /.idea/shelf
 # user-specific project metadata
 /.idea/workspace.xml
+/.idea/shelf/
+# ignore travis.sh output
+/idea-IC
 # build output
 /out
 # JFlex generator download

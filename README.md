@@ -1,5 +1,7 @@
 # Elixir plugin
 
+[![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
+
 This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
 ([0xDBE](http://www.jetbrains.com/dbe/), [AppCode](http://www.jetbrains.com/objc/),
 [IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
