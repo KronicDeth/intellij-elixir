@@ -1,6 +1,15 @@
 #!/bin/bash
 
 ./fetchIdea.sh
+
+# Erlang version switcher
+curl -O https://raw.githubusercontent.com/spawngrid/kerl/master/kerl
+chmod a+x kerl
+./kerl build 17.4 17.4
+./kerl install 17.4 $PWD/erlang/17.4
+source $PWD/erlang/17.4/activate
+
+# Elixir version switcher
 \curl -sSL https://raw.githubusercontent.com/taylor/kiex/master/install | bash -s
 ~/.kiex/bin/kiex install 1.0.2
 source $HOME/.kiex/elixirs/elixir-1.0.2.env
