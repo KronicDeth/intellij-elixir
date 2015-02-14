@@ -1,6 +1,5 @@
 package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_start.sigil;
 
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
@@ -35,17 +34,17 @@ public class CustomTest extends TokenTest {
     public static Collection<Object[]> generateData() {
         return Arrays.asList(
                 new Object[][]{
-                        {" '''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {" \"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {" '''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {" \"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"'''", ElixirTypes.SIGIL_HEREDOC_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS, true},
                         {";", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
                         {"\"\"\"", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
-                        {"\f'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {"\f\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {"\n", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true},
-                        {"\r\n", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
-                        {"\t'''", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {"\t\"\"\"", TokenType.WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\f'''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\f\"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true},
+                        {"\r\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
+                        {"\t'''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\t\"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
                         {"a", ElixirTypes.SIGIL_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true}
                 }
         );
