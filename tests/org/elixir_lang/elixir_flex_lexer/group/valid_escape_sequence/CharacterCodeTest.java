@@ -87,7 +87,14 @@ public class CharacterCodeTest extends org.elixir_lang.elixir_flex_lexer.Test {
         reset(charSequence);
 
         assertEquals(ElixirTypes.ESCAPE, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, flexLexer.yystate());
+
+        assertEquals(ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.HEXADECIMAL_ESCAPE_SEQUENCE, flexLexer.yystate());
+
+        assertEquals(ElixirTypes.VALID_HEXADECIMAL_DIGITS, flexLexer.advance());
         assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+
         assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
     };
 }
