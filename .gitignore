@@ -3,9 +3,7 @@
 /.idea/workspace.xml
 /.idea/shelf/
 # ignore travis.sh output
-/erlang
-/idea-IC
-/kerl
+/dependencies
 # build output
 /out
 # JFlex generator download

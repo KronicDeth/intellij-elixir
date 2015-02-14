@@ -1,3 +1,7 @@
+cache:
+  directories:
+  - dependencies
+  - "${HOME}/.kiex"
 jdk:
 - openjdk7
 - oraclejdk7
