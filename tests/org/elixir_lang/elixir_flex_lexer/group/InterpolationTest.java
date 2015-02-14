@@ -41,7 +41,7 @@ public class InterpolationTest extends org.elixir_lang.elixir_flex_lexer.group.T
     public static Collection<Object[]> generateData() {
         return Arrays.asList(new Object[][]{
                         { "#{", ElixirTypes.INTERPOLATION_START, ElixirFlexLexer.INTERPOLATION },
-                        { "\\", ElixirTypes.ESCAPE, ElixirFlexLexer.GROUP }
+                        { "\\", ElixirTypes.ESCAPE, ElixirFlexLexer.ESCAPE_SEQUENCE }
                 }
         );
     }
