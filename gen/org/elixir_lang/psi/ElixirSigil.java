@@ -17,6 +17,9 @@ public interface ElixirSigil extends PsiElement {
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
 
   @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

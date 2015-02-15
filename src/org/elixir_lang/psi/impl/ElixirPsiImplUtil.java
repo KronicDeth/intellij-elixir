@@ -487,7 +487,7 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
 
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirCharListHeredocLine charListHeredocLine) {
+    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirInterpolatedCharListHeredocLine charListHeredocLine) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
 
@@ -508,7 +508,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static List<HeredocLine> getHeredocLineList(ElixirCharListHeredoc charListHeredoc) {
-        List<ElixirCharListHeredocLine> charListHeredocLineList = charListHeredoc.getCharListHeredocLineList();
+        List<ElixirInterpolatedCharListHeredocLine> charListHeredocLineList = charListHeredoc.getInterpolatedCharListHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(charListHeredocLineList.size());
 
         for (HeredocLine heredocLine : charListHeredocLineList) {
@@ -529,7 +529,7 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirCharListHeredocLine charListHeredocLine) {
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedCharListHeredocLine charListHeredocLine) {
         return charListHeredocLine.getInterpolatedCharListBody();
     }
 

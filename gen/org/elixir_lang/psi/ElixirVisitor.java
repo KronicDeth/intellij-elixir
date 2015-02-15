@@ -52,10 +52,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitHeredoc(o);
   }
 
-  public void visitCharListHeredocLine(@NotNull ElixirCharListHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
     visitDigits(o);
   }
@@ -120,6 +116,14 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
     visitInterpolatedBody(o);
+  }
+
+  public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
+    visitHeredocLine(o);
+  }
+
+  public void visitInterpolatedCharListSigilHeredoc(@NotNull ElixirInterpolatedCharListSigilHeredoc o) {
+    visitPsiElement(o);
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {

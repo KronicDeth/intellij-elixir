@@ -186,7 +186,7 @@ heredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
  */
 
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
-                    charListHeredocLine*
+                    interpolatedCharListHeredocLine*
                     heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
                     {
                       implements = [
@@ -202,17 +202,17 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                       ]
                       pin = 1
                     }
-charListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
-                        {
-                          implements = [
-                            "org.elixir_lang.psi.HeredocLine"
-                          ]
-                          methods = [
-                            getFragmentType
-                            getInterpolatedBody
-                            quote
-                          ]
-                        }
+interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
+                                    {
+                                      implements = [
+                                        "org.elixir_lang.psi.HeredocLine"
+                                      ]
+                                      methods = [
+                                        getFragmentType
+                                        getInterpolatedBody
+                                        quote
+                                      ]
+                                    }
 
 /*
  * String
@@ -253,9 +253,9 @@ stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
  *
  */
 
-private interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
-                                             interpolatedCharListBody
-                                             CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
+interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+                                     interpolatedCharListHeredocLine*
+                                     heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
 private interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                       interpolatedRegexBody
                                       REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*

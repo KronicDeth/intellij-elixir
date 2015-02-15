@@ -10,11 +10,11 @@ import com.intellij.psi.tree.IElementType;
 
 public interface ElixirCharListHeredoc extends Heredoc {
 
-  @NotNull
-  List<ElixirCharListHeredocLine> getCharListHeredocLineList();
-
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
+
+  @NotNull
+  List<ElixirInterpolatedCharListHeredocLine> getInterpolatedCharListHeredocLineList();
 
   IElementType getFragmentType();
 

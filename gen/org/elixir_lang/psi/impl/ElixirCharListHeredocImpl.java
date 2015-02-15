@@ -26,15 +26,15 @@ public class ElixirCharListHeredocImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListHeredocLine> getCharListHeredocLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredocLine.class);
-  }
-
-  @Override
   @Nullable
   public ElixirHeredocPrefix getHeredocPrefix() {
     return findChildByClass(ElixirHeredocPrefix.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolatedCharListHeredocLine> getInterpolatedCharListHeredocLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListHeredocLine.class);
   }
 
   public IElementType getFragmentType() {

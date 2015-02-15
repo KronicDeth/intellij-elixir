@@ -19,7 +19,6 @@ public interface ElixirTypes {
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
-  IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
@@ -36,6 +35,8 @@ public interface ElixirTypes {
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType INFIX_DOT_OPERATOR = new ElixirElementType("INFIX_DOT_OPERATOR");
   IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
+  IElementType INTERPOLATED_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_CHAR_LIST_HEREDOC_LINE");
+  IElementType INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC");
   IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
@@ -226,9 +227,6 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
       }
-      else if (type == CHAR_LIST_HEREDOC_LINE) {
-        return new ElixirCharListHeredocLineImpl(node);
-      }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);
       }
@@ -276,6 +274,12 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATED_CHAR_LIST_BODY) {
         return new ElixirInterpolatedCharListBodyImpl(node);
+      }
+      else if (type == INTERPOLATED_CHAR_LIST_HEREDOC_LINE) {
+        return new ElixirInterpolatedCharListHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC) {
+        return new ElixirInterpolatedCharListSigilHeredocImpl(node);
       }
       else if (type == INTERPOLATED_STRING_BODY) {
         return new ElixirInterpolatedStringBodyImpl(node);
