@@ -25,6 +25,24 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();
 
+  @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
+  @Nullable
+  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+
+  @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+
+  @Nullable
+  ElixirInterpolatedStringBody getInterpolatedStringBody();
+
+  @NotNull
+  List<ElixirInterpolation> getInterpolationList();
+
   @Nullable
   ElixirList getList();
 
@@ -54,9 +72,6 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
 
   @Nullable
   ElixirQualifiedAlias getQualifiedAlias();
-
-  @Nullable
-  ElixirSigil getSigil();
 
   @Nullable
   ElixirString getString();

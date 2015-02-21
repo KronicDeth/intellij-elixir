@@ -66,6 +66,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
+  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }
@@ -122,12 +128,6 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   @Nullable
   public ElixirQualifiedAlias getQualifiedAlias() {
     return findChildByClass(ElixirQualifiedAlias.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirSigil getSigil() {
-    return findChildByClass(ElixirSigil.class);
   }
 
   @Override

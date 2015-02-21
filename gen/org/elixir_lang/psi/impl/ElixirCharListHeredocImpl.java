@@ -37,6 +37,21 @@ public class ElixirCharListHeredocImpl extends ASTWrapperPsiElement implements E
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListHeredocLine.class);
   }
 
+  @NotNull
+  public List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child) {
+    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, child);
+  }
+
+  @NotNull
+  public List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child) {
+    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
+  }
+
+  @NotNull
+  public List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child) {
+    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, child);
+  }
+
   public IElementType getFragmentType() {
     return ElixirPsiImplUtil.getFragmentType(this);
   }

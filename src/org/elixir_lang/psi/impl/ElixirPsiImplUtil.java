@@ -461,7 +461,7 @@ public class ElixirPsiImplUtil {
      */
     @Contract(pure = true)
     @Nullable
-    public static ASTNode excessWhitespace(@NotNull final ElixirHeredocLinePrefix heredocLinePrefix, @NotNull final IElementType fragmentType, int prefixLength) {
+    public static ASTNode excessWhitespace(@NotNull final ElixirHeredocLinePrefix heredocLinePrefix, @NotNull final IElementType fragmentType, final int prefixLength) {
         int availableLength = heredocLinePrefix.getTextLength();
         int excessLength = availableLength - prefixLength;
         ASTNode excessWhitespaceASTNode = null;
@@ -483,35 +483,19 @@ public class ElixirPsiImplUtil {
         return excessWhitespaceASTNode;
     }
 
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirCharListHeredoc charListHeredoc) {
+    public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
 
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirInterpolatedCharListHeredocLine charListHeredocLine) {
-        return ElixirTypes.CHAR_LIST_FRAGMENT;
-    }
-
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirInterpolatedCharListBody interpolatedCharListBody) {
-        return ElixirTypes.CHAR_LIST_FRAGMENT;
-    }
-
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirInterpolatedStringBody interpolatedStringBody) {
+    public static IElementType getFragmentType(@SuppressWarnings("unused") StringFragmented stringFragmented) {
         return ElixirTypes.STRING_FRAGMENT;
     }
 
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirStringHeredoc stringHeredoc) {
-        return ElixirTypes.STRING_FRAGMENT;
-    }
+    public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
+        List<ElixirInterpolatedCharListHeredocLine> interpolatedCharListHeredocLineList = interpolatedCharListHeredocLined.getInterpolatedCharListHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedCharListHeredocLineList.size());
 
-    public static IElementType getFragmentType(@SuppressWarnings("unused") ElixirStringHeredocLine stringHeredocLine) {
-        return ElixirTypes.STRING_FRAGMENT;
-    }
-
-    public static List<HeredocLine> getHeredocLineList(ElixirCharListHeredoc charListHeredoc) {
-        List<ElixirInterpolatedCharListHeredocLine> charListHeredocLineList = charListHeredoc.getInterpolatedCharListHeredocLineList();
-        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(charListHeredocLineList.size());
-
-        for (HeredocLine heredocLine : charListHeredocLineList) {
+        for (HeredocLine heredocLine : interpolatedCharListHeredocLineList) {
             heredocLineList.add(heredocLine);
         }
 
@@ -626,6 +610,27 @@ public class ElixirPsiImplUtil {
         );
 
         return quotedType;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(ElixirSigilModifiers sigilModifiers) {
+        String sigilModifiersText = sigilModifiers.getText();
+        List<Integer> codePoints = new ArrayList<Integer>(sigilModifiersText.length());
+        OtpErlangObject quoted;
+
+        for (int i = 0; i < sigilModifiersText.length(); i++) {
+            int codePoint = sigilModifiersText.codePointAt(i);
+            codePoints.add(codePoint);
+        }
+
+        if (codePoints.size() == 0) {
+            quoted = new OtpErlangList();
+        } else {
+            quoted = elixirCharList(codePoints);
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
@@ -753,83 +758,86 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(ElixirCharListHeredoc charListHeredoc, OtpErlangTuple binary) {
+    public static OtpErlangObject quote(Sigil sigil) {
+        return null;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(SigilHeredoc sigilHeredoc) {
+        char sigilName = sigilHeredoc.sigilName();
+
+        OtpErlangList sigilHeredocMetadata = metadata(sigilHeredoc);
+        OtpErlangObject quotedHeredoc = quote((Heredoc) sigilHeredoc);
+        OtpErlangObject sigilBinary = quotedFunctionCall("<<>>", sigilHeredocMetadata, quotedHeredoc);
+
+        ElixirSigilModifiers sigilModifiers = sigilHeredoc.getSigilModifiers();
+        OtpErlangObject quotedModifiers = sigilModifiers.quote();
+
+        return quotedFunctionCall(
+                "sigil_" + sigilName,
+                sigilHeredocMetadata,
+                sigilBinary,
+                quotedModifiers
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
         return quotedFunctionCall(
                 "Elixir.String",
                 "to_char_list",
-                metadata(charListHeredoc),
+                metadata(interpolatedCharList),
                 binary
         );
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(ElixirInterpolatedCharListBody interpolatedCharListBody, OtpErlangTuple binary) {
-        return quotedFunctionCall(
-                "Elixir.String",
-                "to_char_list",
-                metadata(interpolatedCharListBody),
-                binary
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") ElixirInterpolatedStringBody interpolatedStringBody, OtpErlangTuple binary) {
+    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedString interpolatedString, OtpErlangTuple binary) {
         return binary;
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") ElixirStringHeredoc stringHeredoc, OtpErlangTuple binary) {
+    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc, OtpErlangTuple binary) {
         return binary;
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") ElixirCharListHeredoc charListHeredoc) {
+    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedCharList interpolatedCharList) {
         return new OtpErlangList();
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") ElixirInterpolatedCharListBody interpolatedCharListBody) {
-        return new OtpErlangList();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") ElixirInterpolatedStringBody interpolatedStringBody) {
+    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedString interpolatedString) {
         return elixirString("");
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") ElixirStringHeredoc stringHeredoc) {
+    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc) {
         return elixirString("");
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") ElixirCharListHeredoc charListHeredoc, List<Integer> codePointList) {
+    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedCharList interpolatedCharList, List<Integer> codePointList) {
         return elixirCharList(codePointList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") ElixirInterpolatedCharListBody interpolatedCharListBody, List<Integer> codePointList) {
-        return elixirCharList(codePointList);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") ElixirInterpolatedStringBody interpolatedStringBody, List<Integer> codePointList) {
+    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedString interpolatedString, List<Integer> codePointList) {
         return elixirString(codePointList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") ElixirStringHeredoc stringHeredoc, List<Integer> codePointList) {
+    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc, List<Integer> codePointList) {
         return elixirString(codePointList);
     }
 
@@ -894,6 +902,14 @@ public class ElixirPsiImplUtil {
                         quotedArguments(arguments)
                 }
         );
+    }
+
+    public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
+        ASTNode sigilNode = sigil.getNode();
+        ASTNode[] childNodes = sigilNode.getChildren(null);
+        ASTNode nameNode = childNodes[1];
+        CharSequence chars = nameNode.getChars();
+        return chars.charAt(0);
     }
 
     @NotNull
@@ -990,7 +1006,79 @@ public class ElixirPsiImplUtil {
         heredocDescendantNodes.add(eolNode);
     }
 
-    private static OtpErlangObject quotedChildNodes(@NotNull Interpolated anchor, @NotNull ASTNode... children) {
+    @NotNull
+    private static List<Integer> ensureCodePointList(@Nullable List<Integer> codePointList) {
+        if (codePointList == null) {
+            codePointList = new LinkedList<Integer>();
+        }
+
+        return codePointList;
+    }
+
+    @NotNull
+    private static List<Integer> addChildTextCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        return addStringCodePoints(codePointList, child.getText());
+    }
+
+    @NotNull
+    public static List<Integer> addEscapedCharacterCodePoints(@NotNull @SuppressWarnings("unused") Quote parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        codePointList = ensureCodePointList(codePointList);
+
+        ElixirEscapedCharacter escapedCharacter = (ElixirEscapedCharacter) child.getPsi();
+
+        codePointList.add(
+                escapedCharacter.codePoint()
+        );
+
+        return codePointList;
+    }
+
+    @NotNull
+    public static List<Integer> addEscapedCharacterCodePoints(@NotNull @SuppressWarnings("unused") Sigil parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        String childText = child.getText();
+
+        // Not sure, why, but \ gets stripped in front of # when quoting using Quoter.
+        if (childText.equals("\\#")) {
+            childText = "#";
+        }
+
+        return addStringCodePoints(codePointList, childText);
+    }
+
+    @NotNull
+    public static List<Integer> addFragmentCodePoints(@NotNull @SuppressWarnings("unused") Parent parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        return addChildTextCodePoints(codePointList, child);
+    }
+
+    @NotNull
+    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Quote parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        codePointList = ensureCodePointList(codePointList);
+
+        ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirHexadecimalEscapeSequence) child.getPsi();
+        codePointList.add(
+                hexadecimalEscapeSequence.codePoint()
+        );
+
+        return codePointList;
+    }
+
+    @NotNull
+    public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Sigil parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
+        return addChildTextCodePoints(codePointList, child);
+    }
+
+    @NotNull
+    private static List<Integer> addStringCodePoints(@Nullable List<Integer> codePointList, @NotNull String string) {
+        codePointList = ensureCodePointList(codePointList);
+
+        for (Integer codePoint : codePoints(string)) {
+            codePointList.add(codePoint);
+        }
+
+        return codePointList;
+    }
+
+    private static OtpErlangObject quotedChildNodes(@NotNull Parent anchor, @NotNull ASTNode... children) {
         OtpErlangObject quoted;
 
         final int childCount = children.length;
@@ -1006,31 +1094,11 @@ public class ElixirPsiImplUtil {
                 IElementType elementType = child.getElementType();
 
                 if (elementType == anchor.getFragmentType()) {
-                    if (codePointList == null) {
-                        codePointList = new LinkedList<Integer>();
-                    }
-
-                    for (Integer codePoint : codePoints(child.getText())) {
-                        codePointList.add(codePoint);
-                    }
+                    codePointList = anchor.addFragmentCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
-                    if (codePointList == null) {
-                        codePointList = new LinkedList<Integer>();
-                    }
-
-                    ElixirEscapedCharacter escapedCharacter = (ElixirEscapedCharacter) child.getPsi();
-                    codePointList.add(
-                            escapedCharacter.codePoint()
-                    );
+                    codePointList = anchor.addEscapedCharacterCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_SEQUENCE) {
-                    if (codePointList == null) {
-                        codePointList = new LinkedList<Integer>();
-                    }
-
-                    ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirHexadecimalEscapeSequence) child.getPsi();
-                    codePointList.add(
-                            hexadecimalEscapeSequence.codePoint()
-                    );
+                    codePointList = anchor.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
                     if (codePointList != null) {
                         quotedAnchorList.add(elixirString(codePointList));

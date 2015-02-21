@@ -66,6 +66,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
+  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }
@@ -104,12 +110,6 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
   @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirSigil getSigil() {
-    return findChildByClass(ElixirSigil.class);
   }
 
   @Override

@@ -29,6 +29,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+
+  @Nullable
   ElixirList getList();
 
   @Nullable
@@ -57,9 +60,6 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
 
   @Nullable
   ElixirQualifiedAlias getQualifiedAlias();
-
-  @Nullable
-  ElixirSigil getSigil();
 
   @NotNull
   List<ElixirString> getStringList();

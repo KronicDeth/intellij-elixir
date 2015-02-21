@@ -372,7 +372,7 @@ ALIAS_HEAD = [A-Z]
 ALIAS = {ALIAS_HEAD} {IDENTIFIER_TAIL}
 
 /*
- * Interpolation
+ * Parent
  */
 
 INTERPOLATION_START = "#{"

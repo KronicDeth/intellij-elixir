@@ -191,8 +191,14 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                     {
                       implements = [
                         "org.elixir_lang.psi.Heredoc"
+                        "org.elixir_lang.psi.InterpolatedCharList"
+                        "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
+                        "org.elixir_lang.psi.Quote"
                       ]
                       methods = [
+                        addEscapedCharacterCodePoints
+                        addFragmentCodePoints
+                        addHexadecimalEscapeSequenceCodePoints
                         getFragmentType
                         getHeredocLineList
                         quote
@@ -205,6 +211,7 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
 interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
                                     {
                                       implements = [
+                                        "org.elixir_lang.psi.CharListFragmented"
                                         "org.elixir_lang.psi.HeredocLine"
                                       ]
                                       methods = [
@@ -224,8 +231,12 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                   {
                     implements = [
                       "org.elixir_lang.psi.Heredoc"
+                      "org.elixir_lang.psi.InterpolatedString"
                     ]
                     methods = [
+                      addEscapedCharacterCodePoints
+                      addFragmentCodePoints
+                      addHexadecimalEscapeSequenceCodePoints
                       getFragmentType
                       getHeredocLineList
                       quote
@@ -239,6 +250,7 @@ stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
                       {
                         implements = [
                           "org.elixir_lang.psi.HeredocLine"
+                          "org.elixir_lang.psi.StringFragmented"
                         ]
                         methods = [
                           getFragmentType
@@ -249,13 +261,34 @@ stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
 
 /*
  *
- * Interpolated Sigil Heredocs
+ * Parent Sigil Heredocs
  *
  */
 
 interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedCharListHeredocLine*
-                                     heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
+                                     heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                     {
+                                       implements = [
+                                         "org.elixir_lang.psi.CharListFragmented"
+                                         "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
+                                         "org.elixir_lang.psi.SigilHeredoc"
+                                       ]
+                                       methods = [
+                                         addEscapedCharacterCodePoints
+                                         addFragmentCodePoints
+                                         addHexadecimalEscapeSequenceCodePoints
+                                         getFragmentType
+                                         getHeredocLineList
+                                         quote
+                                         quoteBinary
+                                         quoteEmpty
+                                         quoteLiteral
+                                         sigilName
+                                       ]
+                                     }
+sigilModifiers ::= SIGIL_MODIFIER* { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                       interpolatedRegexBody
                                       REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
@@ -377,8 +410,14 @@ alias ::= ALIAS_TOKEN
 
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
                              {
-                               implements = "org.elixir_lang.psi.InterpolatedBody"
+                               implements = [
+                                 "org.elixir_lang.psi.InterpolatedCharList"
+                                 "org.elixir_lang.psi.InterpolatedBody"
+                               ]
                                methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
                                  getFragmentType
                                  quote
                                  quoteBinary
@@ -397,8 +436,14 @@ charList ::= CHAR_LIST_PROMOTER
 
 interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
                             {
-                              implements = "org.elixir_lang.psi.InterpolatedBody"
+                              implements = [
+                                "org.elixir_lang.psi.InterpolatedBody"
+                                "org.elixir_lang.psi.InterpolatedString"
+                              ]
                               methods = [
+                                addEscapedCharacterCodePoints
+                                addFragmentCodePoints
+                                addHexadecimalEscapeSequenceCodePoints
                                 getFragmentType
                                 quote
                                 quoteBinary
@@ -594,23 +639,23 @@ number ::= binaryWholeNumber |
  */
 
 private quote ::= (charList | string)
-sigil ::= interpolatedCharListSigil |
-          interpolatedCharListSigilHeredoc |
-          interpolatedRegexHeredoc |
-          interpolatedSigilHeredoc |
-          interpolatedStringSigilHeredoc |
-          interpolatedWordsHeredoc |
-          interpolatedRegex |
-          interpolatedSigil |
-          interpolatedStringSigil |
-          literalCharListSigil |
-          literalRegexHeredoc |
-          literalSigilHeredoc |
-          literalStringSigilHeredoc |
-          literalWordsHeredoc |
-          literalRegex |
-          literalSigil |
-          literalStringSigil |
-          literalWords
+private sigil ::= interpolatedCharListSigil |
+                  interpolatedCharListSigilHeredoc |
+                  interpolatedRegexHeredoc |
+                  interpolatedSigilHeredoc |
+                  interpolatedStringSigilHeredoc |
+                  interpolatedWordsHeredoc |
+                  interpolatedRegex |
+                  interpolatedSigil |
+                  interpolatedStringSigil |
+                  literalCharListSigil |
+                  literalRegexHeredoc |
+                  literalSigilHeredoc |
+                  literalStringSigilHeredoc |
+                  literalWordsHeredoc |
+                  literalRegex |
+                  literalSigil |
+                  literalStringSigil |
+                  literalWords
 
 unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }

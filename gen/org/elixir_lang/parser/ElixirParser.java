@@ -190,8 +190,8 @@ public class ElixirParser implements PsiParser {
     else if (t == QUALIFIED_ALIAS) {
       r = qualifiedAlias(b, 0);
     }
-    else if (t == SIGIL) {
-      r = sigil(b, 0);
+    else if (t == SIGIL_MODIFIERS) {
+      r = sigilModifiers(b, 0);
     }
     else if (t == STRING) {
       r = string(b, 0);
@@ -1138,7 +1138,7 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
   //                                      interpolatedCharListHeredocLine*
-  //                                      heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
+  //                                      heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
   public static boolean interpolatedCharListSigilHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedCharListSigilHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
@@ -1148,6 +1148,7 @@ public class ElixirParser implements PsiParser {
     r = r && interpolatedCharListSigilHeredoc_4(b, l + 1);
     r = r && heredocPrefix(b, l + 1);
     r = r && consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR);
+    r = r && sigilModifiers(b, l + 1);
     exit_section_(b, m, INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC, r);
     return r;
   }
@@ -2855,24 +2856,24 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // interpolatedCharListSigil |
-  //           interpolatedCharListSigilHeredoc |
-  //           interpolatedRegexHeredoc |
-  //           interpolatedSigilHeredoc |
-  //           interpolatedStringSigilHeredoc |
-  //           interpolatedWordsHeredoc |
-  //           interpolatedRegex |
-  //           interpolatedSigil |
-  //           interpolatedStringSigil |
-  //           literalCharListSigil |
-  //           literalRegexHeredoc |
-  //           literalSigilHeredoc |
-  //           literalStringSigilHeredoc |
-  //           literalWordsHeredoc |
-  //           literalRegex |
-  //           literalSigil |
-  //           literalStringSigil |
-  //           literalWords
-  public static boolean sigil(PsiBuilder b, int l) {
+  //                   interpolatedCharListSigilHeredoc |
+  //                   interpolatedRegexHeredoc |
+  //                   interpolatedSigilHeredoc |
+  //                   interpolatedStringSigilHeredoc |
+  //                   interpolatedWordsHeredoc |
+  //                   interpolatedRegex |
+  //                   interpolatedSigil |
+  //                   interpolatedStringSigil |
+  //                   literalCharListSigil |
+  //                   literalRegexHeredoc |
+  //                   literalSigilHeredoc |
+  //                   literalStringSigilHeredoc |
+  //                   literalWordsHeredoc |
+  //                   literalRegex |
+  //                   literalSigil |
+  //                   literalStringSigil |
+  //                   literalWords
+  static boolean sigil(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "sigil")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
@@ -2895,8 +2896,23 @@ public class ElixirParser implements PsiParser {
     if (!r) r = literalSigil(b, l + 1);
     if (!r) r = literalStringSigil(b, l + 1);
     if (!r) r = literalWords(b, l + 1);
-    exit_section_(b, m, SIGIL, r);
+    exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // SIGIL_MODIFIER*
+  public static boolean sigilModifiers(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "sigilModifiers")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<sigil modifiers>");
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, SIGIL_MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "sigilModifiers", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, l, m, SIGIL_MODIFIERS, true, false, null);
+    return true;
   }
 
   /* ********************************************************** */

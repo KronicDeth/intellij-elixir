@@ -65,6 +65,42 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
   }
 
   @Override
+  @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
+    return findChildByClass(ElixirInterpolatedCharListBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
+    return findChildByClass(ElixirInterpolatedStringBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  }
+
+  @Override
   @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
@@ -134,12 +170,6 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
   @Nullable
   public ElixirQualifiedAlias getQualifiedAlias() {
     return findChildByClass(ElixirQualifiedAlias.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirSigil getSigil() {
-    return findChildByClass(ElixirSigil.class);
   }
 
   @Override

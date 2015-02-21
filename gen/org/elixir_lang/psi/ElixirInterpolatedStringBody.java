@@ -6,9 +6,10 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirInterpolatedStringBody extends InterpolatedBody {
+public interface ElixirInterpolatedStringBody extends InterpolatedBody, InterpolatedString {
 
   @NotNull
   List<ElixirEscapedCharacter> getEscapedCharacterList();
@@ -18,6 +19,15 @@ public interface ElixirInterpolatedStringBody extends InterpolatedBody {
 
   @NotNull
   List<ElixirInterpolation> getInterpolationList();
+
+  @NotNull
+  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
+
+  @NotNull
+  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child);
+
+  @NotNull
+  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child);
 
   IElementType getFragmentType();
 

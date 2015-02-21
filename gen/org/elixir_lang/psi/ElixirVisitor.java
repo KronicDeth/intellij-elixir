@@ -50,6 +50,9 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
     visitHeredoc(o);
+    // visitInterpolatedCharList(o);
+    // visitInterpolatedCharListHeredocLined(o);
+    // visitQuote(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
@@ -115,19 +118,24 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
-    visitInterpolatedBody(o);
+    visitInterpolatedCharList(o);
+    // visitInterpolatedBody(o);
   }
 
   public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
-    visitHeredocLine(o);
+    visitCharListFragmented(o);
+    // visitHeredocLine(o);
   }
 
   public void visitInterpolatedCharListSigilHeredoc(@NotNull ElixirInterpolatedCharListSigilHeredoc o) {
-    visitPsiElement(o);
+    visitCharListFragmented(o);
+    // visitInterpolatedCharListHeredocLined(o);
+    // visitSigilHeredoc(o);
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {
     visitInterpolatedBody(o);
+    // visitInterpolatedString(o);
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
@@ -235,8 +243,8 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitSigil(@NotNull ElixirSigil o) {
-    visitPsiElement(o);
+  public void visitSigilModifiers(@NotNull ElixirSigilModifiers o) {
+    visitQuotable(o);
   }
 
   public void visitString(@NotNull ElixirString o) {
@@ -245,10 +253,12 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitHeredoc(o);
+    // visitInterpolatedString(o);
   }
 
   public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
     visitHeredocLine(o);
+    // visitStringFragmented(o);
   }
 
   public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {
@@ -261,6 +271,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitNumber(o);
+  }
+
+  public void visitCharListFragmented(@NotNull CharListFragmented o) {
+    visitElement(o);
   }
 
   public void visitDigits(@NotNull Digits o) {
@@ -284,6 +298,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedBody(@NotNull InterpolatedBody o) {
+    visitElement(o);
+  }
+
+  public void visitInterpolatedCharList(@NotNull InterpolatedCharList o) {
     visitElement(o);
   }
 

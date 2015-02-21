@@ -64,7 +64,7 @@ public interface ElixirTypes {
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType QUALIFIED_ALIAS = new ElixirElementType("QUALIFIED_ALIAS");
-  IElementType SIGIL = new ElixirElementType("SIGIL");
+  IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
@@ -362,8 +362,8 @@ public interface ElixirTypes {
       else if (type == QUALIFIED_ALIAS) {
         return new ElixirQualifiedAliasImpl(node);
       }
-      else if (type == SIGIL) {
-        return new ElixirSigilImpl(node);
+      else if (type == SIGIL_MODIFIERS) {
+        return new ElixirSigilModifiersImpl(node);
       }
       else if (type == STRING) {
         return new ElixirStringImpl(node);

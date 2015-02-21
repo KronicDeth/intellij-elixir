@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implements ElixirAdjacentExpression {
 
@@ -62,6 +62,42 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
+    return findChildByClass(ElixirInterpolatedCharListBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
+    return findChildByClass(ElixirInterpolatedStringBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }
 
   @Override
@@ -134,12 +170,6 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirQualifiedAlias getQualifiedAlias() {
     return findChildByClass(ElixirQualifiedAlias.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirSigil getSigil() {
-    return findChildByClass(ElixirSigil.class);
   }
 
   @Override

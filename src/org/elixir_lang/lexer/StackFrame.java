@@ -110,7 +110,7 @@ public class StackFrame {
     private void setInterpolation(boolean interpolation) {
         if (this.interpolation != null) {
             throw new IllegalStateException(
-                    "Interpolation already set to " + this.interpolation + ".  " +
+                    "Parent already set to " + this.interpolation + ".  " +
                             "It is illegal to set interpolation more than once in any StackFrame."
             );
         }
@@ -120,7 +120,7 @@ public class StackFrame {
 
     public boolean isInterpolating() {
         if (this.interpolation == null) {
-            throw new IllegalStateException("Interpolation not set.");
+            throw new IllegalStateException("Parent not set.");
         }
 
         return this.interpolation.booleanValue();

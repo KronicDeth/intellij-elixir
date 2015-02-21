@@ -28,6 +28,24 @@ public interface ElixirAdjacentExpression extends PsiElement {
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
+  @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
+  @Nullable
+  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+
+  @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+
+  @Nullable
+  ElixirInterpolatedStringBody getInterpolatedStringBody();
+
+  @NotNull
+  List<ElixirInterpolation> getInterpolationList();
+
   @Nullable
   ElixirList getList();
 
@@ -63,9 +81,6 @@ public interface ElixirAdjacentExpression extends PsiElement {
 
   @Nullable
   ElixirQualifiedAlias getQualifiedAlias();
-
-  @Nullable
-  ElixirSigil getSigil();
 
   @Nullable
   ElixirString getString();

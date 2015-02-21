@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirStringHeredocLine extends HeredocLine {
+public interface ElixirStringHeredocLine extends HeredocLine, StringFragmented {
 
   @NotNull
   ElixirHeredocLinePrefix getHeredocLinePrefix();

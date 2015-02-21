@@ -6,15 +6,25 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirStringHeredoc extends Heredoc {
+public interface ElixirStringHeredoc extends Heredoc, InterpolatedString {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
   List<ElixirStringHeredocLine> getStringHeredocLineList();
+
+  @NotNull
+  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
+
+  @NotNull
+  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child);
+
+  @NotNull
+  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child);
 
   IElementType getFragmentType();
 

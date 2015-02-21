@@ -29,6 +29,24 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   ElixirEmptyParentheses getEmptyParentheses();
 
   @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
+  @Nullable
+  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+
+  @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+
+  @Nullable
+  ElixirInterpolatedStringBody getInterpolatedStringBody();
+
+  @NotNull
+  List<ElixirInterpolation> getInterpolationList();
+
+  @NotNull
   ElixirKeywordKey getKeywordKey();
 
   @Nullable
@@ -63,9 +81,6 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
   ElixirQualifiedAlias getQualifiedAlias();
-
-  @Nullable
-  ElixirSigil getSigil();
 
   @Nullable
   ElixirString getString();

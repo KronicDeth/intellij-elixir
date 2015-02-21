@@ -79,6 +79,42 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolatedCharListBody> getInterpolatedCharListBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolation> getInterpolationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirList> getListList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirList.class);
   }
@@ -147,12 +183,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirQualifiedAlias> getQualifiedAliasList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQualifiedAlias.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirSigil> getSigilList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigil.class);
   }
 
   @Override

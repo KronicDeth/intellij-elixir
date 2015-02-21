@@ -26,7 +26,25 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
+
+  @NotNull
   ElixirHatInfixOperator getHatInfixOperator();
+
+  @NotNull
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+
+  @Nullable
+  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+
+  @NotNull
+  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
+
+  @Nullable
+  ElixirInterpolatedStringBody getInterpolatedStringBody();
+
+  @NotNull
+  List<ElixirInterpolation> getInterpolationList();
 
   @NotNull
   List<ElixirList> getListList();
@@ -60,9 +78,6 @@ public interface ElixirMatchedHatOperation extends PsiElement {
 
   @NotNull
   List<ElixirQualifiedAlias> getQualifiedAliasList();
-
-  @NotNull
-  List<ElixirSigil> getSigilList();
 
   @NotNull
   List<ElixirString> getStringList();
