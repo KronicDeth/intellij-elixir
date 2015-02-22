@@ -284,6 +284,7 @@ interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CH
                                          quoteLiteral
                                          sigilName
                                        ]
+                                       pin = 3
                                      }
 
 interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL

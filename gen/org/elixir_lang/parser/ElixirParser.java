@@ -1151,15 +1151,16 @@ public class ElixirParser implements PsiParser {
   public static boolean interpolatedCharListSigilHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedCharListSigilHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
-    r = r && interpolatedCharListSigilHeredoc_4(b, l + 1);
-    r = r && heredocPrefix(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 3
+    r = r && report_error_(b, interpolatedCharListSigilHeredoc_4(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC, r, p, null);
+    return r || p;
   }
 
   // interpolatedCharListHeredocLine*
