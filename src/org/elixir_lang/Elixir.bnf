@@ -211,11 +211,9 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
 interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
                                     {
                                       implements = [
-                                        "org.elixir_lang.psi.CharListFragmented"
                                         "org.elixir_lang.psi.HeredocLine"
                                       ]
                                       methods = [
-                                        getFragmentType
                                         getInterpolatedBody
                                         quote
                                       ]
@@ -250,10 +248,8 @@ stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
                       {
                         implements = [
                           "org.elixir_lang.psi.HeredocLine"
-                          "org.elixir_lang.psi.StringFragmented"
                         ]
                         methods = [
-                          getFragmentType
                           getInterpolatedBody
                           quote
                         ]

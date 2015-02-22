@@ -123,8 +123,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
-    visitCharListFragmented(o);
-    // visitHeredocLine(o);
+    visitHeredocLine(o);
   }
 
   public void visitInterpolatedCharListSigilHeredoc(@NotNull ElixirInterpolatedCharListSigilHeredoc o) {
@@ -273,7 +272,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
     visitHeredocLine(o);
-    // visitStringFragmented(o);
   }
 
   public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {

@@ -666,9 +666,10 @@ public class ElixirPsiImplUtil {
         int prefixLength = heredocPrefix.getTextLength();
         Deque<ASTNode> alignedNodeQueue = new LinkedList<ASTNode>();
         List<HeredocLine> heredocLineList = heredoc.getHeredocLineList();
+        IElementType fragmentType = heredoc.getFragmentType();
 
         for (HeredocLine line  : heredocLineList) {
-            queueChildNodes(line, prefixLength, alignedNodeQueue);
+            queueChildNodes(line, fragmentType, prefixLength, alignedNodeQueue);
         }
 
         Queue<ASTNode> mergedNodeQueue = mergeFragments(
@@ -686,7 +687,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, @NotNull final Heredoc heredoc, int prefixLength) {
         ElixirHeredocLinePrefix heredocLinePrefix = heredocLine.getHeredocLinePrefix();
-        ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(heredocLine.getFragmentType(), prefixLength);
+        ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(heredoc.getFragmentType(), prefixLength);
         InterpolatedBody interpolatedBody = heredocLine.getInterpolatedBody();
         ASTNode[] directChildNodes = childNodes(interpolatedBody);
         ASTNode[] accumulatedChildNodes;
@@ -1016,10 +1017,10 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    private static void queueChildNodes(@NotNull HeredocLine line, int prefixLength, @NotNull Queue<ASTNode> heredocDescendantNodes) {
+    private static void queueChildNodes(@NotNull HeredocLine line, IElementType fragmentType, int prefixLength, @NotNull Queue<ASTNode> heredocDescendantNodes) {
         ElixirHeredocLinePrefix heredocLinePrefix = line.getHeredocLinePrefix();
 
-        ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(line.getFragmentType(), prefixLength);
+        ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(fragmentType, prefixLength);
 
         if (excessWhitespace != null) {
             heredocDescendantNodes.add(excessWhitespace);
@@ -1029,7 +1030,7 @@ public class ElixirPsiImplUtil {
         Collections.addAll(heredocDescendantNodes, childNodes(interpolatedBody));
 
         ASTNode eolNode = Factory.createSingleLeafElement(
-                line.getFragmentType(),
+                fragmentType,
                 "\n",
                 0,
                 1,
