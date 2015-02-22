@@ -10,6 +10,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -25,9 +26,9 @@ public class ElixirInterpolatedRegexHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirHeredocPrefix getHeredocPrefix() {
-    return findNotNullChildByClass(ElixirHeredocPrefix.class);
+    return findChildByClass(ElixirHeredocPrefix.class);
   }
 
   @Override
@@ -37,9 +38,9 @@ public class ElixirInterpolatedRegexHeredocImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirSigilModifiers getSigilModifiers() {
-    return findNotNullChildByClass(ElixirSigilModifiers.class);
+    return findChildByClass(ElixirSigilModifiers.class);
   }
 
   @NotNull

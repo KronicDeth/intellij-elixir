@@ -307,6 +307,7 @@ interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_
                                  quoteLiteral
                                  sigilName
                                ]
+                               pin = 3
                              }
 interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
                                  {

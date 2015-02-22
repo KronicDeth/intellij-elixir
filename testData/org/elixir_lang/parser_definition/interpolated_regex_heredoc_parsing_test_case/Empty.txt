@@ -1,6 +1,10 @@
 Elixir File(0,8)
-  PsiElement(ElixirTokenType.TILDE)('~')(0,1)
-  PsiElement(ElixirTokenType.INTERPOLATING_REGEX_SIGIL_NAME)('r')(1,2)
-  PsiElement(ElixirTokenType.REGEX_HEREDOC_PROMOTER)('"""')(2,5)
-  PsiErrorElement:ElixirTokenType.EOL expected, got '"""'(5,8)
+  ElixirInterpolatedRegexHeredocImpl(INTERPOLATED_REGEX_HEREDOC)(0,8)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.INTERPOLATING_REGEX_SIGIL_NAME)('r')(1,2)
+    PsiElement(ElixirTokenType.REGEX_HEREDOC_PROMOTER)('"""')(2,5)
+    ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
+      <empty list>
     PsiElement(ElixirTokenType.REGEX_HEREDOC_TERMINATOR)('"""')(5,8)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(8,8)
+      <empty list>
