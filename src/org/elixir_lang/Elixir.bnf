@@ -322,9 +322,9 @@ interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
 interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
                           { implements = "org.elixir_lang.psi.InterpolatedBody" }
 
-interpolatedSigilHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                              interpolatedSigilHeredocLine*
-                             heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+                             heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
                              {
                                implements = [
                                  "org.elixir_lang.psi.SigilFragmented"
