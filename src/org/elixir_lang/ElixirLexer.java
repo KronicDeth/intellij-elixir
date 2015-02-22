@@ -12,6 +12,7 @@ public class ElixirLexer extends LookAheadLexer {
     public static final TokenSet FRAGMENTS = TokenSet.create(
             ElixirTypes.ATOM_FRAGMENT,
             ElixirTypes.CHAR_LIST_FRAGMENT,
+            ElixirTypes.REGEX_FRAGMENT,
             ElixirTypes.SIGIL_FRAGMENT,
             ElixirTypes.STRING_FRAGMENT
     );
