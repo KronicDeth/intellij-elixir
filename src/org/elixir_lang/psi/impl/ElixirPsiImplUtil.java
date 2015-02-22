@@ -451,7 +451,7 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final ElixirCharList charList) {
         ElixirInterpolatedCharListBody interpolatedCharListBody = charList.getInterpolatedCharListBody();
 
-        return interpolatedCharListBody.quote();
+        return quotedChildNodes(charList, childNodes(interpolatedCharListBody));
     }
 
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
@@ -656,8 +656,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirString string) {
         ElixirInterpolatedStringBody interpolatedStringBody = string.getInterpolatedStringBody();
-
-        return interpolatedStringBody.quote();
+        return quotedChildNodes(string, childNodes(interpolatedStringBody));
     }
 
     @Contract(pure = true)
@@ -685,7 +684,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, int prefixLength) {
+    public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, @NotNull final Heredoc heredoc, int prefixLength) {
         ElixirHeredocLinePrefix heredocLinePrefix = heredocLine.getHeredocLinePrefix();
         ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(heredocLine.getFragmentType(), prefixLength);
         InterpolatedBody interpolatedBody = heredocLine.getInterpolatedBody();
@@ -703,13 +702,11 @@ public class ElixirPsiImplUtil {
             accumulatedChildNodes = directChildNodes;
         }
 
-        return quotedChildNodes(interpolatedBody, accumulatedChildNodes);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final InterpolatedBody interpolatedBody) {
-        return quotedChildNodes(interpolatedBody, childNodes(interpolatedBody));
+        return quotedChildNodes(
+                heredoc,
+                metadata(heredocLine),
+                accumulatedChildNodes
+        );
     }
 
     @Contract(pure = true)
@@ -1114,52 +1111,56 @@ public class ElixirPsiImplUtil {
         return codePointList;
     }
 
-    private static OtpErlangObject quotedChildNodes(@NotNull Parent anchor, @NotNull ASTNode... children) {
+    @NotNull
+    private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull ASTNode... children) {
+        return quotedChildNodes(parent, metadata(parent), children);
+    }
+
+    private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull OtpErlangList metadata, @NotNull ASTNode... children) {
         OtpErlangObject quoted;
 
         final int childCount = children.length;
 
         if (childCount == 0) {
-            quoted = anchor.quoteEmpty();
+            quoted = parent.quoteEmpty();
         } else {
-            OtpErlangList anchorMetadata = metadata(anchor);
-            List<OtpErlangObject> quotedAnchorList = new LinkedList<OtpErlangObject>();
+            List<OtpErlangObject> quotedParentList = new LinkedList<OtpErlangObject>();
             List<Integer> codePointList = null;
 
             for (ASTNode child : children) {
                 IElementType elementType = child.getElementType();
 
-                if (elementType == anchor.getFragmentType()) {
-                    codePointList = anchor.addFragmentCodePoints(codePointList, child);
+                if (elementType == parent.getFragmentType()) {
+                    codePointList = parent.addFragmentCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
-                    codePointList = anchor.addEscapedCharacterCodePoints(codePointList, child);
+                    codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_SEQUENCE) {
-                    codePointList = anchor.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
+                    codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
                     if (codePointList != null) {
-                        quotedAnchorList.add(elixirString(codePointList));
+                        quotedParentList.add(elixirString(codePointList));
                         codePointList = null;
                     }
 
                     ElixirInterpolation childElement = (ElixirInterpolation) child.getPsi();
-                    quotedAnchorList.add(childElement.quote());
+                    quotedParentList.add(childElement.quote());
                 } else {
                     throw new NotImplementedException("Can't quote " + child);
                 }
             }
 
-            if (codePointList !=  null && quotedAnchorList.isEmpty()) {
-                quoted = anchor.quoteLiteral(codePointList);
+            if (codePointList !=  null && quotedParentList.isEmpty()) {
+                quoted = parent.quoteLiteral(codePointList);
             } else {
                 if (codePointList != null) {
-                    quotedAnchorList.add(elixirString(codePointList));
+                    quotedParentList.add(elixirString(codePointList));
                 }
 
-                OtpErlangObject[] quotedStringElements = new OtpErlangObject[quotedAnchorList.size()];
-                quotedAnchorList.toArray(quotedStringElements);
+                OtpErlangObject[] quotedStringElements = new OtpErlangObject[quotedParentList.size()];
+                quotedParentList.toArray(quotedStringElements);
 
-                OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", anchorMetadata, quotedStringElements);
-                quoted = anchor.quoteBinary(binaryConstruction);
+                OtpErlangTuple binaryConstruction = quotedFunctionCall("<<>>", metadata, quotedStringElements);
+                quoted = parent.quoteBinary(binaryConstruction);
             }
         }
 

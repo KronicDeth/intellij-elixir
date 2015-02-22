@@ -63,11 +63,6 @@ public class ElixirInterpolatedRegexBodyImpl extends ASTWrapperPsiElement implem
   }
 
   @NotNull
-  public OtpErlangObject quote() {
-    return ElixirPsiImplUtil.quote(this);
-  }
-
-  @NotNull
   public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
     return ElixirPsiImplUtil.quoteBinary(this, binary);
   }

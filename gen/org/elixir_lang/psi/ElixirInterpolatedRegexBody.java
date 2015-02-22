@@ -32,9 +32,6 @@ public interface ElixirInterpolatedRegexBody extends InterpolatedCharList, Inter
   IElementType getFragmentType();
 
   @NotNull
-  OtpErlangObject quote();
-
-  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

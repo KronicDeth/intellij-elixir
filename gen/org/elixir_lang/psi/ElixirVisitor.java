@@ -45,7 +45,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCharList(@NotNull ElixirCharList o) {
-    visitQuotable(o);
+    visitInterpolatedCharList(o);
+    // visitQuotable(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
@@ -118,8 +119,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
-    visitInterpolatedCharList(o);
-    // visitInterpolatedBody(o);
+    visitInterpolatedBody(o);
   }
 
   public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
@@ -150,7 +150,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {
     visitInterpolatedBody(o);
-    // visitInterpolatedString(o);
   }
 
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
@@ -263,7 +262,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitString(@NotNull ElixirString o) {
-    visitQuotable(o);
+    visitInterpolatedString(o);
+    // visitQuotable(o);
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
@@ -317,6 +317,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharList(@NotNull InterpolatedCharList o) {
+    visitElement(o);
+  }
+
+  public void visitInterpolatedString(@NotNull InterpolatedString o) {
     visitElement(o);
   }
 

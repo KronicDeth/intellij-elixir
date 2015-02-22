@@ -45,8 +45,8 @@ public class ElixirInterpolatedRegexHeredocLineImpl extends ASTWrapperPsiElement
   }
 
   @NotNull
-  public OtpErlangObject quote(int prefixLength) {
-    return ElixirPsiImplUtil.quote(this, prefixLength);
+  public OtpErlangObject quote(Heredoc heredoc, int prefixLength) {
+    return ElixirPsiImplUtil.quote(this, heredoc, prefixLength);
   }
 
 }

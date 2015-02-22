@@ -20,6 +20,6 @@ public interface ElixirInterpolatedRegexHeredocLine extends RegexFragmented, Her
   InterpolatedBody getInterpolatedBody();
 
   @NotNull
-  OtpErlangObject quote(int prefixLength);
+  OtpErlangObject quote(Heredoc heredoc, int prefixLength);
 
 }

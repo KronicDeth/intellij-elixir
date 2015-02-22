@@ -458,51 +458,52 @@ alias ::= ALIAS_TOKEN
  */
 
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             {
-                               implements = [
-                                 "org.elixir_lang.psi.InterpolatedCharList"
-                                 "org.elixir_lang.psi.InterpolatedBody"
-                               ]
-                               methods = [
-                                 addEscapedCharacterCodePoints
-                                 addFragmentCodePoints
-                                 addHexadecimalEscapeSequenceCodePoints
-                                 getFragmentType
-                                 quote
-                                 quoteBinary
-                                 quoteEmpty
-                                 quoteLiteral
-                               ]
-                             }
+                             { implements =  "org.elixir_lang.psi.InterpolatedBody" }
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+             {
+               implements = [
+                 "org.elixir_lang.psi.InterpolatedCharList"
+                 "org.elixir_lang.psi.Quotable"
+               ]
+               methods = [
+                 addEscapedCharacterCodePoints
+                 addFragmentCodePoints
+                 addHexadecimalEscapeSequenceCodePoints
+                 getFragmentType
+                 quote
+                 quoteBinary
+                 quoteEmpty
+                 quoteLiteral
+               ]
+             }
 
 /*
  * String
  */
 
 interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            {
-                              implements = [
-                                "org.elixir_lang.psi.InterpolatedBody"
-                                "org.elixir_lang.psi.InterpolatedString"
-                              ]
-                              methods = [
-                                addEscapedCharacterCodePoints
-                                addFragmentCodePoints
-                                addHexadecimalEscapeSequenceCodePoints
-                                getFragmentType
-                                quote
-                                quoteBinary
-                                quoteEmpty
-                                quoteLiteral
-                              ]
-                            }
+                            { implements = "org.elixir_lang.psi.InterpolatedBody" }
 string ::= STRING_PROMOTER
            interpolatedStringBody
-           STRING_TERMINATOR { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+           STRING_TERMINATOR
+           {
+             implements = [
+               "org.elixir_lang.psi.InterpolatedString"
+               "org.elixir_lang.psi.Quotable"
+             ]
+             methods = [
+               addEscapedCharacterCodePoints
+               addFragmentCodePoints
+               addHexadecimalEscapeSequenceCodePoints
+               getFragmentType
+               quote
+               quoteBinary
+               quoteEmpty
+               quoteLiteral
+             ]
+           }
 
 /*
  *
