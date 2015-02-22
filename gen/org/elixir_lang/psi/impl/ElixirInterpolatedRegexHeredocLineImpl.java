@@ -5,7 +5,6 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,10 +29,6 @@ public class ElixirInterpolatedRegexHeredocLineImpl extends ASTWrapperPsiElement
   @NotNull
   public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
     return findNotNullChildByClass(ElixirInterpolatedRegexBody.class);
-  }
-
-  public IElementType getFragmentType() {
-    return ElixirPsiImplUtil.getFragmentType(this);
   }
 
   public InterpolatedBody getInterpolatedBody() {

@@ -143,8 +143,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedRegexHeredocLine(@NotNull ElixirInterpolatedRegexHeredocLine o) {
-    visitRegexFragmented(o);
-    // visitHeredocLine(o);
+    visitHeredocLine(o);
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {

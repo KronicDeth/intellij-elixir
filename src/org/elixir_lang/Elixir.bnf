@@ -312,11 +312,9 @@ interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_
 interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
                                  {
                                    implements = [
-                                     "org.elixir_lang.psi.RegexFragmented"
                                      "org.elixir_lang.psi.HeredocLine"
                                    ]
                                    methods = [
-                                     getFragmentType
                                      getInterpolatedBody
                                      quote
                                    ]
