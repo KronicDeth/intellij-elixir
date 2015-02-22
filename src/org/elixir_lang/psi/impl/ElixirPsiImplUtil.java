@@ -726,11 +726,22 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(PsiElement[] children) {
-        Quotable[] quotableChildren = new Quotable[children.length];
+        List<Quotable> quotableList = new LinkedList<Quotable>();
 
         for (int i = 0; i < children.length; i++) {
-            quotableChildren[i] = (Quotable) children[i];
+            PsiElement child = children[i];
+
+            if (child instanceof Quotable) {
+                quotableList.add((Quotable) child);
+            } else if (child instanceof Unquoted) {
+                continue;
+            } else {
+                throw new NotImplementedException("Child, " + child + ", must be Quotable or Unquoted");
+            }
         }
+
+        Quotable[] quotableChildren = new Quotable[quotableList.size()];
+        quotableList.toArray(quotableChildren);
 
         return quote(quotableChildren);
     }
@@ -769,7 +780,13 @@ public class ElixirPsiImplUtil {
 
         OtpErlangList sigilHeredocMetadata = metadata(sigilHeredoc);
         OtpErlangObject quotedHeredoc = quote((Heredoc) sigilHeredoc);
-        OtpErlangObject sigilBinary = quotedFunctionCall("<<>>", sigilHeredocMetadata, quotedHeredoc);
+        OtpErlangTuple sigilBinary;
+
+        if (quotedHeredoc instanceof OtpErlangTuple) {
+            sigilBinary = (OtpErlangTuple) quotedHeredoc;
+        } else {
+            sigilBinary = quotedFunctionCall("<<>>", sigilHeredocMetadata, quotedHeredoc);
+        }
 
         ElixirSigilModifiers sigilModifiers = sigilHeredoc.getSigilModifiers();
         OtpErlangObject quotedModifiers = sigilModifiers.quote();

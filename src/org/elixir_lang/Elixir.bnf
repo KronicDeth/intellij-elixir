@@ -60,7 +60,7 @@
 
 // expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
 // lines
-elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
+private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
  *
@@ -72,7 +72,7 @@ elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
-endOfExpression ::= infixSemicolon | EOL
+endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unquoted" }
 private expression ::= emptyParentheses |
                        noParenthesesManyArgumentsCall |
                        matchedExpression
@@ -575,7 +575,7 @@ private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER inte
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
-interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
+interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |

@@ -81,7 +81,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitEndOfExpression(@NotNull ElixirEndOfExpression o) {
-    visitPsiElement(o);
+    visitUnquoted(o);
   }
 
   public void visitEscapedCharacter(@NotNull ElixirEscapedCharacter o) {
@@ -306,6 +306,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQuotable(@NotNull Quotable o) {
+    visitElement(o);
+  }
+
+  public void visitUnquoted(@NotNull Unquoted o) {
     visitElement(o);
   }
 

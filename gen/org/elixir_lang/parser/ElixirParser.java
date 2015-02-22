@@ -1439,24 +1439,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // INTERPOLATION_START expressionList? INTERPOLATION_END
+  // INTERPOLATION_START elixirFile INTERPOLATION_END
   public static boolean interpolation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolation")) return false;
     if (!nextTokenIs(b, INTERPOLATION_START)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, INTERPOLATION_START);
-    r = r && interpolation_1(b, l + 1);
+    r = r && elixirFile(b, l + 1);
     r = r && consumeToken(b, INTERPOLATION_END);
     exit_section_(b, m, INTERPOLATION, r);
     return r;
-  }
-
-  // expressionList?
-  private static boolean interpolation_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolation_1")) return false;
-    expressionList(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */

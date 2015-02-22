@@ -12,6 +12,10 @@ public class InterpolatedCharListSigilHeredocParsingTestCase extends ParsingTest
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testInterpolation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMinimal() {
         assertParsedAndQuotedCorrectly();
     }
