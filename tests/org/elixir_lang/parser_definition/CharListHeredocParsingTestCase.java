@@ -12,6 +12,10 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testInterpolation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMinimal() {
         assertParsedAndQuotedCorrectly();
     }
