@@ -2,10 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface ElixirAdjacentExpression extends PsiElement {
 
@@ -29,12 +26,6 @@ public interface ElixirAdjacentExpression extends PsiElement {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
-
-  @NotNull
-  List<ElixirEscapedCharacter> getEscapedCharacterList();
-
-  @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
 
   @Nullable
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
@@ -60,8 +51,8 @@ public interface ElixirAdjacentExpression extends PsiElement {
   @Nullable
   ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
 
-  @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  @Nullable
+  ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
   @Nullable
   ElixirList getList();

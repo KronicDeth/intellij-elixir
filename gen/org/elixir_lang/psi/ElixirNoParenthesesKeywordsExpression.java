@@ -5,8 +5,6 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
@@ -29,12 +27,6 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
-
-  @NotNull
-  List<ElixirEscapedCharacter> getEscapedCharacterList();
-
-  @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
 
   @Nullable
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
@@ -60,8 +52,8 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   @Nullable
   ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
 
-  @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  @Nullable
+  ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
   @NotNull
   ElixirKeywordKey getKeywordKey();

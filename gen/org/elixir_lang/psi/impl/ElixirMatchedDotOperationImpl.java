@@ -90,6 +90,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc() {
+    return findChildByClass(ElixirInterpolatedWordsHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }

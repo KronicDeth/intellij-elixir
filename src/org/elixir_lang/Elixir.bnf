@@ -381,9 +381,40 @@ interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_
                                        pin = 3
                                      }
 
-private interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                     interpolatedWordsBody
-                                     WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                             interpolatedWordsHeredocLine*
+                             heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.WordsFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                               pin = 3
+                             }
+interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getInterpolatedBody
+                                     quote
+                                   ]
+                                 }
+interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
+                          { implements = "org.elixir_lang.psi.InterpolatedBody" }
 
 /*
  * Literal Sigil Heredocs
@@ -656,7 +687,6 @@ private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME C
 private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS_TOKEN |

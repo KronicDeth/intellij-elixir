@@ -172,6 +172,19 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilHeredoc(o);
   }
 
+  public void visitInterpolatedWordsBody(@NotNull ElixirInterpolatedWordsBody o) {
+    visitInterpolatedBody(o);
+  }
+
+  public void visitInterpolatedWordsHeredoc(@NotNull ElixirInterpolatedWordsHeredoc o) {
+    visitWordsFragmented(o);
+    // visitSigilHeredoc(o);
+  }
+
+  public void visitInterpolatedWordsHeredocLine(@NotNull ElixirInterpolatedWordsHeredocLine o) {
+    visitHeredocLine(o);
+  }
+
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitQuotable(o);
   }
@@ -356,6 +369,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnquoted(@NotNull Unquoted o) {
+    visitElement(o);
+  }
+
+  public void visitWordsFragmented(@NotNull WordsFragmented o) {
     visitElement(o);
   }
 

@@ -499,6 +499,10 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.STRING_FRAGMENT;
     }
 
+    public static IElementType getFragmentType(@SuppressWarnings("unused") WordsFragmented wordsFragmented) {
+        return ElixirTypes.WORDS_FRAGMENT;
+    }
+
     public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
         List<ElixirInterpolatedCharListHeredocLine> interpolatedCharListHeredocLineList = interpolatedCharListHeredocLined.getInterpolatedCharListHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedCharListHeredocLineList.size());
@@ -542,6 +546,17 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedWordsHeredoc interpolatedWordsHeredoc) {
+        List<ElixirInterpolatedWordsHeredocLine> interpolatedWordsHeredocLines = interpolatedWordsHeredoc.getInterpolatedWordsHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedWordsHeredocLines.size());
+
+        for (HeredocLine heredocLine : interpolatedWordsHeredocLines) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
+
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
         List<ElixirInterpolatedStringHeredocLine> stringHeredocLineList = stringHeredoc.getInterpolatedStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
@@ -567,6 +582,10 @@ public class ElixirPsiImplUtil {
 
     public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
         return stringHeredocLine.getInterpolatedStringBody();
+    }
+
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
+        return wordsHeredocLine.getInterpolatedWordsBody();
     }
 
     public static OtpErlangObject quote(ElixirFile file) {

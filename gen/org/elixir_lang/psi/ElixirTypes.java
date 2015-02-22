@@ -46,6 +46,9 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
   IElementType INTERPOLATED_STRING_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_STRING_HEREDOC_LINE");
   IElementType INTERPOLATED_STRING_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_STRING_SIGIL_HEREDOC");
+  IElementType INTERPOLATED_WORDS_BODY = new ElixirElementType("INTERPOLATED_WORDS_BODY");
+  IElementType INTERPOLATED_WORDS_HEREDOC = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC");
+  IElementType INTERPOLATED_WORDS_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC_LINE");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
@@ -314,6 +317,15 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATED_STRING_SIGIL_HEREDOC) {
         return new ElixirInterpolatedStringSigilHeredocImpl(node);
+      }
+      else if (type == INTERPOLATED_WORDS_BODY) {
+        return new ElixirInterpolatedWordsBodyImpl(node);
+      }
+      else if (type == INTERPOLATED_WORDS_HEREDOC) {
+        return new ElixirInterpolatedWordsHeredocImpl(node);
+      }
+      else if (type == INTERPOLATED_WORDS_HEREDOC_LINE) {
+        return new ElixirInterpolatedWordsHeredocLineImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);

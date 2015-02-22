@@ -60,20 +60,8 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
-  }
-
-  @Override
-  @NotNull
   public ElixirHatInfixOperator getHatInfixOperator() {
     return findNotNullChildByClass(ElixirHatInfixOperator.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
   }
 
   @Override
@@ -126,8 +114,8 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirInterpolation> getInterpolationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  public List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedWordsHeredoc.class);
   }
 
   @Override

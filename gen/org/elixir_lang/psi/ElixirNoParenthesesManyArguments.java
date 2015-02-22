@@ -31,12 +31,6 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirEscapedCharacter> getEscapedCharacterList();
-
-  @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
-
-  @NotNull
   List<ElixirInterpolatedCharListBody> getInterpolatedCharListBodyList();
 
   @NotNull
@@ -61,7 +55,7 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();
 
   @NotNull
   List<ElixirList> getListList();

@@ -36,12 +36,6 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
-  List<ElixirEscapedCharacter> getEscapedCharacterList();
-
-  @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
-
-  @NotNull
   List<ElixirInterpolatedCharListBody> getInterpolatedCharListBodyList();
 
   @NotNull
@@ -66,7 +60,7 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();
 
   @NotNull
   List<ElixirList> getListList();

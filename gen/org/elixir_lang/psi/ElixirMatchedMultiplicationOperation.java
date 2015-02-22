@@ -27,12 +27,6 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   @NotNull
   List<ElixirCharListHeredoc> getCharListHeredocList();
 
-  @NotNull
-  List<ElixirEscapedCharacter> getEscapedCharacterList();
-
-  @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
-
   @Nullable
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
 
@@ -58,7 +52,7 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolation> getInterpolationList();
+  List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();
 
   @NotNull
   List<ElixirList> getListList();

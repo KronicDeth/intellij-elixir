@@ -90,6 +90,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
+  public ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc() {
+    return findChildByClass(ElixirInterpolatedWordsHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }
