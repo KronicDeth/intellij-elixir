@@ -8,14 +8,14 @@ import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirStringHeredocLineImpl extends ASTWrapperPsiElement implements ElixirStringHeredocLine {
+public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringHeredocLine {
 
-  public ElixirStringHeredocLineImpl(ASTNode node) {
+  public ElixirInterpolatedStringHeredocLineImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStringHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedStringHeredocLine(this);
     else super.accept(visitor);
   }
 

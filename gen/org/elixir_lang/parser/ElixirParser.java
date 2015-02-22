@@ -131,6 +131,12 @@ public class ElixirParser implements PsiParser {
     else if (t == INTERPOLATED_STRING_BODY) {
       r = interpolatedStringBody(b, 0);
     }
+    else if (t == INTERPOLATED_STRING_HEREDOC_LINE) {
+      r = interpolatedStringHeredocLine(b, 0);
+    }
+    else if (t == INTERPOLATED_STRING_SIGIL_HEREDOC) {
+      r = interpolatedStringSigilHeredoc(b, 0);
+    }
     else if (t == INTERPOLATION) {
       r = interpolation(b, 0);
     }
@@ -217,9 +223,6 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
-    }
-    else if (t == STRING_HEREDOC_LINE) {
-      r = stringHeredocLine(b, 0);
     }
     else if (t == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
       r = unaryCharTokenOrNumberOperation(b, 0);
@@ -1409,6 +1412,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // heredocLinePrefix interpolatedStringBody EOL
+  public static boolean interpolatedStringHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedStringHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<interpolated string heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
+    r = r && interpolatedStringBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, INTERPOLATED_STRING_HEREDOC_LINE, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
   static boolean interpolatedStringSigil(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringSigil")) return false;
@@ -1424,18 +1440,33 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-  //                                            interpolatedStringBody
-  //                                            STRING_SIGIL_HEREDOC_TERMINATOR
-  static boolean interpolatedStringSigilHeredoc(PsiBuilder b, int l) {
+  //                                      interpolatedStringHeredocLine*
+  //                                      heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+  public static boolean interpolatedStringSigilHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringSigilHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
-    r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_SIGIL_HEREDOC_TERMINATOR);
-    exit_section_(b, m, null, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 3
+    r = r && report_error_(b, interpolatedStringSigilHeredoc_4(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, STRING_SIGIL_HEREDOC_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, INTERPOLATED_STRING_SIGIL_HEREDOC, r, p, null);
+    return r || p;
+  }
+
+  // interpolatedStringHeredocLine*
+  private static boolean interpolatedStringSigilHeredoc_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedStringSigilHeredoc_4")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!interpolatedStringHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "interpolatedStringSigilHeredoc_4", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -2980,7 +3011,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // STRING_HEREDOC_PROMOTER EOL
-  //                   stringHeredocLine*
+  //                   interpolatedStringHeredocLine*
   //                   heredocPrefix STRING_HEREDOC_TERMINATOR
   public static boolean stringHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stringHeredoc")) return false;
@@ -2996,29 +3027,16 @@ public class ElixirParser implements PsiParser {
     return r || p;
   }
 
-  // stringHeredocLine*
+  // interpolatedStringHeredocLine*
   private static boolean stringHeredoc_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stringHeredoc_2")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!stringHeredocLine(b, l + 1)) break;
+      if (!interpolatedStringHeredocLine(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "stringHeredoc_2", c)) break;
       c = current_position_(b);
     }
     return true;
-  }
-
-  /* ********************************************************** */
-  // heredocLinePrefix interpolatedStringBody EOL
-  public static boolean stringHeredocLine(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stringHeredocLine")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<string heredoc line>");
-    r = heredocLinePrefix(b, l + 1);
-    r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, EOL);
-    exit_section_(b, l, m, STRING_HEREDOC_LINE, r, false, null);
-    return r;
   }
 
   /* ********************************************************** */

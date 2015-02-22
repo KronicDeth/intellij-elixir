@@ -4,7 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirStringHeredocLine extends HeredocLine {
+public interface ElixirInterpolatedStringHeredocLine extends HeredocLine {
 
   @NotNull
   ElixirHeredocLinePrefix getHeredocLinePrefix();

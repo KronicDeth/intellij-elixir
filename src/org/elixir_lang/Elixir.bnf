@@ -224,7 +224,7 @@ interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody E
  */
 
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  stringHeredocLine*
+                  interpolatedStringHeredocLine*
                   heredocPrefix STRING_HEREDOC_TERMINATOR
                   {
                     implements = [
@@ -244,16 +244,16 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                     ]
                     pin = 1
                   }
-stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
-                      {
-                        implements = [
-                          "org.elixir_lang.psi.HeredocLine"
-                        ]
-                        methods = [
-                          getInterpolatedBody
-                          quote
-                        ]
-                      }
+interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
+                                  {
+                                    implements = [
+                                      "org.elixir_lang.psi.HeredocLine"
+                                    ]
+                                    methods = [
+                                      getInterpolatedBody
+                                      quote
+                                    ]
+                                  }
 
 /*
  *
@@ -357,9 +357,30 @@ interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
 interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
                           { implements = "org.elixir_lang.psi.InterpolatedBody" }
 
-private interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                           interpolatedStringBody
-                                           STRING_SIGIL_HEREDOC_TERMINATOR
+interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+                                     interpolatedStringHeredocLine*
+                                     heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                     {
+                                       implements = [
+                                         "org.elixir_lang.psi.StringFragmented"
+                                         "org.elixir_lang.psi.InterpolatedStringHeredocLined"
+                                         "org.elixir_lang.psi.SigilHeredoc"
+                                       ]
+                                       methods = [
+                                         addEscapedCharacterCodePoints
+                                         addFragmentCodePoints
+                                         addHexadecimalEscapeSequenceCodePoints
+                                         getFragmentType
+                                         getHeredocLineList
+                                         quote
+                                         quoteBinary
+                                         quoteEmpty
+                                         quoteLiteral
+                                         sigilName
+                                       ]
+                                       pin = 3
+                                     }
+
 private interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                                      interpolatedWordsBody
                                      WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*

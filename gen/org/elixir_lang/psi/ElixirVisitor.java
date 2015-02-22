@@ -162,6 +162,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitInterpolatedBody(o);
   }
 
+  public void visitInterpolatedStringHeredocLine(@NotNull ElixirInterpolatedStringHeredocLine o) {
+    visitHeredocLine(o);
+  }
+
+  public void visitInterpolatedStringSigilHeredoc(@NotNull ElixirInterpolatedStringSigilHeredoc o) {
+    visitStringFragmented(o);
+    // visitInterpolatedStringHeredocLined(o);
+    // visitSigilHeredoc(o);
+  }
+
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitQuotable(o);
   }
@@ -281,10 +291,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInterpolatedString(o);
   }
 
-  public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
-    visitHeredocLine(o);
-  }
-
   public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {
     visitPsiElement(o);
   }
@@ -342,6 +348,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitSigilFragmented(@NotNull SigilFragmented o) {
+    visitElement(o);
+  }
+
+  public void visitStringFragmented(@NotNull StringFragmented o) {
     visitElement(o);
   }
 

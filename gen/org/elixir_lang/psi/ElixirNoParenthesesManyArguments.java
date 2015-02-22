@@ -58,6 +58,9 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList();
 
   @NotNull
+  List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
+
+  @NotNull
   List<ElixirInterpolation> getInterpolationList();
 
   @NotNull

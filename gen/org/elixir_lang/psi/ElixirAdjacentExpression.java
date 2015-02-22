@@ -57,6 +57,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
+  @Nullable
+  ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
+
   @NotNull
   List<ElixirInterpolation> getInterpolationList();
 

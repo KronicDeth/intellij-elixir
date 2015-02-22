@@ -14,14 +14,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements ElixirStringHeredoc {
+public class ElixirInterpolatedStringSigilHeredocImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringSigilHeredoc {
 
-  public ElixirStringHeredocImpl(ASTNode node) {
+  public ElixirInterpolatedStringSigilHeredocImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStringHeredoc(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedStringSigilHeredoc(this);
     else super.accept(visitor);
   }
 
@@ -35,6 +35,12 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirInterpolatedStringHeredocLine> getInterpolatedStringHeredocLineList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringHeredocLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirSigilModifiers getSigilModifiers() {
+    return findChildByClass(ElixirSigilModifiers.class);
   }
 
   @NotNull
@@ -78,6 +84,10 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public OtpErlangObject quoteLiteral(List<Integer> codePointList) {
     return ElixirPsiImplUtil.quoteLiteral(this, codePointList);
+  }
+
+  public char sigilName() {
+    return ElixirPsiImplUtil.sigilName(this);
   }
 
 }

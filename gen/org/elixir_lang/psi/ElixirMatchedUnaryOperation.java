@@ -54,6 +54,9 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
+  @Nullable
+  ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
+
   @NotNull
   List<ElixirInterpolation> getInterpolationList();
 

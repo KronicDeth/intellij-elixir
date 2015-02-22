@@ -120,6 +120,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilHeredoc.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirInterpolation> getInterpolationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
   }

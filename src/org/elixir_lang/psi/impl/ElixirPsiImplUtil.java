@@ -510,6 +510,16 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    public static List<HeredocLine> getHeredocLineList(InterpolatedStringHeredocLined interpolatedStringHeredocLined) {
+        List<ElixirInterpolatedStringHeredocLine> interpolatedStringHeredocLineList = interpolatedStringHeredocLined.getInterpolatedStringHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedStringHeredocLineList.size());
+
+        for (HeredocLine heredocLine : interpolatedStringHeredocLineList) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedRegexHeredoc interpolatedRegexHeredoc) {
         List<ElixirInterpolatedRegexHeredocLine> interpolatedRegexHeredocLines = interpolatedRegexHeredoc.getInterpolatedRegexHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedRegexHeredocLines.size());
@@ -533,7 +543,7 @@ public class ElixirPsiImplUtil {
     }
 
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
-        List<ElixirStringHeredocLine> stringHeredocLineList = stringHeredoc.getStringHeredocLineList();
+        List<ElixirInterpolatedStringHeredocLine> stringHeredocLineList = stringHeredoc.getInterpolatedStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
 
         for (HeredocLine heredocLine : stringHeredocLineList) {
@@ -555,7 +565,7 @@ public class ElixirPsiImplUtil {
         return sigilHeredocLine.getInterpolatedSigilBody();
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirStringHeredocLine stringHeredocLine) {
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
         return stringHeredocLine.getInterpolatedStringBody();
     }
 

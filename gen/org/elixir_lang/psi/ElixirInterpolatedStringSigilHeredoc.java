@@ -10,13 +10,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirStringHeredoc extends Heredoc, InterpolatedString {
+public interface ElixirInterpolatedStringSigilHeredoc extends StringFragmented, InterpolatedStringHeredocLined, SigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
   List<ElixirInterpolatedStringHeredocLine> getInterpolatedStringHeredocLineList();
+
+  @Nullable
+  ElixirSigilModifiers getSigilModifiers();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
@@ -42,5 +45,7 @@ public interface ElixirStringHeredoc extends Heredoc, InterpolatedString {
 
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
+
+  char sigilName();
 
 }

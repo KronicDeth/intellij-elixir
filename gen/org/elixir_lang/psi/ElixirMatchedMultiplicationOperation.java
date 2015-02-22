@@ -55,6 +55,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull
+  List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
+
+  @NotNull
   List<ElixirInterpolation> getInterpolationList();
 
   @NotNull

@@ -84,6 +84,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }

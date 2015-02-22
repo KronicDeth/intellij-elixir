@@ -119,6 +119,12 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   }
 
   @Override
+  @Nullable
+  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+  }
+
+  @Override
   @NotNull
   public List<ElixirInterpolation> getInterpolationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);

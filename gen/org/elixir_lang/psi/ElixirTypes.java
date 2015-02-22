@@ -44,6 +44,8 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC");
   IElementType INTERPOLATED_SIGIL_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC_LINE");
   IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
+  IElementType INTERPOLATED_STRING_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_STRING_HEREDOC_LINE");
+  IElementType INTERPOLATED_STRING_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_STRING_SIGIL_HEREDOC");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
@@ -73,7 +75,6 @@ public interface ElixirTypes {
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
-  IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
@@ -308,6 +309,12 @@ public interface ElixirTypes {
       else if (type == INTERPOLATED_STRING_BODY) {
         return new ElixirInterpolatedStringBodyImpl(node);
       }
+      else if (type == INTERPOLATED_STRING_HEREDOC_LINE) {
+        return new ElixirInterpolatedStringHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_STRING_SIGIL_HEREDOC) {
+        return new ElixirInterpolatedStringSigilHeredocImpl(node);
+      }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
       }
@@ -394,9 +401,6 @@ public interface ElixirTypes {
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
-      }
-      else if (type == STRING_HEREDOC_LINE) {
-        return new ElixirStringHeredocLineImpl(node);
       }
       else if (type == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
         return new ElixirUnaryCharTokenOrNumberOperationImpl(node);

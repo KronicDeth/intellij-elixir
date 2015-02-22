@@ -84,6 +84,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
+  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }
