@@ -133,8 +133,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedRegexBody(@NotNull ElixirInterpolatedRegexBody o) {
-    visitInterpolatedCharList(o);
-    // visitInterpolatedBody(o);
+    visitInterpolatedBody(o);
   }
 
   public void visitInterpolatedRegexHeredoc(@NotNull ElixirInterpolatedRegexHeredoc o) {
