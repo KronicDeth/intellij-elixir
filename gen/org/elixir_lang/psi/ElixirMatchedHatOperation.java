@@ -49,6 +49,12 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList();
 
   @Nullable
+  ElixirInterpolatedSigilBody getInterpolatedSigilBody();
+
+  @NotNull
+  List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

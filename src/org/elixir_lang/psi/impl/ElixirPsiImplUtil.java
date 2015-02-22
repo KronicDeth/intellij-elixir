@@ -491,6 +491,10 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.REGEX_FRAGMENT;
     }
 
+    public static IElementType getFragmentType(@SuppressWarnings("unused") SigilFragmented sigilFragmented) {
+        return ElixirTypes.SIGIL_FRAGMENT;
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") StringFragmented stringFragmented) {
         return ElixirTypes.STRING_FRAGMENT;
     }
@@ -516,6 +520,17 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
+    
+    public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedSigilHeredoc interpolatedSigilHeredoc) {
+        List<ElixirInterpolatedSigilHeredocLine> interpolatedSigilHeredocLines = interpolatedSigilHeredoc.getInterpolatedSigilHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedSigilHeredocLines.size());
+
+        for (HeredocLine heredocLine : interpolatedSigilHeredocLines) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
 
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
         List<ElixirStringHeredocLine> stringHeredocLineList = stringHeredoc.getStringHeredocLineList();
@@ -534,6 +549,10 @@ public class ElixirPsiImplUtil {
 
     public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
         return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
+    }
+
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
+        return sigilHeredocLine.getInterpolatedSigilBody();
     }
 
     public static InterpolatedBody getInterpolatedBody(ElixirStringHeredocLine stringHeredocLine) {
@@ -829,6 +848,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil, OtpErlangTuple binary) {
+        return binary;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedString interpolatedString, OtpErlangTuple binary) {
         return binary;
     }
@@ -847,6 +872,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil) {
+        return elixirString("");
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedString interpolatedString) {
         return elixirString("");
     }
@@ -861,6 +892,12 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedCharList interpolatedCharList, List<Integer> codePointList) {
         return elixirCharList(codePointList);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil, List<Integer> codePointList) {
+        return elixirString(codePointList);
     }
 
     @Contract(pure = true)

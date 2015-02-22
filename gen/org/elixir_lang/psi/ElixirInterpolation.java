@@ -54,6 +54,12 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList();
 
   @NotNull
+  List<ElixirInterpolatedSigilBody> getInterpolatedSigilBodyList();
+
+  @NotNull
+  List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
+
+  @NotNull
   List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList();
 
   @NotNull

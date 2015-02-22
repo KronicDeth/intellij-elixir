@@ -49,6 +49,12 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable
+  ElixirInterpolatedSigilBody getInterpolatedSigilBody();
+
+  @Nullable
+  ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

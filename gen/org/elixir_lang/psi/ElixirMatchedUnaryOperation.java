@@ -46,6 +46,12 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable
+  ElixirInterpolatedSigilBody getInterpolatedSigilBody();
+
+  @Nullable
+  ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

@@ -322,9 +322,41 @@ interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
 interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
                           { implements = "org.elixir_lang.psi.InterpolatedBody" }
 
-private interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                     interpolatedSigilBody
-                                     SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
+interpolatedSigilHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                             interpolatedSigilHeredocLine*
+                             heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.SigilFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                               pin = 3
+                             }
+interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getInterpolatedBody
+                                     quote
+                                   ]
+                                 }
+interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
+                          { implements = "org.elixir_lang.psi.InterpolatedBody" }
+
 private interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                            interpolatedStringBody
                                            STRING_SIGIL_HEREDOC_TERMINATOR
@@ -602,7 +634,6 @@ private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME C
 
 private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END

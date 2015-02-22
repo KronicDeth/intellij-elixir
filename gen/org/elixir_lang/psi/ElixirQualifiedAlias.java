@@ -35,6 +35,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable
+  ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc();
+
+  @Nullable
   ElixirList getList();
 
   @Nullable

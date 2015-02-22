@@ -40,6 +40,9 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_REGEX_BODY = new ElixirElementType("INTERPOLATED_REGEX_BODY");
   IElementType INTERPOLATED_REGEX_HEREDOC = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC");
   IElementType INTERPOLATED_REGEX_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC_LINE");
+  IElementType INTERPOLATED_SIGIL_BODY = new ElixirElementType("INTERPOLATED_SIGIL_BODY");
+  IElementType INTERPOLATED_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC");
+  IElementType INTERPOLATED_SIGIL_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC_LINE");
   IElementType INTERPOLATED_STRING_BODY = new ElixirElementType("INTERPOLATED_STRING_BODY");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
@@ -292,6 +295,15 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATED_REGEX_HEREDOC_LINE) {
         return new ElixirInterpolatedRegexHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_SIGIL_BODY) {
+        return new ElixirInterpolatedSigilBodyImpl(node);
+      }
+      else if (type == INTERPOLATED_SIGIL_HEREDOC) {
+        return new ElixirInterpolatedSigilHeredocImpl(node);
+      }
+      else if (type == INTERPOLATED_SIGIL_HEREDOC_LINE) {
+        return new ElixirInterpolatedSigilHeredocLineImpl(node);
       }
       else if (type == INTERPOLATED_STRING_BODY) {
         return new ElixirInterpolatedStringBodyImpl(node);

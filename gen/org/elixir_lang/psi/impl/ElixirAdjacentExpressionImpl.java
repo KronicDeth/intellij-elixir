@@ -102,6 +102,18 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirInterpolatedSigilBody getInterpolatedSigilBody() {
+    return findChildByClass(ElixirInterpolatedSigilBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirInterpolatedStringBody getInterpolatedStringBody() {
     return findChildByClass(ElixirInterpolatedStringBody.class);
   }
