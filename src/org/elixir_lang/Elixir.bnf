@@ -265,6 +265,8 @@ stringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
  *
  */
 
+sigilModifiers ::= SIGIL_MODIFIER* { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedCharListHeredocLine*
                                      heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
@@ -287,11 +289,58 @@ interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CH
                                          sigilName
                                        ]
                                      }
-sigilModifiers ::= SIGIL_MODIFIER* { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                      interpolatedRegexBody
-                                      REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                             interpolatedRegexHeredocLine*
+                             heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.RegexFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                             }
+interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.RegexFragmented"
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getFragmentType
+                                     getInterpolatedBody
+                                     quote
+                                   ]
+                                 }
+interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
+                          {
+                            implements = [
+                              "org.elixir_lang.psi.InterpolatedCharList"
+                              "org.elixir_lang.psi.InterpolatedBody"
+                            ]
+                            methods = [
+                              addEscapedCharacterCodePoints
+                              addFragmentCodePoints
+                              addHexadecimalEscapeSequenceCodePoints
+                              getFragmentType
+                              quote
+                              quoteBinary
+                              quoteEmpty
+                              quoteLiteral
+                            ]
+                          }
+
 private interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedSigilBody
                                      SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
@@ -570,7 +619,6 @@ private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME C
 
 
 private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
 private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
 private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR

@@ -41,6 +41,12 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable
+  ElixirInterpolatedRegexBody getInterpolatedRegexBody();
+
+  @Nullable
+  ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
+
+  @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull

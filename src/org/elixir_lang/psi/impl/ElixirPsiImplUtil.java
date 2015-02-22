@@ -487,6 +487,10 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
 
+    public static IElementType getFragmentType(@SuppressWarnings("unused") RegexFragmented regexFragmented) {
+        return ElixirTypes.REGEX_FRAGMENT;
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") StringFragmented stringFragmented) {
         return ElixirTypes.STRING_FRAGMENT;
     }
@@ -496,6 +500,17 @@ public class ElixirPsiImplUtil {
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedCharListHeredocLineList.size());
 
         for (HeredocLine heredocLine : interpolatedCharListHeredocLineList) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
+
+    public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedRegexHeredoc interpolatedRegexHeredoc) {
+        List<ElixirInterpolatedRegexHeredocLine> interpolatedRegexHeredocLines = interpolatedRegexHeredoc.getInterpolatedRegexHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedRegexHeredocLines.size());
+
+        for (HeredocLine heredocLine : interpolatedRegexHeredocLines) {
             heredocLineList.add(heredocLine);
         }
 
@@ -513,8 +528,12 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedCharListHeredocLine charListHeredocLine) {
-        return charListHeredocLine.getInterpolatedCharListBody();
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
+        return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
+    }
+
+    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
+        return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
     }
 
     public static InterpolatedBody getInterpolatedBody(ElixirStringHeredocLine stringHeredocLine) {

@@ -109,6 +109,15 @@ public class ElixirParser implements PsiParser {
     else if (t == INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC) {
       r = interpolatedCharListSigilHeredoc(b, 0);
     }
+    else if (t == INTERPOLATED_REGEX_BODY) {
+      r = interpolatedRegexBody(b, 0);
+    }
+    else if (t == INTERPOLATED_REGEX_HEREDOC) {
+      r = interpolatedRegexHeredoc(b, 0);
+    }
+    else if (t == INTERPOLATED_REGEX_HEREDOC_LINE) {
+      r = interpolatedRegexHeredocLine(b, 0);
+    }
     else if (t == INTERPOLATED_STRING_BODY) {
       r = interpolatedStringBody(b, 0);
     }
@@ -1194,14 +1203,16 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // (interpolation | REGEX_FRAGMENT | escapeSequence)*
-  static boolean interpolatedRegexBody(PsiBuilder b, int l) {
+  public static boolean interpolatedRegexBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedRegexBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<interpolated regex body>");
     int c = current_position_(b);
     while (true) {
       if (!interpolatedRegexBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "interpolatedRegexBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, INTERPOLATED_REGEX_BODY, true, false, null);
     return true;
   }
 
@@ -1219,31 +1230,45 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-  //                                       interpolatedRegexBody
-  //                                       REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-  static boolean interpolatedRegexHeredoc(PsiBuilder b, int l) {
+  //                              interpolatedRegexHeredocLine*
+  //                              heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+  public static boolean interpolatedRegexHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedRegexHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_HEREDOC_PROMOTER, EOL);
-    r = r && interpolatedRegexBody(b, l + 1);
+    r = r && interpolatedRegexHeredoc_4(b, l + 1);
+    r = r && heredocPrefix(b, l + 1);
     r = r && consumeToken(b, REGEX_HEREDOC_TERMINATOR);
-    r = r && interpolatedRegexHeredoc_6(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, INTERPOLATED_REGEX_HEREDOC, r);
     return r;
   }
 
-  // SIGIL_MODIFIER*
-  private static boolean interpolatedRegexHeredoc_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedRegexHeredoc_6")) return false;
+  // interpolatedRegexHeredocLine*
+  private static boolean interpolatedRegexHeredoc_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedRegexHeredoc_4")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "interpolatedRegexHeredoc_6", c)) break;
+      if (!interpolatedRegexHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "interpolatedRegexHeredoc_4", c)) break;
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // heredocLinePrefix interpolatedRegexBody EOL
+  public static boolean interpolatedRegexHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedRegexHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<interpolated regex heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
+    r = r && interpolatedRegexBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, INTERPOLATED_REGEX_HEREDOC_LINE, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

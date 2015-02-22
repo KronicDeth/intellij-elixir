@@ -90,6 +90,18 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
+    return findChildByClass(ElixirInterpolatedRegexBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
+    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirInterpolatedStringBody getInterpolatedStringBody() {
     return findChildByClass(ElixirInterpolatedStringBody.class);
   }

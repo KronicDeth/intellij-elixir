@@ -9,16 +9,16 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragmented, InterpolatedCharListHeredocLined, SigilHeredoc {
+public interface ElixirInterpolatedRegexBody extends InterpolatedCharList, InterpolatedBody {
 
   @NotNull
-  ElixirHeredocPrefix getHeredocPrefix();
+  List<ElixirEscapedCharacter> getEscapedCharacterList();
 
   @NotNull
-  List<ElixirInterpolatedCharListHeredocLine> getInterpolatedCharListHeredocLineList();
+  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
 
   @NotNull
-  ElixirSigilModifiers getSigilModifiers();
+  List<ElixirInterpolation> getInterpolationList();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
@@ -31,8 +31,6 @@ public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragment
 
   IElementType getFragmentType();
 
-  List<HeredocLine> getHeredocLineList();
-
   @NotNull
   OtpErlangObject quote();
 
@@ -44,7 +42,5 @@ public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragment
 
   @NotNull
   OtpErlangObject quoteLiteral(List<Integer> codePointList);
-
-  char sigilName();
 
 }

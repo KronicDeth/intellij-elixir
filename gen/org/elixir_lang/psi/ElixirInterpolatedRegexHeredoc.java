@@ -9,13 +9,13 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
 
-public interface ElixirInterpolatedCharListSigilHeredoc extends CharListFragmented, InterpolatedCharListHeredocLined, SigilHeredoc {
+public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, SigilHeredoc {
 
   @NotNull
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
-  List<ElixirInterpolatedCharListHeredocLine> getInterpolatedCharListHeredocLineList();
+  List<ElixirInterpolatedRegexHeredocLine> getInterpolatedRegexHeredocLineList();
 
   @NotNull
   ElixirSigilModifiers getSigilModifiers();

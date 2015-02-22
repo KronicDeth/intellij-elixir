@@ -72,6 +72,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
+  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
+    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }

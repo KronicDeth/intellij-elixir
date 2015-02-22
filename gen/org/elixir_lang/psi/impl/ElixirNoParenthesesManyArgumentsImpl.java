@@ -90,6 +90,18 @@ public class ElixirNoParenthesesManyArgumentsImpl extends ASTWrapperPsiElement i
 
   @Override
   @NotNull
+  public List<ElixirInterpolatedRegexBody> getInterpolatedRegexBodyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringBody.class);
   }
