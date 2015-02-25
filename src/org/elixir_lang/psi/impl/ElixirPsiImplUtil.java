@@ -483,6 +483,30 @@ public class ElixirPsiImplUtil {
         return excessWhitespaceASTNode;
     }
 
+    public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
+        return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
+    }
+
+    public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
+        return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
+    }
+
+    public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
+        return sigilHeredocLine.getInterpolatedSigilBody();
+    }
+
+    public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
+        return stringHeredocLine.getInterpolatedStringBody();
+    }
+
+    public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
+        return wordsHeredocLine.getInterpolatedWordsBody();
+    }
+
+    public static Body getBody(ElixirLiteralCharListHeredocLine charListHeredocLine) {
+        return charListHeredocLine.getLiteralCharListBody();
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
@@ -557,6 +581,17 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    public static List<HeredocLine> getHeredocLineList(ElixirLiteralCharListSigilHeredoc literalCharListSigilHeredoc) {
+        List<ElixirLiteralCharListHeredocLine> literalCharListHeredocLines = literalCharListSigilHeredoc.getLiteralCharListHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalCharListHeredocLines.size());
+
+        for (HeredocLine heredocLine : literalCharListHeredocLines) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
+
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
         List<ElixirInterpolatedStringHeredocLine> stringHeredocLineList = stringHeredoc.getInterpolatedStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
@@ -566,26 +601,6 @@ public class ElixirPsiImplUtil {
         }
 
         return heredocLineList;
-    }
-
-    public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
-        return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
-    }
-
-    public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
-        return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
-    }
-
-    public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
-        return sigilHeredocLine.getInterpolatedSigilBody();
-    }
-
-    public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
-        return stringHeredocLine.getInterpolatedStringBody();
-    }
-
-    public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
-        return wordsHeredocLine.getInterpolatedWordsBody();
     }
 
     public static OtpErlangObject quote(ElixirFile file) {

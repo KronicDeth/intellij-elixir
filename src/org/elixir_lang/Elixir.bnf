@@ -420,6 +420,41 @@ interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
  * Literal Sigil Heredocs
  */
 
+literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_HEREDOC_PROMOTER EOL
+                                literalCharListHeredocLine*
+                                heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                {
+                                  implements = [
+                                    "org.elixir_lang.psi.CharListFragmented"
+                                    "org.elixir_lang.psi.SigilHeredoc"
+                                  ]
+                                  methods = [
+                                    addEscapedCharacterCodePoints
+                                    addFragmentCodePoints
+                                    addHexadecimalEscapeSequenceCodePoints
+                                    getFragmentType
+                                    getHeredocLineList
+                                    quote
+                                    quoteBinary
+                                    quoteEmpty
+                                    quoteLiteral
+                                    sigilName
+                                  ]
+                                  pin = 3
+                                }
+literalCharListHeredocLine ::= heredocLinePrefix literalCharListBody EOL
+                               {
+                                 implements = [
+                                   "org.elixir_lang.psi.HeredocLine"
+                                 ]
+                                 methods = [
+                                   getBody
+                                   quote
+                                 ]
+                               }
+literalCharListBody ::= CHAR_LIST_FRAGMENT*
+                        { implements = "org.elixir_lang.psi.Body" }
+
 private literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                                 literalRegexBody
                                 REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
@@ -720,7 +755,6 @@ keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
 private listString ::= charList | charListHeredoc
-private literalCharListBody ::= CHAR_LIST_FRAGMENT*
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private literalRegexBody ::= REGEX_FRAGMENT*
@@ -761,6 +795,7 @@ private sigil ::= interpolatedCharListSigil |
                   interpolatedSigil |
                   interpolatedStringSigil |
                   literalCharListSigil |
+                  literalCharListSigilHeredoc |
                   literalRegexHeredoc |
                   literalSigilHeredoc |
                   literalStringSigilHeredoc |

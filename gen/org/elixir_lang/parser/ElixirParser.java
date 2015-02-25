@@ -160,6 +160,15 @@ public class ElixirParser implements PsiParser {
     else if (t == LIST) {
       r = list(b, 0);
     }
+    else if (t == LITERAL_CHAR_LIST_BODY) {
+      r = literalCharListBody(b, 0);
+    }
+    else if (t == LITERAL_CHAR_LIST_HEREDOC_LINE) {
+      r = literalCharListHeredocLine(b, 0);
+    }
+    else if (t == LITERAL_CHAR_LIST_SIGIL_HEREDOC) {
+      r = literalCharListSigilHeredoc(b, 0);
+    }
     else if (t == MATCHED_AT_OPERATION) {
       r = matchedAtOperation(b, 0);
     }
@@ -1763,15 +1772,30 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // CHAR_LIST_FRAGMENT*
-  static boolean literalCharListBody(PsiBuilder b, int l) {
+  public static boolean literalCharListBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalCharListBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<literal char list body>");
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, CHAR_LIST_FRAGMENT)) break;
       if (!empty_element_parsed_guard_(b, "literalCharListBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, LITERAL_CHAR_LIST_BODY, true, false, null);
     return true;
+  }
+
+  /* ********************************************************** */
+  // heredocLinePrefix literalCharListBody EOL
+  public static boolean literalCharListHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<literal char list heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
+    r = r && literalCharListBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, LITERAL_CHAR_LIST_HEREDOC_LINE, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1786,6 +1810,37 @@ public class ElixirParser implements PsiParser {
     r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_HEREDOC_PROMOTER EOL
+  //                                 literalCharListHeredocLine*
+  //                                 heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+  public static boolean literalCharListSigilHeredoc(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListSigilHeredoc")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 3
+    r = r && report_error_(b, literalCharListSigilHeredoc_4(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, LITERAL_CHAR_LIST_SIGIL_HEREDOC, r, p, null);
+    return r || p;
+  }
+
+  // literalCharListHeredocLine*
+  private static boolean literalCharListSigilHeredoc_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListSigilHeredoc_4")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!literalCharListHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "literalCharListSigilHeredoc_4", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -2968,6 +3023,7 @@ public class ElixirParser implements PsiParser {
   //                   interpolatedSigil |
   //                   interpolatedStringSigil |
   //                   literalCharListSigil |
+  //                   literalCharListSigilHeredoc |
   //                   literalRegexHeredoc |
   //                   literalSigilHeredoc |
   //                   literalStringSigilHeredoc |
@@ -2991,6 +3047,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = interpolatedSigil(b, l + 1);
     if (!r) r = interpolatedStringSigil(b, l + 1);
     if (!r) r = literalCharListSigil(b, l + 1);
+    if (!r) r = literalCharListSigilHeredoc(b, l + 1);
     if (!r) r = literalRegexHeredoc(b, l + 1);
     if (!r) r = literalSigilHeredoc(b, l + 1);
     if (!r) r = literalStringSigilHeredoc(b, l + 1);

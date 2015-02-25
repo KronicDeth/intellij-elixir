@@ -54,6 +54,9 @@ public interface ElixirTypes {
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
   IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
+  IElementType LITERAL_CHAR_LIST_BODY = new ElixirElementType("LITERAL_CHAR_LIST_BODY");
+  IElementType LITERAL_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("LITERAL_CHAR_LIST_HEREDOC_LINE");
+  IElementType LITERAL_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_HEREDOC");
   IElementType MATCHED_AT_OPERATION = new ElixirElementType("MATCHED_AT_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
@@ -341,6 +344,15 @@ public interface ElixirTypes {
       }
       else if (type == LIST) {
         return new ElixirListImpl(node);
+      }
+      else if (type == LITERAL_CHAR_LIST_BODY) {
+        return new ElixirLiteralCharListBodyImpl(node);
+      }
+      else if (type == LITERAL_CHAR_LIST_HEREDOC_LINE) {
+        return new ElixirLiteralCharListHeredocLineImpl(node);
+      }
+      else if (type == LITERAL_CHAR_LIST_SIGIL_HEREDOC) {
+        return new ElixirLiteralCharListSigilHeredocImpl(node);
       }
       else if (type == MATCHED_AT_OPERATION) {
         return new ElixirMatchedAtOperationImpl(node);

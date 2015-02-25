@@ -47,6 +47,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirList getList();
 
   @Nullable
+  ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable
