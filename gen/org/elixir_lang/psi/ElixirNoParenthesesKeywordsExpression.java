@@ -68,6 +68,12 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
   @Nullable
+  ElixirLiteralRegexBody getLiteralRegexBody();
+
+  @Nullable
+  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

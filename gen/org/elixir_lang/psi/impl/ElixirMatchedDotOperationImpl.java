@@ -108,6 +108,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
+    return findChildByClass(ElixirLiteralRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
   }

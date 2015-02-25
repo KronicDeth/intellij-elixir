@@ -50,6 +50,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
   @Nullable
+  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

@@ -138,6 +138,18 @@ public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirLiteralRegexBody getLiteralRegexBody() {
+    return findChildByClass(ElixirLiteralRegexBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
+    return findChildByClass(ElixirLiteralRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
     return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }

@@ -218,6 +218,19 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilHeredoc(o);
   }
 
+  public void visitLiteralRegexBody(@NotNull ElixirLiteralRegexBody o) {
+    visitBody(o);
+  }
+
+  public void visitLiteralRegexHeredoc(@NotNull ElixirLiteralRegexHeredoc o) {
+    visitRegexFragmented(o);
+    // visitSigilHeredoc(o);
+  }
+
+  public void visitLiteralRegexHeredocLine(@NotNull ElixirLiteralRegexHeredocLine o) {
+    visitHeredocLine(o);
+  }
+
   public void visitMatchedAtOperation(@NotNull ElixirMatchedAtOperation o) {
     visitPsiElement(o);
   }
