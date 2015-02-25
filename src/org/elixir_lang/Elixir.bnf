@@ -420,7 +420,7 @@ interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
  * Literal Sigil Heredocs
  */
 
-literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_HEREDOC_PROMOTER EOL
+literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
                                 literalCharListHeredocLine*
                                 heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
                                 {

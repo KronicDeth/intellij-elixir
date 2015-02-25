@@ -1,0 +1,10 @@
+Elixir File(0,8)
+  ElixirLiteralCharListSigilHeredocImpl(LITERAL_CHAR_LIST_SIGIL_HEREDOC)(0,8)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.LITERAL_CHAR_LIST_SIGIL_NAME)('C')(1,2)
+    PsiElement(ElixirTokenType.CHAR_LIST_SIGIL_HEREDOC_PROMOTER)(''''')(2,5)
+    ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
+      <empty list>
+    PsiElement(ElixirTokenType.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)(''''')(5,8)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(8,8)
+      <empty list>

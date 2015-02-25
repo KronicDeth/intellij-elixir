@@ -1813,7 +1813,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_HEREDOC_PROMOTER EOL
+  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
   //                                 literalCharListHeredocLine*
   //                                 heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
   public static boolean literalCharListSigilHeredoc(PsiBuilder b, int l) {
@@ -1821,7 +1821,7 @@ public class ElixirParser implements PsiParser {
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = consumeTokens(b, 3, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_HEREDOC_PROMOTER, EOL);
+    r = consumeTokens(b, 3, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
     p = r; // pin = 3
     r = r && report_error_(b, literalCharListSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
