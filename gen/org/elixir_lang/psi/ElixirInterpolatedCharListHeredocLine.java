@@ -12,7 +12,7 @@ public interface ElixirInterpolatedCharListHeredocLine extends HeredocLine {
   @NotNull
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
 
-  InterpolatedBody getInterpolatedBody();
+  Body getBody();
 
   @NotNull
   OtpErlangObject quote(Heredoc heredoc, int prefixLength);

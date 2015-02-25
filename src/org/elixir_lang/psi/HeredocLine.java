@@ -8,5 +8,5 @@ import com.intellij.psi.PsiElement;
 public interface HeredocLine extends PsiElement {
     public abstract ElixirHeredocLinePrefix getHeredocLinePrefix();
 
-    public abstract InterpolatedBody getInterpolatedBody();
+    public abstract Body getBody();
 }

@@ -214,7 +214,7 @@ interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody E
                                         "org.elixir_lang.psi.HeredocLine"
                                       ]
                                       methods = [
-                                        getInterpolatedBody
+                                        getBody
                                         quote
                                       ]
                                     }
@@ -250,7 +250,7 @@ interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
                                       "org.elixir_lang.psi.HeredocLine"
                                     ]
                                     methods = [
-                                      getInterpolatedBody
+                                      getBody
                                       quote
                                     ]
                                   }
@@ -315,12 +315,12 @@ interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
                                      "org.elixir_lang.psi.HeredocLine"
                                    ]
                                    methods = [
-                                     getInterpolatedBody
+                                     getBody
                                      quote
                                    ]
                                  }
 interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
-                          { implements = "org.elixir_lang.psi.InterpolatedBody" }
+                          { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                              interpolatedSigilHeredocLine*
@@ -350,12 +350,12 @@ interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
                                      "org.elixir_lang.psi.HeredocLine"
                                    ]
                                    methods = [
-                                     getInterpolatedBody
+                                     getBody
                                      quote
                                    ]
                                  }
 interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
-                          { implements = "org.elixir_lang.psi.InterpolatedBody" }
+                          { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                      interpolatedStringHeredocLine*
@@ -409,12 +409,12 @@ interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
                                      "org.elixir_lang.psi.HeredocLine"
                                    ]
                                    methods = [
-                                     getInterpolatedBody
+                                     getBody
                                      quote
                                    ]
                                  }
 interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
-                          { implements = "org.elixir_lang.psi.InterpolatedBody" }
+                          { implements = "org.elixir_lang.psi.Body" }
 
 /*
  * Literal Sigil Heredocs
@@ -523,7 +523,7 @@ alias ::= ALIAS_TOKEN
  */
 
 interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             { implements =  "org.elixir_lang.psi.InterpolatedBody" }
+                             { implements =  "org.elixir_lang.psi.Body" }
 charList ::= CHAR_LIST_PROMOTER
              interpolatedCharListBody
              CHAR_LIST_TERMINATOR
@@ -549,7 +549,7 @@ charList ::= CHAR_LIST_PROMOTER
  */
 
 interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            { implements = "org.elixir_lang.psi.InterpolatedBody" }
+                            { implements = "org.elixir_lang.psi.Body" }
 string ::= STRING_PROMOTER
            interpolatedStringBody
            STRING_TERMINATOR

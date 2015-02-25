@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -119,7 +119,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
-    visitInterpolatedBody(o);
+    visitBody(o);
   }
 
   public void visitInterpolatedCharListHeredocLine(@NotNull ElixirInterpolatedCharListHeredocLine o) {
@@ -133,7 +133,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedRegexBody(@NotNull ElixirInterpolatedRegexBody o) {
-    visitInterpolatedBody(o);
+    visitBody(o);
   }
 
   public void visitInterpolatedRegexHeredoc(@NotNull ElixirInterpolatedRegexHeredoc o) {
@@ -146,7 +146,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedSigilBody(@NotNull ElixirInterpolatedSigilBody o) {
-    visitInterpolatedBody(o);
+    visitBody(o);
   }
 
   public void visitInterpolatedSigilHeredoc(@NotNull ElixirInterpolatedSigilHeredoc o) {
@@ -159,7 +159,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedStringBody(@NotNull ElixirInterpolatedStringBody o) {
-    visitInterpolatedBody(o);
+    visitBody(o);
   }
 
   public void visitInterpolatedStringHeredocLine(@NotNull ElixirInterpolatedStringHeredocLine o) {
@@ -173,7 +173,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitInterpolatedWordsBody(@NotNull ElixirInterpolatedWordsBody o) {
-    visitInterpolatedBody(o);
+    visitBody(o);
   }
 
   public void visitInterpolatedWordsHeredoc(@NotNull ElixirInterpolatedWordsHeredoc o) {
@@ -316,6 +316,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitNumber(o);
   }
 
+  public void visitBody(@NotNull Body o) {
+    visitElement(o);
+  }
+
   public void visitCharListFragmented(@NotNull CharListFragmented o) {
     visitElement(o);
   }
@@ -337,10 +341,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
-    visitElement(o);
-  }
-
-  public void visitInterpolatedBody(@NotNull InterpolatedBody o) {
     visitElement(o);
   }
 

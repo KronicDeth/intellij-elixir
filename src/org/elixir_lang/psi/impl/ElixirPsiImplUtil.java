@@ -568,23 +568,23 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
+    public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
         return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
+    public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
         return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
+    public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
         return sigilHeredocLine.getInterpolatedSigilBody();
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
+    public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
         return stringHeredocLine.getInterpolatedStringBody();
     }
 
-    public static InterpolatedBody getInterpolatedBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
+    public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
         return wordsHeredocLine.getInterpolatedWordsBody();
     }
 
@@ -736,8 +736,8 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final HeredocLine heredocLine, @NotNull final Heredoc heredoc, int prefixLength) {
         ElixirHeredocLinePrefix heredocLinePrefix = heredocLine.getHeredocLinePrefix();
         ASTNode excessWhitespace = heredocLinePrefix.excessWhitespace(heredoc.getFragmentType(), prefixLength);
-        InterpolatedBody interpolatedBody = heredocLine.getInterpolatedBody();
-        ASTNode[] directChildNodes = childNodes(interpolatedBody);
+        Body body = heredocLine.getBody();
+        ASTNode[] directChildNodes = childNodes(body);
         ASTNode[] accumulatedChildNodes;
 
         if (excessWhitespace != null) {
@@ -1092,8 +1092,8 @@ public class ElixirPsiImplUtil {
             heredocDescendantNodes.add(excessWhitespace);
         }
 
-        InterpolatedBody interpolatedBody = line.getInterpolatedBody();
-        Collections.addAll(heredocDescendantNodes, childNodes(interpolatedBody));
+        Body body = line.getBody();
+        Collections.addAll(heredocDescendantNodes, childNodes(body));
 
         ASTNode eolNode = Factory.createSingleLeafElement(
                 fragmentType,
