@@ -952,19 +952,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil, OtpErlangTuple binary) {
-        return binary;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") InterpolatedString interpolatedString, OtpErlangTuple binary) {
         return binary;
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc, OtpErlangTuple binary) {
+    public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") Sigil sigil, OtpErlangTuple binary) {
         return binary;
     }
 
@@ -976,19 +970,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil) {
-        return elixirString("");
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") InterpolatedString interpolatedString) {
         return elixirString("");
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc) {
+    public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") Sigil sigil) {
         return elixirString("");
     }
 
@@ -1000,19 +988,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedSigil interpolatedSigil, List<Integer> codePointList) {
-        return elixirString(codePointList);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") InterpolatedString interpolatedString, List<Integer> codePointList) {
         return elixirString(codePointList);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") SigilHeredoc sigilHeredoc, List<Integer> codePointList) {
+    public static OtpErlangObject quoteLiteral(@SuppressWarnings("unused") Sigil sigil, List<Integer> codePointList) {
         return elixirString(codePointList);
     }
 
