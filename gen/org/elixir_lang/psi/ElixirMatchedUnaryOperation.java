@@ -80,6 +80,9 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
 
   @Nullable
+  ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

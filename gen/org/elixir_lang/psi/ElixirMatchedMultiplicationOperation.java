@@ -82,6 +82,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
 
   @NotNull
+  List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList();
+
+  @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
 
   @NotNull

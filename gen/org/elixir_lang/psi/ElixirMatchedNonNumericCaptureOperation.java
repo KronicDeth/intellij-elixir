@@ -83,6 +83,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
 
   @Nullable
+  ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

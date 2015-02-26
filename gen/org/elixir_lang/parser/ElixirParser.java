@@ -197,6 +197,15 @@ public class ElixirParser implements PsiParser {
     else if (t == LITERAL_STRING_SIGIL_HEREDOC) {
       r = literalStringSigilHeredoc(b, 0);
     }
+    else if (t == LITERAL_WORDS_BODY) {
+      r = literalWordsBody(b, 0);
+    }
+    else if (t == LITERAL_WORDS_HEREDOC) {
+      r = literalWordsHeredoc(b, 0);
+    }
+    else if (t == LITERAL_WORDS_HEREDOC_LINE) {
+      r = literalWordsHeredocLine(b, 0);
+    }
     else if (t == MATCHED_AT_OPERATION) {
       r = matchedAtOperation(b, 0);
     }
@@ -2143,44 +2152,61 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // WORDS_FRAGMENT*
-  static boolean literalWordsBody(PsiBuilder b, int l) {
+  public static boolean literalWordsBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<literal words body>");
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, WORDS_FRAGMENT)) break;
       if (!empty_element_parsed_guard_(b, "literalWordsBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, LITERAL_WORDS_BODY, true, false, null);
     return true;
   }
 
   /* ********************************************************** */
   // TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-  //                                 literalWordsBody
-  //                                 WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalWordsHeredoc(PsiBuilder b, int l) {
+  //                         literalWordsHeredocLine*
+  //                         heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
+  public static boolean literalWordsHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
-    r = r && literalWordsBody(b, l + 1);
-    r = r && consumeToken(b, WORDS_HEREDOC_TERMINATOR);
-    r = r && literalWordsHeredoc_6(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 3
+    r = r && report_error_(b, literalWordsHeredoc_4(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, WORDS_HEREDOC_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, LITERAL_WORDS_HEREDOC, r, p, null);
+    return r || p;
   }
 
-  // SIGIL_MODIFIER*
-  private static boolean literalWordsHeredoc_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalWordsHeredoc_6")) return false;
+  // literalWordsHeredocLine*
+  private static boolean literalWordsHeredoc_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsHeredoc_4")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalWordsHeredoc_6", c)) break;
+      if (!literalWordsHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "literalWordsHeredoc_4", c)) break;
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // heredocLinePrefix literalWordsBody EOL
+  public static boolean literalWordsHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<literal words heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
+    r = r && literalWordsBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, LITERAL_WORDS_HEREDOC_LINE, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

@@ -559,10 +559,41 @@ literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
                              }
 literalStringBody ::= STRING_FRAGMENT*
                       { implements = "org.elixir_lang.psi.Body" }
-
-private literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                literalWordsBody
-                                WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+                      
+literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                        literalWordsHeredocLine*
+                        heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.WordsFragmented"
+                            "org.elixir_lang.psi.SigilHeredoc"
+                          ]
+                          methods = [
+                            addEscapedCharacterCodePoints
+                            addFragmentCodePoints
+                            addHexadecimalEscapeSequenceCodePoints
+                            getFragmentType
+                            getHeredocLineList
+                            quote
+                            quoteBinary
+                            quoteEmpty
+                            quoteLiteral
+                            sigilName
+                          ]
+                          pin = 3
+                        }
+literalWordsHeredocLine ::= heredocLinePrefix literalWordsBody EOL
+                            {
+                              implements = [
+                                "org.elixir_lang.psi.HeredocLine"
+                              ]
+                              methods = [
+                                getBody
+                                quote
+                              ]
+                            }
+literalWordsBody ::= WORDS_FRAGMENT*
+                     { implements = "org.elixir_lang.psi.Body" }
 
 /*
  *
@@ -856,7 +887,6 @@ private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBod
 private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
-private literalWordsBody ::= WORDS_FRAGMENT*
 
 atCharTokenOrNumberOperation ::= atPrefixOperator numeric
 captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric

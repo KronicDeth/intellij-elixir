@@ -123,6 +123,12 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
 
   @Override
   @Nullable
+  public ElixirLiteralWordsHeredoc getLiteralWordsHeredoc() {
+    return findChildByClass(ElixirLiteralWordsHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
   }

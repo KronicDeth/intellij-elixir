@@ -174,6 +174,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralWordsHeredoc.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirMatchedAtOperation> getMatchedAtOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedAtOperation.class);
   }
