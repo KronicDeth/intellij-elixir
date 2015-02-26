@@ -79,6 +79,12 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList();
 
   @NotNull
+  List<ElixirLiteralStringBody> getLiteralStringBodyList();
+
+  @NotNull
+  List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
+
+  @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
 
   @NotNull

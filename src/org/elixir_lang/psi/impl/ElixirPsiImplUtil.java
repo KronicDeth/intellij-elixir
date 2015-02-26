@@ -515,6 +515,10 @@ public class ElixirPsiImplUtil {
         return literalSigilHeredocLine.getLiteralSigilBody();
     }
 
+    public static Body getBody(ElixirLiteralStringHeredocLine literalStringSigilHeredocLine) {
+        return literalStringSigilHeredocLine.getLiteralStringBody();
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
@@ -621,6 +625,17 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
+ 
+    public static List<HeredocLine> getHeredocLineList(ElixirLiteralStringSigilHeredoc literalStringSigilHeredoc) {
+        List<ElixirLiteralStringHeredocLine> literalStringHeredocLines = literalStringSigilHeredoc.getLiteralStringHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalStringHeredocLines.size());
+
+        for (HeredocLine heredocLine : literalStringHeredocLines) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }   
     
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
         List<ElixirInterpolatedStringHeredocLine> stringHeredocLineList = stringHeredoc.getInterpolatedStringHeredocLineList();

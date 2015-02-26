@@ -159,6 +159,18 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
+  public ElixirLiteralStringBody getLiteralStringBody() {
+    return findChildByClass(ElixirLiteralStringBody.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
+    return findChildByClass(ElixirLiteralStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
   }

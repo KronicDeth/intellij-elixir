@@ -58,6 +58,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
 
   @Nullable
+  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

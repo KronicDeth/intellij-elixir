@@ -76,6 +76,12 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
 
   @Nullable
+  ElixirLiteralStringBody getLiteralStringBody();
+
+  @Nullable
+  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

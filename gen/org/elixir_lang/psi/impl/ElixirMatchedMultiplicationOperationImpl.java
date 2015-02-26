@@ -155,6 +155,18 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   }
 
   @Override
+  @Nullable
+  public ElixirLiteralStringBody getLiteralStringBody() {
+    return findChildByClass(ElixirLiteralStringBody.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralStringSigilHeredoc.class);
+  }
+
+  @Override
   @NotNull
   public List<ElixirMatchedAtOperation> getMatchedAtOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedAtOperation.class);

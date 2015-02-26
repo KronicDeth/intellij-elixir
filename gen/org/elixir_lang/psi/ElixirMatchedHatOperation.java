@@ -78,6 +78,12 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   @NotNull
   List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList();
 
+  @Nullable
+  ElixirLiteralStringBody getLiteralStringBody();
+
+  @NotNull
+  List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
+
   @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();
 

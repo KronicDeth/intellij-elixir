@@ -120,6 +120,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
+  public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
+    return findChildByClass(ElixirLiteralStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
   }
