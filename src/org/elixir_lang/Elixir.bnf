@@ -490,9 +490,41 @@ literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
 literalRegexBody ::= REGEX_FRAGMENT*
                      { implements = "org.elixir_lang.psi.Body" }
 
-private literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                literalSigilBody
-                                SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
+literalSigilHeredoc ::= TILDE LITERAL_SIGIL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+                        literalSigilHeredocLine*
+                        heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.SigilFragmented"
+                            "org.elixir_lang.psi.SigilHeredoc"
+                          ]
+                          methods = [
+                            addEscapedCharacterCodePoints
+                            addFragmentCodePoints
+                            addHexadecimalEscapeSequenceCodePoints
+                            getFragmentType
+                            getHeredocLineList
+                            quote
+                            quoteBinary
+                            quoteEmpty
+                            quoteLiteral
+                            sigilName
+                          ]
+                          pin = 3
+                        }
+literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
+                            {
+                              implements = [
+                                "org.elixir_lang.psi.HeredocLine"
+                              ]
+                              methods = [
+                                getBody
+                                quote
+                              ]
+                            }
+literalSigilBody ::= SIGIL_FRAGMENT*
+                     { implements = "org.elixir_lang.psi.Body" }
+
 private literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                                       literalStringBody
                                       STRING_SIGIL_HEREDOC_TERMINATOR
@@ -790,7 +822,6 @@ private listString ::= charList | charListHeredoc
 private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
 private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private literalSigilBody ::= SIGIL_FRAGMENT*
 private literalStringBody ::= STRING_FRAGMENT*
 private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
 private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*

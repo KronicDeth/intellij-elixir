@@ -1,9 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ElixirNoParenthesesManyArguments extends PsiElement {
 
@@ -69,6 +71,12 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
 
   @NotNull
   List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList();
+
+  @NotNull
+  List<ElixirLiteralSigilBody> getLiteralSigilBodyList();
+
+  @NotNull
+  List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList();
 
   @NotNull
   List<ElixirMatchedAtOperation> getMatchedAtOperationList();

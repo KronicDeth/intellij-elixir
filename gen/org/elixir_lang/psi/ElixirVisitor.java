@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -228,6 +228,19 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitLiteralRegexHeredocLine(@NotNull ElixirLiteralRegexHeredocLine o) {
+    visitHeredocLine(o);
+  }
+
+  public void visitLiteralSigilBody(@NotNull ElixirLiteralSigilBody o) {
+    visitBody(o);
+  }
+
+  public void visitLiteralSigilHeredoc(@NotNull ElixirLiteralSigilHeredoc o) {
+    visitSigilFragmented(o);
+    // visitSigilHeredoc(o);
+  }
+
+  public void visitLiteralSigilHeredocLine(@NotNull ElixirLiteralSigilHeredocLine o) {
     visitHeredocLine(o);
   }
 

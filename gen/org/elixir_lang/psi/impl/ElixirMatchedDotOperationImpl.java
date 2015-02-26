@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedDotOperation {
 
@@ -110,6 +110,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
   @Nullable
   public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
     return findChildByClass(ElixirLiteralRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralSigilHeredoc getLiteralSigilHeredoc() {
+    return findChildByClass(ElixirLiteralSigilHeredoc.class);
   }
 
   @Override

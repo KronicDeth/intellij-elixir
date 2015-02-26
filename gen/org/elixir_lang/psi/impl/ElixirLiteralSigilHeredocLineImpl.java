@@ -8,14 +8,14 @@ import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedStringHeredocLine {
+public class ElixirLiteralSigilHeredocLineImpl extends ASTWrapperPsiElement implements ElixirLiteralSigilHeredocLine {
 
-  public ElixirInterpolatedStringHeredocLineImpl(ASTNode node) {
+  public ElixirLiteralSigilHeredocLineImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedStringHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralSigilHeredocLine(this);
     else super.accept(visitor);
   }
 
@@ -27,8 +27,8 @@ public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElemen
 
   @Override
   @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
+  public ElixirLiteralSigilBody getLiteralSigilBody() {
+    return findNotNullChildByClass(ElixirLiteralSigilBody.class);
   }
 
   public Body getBody() {

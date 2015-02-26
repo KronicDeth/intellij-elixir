@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -177,6 +178,15 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == LITERAL_REGEX_HEREDOC_LINE) {
       r = literalRegexHeredocLine(b, 0);
+    }
+    else if (t == LITERAL_SIGIL_BODY) {
+      r = literalSigilBody(b, 0);
+    }
+    else if (t == LITERAL_SIGIL_HEREDOC) {
+      r = literalSigilHeredoc(b, 0);
+    }
+    else if (t == LITERAL_SIGIL_HEREDOC_LINE) {
+      r = literalSigilHeredocLine(b, 0);
     }
     else if (t == MATCHED_AT_OPERATION) {
       r = matchedAtOperation(b, 0);
@@ -1967,44 +1977,61 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // SIGIL_FRAGMENT*
-  static boolean literalSigilBody(PsiBuilder b, int l) {
+  public static boolean literalSigilBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilBody")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<literal sigil body>");
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, SIGIL_FRAGMENT)) break;
       if (!empty_element_parsed_guard_(b, "literalSigilBody", c)) break;
       c = current_position_(b);
     }
+    exit_section_(b, l, m, LITERAL_SIGIL_BODY, true, false, null);
     return true;
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-  //                                 literalSigilBody
-  //                                 SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalSigilHeredoc(PsiBuilder b, int l) {
+  // TILDE LITERAL_SIGIL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+  //                         literalSigilHeredocLine*
+  //                         heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
+  public static boolean literalSigilHeredoc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilHeredoc")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
-    r = r && literalSigilBody(b, l + 1);
-    r = r && consumeToken(b, SIGIL_HEREDOC_TERMINATOR);
-    r = r && literalSigilHeredoc_6(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_SIGIL_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
+    p = r; // pin = 3
+    r = r && report_error_(b, literalSigilHeredoc_4(b, l + 1));
+    r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
+    r = p && report_error_(b, consumeToken(b, SIGIL_HEREDOC_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, LITERAL_SIGIL_HEREDOC, r, p, null);
+    return r || p;
   }
 
-  // SIGIL_MODIFIER*
-  private static boolean literalSigilHeredoc_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalSigilHeredoc_6")) return false;
+  // literalSigilHeredocLine*
+  private static boolean literalSigilHeredoc_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilHeredoc_4")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalSigilHeredoc_6", c)) break;
+      if (!literalSigilHeredocLine(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "literalSigilHeredoc_4", c)) break;
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // heredocLinePrefix literalSigilBody EOL
+  public static boolean literalSigilHeredocLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilHeredocLine")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<literal sigil heredoc line>");
+    r = heredocLinePrefix(b, l + 1);
+    r = r && literalSigilBody(b, l + 1);
+    r = r && consumeToken(b, EOL);
+    exit_section_(b, l, m, LITERAL_SIGIL_HEREDOC_LINE, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

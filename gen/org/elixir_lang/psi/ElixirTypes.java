@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -60,6 +60,9 @@ public interface ElixirTypes {
   IElementType LITERAL_REGEX_BODY = new ElixirElementType("LITERAL_REGEX_BODY");
   IElementType LITERAL_REGEX_HEREDOC = new ElixirElementType("LITERAL_REGEX_HEREDOC");
   IElementType LITERAL_REGEX_HEREDOC_LINE = new ElixirElementType("LITERAL_REGEX_HEREDOC_LINE");
+  IElementType LITERAL_SIGIL_BODY = new ElixirElementType("LITERAL_SIGIL_BODY");
+  IElementType LITERAL_SIGIL_HEREDOC = new ElixirElementType("LITERAL_SIGIL_HEREDOC");
+  IElementType LITERAL_SIGIL_HEREDOC_LINE = new ElixirElementType("LITERAL_SIGIL_HEREDOC_LINE");
   IElementType MATCHED_AT_OPERATION = new ElixirElementType("MATCHED_AT_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
@@ -151,6 +154,7 @@ public interface ElixirTypes {
   IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("LITERAL_CHAR_LIST_SIGIL_NAME");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
+  IElementType LITERAL_SIGIL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("MAP_OPERATOR");
@@ -365,6 +369,15 @@ public interface ElixirTypes {
       }
       else if (type == LITERAL_REGEX_HEREDOC_LINE) {
         return new ElixirLiteralRegexHeredocLineImpl(node);
+      }
+      else if (type == LITERAL_SIGIL_BODY) {
+        return new ElixirLiteralSigilBodyImpl(node);
+      }
+      else if (type == LITERAL_SIGIL_HEREDOC) {
+        return new ElixirLiteralSigilHeredocImpl(node);
+      }
+      else if (type == LITERAL_SIGIL_HEREDOC_LINE) {
+        return new ElixirLiteralSigilHeredocLineImpl(node);
       }
       else if (type == MATCHED_AT_OPERATION) {
         return new ElixirMatchedAtOperationImpl(node);

@@ -10,13 +10,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirInterpolatedSigilHeredoc extends SigilFragmented, SigilHeredoc {
+public interface ElixirLiteralSigilHeredoc extends SigilFragmented, SigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
-  List<ElixirInterpolatedSigilHeredocLine> getInterpolatedSigilHeredocLineList();
+  List<ElixirLiteralSigilHeredocLine> getLiteralSigilHeredocLineList();
 
   @Nullable
   ElixirSigilModifiers getSigilModifiers();
