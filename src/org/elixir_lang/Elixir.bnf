@@ -257,7 +257,7 @@ interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
 
 /*
  *
- * Parent Sigil Heredocs
+ * Interpolated Sigil Heredocs
  *
  */
 
