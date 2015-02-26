@@ -490,7 +490,7 @@ literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
 literalRegexBody ::= REGEX_FRAGMENT*
                      { implements = "org.elixir_lang.psi.Body" }
 
-literalSigilHeredoc ::= TILDE LITERAL_SIGIL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                         literalSigilHeredocLine*
                         heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
                         {
