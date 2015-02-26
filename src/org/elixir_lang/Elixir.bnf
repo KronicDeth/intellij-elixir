@@ -813,6 +813,37 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
 /*
  *
  *
+ * Sigils
+ *
+ *
+ */
+
+/*
+ *
+ * Interpolated Sigils
+ *
+ */
+
+private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
+private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
+
+/*
+ *
+ * Literal Sigils
+ *
+ */
+
+private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
+private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
+private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
+
+/*
+ *
+ *
  * In alphabetical order
  *
  *
@@ -843,12 +874,6 @@ openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
 escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
-private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-
-
-private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS_TOKEN |
@@ -882,11 +907,7 @@ keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
 private listString ::= charList | charListHeredoc
-private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
-private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
+
 
 atCharTokenOrNumberOperation ::= atPrefixOperator numeric
 captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
