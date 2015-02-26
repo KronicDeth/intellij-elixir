@@ -14,7 +14,8 @@ public class ElixirLexer extends LookAheadLexer {
             ElixirTypes.CHAR_LIST_FRAGMENT,
             ElixirTypes.REGEX_FRAGMENT,
             ElixirTypes.SIGIL_FRAGMENT,
-            ElixirTypes.STRING_FRAGMENT
+            ElixirTypes.STRING_FRAGMENT,
+            ElixirTypes.WORDS_FRAGMENT
     );
 
     public ElixirLexer() {
