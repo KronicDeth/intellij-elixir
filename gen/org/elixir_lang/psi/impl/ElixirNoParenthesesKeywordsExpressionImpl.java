@@ -116,6 +116,12 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   }
 
   @Override
+  @Nullable
+  public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
+    return findChildByClass(ElixirInterpolatedWordsLine.class);
+  }
+
+  @Override
   @NotNull
   public ElixirKeywordKey getKeywordKey() {
     return findNotNullChildByClass(ElixirKeywordKey.class);

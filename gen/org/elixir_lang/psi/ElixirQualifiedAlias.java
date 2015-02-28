@@ -56,6 +56,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
   @Nullable
+  ElixirInterpolatedWordsLine getInterpolatedWordsLine();
+
+  @Nullable
   ElixirList getList();
 
   @Nullable

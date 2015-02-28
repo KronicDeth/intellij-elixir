@@ -53,6 +53,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_WORDS_BODY = new ElixirElementType("INTERPOLATED_WORDS_BODY");
   IElementType INTERPOLATED_WORDS_HEREDOC = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC");
   IElementType INTERPOLATED_WORDS_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC_LINE");
+  IElementType INTERPOLATED_WORDS_LINE = new ElixirElementType("INTERPOLATED_WORDS_LINE");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
@@ -357,6 +358,9 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATED_WORDS_HEREDOC_LINE) {
         return new ElixirInterpolatedWordsHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_WORDS_LINE) {
+        return new ElixirInterpolatedWordsLineImpl(node);
       }
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);

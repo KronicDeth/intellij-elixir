@@ -205,6 +205,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitHeredocLine(o);
   }
 
+  public void visitInterpolatedWordsLine(@NotNull ElixirInterpolatedWordsLine o) {
+    visitWordsFragmented(o);
+    // visitSigilLine(o);
+  }
+
   public void visitInterpolation(@NotNull ElixirInterpolation o) {
     visitQuotable(o);
   }

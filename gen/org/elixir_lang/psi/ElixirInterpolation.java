@@ -63,6 +63,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();
 
   @NotNull
+  List<ElixirInterpolatedWordsLine> getInterpolatedWordsLineList();
+
+  @NotNull
   List<ElixirList> getListList();
 
   @NotNull

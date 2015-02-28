@@ -58,6 +58,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
   @Nullable
+  ElixirInterpolatedWordsLine getInterpolatedWordsLine();
+
+  @Nullable
   ElixirList getList();
 
   @Nullable

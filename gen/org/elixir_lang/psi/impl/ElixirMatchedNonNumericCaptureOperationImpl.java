@@ -117,6 +117,12 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
+  public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
+    return findChildByClass(ElixirInterpolatedWordsLine.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirList getList() {
     return findChildByClass(ElixirList.class);
   }

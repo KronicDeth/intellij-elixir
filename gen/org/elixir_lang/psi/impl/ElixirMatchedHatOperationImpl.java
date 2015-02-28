@@ -120,6 +120,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirInterpolatedWordsLine> getInterpolatedWordsLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedWordsLine.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirList> getListList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirList.class);
   }

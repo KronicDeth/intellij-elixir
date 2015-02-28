@@ -55,6 +55,9 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   @Nullable
   ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
+  @Nullable
+  ElixirInterpolatedWordsLine getInterpolatedWordsLine();
+
   @NotNull
   ElixirKeywordKey getKeywordKey();
 

@@ -158,6 +158,9 @@ public class ElixirParser implements PsiParser {
     else if (t == INTERPOLATED_WORDS_HEREDOC_LINE) {
       r = interpolatedWordsHeredocLine(b, 0);
     }
+    else if (t == INTERPOLATED_WORDS_LINE) {
+      r = interpolatedWordsLine(b, 0);
+    }
     else if (t == INTERPOLATION) {
       r = interpolation(b, 0);
     }
@@ -1579,6 +1582,21 @@ public class ElixirParser implements PsiParser {
     r = r && interpolatedWordsBody(b, l + 1);
     r = r && consumeToken(b, EOL);
     exit_section_(b, l, m, INTERPOLATED_WORDS_HEREDOC_LINE, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER interpolatedWordsBody WORDS_TERMINATOR sigilModifiers
+  public static boolean interpolatedWordsLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedWordsLine")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TILDE, INTERPOLATING_WORDS_SIGIL_NAME, WORDS_PROMOTER);
+    r = r && interpolatedWordsBody(b, l + 1);
+    r = r && consumeToken(b, WORDS_TERMINATOR);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, INTERPOLATED_WORDS_LINE, r);
     return r;
   }
 
@@ -3125,6 +3143,7 @@ public class ElixirParser implements PsiParser {
   //                   interpolatedSigilHeredoc |
   //                   interpolatedStringSigilHeredoc |
   //                   interpolatedWordsHeredoc |
+  //                   interpolatedWordsLine |
   //                   interpolatedRegexLine |
   //                   interpolatedSigilLine |
   //                   interpolatedStringSigilLine |
@@ -3149,6 +3168,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = interpolatedSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedStringSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedWordsHeredoc(b, l + 1);
+    if (!r) r = interpolatedWordsLine(b, l + 1);
     if (!r) r = interpolatedRegexLine(b, l + 1);
     if (!r) r = interpolatedSigilLine(b, l + 1);
     if (!r) r = interpolatedStringSigilLine(b, l + 1);
