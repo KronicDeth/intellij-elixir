@@ -721,7 +721,26 @@ interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpol
                               sigilName
                             ]
                           }
-private interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
+
+interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+                                {
+                                  implements = [
+                                    "org.elixir_lang.psi.StringFragmented"
+                                    "org.elixir_lang.psi.SigilLine"
+                                  ]
+                                  methods = [
+                                    addEscapedCharacterCodePoints
+                                    addFragmentCodePoints
+                                    addHexadecimalEscapeSequenceCodePoints
+                                    getBody
+                                    getFragmentType
+                                    quote
+                                    quoteBinary
+                                    quoteEmpty
+                                    quoteLiteral
+                                    sigilName
+                                  ]
+                                }
 
 /*
  * Literal Sigils

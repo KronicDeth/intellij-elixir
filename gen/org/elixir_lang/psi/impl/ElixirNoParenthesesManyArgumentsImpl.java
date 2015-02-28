@@ -102,14 +102,14 @@ public class ElixirNoParenthesesManyArgumentsImpl extends ASTWrapperPsiElement i
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringBody.class);
+  public List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilHeredoc.class);
+  public List<ElixirInterpolatedStringSigilLine> getInterpolatedStringSigilLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilLine.class);
   }
 
   @Override

@@ -93,14 +93,14 @@ public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findChildByClass(ElixirInterpolatedStringBody.class);
+  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
-    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+  public ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine() {
+    return findChildByClass(ElixirInterpolatedStringSigilLine.class);
   }
 
   @Override

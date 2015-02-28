@@ -187,6 +187,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilHeredoc(o);
   }
 
+  public void visitInterpolatedStringSigilLine(@NotNull ElixirInterpolatedStringSigilLine o) {
+    visitStringFragmented(o);
+    // visitSigilLine(o);
+  }
+
   public void visitInterpolatedWordsBody(@NotNull ElixirInterpolatedWordsBody o) {
     visitBody(o);
   }

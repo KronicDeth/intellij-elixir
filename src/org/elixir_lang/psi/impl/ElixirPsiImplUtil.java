@@ -511,6 +511,10 @@ public class ElixirPsiImplUtil {
         return stringHeredocLine.getInterpolatedStringBody();
     }
 
+    public static Body getBody(ElixirInterpolatedStringSigilLine interpolatedStringSigilLine) {
+        return interpolatedStringSigilLine.getInterpolatedStringBody();
+    }
+
     public static Body getBody(ElixirInterpolatedWordsHeredocLine wordsHeredocLine) {
         return wordsHeredocLine.getInterpolatedWordsBody();
     }

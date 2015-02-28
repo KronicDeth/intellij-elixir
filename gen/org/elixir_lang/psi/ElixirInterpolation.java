@@ -54,10 +54,10 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirInterpolatedSigilLine> getInterpolatedSigilLineList();
 
   @NotNull
-  List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList();
+  List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
+  List<ElixirInterpolatedStringSigilLine> getInterpolatedStringSigilLineList();
 
   @NotNull
   List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();

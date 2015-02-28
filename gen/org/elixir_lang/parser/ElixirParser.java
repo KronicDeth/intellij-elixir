@@ -146,6 +146,9 @@ public class ElixirParser implements PsiParser {
     else if (t == INTERPOLATED_STRING_SIGIL_HEREDOC) {
       r = interpolatedStringSigilHeredoc(b, 0);
     }
+    else if (t == INTERPOLATED_STRING_SIGIL_LINE) {
+      r = interpolatedStringSigilLine(b, 0);
+    }
     else if (t == INTERPOLATED_WORDS_BODY) {
       r = interpolatedWordsBody(b, 0);
     }
@@ -1494,8 +1497,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-  static boolean interpolatedStringSigilLine(PsiBuilder b, int l) {
+  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+  public static boolean interpolatedStringSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
@@ -1503,7 +1506,8 @@ public class ElixirParser implements PsiParser {
     r = consumeTokens(b, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
     r = r && interpolatedStringBody(b, l + 1);
     r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, INTERPOLATED_STRING_SIGIL_LINE, r);
     return r;
   }
 
