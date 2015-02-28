@@ -139,9 +139,10 @@
   <property name="test" value="tests"/>
 
   <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir" description="test module">
+    <mkdir dir="tmp"/>
+    <mkdir dir="tmp/results"/>
+
     <junit failureproperty="failure_found"
-           fork="yes"
-           forkmode="once"
            haltonfailure="no"
            printsummary="on"
            showoutput="yes">
@@ -150,14 +151,32 @@
         <pathelement location="${test.build}"/>
         <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
       </classpath>
-      <formatter type="brief" usefile="false" />
-      <batchtest>
+      <formatter type="xml"/>
+      <batchtest todir="tmp/results">
         <fileset dir="${test}">
           <include name="**/*Test*.java"/>
-          <exclude name="**/*TestCase.java"/>
         </fileset>
       </batchtest>
     </junit>
+
+    <!-- generate report with junitreport -->
+    <junitreport todir="tmp">
+      <fileset dir="tmp/results" />
+      <report todir="tmp/report" />
+    </junitreport>
+
+    <!-- concat the report through a filter chain to extract what you want -->
+    <concat>
+      <fileset file="tmp/report/overview-summary.html" />
+      <filterchain>
+        <linecontainsregexp>
+          <regexp pattern='title="Display all tests"' />
+        </linecontainsregexp>
+        <tokenfilter>
+          <replaceregex pattern='&lt;td&gt;&lt;a title="Display all tests" href="all-tests.html"&gt;(\d+)&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a title="Display all failures" href="alltests-fails.html"&gt;(\d+)&lt;/a&gt;&lt;/td&gt;&lt;td&gt;&lt;a title="Display all errors" href="alltests-errors.html"&gt;(\d+).*$' replace="Run: \1, Failed: \2, Errors: \3" />
+        </tokenfilter>
+      </filterchain>
+    </concat>
 
     <antcall target="check_test"/>
   </target>
