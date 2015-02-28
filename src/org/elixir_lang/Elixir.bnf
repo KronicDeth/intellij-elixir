@@ -702,7 +702,25 @@ interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER in
                             ]
                           }
 
-private interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR sigilModifiers
+                          {
+                            implements = [
+                              "org.elixir_lang.psi.SigilFragmented"
+                              "org.elixir_lang.psi.SigilLine"
+                            ]
+                            methods = [
+                              addEscapedCharacterCodePoints
+                              addFragmentCodePoints
+                              addHexadecimalEscapeSequenceCodePoints
+                              getBody
+                              getFragmentType
+                              quote
+                              quoteBinary
+                              quoteEmpty
+                              quoteLiteral
+                              sigilName
+                            ]
+                          }
 private interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
 
 /*

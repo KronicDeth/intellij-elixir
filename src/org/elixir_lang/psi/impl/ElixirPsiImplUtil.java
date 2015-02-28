@@ -503,6 +503,10 @@ public class ElixirPsiImplUtil {
         return sigilHeredocLine.getInterpolatedSigilBody();
     }
 
+    public static Body getBody(ElixirInterpolatedSigilLine interpolatedSigilLine) {
+        return interpolatedSigilLine.getInterpolatedSigilBody();
+    }
+
     public static Body getBody(ElixirInterpolatedStringHeredocLine stringHeredocLine) {
         return stringHeredocLine.getInterpolatedStringBody();
     }

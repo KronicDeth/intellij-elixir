@@ -42,11 +42,11 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   @NotNull
   List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList();
 
-  @Nullable
-  ElixirInterpolatedSigilBody getInterpolatedSigilBody();
-
   @NotNull
   List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
+
+  @NotNull
+  List<ElixirInterpolatedSigilLine> getInterpolatedSigilLineList();
 
   @Nullable
   ElixirInterpolatedStringBody getInterpolatedStringBody();

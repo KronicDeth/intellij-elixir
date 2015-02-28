@@ -43,10 +43,10 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList();
 
   @NotNull
-  List<ElixirInterpolatedSigilBody> getInterpolatedSigilBodyList();
+  List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
+  List<ElixirInterpolatedSigilLine> getInterpolatedSigilLineList();
 
   @NotNull
   List<ElixirInterpolatedStringBody> getInterpolatedStringBodyList();
