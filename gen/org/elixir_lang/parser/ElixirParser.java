@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -49,11 +50,11 @@ public class ElixirParser implements PsiParser {
     else if (t == CAPTURE_PREFIX_OPERATOR) {
       r = capturePrefixOperator(b, 0);
     }
-    else if (t == CHAR_LIST) {
-      r = charList(b, 0);
-    }
     else if (t == CHAR_LIST_HEREDOC) {
       r = charListHeredoc(b, 0);
+    }
+    else if (t == CHAR_LIST_LINE) {
+      r = charListLine(b, 0);
     }
     else if (t == DECIMAL_DIGITS) {
       r = decimalDigits(b, 0);
@@ -271,11 +272,11 @@ public class ElixirParser implements PsiParser {
     else if (t == SIGIL_MODIFIERS) {
       r = sigilModifiers(b, 0);
     }
-    else if (t == STRING) {
-      r = string(b, 0);
-    }
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
+    }
+    else if (t == STRING_LINE) {
+      r = stringLine(b, 0);
     }
     else if (t == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
       r = unaryCharTokenOrNumberOperation(b, 0);
@@ -450,13 +451,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // string | stringHeredoc
+  // stringLine | stringHeredoc
   static boolean binaryString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binaryString")) return false;
     if (!nextTokenIs(b, "", STRING_HEREDOC_PROMOTER, STRING_PROMOTER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = string(b, l + 1);
+    r = stringLine(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -543,22 +544,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // CHAR_LIST_PROMOTER
-  //              interpolatedCharListBody
-  //              CHAR_LIST_TERMINATOR
-  public static boolean charList(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "charList")) return false;
-    if (!nextTokenIs(b, CHAR_LIST_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, CHAR_LIST_PROMOTER);
-    r = r && interpolatedCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_TERMINATOR);
-    exit_section_(b, m, CHAR_LIST, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // CHAR_LIST_HEREDOC_PROMOTER EOL
   //                     interpolatedCharListHeredocLine*
   //                     heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
@@ -586,6 +571,20 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATOR
+  public static boolean charListLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charListLine")) return false;
+    if (!nextTokenIs(b, CHAR_LIST_PROMOTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CHAR_LIST_PROMOTER);
+    r = r && interpolatedCharListBody(b, l + 1);
+    r = r && consumeToken(b, CHAR_LIST_TERMINATOR);
+    exit_section_(b, m, CHAR_LIST_LINE, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1197,20 +1196,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-  static boolean interpolatedCharListSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedCharListSigil")) return false;
-    if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
-    r = r && interpolatedCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
   //                                      interpolatedCharListHeredocLine*
   //                                      heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
@@ -1242,30 +1227,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-  static boolean interpolatedRegex(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedRegex")) return false;
+  // TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
+  static boolean interpolatedCharListSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedCharListSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
-    r = r && interpolatedRegexBody(b, l + 1);
-    r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && interpolatedRegex_5(b, l + 1);
+    r = consumeTokens(b, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    r = r && interpolatedCharListBody(b, l + 1);
+    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean interpolatedRegex_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedRegex_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "interpolatedRegex_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -1340,27 +1312,27 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-  static boolean interpolatedSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedSigil")) return false;
+  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+  static boolean interpolatedRegexLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_PROMOTER);
-    r = r && interpolatedSigilBody(b, l + 1);
-    r = r && consumeToken(b, SIGIL_TERMINATOR);
-    r = r && interpolatedSigil_5(b, l + 1);
+    r = consumeTokens(b, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
+    r = r && interpolatedRegexBody(b, l + 1);
+    r = r && consumeToken(b, REGEX_TERMINATOR);
+    r = r && interpolatedRegexLine_5(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // SIGIL_MODIFIER*
-  private static boolean interpolatedSigil_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedSigil_5")) return false;
+  private static boolean interpolatedRegexLine_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedRegexLine_5")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "interpolatedSigil_5", c)) break;
+      if (!empty_element_parsed_guard_(b, "interpolatedRegexLine_5", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -1438,6 +1410,33 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+  static boolean interpolatedSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedSigilLine")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_PROMOTER);
+    r = r && interpolatedSigilBody(b, l + 1);
+    r = r && consumeToken(b, SIGIL_TERMINATOR);
+    r = r && interpolatedSigilLine_5(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SIGIL_MODIFIER*
+  private static boolean interpolatedSigilLine_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedSigilLine_5")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, SIGIL_MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "interpolatedSigilLine_5", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // (interpolation | STRING_FRAGMENT | escapeSequence)*
   public static boolean interpolatedStringBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringBody")) return false;
@@ -1478,20 +1477,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-  static boolean interpolatedStringSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedStringSigil")) return false;
-    if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
-    r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
   //                                      interpolatedStringHeredocLine*
   //                                      heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
@@ -1520,6 +1505,20 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
+  static boolean interpolatedStringSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "interpolatedStringSigilLine")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    r = r && interpolatedStringBody(b, l + 1);
+    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1794,13 +1793,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // charList | charListHeredoc
+  // charListLine | charListHeredoc
   static boolean listString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "listString")) return false;
     if (!nextTokenIs(b, "", CHAR_LIST_HEREDOC_PROMOTER, CHAR_LIST_PROMOTER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = charList(b, l + 1);
+    r = charListLine(b, l + 1);
     if (!r) r = charListHeredoc(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1831,20 +1830,6 @@ public class ElixirParser implements PsiParser {
     r = r && literalCharListBody(b, l + 1);
     r = r && consumeToken(b, EOL);
     exit_section_(b, l, m, LITERAL_CHAR_LIST_HEREDOC_LINE, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-  static boolean literalCharListSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalCharListSigil")) return false;
-    if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
-    r = r && literalCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1880,30 +1865,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalRegex(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalRegex")) return false;
+  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
+  static boolean literalCharListSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, REGEX_PROMOTER);
-    r = r && literalRegexBody(b, l + 1);
-    r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && literalRegex_5(b, l + 1);
+    r = consumeTokens(b, 0, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    r = r && literalCharListBody(b, l + 1);
+    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean literalRegex_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalRegex_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalRegex_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -1966,27 +1938,27 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalSigil")) return false;
+  // TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+  static boolean literalRegexLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
-    r = r && literalSigilBody(b, l + 1);
-    r = r && consumeToken(b, SIGIL_TERMINATOR);
-    r = r && literalSigil_5(b, l + 1);
+    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, REGEX_PROMOTER);
+    r = r && literalRegexBody(b, l + 1);
+    r = r && consumeToken(b, REGEX_TERMINATOR);
+    r = r && literalRegexLine_5(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // SIGIL_MODIFIER*
-  private static boolean literalSigil_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalSigil_5")) return false;
+  private static boolean literalRegexLine_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalRegexLine_5")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalSigil_5", c)) break;
+      if (!empty_element_parsed_guard_(b, "literalRegexLine_5", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -2052,6 +2024,33 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+  static boolean literalSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilLine")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
+    r = r && literalSigilBody(b, l + 1);
+    r = r && consumeToken(b, SIGIL_TERMINATOR);
+    r = r && literalSigilLine_5(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SIGIL_MODIFIER*
+  private static boolean literalSigilLine_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilLine_5")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, SIGIL_MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "literalSigilLine_5", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // STRING_FRAGMENT*
   public static boolean literalStringBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalStringBody")) return false;
@@ -2076,20 +2075,6 @@ public class ElixirParser implements PsiParser {
     r = r && literalStringBody(b, l + 1);
     r = r && consumeToken(b, EOL);
     exit_section_(b, l, m, LITERAL_STRING_HEREDOC_LINE, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
-  static boolean literalStringSigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalStringSigil")) return false;
-    if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
-    r = r && literalStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -2125,28 +2110,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalWords(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalWords")) return false;
+  // TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
+  static boolean literalStringSigilLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalStringSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, WORDS_PROMOTER, LITERAL, WORDS_TERMINATOR);
-    r = r && literalWords_5(b, l + 1);
+    r = consumeTokens(b, 0, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    r = r && literalStringBody(b, l + 1);
+    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean literalWords_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalWords_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalWords_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */
@@ -2206,6 +2180,31 @@ public class ElixirParser implements PsiParser {
     r = r && consumeToken(b, EOL);
     exit_section_(b, l, m, LITERAL_WORDS_HEREDOC_LINE, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
+  static boolean literalWordsLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsLine")) return false;
+    if (!nextTokenIs(b, TILDE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, WORDS_PROMOTER, LITERAL, WORDS_TERMINATOR);
+    r = r && literalWordsLine_5(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SIGIL_MODIFIER*
+  private static boolean literalWordsLine_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsLine_5")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, SIGIL_MODIFIER)) break;
+      if (!empty_element_parsed_guard_(b, "literalWordsLine_5", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -3117,62 +3116,62 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // charList | string
+  // charListLine | stringLine
   static boolean quote(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "quote")) return false;
     if (!nextTokenIs(b, "", CHAR_LIST_PROMOTER, STRING_PROMOTER)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = charList(b, l + 1);
-    if (!r) r = string(b, l + 1);
+    r = charListLine(b, l + 1);
+    if (!r) r = stringLine(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // interpolatedCharListSigil |
+  // interpolatedCharListSigilLine |
   //                   interpolatedCharListSigilHeredoc |
   //                   interpolatedRegexHeredoc |
   //                   interpolatedSigilHeredoc |
   //                   interpolatedStringSigilHeredoc |
   //                   interpolatedWordsHeredoc |
-  //                   interpolatedRegex |
-  //                   interpolatedSigil |
-  //                   interpolatedStringSigil |
-  //                   literalCharListSigil |
+  //                   interpolatedRegexLine |
+  //                   interpolatedSigilLine |
+  //                   interpolatedStringSigilLine |
+  //                   literalCharListSigilLine |
   //                   literalCharListSigilHeredoc |
   //                   literalRegexHeredoc |
   //                   literalSigilHeredoc |
   //                   literalStringSigilHeredoc |
   //                   literalWordsHeredoc |
-  //                   literalRegex |
-  //                   literalSigil |
-  //                   literalStringSigil |
-  //                   literalWords
+  //                   literalRegexLine |
+  //                   literalSigilLine |
+  //                   literalStringSigilLine |
+  //                   literalWordsLine
   static boolean sigil(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "sigil")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = interpolatedCharListSigil(b, l + 1);
+    r = interpolatedCharListSigilLine(b, l + 1);
     if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedRegexHeredoc(b, l + 1);
     if (!r) r = interpolatedSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedStringSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedWordsHeredoc(b, l + 1);
-    if (!r) r = interpolatedRegex(b, l + 1);
-    if (!r) r = interpolatedSigil(b, l + 1);
-    if (!r) r = interpolatedStringSigil(b, l + 1);
-    if (!r) r = literalCharListSigil(b, l + 1);
+    if (!r) r = interpolatedRegexLine(b, l + 1);
+    if (!r) r = interpolatedSigilLine(b, l + 1);
+    if (!r) r = interpolatedStringSigilLine(b, l + 1);
+    if (!r) r = literalCharListSigilLine(b, l + 1);
     if (!r) r = literalCharListSigilHeredoc(b, l + 1);
     if (!r) r = literalRegexHeredoc(b, l + 1);
     if (!r) r = literalSigilHeredoc(b, l + 1);
     if (!r) r = literalStringSigilHeredoc(b, l + 1);
     if (!r) r = literalWordsHeredoc(b, l + 1);
-    if (!r) r = literalRegex(b, l + 1);
-    if (!r) r = literalSigil(b, l + 1);
-    if (!r) r = literalStringSigil(b, l + 1);
-    if (!r) r = literalWords(b, l + 1);
+    if (!r) r = literalRegexLine(b, l + 1);
+    if (!r) r = literalSigilLine(b, l + 1);
+    if (!r) r = literalStringSigilLine(b, l + 1);
+    if (!r) r = literalWordsLine(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3190,22 +3189,6 @@ public class ElixirParser implements PsiParser {
     }
     exit_section_(b, l, m, SIGIL_MODIFIERS, true, false, null);
     return true;
-  }
-
-  /* ********************************************************** */
-  // STRING_PROMOTER
-  //            interpolatedStringBody
-  //            STRING_TERMINATOR
-  public static boolean string(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "string")) return false;
-    if (!nextTokenIs(b, STRING_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, STRING_PROMOTER);
-    r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_TERMINATOR);
-    exit_section_(b, m, STRING, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -3236,6 +3219,22 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // STRING_PROMOTER
+  //                interpolatedStringBody
+  //                STRING_TERMINATOR
+  public static boolean stringLine(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stringLine")) return false;
+    if (!nextTokenIs(b, STRING_PROMOTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRING_PROMOTER);
+    r = r && interpolatedStringBody(b, l + 1);
+    r = r && consumeToken(b, STRING_TERMINATOR);
+    exit_section_(b, m, STRING_LINE, r);
+    return r;
   }
 
   /* ********************************************************** */

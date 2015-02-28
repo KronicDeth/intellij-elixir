@@ -182,7 +182,7 @@ heredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
  */
 
 /*
- * CharList
+ * CharList Heredoc
  */
 
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
@@ -220,7 +220,7 @@ interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody E
                                     }
 
 /*
- * String
+ * String Heredoc
  */
 
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
@@ -598,6 +598,88 @@ literalWordsBody ::= WORDS_FRAGMENT*
 /*
  *
  *
+ * Lines (as opposed to Heredocs)
+ *
+ *
+ */
+
+/*
+ *
+ * Quote Lines
+ *
+ */
+
+
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
+                             { implements =  "org.elixir_lang.psi.Body" }
+charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATOR
+                 {
+                   implements = [
+                     "org.elixir_lang.psi.InterpolatedCharList"
+                     "org.elixir_lang.psi.Quotable"
+                   ]
+                   methods = [
+                     addEscapedCharacterCodePoints
+                     addFragmentCodePoints
+                     addHexadecimalEscapeSequenceCodePoints
+                     getFragmentType
+                     quote
+                     quoteBinary
+                     quoteEmpty
+                     quoteLiteral
+                   ]
+                 }
+
+interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
+                            { implements = "org.elixir_lang.psi.Body" }
+stringLine ::= STRING_PROMOTER
+               interpolatedStringBody
+               STRING_TERMINATOR
+               {
+                 implements = [
+                   "org.elixir_lang.psi.InterpolatedString"
+                   "org.elixir_lang.psi.Quotable"
+                 ]
+                 methods = [
+                   addEscapedCharacterCodePoints
+                   addFragmentCodePoints
+                   addHexadecimalEscapeSequenceCodePoints
+                   getFragmentType
+                   quote
+                   quoteBinary
+                   quoteEmpty
+                   quoteLiteral
+                 ]
+               }
+
+/*
+ *
+ * Sigil Lines
+ *
+ */
+
+/*
+ * Interpolated Sigil Lines
+ */
+
+private interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
+private interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+private interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+private interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
+
+/*
+ * Literal Sigils
+ */
+
+private literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
+private literalRegexLine ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
+private literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
+private literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
+private literalWordsLine ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
+
+/*
+ *
+ *
  * Matched Expressions - ordered by outer-most (lowest precedence) to inner-most (highest precedence)
  *
  *
@@ -671,66 +753,6 @@ private accessExpression ::= atCharTokenOrNumberOperation |
                              alias
 alias ::= ALIAS_TOKEN
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-/*
- *
- *
- * Quotes
- *
- *
- */
-
-/*
- * CharList
- */
-
-interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             { implements =  "org.elixir_lang.psi.Body" }
-charList ::= CHAR_LIST_PROMOTER
-             interpolatedCharListBody
-             CHAR_LIST_TERMINATOR
-             {
-               implements = [
-                 "org.elixir_lang.psi.InterpolatedCharList"
-                 "org.elixir_lang.psi.Quotable"
-               ]
-               methods = [
-                 addEscapedCharacterCodePoints
-                 addFragmentCodePoints
-                 addHexadecimalEscapeSequenceCodePoints
-                 getFragmentType
-                 quote
-                 quoteBinary
-                 quoteEmpty
-                 quoteLiteral
-               ]
-             }
-
-/*
- * String
- */
-
-interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            { implements = "org.elixir_lang.psi.Body" }
-string ::= STRING_PROMOTER
-           interpolatedStringBody
-           STRING_TERMINATOR
-           {
-             implements = [
-               "org.elixir_lang.psi.InterpolatedString"
-               "org.elixir_lang.psi.Quotable"
-             ]
-             methods = [
-               addEscapedCharacterCodePoints
-               addFragmentCodePoints
-               addHexadecimalEscapeSequenceCodePoints
-               getFragmentType
-               quote
-               quoteBinary
-               quoteEmpty
-               quoteLiteral
-             ]
-           }
 
 /*
  *
@@ -813,37 +835,6 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
 /*
  *
  *
- * Sigils
- *
- *
- */
-
-/*
- *
- * Interpolated Sigils
- *
- */
-
-private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-
-/*
- *
- * Literal Sigils
- *
- */
-
-private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
-private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
-
-/*
- *
- *
  * In alphabetical order
  *
  *
@@ -854,7 +845,7 @@ adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private binaryString ::= string | stringHeredoc
+private binaryString ::= stringLine | stringHeredoc
 private infixComma ::= COMMA EOL*
 
 private containerExpression ::= emptyParentheses
@@ -906,7 +897,7 @@ private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
-private listString ::= charList | charListHeredoc
+private listString ::= charListLine | charListHeredoc
 
 
 atCharTokenOrNumberOperation ::= atPrefixOperator numeric
@@ -928,25 +919,25 @@ number ::= binaryWholeNumber |
  * Number Operations - Used in accessExpression
  */
 
-private quote ::= (charList | string)
-private sigil ::= interpolatedCharListSigil |
+private quote ::= (charListLine | stringLine)
+private sigil ::= interpolatedCharListSigilLine |
                   interpolatedCharListSigilHeredoc |
                   interpolatedRegexHeredoc |
                   interpolatedSigilHeredoc |
                   interpolatedStringSigilHeredoc |
                   interpolatedWordsHeredoc |
-                  interpolatedRegex |
-                  interpolatedSigil |
-                  interpolatedStringSigil |
-                  literalCharListSigil |
+                  interpolatedRegexLine |
+                  interpolatedSigilLine |
+                  interpolatedStringSigilLine |
+                  literalCharListSigilLine |
                   literalCharListSigilHeredoc |
                   literalRegexHeredoc |
                   literalSigilHeredoc |
                   literalStringSigilHeredoc |
                   literalWordsHeredoc |
-                  literalRegex |
-                  literalSigil |
-                  literalStringSigil |
-                  literalWords
+                  literalRegexLine |
+                  literalSigilLine |
+                  literalStringSigilLine |
+                  literalWordsLine
 
 unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }

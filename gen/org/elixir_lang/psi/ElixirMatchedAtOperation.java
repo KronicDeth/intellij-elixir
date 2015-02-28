@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface ElixirMatchedAtOperation extends PsiElement {
 
@@ -23,10 +23,10 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @Nullable
-  ElixirCharList getCharList();
+  ElixirCharListHeredoc getCharListHeredoc();
 
   @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
+  ElixirCharListLine getCharListLine();
 
   @Nullable
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
@@ -104,10 +104,10 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirNumber getNumber();
 
   @Nullable
-  ElixirString getString();
+  ElixirStringHeredoc getStringHeredoc();
 
   @Nullable
-  ElixirStringHeredoc getStringHeredoc();
+  ElixirStringLine getStringLine();
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();

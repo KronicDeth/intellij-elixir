@@ -1,5 +1,5 @@
 Elixir File(0,6)
-  ElixirCharListImpl(CHAR_LIST)(0,2)
+  ElixirCharListLineImpl(CHAR_LIST_LINE)(0,2)
     PsiElement(ElixirTokenType.CHAR_LIST_PROMOTER)(''')(0,1)
     ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(1,1)
       <empty list>
@@ -8,7 +8,7 @@ Elixir File(0,6)
     PsiElement(ElixirTokenType.EOL)('\n')(2,3)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(3,4)
     PsiElement(ElixirTokenType.EOL)('\n')(3,4)
-  ElixirCharListImpl(CHAR_LIST)(4,6)
+  ElixirCharListLineImpl(CHAR_LIST_LINE)(4,6)
     PsiElement(ElixirTokenType.CHAR_LIST_PROMOTER)(''')(4,5)
     ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(5,5)
       <empty list>

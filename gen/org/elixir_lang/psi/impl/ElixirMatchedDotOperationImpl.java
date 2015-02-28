@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedDotOperation {
 
@@ -48,14 +48,14 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirCharList> getCharListList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharList.class);
+  public List<ElixirCharListHeredoc> getCharListHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
+  public List<ElixirCharListLine> getCharListLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
   }
 
   @Override
@@ -168,14 +168,14 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirString> getStringList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirString.class);
+  public List<ElixirStringHeredoc> getStringHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  public List<ElixirStringLine> getStringLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
   }
 
   @Override

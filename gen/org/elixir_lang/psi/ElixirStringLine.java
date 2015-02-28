@@ -9,10 +9,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirCharList extends InterpolatedCharList, Quotable {
+public interface ElixirStringLine extends InterpolatedString, Quotable {
 
   @NotNull
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+  ElixirInterpolatedStringBody getInterpolatedStringBody();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);

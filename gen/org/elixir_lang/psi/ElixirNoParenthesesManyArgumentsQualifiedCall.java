@@ -1,9 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElement {
 
@@ -20,10 +22,10 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull
-  List<ElixirCharList> getCharListList();
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
   @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
+  List<ElixirCharListLine> getCharListLineList();
 
   @NotNull
   ElixirInfixDotOperator getInfixDotOperator();
@@ -89,10 +91,10 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirQualifiedAlias getQualifiedAlias();
 
   @NotNull
-  List<ElixirString> getStringList();
+  List<ElixirStringHeredoc> getStringHeredocList();
 
   @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  List<ElixirStringLine> getStringLineList();
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();

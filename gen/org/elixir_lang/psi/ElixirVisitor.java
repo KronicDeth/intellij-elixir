@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -44,16 +44,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitCharList(@NotNull ElixirCharList o) {
-    visitInterpolatedCharList(o);
-    // visitQuotable(o);
-  }
-
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedCharList(o);
     // visitInterpolatedCharListHeredocLined(o);
     // visitQuote(o);
+  }
+
+  public void visitCharListLine(@NotNull ElixirCharListLine o) {
+    visitInterpolatedCharList(o);
+    // visitQuotable(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
@@ -359,14 +359,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitString(@NotNull ElixirString o) {
-    visitInterpolatedString(o);
-    // visitQuotable(o);
-  }
-
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedString(o);
+  }
+
+  public void visitStringLine(@NotNull ElixirStringLine o) {
+    visitInterpolatedString(o);
+    // visitQuotable(o);
   }
 
   public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {

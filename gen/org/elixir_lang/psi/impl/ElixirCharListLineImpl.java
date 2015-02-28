@@ -1,34 +1,34 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.psi.ElixirCharListLine;
+import org.elixir_lang.psi.ElixirInterpolatedCharListBody;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.jetbrains.annotations.NotNull;
 
-public class ElixirStringImpl extends ASTWrapperPsiElement implements ElixirString {
+import java.util.List;
 
-  public ElixirStringImpl(ASTNode node) {
+public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements ElixirCharListLine {
+
+  public ElixirCharListLineImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitString(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharListLine(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
+  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
+    return findNotNullChildByClass(ElixirInterpolatedCharListBody.class);
   }
 
   @NotNull

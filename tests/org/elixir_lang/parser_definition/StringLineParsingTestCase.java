@@ -3,7 +3,7 @@ package org.elixir_lang.parser_definition;
 /**
  * Created by luke.imhoff on 8/7/14.
  */
-public class StringParsingTestCase extends ParsingTestCase {
+public class StringLineParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
     }
@@ -37,6 +37,6 @@ public class StringParsingTestCase extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/string_parsing_test_case";
+        return super.getTestDataPath() + "/string_line_parsing_test_case";
     }
 }

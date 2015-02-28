@@ -391,10 +391,10 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
-        ElixirCharList charList = atom.getCharList();
+        ElixirCharListLine charListLine = atom.getCharListLine();
 
-        if (charList != null) {
-            OtpErlangObject quotedCharList = charList.quote();
+        if (charListLine != null) {
+            OtpErlangObject quotedCharList = charListLine.quote();
 
             if (quotedCharList instanceof OtpErlangString) {
                 final String atomText = ((OtpErlangString) quotedCharList).stringValue();
@@ -413,10 +413,10 @@ public class ElixirPsiImplUtil {
                 );
             }
         } else {
-            ElixirString string = atom.getString();
+            ElixirStringLine stringLine = atom.getStringLine();
 
-            if (string != null) {
-                OtpErlangObject quotedString = string.quote();
+            if (stringLine != null) {
+                OtpErlangObject quotedString = stringLine.quote();
 
                 if (quotedString instanceof OtpErlangBinary) {
                     String atomText = javaString((OtpErlangBinary) quotedString);
@@ -428,7 +428,7 @@ public class ElixirPsiImplUtil {
                     quoted = quotedFunctionCall(
                             "erlang",
                             "binary_to_atom",
-                            metadata(string),
+                            metadata(stringLine),
                             quotedString,
                             UTF_8
                     );
@@ -448,10 +448,10 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirCharList charList) {
-        ElixirInterpolatedCharListBody interpolatedCharListBody = charList.getInterpolatedCharListBody();
+    public static OtpErlangObject quote(@NotNull final ElixirCharListLine charListLine) {
+        ElixirInterpolatedCharListBody interpolatedCharListBody = charListLine.getInterpolatedCharListBody();
 
-        return quotedChildNodes(charList, childNodes(interpolatedCharListBody));
+        return quotedChildNodes(charListLine, childNodes(interpolatedCharListBody));
     }
 
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
@@ -777,9 +777,9 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirString string) {
-        ElixirInterpolatedStringBody interpolatedStringBody = string.getInterpolatedStringBody();
-        return quotedChildNodes(string, childNodes(interpolatedStringBody));
+    public static OtpErlangObject quote(@NotNull final ElixirStringLine stringLine) {
+        ElixirInterpolatedStringBody interpolatedStringBody = stringLine.getInterpolatedStringBody();
+        return quotedChildNodes(stringLine, childNodes(interpolatedStringBody));
     }
 
     @Contract(pure = true)

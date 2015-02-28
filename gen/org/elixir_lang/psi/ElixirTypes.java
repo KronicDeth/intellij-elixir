@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -17,8 +17,8 @@ public interface ElixirTypes {
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
-  IElementType CHAR_LIST = new ElixirElementType("CHAR_LIST");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
@@ -91,8 +91,8 @@ public interface ElixirTypes {
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType QUALIFIED_ALIAS = new ElixirElementType("QUALIFIED_ALIAS");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
-  IElementType STRING = new ElixirElementType("STRING");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
@@ -246,11 +246,11 @@ public interface ElixirTypes {
       else if (type == CAPTURE_PREFIX_OPERATOR) {
         return new ElixirCapturePrefixOperatorImpl(node);
       }
-      else if (type == CHAR_LIST) {
-        return new ElixirCharListImpl(node);
-      }
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
+      }
+      else if (type == CHAR_LIST_LINE) {
+        return new ElixirCharListLineImpl(node);
       }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);
@@ -468,11 +468,11 @@ public interface ElixirTypes {
       else if (type == SIGIL_MODIFIERS) {
         return new ElixirSigilModifiersImpl(node);
       }
-      else if (type == STRING) {
-        return new ElixirStringImpl(node);
-      }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == STRING_LINE) {
+        return new ElixirStringLineImpl(node);
       }
       else if (type == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
         return new ElixirUnaryCharTokenOrNumberOperationImpl(node);

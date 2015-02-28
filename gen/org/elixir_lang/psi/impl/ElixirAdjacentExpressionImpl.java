@@ -1,15 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implements ElixirAdjacentExpression {
 
@@ -48,14 +45,14 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirCharList getCharList() {
-    return findChildByClass(ElixirCharList.class);
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirCharListHeredoc getCharListHeredoc() {
-    return findChildByClass(ElixirCharListHeredoc.class);
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
   }
 
   @Override
@@ -246,14 +243,14 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirString getString() {
-    return findChildByClass(ElixirString.class);
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirStringHeredoc getStringHeredoc() {
-    return findChildByClass(ElixirStringHeredoc.class);
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
   }
 
   @Override
