@@ -914,56 +914,19 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilHeredoc sigilHeredoc) {
-        char sigilName = sigilHeredoc.sigilName();
-
-        OtpErlangList sigilHeredocMetadata = metadata(sigilHeredoc);
         OtpErlangObject quotedHeredoc = quote((Heredoc) sigilHeredoc);
-        OtpErlangTuple sigilBinary;
 
-        if (quotedHeredoc instanceof OtpErlangTuple) {
-            sigilBinary = (OtpErlangTuple) quotedHeredoc;
-        } else {
-            sigilBinary = quotedFunctionCall("<<>>", sigilHeredocMetadata, quotedHeredoc);
-        }
-
-        ElixirSigilModifiers sigilModifiers = sigilHeredoc.getSigilModifiers();
-        OtpErlangObject quotedModifiers = sigilModifiers.quote();
-
-        return quotedFunctionCall(
-                "sigil_" + sigilName,
-                sigilHeredocMetadata,
-                sigilBinary,
-                quotedModifiers
-        );
+        return quote(sigilHeredoc, quotedHeredoc);
     }
 
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(SigilLine sigilLine) {
-        char sigilName = sigilLine.sigilName();
-
-        OtpErlangList sigilLineMetadata = metadata(sigilLine);
-
         Body body = sigilLine.getBody();
         ASTNode[] bodyChildNodes = childNodes(body);
-        OtpErlangObject quotedBody = quotedChildNodes(sigilLine, sigilLineMetadata, bodyChildNodes);
-        OtpErlangTuple sigilBinary;
+        OtpErlangObject quotedBody = quotedChildNodes(sigilLine, bodyChildNodes);
 
-        if (quotedBody instanceof OtpErlangTuple) {
-            sigilBinary = (OtpErlangTuple) quotedBody;
-        } else {
-            sigilBinary = quotedFunctionCall("<<>>", sigilLineMetadata, quotedBody);
-        }
-
-        ElixirSigilModifiers sigilModifiers = sigilLine.getSigilModifiers();
-        OtpErlangObject quotedModifiers = sigilModifiers.quote();
-
-        return quotedFunctionCall(
-                "sigil_" + sigilName,
-                sigilLineMetadata,
-                sigilBinary,
-                quotedModifiers
-        );
+        return quote(sigilLine, quotedBody);
     }
 
     @Contract(pure = true)
@@ -1188,6 +1151,31 @@ public class ElixirPsiImplUtil {
                 line.getManager()
         );
         heredocDescendantNodes.add(eolNode);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
+        char sigilName = sigil.sigilName();
+
+        OtpErlangList sigilMetadata = metadata(sigil);
+        OtpErlangTuple sigilBinary;
+
+        if (quotedContent instanceof OtpErlangTuple) {
+            sigilBinary = (OtpErlangTuple) quotedContent;
+        } else {
+            sigilBinary = quotedFunctionCall("<<>>", sigilMetadata, quotedContent);
+        }
+
+        ElixirSigilModifiers sigilModifiers = sigil.getSigilModifiers();
+        OtpErlangObject quotedModifiers = sigilModifiers.quote();
+
+        return quotedFunctionCall(
+                "sigil_" + sigilName,
+                sigilMetadata,
+                sigilBinary,
+                quotedModifiers
+        );
     }
 
     @NotNull
