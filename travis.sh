@@ -53,7 +53,7 @@ erlang_lib=`elixir -e "IO.write :code.lib_dir"`
 popd
 
 # Run the tests
-ant -f intellij-elixir.xml -Derlang.lib=${erlang_lib} -Didea.home=dependencies/${idea_path} -Djdk.bin=${JAVA_HOME}/bin test.modules
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=${erlang_lib} -Didea.home=dependencies/${idea_path} -Djdk.bin=${JAVA_HOME}/bin test.modules
 
 # Was our build successful?
 stat=$?
