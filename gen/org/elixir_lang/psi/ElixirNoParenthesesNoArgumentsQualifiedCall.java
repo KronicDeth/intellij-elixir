@@ -34,6 +34,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable
+  ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
+
+  @Nullable
   ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable

@@ -662,7 +662,25 @@ stringLine ::= STRING_PROMOTER
  * Interpolated Sigil Lines
  */
 
-private interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
+interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+                                  {
+                                    implements = [
+                                      "org.elixir_lang.psi.CharListFragmented"
+                                      "org.elixir_lang.psi.SigilLine"
+                                    ]
+                                    methods = [
+                                      addEscapedCharacterCodePoints
+                                      addFragmentCodePoints
+                                      addHexadecimalEscapeSequenceCodePoints
+                                      getBody
+                                      getFragmentType
+                                      quote
+                                      quoteBinary
+                                      quoteEmpty
+                                      quoteLiteral
+                                      sigilName
+                                    ]
+                                  }
 private interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
 private interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
 private interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR

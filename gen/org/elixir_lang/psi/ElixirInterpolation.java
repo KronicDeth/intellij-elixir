@@ -36,10 +36,10 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
-  List<ElixirInterpolatedCharListBody> getInterpolatedCharListBodyList();
+  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
+  List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
 
   @NotNull
   List<ElixirInterpolatedRegexBody> getInterpolatedRegexBodyList();

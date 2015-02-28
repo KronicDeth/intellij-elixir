@@ -28,10 +28,10 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirEmptyParentheses getEmptyParentheses();
 
   @Nullable
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable
-  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+  ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
 
   @Nullable
   ElixirInterpolatedRegexBody getInterpolatedRegexBody();

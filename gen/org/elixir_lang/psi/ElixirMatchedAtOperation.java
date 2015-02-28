@@ -29,10 +29,10 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirCharListLine getCharListLine();
 
   @Nullable
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable
-  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
+  ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
 
   @Nullable
   ElixirInterpolatedRegexBody getInterpolatedRegexBody();

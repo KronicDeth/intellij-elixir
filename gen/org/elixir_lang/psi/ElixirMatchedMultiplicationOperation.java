@@ -27,11 +27,11 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   @NotNull
   List<ElixirCharListLine> getCharListLineList();
 
-  @Nullable
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
-
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
+
+  @NotNull
+  List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
 
   @Nullable
   ElixirInterpolatedRegexBody getInterpolatedRegexBody();

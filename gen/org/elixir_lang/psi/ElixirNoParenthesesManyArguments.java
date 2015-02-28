@@ -31,10 +31,10 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirInterpolatedCharListBody> getInterpolatedCharListBodyList();
+  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
+  List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
 
   @NotNull
   List<ElixirInterpolatedRegexBody> getInterpolatedRegexBodyList();

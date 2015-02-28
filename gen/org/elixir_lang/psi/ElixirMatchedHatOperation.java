@@ -30,11 +30,11 @@ public interface ElixirMatchedHatOperation extends PsiElement {
   @NotNull
   ElixirHatInfixOperator getHatInfixOperator();
 
-  @Nullable
-  ElixirInterpolatedCharListBody getInterpolatedCharListBody();
-
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
+
+  @NotNull
+  List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
 
   @Nullable
   ElixirInterpolatedRegexBody getInterpolatedRegexBody();

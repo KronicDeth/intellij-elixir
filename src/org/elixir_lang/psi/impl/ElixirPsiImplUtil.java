@@ -487,6 +487,10 @@ public class ElixirPsiImplUtil {
         return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
     }
 
+    public static Body getBody(ElixirInterpolatedCharListSigilLine interpolatedCharListSigilLine) {
+        return interpolatedCharListSigilLine.getInterpolatedCharListBody();
+    }
+
     public static Body getBody(ElixirInterpolatedRegexHeredocLine interpolatedRegexHeredocLine) {
         return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
     }
@@ -909,12 +913,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(Sigil sigil) {
-        return null;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(SigilHeredoc sigilHeredoc) {
         char sigilName = sigilHeredoc.sigilName();
 
@@ -934,6 +932,35 @@ public class ElixirPsiImplUtil {
         return quotedFunctionCall(
                 "sigil_" + sigilName,
                 sigilHeredocMetadata,
+                sigilBinary,
+                quotedModifiers
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(SigilLine sigilLine) {
+        char sigilName = sigilLine.sigilName();
+
+        OtpErlangList sigilLineMetadata = metadata(sigilLine);
+
+        Body body = sigilLine.getBody();
+        ASTNode[] bodyChildNodes = childNodes(body);
+        OtpErlangObject quotedBody = quotedChildNodes(sigilLine, sigilLineMetadata, bodyChildNodes);
+        OtpErlangTuple sigilBinary;
+
+        if (quotedBody instanceof OtpErlangTuple) {
+            sigilBinary = (OtpErlangTuple) quotedBody;
+        } else {
+            sigilBinary = quotedFunctionCall("<<>>", sigilLineMetadata, quotedBody);
+        }
+
+        ElixirSigilModifiers sigilModifiers = sigilLine.getSigilModifiers();
+        OtpErlangObject quotedModifiers = sigilModifiers.quote();
+
+        return quotedFunctionCall(
+                "sigil_" + sigilName,
+                sigilLineMetadata,
                 sigilBinary,
                 quotedModifiers
         );
