@@ -41,6 +41,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_REGEX_BODY = new ElixirElementType("INTERPOLATED_REGEX_BODY");
   IElementType INTERPOLATED_REGEX_HEREDOC = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC");
   IElementType INTERPOLATED_REGEX_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_REGEX_HEREDOC_LINE");
+  IElementType INTERPOLATED_REGEX_LINE = new ElixirElementType("INTERPOLATED_REGEX_LINE");
   IElementType INTERPOLATED_SIGIL_BODY = new ElixirElementType("INTERPOLATED_SIGIL_BODY");
   IElementType INTERPOLATED_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC");
   IElementType INTERPOLATED_SIGIL_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_SIGIL_HEREDOC_LINE");
@@ -318,6 +319,9 @@ public interface ElixirTypes {
       }
       else if (type == INTERPOLATED_REGEX_HEREDOC_LINE) {
         return new ElixirInterpolatedRegexHeredocLineImpl(node);
+      }
+      else if (type == INTERPOLATED_REGEX_LINE) {
+        return new ElixirInterpolatedRegexLineImpl(node);
       }
       else if (type == INTERPOLATED_SIGIL_BODY) {
         return new ElixirInterpolatedSigilBodyImpl(node);

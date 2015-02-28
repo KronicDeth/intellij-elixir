@@ -75,14 +75,14 @@ public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
-    return findChildByClass(ElixirInterpolatedRegexBody.class);
+  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
+    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
-    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
+  public ElixirInterpolatedRegexLine getInterpolatedRegexLine() {
+    return findChildByClass(ElixirInterpolatedRegexLine.class);
   }
 
   @Override

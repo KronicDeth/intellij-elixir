@@ -35,10 +35,10 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
 
   @Nullable
-  ElixirInterpolatedRegexBody getInterpolatedRegexBody();
+  ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable
-  ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
+  ElixirInterpolatedRegexLine getInterpolatedRegexLine();
 
   @Nullable
   ElixirInterpolatedSigilBody getInterpolatedSigilBody();

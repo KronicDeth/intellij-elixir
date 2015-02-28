@@ -495,6 +495,10 @@ public class ElixirPsiImplUtil {
         return interpolatedRegexHeredocLine.getInterpolatedRegexBody();
     }
 
+    public static Body getBody(ElixirInterpolatedRegexLine interpolatedRegexLine) {
+        return interpolatedRegexLine.getInterpolatedRegexBody();
+    }
+
     public static Body getBody(ElixirInterpolatedSigilHeredocLine sigilHeredocLine) {
         return sigilHeredocLine.getInterpolatedSigilBody();
     }

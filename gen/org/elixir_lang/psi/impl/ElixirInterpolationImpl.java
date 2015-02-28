@@ -90,14 +90,14 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedRegexBody> getInterpolatedRegexBodyList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexBody.class);
+  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
+  public List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexLine.class);
   }
 
   @Override

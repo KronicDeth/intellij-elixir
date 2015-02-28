@@ -42,10 +42,10 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
 
   @NotNull
-  List<ElixirInterpolatedRegexBody> getInterpolatedRegexBodyList();
+  List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList();
 
   @NotNull
-  List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList();
+  List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList();
 
   @NotNull
   List<ElixirInterpolatedSigilBody> getInterpolatedSigilBodyList();

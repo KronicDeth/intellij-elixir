@@ -77,15 +77,15 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirInterpolatedRegexBody getInterpolatedRegexBody() {
-    return findChildByClass(ElixirInterpolatedRegexBody.class);
+  @NotNull
+  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
+  public List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexLine.class);
   }
 
   @Override

@@ -122,6 +122,9 @@ public class ElixirParser implements PsiParser {
     else if (t == INTERPOLATED_REGEX_HEREDOC_LINE) {
       r = interpolatedRegexHeredocLine(b, 0);
     }
+    else if (t == INTERPOLATED_REGEX_LINE) {
+      r = interpolatedRegexLine(b, 0);
+    }
     else if (t == INTERPOLATED_SIGIL_BODY) {
       r = interpolatedSigilBody(b, 0);
     }
@@ -1316,8 +1319,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-  static boolean interpolatedRegexLine(PsiBuilder b, int l) {
+  // TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR sigilModifiers
+  public static boolean interpolatedRegexLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
@@ -1325,21 +1328,9 @@ public class ElixirParser implements PsiParser {
     r = consumeTokens(b, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
     r = r && interpolatedRegexBody(b, l + 1);
     r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && interpolatedRegexLine_5(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, INTERPOLATED_REGEX_LINE, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean interpolatedRegexLine_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "interpolatedRegexLine_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "interpolatedRegexLine_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */
