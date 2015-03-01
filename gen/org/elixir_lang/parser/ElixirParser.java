@@ -80,6 +80,9 @@ public class ElixirParser implements PsiParser {
     else if (t == ESCAPED_CHARACTER) {
       r = escapedCharacter(b, 0);
     }
+    else if (t == ESCAPED_EOL) {
+      r = escapedEOL(b, 0);
+    }
     else if (t == HAT_INFIX_OPERATOR) {
       r = hatInfixOperator(b, 0);
     }
@@ -830,7 +833,8 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // hexadecimalEscapeSequence |
-  //                            /* Must be second so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+  //                            escapedEOL |
+  //                            /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
   //                               ("\x") in hexadecimalEscapeSequence  */
   //                            escapedCharacter
   static boolean escapeSequence(PsiBuilder b, int l) {
@@ -839,6 +843,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = hexadecimalEscapeSequence(b, l + 1);
+    if (!r) r = escapedEOL(b, l + 1);
     if (!r) r = escapedCharacter(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -855,6 +860,18 @@ public class ElixirParser implements PsiParser {
     p = r; // pin = 1
     exit_section_(b, l, m, ESCAPED_CHARACTER, r, p, null);
     return r || p;
+  }
+
+  /* ********************************************************** */
+  // ESCAPE EOL
+  public static boolean escapedEOL(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "escapedEOL")) return false;
+    if (!nextTokenIs(b, ESCAPE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, ESCAPE, EOL);
+    exit_section_(b, m, ESCAPED_EOL, r);
+    return r;
   }
 
   /* ********************************************************** */

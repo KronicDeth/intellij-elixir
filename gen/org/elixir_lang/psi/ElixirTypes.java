@@ -27,6 +27,7 @@ public interface ElixirTypes {
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType ESCAPED_CHARACTER = new ElixirElementType("ESCAPED_CHARACTER");
+  IElementType ESCAPED_EOL = new ElixirElementType("ESCAPED_EOL");
   IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
   IElementType HEREDOC_LINE_PREFIX = new ElixirElementType("HEREDOC_LINE_PREFIX");
   IElementType HEREDOC_PREFIX = new ElixirElementType("HEREDOC_PREFIX");
@@ -281,6 +282,9 @@ public interface ElixirTypes {
       }
       else if (type == ESCAPED_CHARACTER) {
         return new ElixirEscapedCharacterImpl(node);
+      }
+      else if (type == ESCAPED_EOL) {
+        return new ElixirEscapedEOLImpl(node);
       }
       else if (type == HAT_INFIX_OPERATOR) {
         return new ElixirHatInfixOperatorImpl(node);

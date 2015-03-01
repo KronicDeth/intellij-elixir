@@ -89,6 +89,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitEscapeSequence(o);
   }
 
+  public void visitEscapedEOL(@NotNull ElixirEscapedEOL o) {
+    visitPsiElement(o);
+  }
+
   public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {
     visitPsiElement(o);
   }

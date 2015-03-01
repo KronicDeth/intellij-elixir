@@ -743,6 +743,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <ESCAPE_SEQUENCE> {
+  {EOL}                           { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                    yybegin(stackFrame.getLastLexicalState());
+                                    return ElixirTypes.EOL; }
   {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
   .                               { org.elixir_lang.lexer.StackFrame stackFrame = pop();

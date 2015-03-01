@@ -967,7 +967,8 @@ decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MA
 decimalNumber ::= decimalFloat |
                   decimalWholeNumber
 private escapeSequence ::= hexadecimalEscapeSequence |
-                           /* Must be second so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                           escapedEOL |
+                           /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
                               ("\x") in hexadecimalEscapeSequence  */
                            escapedCharacter
 hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence) { methods = [codePoint] pin = 2 }
@@ -977,6 +978,7 @@ openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
                                   { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] }
 escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
+escapedEOL ::= ESCAPE EOL
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

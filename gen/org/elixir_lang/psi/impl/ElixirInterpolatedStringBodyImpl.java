@@ -29,6 +29,12 @@ public class ElixirInterpolatedStringBodyImpl extends ASTWrapperPsiElement imple
 
   @Override
   @NotNull
+  public List<ElixirEscapedEOL> getEscapedEOLList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedEOL.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
   }

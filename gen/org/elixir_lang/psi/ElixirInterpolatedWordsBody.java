@@ -11,6 +11,9 @@ public interface ElixirInterpolatedWordsBody extends Body {
   List<ElixirEscapedCharacter> getEscapedCharacterList();
 
   @NotNull
+  List<ElixirEscapedEOL> getEscapedEOLList();
+
+  @NotNull
   List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
 
   @NotNull

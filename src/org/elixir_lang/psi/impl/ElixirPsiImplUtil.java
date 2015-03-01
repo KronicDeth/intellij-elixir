@@ -1299,6 +1299,8 @@ public class ElixirPsiImplUtil {
                     codePointList = parent.addFragmentCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);
+                } else if (elementType == ElixirTypes.ESCAPED_EOL) {
+                    continue;
                 } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_SEQUENCE) {
                     codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
