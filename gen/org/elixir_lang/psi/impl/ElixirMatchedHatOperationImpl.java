@@ -155,15 +155,15 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirLiteralSigilBody getLiteralSigilBody() {
-    return findChildByClass(ElixirLiteralSigilBody.class);
+  @NotNull
+  public List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilHeredoc.class);
+  public List<ElixirLiteralSigilLine> getLiteralSigilLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilLine.class);
   }
 
   @Override

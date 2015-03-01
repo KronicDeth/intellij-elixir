@@ -212,6 +212,9 @@ public class ElixirParser implements PsiParser {
     else if (t == LITERAL_SIGIL_HEREDOC_LINE) {
       r = literalSigilHeredocLine(b, 0);
     }
+    else if (t == LITERAL_SIGIL_LINE) {
+      r = literalSigilLine(b, 0);
+    }
     else if (t == LITERAL_STRING_BODY) {
       r = literalStringBody(b, 0);
     }
@@ -2044,8 +2047,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalSigilLine(PsiBuilder b, int l) {
+  // TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR sigilModifiers
+  public static boolean literalSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
@@ -2053,21 +2056,9 @@ public class ElixirParser implements PsiParser {
     r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
     r = r && literalSigilBody(b, l + 1);
     r = r && consumeToken(b, SIGIL_TERMINATOR);
-    r = r && literalSigilLine_5(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, LITERAL_SIGIL_LINE, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean literalSigilLine_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalSigilLine_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalSigilLine_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */

@@ -74,10 +74,10 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirLiteralRegexLine getLiteralRegexLine();
 
   @Nullable
-  ElixirLiteralSigilBody getLiteralSigilBody();
+  ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
 
   @Nullable
-  ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
+  ElixirLiteralSigilLine getLiteralSigilLine();
 
   @Nullable
   ElixirLiteralStringBody getLiteralStringBody();

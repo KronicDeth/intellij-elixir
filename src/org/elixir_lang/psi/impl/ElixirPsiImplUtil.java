@@ -543,6 +543,10 @@ public class ElixirPsiImplUtil {
         return literalSigilHeredocLine.getLiteralSigilBody();
     }
 
+    public static Body getBody(ElixirLiteralSigilLine literalSigilLine) {
+        return literalSigilLine.getLiteralSigilBody();
+    }
+
     public static Body getBody(ElixirLiteralStringHeredocLine literalStringSigilHeredocLine) {
         return literalStringSigilHeredocLine.getLiteralStringBody();
     }

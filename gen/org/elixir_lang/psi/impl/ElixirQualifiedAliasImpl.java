@@ -159,6 +159,12 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
 
   @Override
   @Nullable
+  public ElixirLiteralSigilLine getLiteralSigilLine() {
+    return findChildByClass(ElixirLiteralSigilLine.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
     return findChildByClass(ElixirLiteralStringSigilHeredoc.class);
   }
