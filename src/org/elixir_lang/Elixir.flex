@@ -516,6 +516,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
+%state ESCAPE_IN_LITERAL_GROUP
 %state ESCAPE_SEQUENCE
 %state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
 %state GROUP
@@ -734,6 +735,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
+<ESCAPE_IN_LITERAL_GROUP> {
+  .     {
+          yybegin(GROUP);
+          return fragmentType();
+        }
+}
+
 <ESCAPE_SEQUENCE> {
   {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
@@ -751,26 +759,27 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 <GROUP,
  GROUP_HEREDOC_LINE_BODY> {
-  {INTERPOLATION_START}   {
-                            if (isInterpolating()) {
-                             pushAndBegin(INTERPOLATION);
-                             return ElixirTypes.INTERPOLATION_START;
-                            } else {
-                             return fragmentType();
-                            }
+  {INTERPOLATION_START} {
+                          if (isInterpolating()) {
+                           pushAndBegin(INTERPOLATION);
+                           return ElixirTypes.INTERPOLATION_START;
+                          } else {
+                           return fragmentType();
                           }
-  {ESCAPE}                {
-                            if (isInterpolating()) {
-                              pushAndBegin(ESCAPE_SEQUENCE);
-                              return ElixirTypes.ESCAPE;
-                            } else {
-                              return fragmentType();
-                            }
-                          }
+                        }
 }
 
 // Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
 <GROUP> {
+  {ESCAPE}           {
+                       if (isInterpolating()) {
+                         pushAndBegin(ESCAPE_SEQUENCE);
+                         return ElixirTypes.ESCAPE;
+                       } else {
+                         yybegin(ESCAPE_IN_LITERAL_GROUP);
+                         return fragmentType();
+                       }
+                     }
   {GROUP_TERMINATOR} {
                        if (isTerminator(yytext())) {
                          if (isSigil()) {
@@ -808,6 +817,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
+  {ESCAPE} {
+             if (isInterpolating()) {
+               pushAndBegin(ESCAPE_SEQUENCE);
+               return ElixirTypes.ESCAPE;
+             } else {
+               return fragmentType();
+             }
+           }
   {EOL} {
           yybegin(GROUP_HEREDOC_LINE_START);
           return ElixirTypes.EOL;
