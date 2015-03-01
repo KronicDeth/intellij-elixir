@@ -83,6 +83,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
 
   @Nullable
+  ElixirLiteralStringSigilLine getLiteralStringSigilLine();
+
+  @Nullable
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
 
   @Nullable

@@ -80,10 +80,10 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirLiteralSigilLine getLiteralSigilLine();
 
   @Nullable
-  ElixirLiteralStringBody getLiteralStringBody();
+  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
 
   @Nullable
-  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
+  ElixirLiteralStringSigilLine getLiteralStringSigilLine();
 
   @Nullable
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();

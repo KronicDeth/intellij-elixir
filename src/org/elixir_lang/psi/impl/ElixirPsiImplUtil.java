@@ -551,6 +551,10 @@ public class ElixirPsiImplUtil {
         return literalStringSigilHeredocLine.getLiteralStringBody();
     }
 
+    public static Body getBody(ElixirLiteralStringSigilLine literalStringSigilLine) {
+        return literalStringSigilLine.getLiteralStringBody();
+    }
+
     public static Body getBody(ElixirLiteralWordsHeredocLine literalWordsHeredocLine) {
         return literalWordsHeredocLine.getLiteralWordsBody();
     }

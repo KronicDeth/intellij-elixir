@@ -78,11 +78,11 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   @NotNull
   List<ElixirLiteralSigilLine> getLiteralSigilLineList();
 
-  @Nullable
-  ElixirLiteralStringBody getLiteralStringBody();
-
   @NotNull
   List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
+
+  @NotNull
+  List<ElixirLiteralStringSigilLine> getLiteralStringSigilLineList();
 
   @NotNull
   List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList();

@@ -87,10 +87,10 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirLiteralSigilLine> getLiteralSigilLineList();
 
   @NotNull
-  List<ElixirLiteralStringBody> getLiteralStringBodyList();
+  List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
 
   @NotNull
-  List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
+  List<ElixirLiteralStringSigilLine> getLiteralStringSigilLineList();
 
   @NotNull
   List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList();
