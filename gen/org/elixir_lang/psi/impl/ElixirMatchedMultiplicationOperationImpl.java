@@ -125,15 +125,15 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @Nullable
-  public ElixirLiteralCharListBody getLiteralCharListBody() {
-    return findChildByClass(ElixirLiteralCharListBody.class);
+  @NotNull
+  public List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralCharListSigilHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralCharListSigilHeredoc.class);
+  public List<ElixirLiteralCharListSigilLine> getLiteralCharListSigilLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralCharListSigilLine.class);
   }
 
   @Override

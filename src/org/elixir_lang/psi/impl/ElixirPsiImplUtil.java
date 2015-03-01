@@ -527,6 +527,10 @@ public class ElixirPsiImplUtil {
         return charListHeredocLine.getLiteralCharListBody();
     }
 
+    public static Body getBody(ElixirLiteralCharListSigilLine literalCharListLine) {
+        return literalCharListLine.getLiteralCharListBody();
+    }
+
     public static Body getBody(ElixirLiteralRegexHeredocLine literalRegexHeredocLine) {
         return literalRegexHeredocLine.getLiteralRegexBody();
     }

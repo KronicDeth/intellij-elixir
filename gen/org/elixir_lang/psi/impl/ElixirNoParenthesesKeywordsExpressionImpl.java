@@ -135,14 +135,14 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirLiteralCharListBody getLiteralCharListBody() {
-    return findChildByClass(ElixirLiteralCharListBody.class);
+  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
+    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
-    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
+  public ElixirLiteralCharListSigilLine getLiteralCharListSigilLine() {
+    return findChildByClass(ElixirLiteralCharListSigilLine.class);
   }
 
   @Override

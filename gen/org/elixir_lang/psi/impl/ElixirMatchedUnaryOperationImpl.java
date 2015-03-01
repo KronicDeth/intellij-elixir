@@ -123,14 +123,14 @@ public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirLiteralCharListBody getLiteralCharListBody() {
-    return findChildByClass(ElixirLiteralCharListBody.class);
+  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
+    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
-    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
+  public ElixirLiteralCharListSigilLine getLiteralCharListSigilLine() {
+    return findChildByClass(ElixirLiteralCharListSigilLine.class);
   }
 
   @Override

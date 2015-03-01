@@ -1,0 +1,10 @@
+Elixir File(0,68)
+  ElixirLiteralCharListSigilLineImpl(LITERAL_CHAR_LIST_SIGIL_LINE)(0,68)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.LITERAL_CHAR_LIST_SIGIL_NAME)('C')(1,2)
+    PsiElement(ElixirTokenType.CHAR_LIST_SIGIL_PROMOTER)(''')(2,3)
+    ElixirLiteralCharListBodyImpl(LITERAL_CHAR_LIST_BODY)(3,67)
+      PsiElement(ElixirTokenType.CHAR_LIST_FRAGMENT)('\n  Outside Before #{\n            "Inside"\n  }\n  Outside After\n  ')(3,67)
+    PsiElement(ElixirTokenType.CHAR_LIST_SIGIL_TERMINATOR)(''')(67,68)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(68,68)
+      <empty list>

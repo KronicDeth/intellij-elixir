@@ -69,10 +69,10 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirList> getListList();
 
   @NotNull
-  List<ElixirLiteralCharListBody> getLiteralCharListBodyList();
+  List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList();
 
   @NotNull
-  List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList();
+  List<ElixirLiteralCharListSigilLine> getLiteralCharListSigilLineList();
 
   @NotNull
   List<ElixirLiteralRegexBody> getLiteralRegexBodyList();

@@ -67,6 +67,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
   @Nullable
+  ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
+
+  @Nullable
   ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
 
   @Nullable

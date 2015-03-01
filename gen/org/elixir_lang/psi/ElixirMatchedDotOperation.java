@@ -67,6 +67,9 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
   @Nullable
+  ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
+
+  @Nullable
   ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
 
   @Nullable

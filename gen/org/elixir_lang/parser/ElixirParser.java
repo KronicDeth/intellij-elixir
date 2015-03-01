@@ -185,6 +185,9 @@ public class ElixirParser implements PsiParser {
     else if (t == LITERAL_CHAR_LIST_SIGIL_HEREDOC) {
       r = literalCharListSigilHeredoc(b, 0);
     }
+    else if (t == LITERAL_CHAR_LIST_SIGIL_LINE) {
+      r = literalCharListSigilLine(b, 0);
+    }
     else if (t == LITERAL_REGEX_BODY) {
       r = literalRegexBody(b, 0);
     }
@@ -1873,8 +1876,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-  static boolean literalCharListSigilLine(PsiBuilder b, int l) {
+  // TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+  public static boolean literalCharListSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalCharListSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
@@ -1882,7 +1885,8 @@ public class ElixirParser implements PsiParser {
     r = consumeTokens(b, 0, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
     r = r && literalCharListBody(b, l + 1);
     r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, LITERAL_CHAR_LIST_SIGIL_LINE, r);
     return r;
   }
 

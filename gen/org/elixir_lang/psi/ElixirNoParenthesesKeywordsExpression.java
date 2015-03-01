@@ -65,10 +65,10 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   ElixirList getList();
 
   @Nullable
-  ElixirLiteralCharListBody getLiteralCharListBody();
+  ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
   @Nullable
-  ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
+  ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
 
   @Nullable
   ElixirLiteralRegexBody getLiteralRegexBody();

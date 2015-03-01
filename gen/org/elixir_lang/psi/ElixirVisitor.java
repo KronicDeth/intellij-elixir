@@ -243,6 +243,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilHeredoc(o);
   }
 
+  public void visitLiteralCharListSigilLine(@NotNull ElixirLiteralCharListSigilLine o) {
+    visitCharListFragmented(o);
+    // visitSigilLine(o);
+  }
+
   public void visitLiteralRegexBody(@NotNull ElixirLiteralRegexBody o) {
     visitBody(o);
   }
