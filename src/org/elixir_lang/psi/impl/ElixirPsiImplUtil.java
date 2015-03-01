@@ -1256,10 +1256,16 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
+    private static String filterEscapedEOL(String unfiltered) {
+        return unfiltered.replace("\\\n", "");
+    }
+
+    @NotNull
     private static List<Integer> addStringCodePoints(@Nullable List<Integer> codePointList, @NotNull String string) {
         codePointList = ensureCodePointList(codePointList);
+        String filteredString = filterEscapedEOL(string);
 
-        for (Integer codePoint : codePoints(string)) {
+        for (Integer codePoint : codePoints(filteredString)) {
             codePointList.add(codePoint);
         }
 

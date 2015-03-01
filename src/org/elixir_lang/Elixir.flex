@@ -736,10 +736,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {
-  .     {
-          yybegin(GROUP);
-          return fragmentType();
-        }
+  {EOL}|. {
+            yybegin(GROUP);
+            return fragmentType();
+          }
 }
 
 <ESCAPE_SEQUENCE> {
