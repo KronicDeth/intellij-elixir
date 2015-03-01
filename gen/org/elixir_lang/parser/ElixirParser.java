@@ -200,6 +200,9 @@ public class ElixirParser implements PsiParser {
     else if (t == LITERAL_REGEX_HEREDOC_LINE) {
       r = literalRegexHeredocLine(b, 0);
     }
+    else if (t == LITERAL_REGEX_LINE) {
+      r = literalRegexLine(b, 0);
+    }
     else if (t == LITERAL_SIGIL_BODY) {
       r = literalSigilBody(b, 0);
     }
@@ -1967,30 +1970,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalRegexLine(PsiBuilder b, int l) {
+  // TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR sigilModifiers
+  public static boolean literalRegexLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, REGEX_PROMOTER);
+    r = consumeTokens(b, 0, TILDE, LITERAL_REGEX_SIGIL_NAME, REGEX_PROMOTER);
     r = r && literalRegexBody(b, l + 1);
     r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && literalRegexLine_5(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, LITERAL_REGEX_LINE, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean literalRegexLine_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalRegexLine_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalRegexLine_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */

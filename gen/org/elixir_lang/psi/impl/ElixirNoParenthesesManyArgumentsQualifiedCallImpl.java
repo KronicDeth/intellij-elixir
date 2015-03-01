@@ -150,6 +150,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
+  public ElixirLiteralRegexLine getLiteralRegexLine() {
+    return findChildByClass(ElixirLiteralRegexLine.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirLiteralSigilHeredoc getLiteralSigilHeredoc() {
     return findChildByClass(ElixirLiteralSigilHeredoc.class);
   }

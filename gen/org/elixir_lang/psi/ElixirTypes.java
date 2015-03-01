@@ -67,6 +67,7 @@ public interface ElixirTypes {
   IElementType LITERAL_REGEX_BODY = new ElixirElementType("LITERAL_REGEX_BODY");
   IElementType LITERAL_REGEX_HEREDOC = new ElixirElementType("LITERAL_REGEX_HEREDOC");
   IElementType LITERAL_REGEX_HEREDOC_LINE = new ElixirElementType("LITERAL_REGEX_HEREDOC_LINE");
+  IElementType LITERAL_REGEX_LINE = new ElixirElementType("LITERAL_REGEX_LINE");
   IElementType LITERAL_SIGIL_BODY = new ElixirElementType("LITERAL_SIGIL_BODY");
   IElementType LITERAL_SIGIL_HEREDOC = new ElixirElementType("LITERAL_SIGIL_HEREDOC");
   IElementType LITERAL_SIGIL_HEREDOC_LINE = new ElixirElementType("LITERAL_SIGIL_HEREDOC_LINE");
@@ -402,6 +403,9 @@ public interface ElixirTypes {
       }
       else if (type == LITERAL_REGEX_HEREDOC_LINE) {
         return new ElixirLiteralRegexHeredocLineImpl(node);
+      }
+      else if (type == LITERAL_REGEX_LINE) {
+        return new ElixirLiteralRegexLineImpl(node);
       }
       else if (type == LITERAL_SIGIL_BODY) {
         return new ElixirLiteralSigilBodyImpl(node);

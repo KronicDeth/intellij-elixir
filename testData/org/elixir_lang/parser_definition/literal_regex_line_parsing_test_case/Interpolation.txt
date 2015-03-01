@@ -1,0 +1,10 @@
+Elixir File(0,68)
+  ElixirLiteralRegexLineImpl(LITERAL_REGEX_LINE)(0,68)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.LITERAL_REGEX_SIGIL_NAME)('R')(1,2)
+    PsiElement(ElixirTokenType.REGEX_PROMOTER)(''')(2,3)
+    ElixirLiteralRegexBodyImpl(LITERAL_REGEX_BODY)(3,67)
+      PsiElement(ElixirTokenType.REGEX_FRAGMENT)('\n  Outside Before #{\n            "Inside"\n  }\n  Outside After\n  ')(3,67)
+    PsiElement(ElixirTokenType.REGEX_TERMINATOR)(''')(67,68)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(68,68)
+      <empty list>

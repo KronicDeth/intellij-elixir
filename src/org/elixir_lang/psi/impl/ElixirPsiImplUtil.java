@@ -535,6 +535,10 @@ public class ElixirPsiImplUtil {
         return literalRegexHeredocLine.getLiteralRegexBody();
     }
 
+    public static Body getBody(ElixirLiteralRegexLine literalRegexLine) {
+        return literalRegexLine.getLiteralRegexBody();
+    }
+
     public static Body getBody(ElixirLiteralSigilHeredocLine literalSigilHeredocLine) {
         return literalSigilHeredocLine.getLiteralSigilBody();
     }

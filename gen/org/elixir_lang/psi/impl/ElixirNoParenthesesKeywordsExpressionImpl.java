@@ -147,14 +147,14 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirLiteralRegexBody getLiteralRegexBody() {
-    return findChildByClass(ElixirLiteralRegexBody.class);
+  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
+    return findChildByClass(ElixirLiteralRegexHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
-    return findChildByClass(ElixirLiteralRegexHeredoc.class);
+  public ElixirLiteralRegexLine getLiteralRegexLine() {
+    return findChildByClass(ElixirLiteralRegexLine.class);
   }
 
   @Override

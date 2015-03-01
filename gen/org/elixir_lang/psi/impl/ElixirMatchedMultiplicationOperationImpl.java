@@ -137,15 +137,15 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @Nullable
-  public ElixirLiteralRegexBody getLiteralRegexBody() {
-    return findChildByClass(ElixirLiteralRegexBody.class);
+  @NotNull
+  public List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralRegexHeredoc.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralRegexHeredoc.class);
+  public List<ElixirLiteralRegexLine> getLiteralRegexLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralRegexLine.class);
   }
 
   @Override

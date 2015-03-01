@@ -65,10 +65,10 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
 
   @Nullable
-  ElixirLiteralRegexBody getLiteralRegexBody();
+  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
 
   @Nullable
-  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
+  ElixirLiteralRegexLine getLiteralRegexLine();
 
   @Nullable
   ElixirLiteralSigilBody getLiteralSigilBody();

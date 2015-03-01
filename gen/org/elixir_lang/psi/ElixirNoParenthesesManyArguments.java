@@ -70,10 +70,10 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirLiteralCharListSigilLine> getLiteralCharListSigilLineList();
 
   @NotNull
-  List<ElixirLiteralRegexBody> getLiteralRegexBodyList();
+  List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList();
 
   @NotNull
-  List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList();
+  List<ElixirLiteralRegexLine> getLiteralRegexLineList();
 
   @NotNull
   List<ElixirLiteralSigilBody> getLiteralSigilBodyList();
