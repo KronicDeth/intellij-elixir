@@ -91,6 +91,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
 
   @Nullable
+  ElixirLiteralWordsLine getLiteralWordsLine();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

@@ -236,6 +236,9 @@ public class ElixirParser implements PsiParser {
     else if (t == LITERAL_WORDS_HEREDOC_LINE) {
       r = literalWordsHeredocLine(b, 0);
     }
+    else if (t == LITERAL_WORDS_LINE) {
+      r = literalWordsLine(b, 0);
+    }
     else if (t == MATCHED_AT_OPERATION) {
       r = matchedAtOperation(b, 0);
     }
@@ -2198,28 +2201,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
-  static boolean literalWordsLine(PsiBuilder b, int l) {
+  // TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
+  public static boolean literalWordsLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, WORDS_PROMOTER, LITERAL, WORDS_TERMINATOR);
-    r = r && literalWordsLine_5(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, WORDS_PROMOTER);
+    r = r && literalWordsBody(b, l + 1);
+    r = r && consumeToken(b, WORDS_TERMINATOR);
+    r = r && sigilModifiers(b, l + 1);
+    exit_section_(b, m, LITERAL_WORDS_LINE, r);
     return r;
-  }
-
-  // SIGIL_MODIFIER*
-  private static boolean literalWordsLine_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "literalWordsLine_5")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, SIGIL_MODIFIER)) break;
-      if (!empty_element_parsed_guard_(b, "literalWordsLine_5", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */

@@ -92,6 +92,9 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
 
   @Nullable
+  ElixirLiteralWordsLine getLiteralWordsLine();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

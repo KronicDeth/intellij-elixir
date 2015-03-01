@@ -1,0 +1,10 @@
+Elixir File(0,17)
+  ElixirLiteralStringSigilLineImpl(LITERAL_STRING_SIGIL_LINE)(0,17)
+    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
+    PsiElement(ElixirTokenType.LITERAL_STRING_SIGIL_NAME)('S')(1,2)
+    PsiElement(ElixirTokenType.STRING_SIGIL_PROMOTER)('"')(2,3)
+    ElixirLiteralStringBodyImpl(LITERAL_STRING_BODY)(3,16)
+      PsiElement(ElixirTokenType.STRING_FRAGMENT)('{}[]<>\"/()|'')(3,16)
+    PsiElement(ElixirTokenType.STRING_SIGIL_TERMINATOR)('"')(16,17)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
+      <empty list>

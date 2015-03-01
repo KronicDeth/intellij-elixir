@@ -845,7 +845,25 @@ literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER
                              ]
                            }
 
-private literalWordsLine ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
+literalWordsLine ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
+                      {
+                        implements = [
+                          "org.elixir_lang.psi.WordsFragmented"
+                          "org.elixir_lang.psi.SigilLine"
+                        ]
+                        methods = [
+                          addEscapedCharacterCodePoints
+                          addFragmentCodePoints
+                          addHexadecimalEscapeSequenceCodePoints
+                          getBody
+                          getFragmentType
+                          quote
+                          quoteBinary
+                          quoteEmpty
+                          quoteLiteral
+                          sigilName
+                        ]
+                      }
 
 /*
  *

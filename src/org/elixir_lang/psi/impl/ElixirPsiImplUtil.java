@@ -559,6 +559,10 @@ public class ElixirPsiImplUtil {
         return literalWordsHeredocLine.getLiteralWordsBody();
     }
 
+    public static Body getBody(ElixirLiteralWordsLine literalWordsLine) {
+        return literalWordsLine.getLiteralWordsBody();
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }

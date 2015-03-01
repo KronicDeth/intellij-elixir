@@ -86,6 +86,9 @@ public interface ElixirMatchedUnaryOperation extends PsiElement {
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
 
   @Nullable
+  ElixirLiteralWordsLine getLiteralWordsLine();
+
+  @Nullable
   ElixirMatchedAtOperation getMatchedAtOperation();
 
   @Nullable

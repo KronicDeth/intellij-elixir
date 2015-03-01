@@ -89,6 +89,9 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
 
   @Nullable
+  ElixirLiteralWordsLine getLiteralWordsLine();
+
+  @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable

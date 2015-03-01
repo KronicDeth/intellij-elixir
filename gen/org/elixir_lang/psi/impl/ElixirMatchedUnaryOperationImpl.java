@@ -177,6 +177,12 @@ public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
+  public ElixirLiteralWordsLine getLiteralWordsLine() {
+    return findChildByClass(ElixirLiteralWordsLine.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedAtOperation getMatchedAtOperation() {
     return findChildByClass(ElixirMatchedAtOperation.class);
   }
