@@ -20,6 +20,9 @@ public interface ElixirMatchedAtOperation extends PsiElement {
   ElixirAtom getAtom();
 
   @Nullable
+  ElixirAtomKeyword getAtomKeyword();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @Nullable

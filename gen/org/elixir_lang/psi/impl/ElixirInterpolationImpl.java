@@ -48,6 +48,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirAtomKeyword> getAtomKeywordList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtomKeyword.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureCharTokenOrNumberOperation.class);
   }

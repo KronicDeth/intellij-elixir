@@ -38,6 +38,9 @@ public class ElixirParser implements PsiParser {
     else if (t == ATOM) {
       r = atom(b, 0);
     }
+    else if (t == ATOM_KEYWORD) {
+      r = atomKeyword(b, 0);
+    }
     else if (t == BINARY_DIGITS) {
       r = binaryDigits(b, 0);
     }
@@ -346,9 +349,7 @@ public class ElixirParser implements PsiParser {
   //                              binaryString |
   //                              listString |
   //                              sigil |
-  //                              FALSE |
-  //                              NIL |
-  //                              TRUE |
+  //                              atomKeyword |
   //                              atom |
   //                              alias
   static boolean accessExpression(PsiBuilder b, int l) {
@@ -364,9 +365,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);
     if (!r) r = sigil(b, l + 1);
-    if (!r) r = consumeToken(b, FALSE);
-    if (!r) r = consumeToken(b, NIL);
-    if (!r) r = consumeToken(b, TRUE);
+    if (!r) r = atomKeyword(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);
@@ -467,6 +466,19 @@ public class ElixirParser implements PsiParser {
     r = consumeToken(b, ATOM_FRAGMENT);
     if (!r) r = quote(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // FALSE | NIL | TRUE
+  public static boolean atomKeyword(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atomKeyword")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<atom keyword>");
+    r = consumeToken(b, FALSE);
+    if (!r) r = consumeToken(b, NIL);
+    if (!r) r = consumeToken(b, TRUE);
+    exit_section_(b, l, m, ATOM_KEYWORD, r, false, null);
     return r;
   }
 

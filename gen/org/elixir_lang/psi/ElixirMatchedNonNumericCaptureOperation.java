@@ -17,6 +17,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PsiElement {
   ElixirAtom getAtom();
 
   @Nullable
+  ElixirAtomKeyword getAtomKeyword();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull

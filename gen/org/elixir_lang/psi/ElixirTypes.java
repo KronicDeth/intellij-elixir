@@ -11,6 +11,7 @@ public interface ElixirTypes {
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType ATOM = new ElixirElementType("ATOM");
+  IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("AT_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
@@ -237,6 +238,9 @@ public interface ElixirTypes {
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
+      }
+      else if (type == ATOM_KEYWORD) {
+        return new ElixirAtomKeywordImpl(node);
       }
       else if (type == AT_CHAR_TOKEN_OR_NUMBER_OPERATION) {
         return new ElixirAtCharTokenOrNumberOperationImpl(node);

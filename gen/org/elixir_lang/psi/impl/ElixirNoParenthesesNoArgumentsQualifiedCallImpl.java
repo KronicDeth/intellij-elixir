@@ -42,6 +42,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
+  public ElixirAtomKeyword getAtomKeyword() {
+    return findChildByClass(ElixirAtomKeyword.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
     return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
   }

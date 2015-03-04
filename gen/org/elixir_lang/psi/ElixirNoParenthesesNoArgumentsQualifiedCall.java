@@ -19,6 +19,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   ElixirAtom getAtom();
 
   @Nullable
+  ElixirAtomKeyword getAtomKeyword();
+
+  @Nullable
   ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
 
   @NotNull

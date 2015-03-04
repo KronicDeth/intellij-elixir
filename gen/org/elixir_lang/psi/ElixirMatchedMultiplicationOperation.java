@@ -19,6 +19,9 @@ public interface ElixirMatchedMultiplicationOperation extends PsiElement {
   List<ElixirAtom> getAtomList();
 
   @NotNull
+  List<ElixirAtomKeyword> getAtomKeywordList();
+
+  @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
 
   @NotNull

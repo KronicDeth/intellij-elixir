@@ -27,6 +27,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitAtomKeyword(@NotNull ElixirAtomKeyword o) {
+    visitQuotable(o);
+  }
+
   public void visitBinaryDigits(@NotNull ElixirBinaryDigits o) {
     visitDigits(o);
   }

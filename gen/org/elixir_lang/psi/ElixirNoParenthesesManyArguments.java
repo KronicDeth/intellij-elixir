@@ -19,6 +19,9 @@ public interface ElixirNoParenthesesManyArguments extends PsiElement {
   List<ElixirAtom> getAtomList();
 
   @NotNull
+  List<ElixirAtomKeyword> getAtomKeywordList();
+
+  @NotNull
   List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
 
   @NotNull

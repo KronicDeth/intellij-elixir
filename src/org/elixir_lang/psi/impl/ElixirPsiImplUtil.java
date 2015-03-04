@@ -448,6 +448,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAtomKeyword atomKeyword) {
+        return new OtpErlangAtom(atomKeyword.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCharListLine charListLine) {
         ElixirInterpolatedCharListBody interpolatedCharListBody = charListLine.getInterpolatedCharListBody();
 
