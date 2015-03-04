@@ -1090,6 +1090,7 @@ private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 keywordPair ::=  keywordKeyColonEOL keywordValue
 keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
+         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private listString ::= charListLine | charListHeredoc
 
 

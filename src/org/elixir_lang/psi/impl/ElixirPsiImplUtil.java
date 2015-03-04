@@ -881,6 +881,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirList list) {
+        return new OtpErlangList();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirQualifiedAlias qualifiedAlias) {
         ASTNode[] children = qualifiedAlias.getNode().getChildren(null);
 

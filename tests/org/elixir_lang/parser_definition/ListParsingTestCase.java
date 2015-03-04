@@ -13,7 +13,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIdentifierWhitespaceColon() {

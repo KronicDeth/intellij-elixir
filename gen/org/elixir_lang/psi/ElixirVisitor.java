@@ -235,7 +235,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitList(@NotNull ElixirList o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitLiteralCharListBody(@NotNull ElixirLiteralCharListBody o) {
