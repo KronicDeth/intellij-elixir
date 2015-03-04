@@ -9,7 +9,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testDotDotDotColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAliasWhitespaceColon() {
@@ -29,15 +29,15 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyBinary() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEmptyMapColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEmptyTupleColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIdentifierColon() {
