@@ -1,15 +1,19 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirKeywordKey extends PsiElement {
+public interface ElixirKeywordKey extends Quotable {
 
   @Nullable
   ElixirCharListLine getCharListLine();
 
   @Nullable
   ElixirStringLine getStringLine();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

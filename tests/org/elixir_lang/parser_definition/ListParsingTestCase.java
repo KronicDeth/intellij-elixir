@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class ListParsingTestCase extends ParsingTestCase {
     public void testAliasColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testDotDotDotColon() {

@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
@@ -17,6 +18,10 @@ public class ElixirEmptyParenthesesImpl extends ASTWrapperPsiElement implements 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitEmptyParentheses(this);
     else super.accept(visitor);
+  }
+
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

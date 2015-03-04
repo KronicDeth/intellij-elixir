@@ -1058,6 +1058,7 @@ escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 escapedEOL ::= ESCAPE EOL
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordKey ::= ALIAS_TOKEN |
@@ -1086,9 +1087,12 @@ keywordKey ::= ALIAS_TOKEN |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
+               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 keywordPair ::=  keywordKeyColonEOL keywordValue
+                 { implements = "org.eliir_lang.psi.Quotable" methods = [quote] }
 keywordValue ::= containerExpression
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private listString ::= charListLine | charListHeredoc

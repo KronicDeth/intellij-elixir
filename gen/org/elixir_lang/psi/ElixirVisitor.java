@@ -78,7 +78,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitEnclosedHexadecimalEscapeSequence(@NotNull ElixirEnclosedHexadecimalEscapeSequence o) {
@@ -223,15 +223,15 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitKeywordKey(@NotNull ElixirKeywordKey o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitKeywordPair(@NotNull ElixirKeywordPair o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitKeywordValue(@NotNull ElixirKeywordValue o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitList(@NotNull ElixirList o) {

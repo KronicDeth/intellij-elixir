@@ -709,6 +709,10 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyParentheses emptyParentheses) {
+        return new OtpErlangAtom("nil");
+    }
+
     public static OtpErlangObject quote(ElixirFile file) {
         final Deque<OtpErlangObject> quotedChildren = new LinkedList<OtpErlangObject>();
 
@@ -881,8 +885,49 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
+        return new OtpErlangAtom(keywordKey.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirKeywordPair keywordPair) {
+        ElixirKeywordKey keywordKey = keywordPair.getKeywordKey();
+        OtpErlangObject quotedKeywordKey = keywordKey.quote();
+
+        ElixirKeywordValue keywordValue = keywordPair.getKeywordValue();
+        OtpErlangObject quotedKeywordValue = keywordValue.quote();
+        OtpErlangObject[] elements = {
+                quotedKeywordKey, quotedKeywordValue
+        };
+
+        return new OtpErlangTuple(elements);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirKeywordValue keywordValue) {
+        ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
+
+        return emptyParentheses.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        return new OtpErlangList();
+        List<ElixirKeywordPair> keywordPairList = list.getKeywordPairList();
+        List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(keywordPairList.size());
+
+        for (ElixirKeywordPair keywordPair : keywordPairList) {
+            quotedKeywordPairList.add(
+                    keywordPair.quote()
+            );
+        }
+
+        OtpErlangObject[] quotedKeywordPairs = new OtpErlangObject[quotedKeywordPairList.size()];
+        quotedKeywordPairList.toArray(quotedKeywordPairs);
+
+        return new OtpErlangList(quotedKeywordPairs);
     }
 
     @Contract(pure = true)
