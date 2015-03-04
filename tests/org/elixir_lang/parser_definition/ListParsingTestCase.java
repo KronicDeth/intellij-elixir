@@ -4,7 +4,19 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 11/22/14.
  */
 public class ListParsingTestCase extends ParsingTestCase {
+    public void testAliasColon() {
+        doTest(true);
+    }
+
+    public void testDotDotDotColon() {
+        doTest(true);
+    }
+
     public void testAliasWhitespaceColon() {
+        doTest(true);
+    }
+
+    public void testCharListColon() {
         doTest(true);
     }
 
@@ -14,6 +26,22 @@ public class ListParsingTestCase extends ParsingTestCase {
 
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testEmptyBinary() {
+        doTest(true);
+    }
+
+    public void testEmptyMapColon() {
+        doTest(true);
+    }
+
+    public void testEmptyTupleColon() {
+        doTest(true);
+    }
+
+    public void testIdentifierColon() {
+        doTest(true);
     }
 
     public void testIdentifierWhitespaceColon() {
@@ -29,6 +57,10 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordPair() {
+        doTest(true);
+    }
+
+    public void testStringColon() {
         doTest(true);
     }
 

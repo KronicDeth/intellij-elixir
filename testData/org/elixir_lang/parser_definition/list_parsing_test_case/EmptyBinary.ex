@@ -1,0 +1,2 @@
+# <four token operator>:
+[<<>>: ()]
