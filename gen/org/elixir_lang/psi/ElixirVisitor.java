@@ -56,7 +56,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCharListLine(@NotNull ElixirCharListLine o) {
-    visitInterpolatedCharList(o);
+    visitAtomable(o);
+    // visitInterpolatedCharList(o);
     // visitQuotable(o);
   }
 
@@ -439,6 +440,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitNumber(o);
   }
 
+  public void visitAtomable(@NotNull Atomable o) {
+    visitElement(o);
+  }
+
   public void visitBody(@NotNull Body o) {
     visitElement(o);
   }
@@ -464,10 +469,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
-    visitElement(o);
-  }
-
-  public void visitInterpolatedCharList(@NotNull InterpolatedCharList o) {
     visitElement(o);
   }
 

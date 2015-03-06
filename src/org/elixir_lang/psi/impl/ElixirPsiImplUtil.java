@@ -394,24 +394,7 @@ public class ElixirPsiImplUtil {
         ElixirCharListLine charListLine = atom.getCharListLine();
 
         if (charListLine != null) {
-            OtpErlangObject quotedCharList = charListLine.quote();
-
-            if (quotedCharList instanceof OtpErlangString) {
-                final String atomText = ((OtpErlangString) quotedCharList).stringValue();
-                quoted = new OtpErlangAtom(atomText);
-            } else {
-                final OtpErlangTuple quotedStringToCharListCall = (OtpErlangTuple) quotedCharList;
-                final OtpErlangList quotedStringToCharListArguments = (OtpErlangList) quotedStringToCharListCall.elementAt(2);
-                final OtpErlangObject binaryConstruction = quotedStringToCharListArguments.getHead();
-
-                quoted = quotedFunctionCall(
-                        "erlang",
-                        "binary_to_atom",
-                        (OtpErlangList) quotedStringToCharListCall.elementAt(1),
-                        binaryConstruction,
-                        UTF_8
-                );
-            }
+            quoted = charListLine.quoteAsAtom();
         } else {
             ElixirStringLine stringLine = atom.getStringLine();
 
@@ -774,6 +757,32 @@ public class ElixirPsiImplUtil {
         return quoted;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteAsAtom(@NotNull final ElixirCharListLine charListLine) {
+        OtpErlangObject quoted = charListLine.quote();
+        OtpErlangObject quotedAsAtom;
+
+        if (quoted instanceof OtpErlangString) {
+            final String atomText = ((OtpErlangString) quoted).stringValue();
+            quotedAsAtom = new OtpErlangAtom(atomText);
+        } else {
+            final OtpErlangTuple quotedStringToCharListCall = (OtpErlangTuple) quoted;
+            final OtpErlangList quotedStringToCharListArguments = (OtpErlangList) quotedStringToCharListCall.elementAt(2);
+            final OtpErlangObject binaryConstruction = quotedStringToCharListArguments.getHead();
+
+            quotedAsAtom = quotedFunctionCall(
+                    "erlang",
+                    "binary_to_atom",
+                    (OtpErlangList) quotedStringToCharListCall.elementAt(1),
+                    binaryConstruction,
+                    UTF_8
+            );
+        }
+
+        return quotedAsAtom;
+    }
+
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
@@ -886,7 +895,32 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
-        return new OtpErlangAtom(keywordKey.getText());
+        ElixirCharListLine charListLine = keywordKey.getCharListLine();
+        OtpErlangObject quoted;
+
+        if (charListLine != null) {
+            quoted = charListLine.quote();
+
+            if (quoted instanceof OtpErlangString) {
+
+            } else {
+                throw new NotImplementedException();
+            }
+        } else {
+            ElixirStringLine stringLine = keywordKey.getStringLine();
+
+            if (stringLine != null) {
+                quoted = stringLine.quote();
+            } else {
+                quoted = new OtpErlangAtom(keywordKey.getText());
+            }
+        }
+
+        if (quoted instanceof OtpErlangTuple) {
+            OtpErlangTuple quotedFunctionCall = (OtpErlangTuple) quoted;
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)

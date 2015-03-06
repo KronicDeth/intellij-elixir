@@ -615,6 +615,7 @@ interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequenc
 charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATOR
                  {
                    implements = [
+                     "org.elixir_lang.psi.Atomable"
                      "org.elixir_lang.psi.InterpolatedCharList"
                      "org.elixir_lang.psi.Quotable"
                    ]
@@ -624,6 +625,7 @@ charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATO
                      addHexadecimalEscapeSequenceCodePoints
                      getFragmentType
                      quote
+                     quoteAsAtom
                      quoteBinary
                      quoteEmpty
                      quoteLiteral
