@@ -1090,7 +1090,7 @@ keywordKey ::= ALIAS_TOKEN |
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 keywordPair ::=  keywordKeyColonEOL keywordValue
-                 { implements = "org.eliir_lang.psi.Quotable" methods = [quote] }
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 keywordValue ::= containerExpression
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 list ::= OPENING_BRACKET EOL* (keywordPair (infixComma keywordPair)* COMMA?)? CLOSING_BRACKET
