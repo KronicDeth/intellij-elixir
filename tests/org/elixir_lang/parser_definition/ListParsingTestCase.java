@@ -57,7 +57,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordPair() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringColon() {
