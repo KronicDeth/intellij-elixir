@@ -90,7 +90,9 @@ public class ElixirPsiImplUtil {
         OtpErlangObject asBlock;
         final int size = quotedChildren.size();
 
-        if (size == 1) {
+        if (size == 0) {
+            asBlock = NIL;
+        } else if (size == 1) {
             asBlock = quotedChildren.getFirst();
         } else {
             OtpErlangObject[] quotedArray = new OtpErlangObject[size];
