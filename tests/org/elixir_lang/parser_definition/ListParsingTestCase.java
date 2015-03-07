@@ -13,7 +13,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testAliasWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testCharListColon() {
