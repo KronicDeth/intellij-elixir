@@ -41,7 +41,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testIdentifierColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIdentifierWhitespaceColon() {
