@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class GeneralParsingTestCase extends ParsingTestCase {
     public void testBlankPrefix() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharToken() {
