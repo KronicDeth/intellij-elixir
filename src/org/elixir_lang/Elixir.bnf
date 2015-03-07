@@ -639,6 +639,7 @@ stringLine ::= STRING_PROMOTER
                STRING_TERMINATOR
                {
                  implements = [
+                   "org.elixir_lang.psi.Atomable"
                    "org.elixir_lang.psi.InterpolatedString"
                    "org.elixir_lang.psi.Quotable"
                  ]
@@ -648,6 +649,7 @@ stringLine ::= STRING_PROMOTER
                    addHexadecimalEscapeSequenceCodePoints
                    getFragmentType
                    quote
+                   quoteAsAtom
                    quoteBinary
                    quoteEmpty
                    quoteLiteral

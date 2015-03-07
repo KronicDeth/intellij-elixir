@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirStringLine extends InterpolatedString, Quotable {
+public interface ElixirStringLine extends Atomable, InterpolatedString, Quotable {
 
   @NotNull
   ElixirInterpolatedStringBody getInterpolatedStringBody();
@@ -27,6 +27,9 @@ public interface ElixirStringLine extends InterpolatedString, Quotable {
 
   @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  OtpErlangObject quoteAsAtom();
 
   @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);

@@ -399,23 +399,7 @@ public class ElixirPsiImplUtil {
             ElixirStringLine stringLine = atom.getStringLine();
 
             if (stringLine != null) {
-                OtpErlangObject quotedString = stringLine.quote();
-
-                if (quotedString instanceof OtpErlangBinary) {
-                    String atomText = javaString((OtpErlangBinary) quotedString);
-                    quoted = new OtpErlangAtom(atomText);
-                } else if (quotedString instanceof OtpErlangString) {
-                    String atomText = ((OtpErlangString) quotedString).stringValue();
-                    quoted = new OtpErlangAtom(atomText);
-                } else {
-                    quoted = quotedFunctionCall(
-                            "erlang",
-                            "binary_to_atom",
-                            metadata(stringLine),
-                            quotedString,
-                            UTF_8
-                    );
-                }
+                quoted = stringLine.quoteAsAtom();
             } else {
                 ASTNode atomNode = atom.getNode();
                 ASTNode atomFragmentNode = atomNode.getLastChildNode();
@@ -780,6 +764,31 @@ public class ElixirPsiImplUtil {
             );
         }
 
+        return quotedAsAtom;
+    }
+    
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteAsAtom(@NotNull final ElixirStringLine stringLine) {
+        OtpErlangObject quoted = stringLine.quote();
+        OtpErlangObject quotedAsAtom;
+
+        if (quoted instanceof OtpErlangBinary) {
+            String atomText = javaString((OtpErlangBinary) quoted);
+            quotedAsAtom = new OtpErlangAtom(atomText);
+        } else if (quoted instanceof OtpErlangString) {
+            String atomText = ((OtpErlangString) quoted).stringValue();
+            quotedAsAtom = new OtpErlangAtom(atomText);
+        } else {
+            quotedAsAtom = quotedFunctionCall(
+                    "erlang",
+                    "binary_to_atom",
+                    metadata(stringLine),
+                    quoted,
+                    UTF_8
+            );
+        }
+        
         return quotedAsAtom;
     }
 

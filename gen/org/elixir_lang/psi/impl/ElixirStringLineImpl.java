@@ -56,6 +56,11 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @NotNull
+  public OtpErlangObject quoteAsAtom() {
+    return ElixirPsiImplUtil.quoteAsAtom(this);
+  }
+
+  @NotNull
   public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
     return ElixirPsiImplUtil.quoteBinary(this, binary);
   }
