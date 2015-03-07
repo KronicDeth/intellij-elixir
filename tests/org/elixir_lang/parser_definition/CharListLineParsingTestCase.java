@@ -17,7 +17,7 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testMultiline() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
