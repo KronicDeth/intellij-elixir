@@ -21,7 +21,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testCharListWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testEmpty() {
@@ -45,7 +45,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testIdentifierWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testKeywordKey() {
@@ -53,7 +53,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordKeyEOLColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testKeywordPair() {
@@ -65,7 +65,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testStringWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     @Override
