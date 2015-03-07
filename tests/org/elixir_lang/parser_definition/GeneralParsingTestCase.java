@@ -13,7 +13,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testCommentAfterNumber() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testComments() {
