@@ -17,7 +17,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testCharListColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharListWhitespaceColon() {
@@ -61,7 +61,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testStringColon() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringWhitespaceColon() {

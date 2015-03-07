@@ -908,25 +908,15 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quoted;
 
         if (charListLine != null) {
-            quoted = charListLine.quote();
-
-            if (quoted instanceof OtpErlangString) {
-
-            } else {
-                throw new NotImplementedException();
-            }
+            quoted = charListLine.quoteAsAtom();
         } else {
             ElixirStringLine stringLine = keywordKey.getStringLine();
 
             if (stringLine != null) {
-                quoted = stringLine.quote();
+                quoted = stringLine.quoteAsAtom();
             } else {
                 quoted = new OtpErlangAtom(keywordKey.getText());
             }
-        }
-
-        if (quoted instanceof OtpErlangTuple) {
-            OtpErlangTuple quotedFunctionCall = (OtpErlangTuple) quoted;
         }
 
         return quoted;
