@@ -49,7 +49,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordKey() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordKeyEOLColon() {
