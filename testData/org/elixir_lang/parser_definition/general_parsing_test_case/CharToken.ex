@@ -3,10 +3,12 @@
 #
 
 # 6 hexadecimal digits
-?\x{123456}
-?\x{789012}
-?\x{ABCDEF}
-?\x{abcdef}
+?\x{102345}
+?\x{106789}
+?\x{10ABCD}
+?\x{10ABEF}
+?\x{10abcd}
+?\x{10abef}
 
 # 5 hexadecimal digits
 ?\x{12345}
