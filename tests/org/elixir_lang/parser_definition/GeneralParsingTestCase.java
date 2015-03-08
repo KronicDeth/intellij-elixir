@@ -25,7 +25,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEOLPosix() {
