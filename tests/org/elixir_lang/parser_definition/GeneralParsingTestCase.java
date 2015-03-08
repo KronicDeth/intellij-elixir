@@ -17,7 +17,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testComments() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCommentEOL() {
