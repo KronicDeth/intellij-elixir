@@ -29,11 +29,11 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testEOLPosix() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEOLWindows() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultipleNumbersOnLine() {
