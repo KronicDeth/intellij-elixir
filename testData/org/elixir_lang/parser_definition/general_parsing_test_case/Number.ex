@@ -1,22 +1,6 @@
 #
-# binary
-#
-
-# current
-0b01
-
-# obsolete
-0B01
-
-#
 # decimal
 #
-
-# normal
-1234567890
-
-# zero prefix
-0001
 
 # underscore separated
 100_000
