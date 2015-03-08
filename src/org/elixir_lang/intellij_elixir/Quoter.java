@@ -204,13 +204,9 @@ public class Quoter {
         return new OtpErlangBinary(bytes);
     }
 
-    // `for codePoint <- 0..255, :io_lib.printable_list([codePoint]), do: IO.puts codePoint`
     @Contract(pure = true)
     public static boolean isErlangPrintable(int codePoint) {
-        return (codePoint >= 8 && codePoint <= 13) ||
-                codePoint == 27 ||
-                (codePoint >= 32 && codePoint <= 126) ||
-                (codePoint >= 160 && codePoint <= 255);
+        return (codePoint >= 0 && codePoint <= 255);
     }
 
     @NotNull
