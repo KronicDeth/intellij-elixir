@@ -96,11 +96,13 @@ public class ElixirPsiImplUtil {
             asBlock = quotedChildren.getFirst();
         } else {
             OtpErlangObject[] quotedArray = new OtpErlangObject[size];
-            OtpErlangAtom blockFunction = new OtpErlangAtom("__block__");
             OtpErlangList blockMetadata = new OtpErlangList();
-            OtpErlangList blockArguments = new OtpErlangList(quotedChildren.toArray(quotedArray));
 
-            asBlock = new OtpErlangTuple(new OtpErlangObject[]{blockFunction, blockMetadata, blockArguments});
+            asBlock = quotedFunctionCall(
+                    "__block__",
+                    blockMetadata,
+                    quotedChildren.toArray(quotedArray)
+            );
         }
 
         return asBlock;
