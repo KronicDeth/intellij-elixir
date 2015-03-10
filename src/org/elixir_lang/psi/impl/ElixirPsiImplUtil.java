@@ -303,7 +303,7 @@ public class ElixirPsiImplUtil {
 
         boolean valid = false;
 
-        if (invalidDigitsCount == 0 && validDigitsCount == 1) {
+        if (invalidDigitsCount < 1 && validDigitsCount > 0) {
             valid = true;
         }
 
@@ -718,8 +718,13 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quoted;
 
         if (inBase(digitsList)) {
-            Digits digits = digitsList.get(0);
-            quoted = digits.quote();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (Digits digits : digitsList) {
+                stringBuilder.append(digits.getText());
+            }
+
+            quoted = quoteInBase(stringBuilder.toString(), wholeNumber.base());
         } else {
             /* 0 elements is invalid in native Elixir and can be emulated as `String.to_integer("", base)` while
                2 elements implies at least one element is invalidDigitsElementType which is invalid in native Elixir and
@@ -1442,5 +1447,11 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    private static OtpErlangObject quoteInBase(@NotNull String string, int base) {
+        BigInteger parsedInteger = new BigInteger(string, base);
+
+        return new OtpErlangLong(parsedInteger);
     }
 }
