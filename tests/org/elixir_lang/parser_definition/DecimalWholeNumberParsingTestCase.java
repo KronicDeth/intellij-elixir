@@ -13,6 +13,10 @@ public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnderscoreSeparated() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testValidDigits() {
         assertParsedAndQuotedCorrectly();
     }

@@ -2,10 +2,6 @@
 # decimal
 #
 
-# underscore separated
-100_000
-12_34_56_78
-
 # trailing underscore is invalid
 100_
 
