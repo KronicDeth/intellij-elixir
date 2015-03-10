@@ -2,9 +2,6 @@
 # float
 #
 
-# invalid without trailing fractional part
-0.
-
 # valid with integral and fractional part
 0.0
 

@@ -8,6 +8,10 @@ public class DecimalFloatParsingTestCase extends ParsingTestCase {
         assertParsedWithError();
     }
 
+    public void testTrailingDecimalMark() {
+        assertParsedWithError();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/decimal_float_parsing_test_case";
