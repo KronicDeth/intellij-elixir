@@ -1,11 +1,4 @@
 #
-# decimal
-#
-
-# trailing underscore is invalid
-100_
-
-#
 # float
 #
 
