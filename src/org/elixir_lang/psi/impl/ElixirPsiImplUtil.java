@@ -701,9 +701,16 @@ public class ElixirPsiImplUtil {
             if (inBase(integralDigitsList) && inBase(fractionalDigitsList) && inBase(exponentDigitsList)) {
                 String integralString = compactDigits(integralDigitsList);
                 String fractionalString = compactDigits(fractionalDigitsList);
+                String exponentSignString = decimalFloatExponent.getDecimalFloatExponentSign().getText();
                 String exponentString = compactDigits(exponentDigitsList);
 
-                String floatString = String.format("%s.%se%s", integralString, fractionalString, exponentString);
+                String floatString = String.format(
+                        "%s.%se%s%s",
+                        integralString,
+                        fractionalString,
+                        exponentSignString,
+                        exponentString
+                );
                 Double parsedDouble = Double.parseDouble(floatString);
                 quoted = new OtpErlangDouble(parsedDouble.doubleValue());
             } else {
