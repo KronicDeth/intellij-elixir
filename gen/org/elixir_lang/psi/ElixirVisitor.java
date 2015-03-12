@@ -67,6 +67,23 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitDecimalFloat(@NotNull ElixirDecimalFloat o) {
     visitDecimalNumber(o);
+    // visitQuotable(o);
+  }
+
+  public void visitDecimalFloatExponent(@NotNull ElixirDecimalFloatExponent o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDecimalFloatExponentSign(@NotNull ElixirDecimalFloatExponentSign o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDecimalFloatFractional(@NotNull ElixirDecimalFloatFractional o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDecimalFloatIntegral(@NotNull ElixirDecimalFloatIntegral o) {
+    visitPsiElement(o);
   }
 
   public void visitDecimalNumber(@NotNull ElixirDecimalNumber o) {

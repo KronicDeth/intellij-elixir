@@ -22,6 +22,10 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
+  IElementType DECIMAL_FLOAT_EXPONENT = new ElixirElementType("DECIMAL_FLOAT_EXPONENT");
+  IElementType DECIMAL_FLOAT_EXPONENT_SIGN = new ElixirElementType("DECIMAL_FLOAT_EXPONENT_SIGN");
+  IElementType DECIMAL_FLOAT_FRACTIONAL = new ElixirElementType("DECIMAL_FLOAT_FRACTIONAL");
+  IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
@@ -271,6 +275,18 @@ public interface ElixirTypes {
       }
       else if (type == DECIMAL_FLOAT) {
         return new ElixirDecimalFloatImpl(node);
+      }
+      else if (type == DECIMAL_FLOAT_EXPONENT) {
+        return new ElixirDecimalFloatExponentImpl(node);
+      }
+      else if (type == DECIMAL_FLOAT_EXPONENT_SIGN) {
+        return new ElixirDecimalFloatExponentSignImpl(node);
+      }
+      else if (type == DECIMAL_FLOAT_FRACTIONAL) {
+        return new ElixirDecimalFloatFractionalImpl(node);
+      }
+      else if (type == DECIMAL_FLOAT_INTEGRAL) {
+        return new ElixirDecimalFloatIntegralImpl(node);
       }
       else if (type == DECIMAL_NUMBER) {
         return new ElixirDecimalNumberImpl(node);

@@ -2,9 +2,6 @@
 # float
 #
 
-# valid with integral and fractional part
-0.0
-
 # valid with exponent without sign
 0.0e0
 

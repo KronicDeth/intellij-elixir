@@ -680,6 +680,45 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    @NotNull
+    public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
+        OtpErlangObject quoted;
+
+        ElixirDecimalFloatIntegral decimalFloatIntegral = decimalFloat.getDecimalFloatIntegral();
+        ElixirDecimalWholeNumber integralDecimalWholeNumber = decimalFloatIntegral.getDecimalWholeNumber();
+        List<Digits> integralDigitsList = integralDecimalWholeNumber.digitsList();
+
+        ElixirDecimalFloatFractional decimalFloatFractional = decimalFloat.getDecimalFloatFractional();
+        ElixirDecimalWholeNumber fractionalDecimalWholeNumber = decimalFloatFractional.getDecimalWholeNumber();
+        List<Digits> fractionalDigitsList = fractionalDecimalWholeNumber.digitsList();
+
+        ElixirDecimalFloatExponent decimalFloatExponent = decimalFloat.getDecimalFloatExponent();
+
+        if (decimalFloatExponent != null) {
+            ElixirDecimalWholeNumber exponentDecimalWholeNumber = decimalFloatExponent.getDecimalWholeNumber();
+            List<Digits> exponentDigitsList = exponentDecimalWholeNumber.digitsList();
+
+            if (inBase(integralDigitsList) && inBase(fractionalDigitsList) && inBase(exponentDigitsList)) {
+                throw new NotImplementedException("Valid I.FeE");
+            } else {
+                throw new NotImplementedException("Invalid I.F.E");
+            }
+        } else {
+            if (inBase(integralDigitsList) && inBase(fractionalDigitsList)) {
+                String integralString = compactDigits(integralDigitsList);
+                String fractionalString = compactDigits(fractionalDigitsList);
+
+                String floatString = String.format("%s.%s", integralString, fractionalString);
+                Double parsedDouble = Double.parseDouble(floatString);
+                quoted = new OtpErlangDouble(parsedDouble.doubleValue());
+            } else {
+                throw new NotImplementedException("Invalid I.F");
+            }
+        }
+
+        return quoted;
+    }
+
     public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyParentheses emptyParentheses) {
         return new OtpErlangAtom("nil");
     }
@@ -1453,5 +1492,15 @@ public class ElixirPsiImplUtil {
         BigInteger parsedInteger = new BigInteger(string, base);
 
         return new OtpErlangLong(parsedInteger);
+    }
+
+    private static String compactDigits(List<Digits> digitsList) {
+        StringBuilder builtString = new StringBuilder();
+
+        for (Digits digits : digitsList) {
+            builtString.append(digits.getText());
+        }
+
+        return builtString.toString();
     }
 }

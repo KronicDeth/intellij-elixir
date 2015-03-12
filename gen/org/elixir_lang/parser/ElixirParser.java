@@ -65,6 +65,18 @@ public class ElixirParser implements PsiParser {
     else if (t == DECIMAL_FLOAT) {
       r = decimalFloat(b, 0);
     }
+    else if (t == DECIMAL_FLOAT_EXPONENT) {
+      r = decimalFloatExponent(b, 0);
+    }
+    else if (t == DECIMAL_FLOAT_EXPONENT_SIGN) {
+      r = decimalFloatExponentSign(b, 0);
+    }
+    else if (t == DECIMAL_FLOAT_FRACTIONAL) {
+      r = decimalFloatFractional(b, 0);
+    }
+    else if (t == DECIMAL_FLOAT_INTEGRAL) {
+      r = decimalFloatIntegral(b, 0);
+    }
     else if (t == DECIMAL_NUMBER) {
       r = decimalNumber(b, 0);
     }
@@ -652,44 +664,82 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+  // decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
   public static boolean decimalFloat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalFloat")) return false;
     if (!nextTokenIs(b, "<decimal float>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<decimal float>");
-    r = decimalWholeNumber(b, l + 1);
+    r = decimalFloatIntegral(b, l + 1);
     r = r && consumeToken(b, DECIMAL_MARK);
-    r = r && decimalWholeNumber(b, l + 1);
+    r = r && decimalFloatFractional(b, l + 1);
     r = r && decimalFloat_3(b, l + 1);
     exit_section_(b, l, m, DECIMAL_FLOAT, r, false, null);
     return r;
   }
 
-  // (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+  // (EXPONENT_MARK decimalFloatExponent)?
   private static boolean decimalFloat_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalFloat_3")) return false;
     decimalFloat_3_0(b, l + 1);
     return true;
   }
 
-  // EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber
+  // EXPONENT_MARK decimalFloatExponent
   private static boolean decimalFloat_3_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "decimalFloat_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EXPONENT_MARK);
-    r = r && decimalFloat_3_0_1(b, l + 1);
-    r = r && decimalWholeNumber(b, l + 1);
+    r = r && decimalFloatExponent(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
+  /* ********************************************************** */
+  // decimalFloatExponentSign decimalWholeNumber
+  public static boolean decimalFloatExponent(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloatExponent")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<decimal float exponent>");
+    r = decimalFloatExponentSign(b, l + 1);
+    r = r && decimalWholeNumber(b, l + 1);
+    exit_section_(b, l, m, DECIMAL_FLOAT_EXPONENT, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // DUAL_OPERATOR?
-  private static boolean decimalFloat_3_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalFloat_3_0_1")) return false;
+  public static boolean decimalFloatExponentSign(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloatExponentSign")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<decimal float exponent sign>");
     consumeToken(b, DUAL_OPERATOR);
+    exit_section_(b, l, m, DECIMAL_FLOAT_EXPONENT_SIGN, true, false, null);
     return true;
+  }
+
+  /* ********************************************************** */
+  // decimalWholeNumber
+  public static boolean decimalFloatFractional(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloatFractional")) return false;
+    if (!nextTokenIs(b, "<decimal float fractional>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<decimal float fractional>");
+    r = decimalWholeNumber(b, l + 1);
+    exit_section_(b, l, m, DECIMAL_FLOAT_FRACTIONAL, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // decimalWholeNumber
+  public static boolean decimalFloatIntegral(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "decimalFloatIntegral")) return false;
+    if (!nextTokenIs(b, "<decimal float integral>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<decimal float integral>");
+    r = decimalWholeNumber(b, l + 1);
+    exit_section_(b, l, m, DECIMAL_FLOAT_INTEGRAL, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

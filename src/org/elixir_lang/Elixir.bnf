@@ -1044,7 +1044,14 @@ private binaryString ::= stringLine | stringHeredoc
 private infixComma ::= COMMA EOL*
 
 private containerExpression ::= emptyParentheses
-decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
+
+decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+decimalFloatExponent ::= decimalFloatExponentSign decimalWholeNumber
+decimalFloatExponentSign ::= DUAL_OPERATOR?
+decimalFloatFractional ::= decimalWholeNumber
+decimalFloatIntegral ::= decimalWholeNumber
+
 // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
 decimalNumber ::= decimalFloat |
                   decimalWholeNumber
