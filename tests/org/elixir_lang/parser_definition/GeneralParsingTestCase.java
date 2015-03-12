@@ -49,7 +49,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPygment() {
