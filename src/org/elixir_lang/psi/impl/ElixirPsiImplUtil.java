@@ -704,15 +704,22 @@ public class ElixirPsiImplUtil {
                 throw new NotImplementedException("Invalid I.F.E");
             }
         } else {
-            if (inBase(integralDigitsList) && inBase(fractionalDigitsList)) {
-                String integralString = compactDigits(integralDigitsList);
-                String fractionalString = compactDigits(fractionalDigitsList);
+            String integralString = compactDigits(integralDigitsList);
+            String fractionalString = compactDigits(fractionalDigitsList);
 
-                String floatString = String.format("%s.%s", integralString, fractionalString);
+            String floatString = String.format("%s.%s", integralString, fractionalString);
+
+            if (inBase(integralDigitsList) && inBase(fractionalDigitsList)) {
                 Double parsedDouble = Double.parseDouble(floatString);
                 quoted = new OtpErlangDouble(parsedDouble.doubleValue());
             } else {
-                throw new NotImplementedException("Invalid I.F");
+                // Convert parser error to runtime ArgumentError
+                quoted = quotedFunctionCall(
+                        "String",
+                        "to_float",
+                        metadata(decimalFloat),
+                        elixirString(floatString)
+                );
             }
         }
 

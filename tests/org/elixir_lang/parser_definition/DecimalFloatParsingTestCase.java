@@ -4,8 +4,16 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 8/3/14.
  */
 public class DecimalFloatParsingTestCase extends ParsingTestCase {
+    public void testInvalidIntegralDecimalMarkFractional() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testIntegralDecimalMarkFractional() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIntegralDecimalMarkInvalidFractional() {
+        assertParsedAndQuotedAroundError();
     }
 
     public void testLeadingDecimalMark() {
