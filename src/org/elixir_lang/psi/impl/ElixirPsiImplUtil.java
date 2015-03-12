@@ -687,44 +687,51 @@ public class ElixirPsiImplUtil {
         ElixirDecimalFloatIntegral decimalFloatIntegral = decimalFloat.getDecimalFloatIntegral();
         ElixirDecimalWholeNumber integralDecimalWholeNumber = decimalFloatIntegral.getDecimalWholeNumber();
         List<Digits> integralDigitsList = integralDecimalWholeNumber.digitsList();
+        String integralString = compactDigits(integralDigitsList);
 
         ElixirDecimalFloatFractional decimalFloatFractional = decimalFloat.getDecimalFloatFractional();
         ElixirDecimalWholeNumber fractionalDecimalWholeNumber = decimalFloatFractional.getDecimalWholeNumber();
         List<Digits> fractionalDigitsList = fractionalDecimalWholeNumber.digitsList();
+        String fractionalString = compactDigits(fractionalDigitsList);
 
         ElixirDecimalFloatExponent decimalFloatExponent = decimalFloat.getDecimalFloatExponent();
 
         if (decimalFloatExponent != null) {
             ElixirDecimalWholeNumber exponentDecimalWholeNumber = decimalFloatExponent.getDecimalWholeNumber();
             List<Digits> exponentDigitsList = exponentDecimalWholeNumber.digitsList();
+            String exponentSignString = decimalFloatExponent.getDecimalFloatExponentSign().getText();
+            String exponentString = compactDigits(exponentDigitsList);
+
+            String floatString = String.format(
+                    "%s.%se%s%s",
+                    integralString,
+                    fractionalString,
+                    exponentSignString,
+                    exponentString
+            );
 
             if (inBase(integralDigitsList) && inBase(fractionalDigitsList) && inBase(exponentDigitsList)) {
-                String integralString = compactDigits(integralDigitsList);
-                String fractionalString = compactDigits(fractionalDigitsList);
-                String exponentSignString = decimalFloatExponent.getDecimalFloatExponentSign().getText();
-                String exponentString = compactDigits(exponentDigitsList);
-
-                String floatString = String.format(
-                        "%s.%se%s%s",
-                        integralString,
-                        fractionalString,
-                        exponentSignString,
-                        exponentString
-                );
                 Double parsedDouble = Double.parseDouble(floatString);
-                quoted = new OtpErlangDouble(parsedDouble.doubleValue());
+                quoted = new OtpErlangDouble(parsedDouble);
             } else {
-                throw new NotImplementedException("Invalid I.F.E");
+                // Convert parser error to runtime ArgumentError
+                quoted = quotedFunctionCall(
+                        "String",
+                        "to_float",
+                        metadata(decimalFloat),
+                        elixirString(floatString)
+                );
             }
         } else {
-            String integralString = compactDigits(integralDigitsList);
-            String fractionalString = compactDigits(fractionalDigitsList);
-
-            String floatString = String.format("%s.%s", integralString, fractionalString);
+            String floatString = String.format(
+                    "%s.%s",
+                    integralString,
+                    fractionalString
+            );
 
             if (inBase(integralDigitsList) && inBase(fractionalDigitsList)) {
                 Double parsedDouble = Double.parseDouble(floatString);
-                quoted = new OtpErlangDouble(parsedDouble.doubleValue());
+                quoted = new OtpErlangDouble(parsedDouble);
             } else {
                 // Convert parser error to runtime ArgumentError
                 quoted = quotedFunctionCall(
