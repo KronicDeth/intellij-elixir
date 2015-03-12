@@ -16,6 +16,10 @@ public class DecimalFloatParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testIntegralDecimalMarkFractionalPlusExponent() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testIntegralDecimalMarkFractionalUpperCaseExponent() {
         assertParsedAndQuotedCorrectly();
     }
