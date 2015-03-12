@@ -45,7 +45,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoEOLAtEOF() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testParentheses() {
