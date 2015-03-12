@@ -699,7 +699,13 @@ public class ElixirPsiImplUtil {
             List<Digits> exponentDigitsList = exponentDecimalWholeNumber.digitsList();
 
             if (inBase(integralDigitsList) && inBase(fractionalDigitsList) && inBase(exponentDigitsList)) {
-                throw new NotImplementedException("Valid I.FeE");
+                String integralString = compactDigits(integralDigitsList);
+                String fractionalString = compactDigits(fractionalDigitsList);
+                String exponentString = compactDigits(exponentDigitsList);
+
+                String floatString = String.format("%s.%se%s", integralString, fractionalString, exponentString);
+                Double parsedDouble = Double.parseDouble(floatString);
+                quoted = new OtpErlangDouble(parsedDouble.doubleValue());
             } else {
                 throw new NotImplementedException("Invalid I.F.E");
             }
