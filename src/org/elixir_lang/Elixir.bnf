@@ -849,7 +849,7 @@ literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER
                              ]
                            }
 
-literalWordsLine ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
+literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
                       {
                         implements = [
                           "org.elixir_lang.psi.WordsFragmented"
