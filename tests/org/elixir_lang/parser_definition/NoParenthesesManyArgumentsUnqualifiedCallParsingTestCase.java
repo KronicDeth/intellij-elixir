@@ -5,10 +5,18 @@ package org.elixir_lang.parser_definition;
  */
 public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends ParsingTestCase {
     public void testFunctionEOLPositional() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testOneKeyword() {
         doTest(true);
     }
 
-    public void testKeywords() {
+    public void testTwoKeywordsSameLine() {
+        doTest(true);
+    }
+
+    public void testTwoKeywordsNewlineAfterComma() {
         doTest(true);
     }
 
