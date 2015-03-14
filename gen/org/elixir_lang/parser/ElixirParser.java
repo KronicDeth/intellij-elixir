@@ -331,6 +331,9 @@ public class ElixirParser implements PsiParser {
     else if (t == UNARY_PREFIX_OPERATOR) {
       r = unaryPrefixOperator(b, 0);
     }
+    else if (t == UNKNOWN_BASE_DIGITS) {
+      r = unknownBaseDigits(b, 0);
+    }
     else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
       r = unknownBaseWholeNumber(b, 0);
     }
@@ -3358,7 +3361,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+
+  // INVALID_UNKNOWN_BASE_DIGITS
+  public static boolean unknownBaseDigits(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unknownBaseDigits")) return false;
+    if (!nextTokenIs(b, INVALID_UNKNOWN_BASE_DIGITS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS);
+    exit_section_(b, m, UNKNOWN_BASE_DIGITS, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE unknownBaseDigits+
   public static boolean unknownBaseWholeNumber(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unknownBaseWholeNumber")) return false;
     if (!nextTokenIs(b, BASE_WHOLE_NUMBER_PREFIX)) return false;
@@ -3371,15 +3386,15 @@ public class ElixirParser implements PsiParser {
     return r || p;
   }
 
-  // INVALID_UNKNOWN_BASE_DIGITS+
+  // unknownBaseDigits+
   private static boolean unknownBaseWholeNumber_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unknownBaseWholeNumber_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS);
+    r = unknownBaseDigits(b, l + 1);
     int c = current_position_(b);
     while (r) {
-      if (!consumeToken(b, INVALID_UNKNOWN_BASE_DIGITS)) break;
+      if (!unknownBaseDigits(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "unknownBaseWholeNumber_2", c)) break;
       c = current_position_(b);
     }

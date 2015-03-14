@@ -1028,6 +1028,23 @@ octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigit
                      }
 
 /*
+ * Unknown (1-36)
+ */
+
+unknownBaseDigits ::= INVALID_UNKNOWN_BASE_DIGITS
+                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE unknownBaseDigits+
+                           {
+                             implements = "org.elixir_lang.psi.WholeNumber"
+                             methods = [
+                               base
+                               digitsList
+                               quote
+                             ]
+                             pin=2
+                           }
+
+/*
  *
  *
  * In alphabetical order
@@ -1149,5 +1166,3 @@ private sigil ::= interpolatedCharListSigilLine |
                   literalSigilLine |
                   literalStringSigilLine |
                   literalWordsLine
-
-unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }

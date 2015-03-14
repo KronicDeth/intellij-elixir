@@ -111,6 +111,7 @@ public interface ElixirTypes {
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
+  IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
 
   IElementType ALIAS_TOKEN = new ElixirTokenType("ALIAS_TOKEN");
@@ -542,6 +543,9 @@ public interface ElixirTypes {
       }
       else if (type == UNARY_PREFIX_OPERATOR) {
         return new ElixirUnaryPrefixOperatorImpl(node);
+      }
+      else if (type == UNKNOWN_BASE_DIGITS) {
+        return new ElixirUnknownBaseDigitsImpl(node);
       }
       else if (type == UNKNOWN_BASE_WHOLE_NUMBER) {
         return new ElixirUnknownBaseWholeNumberImpl(node);

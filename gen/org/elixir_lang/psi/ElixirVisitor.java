@@ -454,8 +454,13 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitUnknownBaseDigits(@NotNull ElixirUnknownBaseDigits o) {
+    visitDigits(o);
+  }
+
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitNumber(o);
+    // visitWholeNumber(o);
   }
 
   public void visitAtomable(@NotNull Atomable o) {

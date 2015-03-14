@@ -35,6 +35,8 @@ public class ElixirPsiImplUtil {
     public static final int DECIMAL_BASE = 10;
     public static final int HEXADECIMAL_BASE = 16;
     public static final int OCTAL_BASE = 8;
+    // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
+    public static final int UNKNOWN_BASE = 36;
 
     @Contract(pure = true)
     @NotNull
@@ -82,6 +84,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static int base(@NotNull @SuppressWarnings("unused") final ElixirOctalWholeNumber octalWholeNumber) {
         return OCTAL_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirUnknownBaseDigits unknownBaseDigits) {
+        return UNKNOWN_BASE;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static int base(@NotNull @SuppressWarnings("unused") final ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
+        return UNKNOWN_BASE;
     }
 
     @Contract(pure = true)
@@ -256,6 +270,15 @@ public class ElixirPsiImplUtil {
         List<Digits> digitsList = new LinkedList<Digits>();
 
         digitsList.addAll(octalWholeNumber.getOctalDigitsList());
+
+        return digitsList;
+    }
+
+    @NotNull
+    public static List<Digits> digitsList(@NotNull ElixirUnknownBaseWholeNumber unknownBaseWholeNumber) {
+        List<Digits> digitsList = new LinkedList<Digits>();
+
+        digitsList.addAll(unknownBaseWholeNumber.getUnknownBaseDigitsList());
 
         return digitsList;
     }
@@ -1279,6 +1302,11 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirOctalDigits octalDigits) {
         return ElixirTypes.VALID_OCTAL_DIGITS;
+    }
+
+    @Nullable
+    public static IElementType validElementType(@NotNull @SuppressWarnings("unused") ElixirUnknownBaseDigits unknownBaseDigits) {
+        return null;
     }
 
     /*

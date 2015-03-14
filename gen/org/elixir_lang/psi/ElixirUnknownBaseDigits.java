@@ -5,22 +5,22 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
-public interface ElixirUnknownBaseWholeNumber extends ElixirNumber, WholeNumber {
-
-  @NotNull
-  List<ElixirUnknownBaseDigits> getUnknownBaseDigitsList();
+public interface ElixirUnknownBaseDigits extends Digits {
 
   @NotNull
-  PsiElement getUnknownWholeNumberBase();
+  PsiElement getInvalidUnknownBaseDigits();
 
   @NotNull
   int base();
 
-  @NotNull
-  List<Digits> digitsList();
+  boolean inBase();
 
   @NotNull
   OtpErlangObject quote();
+
+  @Nullable
+  IElementType validElementType();
 
 }

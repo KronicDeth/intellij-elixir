@@ -8,30 +8,26 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.IElementType;
 
-public class ElixirUnknownBaseWholeNumberImpl extends ElixirNumberImpl implements ElixirUnknownBaseWholeNumber {
+public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseDigits {
 
-  public ElixirUnknownBaseWholeNumberImpl(ASTNode node) {
+  public ElixirUnknownBaseDigitsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnknownBaseWholeNumber(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnknownBaseDigits(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public List<ElixirUnknownBaseDigits> getUnknownBaseDigitsList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnknownBaseDigits.class);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getUnknownWholeNumberBase() {
-    return findNotNullChildByType(UNKNOWN_WHOLE_NUMBER_BASE);
+  public PsiElement getInvalidUnknownBaseDigits() {
+    return findNotNullChildByType(INVALID_UNKNOWN_BASE_DIGITS);
   }
 
   @NotNull
@@ -39,14 +35,18 @@ public class ElixirUnknownBaseWholeNumberImpl extends ElixirNumberImpl implement
     return ElixirPsiImplUtil.base(this);
   }
 
-  @NotNull
-  public List<Digits> digitsList() {
-    return ElixirPsiImplUtil.digitsList(this);
+  public boolean inBase() {
+    return ElixirPsiImplUtil.inBase(this);
   }
 
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @Nullable
+  public IElementType validElementType() {
+    return ElixirPsiImplUtil.validElementType(this);
   }
 
 }
