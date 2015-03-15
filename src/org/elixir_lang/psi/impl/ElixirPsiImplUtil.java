@@ -1001,6 +1001,23 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final KeywordPair keywordPair) {
+        Quotable keywordKey = keywordPair.getKeywordKey();
+        OtpErlangObject quotedKeywordKey = keywordKey.quote();
+
+        Quotable keywordValue = keywordPair.getKeywordValue();
+        OtpErlangObject quotedKeywordValue = keywordValue.quote();
+
+        OtpErlangObject[] elements = {
+                quotedKeywordKey,
+                quotedKeywordValue
+        };
+
+        return new OtpErlangTuple(elements);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
         ElixirCharListLine charListLine = keywordKey.getCharListLine();
         OtpErlangObject quoted;
@@ -1018,21 +1035,6 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirKeywordPair keywordPair) {
-        ElixirKeywordKey keywordKey = keywordPair.getKeywordKey();
-        OtpErlangObject quotedKeywordKey = keywordKey.quote();
-
-        ElixirKeywordValue keywordValue = keywordPair.getKeywordValue();
-        OtpErlangObject quotedKeywordValue = keywordValue.quote();
-        OtpErlangObject[] elements = {
-                quotedKeywordKey, quotedKeywordValue
-        };
-
-        return new OtpErlangTuple(elements);
     }
 
     @Contract(pure = true)
