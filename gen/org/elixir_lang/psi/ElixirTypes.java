@@ -62,9 +62,9 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_WORDS_LINE = new ElixirElementType("INTERPOLATED_WORDS_LINE");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
-  IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
   IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
+  IElementType LIST_KEYWORD_PAIR = new ElixirElementType("LIST_KEYWORD_PAIR");
   IElementType LITERAL_CHAR_LIST_BODY = new ElixirElementType("LITERAL_CHAR_LIST_BODY");
   IElementType LITERAL_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("LITERAL_CHAR_LIST_HEREDOC_LINE");
   IElementType LITERAL_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_HEREDOC");
@@ -397,14 +397,14 @@ public interface ElixirTypes {
       else if (type == KEYWORD_KEY) {
         return new ElixirKeywordKeyImpl(node);
       }
-      else if (type == KEYWORD_PAIR) {
-        return new ElixirKeywordPairImpl(node);
-      }
       else if (type == KEYWORD_VALUE) {
         return new ElixirKeywordValueImpl(node);
       }
       else if (type == LIST) {
         return new ElixirListImpl(node);
+      }
+      else if (type == LIST_KEYWORD_PAIR) {
+        return new ElixirListKeywordPairImpl(node);
       }
       else if (type == LITERAL_CHAR_LIST_BODY) {
         return new ElixirLiteralCharListBodyImpl(node);

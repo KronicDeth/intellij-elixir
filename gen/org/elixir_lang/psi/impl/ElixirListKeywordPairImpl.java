@@ -6,19 +6,19 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirKeywordKey;
-import org.elixir_lang.psi.ElixirKeywordPair;
 import org.elixir_lang.psi.ElixirKeywordValue;
+import org.elixir_lang.psi.ElixirListKeywordPair;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements ElixirKeywordPair {
+public class ElixirListKeywordPairImpl extends ASTWrapperPsiElement implements ElixirListKeywordPair {
 
-  public ElixirKeywordPairImpl(ASTNode node) {
+  public ElixirListKeywordPairImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitKeywordPair(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitListKeywordPair(this);
     else super.accept(visitor);
   }
 

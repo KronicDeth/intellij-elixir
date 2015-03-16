@@ -6,10 +6,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirList extends Quotable {
+public interface ElixirList extends KeywordList {
 
   @NotNull
-  List<ElixirKeywordPair> getKeywordPairList();
+  List<ElixirListKeywordPair> getListKeywordPairList();
+
+  List<KeywordPair> getKeywordPairList();
 
   @NotNull
   OtpErlangObject quote();

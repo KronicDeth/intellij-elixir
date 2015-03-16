@@ -703,6 +703,15 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
+    public static List<KeywordPair> getKeywordPairList(ElixirList list) {
+        List<ElixirListKeywordPair> listKeywordPairList = list.getListKeywordPairList();
+        List<KeywordPair> keywordPairList = new ArrayList<KeywordPair>(listKeywordPairList.size());
+
+        keywordPairList.addAll(listKeywordPairList);
+
+        return keywordPairList;
+    }
+
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
         OtpErlangObject quoted;
@@ -1048,10 +1057,10 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        List<ElixirKeywordPair> keywordPairList = list.getKeywordPairList();
-        List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(keywordPairList.size());
+        List<ElixirListKeywordPair> listKeywordPairList = list.getListKeywordPairList();
+        List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(listKeywordPairList.size());
 
-        for (ElixirKeywordPair keywordPair : keywordPairList) {
+        for (ElixirListKeywordPair keywordPair : listKeywordPairList) {
             quotedKeywordPairList.add(
                     keywordPair.quote()
             );

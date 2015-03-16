@@ -244,16 +244,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitKeywordPair(@NotNull ElixirKeywordPair o) {
-    visitKeywordPair(o);
-  }
-
   public void visitKeywordValue(@NotNull ElixirKeywordValue o) {
     visitQuotable(o);
   }
 
   public void visitList(@NotNull ElixirList o) {
-    visitQuotable(o);
+    visitKeywordList(o);
+  }
+
+  public void visitListKeywordPair(@NotNull ElixirListKeywordPair o) {
+    visitKeywordPair(o);
   }
 
   public void visitLiteralCharListBody(@NotNull ElixirLiteralCharListBody o) {
@@ -492,6 +492,14 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitKeywordList(@NotNull KeywordList o) {
+    visitElement(o);
+  }
+
+  public void visitKeywordPair(@NotNull KeywordPair o) {
     visitElement(o);
   }
 

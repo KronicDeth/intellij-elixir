@@ -6,9 +6,10 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirKeywordPair;
 import org.elixir_lang.psi.ElixirList;
+import org.elixir_lang.psi.ElixirListKeywordPair;
 import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.KeywordPair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,8 +27,12 @@ public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
 
   @Override
   @NotNull
-  public List<ElixirKeywordPair> getKeywordPairList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
+  public List<ElixirListKeywordPair> getListKeywordPairList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirListKeywordPair.class);
+  }
+
+  public List<KeywordPair> getKeywordPairList() {
+    return ElixirPsiImplUtil.getKeywordPairList(this);
   }
 
   @NotNull
