@@ -1010,6 +1010,24 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final KeywordList keywordList) {
+        List<KeywordPair> keywordPairList = keywordList.getKeywordPairList();
+        List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(keywordPairList.size());
+
+        for (KeywordPair keywordPair : keywordPairList) {
+            quotedKeywordPairList.add(
+                    keywordPair.quote()
+            );
+        }
+
+        OtpErlangObject[] quotedKeywordPairs = new OtpErlangObject[quotedKeywordPairList.size()];
+        quotedKeywordPairList.toArray(quotedKeywordPairs);
+
+        return new OtpErlangList(quotedKeywordPairs);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final KeywordPair keywordPair) {
         Quotable keywordKey = keywordPair.getKeywordKey();
         OtpErlangObject quotedKeywordKey = keywordKey.quote();
@@ -1052,24 +1070,6 @@ public class ElixirPsiImplUtil {
         ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
 
         return emptyParentheses.quote();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        List<ElixirListKeywordPair> listKeywordPairList = list.getListKeywordPairList();
-        List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(listKeywordPairList.size());
-
-        for (ElixirListKeywordPair keywordPair : listKeywordPairList) {
-            quotedKeywordPairList.add(
-                    keywordPair.quote()
-            );
-        }
-
-        OtpErlangObject[] quotedKeywordPairs = new OtpErlangObject[quotedKeywordPairList.size()];
-        quotedKeywordPairList.toArray(quotedKeywordPairs);
-
-        return new OtpErlangList(quotedKeywordPairs);
     }
 
     @Contract(pure = true)
