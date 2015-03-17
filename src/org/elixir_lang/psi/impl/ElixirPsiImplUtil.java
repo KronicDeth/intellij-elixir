@@ -449,9 +449,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCapturePrefixOperator capturePrefixOperator) {
-        ASTNode captureOperator = capturePrefixOperator.getNode().getFirstChildNode();
-
-        return new OtpErlangAtom(captureOperator.getText());
+        return quotedOperator(capturePrefixOperator, ElixirTypes.CAPTURE_OPERATOR);
     }
 
     @Contract(pure = true)
@@ -918,13 +916,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirHatInfixOperator hatInfixOperator) {
-        ASTNode hatOperator = hatInfixOperator
-                .getNode()
-                .getChildren(
-                        TokenSet.create(ElixirTypes.HAT_OPERATOR)
-                )[0];
-
-        return new OtpErlangAtom(hatOperator.getText());
+        return quotedOperator(hatInfixOperator, ElixirTypes.HAT_OPERATOR);
     }
 
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
@@ -1177,13 +1169,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
-        ASTNode multiplicationOperator = multiplicationInfixOperator
-                .getNode()
-                .getChildren(
-                        TokenSet.create(ElixirTypes.MULTIPLICATION_OPERATOR)
-                )[0];
-
-        return new OtpErlangAtom(multiplicationOperator.getText());
+        return quotedOperator(multiplicationInfixOperator, ElixirTypes.MULTIPLICATION_OPERATOR);
     }
 
     @Contract(pure = true)
@@ -1697,6 +1683,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull ASTNode... children) {
         return quotedChildNodes(parent, metadata(parent), children);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static OtpErlangObject quotedOperator(@NotNull final PsiElement operatorRuleElement, IElementType operatorTokenType) {
+        ASTNode operator = operatorRuleElement
+                .getNode()
+                .getChildren(
+                        TokenSet.create(operatorTokenType)
+                )[0];
+
+        return new OtpErlangAtom(operator.getText());
     }
 
     private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull OtpErlangList metadata, @NotNull ASTNode... children) {
