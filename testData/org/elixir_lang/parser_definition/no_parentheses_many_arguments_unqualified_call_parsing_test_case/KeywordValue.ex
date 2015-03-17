@@ -37,9 +37,6 @@ function positional, keyword_key: first_list ++ second_list
 # matchedExpressionAdditionOperation
 function positional, keyword_key: first_value + second_value
 
-# matchedExpressionHatOperation
-function positional, keyword_key: first_value ^^^ second_value
-
 # matchedExpressionUnaryOperation
 function positional, keyword_key: -value
 

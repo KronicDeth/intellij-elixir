@@ -1,8 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import org.jetbrains.annotations.NotNull;
 
-public interface ElixirHatInfixOperator extends PsiElement {
+public interface ElixirHatInfixOperator extends Quotable {
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

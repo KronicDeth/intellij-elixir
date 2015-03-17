@@ -915,6 +915,18 @@ public class ElixirPsiImplUtil {
         return quotedAsAtom;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirHatInfixOperator hatInfixOperator) {
+        ASTNode hatOperator = hatInfixOperator
+                .getNode()
+                .getChildren(
+                        TokenSet.create(ElixirTypes.HAT_OPERATOR)
+                )[0];
+
+        return new OtpErlangAtom(hatOperator.getText());
+    }
+
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
@@ -1088,6 +1100,32 @@ public class ElixirPsiImplUtil {
         return emptyParentheses.quote();
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedHatOperation matchedHatOperation) {
+        PsiElement[] children = matchedHatOperation.getChildren();
+
+        if (children.length != 3) {
+            throw new NotImplementedException("MatchedHatOperation expected to have 3 children (left operand, operator, right operand");
+        }
+
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Quotable operator = (Quotable) children[1];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = (Quotable) children[2];
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedLeftOperand,
+                quotedRightOperand
+        );
+    }
+    
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedMultiplicationOperation matchedMultiplicationOperation) {

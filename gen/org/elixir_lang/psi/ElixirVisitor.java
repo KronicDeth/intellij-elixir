@@ -116,7 +116,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitHeredocLinePrefix(@NotNull ElixirHeredocLinePrefix o) {
@@ -355,7 +355,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
