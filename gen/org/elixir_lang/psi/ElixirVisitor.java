@@ -359,7 +359,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
@@ -371,7 +371,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {

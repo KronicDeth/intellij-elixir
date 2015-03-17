@@ -28,6 +28,10 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         doTest(true);
     }
 
+    public void testKeywordValueMatchedMultiplicationOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testKeywordValueMatchedNonNumericCaptureOperation() {
         assertParsedAndQuotedCorrectly();
     }

@@ -1090,6 +1090,32 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedMultiplicationOperation matchedMultiplicationOperation) {
+        PsiElement[] children = matchedMultiplicationOperation.getChildren();
+
+        if (children.length != 3) {
+            throw new NotImplementedException("MatchedMultiplicateionOperation expected to have 3 children (left operand, operator, right operand");
+        }
+
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Quotable operator = (Quotable) children[1];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = (Quotable) children[2];
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedLeftOperand,
+                quotedRightOperand
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull  final ElixirMatchedNonNumericCaptureOperation matchedNonNumericCaptureOperation) {
         PsiElement[] children = matchedNonNumericCaptureOperation.getChildren();
 
@@ -1108,6 +1134,18 @@ public class ElixirPsiImplUtil {
                 metadata(matchedNonNumericCaptureOperation),
                 quotedOperand
         );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
+        ASTNode multiplicationOperator = multiplicationInfixOperator
+                .getNode()
+                .getChildren(
+                        TokenSet.create(ElixirTypes.MULTIPLICATION_OPERATOR)
+                )[0];
+
+        return new OtpErlangAtom(multiplicationOperator.getText());
     }
 
     @Contract(pure = true)

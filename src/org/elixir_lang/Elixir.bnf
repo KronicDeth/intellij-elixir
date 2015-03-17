@@ -919,11 +919,17 @@ matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator (noParenth
                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
-multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL* { name = "*, /" }
+multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
+                                {
+                                  implements = "org.elixir_lang.psi.Quotable"
+                                  name = "*, /"
+                                  methods = [quote]
+                                }
 private matchedMultiplicationExpression ::= matchedMultiplicationLeftOperand matchedMultiplicationOperation*
 private matchedMultiplicationLeftOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
 private matchedMultiplicationRightOperand ::= noParenthesesManyArgumentsCall | matchedMultiplicationLeftOperand
 left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMultiplicationRightOperand
+                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
 hatInfixOperator ::= EOL* HAT_OPERATOR EOL* { name = "^^^" }
