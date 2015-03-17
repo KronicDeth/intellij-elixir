@@ -1,21 +1,25 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesKeywordsExpression {
+import java.util.List;
 
-  public ElixirNoParenthesesKeywordsExpressionImpl(ASTNode node) {
+public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments {
+
+  public ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesKeywordsExpression(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyPositionalAndMaybeKeywordsArguments(this);
     else super.accept(visitor);
   }
 
@@ -59,12 +63,6 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirCharListLine getCharListLine() {
     return findChildByClass(ElixirCharListLine.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
   }
 
   @Override
@@ -125,12 +123,6 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
     return findChildByClass(ElixirInterpolatedWordsLine.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirKeywordKey getKeywordKey() {
-    return findNotNullChildByClass(ElixirKeywordKey.class);
   }
 
   @Override
@@ -230,9 +222,15 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   }
 
   @Override
+  @NotNull
+  public List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesExpression.class);
+  }
+
+  @Override
   @Nullable
-  public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
-    return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
   }
 
   @Override
@@ -275,6 +273,11 @@ public class ElixirNoParenthesesKeywordsExpressionImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
     return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
+  }
+
+  @NotNull
+  public OtpErlangObject[] quoteArguments() {
+    return ElixirPsiImplUtil.quoteArguments(this);
   }
 
 }

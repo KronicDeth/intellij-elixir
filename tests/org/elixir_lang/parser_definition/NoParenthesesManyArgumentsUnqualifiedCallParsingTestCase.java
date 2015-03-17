@@ -9,7 +9,7 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
     }
 
     public void testOneKeyword() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTwoKeywordsSameLine() {

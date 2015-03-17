@@ -712,6 +712,14 @@ public class ElixirPsiImplUtil {
         return keywordPairList;
     }
 
+    public static List<KeywordPair> getKeywordPairList(ElixirNoParenthesesKeywords noParenthesesKeywords) {
+        return new ArrayList<KeywordPair>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
+    }
+
+    public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
+        return noParenthesesKeywordPair.getNoParenthesesExpression();
+    }
+
     @NotNull
     public static OtpErlangObject quote(@NotNull ElixirDecimalFloat decimalFloat) {
         OtpErlangObject quoted;
@@ -1074,6 +1082,55 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
+        PsiElement[] children = noParenthesesExpression.getChildren();
+
+        if (children.length != 1) {
+            throw new NotImplementedException("noParenthesesExpression expected to only have one child");
+        }
+
+        return ((Quotable) children[0]).quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesFirstPositional noParenthesesFirstPositional) {
+        PsiElement[] children = noParenthesesFirstPositional.getChildren();
+
+        if (children.length != 1) {
+            throw new NotImplementedException("noParenthesesFirstPositional expected to only have one child");
+        }
+
+        return ((Quotable) children[0]).quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedCall noParenthesesManyArgumentsUnqualifiedCall) {
+        PsiElement noParenthesesManyArgumentsUnqualifiedIdentifier = noParenthesesManyArgumentsUnqualifiedCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
+        String functionName = noParenthesesManyArgumentsUnqualifiedIdentifier.getText();
+
+        ElixirNoParenthesesManyArguments noParenthesesManyArguments = noParenthesesManyArgumentsUnqualifiedCall.getNoParenthesesManyArguments();
+        OtpErlangObject[] quotedArguments = noParenthesesManyArguments.quoteArguments();
+
+        return quotedFunctionCall(
+                functionName,
+                metadata(noParenthesesManyArgumentsUnqualifiedIdentifier),
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable noParenthesesNoArgumentsUnqualifiedCallOrVariable) {
+        return quotedFunctionCall(
+                noParenthesesNoArgumentsUnqualifiedCallOrVariable.getText(),
+                metadata(noParenthesesNoArgumentsUnqualifiedCallOrVariable)
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirQualifiedAlias qualifiedAlias) {
         ASTNode[] children = qualifiedAlias.getNode().getChildren(null);
 
@@ -1162,6 +1219,41 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedBody = quotedChildNodes(sigilLine, bodyChildNodes);
 
         return quote(sigilLine, quotedBody);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
+        QuotableArguments quotableArguments;
+
+        quotableArguments = noParenthesesManyArguments.getNoParenthesesOnePositionalAndKeywordsArguments();
+
+        if (quotableArguments == null) {
+            quotableArguments = noParenthesesManyArguments.getNoParenthesesManyPositionalAndMaybeKeywordsArguments();
+        }
+
+        return quotableArguments.quoteArguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments noParenthesesManyPositionalAndMaybeKeywordsArguments) {
+        return null;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesOnePositionalAndKeywordsArguments noParenthesesOnePositionalAndKeywordsArguments) {
+        Quotable noParenthesesFirstPositional = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesFirstPositional();
+        OtpErlangObject quotedFirstArgument = noParenthesesFirstPositional.quote();
+
+        Quotable noParenthesesKeywords = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesKeywords();
+        OtpErlangObject quotedKeywordArguments = noParenthesesKeywords.quote();
+
+        return new OtpErlangObject[]{
+                quotedFirstArgument,
+                quotedKeywordArguments
+        };
     }
 
     @Contract(pure = true)

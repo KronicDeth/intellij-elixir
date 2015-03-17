@@ -92,14 +92,19 @@ public interface ElixirTypes {
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_UNARY_OPERATION = new ElixirElementType("MATCHED_UNARY_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
+  IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
+  IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
   IElementType NO_PARENTHESES_KEYWORDS = new ElixirElementType("NO_PARENTHESES_KEYWORDS");
-  IElementType NO_PARENTHESES_KEYWORDS_EXPRESSION = new ElixirElementType("NO_PARENTHESES_KEYWORDS_EXPRESSION");
+  IElementType NO_PARENTHESES_KEYWORD_PAIR = new ElixirElementType("NO_PARENTHESES_KEYWORD_PAIR");
   IElementType NO_PARENTHESES_MANY_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS");
   IElementType NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_QUALIFIED_CALL");
   IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL");
+  IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER");
+  IElementType NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_NO_ARGUMENTS_QUALIFIED_CALL = new ElixirElementType("NO_PARENTHESES_NO_ARGUMENTS_QUALIFIED_CALL");
   IElementType NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE = new ElixirElementType("NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE");
+  IElementType NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType NUMBER = new ElixirElementType("NUMBER");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
@@ -487,11 +492,17 @@ public interface ElixirTypes {
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
       }
+      else if (type == NO_PARENTHESES_EXPRESSION) {
+        return new ElixirNoParenthesesExpressionImpl(node);
+      }
+      else if (type == NO_PARENTHESES_FIRST_POSITIONAL) {
+        return new ElixirNoParenthesesFirstPositionalImpl(node);
+      }
       else if (type == NO_PARENTHESES_KEYWORDS) {
         return new ElixirNoParenthesesKeywordsImpl(node);
       }
-      else if (type == NO_PARENTHESES_KEYWORDS_EXPRESSION) {
-        return new ElixirNoParenthesesKeywordsExpressionImpl(node);
+      else if (type == NO_PARENTHESES_KEYWORD_PAIR) {
+        return new ElixirNoParenthesesKeywordPairImpl(node);
       }
       else if (type == NO_PARENTHESES_MANY_ARGUMENTS) {
         return new ElixirNoParenthesesManyArgumentsImpl(node);
@@ -502,6 +513,12 @@ public interface ElixirTypes {
       else if (type == NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_CALL) {
         return new ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl(node);
       }
+      else if (type == NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER) {
+        return new ElixirNoParenthesesManyArgumentsUnqualifiedIdentifierImpl(node);
+      }
+      else if (type == NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS) {
+        return new ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl(node);
+      }
       else if (type == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(node);
       }
@@ -510,6 +527,9 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE) {
         return new ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(node);
+      }
+      else if (type == NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS) {
+        return new ElixirNoParenthesesOnePositionalAndKeywordsArgumentsImpl(node);
       }
       else if (type == NO_PARENTHESES_STRICT) {
         return new ElixirNoParenthesesStrictImpl(node);

@@ -374,16 +374,24 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitNoParenthesesKeywords(@NotNull ElixirNoParenthesesKeywords o) {
-    visitPsiElement(o);
+  public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
+    visitQuotable(o);
   }
 
-  public void visitNoParenthesesKeywordsExpression(@NotNull ElixirNoParenthesesKeywordsExpression o) {
-    visitPsiElement(o);
+  public void visitNoParenthesesFirstPositional(@NotNull ElixirNoParenthesesFirstPositional o) {
+    visitQuotable(o);
+  }
+
+  public void visitNoParenthesesKeywordPair(@NotNull ElixirNoParenthesesKeywordPair o) {
+    visitKeywordPair(o);
+  }
+
+  public void visitNoParenthesesKeywords(@NotNull ElixirNoParenthesesKeywords o) {
+    visitKeywordList(o);
   }
 
   public void visitNoParenthesesManyArguments(@NotNull ElixirNoParenthesesManyArguments o) {
-    visitPsiElement(o);
+    visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesManyArgumentsQualifiedCall(@NotNull ElixirNoParenthesesManyArgumentsQualifiedCall o) {
@@ -391,7 +399,15 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesManyArgumentsUnqualifiedCall(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedCall o) {
+    visitQuotable(o);
+  }
+
+  public void visitNoParenthesesManyArgumentsUnqualifiedIdentifier(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier o) {
     visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesManyPositionalAndMaybeKeywordsArguments(@NotNull ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments o) {
+    visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
@@ -403,7 +419,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesNoArgumentsUnqualifiedCallOrVariable(@NotNull ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable o) {
-    visitPsiElement(o);
+    visitQuotable(o);
+  }
+
+  public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
+    visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
@@ -504,6 +524,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQuotable(@NotNull Quotable o) {
+    visitElement(o);
+  }
+
+  public void visitQuotableArguments(@NotNull QuotableArguments o) {
     visitElement(o);
   }
 

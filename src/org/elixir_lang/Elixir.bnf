@@ -110,15 +110,15 @@ private matchedDotIdentifierOperand ::= IDENTIFIER |
 private noParenthesesCommaExpression ::= matchedExpression (infixComma noParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-private noParenthesesExpression ::= emptyParentheses |
-                                    /* Must be before matchedExpression because noParenthesesExpression is
-                                       `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
-                                       which is longer than `matchedExpressionDotIdentifier` in
-                                       matchedExpression. */
-                                    /* This will be marked as an error by
-                                       {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-                                    noParenthesesManyStrictNoParenthesesExpression |
-                                    matchedExpression !KEYWORD_PAIR_COLON
+noParenthesesExpression ::= emptyParentheses |
+                            /* Must be before matchedExpression because noParenthesesExpression is
+                               `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer
+                               than `matchedExpressionDotIdentifier` in matchedExpression. */
+                            /* This will be marked as an error by
+                               {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                            noParenthesesManyStrictNoParenthesesExpression |
+                            matchedExpression !KEYWORD_PAIR_COLON
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 /* Special class for wrapping noParenthesesCall so that
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
    ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
@@ -134,15 +134,25 @@ noParenthesesStrict ::= emptyParentheses |
                                              noParenthesesManyArguments
                                             ) CLOSING_PARENTHESIS
 
+noParenthesesFirstPositional ::= matchedExpression
+                                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+noParenthesesOnePositionalAndKeywordsArguments ::= noParenthesesFirstPositional infixComma noParenthesesKeywords
+                                                   { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+noParenthesesManyPositionalAndMaybeKeywordsArguments ::= noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
+                                                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
-noParenthesesManyArguments ::= matchedExpression infixComma noParenthesesKeywords |
-                               noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
+noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
+                               noParenthesesManyPositionalAndMaybeKeywordsArguments
+                               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
-noParenthesesManyArgumentsUnqualifiedCall ::= IDENTIFIER noParenthesesManyArgumentsStrict
+noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER
+noParenthesesManyArgumentsUnqualifiedCall ::= noParenthesesManyArgumentsUnqualifiedIdentifier noParenthesesManyArgumentsStrict
+                                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private noParenthesesManyArgumentsQualifiedExpression ::= matchedDotExpression noParenthesesManyArgumentsQualifiedCall
 left noParenthesesManyArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand noParenthesesManyArgumentsStrict
@@ -154,8 +164,23 @@ private noParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsQualifiedEx
  * 1+ Arguments
  */
 
-noParenthesesKeywords ::= noParenthesesKeywordsExpression (infixComma noParenthesesKeywordsExpression)*
-noParenthesesKeywordsExpression ::= keywordKeyColonEOL noParenthesesExpression
+noParenthesesKeywords ::= noParenthesesKeywordPair (infixComma noParenthesesKeywordPair)*
+                          {
+                            implements = "org.elixir_lang.psi.KeywordList"
+                            methods = [
+                              getKeywordPairList
+                              quote
+                            ]
+                          }
+noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
+                             {
+                               implements = "org.elixir_lang.psi.KeywordPair"
+                               methods = [
+                                 getKeywordKey
+                                 getKeywordValue
+                                 quote
+                               ]
+                             }
 
 /*
  * 0 Arguments
@@ -163,6 +188,7 @@ noParenthesesKeywordsExpression ::= keywordKeyColonEOL noParenthesesExpression
 
 left noParenthesesNoArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand
 noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
+                                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  *

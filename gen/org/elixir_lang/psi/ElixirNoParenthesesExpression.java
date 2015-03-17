@@ -1,11 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
+public interface ElixirNoParenthesesExpression extends Quotable {
 
   @Nullable
   ElixirAlias getAlias();
@@ -60,9 +60,6 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
   ElixirInterpolatedWordsLine getInterpolatedWordsLine();
-
-  @NotNull
-  ElixirKeywordKey getKeywordKey();
 
   @Nullable
   ElixirList getList();
@@ -135,5 +132,8 @@ public interface ElixirNoParenthesesKeywordsExpression extends PsiElement {
 
   @Nullable
   ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }
