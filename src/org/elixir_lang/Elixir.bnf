@@ -906,11 +906,17 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
 private matchedExpression ::= matchedNonNumericCaptureExpression
 
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
-capturePrefixOperator ::= CAPTURE_OPERATOR EOL* { name = "&" }
+capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
+                          {
+                            implements = "org.elixir_lang.psi.Quotable"
+                            name = "&"
+                            methods = [quote]
+                          }
 private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation | matchedMultiplicationExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator (noParenthesesManyArgumentsCall | matchedNonNumericCaptureOperand)
+                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
 multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL* { name = "*, /" }

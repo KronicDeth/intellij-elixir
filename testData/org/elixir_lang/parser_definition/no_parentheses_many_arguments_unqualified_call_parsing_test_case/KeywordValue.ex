@@ -1,6 +1,3 @@
-# matchedExpressionCaptureOperation
-function positional, keyword_key: &capture
-
 # matchedExpressionInMatchOperation
 function positional, keyword_key: keyword_value \\ nil
 

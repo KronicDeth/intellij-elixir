@@ -45,7 +45,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCapturePrefixOperator(@NotNull ElixirCapturePrefixOperator o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
@@ -363,7 +363,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitMatchedUnaryOperation(@NotNull ElixirMatchedUnaryOperation o) {

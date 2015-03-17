@@ -448,6 +448,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirCapturePrefixOperator capturePrefixOperator) {
+        ASTNode captureOperator = capturePrefixOperator.getNode().getFirstChildNode();
+
+        return new OtpErlangAtom(captureOperator.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCharListLine charListLine) {
         ElixirInterpolatedCharListBody interpolatedCharListBody = charListLine.getInterpolatedCharListBody();
 
@@ -1078,6 +1086,28 @@ public class ElixirPsiImplUtil {
         ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
 
         return emptyParentheses.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull  final ElixirMatchedNonNumericCaptureOperation matchedNonNumericCaptureOperation) {
+        PsiElement[] children = matchedNonNumericCaptureOperation.getChildren();
+
+        if (children.length != 2) {
+            throw new NotImplementedException("MatchedNonNumericCaptureOperation expected to have 2 children (operator and operand");
+        }
+
+        Quotable operator = (Quotable) children[0];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable operand = (Quotable) children[1];
+        OtpErlangObject quotedOperand = operand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(matchedNonNumericCaptureOperation),
+                quotedOperand
+        );
     }
 
     @Contract(pure = true)
