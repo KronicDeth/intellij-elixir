@@ -12,12 +12,12 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testTwoKeywordsSameLine() {
-        doTest(true);
+    public void testTwoKeywordsNewlineAfterComma() {
+        assertParsedAndQuotedCorrectly();
     }
 
-    public void testTwoKeywordsNewlineAfterComma() {
-        doTest(true);
+    public void testTwoKeywordsSameLine() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordValue() {
