@@ -355,11 +355,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
-    visitQuotable(o);
+    visitBinaryOperation(o);
   }
 
   public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
-    visitQuotable(o);
+    visitBinaryOperation(o);
   }
 
   public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
@@ -484,6 +484,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAtomable(@NotNull Atomable o) {
+    visitElement(o);
+  }
+
+  public void visitBinaryOperation(@NotNull BinaryOperation o) {
     visitElement(o);
   }
 

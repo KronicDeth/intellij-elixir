@@ -406,6 +406,32 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final BinaryOperation binaryOperation) {
+        PsiElement[] children = binaryOperation.getChildren();
+
+        if (children.length != 3) {
+            throw new NotImplementedException("BinaryOperation expected to have 3 children (left operand, operator, right operand");
+        }
+
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Quotable operator = (Quotable) children[1];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = (Quotable) children[2];
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedLeftOperand,
+                quotedRightOperand
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Digits digits) {
         final String text = digits.getText();
         final int base = digits.base();
@@ -1096,58 +1122,6 @@ public class ElixirPsiImplUtil {
         ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
 
         return emptyParentheses.quote();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedHatOperation matchedHatOperation) {
-        PsiElement[] children = matchedHatOperation.getChildren();
-
-        if (children.length != 3) {
-            throw new NotImplementedException("MatchedHatOperation expected to have 3 children (left operand, operator, right operand");
-        }
-
-        Quotable leftOperand = (Quotable) children[0];
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
-
-        Quotable operator = (Quotable) children[1];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable rightOperand = (Quotable) children[2];
-        OtpErlangObject quotedRightOperand = rightOperand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(operator),
-                quotedLeftOperand,
-                quotedRightOperand
-        );
-    }
-    
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedMultiplicationOperation matchedMultiplicationOperation) {
-        PsiElement[] children = matchedMultiplicationOperation.getChildren();
-
-        if (children.length != 3) {
-            throw new NotImplementedException("MatchedMultiplicateionOperation expected to have 3 children (left operand, operator, right operand");
-        }
-
-        Quotable leftOperand = (Quotable) children[0];
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
-
-        Quotable operator = (Quotable) children[1];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable rightOperand = (Quotable) children[2];
-        OtpErlangObject quotedRightOperand = rightOperand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(operator),
-                quotedLeftOperand,
-                quotedRightOperand
-        );
     }
 
     @Contract(pure = true)

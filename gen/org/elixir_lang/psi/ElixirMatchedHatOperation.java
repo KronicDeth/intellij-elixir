@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedHatOperation extends Quotable {
+public interface ElixirMatchedHatOperation extends BinaryOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();

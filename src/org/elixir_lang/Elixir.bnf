@@ -935,7 +935,7 @@ private matchedMultiplicationExpression ::= matchedMultiplicationLeftOperand mat
 private matchedMultiplicationLeftOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
 private matchedMultiplicationRightOperand ::= noParenthesesManyArgumentsCall | matchedMultiplicationLeftOperand
 left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMultiplicationRightOperand
-                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                        { implements = "org.elixir_lang.psi.BinaryOperation" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
 hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
@@ -951,7 +951,7 @@ private matchedHatExpression ::= matchedHatLeftOperand matchedHatOperation*
 private matchedHatLeftOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression
 private matchedHatRightOperand ::= noParenthesesManyArgumentsCall | matchedHatLeftOperand
 left matchedHatOperation ::= hatInfixOperator matchedHatRightOperand
-                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                             { implements = "org.elixir_lang.psi.BinaryOperation" methods = [quote] }
 
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67)
 unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* { name = "+, -, !, ^, not, ~~~" }
