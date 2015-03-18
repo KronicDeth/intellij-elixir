@@ -45,7 +45,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCapturePrefixOperator(@NotNull ElixirCapturePrefixOperator o) {
-    visitQuotable(o);
+    visitOperator(o);
   }
 
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
@@ -116,7 +116,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {
-    visitQuotable(o);
+    visitOperator(o);
   }
 
   public void visitHeredocLinePrefix(@NotNull ElixirHeredocLinePrefix o) {
@@ -371,7 +371,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
-    visitQuotable(o);
+    visitOperator(o);
   }
 
   public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
@@ -520,6 +520,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitKeywordPair(@NotNull KeywordPair o) {
+    visitElement(o);
+  }
+
+  public void visitOperator(@NotNull Operator o) {
     visitElement(o);
   }
 

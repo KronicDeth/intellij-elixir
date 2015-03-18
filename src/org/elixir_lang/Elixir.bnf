@@ -908,9 +908,12 @@ private matchedExpression ::= matchedNonNumericCaptureExpression
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
 capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                           {
-                            implements = "org.elixir_lang.psi.Quotable"
+                            implements = "org.elixir_lang.psi.Operator"
                             name = "&"
-                            methods = [quote]
+                            methods = [
+                              operatorTokenType
+                              quote
+                            ]
                           }
 private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation | matchedNonNumericCaptureOperand
@@ -921,9 +924,12 @@ matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator (noParenth
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
 multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                 {
-                                  implements = "org.elixir_lang.psi.Quotable"
+                                  implements = "org.elixir_lang.psi.Operator"
                                   name = "*, /"
-                                  methods = [quote]
+                                  methods = [
+                                    operatorTokenType
+                                    quote
+                                  ]
                                 }
 private matchedMultiplicationExpression ::= matchedMultiplicationLeftOperand matchedMultiplicationOperation*
 private matchedMultiplicationLeftOperand ::= matchedNonNumericCaptureOperation | matchedHatExpression
@@ -934,9 +940,12 @@ left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMulti
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
 hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                      {
-                       implements = "org.elixir_lang.psi.Quotable"
+                       implements = "org.elixir_lang.psi.Operator"
                        name = "^^^"
-                       methods = [quote]
+                       methods = [
+                         operatorTokenType
+                         quote
+                       ]
                      }
 private matchedHatExpression ::= matchedHatLeftOperand matchedHatOperation*
 private matchedHatLeftOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression

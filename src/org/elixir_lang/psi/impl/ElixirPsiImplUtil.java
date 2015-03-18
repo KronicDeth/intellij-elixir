@@ -388,6 +388,24 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirCapturePrefixOperator capturePrefixOperator) {
+        return ElixirTypes.CAPTURE_OPERATOR;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
+        return ElixirTypes.MULTIPLICATION_OPERATOR;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirHatInfixOperator hatInfixOperator) {
+        return ElixirTypes.HAT_OPERATOR;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Digits digits) {
         final String text = digits.getText();
         final int base = digits.base();
@@ -444,12 +462,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtomKeyword atomKeyword) {
         return new OtpErlangAtom(atomKeyword.getText());
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirCapturePrefixOperator capturePrefixOperator) {
-        return quotedOperator(capturePrefixOperator, ElixirTypes.CAPTURE_OPERATOR);
     }
 
     @Contract(pure = true)
@@ -913,12 +925,6 @@ public class ElixirPsiImplUtil {
         return quotedAsAtom;
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirHatInfixOperator hatInfixOperator) {
-        return quotedOperator(hatInfixOperator, ElixirTypes.HAT_OPERATOR);
-    }
-
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
      * `"\"\#{a}\"" |> Code.string_to_quoted |> Macro.to_string`, so interpolation has to be represented as a type call
      * (`:::`) to binary of a call of `Kernel.to_string`
@@ -1168,12 +1174,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
-        return quotedOperator(multiplicationInfixOperator, ElixirTypes.MULTIPLICATION_OPERATOR);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
         PsiElement[] children = noParenthesesExpression.getChildren();
 
@@ -1249,6 +1249,18 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(Operator operator) {
+        ASTNode operator1 = operator
+                .getNode()
+                .getChildren(
+                        TokenSet.create(operator.operatorTokenType())
+                )[0];
+
+        return new OtpErlangAtom(operator1.getText());
     }
 
     @Contract(pure = true)
@@ -1683,18 +1695,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull ASTNode... children) {
         return quotedChildNodes(parent, metadata(parent), children);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    private static OtpErlangObject quotedOperator(@NotNull final PsiElement operatorRuleElement, IElementType operatorTokenType) {
-        ASTNode operator = operatorRuleElement
-                .getNode()
-                .getChildren(
-                        TokenSet.create(operatorTokenType)
-                )[0];
-
-        return new OtpErlangAtom(operator.getText());
     }
 
     private static OtpErlangObject quotedChildNodes(@NotNull Parent parent, @NotNull OtpErlangList metadata, @NotNull ASTNode... children) {
