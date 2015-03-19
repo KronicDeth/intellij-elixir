@@ -1000,6 +1000,11 @@ private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOpe
 matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+atCharTokenOrNumberOperation ::= atPrefixOperator numeric
+captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
+                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
+
 private accessExpression ::= atCharTokenOrNumberOperation |
                              captureCharTokenOrNumberOperation |
                              unaryCharTokenOrNumberOperation |
@@ -1202,12 +1207,6 @@ keywordValue ::= containerExpression
 list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COMMA?)? CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.KeywordList" methods = [getKeywordPairList quote] }
 private listString ::= charListLine | charListHeredoc
-
-
-atCharTokenOrNumberOperation ::= atPrefixOperator numeric
-captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
-                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
 
 /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's NUMBER and CHAR_TOKEN. */
