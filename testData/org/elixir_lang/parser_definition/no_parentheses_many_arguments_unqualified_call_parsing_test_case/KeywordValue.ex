@@ -46,9 +46,6 @@ function positional, keyword_key: Alias.identifier
 # numberCaptureOperation
 function positional, keyword_key: &0
 
-# numberUnaryOperation
-function positional, keyword_key: -1
-
 # OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS
 function positional, keyword_key: (;)
 
