@@ -20,7 +20,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAtPrefixOperator(@NotNull ElixirAtPrefixOperator o) {
-    visitPsiElement(o);
+    visitOperator(o);
   }
 
   public void visitAtom(@NotNull ElixirAtom o) {
@@ -347,7 +347,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedAtOperation(@NotNull ElixirMatchedAtOperation o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {

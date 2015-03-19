@@ -388,6 +388,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAtPrefixOperator atPrefixOperator) {
+        return TokenSet.create(ElixirTypes.AT_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirCapturePrefixOperator capturePrefixOperator) {
         return TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
     }
@@ -1128,6 +1134,28 @@ public class ElixirPsiImplUtil {
         ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
 
         return emptyParentheses.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull  final ElixirMatchedAtOperation matchedAtOperation) {
+        PsiElement[] children = matchedAtOperation.getChildren();
+
+        if (children.length != 2) {
+            throw new NotImplementedException("MatchedAtOperation expected to have 2 children (operator and operand");
+        }
+
+        Quotable operator = (Quotable) children[0];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable operand = (Quotable) children[1];
+        OtpErlangObject quotedOperand = operand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(matchedAtOperation),
+                quotedOperand
+        );
     }
 
     @Contract(pure = true)

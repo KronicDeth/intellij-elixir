@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
@@ -245,6 +246,11 @@ public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
     return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

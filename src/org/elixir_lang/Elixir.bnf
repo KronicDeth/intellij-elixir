@@ -986,10 +986,19 @@ private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedCall |
 left qualifiedAlias ::= infixDotOperator ALIAS_TOKEN
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
-atPrefixOperator ::= AT_OPERATOR EOL* { name = "@" }
+atPrefixOperator ::= AT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "@"
+                     }
 private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
 private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
 matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
+                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private accessExpression ::= atCharTokenOrNumberOperation |
                              captureCharTokenOrNumberOperation |

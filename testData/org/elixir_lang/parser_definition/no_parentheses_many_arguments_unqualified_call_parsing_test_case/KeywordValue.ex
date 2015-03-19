@@ -43,9 +43,6 @@ function positional, keyword_key: One.Two
 # matchedExpressionDotIdentifier
 function positional, keyword_key: Alias.identifier
 
-# matchedExpressionAtOperation
-function positional, keyword_key: @attribute
-
 # identifierExpression
 function positional, keyword_key: identifier
 
