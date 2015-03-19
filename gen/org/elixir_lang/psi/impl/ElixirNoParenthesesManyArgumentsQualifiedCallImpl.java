@@ -198,8 +198,8 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
-  public ElixirMatchedAtOperation getMatchedAtOperation() {
-    return findChildByClass(ElixirMatchedAtOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override

@@ -193,12 +193,6 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirMatchedAtOperation> getMatchedAtOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedAtOperation.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirMatchedHatOperation> getMatchedHatOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatOperation.class);
   }
@@ -207,6 +201,12 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
   @Nullable
   public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
     return findChildByClass(ElixirMatchedMultiplicationOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override

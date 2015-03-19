@@ -97,10 +97,10 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedAtOperation getMatchedAtOperation();
+  ElixirMatchedDotOperation getMatchedDotOperation();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();

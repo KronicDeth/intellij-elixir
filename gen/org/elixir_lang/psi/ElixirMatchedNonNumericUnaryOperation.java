@@ -92,7 +92,7 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedAtOperation getMatchedAtOperation();
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();

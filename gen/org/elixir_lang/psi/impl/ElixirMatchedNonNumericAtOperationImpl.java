@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedAtOperation {
+public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtOperation {
 
-  public ElixirMatchedAtOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericAtOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtOperation(this);
     else super.accept(visitor);
   }
 

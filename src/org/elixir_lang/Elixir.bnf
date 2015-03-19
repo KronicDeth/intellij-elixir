@@ -972,7 +972,7 @@ matchedNonNumericUnaryOperation ::= nonNumericUnaryPrefixOperator (noParentheses
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
 infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
 private matchedDotExpression ::= matchedDotLeftOperand (matchedDotOperation* matchedDotRightMostOperation)?
-private matchedDotLeftOperand ::= matchedAtExpression
+private matchedDotLeftOperand ::= matchedNonNumericAtExpression
 private matchedDotRightOperand ::= (
                                     ALIAS_TOKEN |
                                     IDENTIFIER |
@@ -996,12 +996,14 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        ]
                        name = "@"
                      }
-private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
-private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
-matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
-                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+private nonNumericAtPrefixOperator ::= atPrefixOperator !numeric
+private matchedNonNumericAtExpression ::= matchedNonNumericAtOperation | matchedNonNumericAtOperand
+private matchedNonNumericAtOperand ::= matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator (noParenthesesManyArgumentsCall | matchedNonNumericAtOperand)
+                                 { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 atNumericOperation ::= atPrefixOperator numeric
+                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 captureNumericOperation ::= capturePrefixOperator numeric
                             { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 unaryNumericOperation ::= unaryPrefixOperator numeric

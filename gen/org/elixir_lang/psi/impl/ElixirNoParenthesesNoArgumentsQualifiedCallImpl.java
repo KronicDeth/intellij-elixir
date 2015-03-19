@@ -198,14 +198,14 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
-  public ElixirMatchedAtOperation getMatchedAtOperation() {
-    return findChildByClass(ElixirMatchedAtOperation.class);
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedDotOperation getMatchedDotOperation() {
-    return findChildByClass(ElixirMatchedDotOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override

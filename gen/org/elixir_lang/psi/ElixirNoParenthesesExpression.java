@@ -95,13 +95,13 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedAtOperation getMatchedAtOperation();
-
-  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
   ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();

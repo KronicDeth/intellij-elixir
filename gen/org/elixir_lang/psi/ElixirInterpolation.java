@@ -102,13 +102,13 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
-  List<ElixirMatchedAtOperation> getMatchedAtOperationList();
-
-  @NotNull
   List<ElixirMatchedHatOperation> getMatchedHatOperationList();
 
   @NotNull
   List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList();
+
+  @NotNull
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();

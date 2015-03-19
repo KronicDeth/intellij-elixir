@@ -96,11 +96,11 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   @NotNull
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
-  @NotNull
-  List<ElixirMatchedAtOperation> getMatchedAtOperationList();
-
   @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
+
+  @NotNull
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();

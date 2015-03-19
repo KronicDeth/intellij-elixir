@@ -94,13 +94,13 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
-  List<ElixirMatchedAtOperation> getMatchedAtOperationList();
-
-  @NotNull
   List<ElixirMatchedHatOperation> getMatchedHatOperationList();
 
   @Nullable
   ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @NotNull
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();

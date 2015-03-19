@@ -94,13 +94,13 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedAtOperation getMatchedAtOperation();
-
-  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
   ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();

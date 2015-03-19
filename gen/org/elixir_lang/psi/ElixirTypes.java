@@ -85,10 +85,10 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_HEREDOC = new ElixirElementType("LITERAL_WORDS_HEREDOC");
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
-  IElementType MATCHED_AT_OPERATION = new ElixirElementType("MATCHED_AT_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
+  IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
@@ -471,9 +471,6 @@ public interface ElixirTypes {
       else if (type == LITERAL_WORDS_LINE) {
         return new ElixirLiteralWordsLineImpl(node);
       }
-      else if (type == MATCHED_AT_OPERATION) {
-        return new ElixirMatchedAtOperationImpl(node);
-      }
       else if (type == MATCHED_DOT_OPERATION) {
         return new ElixirMatchedDotOperationImpl(node);
       }
@@ -482,6 +479,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedMultiplicationOperationImpl(node);
+      }
+      else if (type == MATCHED_NON_NUMERIC_AT_OPERATION) {
+        return new ElixirMatchedNonNumericAtOperationImpl(node);
       }
       else if (type == MATCHED_NON_NUMERIC_CAPTURE_OPERATION) {
         return new ElixirMatchedNonNumericCaptureOperationImpl(node);

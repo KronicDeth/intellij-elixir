@@ -195,12 +195,6 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirMatchedAtOperation getMatchedAtOperation() {
-    return findChildByClass(ElixirMatchedAtOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirMatchedHatOperation getMatchedHatOperation() {
     return findChildByClass(ElixirMatchedHatOperation.class);
   }
@@ -209,6 +203,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
     return findChildByClass(ElixirMatchedMultiplicationOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
