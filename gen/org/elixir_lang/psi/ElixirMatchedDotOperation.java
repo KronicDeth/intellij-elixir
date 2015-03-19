@@ -22,7 +22,7 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @NotNull
   List<ElixirCharListHeredoc> getCharListHeredocList();

@@ -46,8 +46,8 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
-  public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
+  public ElixirCaptureNumericOperation getCaptureNumericOperation() {
+    return findChildByClass(ElixirCaptureNumericOperation.class);
   }
 
   @Override

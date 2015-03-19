@@ -16,7 +16,7 @@ public interface ElixirTypes {
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
-  IElementType CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION");
+  IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
@@ -264,8 +264,8 @@ public interface ElixirTypes {
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
       }
-      else if (type == CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-        return new ElixirCaptureCharTokenOrNumberOperationImpl(node);
+      else if (type == CAPTURE_NUMERIC_OPERATION) {
+        return new ElixirCaptureNumericOperationImpl(node);
       }
       else if (type == CAPTURE_PREFIX_OPERATOR) {
         return new ElixirCapturePrefixOperatorImpl(node);

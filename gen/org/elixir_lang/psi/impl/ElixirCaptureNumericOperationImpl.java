@@ -5,21 +5,21 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirCaptureCharTokenOrNumberOperation;
+import org.elixir_lang.psi.ElixirCaptureNumericOperation;
 import org.elixir_lang.psi.ElixirCapturePrefixOperator;
 import org.elixir_lang.psi.ElixirNumber;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirCaptureCharTokenOrNumberOperationImpl extends ASTWrapperPsiElement implements ElixirCaptureCharTokenOrNumberOperation {
+public class ElixirCaptureNumericOperationImpl extends ASTWrapperPsiElement implements ElixirCaptureNumericOperation {
 
-  public ElixirCaptureCharTokenOrNumberOperationImpl(ASTNode node) {
+  public ElixirCaptureNumericOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCaptureCharTokenOrNumberOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCaptureNumericOperation(this);
     else super.accept(visitor);
   }
 

@@ -48,8 +48,8 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
-  public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
+  public ElixirCaptureNumericOperation getCaptureNumericOperation() {
+    return findChildByClass(ElixirCaptureNumericOperation.class);
   }
 
   @Override

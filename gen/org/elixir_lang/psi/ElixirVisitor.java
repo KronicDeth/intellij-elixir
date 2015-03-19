@@ -40,7 +40,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitWholeNumber(o);
   }
 
-  public void visitCaptureCharTokenOrNumberOperation(@NotNull ElixirCaptureCharTokenOrNumberOperation o) {
+  public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {
     visitPrefixOperation(o);
   }
 

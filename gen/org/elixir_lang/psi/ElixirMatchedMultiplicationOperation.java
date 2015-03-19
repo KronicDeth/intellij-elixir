@@ -22,7 +22,7 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirAtomKeyword> getAtomKeywordList();
 
   @NotNull
-  List<ElixirCaptureCharTokenOrNumberOperation> getCaptureCharTokenOrNumberOperationList();
+  List<ElixirCaptureNumericOperation> getCaptureNumericOperationList();
 
   @NotNull
   List<ElixirCharListHeredoc> getCharListHeredocList();

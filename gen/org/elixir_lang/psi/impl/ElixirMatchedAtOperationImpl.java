@@ -52,8 +52,8 @@ public class ElixirMatchedAtOperationImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
+  public ElixirCaptureNumericOperation getCaptureNumericOperation() {
+    return findChildByClass(ElixirCaptureNumericOperation.class);
   }
 
   @Override

@@ -20,7 +20,7 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();

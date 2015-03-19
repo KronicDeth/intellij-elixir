@@ -20,7 +20,7 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();

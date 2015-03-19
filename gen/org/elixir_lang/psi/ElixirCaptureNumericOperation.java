@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirCaptureCharTokenOrNumberOperation extends PrefixOperation {
+public interface ElixirCaptureNumericOperation extends PrefixOperation {
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();

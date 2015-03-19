@@ -22,7 +22,7 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @NotNull
   List<ElixirCharListHeredoc> getCharListHeredocList();

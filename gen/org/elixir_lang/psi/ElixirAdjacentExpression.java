@@ -19,7 +19,7 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();

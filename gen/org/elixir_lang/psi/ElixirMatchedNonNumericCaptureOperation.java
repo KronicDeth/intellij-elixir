@@ -20,7 +20,7 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();

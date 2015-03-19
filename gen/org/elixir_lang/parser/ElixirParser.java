@@ -47,8 +47,8 @@ public class ElixirParser implements PsiParser {
     else if (t == BINARY_WHOLE_NUMBER) {
       r = binaryWholeNumber(b, 0);
     }
-    else if (t == CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-      r = captureCharTokenOrNumberOperation(b, 0);
+    else if (t == CAPTURE_NUMERIC_OPERATION) {
+      r = captureNumericOperation(b, 0);
     }
     else if (t == CAPTURE_PREFIX_OPERATOR) {
       r = capturePrefixOperator(b, 0);
@@ -371,7 +371,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // atNumericOperation |
-  //                              captureCharTokenOrNumberOperation |
+  //                              captureNumericOperation |
   //                              unaryCharTokenOrNumberOperation |
   //                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
   //                              numeric |
@@ -387,7 +387,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = atNumericOperation(b, l + 1);
-    if (!r) r = captureCharTokenOrNumberOperation(b, l + 1);
+    if (!r) r = captureNumericOperation(b, l + 1);
     if (!r) r = unaryCharTokenOrNumberOperation(b, l + 1);
     if (!r) r = accessExpression_3(b, l + 1);
     if (!r) r = numeric(b, l + 1);
@@ -582,14 +582,14 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // capturePrefixOperator numeric
-  public static boolean captureCharTokenOrNumberOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "captureCharTokenOrNumberOperation")) return false;
+  public static boolean captureNumericOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureNumericOperation")) return false;
     if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = capturePrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
-    exit_section_(b, m, CAPTURE_CHAR_TOKEN_OR_NUMBER_OPERATION, r);
+    exit_section_(b, m, CAPTURE_NUMERIC_OPERATION, r);
     return r;
   }
 

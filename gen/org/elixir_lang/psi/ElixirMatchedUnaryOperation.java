@@ -20,7 +20,7 @@ public interface ElixirMatchedUnaryOperation extends PrefixOperation {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
-  ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation();
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();

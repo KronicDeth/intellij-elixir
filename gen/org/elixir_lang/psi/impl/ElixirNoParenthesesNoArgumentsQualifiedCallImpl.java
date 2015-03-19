@@ -48,8 +48,8 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
 
   @Override
   @Nullable
-  public ElixirCaptureCharTokenOrNumberOperation getCaptureCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirCaptureCharTokenOrNumberOperation.class);
+  public ElixirCaptureNumericOperation getCaptureNumericOperation() {
+    return findChildByClass(ElixirCaptureNumericOperation.class);
   }
 
   @Override
