@@ -418,8 +418,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final BinaryOperation binaryOperation) {
-        PsiElement[] children = binaryOperation.getChildren();
+    public static OtpErlangObject quote(@NotNull final InfixOperation infixOperation) {
+        PsiElement[] children = infixOperation.getChildren();
 
         if (children.length != 3) {
             throw new NotImplementedException("BinaryOperation expected to have 3 children (left operand, operator, right operand");

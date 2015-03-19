@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedHatOperation extends BinaryOperation {
+public interface ElixirMatchedHatOperation extends InfixOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();

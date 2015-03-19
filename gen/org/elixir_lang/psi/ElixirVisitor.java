@@ -355,11 +355,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
-    visitBinaryOperation(o);
+    visitInfixOperation(o);
   }
 
   public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
-    visitBinaryOperation(o);
+    visitInfixOperation(o);
   }
 
   public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
@@ -487,10 +487,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitBinaryOperation(@NotNull BinaryOperation o) {
-    visitElement(o);
-  }
-
   public void visitBody(@NotNull Body o) {
     visitElement(o);
   }
@@ -516,6 +512,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitInfixOperation(@NotNull InfixOperation o) {
     visitElement(o);
   }
 

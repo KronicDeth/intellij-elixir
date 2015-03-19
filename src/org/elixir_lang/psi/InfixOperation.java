@@ -5,6 +5,6 @@ package org.elixir_lang.psi;
  *
  * Created by luke.imhoff on 3/18/15.
  */
-public interface BinaryOperation extends Quotable {
+public interface InfixOperation extends Quotable {
 
 }
