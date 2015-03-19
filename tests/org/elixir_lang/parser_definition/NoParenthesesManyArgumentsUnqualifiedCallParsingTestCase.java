@@ -24,12 +24,12 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         doTest(true);
     }
 
-    public void testKeywordValueEOLComma() {
-        doTest(true);
+    public void testKeywordValueAtNumericOperation() {
+        assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueAtCharTokenOrNumberOperation() {
-        assertParsedAndQuotedCorrectly();
+    public void testKeywordValueEOLComma() {
+        doTest(true);
     }
 
     public void testKeywordValueCaptureCharTokenOrNumberOperation() {

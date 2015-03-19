@@ -11,7 +11,7 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirAlias getAlias();
 
   @Nullable
-  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+  ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable
   ElixirAtom getAtom();

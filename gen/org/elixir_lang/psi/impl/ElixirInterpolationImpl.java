@@ -36,8 +36,8 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtCharTokenOrNumberOperation.class);
+  public List<ElixirAtNumericOperation> getAtNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtNumericOperation.class);
   }
 
   @Override

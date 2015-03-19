@@ -29,8 +29,8 @@ public class ElixirParser implements PsiParser {
     else if (t == ALIAS) {
       r = alias(b, 0);
     }
-    else if (t == AT_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-      r = atCharTokenOrNumberOperation(b, 0);
+    else if (t == AT_NUMERIC_OPERATION) {
+      r = atNumericOperation(b, 0);
     }
     else if (t == AT_PREFIX_OPERATOR) {
       r = atPrefixOperator(b, 0);
@@ -370,7 +370,7 @@ public class ElixirParser implements PsiParser {
   };
 
   /* ********************************************************** */
-  // atCharTokenOrNumberOperation |
+  // atNumericOperation |
   //                              captureCharTokenOrNumberOperation |
   //                              unaryCharTokenOrNumberOperation |
   //                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
@@ -386,7 +386,7 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = atCharTokenOrNumberOperation(b, l + 1);
+    r = atNumericOperation(b, l + 1);
     if (!r) r = captureCharTokenOrNumberOperation(b, l + 1);
     if (!r) r = unaryCharTokenOrNumberOperation(b, l + 1);
     if (!r) r = accessExpression_3(b, l + 1);
@@ -439,14 +439,14 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // atPrefixOperator numeric
-  public static boolean atCharTokenOrNumberOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "atCharTokenOrNumberOperation")) return false;
+  public static boolean atNumericOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atNumericOperation")) return false;
     if (!nextTokenIs(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
-    exit_section_(b, m, AT_CHAR_TOKEN_OR_NUMBER_OPERATION, r);
+    exit_section_(b, m, AT_NUMERIC_OPERATION, r);
     return r;
   }
 

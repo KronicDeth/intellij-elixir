@@ -13,7 +13,7 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirAlias getAlias();
 
   @Nullable
-  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+  ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable
   ElixirAtom getAtom();

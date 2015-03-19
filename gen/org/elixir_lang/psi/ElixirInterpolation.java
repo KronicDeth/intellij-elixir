@@ -15,7 +15,7 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirAlias> getAliasList();
 
   @NotNull
-  List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
+  List<ElixirAtNumericOperation> getAtNumericOperationList();
 
   @NotNull
   List<ElixirAtom> getAtomList();

@@ -11,7 +11,7 @@ public interface ElixirMatchedUnaryOperation extends PrefixOperation {
   ElixirAlias getAlias();
 
   @Nullable
-  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+  ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable
   ElixirAtom getAtom();

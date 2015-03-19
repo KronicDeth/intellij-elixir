@@ -13,7 +13,7 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirAlias> getAliasList();
 
   @NotNull
-  List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList();
+  List<ElixirAtNumericOperation> getAtNumericOperationList();
 
   @NotNull
   List<ElixirAtom> getAtomList();

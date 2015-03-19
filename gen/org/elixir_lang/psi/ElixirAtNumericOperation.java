@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtCharTokenOrNumberOperation extends PsiElement {
+public interface ElixirAtNumericOperation extends PsiElement {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();

@@ -12,7 +12,7 @@ public interface ElixirTypes {
   IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
-  IElementType AT_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("AT_CHAR_TOKEN_OR_NUMBER_OPERATION");
+  IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
@@ -252,8 +252,8 @@ public interface ElixirTypes {
       else if (type == ATOM_KEYWORD) {
         return new ElixirAtomKeywordImpl(node);
       }
-      else if (type == AT_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-        return new ElixirAtCharTokenOrNumberOperationImpl(node);
+      else if (type == AT_NUMERIC_OPERATION) {
+        return new ElixirAtNumericOperationImpl(node);
       }
       else if (type == AT_PREFIX_OPERATOR) {
         return new ElixirAtPrefixOperatorImpl(node);

@@ -10,7 +10,7 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirAlias getAlias();
 
   @Nullable
-  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+  ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable
   ElixirAtom getAtom();

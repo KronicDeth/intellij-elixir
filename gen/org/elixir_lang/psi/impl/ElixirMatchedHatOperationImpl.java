@@ -31,8 +31,8 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirAtCharTokenOrNumberOperation> getAtCharTokenOrNumberOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtCharTokenOrNumberOperation.class);
+  public List<ElixirAtNumericOperation> getAtNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtNumericOperation.class);
   }
 
   @Override

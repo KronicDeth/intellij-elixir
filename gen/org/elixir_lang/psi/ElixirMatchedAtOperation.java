@@ -11,7 +11,7 @@ public interface ElixirMatchedAtOperation extends PrefixOperation {
   ElixirAlias getAlias();
 
   @Nullable
-  ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation();
+  ElixirAtNumericOperation getAtNumericOperation();
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();

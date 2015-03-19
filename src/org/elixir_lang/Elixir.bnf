@@ -1000,12 +1000,12 @@ private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOpe
 matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
-atCharTokenOrNumberOperation ::= atPrefixOperator numeric
+atNumericOperation ::= atPrefixOperator numeric
 captureCharTokenOrNumberOperation ::= capturePrefixOperator numeric
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
 
-private accessExpression ::= atCharTokenOrNumberOperation |
+private accessExpression ::= atNumericOperation |
                              captureCharTokenOrNumberOperation |
                              unaryCharTokenOrNumberOperation |
                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |

@@ -28,8 +28,8 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
-  public ElixirAtCharTokenOrNumberOperation getAtCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirAtCharTokenOrNumberOperation.class);
+  public ElixirAtNumericOperation getAtNumericOperation() {
+    return findChildByClass(ElixirAtNumericOperation.class);
   }
 
   @Override
