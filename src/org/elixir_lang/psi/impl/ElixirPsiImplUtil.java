@@ -406,6 +406,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirUnaryPrefixOperator unaryPrefixOperator) {
+        return TokenSet.create(ElixirTypes.DUAL_OPERATOR, ElixirTypes.UNARY_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final BinaryOperation binaryOperation) {
         PsiElement[] children = binaryOperation.getChildren();
 
@@ -1142,6 +1148,28 @@ public class ElixirPsiImplUtil {
         return quotedFunctionCall(
                 quotedOperator,
                 metadata(matchedNonNumericCaptureOperation),
+                quotedOperand
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull  final ElixirMatchedUnaryOperation matchedUnaryOperation) {
+        PsiElement[] children = matchedUnaryOperation.getChildren();
+
+        if (children.length != 2) {
+            throw new NotImplementedException("MatchedUnaryOperation expected to have 2 children (operator and operand");
+        }
+
+        Quotable operator = (Quotable) children[0];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable operand = (Quotable) children[1];
+        OtpErlangObject quotedOperand = operand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(matchedUnaryOperation),
                 quotedOperand
         );
     }
