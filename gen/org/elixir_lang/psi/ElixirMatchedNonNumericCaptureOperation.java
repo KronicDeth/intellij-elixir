@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericCaptureOperation extends Quotable {
+public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();

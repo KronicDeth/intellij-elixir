@@ -1138,72 +1138,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull  final ElixirMatchedAtOperation matchedAtOperation) {
-        PsiElement[] children = matchedAtOperation.getChildren();
-
-        if (children.length != 2) {
-            throw new NotImplementedException("MatchedAtOperation expected to have 2 children (operator and operand");
-        }
-
-        Quotable operator = (Quotable) children[0];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable operand = (Quotable) children[1];
-        OtpErlangObject quotedOperand = operand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(matchedAtOperation),
-                quotedOperand
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull  final ElixirMatchedNonNumericCaptureOperation matchedNonNumericCaptureOperation) {
-        PsiElement[] children = matchedNonNumericCaptureOperation.getChildren();
-
-        if (children.length != 2) {
-            throw new NotImplementedException("MatchedNonNumericCaptureOperation expected to have 2 children (operator and operand");
-        }
-
-        Quotable operator = (Quotable) children[0];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable operand = (Quotable) children[1];
-        OtpErlangObject quotedOperand = operand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(matchedNonNumericCaptureOperation),
-                quotedOperand
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull  final ElixirMatchedUnaryOperation matchedUnaryOperation) {
-        PsiElement[] children = matchedUnaryOperation.getChildren();
-
-        if (children.length != 2) {
-            throw new NotImplementedException("MatchedUnaryOperation expected to have 2 children (operator and operand");
-        }
-
-        Quotable operator = (Quotable) children[0];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable operand = (Quotable) children[1];
-        OtpErlangObject quotedOperand = operand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(matchedUnaryOperation),
-                quotedOperand
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
         PsiElement[] children = noParenthesesExpression.getChildren();
 
@@ -1291,6 +1225,28 @@ public class ElixirPsiImplUtil {
                 )[0];
 
         return new OtpErlangAtom(operator1.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(PrefixOperation prefixOperation) {
+        PsiElement[] children = prefixOperation.getChildren();
+
+        if (children.length != 2) {
+            throw new NotImplementedException("PrefixOperation expected to have 2 children (operator and operand");
+        }
+
+        Quotable operator = (Quotable) children[0];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable operand = (Quotable) children[1];
+        OtpErlangObject quotedOperand = operand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(prefixOperation),
+                quotedOperand
+        );
     }
 
     @Contract(pure = true)
