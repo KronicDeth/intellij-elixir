@@ -41,7 +41,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitCaptureCharTokenOrNumberOperation(@NotNull ElixirCaptureCharTokenOrNumberOperation o) {
-    visitPsiElement(o);
+    visitPrefixOperation(o);
   }
 
   public void visitCapturePrefixOperator(@NotNull ElixirCapturePrefixOperator o) {

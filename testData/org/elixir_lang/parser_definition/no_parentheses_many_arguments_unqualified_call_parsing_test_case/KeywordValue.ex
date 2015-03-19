@@ -43,9 +43,6 @@ function positional, keyword_key: One.Two
 # matchedExpressionDotIdentifier
 function positional, keyword_key: Alias.identifier
 
-# numberCaptureOperation
-function positional, keyword_key: &0
-
 # OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS
 function positional, keyword_key: (;)
 
