@@ -49,9 +49,6 @@ function positional, keyword_key: &0
 # numberUnaryOperation
 function positional, keyword_key: -1
 
-# numberAtOperation
-function positional, keyword_key: @0
-
 # OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS
 function positional, keyword_key: (;)
 
