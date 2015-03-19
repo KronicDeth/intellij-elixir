@@ -133,7 +133,7 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @NotNull
   OtpErlangObject[] quoteArguments();

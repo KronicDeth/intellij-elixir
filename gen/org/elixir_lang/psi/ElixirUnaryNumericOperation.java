@@ -5,7 +5,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnaryCharTokenOrNumberOperation extends PsiElement {
+public interface ElixirUnaryNumericOperation extends PsiElement {
 
   @Nullable
   ElixirNumber getNumber();

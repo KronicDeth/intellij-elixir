@@ -130,6 +130,6 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   List<ElixirStringLine> getStringLineList();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
 }

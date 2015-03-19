@@ -1003,11 +1003,11 @@ matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matche
 atNumericOperation ::= atPrefixOperator numeric
 captureNumericOperation ::= capturePrefixOperator numeric
                             { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-unaryCharTokenOrNumberOperation ::= unaryPrefixOperator numeric
+unaryNumericOperation ::= unaryPrefixOperator numeric
 
 private accessExpression ::= atNumericOperation |
                              captureNumericOperation |
-                             unaryCharTokenOrNumberOperation |
+                             unaryNumericOperation |
                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
                              numeric |
                              list |

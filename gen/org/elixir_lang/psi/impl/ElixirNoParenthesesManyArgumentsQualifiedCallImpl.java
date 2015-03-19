@@ -264,8 +264,8 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
-  public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
+  public ElixirUnaryNumericOperation getUnaryNumericOperation() {
+    return findChildByClass(ElixirUnaryNumericOperation.class);
   }
 
 }

@@ -134,7 +134,7 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @NotNull
   OtpErlangObject quote();

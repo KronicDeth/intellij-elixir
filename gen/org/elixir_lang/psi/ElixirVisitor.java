@@ -466,7 +466,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
-  public void visitUnaryCharTokenOrNumberOperation(@NotNull ElixirUnaryCharTokenOrNumberOperation o) {
+  public void visitUnaryNumericOperation(@NotNull ElixirUnaryNumericOperation o) {
     visitPsiElement(o);
   }
 

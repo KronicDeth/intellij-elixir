@@ -246,8 +246,8 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
-  public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
+  public ElixirUnaryNumericOperation getUnaryNumericOperation() {
+    return findChildByClass(ElixirUnaryNumericOperation.class);
   }
 
 }

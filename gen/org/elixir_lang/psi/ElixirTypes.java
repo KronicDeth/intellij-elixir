@@ -114,7 +114,7 @@ public interface ElixirTypes {
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
-  IElementType UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION = new ElixirElementType("UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION");
+  IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
@@ -558,8 +558,8 @@ public interface ElixirTypes {
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);
       }
-      else if (type == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-        return new ElixirUnaryCharTokenOrNumberOperationImpl(node);
+      else if (type == UNARY_NUMERIC_OPERATION) {
+        return new ElixirUnaryNumericOperationImpl(node);
       }
       else if (type == UNARY_PREFIX_OPERATOR) {
         return new ElixirUnaryPrefixOperatorImpl(node);

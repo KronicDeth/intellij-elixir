@@ -119,6 +119,6 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
 }

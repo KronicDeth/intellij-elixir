@@ -121,6 +121,6 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   List<ElixirStringLine> getStringLineList();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
 }

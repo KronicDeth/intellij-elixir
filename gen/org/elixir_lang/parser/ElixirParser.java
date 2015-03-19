@@ -341,8 +341,8 @@ public class ElixirParser implements PsiParser {
     else if (t == STRING_LINE) {
       r = stringLine(b, 0);
     }
-    else if (t == UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION) {
-      r = unaryCharTokenOrNumberOperation(b, 0);
+    else if (t == UNARY_NUMERIC_OPERATION) {
+      r = unaryNumericOperation(b, 0);
     }
     else if (t == UNARY_PREFIX_OPERATOR) {
       r = unaryPrefixOperator(b, 0);
@@ -372,7 +372,7 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // atNumericOperation |
   //                              captureNumericOperation |
-  //                              unaryCharTokenOrNumberOperation |
+  //                              unaryNumericOperation |
   //                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
   //                              numeric |
   //                              list |
@@ -388,7 +388,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = atNumericOperation(b, l + 1);
     if (!r) r = captureNumericOperation(b, l + 1);
-    if (!r) r = unaryCharTokenOrNumberOperation(b, l + 1);
+    if (!r) r = unaryNumericOperation(b, l + 1);
     if (!r) r = accessExpression_3(b, l + 1);
     if (!r) r = numeric(b, l + 1);
     if (!r) r = list(b, l + 1);
@@ -3353,14 +3353,14 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // unaryPrefixOperator numeric
-  public static boolean unaryCharTokenOrNumberOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryCharTokenOrNumberOperation")) return false;
-    if (!nextTokenIs(b, "<unary char token or number operation>", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
+  public static boolean unaryNumericOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unaryNumericOperation")) return false;
+    if (!nextTokenIs(b, "<unary numeric operation>", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<unary char token or number operation>");
+    Marker m = enter_section_(b, l, _NONE_, "<unary numeric operation>");
     r = unaryPrefixOperator(b, l + 1);
     r = r && numeric(b, l + 1);
-    exit_section_(b, l, m, UNARY_CHAR_TOKEN_OR_NUMBER_OPERATION, r, false, null);
+    exit_section_(b, l, m, UNARY_NUMERIC_OPERATION, r, false, null);
     return r;
   }
 

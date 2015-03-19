@@ -141,7 +141,7 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirStringLine> getStringLineList();
 
   @NotNull
-  List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
+  List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
 
   @NotNull
   OtpErlangObject quote();

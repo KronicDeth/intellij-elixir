@@ -268,8 +268,8 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
 
   @Override
   @Nullable
-  public ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation() {
-    return findChildByClass(ElixirUnaryCharTokenOrNumberOperation.class);
+  public ElixirUnaryNumericOperation getUnaryNumericOperation() {
+    return findChildByClass(ElixirUnaryNumericOperation.class);
   }
 
   @NotNull

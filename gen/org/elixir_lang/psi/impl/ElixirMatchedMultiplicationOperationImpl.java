@@ -277,8 +277,8 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
-  public List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryCharTokenOrNumberOperation.class);
+  public List<ElixirUnaryNumericOperation> getUnaryNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryNumericOperation.class);
   }
 
   @NotNull

@@ -119,7 +119,7 @@ public interface ElixirMatchedAtOperation extends PrefixOperation {
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @NotNull
   OtpErlangObject quote();

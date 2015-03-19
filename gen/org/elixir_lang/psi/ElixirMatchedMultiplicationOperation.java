@@ -136,7 +136,7 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirStringLine> getStringLineList();
 
   @NotNull
-  List<ElixirUnaryCharTokenOrNumberOperation> getUnaryCharTokenOrNumberOperationList();
+  List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
 
   @NotNull
   OtpErlangObject quote();

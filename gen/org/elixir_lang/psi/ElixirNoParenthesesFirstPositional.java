@@ -125,7 +125,7 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @NotNull
   OtpErlangObject quote();

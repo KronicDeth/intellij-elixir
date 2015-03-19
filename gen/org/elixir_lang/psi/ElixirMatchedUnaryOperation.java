@@ -125,7 +125,7 @@ public interface ElixirMatchedUnaryOperation extends PrefixOperation {
   ElixirStringLine getStringLine();
 
   @Nullable
-  ElixirUnaryCharTokenOrNumberOperation getUnaryCharTokenOrNumberOperation();
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @NotNull
   ElixirUnaryPrefixOperator getUnaryPrefixOperator();
