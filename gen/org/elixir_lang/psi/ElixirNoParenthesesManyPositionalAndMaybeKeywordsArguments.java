@@ -106,7 +106,7 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @NotNull
   List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();

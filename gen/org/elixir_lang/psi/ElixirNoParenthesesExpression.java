@@ -107,7 +107,7 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();

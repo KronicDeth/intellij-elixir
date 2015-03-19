@@ -103,7 +103,7 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();

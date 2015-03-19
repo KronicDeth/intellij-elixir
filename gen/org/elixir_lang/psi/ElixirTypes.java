@@ -90,7 +90,7 @@ public interface ElixirTypes {
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
-  IElementType MATCHED_UNARY_OPERATION = new ElixirElementType("MATCHED_UNARY_OPERATION");
+  IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
@@ -486,8 +486,8 @@ public interface ElixirTypes {
       else if (type == MATCHED_NON_NUMERIC_CAPTURE_OPERATION) {
         return new ElixirMatchedNonNumericCaptureOperationImpl(node);
       }
-      else if (type == MATCHED_UNARY_OPERATION) {
-        return new ElixirMatchedUnaryOperationImpl(node);
+      else if (type == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
+        return new ElixirMatchedNonNumericUnaryOperationImpl(node);
       }
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);

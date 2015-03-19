@@ -948,7 +948,7 @@ hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                        name = "^^^"
                      }
 private matchedHatExpression ::= matchedHatLeftOperand matchedHatOperation*
-private matchedHatLeftOperand ::= matchedNonNumericCaptureOperation | matchedUnaryExpression
+private matchedHatLeftOperand ::= matchedNonNumericCaptureOperation | matchedNonNumericUnaryExpression
 private matchedHatRightOperand ::= noParenthesesManyArgumentsCall | matchedHatLeftOperand
 left matchedHatOperation ::= hatInfixOperator matchedHatRightOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -963,10 +963,11 @@ unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
                           ]
                           name = "+, -, !, ^, not, ~~~"
                         }
-private matchedUnaryExpression ::= matchedUnaryOperation | matchedUnaryOperand
-private matchedUnaryOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | matchedDotExpression
-matchedUnaryOperation ::= unaryPrefixOperator (noParenthesesManyArgumentsCall | matchedUnaryOperand)
-                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+private nonNumericUnaryPrefixOperator ::= unaryPrefixOperator !numeric
+private matchedNonNumericUnaryExpression ::= matchedNonNumericUnaryOperation | matchedNonNumericUnaryOperand
+private matchedNonNumericUnaryOperand ::= matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | matchedDotExpression
+matchedNonNumericUnaryOperation ::= nonNumericUnaryPrefixOperator (noParenthesesManyArgumentsCall | matchedNonNumericUnaryOperand)
+                                    { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
 infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
@@ -996,7 +997,7 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        name = "@"
                      }
 private matchedAtExpression ::= matchedAtOperation | matchedAtOperand
-private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+private matchedAtOperand ::= matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
 matchedAtOperation ::= atPrefixOperator (noParenthesesManyArgumentsCall | matchedAtOperand)
                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
@@ -1004,6 +1005,7 @@ atNumericOperation ::= atPrefixOperator numeric
 captureNumericOperation ::= capturePrefixOperator numeric
                             { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 unaryNumericOperation ::= unaryPrefixOperator numeric
+                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 private accessExpression ::= atNumericOperation |
                              captureNumericOperation |

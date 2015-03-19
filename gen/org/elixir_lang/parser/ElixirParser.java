@@ -269,8 +269,8 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_NON_NUMERIC_CAPTURE_OPERATION) {
       r = matchedNonNumericCaptureOperation(b, 0);
     }
-    else if (t == MATCHED_UNARY_OPERATION) {
-      r = matchedUnaryOperation(b, 0);
+    else if (t == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
+      r = matchedNonNumericUnaryOperation(b, 0);
     }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
@@ -2308,13 +2308,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureOperation | matchedUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+  // matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
   static boolean matchedAtOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedUnaryOperation(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryOperation(b, l + 1);
     if (!r) r = noParenthesesNoArgumentsUnqualifiedCallOrVariable(b, l + 1);
     if (!r) r = accessExpression(b, l + 1);
     exit_section_(b, m, null, r);
@@ -2523,13 +2523,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureOperation | matchedUnaryExpression
+  // matchedNonNumericCaptureOperation | matchedNonNumericUnaryExpression
   static boolean matchedHatLeftOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedHatLeftOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedUnaryExpression(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2669,50 +2669,50 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedUnaryOperation | matchedUnaryOperand
-  static boolean matchedUnaryExpression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnaryExpression")) return false;
+  // matchedNonNumericUnaryOperation | matchedNonNumericUnaryOperand
+  static boolean matchedNonNumericUnaryExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedNonNumericUnaryExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedUnaryOperation(b, l + 1);
-    if (!r) r = matchedUnaryOperand(b, l + 1);
+    r = matchedNonNumericUnaryOperation(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryOperand(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureOperation | matchedUnaryOperation | matchedDotExpression
-  static boolean matchedUnaryOperand(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnaryOperand")) return false;
+  // matchedNonNumericCaptureOperation | matchedNonNumericUnaryOperation | matchedDotExpression
+  static boolean matchedNonNumericUnaryOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedNonNumericUnaryOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedUnaryOperation(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryOperation(b, l + 1);
     if (!r) r = matchedDotExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // unaryPrefixOperator (noParenthesesManyArgumentsCall | matchedUnaryOperand)
-  public static boolean matchedUnaryOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnaryOperation")) return false;
-    if (!nextTokenIs(b, "<matched unary operation>", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
+  // nonNumericUnaryPrefixOperator (noParenthesesManyArgumentsCall | matchedNonNumericUnaryOperand)
+  public static boolean matchedNonNumericUnaryOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedNonNumericUnaryOperation")) return false;
+    if (!nextTokenIs(b, "<matched non numeric unary operation>", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<matched unary operation>");
-    r = unaryPrefixOperator(b, l + 1);
-    r = r && matchedUnaryOperation_1(b, l + 1);
-    exit_section_(b, l, m, MATCHED_UNARY_OPERATION, r, false, null);
+    Marker m = enter_section_(b, l, _NONE_, "<matched non numeric unary operation>");
+    r = nonNumericUnaryPrefixOperator(b, l + 1);
+    r = r && matchedNonNumericUnaryOperation_1(b, l + 1);
+    exit_section_(b, l, m, MATCHED_NON_NUMERIC_UNARY_OPERATION, r, false, null);
     return r;
   }
 
-  // noParenthesesManyArgumentsCall | matchedUnaryOperand
-  private static boolean matchedUnaryOperation_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedUnaryOperation_1")) return false;
+  // noParenthesesManyArgumentsCall | matchedNonNumericUnaryOperand
+  private static boolean matchedNonNumericUnaryOperation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedNonNumericUnaryOperation_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = noParenthesesManyArgumentsCall(b, l + 1);
-    if (!r) r = matchedUnaryOperand(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryOperand(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3121,6 +3121,29 @@ public class ElixirParser implements PsiParser {
   // !numeric
   private static boolean nonNumericCapturePrefixOperator_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "nonNumericCapturePrefixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !numeric(b, l + 1);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // unaryPrefixOperator !numeric
+  static boolean nonNumericUnaryPrefixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "nonNumericUnaryPrefixOperator")) return false;
+    if (!nextTokenIs(b, "", DUAL_OPERATOR, UNARY_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = unaryPrefixOperator(b, l + 1);
+    r = r && nonNumericUnaryPrefixOperator_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !numeric
+  private static boolean nonNumericUnaryPrefixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "nonNumericUnaryPrefixOperator_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !numeric(b, l + 1);

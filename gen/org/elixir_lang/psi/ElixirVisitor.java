@@ -366,7 +366,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPrefixOperation(o);
   }
 
-  public void visitMatchedUnaryOperation(@NotNull ElixirMatchedUnaryOperation o) {
+  public void visitMatchedNonNumericUnaryOperation(@NotNull ElixirMatchedNonNumericUnaryOperation o) {
     visitPrefixOperation(o);
   }
 
@@ -467,7 +467,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnaryNumericOperation(@NotNull ElixirUnaryNumericOperation o) {
-    visitPsiElement(o);
+    visitPrefixOperation(o);
   }
 
   public void visitUnaryPrefixOperator(@NotNull ElixirUnaryPrefixOperator o) {

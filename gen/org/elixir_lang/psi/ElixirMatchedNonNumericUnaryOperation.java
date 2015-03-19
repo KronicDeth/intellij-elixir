@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedUnaryOperation extends PrefixOperation {
+public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -98,7 +98,7 @@ public interface ElixirMatchedUnaryOperation extends PrefixOperation {
   ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedUnaryOperation getMatchedUnaryOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();

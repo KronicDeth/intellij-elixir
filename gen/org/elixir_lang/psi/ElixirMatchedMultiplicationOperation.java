@@ -106,7 +106,7 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @NotNull
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();

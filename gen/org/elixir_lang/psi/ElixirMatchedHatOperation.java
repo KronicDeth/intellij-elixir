@@ -106,7 +106,7 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedUnaryOperation> getMatchedUnaryOperationList();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @Nullable
   ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();

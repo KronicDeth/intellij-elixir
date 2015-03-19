@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedUnaryOperation {
+public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryOperation {
 
-  public ElixirMatchedUnaryOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericUnaryOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedUnaryOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryOperation(this);
     else super.accept(visitor);
   }
 
@@ -202,8 +202,8 @@ public class ElixirMatchedUnaryOperationImpl extends ASTWrapperPsiElement implem
 
   @Override
   @Nullable
-  public ElixirMatchedUnaryOperation getMatchedUnaryOperation() {
-    return findChildByClass(ElixirMatchedUnaryOperation.class);
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
