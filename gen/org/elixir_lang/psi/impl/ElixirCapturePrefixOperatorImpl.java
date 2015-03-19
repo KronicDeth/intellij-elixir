@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.psi.ElixirCapturePrefixOperator;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -22,8 +22,8 @@ public class ElixirCapturePrefixOperatorImpl extends ASTWrapperPsiElement implem
   }
 
   @NotNull
-  public IElementType operatorTokenType() {
-    return ElixirPsiImplUtil.operatorTokenType(this);
+  public TokenSet operatorTokenSet() {
+    return ElixirPsiImplUtil.operatorTokenSet(this);
   }
 
   @NotNull

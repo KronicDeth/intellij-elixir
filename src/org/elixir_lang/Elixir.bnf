@@ -911,7 +911,7 @@ capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                             implements = "org.elixir_lang.psi.Operator"
                             name = "&"
                             methods = [
-                              operatorTokenType
+                              operatorTokenSet
                               quote
                             ]
                           }
@@ -927,7 +927,7 @@ multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                   implements = "org.elixir_lang.psi.Operator"
                                   name = "*, /"
                                   methods = [
-                                    operatorTokenType
+                                    operatorTokenSet
                                     quote
                                   ]
                                 }
@@ -943,7 +943,7 @@ hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                        implements = "org.elixir_lang.psi.Operator"
                        name = "^^^"
                        methods = [
-                         operatorTokenType
+                         operatorTokenSet
                          quote
                        ]
                      }

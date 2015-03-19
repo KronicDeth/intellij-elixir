@@ -388,20 +388,20 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirCapturePrefixOperator capturePrefixOperator) {
-        return ElixirTypes.CAPTURE_OPERATOR;
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirCapturePrefixOperator capturePrefixOperator) {
+        return TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
-        return ElixirTypes.MULTIPLICATION_OPERATOR;
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
+        return TokenSet.create(ElixirTypes.MULTIPLICATION_OPERATOR);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static IElementType operatorTokenType(@SuppressWarnings("unused") final ElixirHatInfixOperator hatInfixOperator) {
-        return ElixirTypes.HAT_OPERATOR;
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirHatInfixOperator hatInfixOperator) {
+        return TokenSet.create(ElixirTypes.HAT_OPERATOR);
     }
 
     @Contract(pure = true)
@@ -1231,7 +1231,7 @@ public class ElixirPsiImplUtil {
         ASTNode operator1 = operator
                 .getNode()
                 .getChildren(
-                        TokenSet.create(operator.operatorTokenType())
+                        operator.operatorTokenSet()
                 )[0];
 
         return new OtpErlangAtom(operator1.getText());

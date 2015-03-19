@@ -1,6 +1,6 @@
 package org.elixir_lang.psi;
 
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 
 /**
  * An operator that is composed of an operator token and EOLs before or after the token.
@@ -8,5 +8,5 @@ import com.intellij.psi.tree.IElementType;
  * Created by luke.imhoff on 3/18/15.
  */
 public interface Operator extends Quotable {
-    public IElementType operatorTokenType();
+    public TokenSet operatorTokenSet();
 }
