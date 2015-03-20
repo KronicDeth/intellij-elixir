@@ -60,5 +60,3 @@ function positional, keyword_key: """
                                   string
                                   heredoc
                                   """
-# charList
-function positional, keyword_key: 'charList'
