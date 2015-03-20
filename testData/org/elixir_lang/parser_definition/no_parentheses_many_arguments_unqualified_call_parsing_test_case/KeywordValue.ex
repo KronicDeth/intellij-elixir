@@ -82,6 +82,3 @@ function position, keyword_key: true
 
 # atom
 function position, keyword_key: :atom
-
-# ALIAS
-function position, keyword_key: Alias
