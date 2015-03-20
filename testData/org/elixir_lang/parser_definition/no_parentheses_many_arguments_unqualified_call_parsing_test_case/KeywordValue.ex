@@ -48,6 +48,3 @@ function positional, keyword_key: ?c
 
 # number
 function positional, keyword_key: 1.0e-1
-
-# list
-function positional, keyword_key: []
