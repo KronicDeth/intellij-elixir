@@ -51,6 +51,3 @@ function positional, keyword_key: 1.0e-1
 
 # list
 function positional, keyword_key: []
-
-# string
-function positional, keyword_key: "string"
