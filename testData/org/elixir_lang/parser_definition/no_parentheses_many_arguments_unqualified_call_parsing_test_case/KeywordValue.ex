@@ -85,6 +85,3 @@ function position, keyword_key: :atom
 
 # ALIAS
 function position, keyword_key: Alias
-
-# emptyParentheses
-function position, keyword_key: ()

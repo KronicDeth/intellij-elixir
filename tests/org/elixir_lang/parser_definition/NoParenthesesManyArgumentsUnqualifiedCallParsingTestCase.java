@@ -36,6 +36,10 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testKeywordValueEmptyParentheses() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testKeywordValueEOLComma() {
         doTest(true);
     }
