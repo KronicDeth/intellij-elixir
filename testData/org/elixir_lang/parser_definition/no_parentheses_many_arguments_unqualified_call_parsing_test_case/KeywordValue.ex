@@ -79,6 +79,3 @@ function position, keyword_key: nil
 
 # TRUE
 function position, keyword_key: true
-
-# atom
-function position, keyword_key: :atom

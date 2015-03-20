@@ -32,6 +32,10 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testKeywordValueAtom() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testKeywordValueCaptureNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
