@@ -70,12 +70,3 @@ function positional, keyword_key: '''
                                   '''
 # sigil
 function position, keyword_key: ~r{sigil}
-
-# FALSE
-function position, keyword_key: false
-
-# NIL
-function position, keyword_key: nil
-
-# TRUE
-function position, keyword_key: true
