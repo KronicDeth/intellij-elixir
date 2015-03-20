@@ -62,9 +62,3 @@ function positional, keyword_key: """
                                   """
 # charList
 function positional, keyword_key: 'charList'
-
-# charListHeredoc
-function positional, keyword_key: '''
-                                  charList
-                                  heredoc
-                                  '''
