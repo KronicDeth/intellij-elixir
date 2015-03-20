@@ -52,6 +52,10 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testKeywordValueDecimalFloat() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testKeywordValueEmptyBlock() {
         assertParsedAndQuotedCorrectly();
     }
