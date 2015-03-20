@@ -54,9 +54,3 @@ function positional, keyword_key: []
 
 # string
 function positional, keyword_key: "string"
-
-# stringHeredoc
-function positional, keyword_key: """
-                                  string
-                                  heredoc
-                                  """
