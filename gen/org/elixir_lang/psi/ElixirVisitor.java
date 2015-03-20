@@ -61,6 +61,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
+  public void visitCharToken(@NotNull ElixirCharToken o) {
+    visitQuotable(o);
+  }
+
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
     visitDigits(o);
   }

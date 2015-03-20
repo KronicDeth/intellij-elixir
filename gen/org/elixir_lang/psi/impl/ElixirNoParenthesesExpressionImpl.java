@@ -64,6 +64,12 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
 
   @Override
   @Nullable
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyBlock getEmptyBlock() {
     return findChildByClass(ElixirEmptyBlock.class);
   }

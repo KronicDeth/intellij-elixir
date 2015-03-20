@@ -20,6 +20,7 @@ public interface ElixirTypes {
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
+  IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_FLOAT_EXPONENT = new ElixirElementType("DECIMAL_FLOAT_EXPONENT");
@@ -140,7 +141,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_PROMOTER");
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
-  IElementType CHAR_TOKEN = new ElixirTokenType("CHAR_TOKEN");
+  IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
@@ -276,6 +277,9 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_LIST_LINE) {
         return new ElixirCharListLineImpl(node);
+      }
+      else if (type == CHAR_TOKEN) {
+        return new ElixirCharTokenImpl(node);
       }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);

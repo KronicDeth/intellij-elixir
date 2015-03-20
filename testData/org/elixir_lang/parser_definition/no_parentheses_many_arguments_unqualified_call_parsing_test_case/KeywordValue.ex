@@ -42,6 +42,3 @@ function positional, keyword_key: One.Two
 
 # matchedExpressionDotIdentifier
 function positional, keyword_key: Alias.identifier
-
-# CHAR_TOKEN
-function positional, keyword_key: ?c

@@ -72,6 +72,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirCharToken> getCharTokenList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharToken.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirEmptyBlock> getEmptyBlockList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
   }

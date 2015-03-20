@@ -31,6 +31,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
 
   @Nullable

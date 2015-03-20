@@ -67,6 +67,12 @@ public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiEleme
 
   @Override
   @NotNull
+  public List<ElixirCharToken> getCharTokenList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharToken.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirEmptyBlock> getEmptyBlockList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
   }

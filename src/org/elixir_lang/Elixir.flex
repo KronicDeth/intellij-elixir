@@ -303,7 +303,7 @@ VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
  * Char tokens
  */
 
-CHAR_TOKEN = "?" ({VALID_ESCAPE_SEQUENCE} | .)
+CHAR_TOKENIZER = "?"
 
 /*
  * White Space
@@ -512,6 +512,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
 %state CALL_OR_KEYWORD_PAIR_MAYBE
+%state CHAR_TOKENIZATION
 %state DECIMAL_EXPONENT
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
@@ -562,7 +563,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
   {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
-  {CHAR_TOKEN}                               { return ElixirTypes.CHAR_TOKEN; }
+  {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
+                                                          return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
      and ':' being leftover */
   {COLON} / {TYPE_OPERATOR}                  { pushAndBegin(ATOM_START);
@@ -707,6 +709,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                           // zero-width token
                           return ElixirTypes.CALL; }
   {EOL}|.               { handleInState(KEYWORD_PAIR_MAYBE); }
+}
+
+<CHAR_TOKENIZATION> {
+  {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
+             return ElixirTypes.ESCAPE; }
+  {EOL}|.  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+             yybegin(stackFrame.getLastLexicalState());
+             return ElixirTypes.CHAR_LIST_FRAGMENT; }
 }
 
 <DECIMAL_EXPONENT_SIGN> {

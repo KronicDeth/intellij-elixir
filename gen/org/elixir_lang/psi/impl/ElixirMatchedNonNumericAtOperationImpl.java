@@ -70,6 +70,12 @@ public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyBlock getEmptyBlock() {
     return findChildByClass(ElixirEmptyBlock.class);
   }

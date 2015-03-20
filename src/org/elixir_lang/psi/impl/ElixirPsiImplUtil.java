@@ -511,6 +511,34 @@ public class ElixirPsiImplUtil {
         return quotedChildNodes(charListLine, childNodes(interpolatedCharListBody));
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirCharToken charToken) {
+        ASTNode[] children = charToken.getNode().getChildren(null);
+
+        if (children.length != 2) {
+            throw new NotImplementedException("CharToken expected to be ?(<character>|<escape sequence>)");
+        }
+
+        final ASTNode tokenized = children[1];
+        IElementType tokenizedElementType = tokenized.getElementType();
+        OtpErlangObject quoted;
+
+        if (tokenizedElementType == ElixirTypes.CHAR_LIST_FRAGMENT) {
+            if (tokenized.getTextLength() != 1) {
+                throw new NotImplementedException("Tokenized character expected to only be one character long");
+            }
+
+            String tokenizedString = tokenized.getText();
+            int codePoint = tokenizedString.codePointAt(0);
+            quoted = new OtpErlangLong(codePoint);
+        } else {
+            throw new NotImplementedException("Don't know how to quote " + tokenizedElementType);
+        }
+
+        return quoted;
+    }
+
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
      * consumed by prefixLength.
      *

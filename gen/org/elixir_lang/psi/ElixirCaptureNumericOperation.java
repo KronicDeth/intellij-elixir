@@ -11,6 +11,9 @@ public interface ElixirCaptureNumericOperation extends PrefixOperation {
   ElixirCapturePrefixOperator getCapturePrefixOperator();
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirNumber getNumber();
 
   @NotNull

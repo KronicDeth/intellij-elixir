@@ -59,6 +59,9 @@ public class ElixirParser implements PsiParser {
     else if (t == CHAR_LIST_LINE) {
       r = charListLine(b, 0);
     }
+    else if (t == CHAR_TOKEN) {
+      r = charToken(b, 0);
+    }
     else if (t == DECIMAL_DIGITS) {
       r = decimalDigits(b, 0);
     }
@@ -650,6 +653,30 @@ public class ElixirParser implements PsiParser {
     r = r && interpolatedCharListBody(b, l + 1);
     r = r && consumeToken(b, CHAR_LIST_TERMINATOR);
     exit_section_(b, m, CHAR_LIST_LINE, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | escapeSequence)
+  public static boolean charToken(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charToken")) return false;
+    if (!nextTokenIs(b, CHAR_TOKENIZER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CHAR_TOKENIZER);
+    r = r && charToken_1(b, l + 1);
+    exit_section_(b, m, CHAR_TOKEN, r);
+    return r;
+  }
+
+  // CHAR_LIST_FRAGMENT | escapeSequence
+  private static boolean charToken_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "charToken_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CHAR_LIST_FRAGMENT);
+    if (!r) r = escapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -3199,12 +3226,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // CHAR_TOKEN | number
+  // charToken | number
   static boolean numeric(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numeric")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, CHAR_TOKEN);
+    r = charToken(b, l + 1);
     if (!r) r = number(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

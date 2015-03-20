@@ -24,7 +24,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
             new AttributesDescriptor("Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.VALID_DIGIT),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
-            new AttributesDescriptor("Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN),
+            new AttributesDescriptor("Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN_TOKEN),
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
             new AttributesDescriptor("Decimal Exponent, Mark, and Separator", ElixirSyntaxHighlighter.DECIMAL),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),

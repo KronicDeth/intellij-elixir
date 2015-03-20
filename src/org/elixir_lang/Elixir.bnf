@@ -24,6 +24,7 @@
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = ""
+    CHAR_TOKENIZER = "?"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
@@ -1143,6 +1144,9 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
 private binaryString ::= stringLine | stringHeredoc
 private infixComma ::= COMMA EOL*
 
+charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | escapeSequence)
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private containerExpression ::= emptyParentheses
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
@@ -1215,9 +1219,9 @@ list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COM
          { implements = "org.elixir_lang.psi.KeywordList" methods = [getKeywordPairList quote] }
 private listString ::= charListLine | charListHeredoc
 
-/* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
-   Elixir.flex's NUMBER and CHAR_TOKEN. */
-private numeric ::= CHAR_TOKEN | number
+/* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
+   Elixir.flex's NUMBER and CHAR_TOKEN_TOKEN. */
+private numeric ::= charToken | number
 
 //noParenthesesOneExpression ::= dotIdentifier
 

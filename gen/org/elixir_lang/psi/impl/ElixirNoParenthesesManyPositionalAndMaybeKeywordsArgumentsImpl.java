@@ -67,6 +67,12 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyBlock getEmptyBlock() {
     return findChildByClass(ElixirEmptyBlock.class);
   }

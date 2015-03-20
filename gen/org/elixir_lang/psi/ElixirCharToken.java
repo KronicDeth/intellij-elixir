@@ -5,16 +5,16 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtNumericOperation extends PrefixOperation {
-
-  @NotNull
-  ElixirAtPrefixOperator getAtPrefixOperator();
+public interface ElixirCharToken extends Quotable {
 
   @Nullable
-  ElixirCharToken getCharToken();
+  ElixirEscapedCharacter getEscapedCharacter();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirEscapedEOL getEscapedEOL();
+
+  @Nullable
+  ElixirHexadecimalEscapeSequence getHexadecimalEscapeSequence();
 
   @NotNull
   OtpErlangObject quote();

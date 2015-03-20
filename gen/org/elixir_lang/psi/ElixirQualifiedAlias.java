@@ -29,6 +29,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
 
   @NotNull

@@ -66,6 +66,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyBlock getEmptyBlock() {
     return findChildByClass(ElixirEmptyBlock.class);
   }

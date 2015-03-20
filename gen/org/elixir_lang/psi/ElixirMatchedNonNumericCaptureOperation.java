@@ -32,6 +32,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
 
   @Nullable

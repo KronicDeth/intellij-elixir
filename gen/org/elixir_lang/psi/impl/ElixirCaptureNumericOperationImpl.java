@@ -5,10 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirCaptureNumericOperation;
-import org.elixir_lang.psi.ElixirCapturePrefixOperator;
-import org.elixir_lang.psi.ElixirNumber;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +24,12 @@ public class ElixirCaptureNumericOperationImpl extends ASTWrapperPsiElement impl
   @NotNull
   public ElixirCapturePrefixOperator getCapturePrefixOperator() {
     return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
   }
 
   @Override

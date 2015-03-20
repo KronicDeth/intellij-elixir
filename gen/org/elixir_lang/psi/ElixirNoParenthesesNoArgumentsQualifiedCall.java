@@ -31,6 +31,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   List<ElixirCharListLine> getCharListLineList();
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
 
   @NotNull

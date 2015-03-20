@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirUnaryNumericOperation extends PrefixOperation {
 
   @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
   ElixirNumber getNumber();
 
   @NotNull

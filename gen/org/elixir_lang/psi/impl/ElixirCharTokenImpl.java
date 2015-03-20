@@ -9,33 +9,33 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirAtNumericOperationImpl extends ASTWrapperPsiElement implements ElixirAtNumericOperation {
+public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirCharToken {
 
-  public ElixirAtNumericOperationImpl(ASTNode node) {
+  public ElixirCharTokenImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAtNumericOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCharToken(this);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public ElixirAtPrefixOperator getAtPrefixOperator() {
-    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+  @Nullable
+  public ElixirEscapedCharacter getEscapedCharacter() {
+    return findChildByClass(ElixirEscapedCharacter.class);
   }
 
   @Override
   @Nullable
-  public ElixirCharToken getCharToken() {
-    return findChildByClass(ElixirCharToken.class);
+  public ElixirEscapedEOL getEscapedEOL() {
+    return findChildByClass(ElixirEscapedEOL.class);
   }
 
   @Override
   @Nullable
-  public ElixirNumber getNumber() {
-    return findChildByClass(ElixirNumber.class);
+  public ElixirHexadecimalEscapeSequence getHexadecimalEscapeSequence() {
+    return findChildByClass(ElixirHexadecimalEscapeSequence.class);
   }
 
   @NotNull
