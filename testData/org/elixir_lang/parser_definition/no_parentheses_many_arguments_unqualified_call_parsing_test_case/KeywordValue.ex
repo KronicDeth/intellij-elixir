@@ -68,5 +68,3 @@ function positional, keyword_key: '''
                                   charList
                                   heredoc
                                   '''
-# sigil
-function position, keyword_key: ~r{sigil}

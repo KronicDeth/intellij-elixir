@@ -80,6 +80,10 @@ public class NoParenthesesManyArgumentsUnqualifiedCallParsingTestCase extends Pa
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testKeywordValueSigil() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testKeywordValueUnaryNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
