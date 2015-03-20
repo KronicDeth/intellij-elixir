@@ -30,6 +30,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   @NotNull
   List<ElixirCharListLine> getCharListLineList();
 
+  @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
   @NotNull
   ElixirInfixDotOperator getInfixDotOperator();
 

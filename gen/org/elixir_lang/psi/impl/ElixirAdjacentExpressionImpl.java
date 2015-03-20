@@ -63,6 +63,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
   }

@@ -1009,10 +1009,13 @@ captureNumericOperation ::= capturePrefixOperator numeric
 unaryNumericOperation ::= unaryPrefixOperator numeric
                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
+               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private accessExpression ::= atNumericOperation |
                              captureNumericOperation |
                              unaryNumericOperation |
-                             OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
+                             emptyBlock |
                              numeric |
                              list |
                              binaryString |

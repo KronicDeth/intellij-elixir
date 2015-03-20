@@ -31,6 +31,9 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   List<ElixirCharListLine> getCharListLineList();
 
   @NotNull
+  List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
   ElixirHatInfixOperator getHatInfixOperator();
 
   @NotNull

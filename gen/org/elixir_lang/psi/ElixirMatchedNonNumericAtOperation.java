@@ -32,6 +32,9 @@ public interface ElixirMatchedNonNumericAtOperation extends PrefixOperation {
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable

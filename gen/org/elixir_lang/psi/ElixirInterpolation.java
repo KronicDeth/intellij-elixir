@@ -33,6 +33,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirCharListLine> getCharListLineList();
 
   @NotNull
+  List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull

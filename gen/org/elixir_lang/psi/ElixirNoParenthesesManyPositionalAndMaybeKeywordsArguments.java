@@ -31,6 +31,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable

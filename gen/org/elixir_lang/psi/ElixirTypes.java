@@ -28,6 +28,7 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
+  IElementType EMPTY_BLOCK = new ElixirElementType("EMPTY_BLOCK");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -299,6 +300,9 @@ public interface ElixirTypes {
       }
       else if (type == DECIMAL_WHOLE_NUMBER) {
         return new ElixirDecimalWholeNumberImpl(node);
+      }
+      else if (type == EMPTY_BLOCK) {
+        return new ElixirEmptyBlockImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);

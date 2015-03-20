@@ -28,6 +28,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
   @Nullable

@@ -64,6 +64,12 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
     return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
   }

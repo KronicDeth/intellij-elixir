@@ -83,6 +83,9 @@ public class ElixirParser implements PsiParser {
     else if (t == DECIMAL_WHOLE_NUMBER) {
       r = decimalWholeNumber(b, 0);
     }
+    else if (t == EMPTY_BLOCK) {
+      r = emptyBlock(b, 0);
+    }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
     }
@@ -373,7 +376,7 @@ public class ElixirParser implements PsiParser {
   // atNumericOperation |
   //                              captureNumericOperation |
   //                              unaryNumericOperation |
-  //                              OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS |
+  //                              emptyBlock |
   //                              numeric |
   //                              list |
   //                              binaryString |
@@ -389,7 +392,7 @@ public class ElixirParser implements PsiParser {
     r = atNumericOperation(b, l + 1);
     if (!r) r = captureNumericOperation(b, l + 1);
     if (!r) r = unaryNumericOperation(b, l + 1);
-    if (!r) r = accessExpression_3(b, l + 1);
+    if (!r) r = emptyBlock(b, l + 1);
     if (!r) r = numeric(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);
@@ -398,18 +401,6 @@ public class ElixirParser implements PsiParser {
     if (!r) r = atomKeyword(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
-  private static boolean accessExpression_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_3")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && infixSemicolon(b, l + 1);
-    r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -869,6 +860,20 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
+  public static boolean emptyBlock(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "emptyBlock")) return false;
+    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_PARENTHESIS);
+    r = r && infixSemicolon(b, l + 1);
+    r = r && consumeToken(b, CLOSING_PARENTHESIS);
+    exit_section_(b, m, EMPTY_BLOCK, r);
+    return r;
   }
 
   /* ********************************************************** */

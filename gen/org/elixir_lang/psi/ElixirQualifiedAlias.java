@@ -28,6 +28,9 @@ public interface ElixirQualifiedAlias extends PsiElement {
   @Nullable
   ElixirCharListLine getCharListLine();
 
+  @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
   @NotNull
   ElixirInfixDotOperator getInfixDotOperator();
 

@@ -65,6 +65,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
+  @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
+  }
+
+  @Override
   @NotNull
   public ElixirInfixDotOperator getInfixDotOperator() {
     return findNotNullChildByClass(ElixirInfixDotOperator.class);

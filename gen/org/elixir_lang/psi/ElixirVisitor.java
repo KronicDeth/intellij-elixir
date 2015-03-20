@@ -95,6 +95,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitWholeNumber(o);
   }
 
+  public void visitEmptyBlock(@NotNull ElixirEmptyBlock o) {
+    visitQuotable(o);
+  }
+
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitQuotable(o);
   }

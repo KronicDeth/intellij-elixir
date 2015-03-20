@@ -29,6 +29,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirCharListLine getCharListLine();
 
   @Nullable
+  ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable

@@ -31,6 +31,9 @@ public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
   List<ElixirCharListLine> getCharListLineList();
 
   @NotNull
+  List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
 
   @NotNull

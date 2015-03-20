@@ -64,6 +64,12 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
     return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
   }

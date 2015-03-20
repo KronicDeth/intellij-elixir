@@ -29,6 +29,7 @@ public class ElixirPsiImplUtil {
             PsiComment.class,
             PsiWhiteSpace.class
     };
+    public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
@@ -113,7 +114,7 @@ public class ElixirPsiImplUtil {
             OtpErlangList blockMetadata = new OtpErlangList();
 
             asBlock = quotedFunctionCall(
-                    "__block__",
+                    BLOCK,
                     blockMetadata,
                     quotedChildren.toArray(quotedArray)
             );
@@ -840,6 +841,18 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyBlock emptyBlock) {
+        // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
+        //   arguments are given while empty block is quoted as `{__block__, [], []}`
+        return new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        BLOCK,
+                        new OtpErlangList(),
+                        new OtpErlangList()
+                }
+        );
     }
 
     public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyParentheses emptyParentheses) {
