@@ -23,9 +23,9 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirAlias getAlias() {
-    return findChildByClass(ElixirAlias.class);
+  @NotNull
+  public List<ElixirAlias> getAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
   }
 
   @Override
@@ -71,15 +71,15 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
+  @NotNull
+  public ElixirDotInfixOperator getDotInfixOperator() {
+    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
-  @NotNull
-  public ElixirInfixDotOperator getInfixDotOperator() {
-    return findNotNullChildByClass(ElixirInfixDotOperator.class);
+  @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override

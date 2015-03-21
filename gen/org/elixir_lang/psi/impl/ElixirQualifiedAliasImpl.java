@@ -68,15 +68,15 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
+  @NotNull
+  public ElixirDotInfixOperator getDotInfixOperator() {
+    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
-  @NotNull
-  public ElixirInfixDotOperator getInfixDotOperator() {
-    return findNotNullChildByClass(ElixirInfixDotOperator.class);
+  @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override

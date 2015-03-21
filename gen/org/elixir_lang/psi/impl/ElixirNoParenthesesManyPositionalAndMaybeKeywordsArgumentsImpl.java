@@ -205,6 +205,12 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedHatOperation getMatchedHatOperation() {
     return findChildByClass(ElixirMatchedHatOperation.class);
   }
@@ -247,8 +253,8 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
-  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
   }
 
   @Override

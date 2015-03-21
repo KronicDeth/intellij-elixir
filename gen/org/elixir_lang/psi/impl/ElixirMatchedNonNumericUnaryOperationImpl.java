@@ -202,6 +202,12 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
     return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
@@ -232,8 +238,8 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
   }
 
   @Override

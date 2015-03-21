@@ -211,6 +211,12 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @Nullable
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedHatOperation getMatchedHatOperation() {
     return findChildByClass(ElixirMatchedHatOperation.class);
   }
@@ -247,8 +253,8 @@ public class ElixirMatchedHatOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  public List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsCall.class);
   }
 
   @Override

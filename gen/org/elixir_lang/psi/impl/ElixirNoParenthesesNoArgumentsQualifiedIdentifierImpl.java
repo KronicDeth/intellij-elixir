@@ -1,24 +1,22 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public class ElixirNoParenthesesNoArgumentsQualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesNoArgumentsQualifiedIdentifier {
 
-public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesNoArgumentsQualifiedCall {
-
-  public ElixirNoParenthesesNoArgumentsQualifiedCallImpl(ASTNode node) {
+  public ElixirNoParenthesesNoArgumentsQualifiedIdentifierImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesNoArgumentsQualifiedCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesNoArgumentsQualifiedIdentifier(this);
     else super.accept(visitor);
   }
 
@@ -53,15 +51,15 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
+  @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListLine> getCharListLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
+  @Nullable
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
   }
 
   @Override
@@ -71,15 +69,15 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
+  @NotNull
+  public ElixirDotInfixOperator getDotInfixOperator() {
+    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
-  @NotNull
-  public ElixirInfixDotOperator getInfixDotOperator() {
-    return findNotNullChildByClass(ElixirInfixDotOperator.class);
+  @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override
@@ -209,6 +207,12 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
   }
 
   @Override
+  @NotNull
+  public ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand() {
+    return findNotNullChildByClass(ElixirMatchedDotIdentifierOperand.class);
+  }
+
+  @Override
   @Nullable
   public ElixirMatchedDotOperation getMatchedDotOperation() {
     return findChildByClass(ElixirMatchedDotOperation.class);
@@ -245,21 +249,26 @@ public class ElixirNoParenthesesNoArgumentsQualifiedCallImpl extends ASTWrapperP
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringLine> getStringLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
+  @Nullable
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
   }
 
   @Override
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

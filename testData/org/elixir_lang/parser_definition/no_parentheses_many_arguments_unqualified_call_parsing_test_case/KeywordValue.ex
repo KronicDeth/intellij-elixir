@@ -39,6 +39,3 @@ function positional, keyword_key: first_value + second_value
 
 # matchedExpressionDotAlias
 function positional, keyword_key: One.Two
-
-# matchedExpressionDotIdentifier
-function positional, keyword_key: Alias.identifier

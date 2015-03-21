@@ -98,6 +98,9 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
@@ -113,7 +116,7 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
   ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

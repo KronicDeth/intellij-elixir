@@ -101,6 +101,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
@@ -122,7 +125,7 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

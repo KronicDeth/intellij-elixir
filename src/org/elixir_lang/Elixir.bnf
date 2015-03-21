@@ -90,12 +90,11 @@ private expressionList ::= expression (endOfExpression+ expression | adjacentExp
 
 /* The Elixir native lexer converts Strings, CharLists and keywords (false, nil, true) to ALIAS_TOKEN/IDENTIFIER as needed.
    Elixir.flex doesn't do that, so have to list those tokens/rules that would be converted to ALIAS_TOKEN/IDENTIFIER here */
-private matchedDotIdentifierOperand ::= IDENTIFIER |
-                                        FALSE |
-                                        NIL |
-                                        TRUE |
-                                        binaryString |
-                                        listString
+matchedDotIdentifierOperand ::= IDENTIFIER |
+                                atomKeyword |
+                                binaryString |
+                                listString
+                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 
 /*
@@ -156,7 +155,7 @@ noParenthesesManyArgumentsUnqualifiedCall ::= noParenthesesManyArgumentsUnqualif
                                               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private noParenthesesManyArgumentsQualifiedExpression ::= matchedDotExpression noParenthesesManyArgumentsQualifiedCall
-left noParenthesesManyArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand noParenthesesManyArgumentsStrict
+left noParenthesesManyArgumentsQualifiedCall ::= dotInfixOperator matchedDotIdentifierOperand noParenthesesManyArgumentsStrict
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 private noParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsQualifiedExpression | noParenthesesManyArgumentsUnqualifiedCall
@@ -187,7 +186,11 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  * 0 Arguments
  */
 
-left noParenthesesNoArgumentsQualifiedCall ::= infixDotOperator matchedDotIdentifierOperand
+left noParenthesesNoArgumentsQualifiedIdentifier ::= dotInfixOperator matchedDotIdentifierOperand
+                                                     { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+left noParenthesesNoArgumentsCall ::= /* purposely empty as rule is only meant to enclose
+                                         noParenthesesNoArgumentsQualifiedIdentifier, so it can use InfixOperation */
+                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
                                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
@@ -971,21 +974,29 @@ matchedNonNumericUnaryOperation ::= nonNumericUnaryPrefixOperator (noParentheses
                                     { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
-infixDotOperator ::= EOL* DOT_OPERATOR EOL* { name = "." }
+dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       name = "."
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                     }
 private matchedDotExpression ::= matchedDotLeftOperand (matchedDotOperation* matchedDotRightMostOperation)?
 private matchedDotLeftOperand ::= matchedNonNumericAtExpression
 private matchedDotRightOperand ::= (
-                                    ALIAS_TOKEN |
+                                    alias |
                                     IDENTIFIER |
                                     FALSE |
                                     NIL |
                                     TRUE |
                                     binaryString |
                                     listString
-                                   ) &infixDotOperator
-left matchedDotOperation ::= infixDotOperator matchedDotRightOperand
-private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedCall | qualifiedAlias
-left qualifiedAlias ::= infixDotOperator ALIAS_TOKEN
+                                   ) &dotInfixOperator
+left matchedDotOperation ::= dotInfixOperator matchedDotRightOperand
+private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedIdentifier noParenthesesNoArgumentsCall | qualifiedAlias
+left qualifiedAlias ::= dotInfixOperator ALIAS_TOKEN
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
 atPrefixOperator ::= AT_OPERATOR EOL*

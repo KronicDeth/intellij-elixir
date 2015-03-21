@@ -31,11 +31,11 @@ public interface ElixirQualifiedAlias extends PsiElement {
   @Nullable
   ElixirCharToken getCharToken();
 
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
+
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
-
-  @NotNull
-  ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();

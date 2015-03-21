@@ -4,12 +4,9 @@ package org.elixir_lang.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsQualifiedCall {
 
@@ -53,15 +50,15 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
+  @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListLine> getCharListLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
+  @Nullable
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
   }
 
   @Override
@@ -71,15 +68,15 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
+  @NotNull
+  public ElixirDotInfixOperator getDotInfixOperator() {
+    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
-  @NotNull
-  public ElixirInfixDotOperator getInfixDotOperator() {
-    return findNotNullChildByClass(ElixirInfixDotOperator.class);
+  @Nullable
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override
@@ -209,6 +206,12 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
+  @NotNull
+  public ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand() {
+    return findNotNullChildByClass(ElixirMatchedDotIdentifierOperand.class);
+  }
+
+  @Override
   @Nullable
   public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
     return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
@@ -234,8 +237,8 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
-  public ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsQualifiedCall.class);
+  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
   }
 
   @Override
@@ -263,15 +266,15 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringLine> getStringLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
+  @Nullable
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
   }
 
   @Override

@@ -100,6 +100,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
@@ -121,7 +124,7 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirNoParenthesesKeywords getNoParenthesesKeywords();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

@@ -98,6 +98,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
@@ -113,7 +116,7 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

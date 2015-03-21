@@ -5,8 +5,6 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElement {
 
   @Nullable
@@ -24,20 +22,20 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
-  @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
 
-  @NotNull
-  List<ElixirCharListLine> getCharListLineList();
+  @Nullable
+  ElixirCharListLine getCharListLine();
 
   @Nullable
   ElixirCharToken getCharToken();
 
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
+
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
-
-  @NotNull
-  ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -102,6 +100,9 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   @Nullable
   ElixirLiteralWordsLine getLiteralWordsLine();
 
+  @NotNull
+  ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
+
   @Nullable
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
@@ -115,7 +116,7 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsQualifiedCall getNoParenthesesNoArgumentsQualifiedCall();
+  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
@@ -129,11 +130,11 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   @Nullable
   ElixirQualifiedAlias getQualifiedAlias();
 
-  @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
 
-  @NotNull
-  List<ElixirStringLine> getStringLineList();
+  @Nullable
+  ElixirStringLine getStringLine();
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();

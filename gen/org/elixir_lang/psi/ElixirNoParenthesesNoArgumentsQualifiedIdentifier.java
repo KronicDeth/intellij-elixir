@@ -1,13 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement {
+public interface ElixirNoParenthesesNoArgumentsQualifiedIdentifier extends InfixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -24,20 +22,20 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
-  @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
 
-  @NotNull
-  List<ElixirCharListLine> getCharListLineList();
+  @Nullable
+  ElixirCharListLine getCharListLine();
 
   @Nullable
   ElixirCharToken getCharToken();
 
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
+
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
-
-  @NotNull
-  ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -102,6 +100,9 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   @Nullable
   ElixirLiteralWordsLine getLiteralWordsLine();
 
+  @NotNull
+  ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
+
   @Nullable
   ElixirMatchedDotOperation getMatchedDotOperation();
 
@@ -120,13 +121,16 @@ public interface ElixirNoParenthesesNoArgumentsQualifiedCall extends PsiElement 
   @Nullable
   ElixirNumber getNumber();
 
-  @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
 
-  @NotNull
-  List<ElixirStringLine> getStringLineList();
+  @Nullable
+  ElixirStringLine getStringLine();
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

@@ -401,6 +401,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirDotInfixOperator dotInfixOperator) {
+        return TokenSet.create(ElixirTypes.DOT_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
         return TokenSet.create(ElixirTypes.MULTIPLICATION_OPERATOR);
     }
@@ -1020,7 +1026,7 @@ public class ElixirPsiImplUtil {
                 interpolationMetadata,
                 quotedChildren
         );
-        OtpErlangObject quotedBinaryCall = quotedFunctionCall(
+        OtpErlangObject quotedBinaryCall = quotedVariable(
                 "binary",
                 interpolationMetadata
         );
@@ -1179,6 +1185,29 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotIdentifierOperand matchedDotIdentifierOperand) {
+        ASTNode[] children = matchedDotIdentifierOperand.getNode().getChildren(null);
+
+        if (children.length != 1) {
+            throw new NotImplementedException("Expect 1 child for matchedDotIdentifierOperand");
+        }
+
+        ASTNode operand = children[0];
+        IElementType operandType = operand.getElementType();
+        OtpErlangObject quoted;
+
+        if (operandType == ElixirTypes.IDENTIFIER) {
+            quoted = new OtpErlangAtom(operand.getText());
+        } else {
+            Quotable quotable = (Quotable) operand.getPsi();
+            quoted = quotable.quote();
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
         PsiElement[] children = noParenthesesExpression.getChildren();
 
@@ -1219,8 +1248,24 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable noParenthesesNoArgumentsUnqualifiedCallOrVariable) {
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsCall noParenthesesNoArgumentsCall) {
+        Quotable identifier = noParenthesesNoArgumentsCall.getNoParenthesesNoArgumentsQualifiedIdentifier();
+        OtpErlangObject quotedIdentifier = identifier.quote();
+
         return quotedFunctionCall(
+                quotedIdentifier,
+                metadata(noParenthesesNoArgumentsCall)
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable noParenthesesNoArgumentsUnqualifiedCallOrVariable) {
+        /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
+           {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
+           {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are [] when
+           there are no arguments. */
+        return quotedVariable(
                 noParenthesesNoArgumentsUnqualifiedCallOrVariable.getText(),
                 metadata(noParenthesesNoArgumentsUnqualifiedCallOrVariable)
         );
@@ -1447,24 +1492,17 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static OtpErlangObject quotedArguments(final OtpErlangObject... arguments) {
-        OtpErlangObject quoted;
-
-        if (arguments.length == 0) {
-            quoted = NIL;
-        } else {
-            OtpErlangList erlangList = new OtpErlangList(arguments);
-            /*
-             * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
-             * points.
-             * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
-             * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
-             * of OtpErlangList and do the same.
-             */
-            quoted = elixirCharList(erlangList);
-        }
-
-        return quoted;
+    public static OtpErlangObject quotedFunctionArguments(final OtpErlangObject... arguments) {
+        /*
+         * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
+         * points.
+         * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
+         * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
+         * of OtpErlangList and do the same.
+         */
+        return elixirCharList(
+                new OtpErlangList(arguments)
+        );
     }
 
     @NotNull
@@ -1504,7 +1542,38 @@ public class ElixirPsiImplUtil {
                 new OtpErlangObject[] {
                         quotedQualifiedIdentifier,
                         metadata,
-                        quotedArguments(arguments)
+                        quotedFunctionArguments(arguments)
+                }
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quotedVariable(@NotNull final String identifier, @NotNull final OtpErlangList metadata) {
+        return quotedVariable(
+                new OtpErlangAtom(identifier),
+                metadata
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quotedVariable(@NotNull final OtpErlangObject quotedIdentifier, @NotNull final OtpErlangList metadata) {
+      return quotedVariable(
+              quotedIdentifier,
+              metadata,
+              NIL
+      );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quotedVariable(@NotNull final OtpErlangObject quotedIdentifier, @NotNull final OtpErlangList metadata, @NotNull final OtpErlangObject context) {
+        return new OtpErlangTuple(
+                new OtpErlangObject[] {
+                        quotedIdentifier,
+                        metadata,
+                        context
                 }
         );
     }

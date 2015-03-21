@@ -184,6 +184,10 @@ public class Quoter {
             }
         }
 
+        if (erlangList.arity() == 0) {
+            isErlangPrintable = false;
+        }
+
         return isErlangPrintable;
     }
 

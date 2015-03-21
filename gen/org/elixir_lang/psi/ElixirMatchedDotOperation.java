@@ -9,8 +9,8 @@ import java.util.List;
 
 public interface ElixirMatchedDotOperation extends PsiElement {
 
-  @Nullable
-  ElixirAlias getAlias();
+  @NotNull
+  List<ElixirAlias> getAliasList();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
@@ -33,11 +33,11 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   @Nullable
   ElixirCharToken getCharToken();
 
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
+
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
-
-  @NotNull
-  ElixirInfixDotOperator getInfixDotOperator();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();

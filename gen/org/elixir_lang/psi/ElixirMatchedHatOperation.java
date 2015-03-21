@@ -103,6 +103,9 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @NotNull
@@ -121,7 +124,7 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
 
   @NotNull
-  List<ElixirNoParenthesesNoArgumentsQualifiedCall> getNoParenthesesNoArgumentsQualifiedCallList();
+  List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
