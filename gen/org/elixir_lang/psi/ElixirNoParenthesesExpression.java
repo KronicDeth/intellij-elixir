@@ -101,13 +101,7 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
-
-  @Nullable
   ElixirMatchedDotRightOperation getMatchedDotRightOperation();
-
-  @Nullable
-  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
 
   @Nullable
   ElixirMatchedHatRightOperation getMatchedHatRightOperation();

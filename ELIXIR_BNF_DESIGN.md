@@ -28,10 +28,13 @@ private matched<name>Expression ::= matched<name>RightExpression |
 
 matched<name>RightExpression only exists to ensure matched<name>RightOperation is used.  matched<name>RightExpression
 does not need to be Quotable because matched<name>RightOperation is a left rule and will surround
-matched<name>LeftOperand for quoting.
+matched<name>LeftOperand for quoting.  Note, the `+` is crucial as it ensures there is at least one
+matched<name>RightOperation and matched<name>RightExpression does not degenerate to just matched<name>LeftOperand, which
+would make the right and left expression equivalent.  Additionally with `*` instead of `+`, the identifier in
+noParenthesesManyArgumentsCall will be consumed as a noParenthesesNoArgumentsCall.
 
 ```
-private matched<name>RightExpression ::= matched<name>LeftOperand matched<name>RightOperation*
+private matched<name>RightExpression ::= matched<name>LeftOperand matched<name>RightOperation+
 ```
 
 #### Operand
@@ -64,7 +67,9 @@ right-hand side only constructs like noParenthesesManyArgumentsCall.
 
 matched<name>LeftExpression exists to ensure that matched<name>LeftOperation is used.  matched<name>LeftExpression
 does not need to be Quotable because matched<name>LeftOperation is a left rule and will surround
-matched<name>LeftOperand for quoting.
+matched<name>LeftOperand for quoting.  It should be noted that matched<name>LeftExpression uses `*` on its operation
+unlike matched<name>RightExpression uses `+` on its operation.  This is because it is ok for left expressions to
+degenerate to the higher precedence operand.
 
 ```
 private matched<name>LeftExpression ::= matched<name>LeftOperand matched<name>LeftOperation*

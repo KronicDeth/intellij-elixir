@@ -2604,7 +2604,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedHatLeftOperand matchedHatRightOperation*
+  // matchedHatLeftOperand matchedHatRightOperation+
   static boolean matchedHatRightExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedHatRightExpression")) return false;
     boolean r;
@@ -2615,16 +2615,20 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // matchedHatRightOperation*
+  // matchedHatRightOperation+
   private static boolean matchedHatRightExpression_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedHatRightExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedHatRightOperation(b, l + 1);
     int c = current_position_(b);
-    while (true) {
+    while (r) {
       if (!matchedHatRightOperation(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "matchedHatRightExpression_1", c)) break;
       c = current_position_(b);
     }
-    return true;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -2715,7 +2719,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedMultiplicationLeftOperand matchedMultiplicationRightOperation*
+  // matchedMultiplicationLeftOperand matchedMultiplicationRightOperation+
   static boolean matchedMultiplicationRightExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedMultiplicationRightExpression")) return false;
     boolean r;
@@ -2726,16 +2730,20 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // matchedMultiplicationRightOperation*
+  // matchedMultiplicationRightOperation+
   private static boolean matchedMultiplicationRightExpression_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedMultiplicationRightExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedMultiplicationRightOperation(b, l + 1);
     int c = current_position_(b);
-    while (true) {
+    while (r) {
       if (!matchedMultiplicationRightOperation(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "matchedMultiplicationRightExpression_1", c)) break;
       c = current_position_(b);
     }
-    return true;
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
