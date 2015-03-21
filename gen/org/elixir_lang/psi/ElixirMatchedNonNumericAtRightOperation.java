@@ -1,17 +1,20 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElement {
+public interface ElixirMatchedNonNumericAtRightOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
+
+  @NotNull
+  ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
   ElixirAtom getAtom();
@@ -30,9 +33,6 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
 
   @Nullable
   ElixirCharToken getCharToken();
-
-  @NotNull
-  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
@@ -100,35 +100,20 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
   @Nullable
   ElixirLiteralWordsLine getLiteralWordsLine();
 
-  @NotNull
-  ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
+  @Nullable
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
-
-  @Nullable
-  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
-
-  @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
+  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
-  ElixirNoParenthesesStrict getNoParenthesesStrict();
-
-  @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
@@ -138,5 +123,8 @@ public interface ElixirNoParenthesesManyArgumentsQualifiedCall extends PsiElemen
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

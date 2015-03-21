@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation {
+public interface ElixirMatchedNonNumericCaptureLeftOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -101,40 +101,28 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
+  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
 
   @Nullable
-  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+  ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
-
-  @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();

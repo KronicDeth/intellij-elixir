@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryOperation {
+public class ElixirMatchedNonNumericAtRightOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtRightOperation {
 
-  public ElixirMatchedNonNumericUnaryOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericAtRightOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtRightOperation(this);
     else super.accept(visitor);
   }
 
@@ -30,6 +30,12 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
     return findChildByClass(ElixirAtNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirAtPrefixOperator getAtPrefixOperator() {
+    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
   }
 
   @Override
@@ -202,44 +208,20 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirMatchedDotOperation getMatchedDotOperation() {
-    return findChildByClass(ElixirMatchedDotOperation.class);
+  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
+  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesManyArgumentsQualifiedCall.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
+  public ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsCall.class);
   }
 
   @Override
@@ -252,12 +234,6 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirQualifiedAlias getQualifiedAlias() {
-    return findChildByClass(ElixirQualifiedAlias.class);
   }
 
   @Override
@@ -276,12 +252,6 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
-    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
   }
 
   @NotNull

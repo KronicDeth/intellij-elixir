@@ -1,16 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public interface ElixirMatchedNonNumericUnaryRightOperation extends PrefixOperation {
 
-public interface ElixirMatchedDotOperation extends PsiElement {
-
-  @NotNull
-  List<ElixirAlias> getAliasList();
+  @Nullable
+  ElixirAlias getAlias();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
@@ -24,17 +22,14 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
-  @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
 
-  @NotNull
-  List<ElixirCharListLine> getCharListLineList();
+  @Nullable
+  ElixirCharListLine getCharListLine();
 
   @Nullable
   ElixirCharToken getCharToken();
-
-  @NotNull
-  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
@@ -103,16 +98,19 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+
+  @Nullable
+  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
@@ -120,13 +118,19 @@ public interface ElixirMatchedDotOperation extends PsiElement {
   @Nullable
   ElixirNumber getNumber();
 
-  @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
 
-  @NotNull
-  List<ElixirStringLine> getStringLineList();
+  @Nullable
+  ElixirStringLine getStringLine();
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @NotNull
+  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
+
+  @NotNull
+  OtpErlangObject quote();
 
 }

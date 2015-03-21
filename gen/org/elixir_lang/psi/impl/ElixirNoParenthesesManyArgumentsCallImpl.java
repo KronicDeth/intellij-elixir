@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsUnqualifiedCall {
+public class ElixirNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsCall {
 
-  public ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl(ASTNode node) {
+  public ElixirNoParenthesesManyArgumentsCallImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsUnqualifiedCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsCall(this);
     else super.accept(visitor);
   }
 
@@ -27,15 +27,31 @@ public class ElixirNoParenthesesManyArgumentsUnqualifiedCallImpl extends ASTWrap
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier getNoParenthesesManyArgumentsUnqualifiedIdentifier() {
-    return findNotNullChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier.class);
+    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier() {
+    return findChildByClass(ElixirNoParenthesesQualifiedIdentifier.class);
   }
 
   @Override
   @Nullable
   public ElixirNoParenthesesStrict getNoParenthesesStrict() {
     return findChildByClass(ElixirNoParenthesesStrict.class);
+  }
+
+  @NotNull
+  public QuotableArguments getArguments() {
+    return ElixirPsiImplUtil.getArguments(this);
+  }
+
+  @NotNull
+  public Quotable getIdentifier() {
+    return ElixirPsiImplUtil.getIdentifier(this);
   }
 
   @NotNull

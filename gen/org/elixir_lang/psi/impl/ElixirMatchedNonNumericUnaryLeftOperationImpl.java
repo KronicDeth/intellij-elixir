@@ -5,28 +5,25 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public class ElixirMatchedNonNumericUnaryLeftOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryLeftOperation {
 
-public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements ElixirQualifiedAlias {
-
-  public ElixirQualifiedAliasImpl(ASTNode node) {
+  public ElixirMatchedNonNumericUnaryLeftOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitQualifiedAlias(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryLeftOperation(this);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public List<ElixirAlias> getAliasList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
   }
 
   @Override
@@ -69,12 +66,6 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
   @Nullable
   public ElixirCharToken getCharToken() {
     return findChildByClass(ElixirCharToken.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
@@ -211,8 +202,8 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
 
   @Override
   @Nullable
-  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
-    return findChildByClass(ElixirMatchedDotRightOperation.class);
+  public ElixirMatchedDotLeftOperation getMatchedDotLeftOperation() {
+    return findChildByClass(ElixirMatchedDotLeftOperation.class);
   }
 
   @Override
@@ -261,6 +252,12 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
+    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
   }
 
   @NotNull

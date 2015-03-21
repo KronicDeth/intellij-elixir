@@ -5,10 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesExpression extends Quotable {
+import java.util.List;
 
-  @Nullable
-  ElixirAlias getAlias();
+public interface ElixirMatchedDotRightOperation extends InfixOperation {
+
+  @NotNull
+  List<ElixirAlias> getAliasList();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
@@ -22,20 +24,20 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
-  @Nullable
-  ElixirCharListHeredoc getCharListHeredoc();
+  @NotNull
+  List<ElixirCharListHeredoc> getCharListHeredocList();
 
-  @Nullable
-  ElixirCharListLine getCharListLine();
+  @NotNull
+  List<ElixirCharListLine> getCharListLineList();
 
   @Nullable
   ElixirCharToken getCharToken();
 
-  @Nullable
-  ElixirEmptyBlock getEmptyBlock();
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
+  ElixirEmptyBlock getEmptyBlock();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -101,43 +103,16 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
-
-  @Nullable
   ElixirMatchedDotRightOperation getMatchedDotRightOperation();
-
-  @Nullable
-  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
-
-  @Nullable
-  ElixirMatchedHatRightOperation getMatchedHatRightOperation();
-
-  @Nullable
-  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
 
   @Nullable
   ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
-
-  @Nullable
   ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
-
-  @Nullable
   ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
-
-  @Nullable
-  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
-
-  @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
@@ -145,14 +120,11 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   @Nullable
   ElixirNumber getNumber();
 
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
+  @NotNull
+  List<ElixirStringHeredoc> getStringHeredocList();
 
-  @Nullable
-  ElixirStringHeredoc getStringHeredoc();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  @NotNull
+  List<ElixirStringLine> getStringLineList();
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();

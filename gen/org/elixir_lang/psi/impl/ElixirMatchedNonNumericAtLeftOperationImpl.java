@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtOperation {
+public class ElixirMatchedNonNumericAtLeftOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtLeftOperation {
 
-  public ElixirMatchedNonNumericAtOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericAtLeftOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtLeftOperation(this);
     else super.accept(visitor);
   }
 
@@ -208,26 +208,14 @@ public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesManyArgumentsQualifiedCall.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall() {
-    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedCall.class);
+  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
   }
 
   @Override

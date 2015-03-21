@@ -100,22 +100,37 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
+  ElixirMatchedDotRightOperation getMatchedDotRightOperation();
 
   @Nullable
-  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedHatRightOperation getMatchedHatRightOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
 
   @NotNull
   List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();

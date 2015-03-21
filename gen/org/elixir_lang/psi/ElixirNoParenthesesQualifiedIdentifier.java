@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesExpression extends Quotable {
+public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -31,11 +31,11 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   @Nullable
   ElixirCharToken getCharToken();
 
-  @Nullable
-  ElixirEmptyBlock getEmptyBlock();
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
+  ElixirEmptyBlock getEmptyBlock();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -100,53 +100,26 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   @Nullable
   ElixirLiteralWordsLine getLiteralWordsLine();
 
-  @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
+  @NotNull
+  ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
 
   @Nullable
   ElixirMatchedDotRightOperation getMatchedDotRightOperation();
 
   @Nullable
-  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
-
-  @Nullable
-  ElixirMatchedHatRightOperation getMatchedHatRightOperation();
-
-  @Nullable
-  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
-
-  @Nullable
   ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
-
-  @Nullable
   ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
-
-  @Nullable
-  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
-
-  @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();

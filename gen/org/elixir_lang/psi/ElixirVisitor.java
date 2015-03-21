@@ -358,27 +358,51 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
+  public void visitMatchedDotLeftOperation(@NotNull ElixirMatchedDotLeftOperation o) {
     visitInfixOperation(o);
   }
 
-  public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
+  public void visitMatchedDotRightOperation(@NotNull ElixirMatchedDotRightOperation o) {
     visitInfixOperation(o);
   }
 
-  public void visitMatchedNonNumericAtOperation(@NotNull ElixirMatchedNonNumericAtOperation o) {
+  public void visitMatchedHatLeftOperation(@NotNull ElixirMatchedHatLeftOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedHatRightOperation(@NotNull ElixirMatchedHatRightOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedMultiplicationLeftOperation(@NotNull ElixirMatchedMultiplicationLeftOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedMultiplicationRightOperation(@NotNull ElixirMatchedMultiplicationRightOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedNonNumericAtLeftOperation(@NotNull ElixirMatchedNonNumericAtLeftOperation o) {
     visitPrefixOperation(o);
   }
 
-  public void visitMatchedNonNumericCaptureOperation(@NotNull ElixirMatchedNonNumericCaptureOperation o) {
+  public void visitMatchedNonNumericAtRightOperation(@NotNull ElixirMatchedNonNumericAtRightOperation o) {
     visitPrefixOperation(o);
   }
 
-  public void visitMatchedNonNumericUnaryOperation(@NotNull ElixirMatchedNonNumericUnaryOperation o) {
+  public void visitMatchedNonNumericCaptureLeftOperation(@NotNull ElixirMatchedNonNumericCaptureLeftOperation o) {
+    visitPrefixOperation(o);
+  }
+
+  public void visitMatchedNonNumericCaptureRightOperation(@NotNull ElixirMatchedNonNumericCaptureRightOperation o) {
+    visitPrefixOperation(o);
+  }
+
+  public void visitMatchedNonNumericUnaryLeftOperation(@NotNull ElixirMatchedNonNumericUnaryLeftOperation o) {
+    visitPrefixOperation(o);
+  }
+
+  public void visitMatchedNonNumericUnaryRightOperation(@NotNull ElixirMatchedNonNumericUnaryRightOperation o) {
     visitPrefixOperation(o);
   }
 
@@ -406,16 +430,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotableArguments(o);
   }
 
-  public void visitNoParenthesesManyArgumentsQualifiedCall(@NotNull ElixirNoParenthesesManyArgumentsQualifiedCall o) {
-    visitPsiElement(o);
-  }
-
-  public void visitNoParenthesesManyArgumentsUnqualifiedCall(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedCall o) {
+  public void visitNoParenthesesManyArgumentsCall(@NotNull ElixirNoParenthesesManyArgumentsCall o) {
     visitQuotable(o);
   }
 
   public void visitNoParenthesesManyArgumentsUnqualifiedIdentifier(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitNoParenthesesManyPositionalAndMaybeKeywordsArguments(@NotNull ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments o) {
@@ -430,16 +450,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitNoParenthesesNoArgumentsQualifiedIdentifier(@NotNull ElixirNoParenthesesNoArgumentsQualifiedIdentifier o) {
-    visitInfixOperation(o);
-  }
-
   public void visitNoParenthesesNoArgumentsUnqualifiedCallOrVariable(@NotNull ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable o) {
     visitQuotable(o);
   }
 
   public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
     visitQuotableArguments(o);
+  }
+
+  public void visitNoParenthesesQualifiedIdentifier(@NotNull ElixirNoParenthesesQualifiedIdentifier o) {
+    visitInfixOperation(o);
   }
 
   public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {

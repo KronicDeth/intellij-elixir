@@ -205,38 +205,68 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
-  public ElixirMatchedDotOperation getMatchedDotOperation() {
-    return findChildByClass(ElixirMatchedDotOperation.class);
+  public ElixirMatchedDotLeftOperation getMatchedDotLeftOperation() {
+    return findChildByClass(ElixirMatchedDotLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedHatOperation getMatchedHatOperation() {
-    return findChildByClass(ElixirMatchedHatOperation.class);
+  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
+    return findChildByClass(ElixirMatchedDotRightOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
-    return findChildByClass(ElixirMatchedMultiplicationOperation.class);
+  public ElixirMatchedHatLeftOperation getMatchedHatLeftOperation() {
+    return findChildByClass(ElixirMatchedHatLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
+  public ElixirMatchedHatRightOperation getMatchedHatRightOperation() {
+    return findChildByClass(ElixirMatchedHatRightOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  public ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationRightOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
+  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtRightOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureRightOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryRightOperation.class);
   }
 
   @Override

@@ -1,28 +1,32 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsQualifiedCall {
+import java.util.List;
 
-  public ElixirNoParenthesesManyArgumentsQualifiedCallImpl(ASTNode node) {
+public class ElixirMatchedDotRightOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedDotRightOperation {
+
+  public ElixirMatchedDotRightOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsQualifiedCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedDotRightOperation(this);
     else super.accept(visitor);
   }
 
   @Override
-  @Nullable
-  public ElixirAlias getAlias() {
-    return findChildByClass(ElixirAlias.class);
+  @NotNull
+  public List<ElixirAlias> getAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
   }
 
   @Override
@@ -50,15 +54,15 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
-  @Nullable
-  public ElixirCharListHeredoc getCharListHeredoc() {
-    return findChildByClass(ElixirCharListHeredoc.class);
+  @NotNull
+  public List<ElixirCharListHeredoc> getCharListHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
   }
 
   @Override
-  @Nullable
-  public ElixirCharListLine getCharListLine() {
-    return findChildByClass(ElixirCharListLine.class);
+  @NotNull
+  public List<ElixirCharListLine> getCharListLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
   }
 
   @Override
@@ -206,39 +210,27 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
   }
 
   @Override
-  @NotNull
-  public ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand() {
-    return findNotNullChildByClass(ElixirMatchedDotIdentifierOperand.class);
+  @Nullable
+  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
+    return findChildByClass(ElixirMatchedDotRightOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
+  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
-    return findChildByClass(ElixirNoParenthesesManyArguments.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
+  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
   }
 
   @Override
@@ -249,38 +241,31 @@ public class ElixirNoParenthesesManyArgumentsQualifiedCallImpl extends ASTWrappe
 
   @Override
   @Nullable
-  public ElixirNoParenthesesStrict getNoParenthesesStrict() {
-    return findChildByClass(ElixirNoParenthesesStrict.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
   }
 
   @Override
-  @Nullable
-  public ElixirQualifiedAlias getQualifiedAlias() {
-    return findChildByClass(ElixirQualifiedAlias.class);
+  @NotNull
+  public List<ElixirStringHeredoc> getStringHeredocList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
   }
 
   @Override
-  @Nullable
-  public ElixirStringHeredoc getStringHeredoc() {
-    return findChildByClass(ElixirStringHeredoc.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStringLine getStringLine() {
-    return findChildByClass(ElixirStringLine.class);
+  @NotNull
+  public List<ElixirStringLine> getStringLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
   }
 
   @Override
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

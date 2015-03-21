@@ -8,24 +8,19 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements ElixirInterpolation {
+public class ElixirMatchedMultiplicationRightOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedMultiplicationRightOperation {
 
-  public ElixirInterpolationImpl(ASTNode node) {
+  public ElixirMatchedMultiplicationRightOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedMultiplicationRightOperation(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirAdjacentExpression> getAdjacentExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAdjacentExpression.class);
   }
 
   @Override
@@ -80,18 +75,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirEmptyBlock> getEmptyBlockList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirEndOfExpression> getEndOfExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
   }
 
   @Override
@@ -228,26 +211,14 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirMatchedDotRightOperation> getMatchedDotRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotRightOperation.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatLeftOperation.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirMatchedHatRightOperation> getMatchedHatRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedMultiplicationRightOperation> getMatchedMultiplicationRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedMultiplicationRightOperation.class);
+  @Nullable
+  public ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationRightOperation.class);
   }
 
   @Override
@@ -258,20 +229,8 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericAtRightOperation> getMatchedNonNumericAtRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtRightOperation.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureLeftOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericCaptureRightOperation> getMatchedNonNumericCaptureRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureRightOperation.class);
   }
 
   @Override
@@ -282,20 +241,14 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericUnaryRightOperation> getMatchedNonNumericUnaryRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryRightOperation.class);
+  public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
+    return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirNoParenthesesManyArgumentsCall> getNoParenthesesManyArgumentsCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyArgumentsCall.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsCall.class);
+  @Nullable
+  public ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall() {
+    return findChildByClass(ElixirNoParenthesesManyArgumentsCall.class);
   }
 
   @Override
@@ -308,12 +261,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirNumber> getNumberList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirQualifiedAlias> getQualifiedAliasList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQualifiedAlias.class);
   }
 
   @Override

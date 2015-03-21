@@ -575,6 +575,12 @@ public class ElixirPsiImplUtil {
         return excessWhitespaceASTNode;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static QuotableArguments getArguments(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
+      return noParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+    }
+
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
         return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
     }
@@ -793,6 +799,18 @@ public class ElixirPsiImplUtil {
         }
 
         return heredocLineList;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Quotable getIdentifier(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
+        Quotable identifier = noParenthesesManyArgumentsCall.getNoParenthesesQualifiedIdentifier();
+
+        if (identifier == null) {
+            identifier = noParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
+        }
+
+        return identifier;
     }
 
     public static List<KeywordPair> getKeywordPairList(ElixirList list) {
@@ -1233,24 +1251,30 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedCall noParenthesesManyArgumentsUnqualifiedCall) {
-        PsiElement noParenthesesManyArgumentsUnqualifiedIdentifier = noParenthesesManyArgumentsUnqualifiedCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
-        String functionName = noParenthesesManyArgumentsUnqualifiedIdentifier.getText();
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
+        Quotable identifier = noParenthesesManyArgumentsCall.getIdentifier();
+        OtpErlangObject quotedIdentifier = identifier.quote();
 
-        ElixirNoParenthesesManyArguments noParenthesesManyArguments = noParenthesesManyArgumentsUnqualifiedCall.getNoParenthesesManyArguments();
-        OtpErlangObject[] quotedArguments = noParenthesesManyArguments.quoteArguments();
+        QuotableArguments arguments = noParenthesesManyArgumentsCall.getArguments();
+        OtpErlangObject[] quotedArguments = arguments.quoteArguments();
 
         return quotedFunctionCall(
-                functionName,
-                metadata(noParenthesesManyArgumentsUnqualifiedIdentifier),
+                quotedIdentifier,
+                metadata(noParenthesesManyArgumentsCall),
                 quotedArguments
         );
     }
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier noParenthesesManyArgumentsUnqualifiedIdentifier) {
+        return new OtpErlangAtom(noParenthesesManyArgumentsUnqualifiedIdentifier.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsCall noParenthesesNoArgumentsCall) {
-        Quotable identifier = noParenthesesNoArgumentsCall.getNoParenthesesNoArgumentsQualifiedIdentifier();
+        Quotable identifier = noParenthesesNoArgumentsCall.getNoParenthesesQualifiedIdentifier();
         OtpErlangObject quotedIdentifier = identifier.quote();
 
         return quotedFunctionCall(

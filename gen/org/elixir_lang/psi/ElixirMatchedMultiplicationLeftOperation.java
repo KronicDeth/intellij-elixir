@@ -3,13 +3,11 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirInterpolation extends Quotable {
-
-  @NotNull
-  List<ElixirAdjacentExpression> getAdjacentExpressionList();
+public interface ElixirMatchedMultiplicationLeftOperation extends InfixOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -37,12 +35,6 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
-
-  @NotNull
-  List<ElixirEmptyParentheses> getEmptyParenthesesList();
-
-  @NotNull
-  List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
@@ -111,49 +103,28 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList();
 
   @NotNull
-  List<ElixirMatchedDotRightOperation> getMatchedDotRightOperationList();
-
-  @NotNull
   List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList();
 
-  @NotNull
-  List<ElixirMatchedHatRightOperation> getMatchedHatRightOperationList();
-
-  @NotNull
-  List<ElixirMatchedMultiplicationRightOperation> getMatchedMultiplicationRightOperationList();
+  @Nullable
+  ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation();
 
   @NotNull
   List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtRightOperation> getMatchedNonNumericAtRightOperationList();
-
-  @NotNull
   List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericCaptureRightOperation> getMatchedNonNumericCaptureRightOperationList();
 
   @NotNull
   List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryRightOperation> getMatchedNonNumericUnaryRightOperationList();
-
-  @NotNull
-  List<ElixirNoParenthesesManyArgumentsCall> getNoParenthesesManyArgumentsCallList();
-
-  @NotNull
-  List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList();
+  ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();
-
-  @NotNull
-  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirStringHeredoc> getStringHeredocList();

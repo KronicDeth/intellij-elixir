@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesNoArgumentsQualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesNoArgumentsQualifiedIdentifier {
+public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesQualifiedIdentifier {
 
-  public ElixirNoParenthesesNoArgumentsQualifiedIdentifierImpl(ASTNode node) {
+  public ElixirNoParenthesesQualifiedIdentifierImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesNoArgumentsQualifiedIdentifier(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesQualifiedIdentifier(this);
     else super.accept(visitor);
   }
 
@@ -214,26 +214,26 @@ public class ElixirNoParenthesesNoArgumentsQualifiedIdentifierImpl extends ASTWr
 
   @Override
   @Nullable
-  public ElixirMatchedDotOperation getMatchedDotOperation() {
-    return findChildByClass(ElixirMatchedDotOperation.class);
+  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
+    return findChildByClass(ElixirMatchedDotRightOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
+  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
+  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
   }
 
   @Override

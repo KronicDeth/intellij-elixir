@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedHatOperation extends InfixOperation {
+public interface ElixirMatchedDotLeftOperation extends InfixOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -34,10 +34,10 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   List<ElixirCharToken> getCharTokenList();
 
   @NotNull
-  List<ElixirEmptyBlock> getEmptyBlockList();
+  ElixirDotInfixOperator getDotInfixOperator();
 
   @NotNull
-  ElixirHatInfixOperator getHatInfixOperator();
+  List<ElixirEmptyBlock> getEmptyBlockList();
 
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
@@ -103,37 +103,22 @@ public interface ElixirMatchedHatOperation extends InfixOperation {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
-
-  @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
+  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
+  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
-
-  @NotNull
-  List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList();
+  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();
-
-  @NotNull
-  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirStringHeredoc> getStringHeredocList();

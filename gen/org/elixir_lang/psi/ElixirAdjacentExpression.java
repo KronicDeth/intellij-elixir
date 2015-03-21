@@ -100,28 +100,40 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @Nullable
-  ElixirMatchedHatOperation getMatchedHatOperation();
+  ElixirMatchedDotRightOperation getMatchedDotRightOperation();
 
   @Nullable
-  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedHatRightOperation getMatchedHatRightOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
 
   @Nullable
-  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
+  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
 
   @Nullable
-  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
+
+  @Nullable
+  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();

@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
+public interface ElixirMatchedNonNumericCaptureRightOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -21,6 +21,9 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
 
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
+
+  @NotNull
+  ElixirCapturePrefixOperator getCapturePrefixOperator();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();
@@ -98,34 +101,31 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotOperation getMatchedDotOperation();
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+  ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
 
   @Nullable
-  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
+  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
-  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
+  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
+  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
@@ -135,9 +135,6 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
-
-  @NotNull
-  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
 
   @NotNull
   OtpErlangObject quote();

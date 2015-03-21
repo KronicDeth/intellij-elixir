@@ -2,14 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public interface ElixirNoParenthesesManyStrictNoParenthesesExpression extends PsiElement {
 
-  @Nullable
-  ElixirNoParenthesesManyArgumentsQualifiedCall getNoParenthesesManyArgumentsQualifiedCall();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsUnqualifiedCall getNoParenthesesManyArgumentsUnqualifiedCall();
+  @NotNull
+  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
 }

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ElixirNoParenthesesNoArgumentsCall extends Quotable {
 
   @NotNull
-  ElixirNoParenthesesNoArgumentsQualifiedIdentifier getNoParenthesesNoArgumentsQualifiedIdentifier();
+  ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier();
 
   @NotNull
   OtpErlangObject quote();
