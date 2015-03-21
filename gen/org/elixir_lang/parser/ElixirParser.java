@@ -3313,14 +3313,14 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // dotInfixOperator ALIAS_TOKEN
+  // dotInfixOperator alias
   public static boolean qualifiedAlias(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "qualifiedAlias")) return false;
     if (!nextTokenIs(b, "<qualified alias>", DOT_OPERATOR, EOL)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _LEFT_, "<qualified alias>");
     r = dotInfixOperator(b, l + 1);
-    r = r && consumeToken(b, ALIAS_TOKEN);
+    r = r && alias(b, l + 1);
     exit_section_(b, l, m, QUALIFIED_ALIAS, r, false, null);
     return r;
   }

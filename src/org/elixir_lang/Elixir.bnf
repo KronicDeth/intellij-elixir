@@ -996,7 +996,8 @@ private matchedDotRightOperand ::= (
                                    ) &dotInfixOperator
 left matchedDotOperation ::= dotInfixOperator matchedDotRightOperand
 private matchedDotRightMostOperation ::= noParenthesesNoArgumentsQualifiedIdentifier noParenthesesNoArgumentsCall | qualifiedAlias
-left qualifiedAlias ::= dotInfixOperator ALIAS_TOKEN
+left qualifiedAlias ::= dotInfixOperator alias
+                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
 atPrefixOperator ::= AT_OPERATOR EOL*

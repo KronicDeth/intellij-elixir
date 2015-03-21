@@ -464,7 +464,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQualifiedAlias(@NotNull ElixirQualifiedAlias o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitSigilModifiers(@NotNull ElixirSigilModifiers o) {

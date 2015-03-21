@@ -29,6 +29,7 @@ public class ElixirPsiImplUtil {
             PsiComment.class,
             PsiWhiteSpace.class
     };
+    public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
@@ -471,7 +472,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAlias alias) {
         return quotedFunctionCall(
-                "__aliases__",
+                ALIASES,
                 metadata(alias, 0),
                 new OtpErlangAtom(alias.getText())
         );
@@ -1274,28 +1275,59 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirQualifiedAlias qualifiedAlias) {
-        ASTNode[] children = qualifiedAlias.getNode().getChildren(null);
+        PsiElement[] children = qualifiedAlias.getChildren();
 
-        if (children.length != 1) {
-            throw new NotImplementedException("Don't know how to quote qualifiedAlias with qualifier");
+        if (children.length != 3) {
+            throw new NotImplementedException("3 children expected for qualifiedAlias (left alias, dot, right alias)");
         }
 
-        OtpErlangObject quoted;
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
 
-        ASTNode child = children[0];
+        Quotable rightOperand = (Quotable) children[2];
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
 
-        IElementType elementType = child.getElementType();
+        OtpErlangObject quoted = null;
 
-        if (elementType == ElixirTypes.ALIAS) {
-            quoted = quotedFunctionCall(
-                    "__aliases__",
-                    metadata(qualifiedAlias, 0),
-                    new OtpErlangAtom(
-                            child.getText()
-                    )
-            );
-        } else {
-            throw new NotImplementedException("Don't know how to quote non-Alias");
+        if (quotedLeftOperand instanceof OtpErlangTuple) {
+            final OtpErlangTuple leftTuple = (OtpErlangTuple) quotedLeftOperand;
+            OtpErlangObject leftFirst = leftTuple.elementAt(0);
+
+            if (leftFirst.equals(ALIASES)) {
+                OtpErlangList leftAliases = (OtpErlangList) leftTuple.elementAt(2);
+
+                if (quotedRightOperand instanceof OtpErlangTuple) {
+                    OtpErlangTuple rightTuple = (OtpErlangTuple) quotedRightOperand;
+                    OtpErlangObject rightFirst = rightTuple.elementAt(0);
+
+                    if (rightFirst.equals(ALIASES)) {
+                        OtpErlangList rightAliases = (OtpErlangList) rightTuple.elementAt(2);
+
+                        if (rightAliases.arity() != 1) {
+                            throw new NotImplementedException("Expected right operand of qualifiedAlias to be a single alias");
+                        }
+
+                        OtpErlangObject lastAlias = rightAliases.elementAt(0);
+
+                        OtpErlangObject[] combinedElements = new OtpErlangObject[leftAliases.arity() + 1];
+
+                        for (int i = 0; i < leftAliases.arity(); i++) {
+                            combinedElements[i] = leftAliases.elementAt(i);
+                        }
+
+                        combinedElements[combinedElements.length - 1] = lastAlias;
+
+                        quoted = quotedFunctionCall(
+                                ALIASES,
+                                /* testing in iex reveal line is based on last alias as in
+                                   iex> Code.string_to_quoted("D.C.\nB")
+                                   {:ok, {:__aliases__, [line: 2], [:D, :C, :B]}} */
+                                metadata(rightOperand),
+                                combinedElements
+                        );
+                    }
+                }
+            }
         }
 
         return quoted;

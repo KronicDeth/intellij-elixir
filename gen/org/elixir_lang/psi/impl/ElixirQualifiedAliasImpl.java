@@ -1,12 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements ElixirQualifiedAlias {
 
@@ -20,9 +24,9 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
   }
 
   @Override
-  @Nullable
-  public ElixirAlias getAlias() {
-    return findChildByClass(ElixirAlias.class);
+  @NotNull
+  public List<ElixirAlias> getAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
   }
 
   @Override
@@ -257,6 +261,11 @@ public class ElixirQualifiedAliasImpl extends ASTWrapperPsiElement implements El
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }
