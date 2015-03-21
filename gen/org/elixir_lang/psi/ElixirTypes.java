@@ -193,7 +193,6 @@ public interface ElixirTypes {
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("MAP_OPERATOR");
-  IElementType MATCHEDDOTOPERATION = new ElixirTokenType("matchedDotOperation");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NIL = new ElixirTokenType("nil");

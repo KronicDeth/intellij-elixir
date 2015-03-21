@@ -157,7 +157,7 @@ private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
    internals of matchedDotExpression so that at least one matchedDotOperation occurs by stripping the ( )? around the
    final two rules. */
 // private because noParenthesesQualifiedIdentifier is a left rule so it will enclose everything and can handle quoting
-private noParenthesesManyArgumentsQualifiedIdentifier ::= matchedDotLeftOperand matchedDotOperation* noParenthesesQualifiedIdentifier
+private noParenthesesManyArgumentsQualifiedIdentifier ::= matchedDotLeftOperand matchedDotLeftOperation* noParenthesesQualifiedIdentifier
 /* Not the same as noParenthesesQualifiedIdentifier because with the '.' in qualification, things like strings, and true
    become valid identifiers. */
 noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER
@@ -1068,7 +1068,7 @@ atPrefixOperator ::= AT_OPERATOR EOL*
 private nonNumericAtPrefixOperator ::= atPrefixOperator !numeric
 
 private matchedNonNumericAtExpression ::= matchedNonNumericAtRightExpression |
-                                          accessExpression
+                                          matchedOperandExpression
 
 private matchedNonNumericAtRightExpression ::= matchedNonNumericAtRightOperation
 private matchedNonNumericAtRightOperand ::= noParenthesesManyArgumentsCall | matchedNonNumericAtLeftOperand
@@ -1076,9 +1076,12 @@ matchedNonNumericAtRightOperation ::= nonNumericAtPrefixOperator matchedNonNumer
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 private matchedNonNumericAtLeftExpression ::= matchedNonNumericAtLeftOperation | matchedNonNumericAtLeftOperand
-private matchedNonNumericAtLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+private matchedNonNumericAtLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedOperandExpression
 matchedNonNumericAtLeftOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtLeftOperand
                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+private matchedOperandExpression ::= noParenthesesNoArgumentsUnqualifiedCallOrVariable |
+                                     accessExpression
 
 atNumericOperation ::= atPrefixOperator numeric
                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }

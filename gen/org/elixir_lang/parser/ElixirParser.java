@@ -2773,13 +2773,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericAtRightExpression |
-  //                                           accessExpression
+  //                                           matchedOperandExpression
   static boolean matchedNonNumericAtExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericAtExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericAtRightExpression(b, l + 1);
-    if (!r) r = accessExpression(b, l + 1);
+    if (!r) r = matchedOperandExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2797,15 +2797,14 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | noParenthesesNoArgumentsUnqualifiedCallOrVariable | accessExpression
+  // matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedOperandExpression
   static boolean matchedNonNumericAtLeftOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericAtLeftOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureLeftOperation(b, l + 1);
     if (!r) r = matchedNonNumericUnaryLeftOperation(b, l + 1);
-    if (!r) r = noParenthesesNoArgumentsUnqualifiedCallOrVariable(b, l + 1);
-    if (!r) r = accessExpression(b, l + 1);
+    if (!r) r = matchedOperandExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3014,6 +3013,19 @@ public class ElixirParser implements PsiParser {
     r = nonNumericUnaryPrefixOperator(b, l + 1);
     r = r && matchedNonNumericUnaryRightOperand(b, l + 1);
     exit_section_(b, l, m, MATCHED_NON_NUMERIC_UNARY_RIGHT_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // noParenthesesNoArgumentsUnqualifiedCallOrVariable |
+  //                                      accessExpression
+  static boolean matchedOperandExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedOperandExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesNoArgumentsUnqualifiedCallOrVariable(b, l + 1);
+    if (!r) r = accessExpression(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -3231,7 +3243,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedDotLeftOperand matchedDotOperation* noParenthesesQualifiedIdentifier
+  // matchedDotLeftOperand matchedDotLeftOperation* noParenthesesQualifiedIdentifier
   static boolean noParenthesesManyArgumentsQualifiedIdentifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesManyArgumentsQualifiedIdentifier")) return false;
     boolean r;
@@ -3243,12 +3255,12 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // matchedDotOperation*
+  // matchedDotLeftOperation*
   private static boolean noParenthesesManyArgumentsQualifiedIdentifier_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesManyArgumentsQualifiedIdentifier_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, MATCHEDDOTOPERATION)) break;
+      if (!matchedDotLeftOperation(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "noParenthesesManyArgumentsQualifiedIdentifier_1", c)) break;
       c = current_position_(b);
     }

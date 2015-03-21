@@ -104,6 +104,9 @@ public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
   ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
 
   @Nullable
+  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
+
+  @Nullable
   ElixirMatchedDotRightOperation getMatchedDotRightOperation();
 
   @Nullable
