@@ -77,7 +77,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueEOLComma() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testKeywordValueList() {
@@ -133,11 +133,11 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalEOLComma() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testPositionalsEOLComma() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testPositionalsWithKeywords() {
