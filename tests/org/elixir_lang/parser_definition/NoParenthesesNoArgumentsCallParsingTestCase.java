@@ -4,6 +4,7 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 9/17/14.
  */
 public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase {
+
     /*
      *
      * Vary Qualifier
@@ -43,6 +44,12 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
      */
 
     public void testAtNumericOperationDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    /* underscore is a special case of identifier because _ is also a decimal separator, so this checks that _ as an
+       identifier is favored. */
+    public void testAtNumericOperationDotUnderscore() {
         assertParsedAndQuotedCorrectly();
     }
 

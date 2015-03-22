@@ -731,8 +731,20 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DECIMAL_WHOLE_NUMBER> {
-  {DECIMAL_MARK} { yybegin(DECIMAL_FRACTION);
-                   return ElixirTypes.DECIMAL_MARK; }
+  /*
+   Error handling with {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} can only occur after at least one valid decimal
+   digit after the decimal mark because {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} will be parsed as an
+   identifier immediately after `.`
+
+   ```
+   iex> Code.string_to_quoted("1._")
+   {:ok, {{:., [line: 1], [1, :_]}, [line: 1], []}}
+   iex> Code.string_to_quoted("1.a")
+   {:ok, {{:., [line: 1], [1, :a]}, [line: 1], []}}
+   ```
+  */
+  {DECIMAL_MARK} / {VALID_DECIMAL_DIGITS} { yybegin(DECIMAL_FRACTION);
+                                            return ElixirTypes.DECIMAL_MARK; }
 }
 
 <DECIMAL_EXPONENT,
