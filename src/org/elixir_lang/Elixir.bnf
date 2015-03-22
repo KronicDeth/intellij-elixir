@@ -1272,6 +1272,7 @@ openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
 escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 escapedEOL ::= ESCAPE EOL
+               { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] }
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END

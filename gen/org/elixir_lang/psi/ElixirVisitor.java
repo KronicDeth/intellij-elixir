@@ -124,7 +124,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitEscapedEOL(@NotNull ElixirEscapedEOL o) {
-    visitPsiElement(o);
+    visitEscapeSequence(o);
   }
 
   public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {

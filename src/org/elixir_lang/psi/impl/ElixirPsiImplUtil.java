@@ -179,6 +179,11 @@ public class ElixirPsiImplUtil {
         return parsedCodePoint;
     }
 
+    @Contract(pure = true)
+    public static int codePoint(@SuppressWarnings("unused") ElixirEscapedEOL escapedEOL) {
+        return 10;
+    }
+
     // @return -1 if codePoint cannot be parsed.
     public static int codePoint(@NotNull EscapedHexadecimalDigits hexadecimalEscapeSequence) {
         ASTNode[] validHexadecimalDigitsArray = hexadecimalEscapeSequence
