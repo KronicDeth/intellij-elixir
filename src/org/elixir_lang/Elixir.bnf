@@ -1259,7 +1259,12 @@ private escapeSequence ::= hexadecimalEscapeSequence |
                            /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
                               ("\x") in hexadecimalEscapeSequence  */
                            escapedCharacter
-hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence) { methods = [codePoint] pin = 2 }
+hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
+                              {
+                                implements = "org.elixir_lang.psi.EscapeSequence"
+                                methods = [codePoint]
+                                pin = 2
+                              }
 enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLOSING_CURLY
                                       { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] pin = 1 }
 openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS

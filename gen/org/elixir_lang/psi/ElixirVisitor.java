@@ -144,7 +144,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHexadecimalEscapeSequence(@NotNull ElixirHexadecimalEscapeSequence o) {
-    visitPsiElement(o);
+    visitEscapeSequence(o);
   }
 
   public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {

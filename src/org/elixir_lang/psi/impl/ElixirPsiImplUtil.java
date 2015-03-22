@@ -529,7 +529,7 @@ public class ElixirPsiImplUtil {
 
         final ASTNode tokenized = children[1];
         IElementType tokenizedElementType = tokenized.getElementType();
-        OtpErlangObject quoted;
+        int codePoint;
 
         if (tokenizedElementType == ElixirTypes.CHAR_LIST_FRAGMENT) {
             if (tokenized.getTextLength() != 1) {
@@ -537,13 +537,13 @@ public class ElixirPsiImplUtil {
             }
 
             String tokenizedString = tokenized.getText();
-            int codePoint = tokenizedString.codePointAt(0);
-            quoted = new OtpErlangLong(codePoint);
+            codePoint = tokenizedString.codePointAt(0);
         } else {
-            throw new NotImplementedException("Don't know how to quote " + tokenizedElementType);
+            EscapeSequence escapeSequence = (EscapeSequence) tokenized.getPsi();
+            codePoint = escapeSequence.codePoint();
         }
 
-        return quoted;
+        return new OtpErlangLong(codePoint);
     }
 
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
