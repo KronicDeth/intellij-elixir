@@ -101,13 +101,22 @@ public interface ElixirMatchedNonNumericAtRightOperation extends PrefixOperation
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
+
+  @Nullable
   ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
 
   @Nullable
   ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
+  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
+
+  @Nullable
   ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
 
   @Nullable
   ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();

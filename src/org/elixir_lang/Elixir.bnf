@@ -946,7 +946,8 @@ private matchedNonNumericCaptureRightOperand ::= matchedNonNumericCaptureRightOp
 matchedNonNumericCaptureRightOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureRightOperand
                                            { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
-private matchedNonNumericCaptureLeftExpression ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericCaptureLeftOperand
+private matchedNonNumericCaptureLeftExpression ::= matchedNonNumericCaptureLeftOperation |
+                                                   matchedNonNumericCaptureLeftOperand
 private matchedNonNumericCaptureLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedMultiplicationLeftExpression
 matchedNonNumericCaptureLeftOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureLeftOperand
                                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
@@ -1013,14 +1014,17 @@ private matchedNonNumericUnaryExpression ::= matchedNonNumericUnaryRightExpressi
                                              matchedDotExpression
 
 private matchedNonNumericUnaryRightExpression ::= matchedNonNumericUnaryRightOperation
-private matchedNonNumericUnaryRightOperand ::= matchedNonNumericUnaryRightOperation |
+private matchedNonNumericUnaryRightOperand ::= matchedNonNumericCaptureRightOperation |
+                                               matchedNonNumericUnaryRightOperation |
                                                noParenthesesManyArgumentsCall |
                                                matchedNonNumericUnaryLeftOperand
 matchedNonNumericUnaryRightOperation ::= nonNumericUnaryPrefixOperator matchedNonNumericUnaryRightOperand
                                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 private matchedNonNumericUnaryLeftExpression ::= matchedNonNumericUnaryLeftOperation | matchedNonNumericUnaryLeftOperand
-private matchedNonNumericUnaryLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedDotLeftExpression
+private matchedNonNumericUnaryLeftOperand ::= matchedNonNumericCaptureLeftOperation |
+                                              matchedNonNumericUnaryLeftOperation |
+                                              matchedDotLeftExpression
 matchedNonNumericUnaryLeftOperation ::= nonNumericUnaryPrefixOperator matchedNonNumericUnaryLeftOperand
                                         { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
@@ -1075,14 +1079,19 @@ private matchedNonNumericAtExpression ::= matchedNonNumericAtRightExpression |
                                           matchedOperandExpression
 
 private matchedNonNumericAtRightExpression ::= matchedNonNumericAtRightOperation
-private matchedNonNumericAtRightOperand ::= matchedNonNumericAtRightOperation |
+private matchedNonNumericAtRightOperand ::= matchedNonNumericCaptureRightOperation |
+                                            matchedNonNumericUnaryRightOperation |
+                                            matchedNonNumericAtRightOperation |
                                             noParenthesesManyArgumentsCall |
                                             matchedNonNumericAtLeftOperand
 matchedNonNumericAtRightOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtRightOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 private matchedNonNumericAtLeftExpression ::= matchedNonNumericAtLeftOperation | matchedNonNumericAtLeftOperand
-private matchedNonNumericAtLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedOperandExpression
+private matchedNonNumericAtLeftOperand ::= matchedNonNumericCaptureLeftOperation |
+                                           matchedNonNumericUnaryLeftOperation |
+                                           matchedNonNumericAtLeftOperation |
+                                           matchedOperandExpression
 matchedNonNumericAtLeftOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtLeftOperand
                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 

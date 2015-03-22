@@ -121,6 +121,9 @@ public interface ElixirQualifiedAlias extends Quotable {
   ElixirNumber getNumber();
 
   @Nullable
+  ElixirQualifiedAlias getQualifiedAlias();
+
+  @Nullable
   ElixirStringHeredoc getStringHeredoc();
 
   @Nullable

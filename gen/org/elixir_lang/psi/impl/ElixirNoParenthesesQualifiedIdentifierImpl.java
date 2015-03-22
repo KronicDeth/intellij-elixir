@@ -250,6 +250,12 @@ public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiEle
 
   @Override
   @Nullable
+  public ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier() {
+    return findChildByClass(ElixirNoParenthesesQualifiedIdentifier.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNumber getNumber() {
     return findChildByClass(ElixirNumber.class);
   }

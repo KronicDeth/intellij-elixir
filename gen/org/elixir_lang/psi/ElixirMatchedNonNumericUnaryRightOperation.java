@@ -107,6 +107,9 @@ public interface ElixirMatchedNonNumericUnaryRightOperation extends PrefixOperat
   ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable
+  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
+
+  @Nullable
   ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
 
   @Nullable

@@ -220,6 +220,12 @@ public class ElixirMatchedNonNumericUnaryRightOperationImpl extends ASTWrapperPs
 
   @Override
   @Nullable
+  public ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureRightOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
     return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
   }

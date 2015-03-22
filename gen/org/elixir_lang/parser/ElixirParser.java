@@ -2797,13 +2797,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedOperandExpression
+  // matchedNonNumericCaptureLeftOperation |
+  //                                            matchedNonNumericUnaryLeftOperation |
+  //                                            matchedNonNumericAtLeftOperation |
+  //                                            matchedOperandExpression
   static boolean matchedNonNumericAtLeftOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericAtLeftOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureLeftOperation(b, l + 1);
     if (!r) r = matchedNonNumericUnaryLeftOperation(b, l + 1);
+    if (!r) r = matchedNonNumericAtLeftOperation(b, l + 1);
     if (!r) r = matchedOperandExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -2829,14 +2833,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericAtRightOperation |
+  // matchedNonNumericCaptureRightOperation |
+  //                                             matchedNonNumericUnaryRightOperation |
+  //                                             matchedNonNumericAtRightOperation |
   //                                             noParenthesesManyArgumentsCall |
   //                                             matchedNonNumericAtLeftOperand
   static boolean matchedNonNumericAtRightOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericAtRightOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedNonNumericAtRightOperation(b, l + 1);
+    r = matchedNonNumericCaptureRightOperation(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryRightOperation(b, l + 1);
+    if (!r) r = matchedNonNumericAtRightOperation(b, l + 1);
     if (!r) r = noParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = matchedNonNumericAtLeftOperand(b, l + 1);
     exit_section_(b, m, null, r);
@@ -2870,7 +2878,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureLeftOperation | matchedNonNumericCaptureLeftOperand
+  // matchedNonNumericCaptureLeftOperation |
+  //                                                    matchedNonNumericCaptureLeftOperand
   static boolean matchedNonNumericCaptureLeftExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureLeftExpression")) return false;
     boolean r;
@@ -2966,7 +2975,9 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftOperation | matchedDotLeftExpression
+  // matchedNonNumericCaptureLeftOperation |
+  //                                               matchedNonNumericUnaryLeftOperation |
+  //                                               matchedDotLeftExpression
   static boolean matchedNonNumericUnaryLeftOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericUnaryLeftOperand")) return false;
     boolean r;
@@ -2998,14 +3009,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedNonNumericUnaryRightOperation |
+  // matchedNonNumericCaptureRightOperation |
+  //                                                matchedNonNumericUnaryRightOperation |
   //                                                noParenthesesManyArgumentsCall |
   //                                                matchedNonNumericUnaryLeftOperand
   static boolean matchedNonNumericUnaryRightOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericUnaryRightOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedNonNumericUnaryRightOperation(b, l + 1);
+    r = matchedNonNumericCaptureRightOperation(b, l + 1);
+    if (!r) r = matchedNonNumericUnaryRightOperation(b, l + 1);
     if (!r) r = noParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = matchedNonNumericUnaryLeftOperand(b, l + 1);
     exit_section_(b, m, null, r);

@@ -208,6 +208,12 @@ public class ElixirMatchedNonNumericAtLeftOperationImpl extends ASTWrapperPsiEle
 
   @Override
   @Nullable
+  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
     return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
   }

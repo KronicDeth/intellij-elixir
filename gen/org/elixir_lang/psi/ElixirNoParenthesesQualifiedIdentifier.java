@@ -122,6 +122,9 @@ public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
+  ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier();
+
+  @Nullable
   ElixirNumber getNumber();
 
   @Nullable
