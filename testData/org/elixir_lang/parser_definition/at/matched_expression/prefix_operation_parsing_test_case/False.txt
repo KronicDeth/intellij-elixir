@@ -1,8 +1,0 @@
-Elixir File(0,17)
-  PsiComment(ElixirTokenType.COMMENT)('# @(false)')(0,10)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(10,11)
-    PsiElement(ElixirTokenType.EOL)('\n')(10,11)
-  ElixirMatchedAtOperationImpl(MATCHED_AT_OPERATION)(11,17)
-    ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(11,12)
-      PsiElement(ElixirTokenType.AT_OPERATOR)('@')(11,12)
-    PsiElement(ElixirTokenType.false)('false')(12,17)
