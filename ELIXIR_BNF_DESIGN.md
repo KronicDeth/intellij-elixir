@@ -168,7 +168,7 @@ private matched<name>RightExpression ::= matched<name>RightOperation
 matched<name>RightOperand for prefix operator follow the same pattern as for infix operators
 
 ```
-private matched<name>RightOperand ::= noParenthesesManyArgumentsCall | matched<name>LeftOperand
+private matched<name>RightOperand ::= matched<name>RightOperation | noParenthesesManyArgumentsCall | matched<name>LeftOperand
 ```
 
 ### Operation

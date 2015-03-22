@@ -101,6 +101,9 @@ public interface ElixirMatchedNonNumericAtRightOperation extends PrefixOperation
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
+
+  @Nullable
   ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
 
   @Nullable

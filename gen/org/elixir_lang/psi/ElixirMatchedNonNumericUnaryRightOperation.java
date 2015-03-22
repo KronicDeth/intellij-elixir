@@ -110,6 +110,9 @@ public interface ElixirMatchedNonNumericUnaryRightOperation extends PrefixOperat
   ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
 
   @Nullable
+  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
+
+  @Nullable
   ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
 
   @Nullable
