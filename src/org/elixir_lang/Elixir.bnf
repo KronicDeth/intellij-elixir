@@ -924,6 +924,13 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
 
 private matchedExpression ::= matchedNonNumericCaptureExpression
 
+/*
+ * Non-Numeric Capture Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
+ *
+ */
+
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
 capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                           {
@@ -952,6 +959,13 @@ private matchedNonNumericCaptureLeftOperand ::= matchedNonNumericCaptureLeftOper
 matchedNonNumericCaptureLeftOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureLeftOperand
                                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+/*
+ * Multiplication Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65
+ *
+ */
+
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65)
 multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                 {
@@ -975,6 +989,13 @@ private matchedMultiplicationLeftOperand ::= matchedNonNumericCaptureLeftOperati
 left matchedMultiplicationLeftOperation ::= multiplicationInfixOperator matchedMultiplicationLeftOperand
                                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
+/*
+ * Hat Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66
+ *
+ */
+
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66)
 hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                      {
@@ -997,6 +1018,13 @@ private matchedHatLeftExpression ::= matchedHatLeftOperand matchedHatLeftOperati
 private matchedHatLeftOperand ::= matchedNonNumericCaptureLeftOperation | matchedNonNumericUnaryLeftExpression
 left matchedHatLeftOperation ::= hatInfixOperator matchedHatLeftOperand
                                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Non-Numeric Unary Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
+ *
+ */
 
 // non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67)
 unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
@@ -1027,6 +1055,14 @@ private matchedNonNumericUnaryLeftOperand ::= matchedNonNumericCaptureLeftOperat
                                               matchedDotLeftExpression
 matchedNonNumericUnaryLeftOperation ::= nonNumericUnaryPrefixOperator matchedNonNumericUnaryLeftOperand
                                         { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Dot Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
+ *
+ */
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
 dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
@@ -1062,6 +1098,13 @@ private matchedDotLeftExpression ::= matchedDotLeftOperand matchedDotLeftOperati
 private matchedDotLeftOperand ::= matchedNonNumericAtLeftExpression
 left matchedDotLeftOperation ::= dotInfixOperator matchedDotLeftOperand
                                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Non-Numeric At Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
+ *
+ */
 
 // non-associative (https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70)
 atPrefixOperator ::= AT_OPERATOR EOL*
@@ -1107,6 +1150,10 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
 
 emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L200-L223
+ */
 
 private accessExpression ::= atNumericOperation |
                              captureNumericOperation |
