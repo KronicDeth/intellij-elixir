@@ -1,0 +1,8 @@
+Elixir File(0,4)
+  ElixirMatchedNonNumericAtRightOperationImpl(MATCHED_NON_NUMERIC_AT_RIGHT_OPERATION)(0,4)
+    ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
+      PsiElement(ElixirTokenType.AT_OPERATOR)('@')(0,1)
+    ElixirEmptyBlockImpl(EMPTY_BLOCK)(1,4)
+      PsiElement(ElixirTokenType.()('(')(1,2)
+      PsiElement(ElixirTokenType.;)(';')(2,3)
+      PsiElement(ElixirTokenType.))(')')(3,4)

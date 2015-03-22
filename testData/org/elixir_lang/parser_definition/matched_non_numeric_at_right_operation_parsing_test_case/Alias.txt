@@ -1,0 +1,6 @@
+Elixir File(0,6)
+  ElixirMatchedNonNumericAtRightOperationImpl(MATCHED_NON_NUMERIC_AT_RIGHT_OPERATION)(0,6)
+    ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
+      PsiElement(ElixirTokenType.AT_OPERATOR)('@')(0,1)
+    ElixirAliasImpl(ALIAS)(1,6)
+      PsiElement(ElixirTokenType.ALIAS_TOKEN)('Alias')(1,6)
