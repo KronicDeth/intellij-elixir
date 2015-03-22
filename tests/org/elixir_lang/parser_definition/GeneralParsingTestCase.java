@@ -8,10 +8,6 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharToken() {
-        doTest(true);
-    }
-
     public void testCommentAfterNumber() {
         assertParsedAndQuotedCorrectly();
     }

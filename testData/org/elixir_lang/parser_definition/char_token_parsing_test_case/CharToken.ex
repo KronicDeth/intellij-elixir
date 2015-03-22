@@ -90,11 +90,3 @@
 ?\x8
 ?\x9
 ?\x0
-
-#
-# Characters
-#
-
-?  # space
-?    # tab
-?a
