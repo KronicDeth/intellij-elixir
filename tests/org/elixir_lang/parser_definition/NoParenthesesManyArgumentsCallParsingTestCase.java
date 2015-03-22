@@ -132,12 +132,96 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         doTest(true);
     }
 
+    public void testPositionalAlias() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalAtNonNumericOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalAtom() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalAtomKeyword() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalCharListHeredoc() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalCharListLine() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalCharToken() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalDecimalFloat() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalEmptyBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testPositionalEOLComma() {
         assertParsedWithError();
     }
 
+    public void testPositionalHatOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalList() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalMultiplicationOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalNonNumericCaptureOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalNonNumericUnaryOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalNumericAtOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalNumericCaptureOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalNumericUnaryOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalQualifiedAlias() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testPositionalsEOLComma() {
         assertParsedWithError();
+    }
+
+    public void testPositionalSigil() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalString() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalStringHeredoc() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalsWithKeywords() {
@@ -146,6 +230,10 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
 
     public void testPositionalsWithoutKeywords() {
         doTest(true);
+    }
+
+    public void testPositionalVariable() {
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
