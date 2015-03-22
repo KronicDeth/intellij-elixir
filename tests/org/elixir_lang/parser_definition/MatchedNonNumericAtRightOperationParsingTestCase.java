@@ -4,7 +4,15 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 9/17/14.
  */
 public class MatchedNonNumericAtRightOperationParsingTestCase extends ParsingTestCase {
+    /*
+     * matchedNonNumericAtRightOperand
+     */
+
     public void testNoParenthesesManyArgumentsCall() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAtNoParenthesesManyArgumentsCall() {
         assertParsedAndQuotedCorrectly();
     }
 
