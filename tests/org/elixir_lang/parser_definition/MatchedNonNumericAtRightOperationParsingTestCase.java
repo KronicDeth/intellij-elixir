@@ -16,6 +16,14 @@ public class MatchedNonNumericAtRightOperationParsingTestCase extends ParsingTes
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testCaptureNoParenthesesManyArgumentsCall() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnaryNoParenthesesManyArgumentsCall() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/matched_non_numeric_at_right_operation_parsing_test_case";
