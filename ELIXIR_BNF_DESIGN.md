@@ -149,6 +149,7 @@ In general the `expression` suffix should be used for private rules.
 
 ```
 private matched<name>Expression ::= matched<name>RightExpression |
+                                    matched<name>LeftExpression |
                                     matched<name(precedence + 1)>Expression
 ```
 
@@ -170,8 +171,7 @@ matched<name>RightOperand for prefix operator follow the same pattern as for inf
 ```
 private matched<name>RightOperand ::= <for name(p_l) with equal or lower precedence and prefix fixity:
                                         matched<name(p_l)>RightOperation> |
-                                      noParenthesesManyArgumentsCall |
-                                      matched<name>LeftOperand
+                                      noParenthesesManyArgumentsCall
 ```
 
 ### Operation

@@ -5,7 +5,7 @@ package org.elixir_lang;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.lexer.group.*;
+import org.elixir_lang.lexer.group.Base;
 import org.elixir_lang.psi.ElixirTypes;
 
 
