@@ -9,7 +9,7 @@ public class TailExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoParenthesesCall() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
