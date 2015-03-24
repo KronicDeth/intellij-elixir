@@ -19,7 +19,7 @@ public class NoParentheseStrictTestCase extends LightCodeInsightFixtureTestCase 
     }
 
     public void testFunctionSpacePositinalsAndKeywordsInParentheses() {
-        myFixture.configureByFiles("PositionalsAndKeywordsInParentheses.ex");
+        myFixture.configureByFiles("FunctionSpacePositionalsAndKeywordsInParentheses.ex");
         myFixture.enableInspections(NoParenthesesStrict.class);
         myFixture.checkHighlighting();
     }
