@@ -2,164 +2,140 @@
 package org.elixir_lang.psi;
 
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface ElixirAdjacentExpression extends PsiElement {
 
-  @NotNull
-  List<ElixirAlias> getAliasList();
+  @Nullable
+  ElixirAlias getAlias();
 
-  @NotNull
-  List<ElixirAtNumericOperation> getAtNumericOperationList();
+  @Nullable
+  ElixirAtNumericOperation getAtNumericOperation();
 
-  @NotNull
-  List<ElixirAtom> getAtomList();
+  @Nullable
+  ElixirAtom getAtom();
 
-  @NotNull
-  List<ElixirAtomKeyword> getAtomKeywordList();
+  @Nullable
+  ElixirAtomKeyword getAtomKeyword();
 
-  @NotNull
-  List<ElixirCaptureNumericOperation> getCaptureNumericOperationList();
+  @Nullable
+  ElixirCaptureNumericOperation getCaptureNumericOperation();
 
-  @NotNull
-  List<ElixirCharListHeredoc> getCharListHeredocList();
+  @Nullable
+  ElixirCharListHeredoc getCharListHeredoc();
 
-  @NotNull
-  List<ElixirCharListLine> getCharListLineList();
+  @Nullable
+  ElixirCharListLine getCharListLine();
 
-  @NotNull
-  List<ElixirCharToken> getCharTokenList();
+  @Nullable
+  ElixirCharToken getCharToken();
 
-  @NotNull
-  List<ElixirEmptyBlock> getEmptyBlockList();
+  @Nullable
+  ElixirEmptyBlock getEmptyBlock();
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
-  @NotNull
-  List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
-
-  @NotNull
-  List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList();
-
-  @NotNull
-  List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList();
-
-  @NotNull
-  List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList();
-
-  @NotNull
-  List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList();
-
-  @NotNull
-  List<ElixirInterpolatedSigilLine> getInterpolatedSigilLineList();
-
-  @NotNull
-  List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList();
-
-  @NotNull
-  List<ElixirInterpolatedStringSigilLine> getInterpolatedStringSigilLineList();
-
-  @NotNull
-  List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList();
-
-  @NotNull
-  List<ElixirInterpolatedWordsLine> getInterpolatedWordsLineList();
-
-  @NotNull
-  List<ElixirList> getListList();
-
-  @NotNull
-  List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList();
-
-  @NotNull
-  List<ElixirLiteralCharListSigilLine> getLiteralCharListSigilLineList();
-
-  @NotNull
-  List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList();
-
-  @NotNull
-  List<ElixirLiteralRegexLine> getLiteralRegexLineList();
-
-  @NotNull
-  List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList();
-
-  @NotNull
-  List<ElixirLiteralSigilLine> getLiteralSigilLineList();
-
-  @NotNull
-  List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList();
-
-  @NotNull
-  List<ElixirLiteralStringSigilLine> getLiteralStringSigilLineList();
-
-  @NotNull
-  List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList();
-
-  @NotNull
-  List<ElixirLiteralWordsLine> getLiteralWordsLineList();
-
-  @NotNull
-  List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList();
+  @Nullable
+  ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
 
   @Nullable
-  ElixirMatchedDotRightOperation getMatchedDotRightOperation();
+  ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine();
 
   @Nullable
-  ElixirMatchedHatLeftOperation getMatchedHatLeftOperation();
+  ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc();
 
   @Nullable
-  ElixirMatchedHatRightOperation getMatchedHatRightOperation();
+  ElixirInterpolatedRegexLine getInterpolatedRegexLine();
 
   @Nullable
-  ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation();
+  ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc();
 
   @Nullable
-  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
-
-  @NotNull
-  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
+  ElixirInterpolatedSigilLine getInterpolatedSigilLine();
 
   @Nullable
-  ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation();
-
-  @NotNull
-  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
+  ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation();
-
-  @NotNull
-  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
+  ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation();
+  ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc();
 
   @Nullable
-  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
+  ElixirInterpolatedWordsLine getInterpolatedWordsLine();
 
   @Nullable
-  ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall();
-
-  @NotNull
-  List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
-
-  @NotNull
-  List<ElixirNumber> getNumberList();
+  ElixirList getList();
 
   @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
+  ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc();
 
-  @NotNull
-  List<ElixirStringHeredoc> getStringHeredocList();
+  @Nullable
+  ElixirLiteralCharListSigilLine getLiteralCharListSigilLine();
 
-  @NotNull
-  List<ElixirStringLine> getStringLineList();
+  @Nullable
+  ElixirLiteralRegexHeredoc getLiteralRegexHeredoc();
 
-  @NotNull
-  List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
+  @Nullable
+  ElixirLiteralRegexLine getLiteralRegexLine();
+
+  @Nullable
+  ElixirLiteralSigilHeredoc getLiteralSigilHeredoc();
+
+  @Nullable
+  ElixirLiteralSigilLine getLiteralSigilLine();
+
+  @Nullable
+  ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc();
+
+  @Nullable
+  ElixirLiteralStringSigilLine getLiteralStringSigilLine();
+
+  @Nullable
+  ElixirLiteralWordsHeredoc getLiteralWordsHeredoc();
+
+  @Nullable
+  ElixirLiteralWordsLine getLiteralWordsLine();
+
+  @Nullable
+  ElixirMatchedCallOperation getMatchedCallOperation();
+
+  @Nullable
+  ElixirMatchedDotOperation getMatchedDotOperation();
+
+  @Nullable
+  ElixirMatchedHatOperation getMatchedHatOperation();
+
+  @Nullable
+  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+
+  @Nullable
+  ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
+
+  @Nullable
+  ElixirNumber getNumber();
+
+  @Nullable
+  ElixirStringHeredoc getStringHeredoc();
+
+  @Nullable
+  ElixirStringLine getStringLine();
+
+  @Nullable
+  ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @Nullable
+  ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
 }

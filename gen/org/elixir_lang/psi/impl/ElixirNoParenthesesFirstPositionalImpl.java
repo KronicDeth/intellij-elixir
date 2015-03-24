@@ -5,12 +5,9 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesFirstPositional {
 
@@ -24,297 +21,255 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
   }
 
   @Override
-  @NotNull
-  public List<ElixirAlias> getAliasList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirAtNumericOperation> getAtNumericOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtNumericOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirAtom> getAtomList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirAtomKeyword> getAtomKeywordList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtomKeyword.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCaptureNumericOperation> getCaptureNumericOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureNumericOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCharListLine> getCharListLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCharToken> getCharTokenList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharToken.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirEmptyBlock> getEmptyBlockList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedCharListSigilLine> getInterpolatedCharListSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedCharListSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedRegexHeredoc> getInterpolatedRegexHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedRegexLine> getInterpolatedRegexLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedRegexLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedSigilHeredoc> getInterpolatedSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedSigilLine> getInterpolatedSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedStringSigilHeredoc> getInterpolatedStringSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedStringSigilLine> getInterpolatedStringSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedWordsHeredoc> getInterpolatedWordsHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedWordsHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirInterpolatedWordsLine> getInterpolatedWordsLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedWordsLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirList> getListList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirList.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralCharListSigilHeredoc> getLiteralCharListSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralCharListSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralCharListSigilLine> getLiteralCharListSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralCharListSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralRegexHeredoc> getLiteralRegexHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralRegexHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralRegexLine> getLiteralRegexLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralRegexLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralSigilHeredoc> getLiteralSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralSigilLine> getLiteralSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralStringSigilHeredoc> getLiteralStringSigilHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralStringSigilHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralStringSigilLine> getLiteralStringSigilLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralStringSigilLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralWordsHeredoc> getLiteralWordsHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralWordsHeredoc.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirLiteralWordsLine> getLiteralWordsLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirLiteralWordsLine.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotLeftOperation.class);
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
-    return findChildByClass(ElixirMatchedDotRightOperation.class);
+  public ElixirAtNumericOperation getAtNumericOperation() {
+    return findChildByClass(ElixirAtNumericOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedHatLeftOperation getMatchedHatLeftOperation() {
-    return findChildByClass(ElixirMatchedHatLeftOperation.class);
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedHatRightOperation getMatchedHatRightOperation() {
-    return findChildByClass(ElixirMatchedHatRightOperation.class);
+  public ElixirAtomKeyword getAtomKeyword() {
+    return findChildByClass(ElixirAtomKeyword.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation() {
-    return findChildByClass(ElixirMatchedMultiplicationLeftOperation.class);
+  public ElixirCaptureNumericOperation getCaptureNumericOperation() {
+    return findChildByClass(ElixirCaptureNumericOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation() {
-    return findChildByClass(ElixirMatchedMultiplicationRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtLeftOperation.class);
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtRightOperation getMatchedNonNumericAtRightOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureLeftOperation.class);
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureRightOperation getMatchedNonNumericCaptureRightOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public ElixirCharToken getCharToken() {
+    return findChildByClass(ElixirCharToken.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryRightOperation getMatchedNonNumericUnaryRightOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryRightOperation.class);
+  public ElixirEmptyBlock getEmptyBlock() {
+    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override
   @Nullable
-  public ElixirNoParenthesesNoArgumentsCall getNoParenthesesNoArgumentsCall() {
-    return findChildByClass(ElixirNoParenthesesNoArgumentsCall.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNumber> getNumberList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
+  public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
   }
 
   @Override
   @Nullable
-  public ElixirQualifiedAlias getQualifiedAlias() {
-    return findChildByClass(ElixirQualifiedAlias.class);
+  public ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine() {
+    return findChildByClass(ElixirInterpolatedCharListSigilLine.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  @Nullable
+  public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
+    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringLine> getStringLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
+  @Nullable
+  public ElixirInterpolatedRegexLine getInterpolatedRegexLine() {
+    return findChildByClass(ElixirInterpolatedRegexLine.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirUnaryNumericOperation> getUnaryNumericOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryNumericOperation.class);
+  @Nullable
+  public ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedSigilLine getInterpolatedSigilLine() {
+    return findChildByClass(ElixirInterpolatedSigilLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
+    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine() {
+    return findChildByClass(ElixirInterpolatedStringSigilLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc() {
+    return findChildByClass(ElixirInterpolatedWordsHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
+    return findChildByClass(ElixirInterpolatedWordsLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirList getList() {
+    return findChildByClass(ElixirList.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
+    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralCharListSigilLine getLiteralCharListSigilLine() {
+    return findChildByClass(ElixirLiteralCharListSigilLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
+    return findChildByClass(ElixirLiteralRegexHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralRegexLine getLiteralRegexLine() {
+    return findChildByClass(ElixirLiteralRegexLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralSigilHeredoc getLiteralSigilHeredoc() {
+    return findChildByClass(ElixirLiteralSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralSigilLine getLiteralSigilLine() {
+    return findChildByClass(ElixirLiteralSigilLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
+    return findChildByClass(ElixirLiteralStringSigilHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralStringSigilLine getLiteralStringSigilLine() {
+    return findChildByClass(ElixirLiteralStringSigilLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralWordsHeredoc getLiteralWordsHeredoc() {
+    return findChildByClass(ElixirLiteralWordsHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirLiteralWordsLine getLiteralWordsLine() {
+    return findChildByClass(ElixirLiteralWordsLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedCallOperation getMatchedCallOperation() {
+    return findChildByClass(ElixirMatchedCallOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedHatOperation getMatchedHatOperation() {
+    return findChildByClass(ElixirMatchedHatOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
+    return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNumber getNumber() {
+    return findChildByClass(ElixirNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnaryNumericOperation getUnaryNumericOperation() {
+    return findChildByClass(ElixirUnaryNumericOperation.class);
   }
 
   @NotNull

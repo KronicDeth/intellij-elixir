@@ -5,16 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesManyArgumentsCall extends Quotable {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Call {
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
-  @Nullable
+  @NotNull
   ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier getNoParenthesesManyArgumentsUnqualifiedIdentifier();
-
-  @Nullable
-  ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();

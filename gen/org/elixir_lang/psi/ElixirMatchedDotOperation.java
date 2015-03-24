@@ -1,13 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedMultiplicationRightOperation extends InfixOperation {
+public interface ElixirMatchedDotOperation extends PsiElement {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -32,6 +32,9 @@ public interface ElixirMatchedMultiplicationRightOperation extends InfixOperatio
 
   @NotNull
   List<ElixirCharToken> getCharTokenList();
+
+  @NotNull
+  ElixirDotInfixOperator getDotInfixOperator();
 
   @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
@@ -100,28 +103,19 @@ public interface ElixirMatchedMultiplicationRightOperation extends InfixOperatio
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
-  List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList();
-
-  @NotNull
-  List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList();
+  List<ElixirMatchedCallOperation> getMatchedCallOperationList();
 
   @Nullable
-  ElixirMatchedMultiplicationRightOperation getMatchedMultiplicationRightOperation();
+  ElixirMatchedDotOperation getMatchedDotOperation();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
+  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
-
-  @NotNull
-  ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
-
-  @Nullable
-  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
@@ -137,8 +131,5 @@ public interface ElixirMatchedMultiplicationRightOperation extends InfixOperatio
 
   @NotNull
   List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
-
-  @NotNull
-  OtpErlangObject quote();
 
 }

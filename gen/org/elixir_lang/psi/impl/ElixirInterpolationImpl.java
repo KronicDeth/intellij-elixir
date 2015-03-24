@@ -222,86 +222,44 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotLeftOperation.class);
+  public List<ElixirMatchedCallOperation> getMatchedCallOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedCallOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedDotRightOperation> getMatchedDotRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotRightOperation.class);
+  public List<ElixirMatchedDotOperation> getMatchedDotOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatLeftOperation.class);
+  public List<ElixirMatchedHatOperation> getMatchedHatOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedHatRightOperation> getMatchedHatRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatRightOperation.class);
+  public List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedMultiplicationOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedMultiplicationLeftOperation> getMatchedMultiplicationLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedMultiplicationLeftOperation.class);
+  public List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedMultiplicationRightOperation> getMatchedMultiplicationRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedMultiplicationRightOperation.class);
+  public List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtLeftOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericAtRightOperation> getMatchedNonNumericAtRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureLeftOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericCaptureRightOperation> getMatchedNonNumericCaptureRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryLeftOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericUnaryRightOperation> getMatchedNonNumericUnaryRightOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryRightOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNoParenthesesManyArgumentsCall> getNoParenthesesManyArgumentsCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyArgumentsCall.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesNoArgumentsCall.class);
+  public List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
@@ -314,12 +272,6 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirNumber> getNumberList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirQualifiedAlias> getQualifiedAliasList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirQualifiedAlias.class);
   }
 
   @Override
@@ -338,6 +290,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
   @NotNull
   public List<ElixirUnaryNumericOperation> getUnaryNumericOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull

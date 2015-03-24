@@ -5,16 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericAtLeftOperation extends PrefixOperation {
+public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
-
-  @NotNull
-  ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
   ElixirAtom getAtom();
@@ -101,13 +98,19 @@ public interface ElixirMatchedNonNumericAtLeftOperation extends PrefixOperation 
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
+  ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
+  ElixirMatchedDotOperation getMatchedDotOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
@@ -123,6 +126,9 @@ public interface ElixirMatchedNonNumericAtLeftOperation extends PrefixOperation 
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @NotNull
+  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
 
   @NotNull
   OtpErlangObject quote();

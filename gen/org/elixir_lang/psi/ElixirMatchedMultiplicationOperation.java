@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedDotLeftOperation extends InfixOperation {
+public interface ElixirMatchedMultiplicationOperation extends InfixOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -32,9 +32,6 @@ public interface ElixirMatchedDotLeftOperation extends InfixOperation {
 
   @NotNull
   List<ElixirCharToken> getCharTokenList();
-
-  @NotNull
-  ElixirDotInfixOperator getDotInfixOperator();
 
   @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
@@ -102,17 +99,29 @@ public interface ElixirMatchedDotLeftOperation extends InfixOperation {
   @NotNull
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
+  @NotNull
+  List<ElixirMatchedCallOperation> getMatchedCallOperationList();
+
+  @NotNull
+  List<ElixirMatchedDotOperation> getMatchedDotOperationList();
+
+  @NotNull
+  List<ElixirMatchedHatOperation> getMatchedHatOperationList();
+
   @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
+  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
+  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
+
+  @NotNull
+  ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();

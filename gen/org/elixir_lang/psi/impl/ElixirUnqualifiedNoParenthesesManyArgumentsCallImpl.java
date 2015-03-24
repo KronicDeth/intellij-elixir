@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsCall {
+public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiElement implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
 
-  public ElixirNoParenthesesManyArgumentsCallImpl(ASTNode node) {
+  public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnqualifiedNoParenthesesManyArgumentsCall(this);
     else super.accept(visitor);
   }
 
@@ -27,15 +27,9 @@ public class ElixirNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiEleme
   }
 
   @Override
-  @Nullable
+  @NotNull
   public ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier getNoParenthesesManyArgumentsUnqualifiedIdentifier() {
-    return findChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier() {
-    return findChildByClass(ElixirNoParenthesesQualifiedIdentifier.class);
+    return findNotNullChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier.class);
   }
 
   @Override

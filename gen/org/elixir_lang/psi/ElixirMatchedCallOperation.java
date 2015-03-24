@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
+public interface ElixirMatchedCallOperation extends Call {
 
   @Nullable
   ElixirAlias getAlias();
@@ -30,9 +30,6 @@ public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
 
   @Nullable
   ElixirCharToken getCharToken();
-
-  @NotNull
-  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
@@ -100,29 +97,23 @@ public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
   @Nullable
   ElixirLiteralWordsLine getLiteralWordsLine();
 
-  @NotNull
-  ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand();
+  @Nullable
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedDotRightOperation getMatchedDotRightOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
-  ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier();
+  ElixirNoParenthesesStrict getNoParenthesesStrict();
 
   @Nullable
   ElixirNumber getNumber();
@@ -135,6 +126,12 @@ public interface ElixirNoParenthesesQualifiedIdentifier extends InfixOperation {
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @NotNull
+  QuotableArguments getArguments();
+
+  @NotNull
+  Quotable getIdentifier();
 
   @NotNull
   OtpErlangObject quote();

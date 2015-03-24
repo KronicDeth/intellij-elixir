@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNonNumericCaptureLeftOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericCaptureLeftOperation {
+public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryOperation {
 
-  public ElixirMatchedNonNumericCaptureLeftOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericUnaryOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericCaptureLeftOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryOperation(this);
     else super.accept(visitor);
   }
 
@@ -48,12 +48,6 @@ public class ElixirMatchedNonNumericCaptureLeftOperationImpl extends ASTWrapperP
   @Nullable
   public ElixirCaptureNumericOperation getCaptureNumericOperation() {
     return findChildByClass(ElixirCaptureNumericOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
-    return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
   }
 
   @Override
@@ -208,38 +202,32 @@ public class ElixirMatchedNonNumericCaptureLeftOperationImpl extends ASTWrapperP
 
   @Override
   @Nullable
-  public ElixirMatchedDotLeftOperation getMatchedDotLeftOperation() {
-    return findChildByClass(ElixirMatchedDotLeftOperation.class);
+  public ElixirMatchedCallOperation getMatchedCallOperation() {
+    return findChildByClass(ElixirMatchedCallOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedHatLeftOperation getMatchedHatLeftOperation() {
-    return findChildByClass(ElixirMatchedHatLeftOperation.class);
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation() {
-    return findChildByClass(ElixirMatchedMultiplicationLeftOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
@@ -270,6 +258,12 @@ public class ElixirMatchedNonNumericCaptureLeftOperationImpl extends ASTWrapperP
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
+    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
   }
 
   @NotNull

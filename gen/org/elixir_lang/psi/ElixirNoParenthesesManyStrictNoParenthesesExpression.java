@@ -7,6 +7,6 @@ import org.jetbrains.annotations.NotNull;
 public interface ElixirNoParenthesesManyStrictNoParenthesesExpression extends PsiElement {
 
   @NotNull
-  ElixirNoParenthesesManyArgumentsCall getNoParenthesesManyArgumentsCall();
+  ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
 }

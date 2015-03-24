@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNonNumericUnaryLeftOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryLeftOperation {
+public class ElixirMatchedCallOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedCallOperation {
 
-  public ElixirMatchedNonNumericUnaryLeftOperationImpl(ASTNode node) {
+  public ElixirMatchedCallOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryLeftOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedCallOperation(this);
     else super.accept(visitor);
   }
 
@@ -202,32 +202,38 @@ public class ElixirMatchedNonNumericUnaryLeftOperationImpl extends ASTWrapperPsi
 
   @Override
   @Nullable
-  public ElixirMatchedDotLeftOperation getMatchedDotLeftOperation() {
-    return findChildByClass(ElixirMatchedDotLeftOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
+    return findChildByClass(ElixirNoParenthesesManyArguments.class);
   }
 
   @Override
   @Nullable
   public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
     return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesStrict getNoParenthesesStrict() {
+    return findChildByClass(ElixirNoParenthesesStrict.class);
   }
 
   @Override
@@ -254,10 +260,14 @@ public class ElixirMatchedNonNumericUnaryLeftOperationImpl extends ASTWrapperPsi
     return findChildByClass(ElixirUnaryNumericOperation.class);
   }
 
-  @Override
   @NotNull
-  public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
-    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
+  public QuotableArguments getArguments() {
+    return ElixirPsiImplUtil.getArguments(this);
+  }
+
+  @NotNull
+  public Quotable getIdentifier() {
+    return ElixirPsiImplUtil.getIdentifier(this);
   }
 
   @NotNull

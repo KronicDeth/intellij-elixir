@@ -457,6 +457,28 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final Call call) {
+        Quotable identifier = call.getIdentifier();
+        OtpErlangObject quotedIdentifier;
+
+        if (identifier instanceof ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl) {
+            quotedIdentifier = new OtpErlangAtom(identifier.getText());
+        } else {
+            quotedIdentifier = identifier.quote();
+        }
+
+        QuotableArguments arguments = call.getArguments();
+        OtpErlangObject[] quotedArguments = arguments.quoteArguments();
+
+        return quotedFunctionCall(
+                quotedIdentifier,
+                metadata(call),
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Digits digits) {
         final String text = digits.getText();
         final int base = digits.base();
@@ -582,8 +604,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
-      return noParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+    public static QuotableArguments getArguments(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
+        return matchedCallOperation.getNoParenthesesManyArguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+      return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
     }
 
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
@@ -808,14 +836,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static Quotable getIdentifier(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
-        Quotable identifier = noParenthesesManyArgumentsCall.getNoParenthesesQualifiedIdentifier();
+    public static Quotable getIdentifier(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
+        return (Quotable) matchedCallOperation.getFirstChild();
+    }
 
-        if (identifier == null) {
-            identifier = noParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
-        }
-
-        return identifier;
+    @Contract(pure = true)
+    @NotNull
+    public static Quotable getIdentifier(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
     }
 
     public static List<KeywordPair> getKeywordPairList(ElixirList list) {
@@ -1209,29 +1237,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotIdentifierOperand matchedDotIdentifierOperand) {
-        ASTNode[] children = matchedDotIdentifierOperand.getNode().getChildren(null);
-
-        if (children.length != 1) {
-            throw new NotImplementedException("Expect 1 child for matchedDotIdentifierOperand");
-        }
-
-        ASTNode operand = children[0];
-        IElementType operandType = operand.getElementType();
-        OtpErlangObject quoted;
-
-        if (operandType == ElixirTypes.IDENTIFIER) {
-            quoted = new OtpErlangAtom(operand.getText());
-        } else {
-            Quotable quotable = (Quotable) operand.getPsi();
-            quoted = quotable.quote();
-        }
-
-        return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
         PsiElement[] children = noParenthesesExpression.getChildren();
 
@@ -1256,36 +1261,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsCall noParenthesesManyArgumentsCall) {
-        Quotable identifier = noParenthesesManyArgumentsCall.getIdentifier();
-        OtpErlangObject quotedIdentifier = identifier.quote();
-
-        QuotableArguments arguments = noParenthesesManyArgumentsCall.getArguments();
-        OtpErlangObject[] quotedArguments = arguments.quoteArguments();
-
-        return quotedFunctionCall(
-                quotedIdentifier,
-                metadata(noParenthesesManyArgumentsCall),
-                quotedArguments
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier noParenthesesManyArgumentsUnqualifiedIdentifier) {
         return new OtpErlangAtom(noParenthesesManyArgumentsUnqualifiedIdentifier.getText());
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsCall noParenthesesNoArgumentsCall) {
-        Quotable identifier = noParenthesesNoArgumentsCall.getNoParenthesesQualifiedIdentifier();
-        OtpErlangObject quotedIdentifier = identifier.quote();
-
-        return quotedFunctionCall(
-                quotedIdentifier,
-                metadata(noParenthesesNoArgumentsCall)
-        );
     }
 
     @Contract(pure = true)
@@ -1299,67 +1276,6 @@ public class ElixirPsiImplUtil {
                 noParenthesesNoArgumentsUnqualifiedCallOrVariable.getText(),
                 metadata(noParenthesesNoArgumentsUnqualifiedCallOrVariable)
         );
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirQualifiedAlias qualifiedAlias) {
-        PsiElement[] children = qualifiedAlias.getChildren();
-
-        if (children.length != 3) {
-            throw new NotImplementedException("3 children expected for qualifiedAlias (left alias, dot, right alias)");
-        }
-
-        Quotable leftOperand = (Quotable) children[0];
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
-
-        Quotable rightOperand = (Quotable) children[2];
-        OtpErlangObject quotedRightOperand = rightOperand.quote();
-
-        OtpErlangObject quoted = null;
-
-        if (quotedLeftOperand instanceof OtpErlangTuple) {
-            final OtpErlangTuple leftTuple = (OtpErlangTuple) quotedLeftOperand;
-            OtpErlangObject leftFirst = leftTuple.elementAt(0);
-
-            if (leftFirst.equals(ALIASES)) {
-                OtpErlangList leftAliases = (OtpErlangList) leftTuple.elementAt(2);
-
-                if (quotedRightOperand instanceof OtpErlangTuple) {
-                    OtpErlangTuple rightTuple = (OtpErlangTuple) quotedRightOperand;
-                    OtpErlangObject rightFirst = rightTuple.elementAt(0);
-
-                    if (rightFirst.equals(ALIASES)) {
-                        OtpErlangList rightAliases = (OtpErlangList) rightTuple.elementAt(2);
-
-                        if (rightAliases.arity() != 1) {
-                            throw new NotImplementedException("Expected right operand of qualifiedAlias to be a single alias");
-                        }
-
-                        OtpErlangObject lastAlias = rightAliases.elementAt(0);
-
-                        OtpErlangObject[] combinedElements = new OtpErlangObject[leftAliases.arity() + 1];
-
-                        for (int i = 0; i < leftAliases.arity(); i++) {
-                            combinedElements[i] = leftAliases.elementAt(i);
-                        }
-
-                        combinedElements[combinedElements.length - 1] = lastAlias;
-
-                        quoted = quotedFunctionCall(
-                                ALIASES,
-                                /* testing in iex reveal line is based on last alias as in
-                                   iex> Code.string_to_quoted("D.C.\nB")
-                                   {:ok, {:__aliases__, [line: 2], [:D, :C, :B]}} */
-                                metadata(rightOperand),
-                                combinedElements
-                        );
-                    }
-                }
-            }
-        }
-
-        return quoted;
     }
 
     @Contract(pure = true)

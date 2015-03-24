@@ -5,34 +5,37 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtOperation {
 
-public class ElixirMatchedDotRightOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedDotRightOperation {
-
-  public ElixirMatchedDotRightOperationImpl(ASTNode node) {
+  public ElixirMatchedNonNumericAtOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedDotRightOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtOperation(this);
     else super.accept(visitor);
   }
 
   @Override
-  @NotNull
-  public List<ElixirAlias> getAliasList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
   }
 
   @Override
   @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
     return findChildByClass(ElixirAtNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirAtPrefixOperator getAtPrefixOperator() {
+    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
   }
 
   @Override
@@ -54,27 +57,21 @@ public class ElixirMatchedDotRightOperationImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListHeredoc> getCharListHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListHeredoc.class);
+  @Nullable
+  public ElixirCharListHeredoc getCharListHeredoc() {
+    return findChildByClass(ElixirCharListHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirCharListLine> getCharListLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCharListLine.class);
+  @Nullable
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
   }
 
   @Override
   @Nullable
   public ElixirCharToken getCharToken() {
     return findChildByClass(ElixirCharToken.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
@@ -211,26 +208,26 @@ public class ElixirMatchedDotRightOperationImpl extends ASTWrapperPsiElement imp
 
   @Override
   @Nullable
-  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
-    return findChildByClass(ElixirMatchedDotRightOperation.class);
+  public ElixirMatchedCallOperation getMatchedCallOperation() {
+    return findChildByClass(ElixirMatchedCallOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
@@ -246,15 +243,15 @@ public class ElixirMatchedDotRightOperationImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringHeredoc> getStringHeredocList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredoc.class);
+  @Nullable
+  public ElixirStringHeredoc getStringHeredoc() {
+    return findChildByClass(ElixirStringHeredoc.class);
   }
 
   @Override
-  @NotNull
-  public List<ElixirStringLine> getStringLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringLine.class);
+  @Nullable
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
   }
 
   @Override

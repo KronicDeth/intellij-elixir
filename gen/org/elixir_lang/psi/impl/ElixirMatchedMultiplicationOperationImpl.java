@@ -12,14 +12,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirMatchedHatLeftOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedHatLeftOperation {
+public class ElixirMatchedMultiplicationOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedMultiplicationOperation {
 
-  public ElixirMatchedHatLeftOperationImpl(ASTNode node) {
+  public ElixirMatchedMultiplicationOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedHatLeftOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedMultiplicationOperation(this);
     else super.accept(visitor);
   }
 
@@ -75,12 +75,6 @@ public class ElixirMatchedHatLeftOperationImpl extends ASTWrapperPsiElement impl
   @NotNull
   public List<ElixirEmptyBlock> getEmptyBlockList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirHatInfixOperator getHatInfixOperator() {
-    return findNotNullChildByClass(ElixirHatInfixOperator.class);
   }
 
   @Override
@@ -211,32 +205,50 @@ public class ElixirMatchedHatLeftOperationImpl extends ASTWrapperPsiElement impl
 
   @Override
   @NotNull
-  public List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotLeftOperation.class);
+  public List<ElixirMatchedCallOperation> getMatchedCallOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedCallOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedDotOperation> getMatchedDotOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedDotOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedHatOperation> getMatchedHatOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedHatOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedHatLeftOperation getMatchedHatLeftOperation() {
-    return findChildByClass(ElixirMatchedHatLeftOperation.class);
+  public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtLeftOperation.class);
+  public List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureLeftOperation.class);
+  public List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
+    return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
   }
 
   @Override

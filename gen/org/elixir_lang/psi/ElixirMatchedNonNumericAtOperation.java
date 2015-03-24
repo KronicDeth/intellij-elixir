@@ -5,15 +5,16 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public interface ElixirMatchedNonNumericAtOperation extends PrefixOperation {
 
-public interface ElixirQualifiedAlias extends Quotable {
-
-  @NotNull
-  List<ElixirAlias> getAliasList();
+  @Nullable
+  ElixirAlias getAlias();
 
   @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
+
+  @NotNull
+  ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
   ElixirAtom getAtom();
@@ -32,9 +33,6 @@ public interface ElixirQualifiedAlias extends Quotable {
 
   @Nullable
   ElixirCharToken getCharToken();
-
-  @NotNull
-  ElixirDotInfixOperator getDotInfixOperator();
 
   @Nullable
   ElixirEmptyBlock getEmptyBlock();
@@ -103,25 +101,22 @@ public interface ElixirQualifiedAlias extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotRightOperation getMatchedDotRightOperation();
+  ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
   ElixirNumber getNumber();
-
-  @Nullable
-  ElixirQualifiedAlias getQualifiedAlias();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();

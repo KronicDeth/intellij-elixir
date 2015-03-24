@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedMultiplicationLeftOperation extends InfixOperation {
+public interface ElixirMatchedHatOperation extends InfixOperation {
 
   @NotNull
   List<ElixirAlias> getAliasList();
@@ -35,6 +35,9 @@ public interface ElixirMatchedMultiplicationLeftOperation extends InfixOperation
 
   @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
+  ElixirHatInfixOperator getHatInfixOperator();
 
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
@@ -100,25 +103,22 @@ public interface ElixirMatchedMultiplicationLeftOperation extends InfixOperation
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
-  List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList();
+  List<ElixirMatchedCallOperation> getMatchedCallOperationList();
 
   @NotNull
-  List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList();
+  List<ElixirMatchedDotOperation> getMatchedDotOperationList();
 
   @Nullable
-  ElixirMatchedMultiplicationLeftOperation getMatchedMultiplicationLeftOperation();
+  ElixirMatchedHatOperation getMatchedHatOperation();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
+  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
-
-  @NotNull
-  ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();

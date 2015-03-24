@@ -108,55 +108,31 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
-  List<ElixirMatchedDotLeftOperation> getMatchedDotLeftOperationList();
+  List<ElixirMatchedCallOperation> getMatchedCallOperationList();
 
   @NotNull
-  List<ElixirMatchedDotRightOperation> getMatchedDotRightOperationList();
+  List<ElixirMatchedDotOperation> getMatchedDotOperationList();
 
   @NotNull
-  List<ElixirMatchedHatLeftOperation> getMatchedHatLeftOperationList();
+  List<ElixirMatchedHatOperation> getMatchedHatOperationList();
 
   @NotNull
-  List<ElixirMatchedHatRightOperation> getMatchedHatRightOperationList();
+  List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList();
 
   @NotNull
-  List<ElixirMatchedMultiplicationLeftOperation> getMatchedMultiplicationLeftOperationList();
+  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedMultiplicationRightOperation> getMatchedMultiplicationRightOperationList();
+  List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericAtLeftOperation> getMatchedNonNumericAtLeftOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericAtRightOperation> getMatchedNonNumericAtRightOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericCaptureLeftOperation> getMatchedNonNumericCaptureLeftOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericCaptureRightOperation> getMatchedNonNumericCaptureRightOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericUnaryLeftOperation> getMatchedNonNumericUnaryLeftOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericUnaryRightOperation> getMatchedNonNumericUnaryRightOperationList();
-
-  @NotNull
-  List<ElixirNoParenthesesManyArgumentsCall> getNoParenthesesManyArgumentsCallList();
-
-  @NotNull
-  List<ElixirNoParenthesesNoArgumentsCall> getNoParenthesesNoArgumentsCallList();
+  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
   List<ElixirNumber> getNumberList();
-
-  @NotNull
-  List<ElixirQualifiedAlias> getQualifiedAliasList();
 
   @NotNull
   List<ElixirStringHeredoc> getStringHeredocList();
@@ -166,6 +142,9 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
+
+  @NotNull
+  List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
 
   @NotNull
   OtpErlangObject quote();

@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesQualifiedIdentifier {
+public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericCaptureOperation {
 
-  public ElixirNoParenthesesQualifiedIdentifierImpl(ASTNode node) {
+  public ElixirMatchedNonNumericCaptureOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesQualifiedIdentifier(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericCaptureOperation(this);
     else super.accept(visitor);
   }
 
@@ -51,6 +51,12 @@ public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiEle
   }
 
   @Override
+  @NotNull
+  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
+    return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
+  }
+
+  @Override
   @Nullable
   public ElixirCharListHeredoc getCharListHeredoc() {
     return findChildByClass(ElixirCharListHeredoc.class);
@@ -66,12 +72,6 @@ public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiEle
   @Nullable
   public ElixirCharToken getCharToken() {
     return findChildByClass(ElixirCharToken.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
 
   @Override
@@ -207,51 +207,51 @@ public class ElixirNoParenthesesQualifiedIdentifierImpl extends ASTWrapperPsiEle
   }
 
   @Override
-  @NotNull
-  public ElixirMatchedDotIdentifierOperand getMatchedDotIdentifierOperand() {
-    return findNotNullChildByClass(ElixirMatchedDotIdentifierOperand.class);
+  @Nullable
+  public ElixirMatchedCallOperation getMatchedCallOperation() {
+    return findChildByClass(ElixirMatchedCallOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedDotLeftOperation getMatchedDotLeftOperation() {
-    return findChildByClass(ElixirMatchedDotLeftOperation.class);
+  public ElixirMatchedDotOperation getMatchedDotOperation() {
+    return findChildByClass(ElixirMatchedDotOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedDotRightOperation getMatchedDotRightOperation() {
-    return findChildByClass(ElixirMatchedDotRightOperation.class);
+  public ElixirMatchedHatOperation getMatchedHatOperation() {
+    return findChildByClass(ElixirMatchedHatOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtLeftOperation.class);
+  public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
+    return findChildByClass(ElixirMatchedMultiplicationOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureLeftOperation.class);
+  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
+    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryLeftOperation.class);
+  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
+    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
+    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
     return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesQualifiedIdentifier getNoParenthesesQualifiedIdentifier() {
-    return findChildByClass(ElixirNoParenthesesQualifiedIdentifier.class);
   }
 
   @Override

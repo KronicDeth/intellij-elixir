@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericUnaryLeftOperation extends PrefixOperation {
+public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -21,6 +21,9 @@ public interface ElixirMatchedNonNumericUnaryLeftOperation extends PrefixOperati
 
   @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
+
+  @NotNull
+  ElixirCapturePrefixOperator getCapturePrefixOperator();
 
   @Nullable
   ElixirCharListHeredoc getCharListHeredoc();
@@ -98,16 +101,25 @@ public interface ElixirMatchedNonNumericUnaryLeftOperation extends PrefixOperati
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
-  ElixirMatchedDotLeftOperation getMatchedDotLeftOperation();
+  ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
-  ElixirMatchedNonNumericAtLeftOperation getMatchedNonNumericAtLeftOperation();
+  ElixirMatchedDotOperation getMatchedDotOperation();
 
   @Nullable
-  ElixirMatchedNonNumericCaptureLeftOperation getMatchedNonNumericCaptureLeftOperation();
+  ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryLeftOperation getMatchedNonNumericUnaryLeftOperation();
+  ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
+
+  @Nullable
+  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
@@ -123,9 +135,6 @@ public interface ElixirMatchedNonNumericUnaryLeftOperation extends PrefixOperati
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
-
-  @NotNull
-  ElixirUnaryPrefixOperator getUnaryPrefixOperator();
 
   @NotNull
   OtpErlangObject quote();
