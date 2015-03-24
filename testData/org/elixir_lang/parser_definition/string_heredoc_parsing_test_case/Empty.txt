@@ -1,6 +1,8 @@
 Elixir File(0,6)
   ElixirStringHeredocImpl(STRING_HEREDOC)(0,6)
     PsiElement(ElixirTokenType.STRING_HEREDOC_PROMOTER)('"""')(0,3)
+    PsiErrorElement:ElixirTokenType.EOL expected, got '"""'(3,3)
+      <empty list>
     ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(3,3)
       <empty list>
     PsiElement(ElixirTokenType.STRING_HEREDOC_TERMINATOR)('"""')(3,6)

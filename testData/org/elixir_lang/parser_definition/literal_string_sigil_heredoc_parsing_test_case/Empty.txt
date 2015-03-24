@@ -3,6 +3,8 @@ Elixir File(0,8)
     PsiElement(ElixirTokenType.TILDE)('~')(0,1)
     PsiElement(ElixirTokenType.LITERAL_STRING_SIGIL_NAME)('S')(1,2)
     PsiElement(ElixirTokenType.STRING_SIGIL_HEREDOC_PROMOTER)('"""')(2,5)
+    PsiErrorElement:ElixirTokenType.EOL expected, got '"""'(5,5)
+      <empty list>
     ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
       <empty list>
     PsiElement(ElixirTokenType.STRING_SIGIL_HEREDOC_TERMINATOR)('"""')(5,8)
