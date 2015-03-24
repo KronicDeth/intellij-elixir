@@ -5,26 +5,20 @@ Elixir File(0,98)
   ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(34,36)
     PsiElement(ElixirTokenType.0)('0')(34,35)
     PsiElement(ElixirTokenType.X)('X')(35,36)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
-    PsiErrorElement:<*, />, <.>, <^^^>, <end of expression>, <hexadecimal digits>, <matched dot left operation>, <matched dot right operation>, <matched hat left operation>, <matched hat right operation>, <matched multiplication right operation>, <no parentheses qualified identifier>, <qualified alias>, ElixirTokenType.. or ElixirTokenType.EOL expected, got '
+    PsiErrorElement:<hexadecimal digits> expected, got '
 '(36,36)
       <empty list>
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
     PsiElement(ElixirTokenType.EOL)('\n')(36,37)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(37,38)
-    PsiErrorElement:<end of expression> or ElixirTokenType.EOL expected, got '
-'(37,37)
-      <empty list>
     PsiElement(ElixirTokenType.EOL)('\n')(37,38)
   PsiComment(ElixirTokenType.COMMENT)('# No digits should recover at ;')(38,69)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(69,70)
-    PsiErrorElement:<end of expression> or ElixirTokenType.EOL expected, got '
-'(69,69)
-      <empty list>
     PsiElement(ElixirTokenType.EOL)('\n')(69,70)
   ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(70,72)
     PsiElement(ElixirTokenType.0)('0')(70,71)
     PsiElement(ElixirTokenType.X)('X')(71,72)
-    PsiErrorElement:<hexadecimal digits>, <matched dot left operation>, <matched dot right operation>, <matched hat left operation>, <matched hat right operation>, <matched multiplication right operation>, <no parentheses qualified identifier>, ElixirTokenType.. or ElixirTokenType.EOL expected, got ';'(72,72)
+    PsiErrorElement:<hexadecimal digits> expected, got ';'(72,72)
       <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(ElixirTokenType.;)(';')(72,73)
