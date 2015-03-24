@@ -5,59 +5,59 @@ package org.elixir_lang.parser_definition.capture.alias.hat.capture;
  */
 public class MatchedExpressionParsingTestCase extends ParsingTestCase {
     public void testAlias() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharList() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharListHeredoc() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharToken() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEmptyBlock() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testFalse() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIdentifier() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testList() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNil() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNumber() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testSigil() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testString() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringHeredoc() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTrue() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
