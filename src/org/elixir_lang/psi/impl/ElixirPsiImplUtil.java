@@ -1240,7 +1240,7 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedDotOperation matchedDotOperation) {
         // get basic quoting of aliases, etc
-        OtpErlangObject quotedInfixOperation = quote((InfixOperation) matchedDotOperation);
+        OtpErlangTuple quotedInfixOperation = (OtpErlangTuple) quote((InfixOperation) matchedDotOperation);
         // by default, no specialization
         OtpErlangObject specializedQuoted = quotedInfixOperation;
 
@@ -1287,6 +1287,36 @@ public class ElixirPsiImplUtil {
                         ALIASES,
                         newMetdata,
                         mergedArguments
+                );
+            }
+        } else if (Macro.isVariable(lastQuotedArgument)) {
+            OtpErlangTuple lastExpression = (OtpErlangTuple) lastQuotedArgument;
+            OtpErlangObject context = lastExpression.elementAt(2);
+
+            // Variables are turned into remote calls and only the atom is used as the second argument to `.`.
+            if (context.equals(NIL)) {
+                OtpErlangObject identifier = lastExpression.elementAt(0);
+
+                OtpErlangObject[] mergedArguments = new OtpErlangObject[]{
+                        quotedArgumentList.elementAt(0),
+                        identifier
+                };
+                OtpErlangList mergedArgumentList = new OtpErlangList(mergedArguments);
+
+                OtpErlangTuple quotedRemoteFunction = new OtpErlangTuple(
+                        new OtpErlangObject[]{
+                                quotedInfixOperation.elementAt(0),
+                                quotedInfixOperation.elementAt(1),
+                                mergedArgumentList
+                        }
+                );
+
+                /* The quotedRemoteFunction is not a complete call yet because a call is the {function, metadata, args}
+                   where quotedRemoteFunction is function */
+
+                specializedQuoted = quotedFunctionCall(
+                        quotedRemoteFunction,
+                        (OtpErlangList) quotedRemoteFunction.elementAt(1)
                 );
             }
         }
