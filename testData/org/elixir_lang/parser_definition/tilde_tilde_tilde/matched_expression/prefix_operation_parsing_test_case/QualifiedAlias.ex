@@ -1,2 +1,1 @@
-# .(~~~(First), Second)
 ~~~First.Second

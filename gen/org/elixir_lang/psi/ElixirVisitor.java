@@ -359,7 +359,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {
-    visitPsiElement(o);
+    visitInfixOperation(o);
   }
 
   public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {

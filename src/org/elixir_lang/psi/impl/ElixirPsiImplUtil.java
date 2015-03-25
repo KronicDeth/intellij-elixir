@@ -9,6 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.Macro;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -1233,6 +1234,64 @@ public class ElixirPsiImplUtil {
         ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
 
         return emptyParentheses.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotOperation matchedDotOperation) {
+        // get basic quoting of aliases, etc
+        OtpErlangObject quotedInfixOperation = quote((InfixOperation) matchedDotOperation);
+        // by default, no specialization
+        OtpErlangObject specializedQuoted = quotedInfixOperation;
+
+        OtpErlangList quotedArgumentList = Macro.callArguments((OtpErlangTuple) quotedInfixOperation);
+        OtpErlangObject lastQuotedArgument = quotedArgumentList.elementAt(1);
+
+        // The final arguments determines whether the whole thing is an alias, so check if first.
+        if (Macro.isAliases(lastQuotedArgument)) {
+            OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
+
+            /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
+               each __aliases__ need to be combined */
+            if (Macro.isAliases(firstQuotedArgument)) {
+                /*
+                 * Use line from last alias, but drop `counter: 0`
+                 */
+                OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
+                OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
+                OtpErlangList newMetdata = new OtpErlangList(
+                        new OtpErlangObject[] {
+                                lineTuple
+                        }
+                );
+
+                /*
+                 * Merge alias names
+                 */
+
+                OtpErlangList firstAliasList = Macro.callArguments((OtpErlangTuple) firstQuotedArgument);
+                OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
+
+                OtpErlangObject[] mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
+
+                int i = 0;
+                for (OtpErlangObject alias : firstAliasList) {
+                    mergedArguments[i++] = alias;
+                }
+
+                for (OtpErlangObject alias : lastAliasList) {
+                    mergedArguments[i++] = alias;
+                }
+
+                specializedQuoted = quotedFunctionCall(
+                        ALIASES,
+                        newMetdata,
+                        mergedArguments
+                );
+            }
+        }
+
+        return specializedQuoted;
     }
 
     @Contract(pure = true)
