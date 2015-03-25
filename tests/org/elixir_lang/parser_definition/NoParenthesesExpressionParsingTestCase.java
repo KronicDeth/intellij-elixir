@@ -2,7 +2,7 @@ package org.elixir_lang.parser_definition;
 
 public class NoParenthesesExpressionParsingTestCase extends ParsingTestCase {
     public void testFunction() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

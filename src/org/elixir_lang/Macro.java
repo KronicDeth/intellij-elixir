@@ -47,6 +47,35 @@ public class Macro {
         return expression;
     }
 
+    /**
+     * Returns whether macro is a local call.
+     *
+     * @param macro a quoted form
+     * @return {@code true} if local call; {@code false} otherwise.
+     * @see <a href="https://github.com/elixir-lang/elixir/blob/6151f2ab1af0189b9c8c526db196e2a65c609c64/lib/elixir/lib/macro.ex#L277-L281">Macro.decompose_call/1</a>
+     */
+    public static boolean isLocalCall(OtpErlangObject macro) {
+        boolean localCall = false;
+
+        if (isExpression(macro)) {
+            OtpErlangTuple expression = (OtpErlangTuple) macro;
+
+            OtpErlangObject first = expression.elementAt(0);
+
+            if (first instanceof OtpErlangAtom) {
+                OtpErlangObject last = expression.elementAt(2);
+
+                /* OtpErlangString maps to CharList, which are list, so is_list in Elixir would be true for
+                   OtpErlangList and OtpErlangString. */
+                if (last instanceof OtpErlangList || last instanceof OtpErlangString) {
+                    localCall = true;
+                }
+            }
+        }
+
+        return localCall;
+    }
+
     /** Return whether macro is a local call expression with no arguments.
      *
      * @param macro

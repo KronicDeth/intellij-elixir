@@ -1289,6 +1289,36 @@ public class ElixirPsiImplUtil {
                         mergedArguments
                 );
             }
+        } else if (Macro.isLocalCall(lastQuotedArgument)) {
+            OtpErlangTuple quotedLocalCall = (OtpErlangTuple) lastQuotedArgument;
+            // lastQuotedArgument = {quotedIdentifier, callMetadata, arguments}
+            OtpErlangObject quotedIdentifier = quotedLocalCall.elementAt(0);
+
+            // quotedInfixOperation = {:., dotMetadata, [firstQuotedArgument, lastQuotedArgument]}
+            OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
+
+            // {:., dotMetadata, [firstQuotedArgument, quotedIdentifier]}
+            final OtpErlangObject newMetadata = quotedInfixOperation.elementAt(1);
+            OtpErlangTuple quotedRemoteFunction = new OtpErlangTuple(
+                    new OtpErlangObject[] {
+                            quotedInfixOperation.elementAt(0),
+                            newMetadata,
+                            new OtpErlangList(
+                                    new OtpErlangObject[]{
+                                            firstQuotedArgument,
+                                            quotedIdentifier
+                                    }
+                            )
+                    }
+            );
+
+            specializedQuoted = new OtpErlangTuple(
+                    new OtpErlangObject[] {
+                            quotedRemoteFunction,
+                            newMetadata,
+                            quotedLocalCall.elementAt(2)
+                    }
+            );
         } else if (Macro.isVariable(lastQuotedArgument)) {
             OtpErlangTuple lastExpression = (OtpErlangTuple) lastQuotedArgument;
             OtpErlangObject context = lastExpression.elementAt(2);
