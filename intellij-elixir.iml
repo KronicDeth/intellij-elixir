@@ -8,7 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/testData" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/res" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
     </content>
     <orderEntry type="jdk" jdkName="IDEA IC-139.659.2" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
