@@ -96,6 +96,7 @@ public interface ElixirTypes {
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
+  IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
@@ -115,6 +116,7 @@ public interface ElixirTypes {
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
+  IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
@@ -506,6 +508,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
         return new ElixirMatchedNonNumericUnaryOperationImpl(node);
       }
+      else if (type == MATCHED_TWO_OPERATION) {
+        return new ElixirMatchedTwoOperationImpl(node);
+      }
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
       }
@@ -562,6 +567,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);
+      }
+      else if (type == TWO_INFIX_OPERATOR) {
+        return new ElixirTwoInfixOperatorImpl(node);
       }
       else if (type == UNARY_NUMERIC_OPERATION) {
         return new ElixirUnaryNumericOperationImpl(node);

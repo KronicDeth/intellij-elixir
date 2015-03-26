@@ -923,10 +923,30 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedAdditionExpression
+                                            matchedTwoExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+/*
+ * Two Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
+ */
+
+twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "++, --, .., <>"
+                     }
+private matchedTwoExpression ::= matchedTwoOperand matchedTwoOperation?
+private matchedTwoOperand ::= matchedNonNumericCaptureOperation |
+                              matchedAdditionExpression
+left matchedTwoOperation ::= twoInfixOperator matchedTwoExpression
+                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 /*
  * Addition Operation
  *

@@ -1,4 +1,4 @@
-## Pattern for Infix Operators
+## Pattern for Left-associative Infix Operators
 
 ```
 <name>InfixOperator := <prefix-eols?> <operator-tokens> EOL*
@@ -36,6 +36,62 @@ The operation is a left rule so that left-associativity works correctly.
 
 ```
 left matched<name>Operation ::= <name>InfixOperator matched<name>Operand
+                                { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+```
+
+### Terminating condition
+
+The right and left sides can only be combined because noParenthesesManyArgumentsCall is checked before
+noParenthesesNoArgumentsCall.  This ordering is necessary because noParenthesesNoArgumentsCall will always parse a
+prefix of noParenthesesManyArgumentsCall.
+
+## Pattern for Right-associative Infix Operators
+
+The operator is the same as for left-associative infix operators.
+
+```
+<name>InfixOperator := <prefix-eols?> <operator-tokens> EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                       }
+```
+
+### Expression
+
+Unlike left-associative, the matched<name>Operation is `?` instead of `*` because to accomplish right-associativeness,
+matched<name>Operation must be embedded in itself.  `?` is used so, like
+
+matched<name>Operation uses `*` so that when there is no operator, the match on `matched<name>Operand` does not need to
+be backtracked.
+
+```
+private matched<name>Expression ::= matched<name>Operand matched<name>Operation?
+```
+
+### Operand
+
+The operand is the same as for left-association.
+
+```
+private matched<name>Operand ::= <for name(p_l) with equal or lower precedence and prefix fixity:
+                                   matched<name(p_l)>RightOperation> |
+                                 matched<name(precedence +1)>Expression
+```
+
+### Operation
+
+`left` is used even though the operator is right-associative so that the if an operation is parsed, then
+the left and right operand are properly wrapped in a matched<name>Operation node for the normal. The difference
+from the left-associative operation, is that the right operand is the matched<name>Expression instead of
+the matched<name>Operand.  Using the matched<name>Expression makes the tree recursively descends on the
+right, which is right-associativity.
+
+```
+left matched<name>Operation ::= <name>InfixOperator matched<name>Expression
                                 { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 ```
 

@@ -287,6 +287,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
       r = matchedNonNumericUnaryOperation(b, 0);
     }
+    else if (t == MATCHED_TWO_OPERATION) {
+      r = matchedTwoOperation(b, 0);
+    }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
     }
@@ -343,6 +346,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == STRING_LINE) {
       r = stringLine(b, 0);
+    }
+    else if (t == TWO_INFIX_OPERATOR) {
+      r = twoInfixOperator(b, 0);
     }
     else if (t == UNARY_NUMERIC_OPERATION) {
       r = unaryNumericOperation(b, 0);
@@ -2667,13 +2673,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedAdditionExpression
+  //                                             matchedTwoExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedAdditionExpression(b, l + 1);
+    if (!r) r = matchedTwoExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2729,6 +2735,51 @@ public class ElixirParser implements PsiParser {
     r = nonNumericUnaryPrefixOperator(b, l + 1);
     r = r && matchedNonNumericUnaryOperand(b, l + 1);
     exit_section_(b, l, m, MATCHED_NON_NUMERIC_UNARY_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedTwoOperand matchedTwoOperation?
+  static boolean matchedTwoExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTwoExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedTwoOperand(b, l + 1);
+    r = r && matchedTwoExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedTwoOperation?
+  private static boolean matchedTwoExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTwoExpression_1")) return false;
+    matchedTwoOperation(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                               matchedAdditionExpression
+  static boolean matchedTwoOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTwoOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedAdditionExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // twoInfixOperator matchedTwoExpression
+  public static boolean matchedTwoOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTwoOperation")) return false;
+    if (!nextTokenIs(b, "<matched two operation>", EOL, TWO_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched two operation>");
+    r = twoInfixOperator(b, l + 1);
+    r = r && matchedTwoExpression(b, l + 1);
+    exit_section_(b, l, m, MATCHED_TWO_OPERATION, r, false, null);
     return r;
   }
 
@@ -3334,6 +3385,44 @@ public class ElixirParser implements PsiParser {
     r = r && consumeToken(b, STRING_TERMINATOR);
     exit_section_(b, m, STRING_LINE, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* TWO_OPERATOR EOL*
+  public static boolean twoInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "twoInfixOperator")) return false;
+    if (!nextTokenIs(b, "<++, --, .., <>>", EOL, TWO_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<++, --, .., <>>");
+    r = twoInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, TWO_OPERATOR);
+    r = r && twoInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, TWO_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean twoInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "twoInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "twoInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean twoInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "twoInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "twoInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */

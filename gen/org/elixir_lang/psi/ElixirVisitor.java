@@ -390,6 +390,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPrefixOperation(o);
   }
 
+  public void visitMatchedTwoOperation(@NotNull ElixirMatchedTwoOperation o) {
+    visitInfixOperation(o);
+  }
+
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
     visitOperator(o);
   }
@@ -468,6 +472,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAtomable(o);
     // visitInterpolatedString(o);
     // visitQuotable(o);
+  }
+
+  public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
+    visitOperator(o);
   }
 
   public void visitUnaryNumericOperation(@NotNull ElixirUnaryNumericOperation o) {
