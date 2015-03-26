@@ -33,11 +33,11 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testMultipleNumbersOnLine() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultipleStringsOnLine() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNoEOLAtEOF() {
@@ -49,11 +49,11 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testPygment() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testRealistic() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

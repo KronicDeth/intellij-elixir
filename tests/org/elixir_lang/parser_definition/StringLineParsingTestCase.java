@@ -20,7 +20,7 @@ public class StringLineParsingTestCase extends ParsingTestCase {
      * {@link https://github.com/KronicDeth/intellij-elixir/issues/2}.
      */
     public void testInterpolationRegression() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultiline() {

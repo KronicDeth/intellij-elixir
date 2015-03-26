@@ -2,15 +2,15 @@ package org.elixir_lang.parser_definition;
 
 public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     public void testAddition() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAnd() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testArrow() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAt() {
@@ -22,7 +22,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testComparison() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testHat() {
@@ -30,15 +30,15 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testIn() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testInMatch() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMatch() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultiplication() {
@@ -46,23 +46,23 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testOr() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPipe() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testRelational() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTwo() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testType() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testUnary() {
@@ -70,11 +70,11 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testValid() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testWhen() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

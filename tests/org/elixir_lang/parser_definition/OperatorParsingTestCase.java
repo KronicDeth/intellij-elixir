@@ -5,115 +5,115 @@ package org.elixir_lang.parser_definition;
  */
 public class OperatorParsingTestCase extends ParsingTestCase {
     public void testAddition() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAnd() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testArrow() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAssociation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAt() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAtNoParenthesesExpression() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testBitString() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCapture() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaptureNumber() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testComparison() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testDot() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testHat() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIn() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testInMatch() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMap() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMatch() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultiplication() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testOr() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPipe() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testRelational() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStab() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStruct() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTuple() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTwo() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testType() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testUnary() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testUnaryNoParenthesesExpression() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testWhen() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

@@ -2,19 +2,19 @@ package org.elixir_lang.parser_definition;
 
 public class NoParenthesesStrictParsingTestCase extends ParsingTestCase {
     public void testEmptyParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordsInParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalsAndKeywordsInParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalsInParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
