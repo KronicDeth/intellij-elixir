@@ -37,7 +37,7 @@ Elixir File(0,900)
   ElixirAdjacentExpressionImpl(ADJACENT_EXPRESSION)(158,163)
     ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE)(158,163)
       PsiElement(ElixirTokenType.IDENTIFIER)('start')(158,163)
-  PsiErrorElement:<adjacent expression>, <end of expression>, <matched dot left operation>, <matched dot right operation>, <matched hat left operation>, <matched hat right operation>, <matched multiplication right operation>, <no parentheses many arguments>, <no parentheses qualified identifier>, ElixirTokenType.(, ElixirTokenType.,, ElixirTokenType.. or ElixirTokenType.EOL expected, got ''(163,163)
+  PsiErrorElement:<adjacent expression>, <end of expression>, <matched call operation>, <matched dot operation>, <matched hat operation>, <matched multiplication operation>, <no parentheses many arguments>, ElixirTokenType.( or ElixirTokenType., expected, got ''(163,163)
     <empty list>
   PsiElement(DUMMY_BLOCK)(163,544)
     PsiElement(DUMMY_BLOCK)(163,203)

@@ -26,7 +26,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testHat() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testIn() {
@@ -42,7 +42,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testMultiplication() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testOr() {
