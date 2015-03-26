@@ -923,9 +923,35 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedMultiplicationExpression
+                                            matchedAdditionExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Addition Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L64
+ *
+ */
+
+// left-associative
+/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
+   interpreted as unaryOperation */
+additionInfixOperator ::= DUAL_OPERATOR EOL*
+                          {
+                            implements = "org.elixir_lang.psi.Operator"
+                            methods = [
+                              operatorTokenSet
+                              quote
+                            ]
+                            name = "+, -"
+                          }
+private matchedAdditionExpression ::= matchedAdditionOperand matchedAdditionOperation*
+private matchedAdditionOperand ::= matchedNonNumericCaptureOperation |
+                                   matchedMultiplicationExpression
+left matchedAdditionOperation ::= additionInfixOperator matchedAdditionOperand
+                                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
 
 /*
  * Multiplication Operation

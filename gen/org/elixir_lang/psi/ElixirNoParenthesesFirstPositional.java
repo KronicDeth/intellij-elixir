@@ -98,6 +98,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedAdditionOperation getMatchedAdditionOperation();
+
+  @Nullable
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable

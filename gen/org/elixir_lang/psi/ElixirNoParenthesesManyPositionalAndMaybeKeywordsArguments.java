@@ -100,6 +100,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedAdditionOperation getMatchedAdditionOperation();
+
+  @Nullable
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable

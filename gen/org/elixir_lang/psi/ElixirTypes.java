@@ -8,6 +8,7 @@ import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
+  IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType ATOM = new ElixirElementType("ATOM");
@@ -87,6 +88,7 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_HEREDOC = new ElixirElementType("LITERAL_WORDS_HEREDOC");
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
+  IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
@@ -240,7 +242,10 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ADJACENT_EXPRESSION) {
+       if (type == ADDITION_INFIX_OPERATOR) {
+        return new ElixirAdditionInfixOperatorImpl(node);
+      }
+      else if (type == ADJACENT_EXPRESSION) {
         return new ElixirAdjacentExpressionImpl(node);
       }
       else if (type == ALIAS) {
@@ -476,6 +481,9 @@ public interface ElixirTypes {
       }
       else if (type == LITERAL_WORDS_LINE) {
         return new ElixirLiteralWordsLineImpl(node);
+      }
+      else if (type == MATCHED_ADDITION_OPERATION) {
+        return new ElixirMatchedAdditionOperationImpl(node);
       }
       else if (type == MATCHED_CALL_OPERATION) {
         return new ElixirMatchedCallOperationImpl(node);

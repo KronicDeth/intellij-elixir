@@ -207,6 +207,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirMatchedAdditionOperation getMatchedAdditionOperation() {
+    return findChildByClass(ElixirMatchedAdditionOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedCallOperation getMatchedCallOperation() {
     return findChildByClass(ElixirMatchedCallOperation.class);
   }

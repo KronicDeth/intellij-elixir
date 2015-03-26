@@ -108,6 +108,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirLiteralWordsLine> getLiteralWordsLineList();
 
   @NotNull
+  List<ElixirMatchedAdditionOperation> getMatchedAdditionOperationList();
+
+  @NotNull
   List<ElixirMatchedCallOperation> getMatchedCallOperationList();
 
   @NotNull

@@ -7,6 +7,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
+  public void visitAdditionInfixOperator(@NotNull ElixirAdditionInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitAdjacentExpression(@NotNull ElixirAdjacentExpression o) {
     visitPsiElement(o);
   }
@@ -352,6 +356,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitLiteralWordsLine(@NotNull ElixirLiteralWordsLine o) {
     visitWordsFragmented(o);
     // visitSigilLine(o);
+  }
+
+  public void visitMatchedAdditionOperation(@NotNull ElixirMatchedAdditionOperation o) {
+    visitInfixOperation(o);
   }
 
   public void visitMatchedCallOperation(@NotNull ElixirMatchedCallOperation o) {

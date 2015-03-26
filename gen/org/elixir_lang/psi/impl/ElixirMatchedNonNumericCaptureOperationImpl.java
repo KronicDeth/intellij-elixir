@@ -208,6 +208,12 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
+  public ElixirMatchedAdditionOperation getMatchedAdditionOperation() {
+    return findChildByClass(ElixirMatchedAdditionOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedCallOperation getMatchedCallOperation() {
     return findChildByClass(ElixirMatchedCallOperation.class);
   }

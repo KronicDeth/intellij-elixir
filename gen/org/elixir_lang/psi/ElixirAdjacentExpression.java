@@ -100,6 +100,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedAdditionOperation getMatchedAdditionOperation();
+
+  @Nullable
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable

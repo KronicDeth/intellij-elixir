@@ -101,6 +101,9 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMatchedAdditionOperation getMatchedAdditionOperation();
+
+  @Nullable
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
