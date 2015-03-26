@@ -1,5 +1,5 @@
 Elixir File(0,42)
-  ElixirNoParenthesesManyArgumentsCallImpl(NO_PARENTHESES_MANY_ARGUMENTS_CALL)(0,42)
+  ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL)(0,42)
     ElixirNoParenthesesManyArgumentsUnqualifiedIdentifierImpl(NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER)(0,8)
       PsiElement(ElixirTokenType.IDENTIFIER)('function')(0,8)
     PsiWhiteSpace(' ')(8,9)

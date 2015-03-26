@@ -5,71 +5,71 @@ package org.elixir_lang.parser_definition.not.matched_expression;
  */
 public class PrefixOperationParsingTestCase extends ParsingTestCase {
     public void testAtMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testAtom() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaptureMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaretMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharList() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharListHeredoc() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testExclamationMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testFalse() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testList() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNil() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNotMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testOpeningParenthesisSemicolonClosingParenthesis() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testQualifiedAlias() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testQualifiedIdentifier() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testSigil() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTildeTildeTildeMatchedExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTrue() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

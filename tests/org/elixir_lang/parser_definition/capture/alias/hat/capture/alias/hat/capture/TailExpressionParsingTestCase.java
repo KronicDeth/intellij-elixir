@@ -4,10 +4,6 @@ package org.elixir_lang.parser_definition.capture.alias.hat.capture.alias.hat.ca
  * Created by luke.imhoff on 12/24/14.
  */
 public class TailExpressionParsingTestCase extends ParsingTestCase {
-    public void testEmptyParentheses() {
-        doTest(true);
-    }
-
     public void testNoParenthesesCall() {
         assertParsedAndQuotedCorrectly();
     }

@@ -4,12 +4,8 @@ package org.elixir_lang.parser_definition.caret.alias.hat.caret;
  * Created by luke.imhoff on 12/26/14.
  */
 public class TailExpressionParsingTestCase extends ParsingTestCase {
-    public void testEmptyParentheses() {
-        doTest(true);
-    }
-
     public void testNoParenthesesCall() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

@@ -5,31 +5,31 @@ package org.elixir_lang.parser_definition.not.expression;
  */
 public class PrefixOperationParsingTestCase extends ParsingTestCase {
     public void testAtExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaptureExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCaretExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testExclamationExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNoParenthesesCall() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNotExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testTildeTildeTildeExpressionPrefixOperation() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

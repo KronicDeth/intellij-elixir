@@ -14,11 +14,11 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testAt() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCapture() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testComparison() {
@@ -26,7 +26,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testHat() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIn() {
@@ -42,7 +42,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testMultiplication() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testOr() {
@@ -66,7 +66,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testUnary() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testValid() {

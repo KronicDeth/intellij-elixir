@@ -21,7 +21,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValue() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordValueAlias() {
@@ -125,11 +125,11 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testNoParenthesesExpressionKeywordValue() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testPositional() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalAlias() {
@@ -225,11 +225,11 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalsWithKeywords() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalsWithoutKeywords() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalVariable() {

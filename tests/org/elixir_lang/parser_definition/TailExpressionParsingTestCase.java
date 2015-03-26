@@ -5,11 +5,11 @@ package org.elixir_lang.parser_definition;
  */
 public class TailExpressionParsingTestCase extends ParsingTestCase {
     public void testEmptyParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testNoParenthesesCall() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
