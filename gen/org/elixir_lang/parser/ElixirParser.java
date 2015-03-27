@@ -32,6 +32,9 @@ public class ElixirParser implements PsiParser {
     else if (t == ALIAS) {
       r = alias(b, 0);
     }
+    else if (t == AND_INFIX_OPERATOR) {
+      r = andInfixOperator(b, 0);
+    }
     else if (t == ARROW_INFIX_OPERATOR) {
       r = arrowInfixOperator(b, 0);
     }
@@ -275,6 +278,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_ADDITION_OPERATION) {
       r = matchedAdditionOperation(b, 0);
     }
+    else if (t == MATCHED_AND_OPERATION) {
+      r = matchedAndOperation(b, 0);
+    }
     else if (t == MATCHED_ARROW_OPERATION) {
       r = matchedArrowOperation(b, 0);
     }
@@ -484,6 +490,44 @@ public class ElixirParser implements PsiParser {
     r = consumeToken(b, ALIAS_TOKEN);
     exit_section_(b, m, ALIAS, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* AND_OPERATOR EOL*
+  public static boolean andInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "andInfixOperator")) return false;
+    if (!nextTokenIs(b, "<&&, &&&, and>", AND_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<&&, &&&, and>");
+    r = andInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, AND_OPERATOR);
+    r = r && andInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, AND_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean andInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "andInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "andInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean andInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "andInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "andInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -2547,6 +2591,56 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // matchedAndOperand matchedAndOperation*
+  static boolean matchedAndExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedAndExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedAndOperand(b, l + 1);
+    r = r && matchedAndExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedAndOperation*
+  private static boolean matchedAndExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedAndExpression_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!matchedAndOperation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "matchedAndExpression_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                               matchedComparisonExpression
+  static boolean matchedAndOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedAndOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedComparisonExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // andInfixOperator matchedAndOperand
+  public static boolean matchedAndOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedAndOperation")) return false;
+    if (!nextTokenIs(b, "<matched and operation>", AND_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched and operation>");
+    r = andInfixOperator(b, l + 1);
+    r = r && matchedAndOperand(b, l + 1);
+    exit_section_(b, l, m, MATCHED_AND_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // matchedArrowOperand matchedArrowOperation*
   static boolean matchedArrowExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedArrowExpression")) return false;
@@ -2961,13 +3055,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedComparisonExpression
+  //                                             matchedAndExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedComparisonExpression(b, l + 1);
+    if (!r) r = matchedAndExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

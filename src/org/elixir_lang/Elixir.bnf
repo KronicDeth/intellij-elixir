@@ -923,14 +923,34 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedComparisonExpression
+                                            matchedAndExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
+ * And Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
+ */
+andInfixOperator ::= EOL* AND_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "&&, &&&, and"
+                     }
+private matchedAndExpression ::= matchedAndOperand matchedAndOperation*
+private matchedAndOperand ::= matchedNonNumericCaptureOperation |
+                              matchedComparisonExpression
+left matchedAndOperation ::= andInfixOperator matchedAndOperand
+                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
  * Comparison Operation - left-associative
  *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59)
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59
  */
 
 comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*

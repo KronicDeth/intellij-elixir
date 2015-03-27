@@ -104,6 +104,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirMatchedAdditionOperation getMatchedAdditionOperation();
 
   @Nullable
+  ElixirMatchedAndOperation getMatchedAndOperation();
+
+  @Nullable
   ElixirMatchedArrowOperation getMatchedArrowOperation();
 
   @Nullable

@@ -402,6 +402,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAndInfixOperator andInfixOperator) {
+        return TokenSet.create(ElixirTypes.AND_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirArrowInfixOperator arrowInfixOperator) {
         return TokenSet.create(ElixirTypes.ARROW_OPERATOR);
     }

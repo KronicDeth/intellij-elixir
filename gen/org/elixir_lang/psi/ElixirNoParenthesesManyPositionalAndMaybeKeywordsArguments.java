@@ -103,6 +103,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirMatchedAdditionOperation getMatchedAdditionOperation();
 
   @Nullable
+  ElixirMatchedAndOperation getMatchedAndOperation();
+
+  @Nullable
   ElixirMatchedArrowOperation getMatchedArrowOperation();
 
   @Nullable
