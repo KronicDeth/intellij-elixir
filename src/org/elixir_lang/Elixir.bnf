@@ -923,10 +923,30 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedInExpression
+                                            matchedArrowExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+/*
+ * Arrow Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
+ */
+
+arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
+                       }
+private matchedArrowExpression ::= matchedArrowOperand matchedArrowOperation*
+private matchedArrowOperand ::= matchedNonNumericCaptureOperation |
+                                matchedInExpression
+left matchedArrowOperation ::= arrowInfixOperator matchedArrowOperand
+                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 /*
  * In Operation - left-associative
  *

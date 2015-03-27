@@ -19,6 +19,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitArrowInfixOperator(@NotNull ElixirArrowInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -363,6 +367,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedAdditionOperation(@NotNull ElixirMatchedAdditionOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedArrowOperation(@NotNull ElixirMatchedArrowOperation o) {
     visitInfixOperation(o);
   }
 

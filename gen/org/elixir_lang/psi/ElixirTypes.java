@@ -11,6 +11,7 @@ public interface ElixirTypes {
   IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
+  IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
@@ -90,6 +91,7 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
+  IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
@@ -254,6 +256,9 @@ public interface ElixirTypes {
       }
       else if (type == ALIAS) {
         return new ElixirAliasImpl(node);
+      }
+      else if (type == ARROW_INFIX_OPERATOR) {
+        return new ElixirArrowInfixOperatorImpl(node);
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
@@ -491,6 +496,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_ADDITION_OPERATION) {
         return new ElixirMatchedAdditionOperationImpl(node);
+      }
+      else if (type == MATCHED_ARROW_OPERATION) {
+        return new ElixirMatchedArrowOperationImpl(node);
       }
       else if (type == MATCHED_CALL_OPERATION) {
         return new ElixirMatchedCallOperationImpl(node);

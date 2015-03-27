@@ -101,6 +101,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedAdditionOperation getMatchedAdditionOperation();
 
   @Nullable
+  ElixirMatchedArrowOperation getMatchedArrowOperation();
+
+  @Nullable
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
