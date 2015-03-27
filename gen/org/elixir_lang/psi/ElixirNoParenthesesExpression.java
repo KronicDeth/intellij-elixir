@@ -152,6 +152,9 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirMatchedTwoOperation getMatchedTwoOperation();
 
   @Nullable
+  ElixirMatchedTypeOperation getMatchedTypeOperation();
+
+  @Nullable
   ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
   @Nullable

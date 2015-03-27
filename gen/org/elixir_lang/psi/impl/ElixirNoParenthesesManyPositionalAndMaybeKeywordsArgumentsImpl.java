@@ -306,6 +306,12 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
   }
 
   @Override
+  @Nullable
+  public ElixirMatchedTypeOperation getMatchedTypeOperation() {
+    return findChildByClass(ElixirMatchedTypeOperation.class);
+  }
+
+  @Override
   @NotNull
   public List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesExpression.class);

@@ -329,6 +329,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_TWO_OPERATION) {
       r = matchedTwoOperation(b, 0);
     }
+    else if (t == MATCHED_TYPE_OPERATION) {
+      r = matchedTypeOperation(b, 0);
+    }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
     }
@@ -397,6 +400,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == TWO_INFIX_OPERATOR) {
       r = twoInfixOperator(b, 0);
+    }
+    else if (t == TYPE_INFIX_OPERATOR) {
+      r = typeInfixOperator(b, 0);
     }
     else if (t == UNARY_NUMERIC_OPERATION) {
       r = unaryNumericOperation(b, 0);
@@ -3156,13 +3162,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedPipeExpression
+  //                                             matchedTypeExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedPipeExpression(b, l + 1);
+    if (!r) r = matchedTypeExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3408,6 +3414,51 @@ public class ElixirParser implements PsiParser {
     r = twoInfixOperator(b, l + 1);
     r = r && matchedTwoExpression(b, l + 1);
     exit_section_(b, l, m, MATCHED_TWO_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedTypeOperand matchedTypeOperation?
+  static boolean matchedTypeExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTypeExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedTypeOperand(b, l + 1);
+    r = r && matchedTypeExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedTypeOperation?
+  private static boolean matchedTypeExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTypeExpression_1")) return false;
+    matchedTypeOperation(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                                matchedPipeExpression
+  static boolean matchedTypeOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTypeOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedPipeExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // typeInfixOperator matchedTypeExpression
+  public static boolean matchedTypeOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedTypeOperation")) return false;
+    if (!nextTokenIs(b, "<matched type operation>", EOL, TYPE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched type operation>");
+    r = typeInfixOperator(b, l + 1);
+    r = r && matchedTypeExpression(b, l + 1);
+    exit_section_(b, l, m, MATCHED_TYPE_OPERATION, r, false, null);
     return r;
   }
 
@@ -4162,6 +4213,44 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!consumeToken(b, EOL)) break;
       if (!empty_element_parsed_guard_(b, "twoInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // EOL* TYPE_OPERATOR EOL*
+  public static boolean typeInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "typeInfixOperator")) return false;
+    if (!nextTokenIs(b, "<::>", EOL, TYPE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<::>");
+    r = typeInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, TYPE_OPERATOR);
+    r = r && typeInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, TYPE_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean typeInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "typeInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "typeInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean typeInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "typeInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "typeInfixOperator_2", c)) break;
       c = current_position_(b);
     }
     return true;

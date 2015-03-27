@@ -150,6 +150,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   @Nullable
   ElixirMatchedTwoOperation getMatchedTwoOperation();
 
+  @Nullable
+  ElixirMatchedTypeOperation getMatchedTypeOperation();
+
   @NotNull
   List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
 

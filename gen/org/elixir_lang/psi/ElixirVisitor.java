@@ -446,6 +446,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitInfixOperation(o);
   }
 
+  public void visitMatchedTypeOperation(@NotNull ElixirMatchedTypeOperation o) {
+    visitInfixOperation(o);
+  }
+
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
     visitOperator(o);
   }
@@ -539,6 +543,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
+    visitOperator(o);
+  }
+
+  public void visitTypeInfixOperator(@NotNull ElixirTypeInfixOperator o) {
     visitOperator(o);
   }
 

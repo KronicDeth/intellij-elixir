@@ -109,6 +109,7 @@ public interface ElixirTypes {
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
+  IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
@@ -133,6 +134,7 @@ public interface ElixirTypes {
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
+  IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
@@ -563,6 +565,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_TWO_OPERATION) {
         return new ElixirMatchedTwoOperationImpl(node);
       }
+      else if (type == MATCHED_TYPE_OPERATION) {
+        return new ElixirMatchedTypeOperationImpl(node);
+      }
       else if (type == MATCH_INFIX_OPERATOR) {
         return new ElixirMatchInfixOperatorImpl(node);
       }
@@ -634,6 +639,9 @@ public interface ElixirTypes {
       }
       else if (type == TWO_INFIX_OPERATOR) {
         return new ElixirTwoInfixOperatorImpl(node);
+      }
+      else if (type == TYPE_INFIX_OPERATOR) {
+        return new ElixirTypeInfixOperatorImpl(node);
       }
       else if (type == UNARY_NUMERIC_OPERATION) {
         return new ElixirUnaryNumericOperationImpl(node);
