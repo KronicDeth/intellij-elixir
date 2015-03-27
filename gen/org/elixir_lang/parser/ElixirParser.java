@@ -68,6 +68,9 @@ public class ElixirParser implements PsiParser {
     else if (t == CHAR_TOKEN) {
       r = charToken(b, 0);
     }
+    else if (t == COMPARISON_INFIX_OPERATOR) {
+      r = comparisonInfixOperator(b, 0);
+    }
     else if (t == DECIMAL_DIGITS) {
       r = decimalDigits(b, 0);
     }
@@ -277,6 +280,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == MATCHED_CALL_OPERATION) {
       r = matchedCallOperation(b, 0);
+    }
+    else if (t == MATCHED_COMPARISON_OPERATION) {
+      r = matchedComparisonOperation(b, 0);
     }
     else if (t == MATCHED_DOT_OPERATION) {
       r = matchedDotOperation(b, 0);
@@ -765,6 +771,44 @@ public class ElixirParser implements PsiParser {
     if (!r) r = escapeSequence(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* COMPARISON_OPERATOR EOL*
+  public static boolean comparisonInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "comparisonInfixOperator")) return false;
+    if (!nextTokenIs(b, "<!=, ==, =~, !==, ===>", COMPARISON_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<!=, ==, =~, !==, ===>");
+    r = comparisonInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, COMPARISON_OPERATOR);
+    r = r && comparisonInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, COMPARISON_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean comparisonInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "comparisonInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "comparisonInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean comparisonInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "comparisonInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "comparisonInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -2602,6 +2646,56 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // matchedComparisonOperand matchedComparisonOperation*
+  static boolean matchedComparisonExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedComparisonExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedComparisonOperand(b, l + 1);
+    r = r && matchedComparisonExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedComparisonOperation*
+  private static boolean matchedComparisonExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedComparisonExpression_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!matchedComparisonOperation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "matchedComparisonExpression_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                                      matchedRelationalExpression
+  static boolean matchedComparisonOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedComparisonOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedRelationalExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // comparisonInfixOperator matchedComparisonOperand
+  public static boolean matchedComparisonOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedComparisonOperation")) return false;
+    if (!nextTokenIs(b, "<matched comparison operation>", COMPARISON_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched comparison operation>");
+    r = comparisonInfixOperator(b, l + 1);
+    r = r && matchedComparisonOperand(b, l + 1);
+    exit_section_(b, l, m, MATCHED_COMPARISON_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // matchedDotOperand matchedDotOperation*
   static boolean matchedDotExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotExpression")) return false;
@@ -2867,13 +2961,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedRelationalExpression
+  //                                             matchedComparisonExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedRelationalExpression(b, l + 1);
+    if (!r) r = matchedComparisonExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

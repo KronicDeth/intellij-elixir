@@ -23,6 +23,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
+  IElementType COMPARISON_INFIX_OPERATOR = new ElixirElementType("COMPARISON_INFIX_OPERATOR");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_FLOAT_EXPONENT = new ElixirElementType("DECIMAL_FLOAT_EXPONENT");
@@ -93,6 +94,7 @@ public interface ElixirTypes {
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
+  IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
@@ -294,6 +296,9 @@ public interface ElixirTypes {
       }
       else if (type == CHAR_TOKEN) {
         return new ElixirCharTokenImpl(node);
+      }
+      else if (type == COMPARISON_INFIX_OPERATOR) {
+        return new ElixirComparisonInfixOperatorImpl(node);
       }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);
@@ -504,6 +509,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_CALL_OPERATION) {
         return new ElixirMatchedCallOperationImpl(node);
+      }
+      else if (type == MATCHED_COMPARISON_OPERATION) {
+        return new ElixirMatchedComparisonOperationImpl(node);
       }
       else if (type == MATCHED_DOT_OPERATION) {
         return new ElixirMatchedDotOperationImpl(node);

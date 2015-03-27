@@ -923,9 +923,30 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedRelationalExpression
+                                            matchedComparisonExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Comparison Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59)
+ */
+
+comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
+                            {
+                              implements = "org.elixir_lang.psi.Operator"
+                              methods = [
+                                operatorTokenSet
+                                quote
+                              ]
+                              name = "!=, ==, =~, !==, ==="
+                            }
+private matchedComparisonExpression ::= matchedComparisonOperand matchedComparisonOperation*
+private matchedComparisonOperand ::= matchedNonNumericCaptureOperation |
+                                     matchedRelationalExpression
+left matchedComparisonOperation ::= comparisonInfixOperator matchedComparisonOperand
+                                    { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
 /*
  * Relational Operation - left-associative
