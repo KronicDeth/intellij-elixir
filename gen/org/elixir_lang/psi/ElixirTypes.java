@@ -64,6 +64,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_WORDS_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_WORDS_HEREDOC_LINE");
   IElementType INTERPOLATED_WORDS_LINE = new ElixirElementType("INTERPOLATED_WORDS_LINE");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
+  IElementType IN_INFIX_OPERATOR = new ElixirElementType("IN_INFIX_OPERATOR");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
@@ -92,6 +93,7 @@ public interface ElixirTypes {
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
+  IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
@@ -412,6 +414,9 @@ public interface ElixirTypes {
       else if (type == INTERPOLATION) {
         return new ElixirInterpolationImpl(node);
       }
+      else if (type == IN_INFIX_OPERATOR) {
+        return new ElixirInInfixOperatorImpl(node);
+      }
       else if (type == KEYWORD_KEY) {
         return new ElixirKeywordKeyImpl(node);
       }
@@ -495,6 +500,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_HAT_OPERATION) {
         return new ElixirMatchedHatOperationImpl(node);
+      }
+      else if (type == MATCHED_IN_OPERATION) {
+        return new ElixirMatchedInOperationImpl(node);
       }
       else if (type == MATCHED_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedMultiplicationOperationImpl(node);

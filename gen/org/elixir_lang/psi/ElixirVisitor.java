@@ -156,6 +156,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitWholeNumber(o);
   }
 
+  public void visitInInfixOperator(@NotNull ElixirInInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitInterpolatedCharListBody(@NotNull ElixirInterpolatedCharListBody o) {
     visitBody(o);
   }
@@ -371,6 +375,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedInOperation(@NotNull ElixirMatchedInOperation o) {
     visitInfixOperation(o);
   }
 

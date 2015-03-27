@@ -112,6 +112,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
+  ElixirMatchedInOperation getMatchedInOperation();
+
+  @Nullable
   ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation();
 
   @Nullable

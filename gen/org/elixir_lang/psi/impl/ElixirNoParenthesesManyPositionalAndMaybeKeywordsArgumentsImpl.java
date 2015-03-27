@@ -229,6 +229,12 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
+  public ElixirMatchedInOperation getMatchedInOperation() {
+    return findChildByClass(ElixirMatchedInOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedMultiplicationOperation getMatchedMultiplicationOperation() {
     return findChildByClass(ElixirMatchedMultiplicationOperation.class);
   }

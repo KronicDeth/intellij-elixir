@@ -120,6 +120,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedHatOperation> getMatchedHatOperationList();
 
   @NotNull
+  List<ElixirMatchedInOperation> getMatchedInOperationList();
+
+  @NotNull
   List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList();
 
   @NotNull
