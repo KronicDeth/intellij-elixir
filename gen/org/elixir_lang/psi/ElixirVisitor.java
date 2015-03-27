@@ -422,6 +422,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPrefixOperation(o);
   }
 
+  public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
+    visitInfixOperation(o);
+  }
+
   public void visitMatchedRelationalOperation(@NotNull ElixirMatchedRelationalOperation o) {
     visitInfixOperation(o);
   }
@@ -493,6 +497,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitOpenHexadecimalEscapeSequence(@NotNull ElixirOpenHexadecimalEscapeSequence o) {
     visitEscapedHexadecimalDigits(o);
+  }
+
+  public void visitOrInfixOperator(@NotNull ElixirOrInfixOperator o) {
+    visitOperator(o);
   }
 
   public void visitRelationalInfixOperator(@NotNull ElixirRelationalInfixOperator o) {

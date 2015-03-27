@@ -923,9 +923,30 @@ private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
 private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
                                                matchedNonNumericCaptureOperand
 private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
-                                            matchedAndExpression
+                                            matchedOrExpression
 matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Or Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
+ */
+
+orInfixOperator ::= EOL* OR_OPERATOR EOL*
+                    {
+                      implements = "org.elixir_lang.psi.Operator"
+                      methods = [
+                        operatorTokenSet
+                        quote
+                      ]
+                      name = "||, |||, or"
+                    }
+private matchedOrExpression ::= matchedOrOperand matchedOrOperation*
+private matchedOrOperand ::= matchedNonNumericCaptureOperation |
+                             matchedAndExpression
+left matchedOrOperation ::= orInfixOperator matchedOrOperand
+                            { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
 /*
  * And Operation - left-associative

@@ -137,6 +137,9 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
+  ElixirMatchedOrOperation getMatchedOrOperation();
+
+  @Nullable
   ElixirMatchedRelationalOperation getMatchedRelationalOperation();
 
   @Nullable

@@ -137,6 +137,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
+  ElixirMatchedOrOperation getMatchedOrOperation();
+
+  @Nullable
   ElixirMatchedRelationalOperation getMatchedRelationalOperation();
 
   @Nullable

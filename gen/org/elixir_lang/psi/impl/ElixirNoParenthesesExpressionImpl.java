@@ -280,6 +280,12 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
 
   @Override
   @Nullable
+  public ElixirMatchedOrOperation getMatchedOrOperation() {
+    return findChildByClass(ElixirMatchedOrOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedRelationalOperation getMatchedRelationalOperation() {
     return findChildByClass(ElixirMatchedRelationalOperation.class);
   }

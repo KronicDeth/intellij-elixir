@@ -144,6 +144,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
 
   @NotNull
+  List<ElixirMatchedOrOperation> getMatchedOrOperationList();
+
+  @NotNull
   List<ElixirMatchedRelationalOperation> getMatchedRelationalOperationList();
 
   @NotNull
