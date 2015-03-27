@@ -130,6 +130,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
+  ElixirMatchedRelationalOperation getMatchedRelationalOperation();
+
+  @Nullable
   ElixirMatchedTwoOperation getMatchedTwoOperation();
 
   @Nullable

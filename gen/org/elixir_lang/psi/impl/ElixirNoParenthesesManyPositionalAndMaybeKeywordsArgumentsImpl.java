@@ -265,6 +265,12 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
 
   @Override
   @Nullable
+  public ElixirMatchedRelationalOperation getMatchedRelationalOperation() {
+    return findChildByClass(ElixirMatchedRelationalOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedTwoOperation getMatchedTwoOperation() {
     return findChildByClass(ElixirMatchedTwoOperation.class);
   }

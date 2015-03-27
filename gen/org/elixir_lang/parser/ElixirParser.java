@@ -299,6 +299,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
       r = matchedNonNumericUnaryOperation(b, 0);
     }
+    else if (t == MATCHED_RELATIONAL_OPERATION) {
+      r = matchedRelationalOperation(b, 0);
+    }
     else if (t == MATCHED_TWO_OPERATION) {
       r = matchedTwoOperation(b, 0);
     }
@@ -349,6 +352,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == OPEN_HEXADECIMAL_ESCAPE_SEQUENCE) {
       r = openHexadecimalEscapeSequence(b, 0);
+    }
+    else if (t == RELATIONAL_INFIX_OPERATOR) {
+      r = relationalInfixOperator(b, 0);
     }
     else if (t == SIGIL_MODIFIERS) {
       r = sigilModifiers(b, 0);
@@ -2861,13 +2867,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedArrowExpression
+  //                                             matchedRelationalExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedArrowExpression(b, l + 1);
+    if (!r) r = matchedRelationalExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2923,6 +2929,56 @@ public class ElixirParser implements PsiParser {
     r = nonNumericUnaryPrefixOperator(b, l + 1);
     r = r && matchedNonNumericUnaryOperand(b, l + 1);
     exit_section_(b, l, m, MATCHED_NON_NUMERIC_UNARY_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedRelationalOperand matchedRelationalOperation*
+  static boolean matchedRelationalExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedRelationalExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedRelationalOperand(b, l + 1);
+    r = r && matchedRelationalExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedRelationalOperation*
+  private static boolean matchedRelationalExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedRelationalExpression_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!matchedRelationalOperation(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "matchedRelationalExpression_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                                      matchedArrowExpression
+  static boolean matchedRelationalOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedRelationalOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedArrowExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // relationalInfixOperator matchedRelationalOperand
+  public static boolean matchedRelationalOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedRelationalOperation")) return false;
+    if (!nextTokenIs(b, "<matched relational operation>", EOL, RELATIONAL_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched relational operation>");
+    r = relationalInfixOperator(b, l + 1);
+    r = r && matchedRelationalOperand(b, l + 1);
+    exit_section_(b, l, m, MATCHED_RELATIONAL_OPERATION, r, false, null);
     return r;
   }
 
@@ -3462,6 +3518,44 @@ public class ElixirParser implements PsiParser {
     if (!r) r = stringLine(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* RELATIONAL_OPERATOR EOL*
+  public static boolean relationalInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relationalInfixOperator")) return false;
+    if (!nextTokenIs(b, "<<, >, <=, >=>", EOL, RELATIONAL_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<<, >, <=, >=>");
+    r = relationalInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, RELATIONAL_OPERATOR);
+    r = r && relationalInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, RELATIONAL_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean relationalInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relationalInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "relationalInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean relationalInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relationalInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "relationalInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */

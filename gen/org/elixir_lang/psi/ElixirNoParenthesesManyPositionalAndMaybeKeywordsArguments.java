@@ -130,6 +130,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
+  ElixirMatchedRelationalOperation getMatchedRelationalOperation();
+
+  @Nullable
   ElixirMatchedTwoOperation getMatchedTwoOperation();
 
   @NotNull

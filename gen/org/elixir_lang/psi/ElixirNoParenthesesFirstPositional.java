@@ -128,6 +128,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
 
   @Nullable
+  ElixirMatchedRelationalOperation getMatchedRelationalOperation();
+
+  @Nullable
   ElixirMatchedTwoOperation getMatchedTwoOperation();
 
   @Nullable

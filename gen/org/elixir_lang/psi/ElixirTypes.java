@@ -100,6 +100,7 @@ public interface ElixirTypes {
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
+  IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
@@ -117,6 +118,7 @@ public interface ElixirTypes {
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
+  IElementType RELATIONAL_INFIX_OPERATOR = new ElixirElementType("RELATIONAL_INFIX_OPERATOR");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
@@ -524,6 +526,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
         return new ElixirMatchedNonNumericUnaryOperationImpl(node);
       }
+      else if (type == MATCHED_RELATIONAL_OPERATION) {
+        return new ElixirMatchedRelationalOperationImpl(node);
+      }
       else if (type == MATCHED_TWO_OPERATION) {
         return new ElixirMatchedTwoOperationImpl(node);
       }
@@ -574,6 +579,9 @@ public interface ElixirTypes {
       }
       else if (type == OPEN_HEXADECIMAL_ESCAPE_SEQUENCE) {
         return new ElixirOpenHexadecimalEscapeSequenceImpl(node);
+      }
+      else if (type == RELATIONAL_INFIX_OPERATOR) {
+        return new ElixirRelationalInfixOperatorImpl(node);
       }
       else if (type == SIGIL_MODIFIERS) {
         return new ElixirSigilModifiersImpl(node);
