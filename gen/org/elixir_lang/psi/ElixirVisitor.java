@@ -374,6 +374,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilLine(o);
   }
 
+  public void visitMatchInfixOperator(@NotNull ElixirMatchInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitMatchedAdditionOperation(@NotNull ElixirMatchedAdditionOperation o) {
     visitInfixOperation(o);
   }
@@ -403,6 +407,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedInOperation(@NotNull ElixirMatchedInOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitMatchedMatchOperation(@NotNull ElixirMatchedMatchOperation o) {
     visitInfixOperation(o);
   }
 

@@ -100,6 +100,7 @@ public interface ElixirTypes {
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
+  IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
@@ -107,6 +108,7 @@ public interface ElixirTypes {
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
+  IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
@@ -532,6 +534,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_IN_OPERATION) {
         return new ElixirMatchedInOperationImpl(node);
       }
+      else if (type == MATCHED_MATCH_OPERATION) {
+        return new ElixirMatchedMatchOperationImpl(node);
+      }
       else if (type == MATCHED_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedMultiplicationOperationImpl(node);
       }
@@ -552,6 +557,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_TWO_OPERATION) {
         return new ElixirMatchedTwoOperationImpl(node);
+      }
+      else if (type == MATCH_INFIX_OPERATOR) {
+        return new ElixirMatchInfixOperatorImpl(node);
       }
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
