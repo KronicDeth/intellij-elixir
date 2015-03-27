@@ -140,6 +140,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedOrOperation getMatchedOrOperation();
 
   @Nullable
+  ElixirMatchedPipeOperation getMatchedPipeOperation();
+
+  @Nullable
   ElixirMatchedRelationalOperation getMatchedRelationalOperation();
 
   @Nullable

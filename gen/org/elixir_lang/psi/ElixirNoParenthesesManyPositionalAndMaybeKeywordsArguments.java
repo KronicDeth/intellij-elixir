@@ -142,6 +142,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirMatchedOrOperation getMatchedOrOperation();
 
   @Nullable
+  ElixirMatchedPipeOperation getMatchedPipeOperation();
+
+  @Nullable
   ElixirMatchedRelationalOperation getMatchedRelationalOperation();
 
   @Nullable

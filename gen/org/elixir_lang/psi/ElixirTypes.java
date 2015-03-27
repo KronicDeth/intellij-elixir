@@ -106,6 +106,7 @@ public interface ElixirTypes {
   IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
+  IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
@@ -126,6 +127,7 @@ public interface ElixirTypes {
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
+  IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
   IElementType RELATIONAL_INFIX_OPERATOR = new ElixirElementType("RELATIONAL_INFIX_OPERATOR");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
@@ -552,6 +554,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_OR_OPERATION) {
         return new ElixirMatchedOrOperationImpl(node);
       }
+      else if (type == MATCHED_PIPE_OPERATION) {
+        return new ElixirMatchedPipeOperationImpl(node);
+      }
       else if (type == MATCHED_RELATIONAL_OPERATION) {
         return new ElixirMatchedRelationalOperationImpl(node);
       }
@@ -611,6 +616,9 @@ public interface ElixirTypes {
       }
       else if (type == OR_INFIX_OPERATOR) {
         return new ElixirOrInfixOperatorImpl(node);
+      }
+      else if (type == PIPE_INFIX_OPERATOR) {
+        return new ElixirPipeInfixOperatorImpl(node);
       }
       else if (type == RELATIONAL_INFIX_OPERATOR) {
         return new ElixirRelationalInfixOperatorImpl(node);

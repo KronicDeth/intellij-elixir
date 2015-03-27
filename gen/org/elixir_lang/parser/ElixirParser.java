@@ -320,6 +320,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_OR_OPERATION) {
       r = matchedOrOperation(b, 0);
     }
+    else if (t == MATCHED_PIPE_OPERATION) {
+      r = matchedPipeOperation(b, 0);
+    }
     else if (t == MATCHED_RELATIONAL_OPERATION) {
       r = matchedRelationalOperation(b, 0);
     }
@@ -376,6 +379,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == OR_INFIX_OPERATOR) {
       r = orInfixOperator(b, 0);
+    }
+    else if (t == PIPE_INFIX_OPERATOR) {
+      r = pipeInfixOperator(b, 0);
     }
     else if (t == RELATIONAL_INFIX_OPERATOR) {
       r = relationalInfixOperator(b, 0);
@@ -3150,13 +3156,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedMatchExpression
+  //                                             matchedPipeExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedMatchExpression(b, l + 1);
+    if (!r) r = matchedPipeExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3262,6 +3268,51 @@ public class ElixirParser implements PsiParser {
     r = orInfixOperator(b, l + 1);
     r = r && matchedOrOperand(b, l + 1);
     exit_section_(b, l, m, MATCHED_OR_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedPipeOperand matchedPipeOperation?
+  static boolean matchedPipeExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedPipeExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedPipeOperand(b, l + 1);
+    r = r && matchedPipeExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedPipeOperation?
+  private static boolean matchedPipeExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedPipeExpression_1")) return false;
+    matchedPipeOperation(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                                matchedMatchExpression
+  static boolean matchedPipeOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedPipeOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = matchedMatchExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // pipeInfixOperator matchedPipeExpression
+  public static boolean matchedPipeOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedPipeOperation")) return false;
+    if (!nextTokenIs(b, "<matched pipe operation>", EOL, PIPE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched pipe operation>");
+    r = pipeInfixOperator(b, l + 1);
+    r = r && matchedPipeExpression(b, l + 1);
+    exit_section_(b, l, m, MATCHED_PIPE_OPERATION, r, false, null);
     return r;
   }
 
@@ -3873,6 +3924,44 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!consumeToken(b, EOL)) break;
       if (!empty_element_parsed_guard_(b, "orInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // EOL* PIPE_OPERATOR EOL*
+  public static boolean pipeInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pipeInfixOperator")) return false;
+    if (!nextTokenIs(b, "<|>", EOL, PIPE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<|>");
+    r = pipeInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, PIPE_OPERATOR);
+    r = r && pipeInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, PIPE_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean pipeInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pipeInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "pipeInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean pipeInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "pipeInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "pipeInfixOperator_2", c)) break;
       c = current_position_(b);
     }
     return true;

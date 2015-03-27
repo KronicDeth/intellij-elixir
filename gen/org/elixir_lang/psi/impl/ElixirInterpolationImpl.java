@@ -306,6 +306,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirMatchedPipeOperation> getMatchedPipeOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedPipeOperation.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirMatchedRelationalOperation> getMatchedRelationalOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedRelationalOperation.class);
   }

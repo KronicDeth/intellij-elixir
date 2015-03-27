@@ -150,6 +150,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedOrOperation> getMatchedOrOperationList();
 
   @NotNull
+  List<ElixirMatchedPipeOperation> getMatchedPipeOperationList();
+
+  @NotNull
   List<ElixirMatchedRelationalOperation> getMatchedRelationalOperationList();
 
   @NotNull
