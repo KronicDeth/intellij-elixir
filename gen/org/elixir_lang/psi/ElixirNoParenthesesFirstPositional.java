@@ -1,9 +1,10 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface ElixirNoParenthesesFirstPositional extends Quotable {
 
@@ -122,6 +123,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
+  ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation();
+
+  @Nullable
   ElixirMatchedComparisonOperation getMatchedComparisonOperation();
 
   @Nullable
@@ -144,9 +148,6 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
 
   @Nullable
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();

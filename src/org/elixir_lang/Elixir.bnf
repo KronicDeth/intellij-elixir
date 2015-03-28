@@ -902,16 +902,15 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
  *
  */
 
-private matchedExpression ::= matchedNonNumericCaptureExpression
+private matchedExpression ::= matchedCaptureNonNumericExpression
 
 /*
- * Non-Numeric Capture Operation
+ * Capture Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
  *
  */
 
-// non-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50)
 capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
@@ -921,13 +920,11 @@ capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                             ]
                             name = "&"
                           }
-private nonNumericCapturePrefixOperator ::= capturePrefixOperator !numeric
-
-private matchedNonNumericCaptureExpression ::= matchedNonNumericCaptureOperation |
-                                               matchedNonNumericCaptureOperand
-private matchedNonNumericCaptureOperand ::= matchedNonNumericCaptureOperation |
+private matchedCaptureNonNumericExpression ::= matchedCaptureNonNumericOperation |
+                                               matchedCaptureNonNumericOperand
+private matchedCaptureNonNumericOperand ::= matchedCaptureNonNumericOperation |
                                             matchedInMatchExpression
-matchedNonNumericCaptureOperation ::= nonNumericCapturePrefixOperator matchedNonNumericCaptureOperand
+matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedCaptureNonNumericOperand
                                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
@@ -946,7 +943,7 @@ inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL*
                       name = "<-, \\\\"
                     }
 private matchedInMatchExpression ::= matchedInMatchOperand matchedInMatchOperation*
-private matchedInMatchOperand ::= matchedNonNumericCaptureOperation |
+private matchedInMatchOperand ::= matchedCaptureNonNumericOperation |
                                   matchedWhenExpression
 left matchedInMatchOperation ::= inMatchInfixOperator matchedInMatchOperand
                                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -967,7 +964,7 @@ whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
                         name = "when"
                       }
 private matchedWhenExpression ::= matchedWhenOperand matchedWhenOperation?
-private matchedWhenOperand ::= matchedNonNumericCaptureOperation |
+private matchedWhenOperand ::= matchedCaptureNonNumericOperation |
                                // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L173
                                noParenthesesKeywords |
                                matchedTypeExpression
@@ -990,7 +987,7 @@ typeInfixOperator ::= EOL* TYPE_OPERATOR EOL*
                         name = "::"
                       }
 private matchedTypeExpression ::= matchedTypeOperand matchedTypeOperation?
-private matchedTypeOperand ::= matchedNonNumericCaptureOperation |
+private matchedTypeOperand ::= matchedCaptureNonNumericOperation |
                                matchedPipeExpression
 left matchedTypeOperation ::= typeInfixOperator matchedTypeExpression
                                { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1010,7 +1007,7 @@ pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL*
                         name = "|"
                       }
 private matchedPipeExpression ::= matchedPipeOperand matchedPipeOperation?
-private matchedPipeOperand ::= matchedNonNumericCaptureOperation |
+private matchedPipeOperand ::= matchedCaptureNonNumericOperation |
                                matchedMatchExpression
 left matchedPipeOperation ::= pipeInfixOperator matchedPipeExpression
                                { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1031,7 +1028,7 @@ matchInfixOperator ::= EOL* MATCH_OPERATOR EOL*
                          name = "="
                        }
 private matchedMatchExpression ::= matchedMatchOperand matchedMatchOperation?
-private matchedMatchOperand ::= matchedNonNumericCaptureOperation |
+private matchedMatchOperand ::= matchedCaptureNonNumericOperation |
                                 matchedOrExpression
 left matchedMatchOperation ::= matchInfixOperator matchedMatchExpression
                                { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1052,7 +1049,7 @@ orInfixOperator ::= EOL* OR_OPERATOR EOL*
                       name = "||, |||, or"
                     }
 private matchedOrExpression ::= matchedOrOperand matchedOrOperation*
-private matchedOrOperand ::= matchedNonNumericCaptureOperation |
+private matchedOrOperand ::= matchedCaptureNonNumericOperation |
                              matchedAndExpression
 left matchedOrOperation ::= orInfixOperator matchedOrOperand
                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1072,7 +1069,7 @@ andInfixOperator ::= EOL* AND_OPERATOR EOL*
                        name = "&&, &&&, and"
                      }
 private matchedAndExpression ::= matchedAndOperand matchedAndOperation*
-private matchedAndOperand ::= matchedNonNumericCaptureOperation |
+private matchedAndOperand ::= matchedCaptureNonNumericOperation |
                               matchedComparisonExpression
 left matchedAndOperation ::= andInfixOperator matchedAndOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1093,7 +1090,7 @@ comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
                               name = "!=, ==, =~, !==, ==="
                             }
 private matchedComparisonExpression ::= matchedComparisonOperand matchedComparisonOperation*
-private matchedComparisonOperand ::= matchedNonNumericCaptureOperation |
+private matchedComparisonOperand ::= matchedCaptureNonNumericOperation |
                                      matchedRelationalExpression
 left matchedComparisonOperation ::= comparisonInfixOperator matchedComparisonOperand
                                     { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1114,7 +1111,7 @@ relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL*
                               name = "<, >, <=, >="
                             }
 private matchedRelationalExpression ::= matchedRelationalOperand matchedRelationalOperation*
-private matchedRelationalOperand ::= matchedNonNumericCaptureOperation |
+private matchedRelationalOperand ::= matchedCaptureNonNumericOperation |
                                      matchedArrowExpression
 left matchedRelationalOperation ::= relationalInfixOperator matchedRelationalOperand
                                     { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1135,7 +1132,7 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                          name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
                        }
 private matchedArrowExpression ::= matchedArrowOperand matchedArrowOperation*
-private matchedArrowOperand ::= matchedNonNumericCaptureOperation |
+private matchedArrowOperand ::= matchedCaptureNonNumericOperation |
                                 matchedInExpression
 left matchedArrowOperation ::= arrowInfixOperator matchedArrowOperand
                                { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1155,7 +1152,7 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
                       name = "in"
                     }
 private matchedInExpression ::= matchedInOperand matchedInOperation*
-private matchedInOperand ::= matchedNonNumericCaptureOperation |
+private matchedInOperand ::= matchedCaptureNonNumericOperation |
                              matchedTwoExpression
 left matchedInOperation ::= inInfixOperator matchedInOperand
                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1176,7 +1173,7 @@ twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
                        name = "++, --, .., <>"
                      }
 private matchedTwoExpression ::= matchedTwoOperand matchedTwoOperation?
-private matchedTwoOperand ::= matchedNonNumericCaptureOperation |
+private matchedTwoOperand ::= matchedCaptureNonNumericOperation |
                               matchedAdditionExpression
 left matchedTwoOperation ::= twoInfixOperator matchedTwoExpression
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1200,7 +1197,7 @@ additionInfixOperator ::= DUAL_OPERATOR EOL*
                             name = "+, -"
                           }
 private matchedAdditionExpression ::= matchedAdditionOperand matchedAdditionOperation*
-private matchedAdditionOperand ::= matchedNonNumericCaptureOperation |
+private matchedAdditionOperand ::= matchedCaptureNonNumericOperation |
                                    matchedMultiplicationExpression
 left matchedAdditionOperation ::= additionInfixOperator matchedAdditionOperand
                                   { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1224,7 +1221,7 @@ multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                   name = "*, /"
                                 }
 private matchedMultiplicationExpression ::= matchedMultiplicationOperand matchedMultiplicationOperation*
-private matchedMultiplicationOperand ::= matchedNonNumericCaptureOperation |
+private matchedMultiplicationOperand ::= matchedCaptureNonNumericOperation |
                                          matchedHatExpression
 left matchedMultiplicationOperation ::= multiplicationInfixOperator matchedMultiplicationOperand
                                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1247,7 +1244,7 @@ hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                        name = "^^^"
                      }
 private matchedHatExpression ::= matchedHatOperand matchedHatOperation*
-private matchedHatOperand ::= matchedNonNumericCaptureOperation |
+private matchedHatOperand ::= matchedCaptureNonNumericOperation |
                               matchedNonNumericUnaryExpression
 left matchedHatOperation ::= hatInfixOperator matchedHatOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1272,7 +1269,7 @@ unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
 private nonNumericUnaryPrefixOperator ::= unaryPrefixOperator !numeric
 private matchedNonNumericUnaryExpression ::= matchedNonNumericUnaryOperation |
                                              matchedNonNumericUnaryOperand
-private matchedNonNumericUnaryOperand ::= matchedNonNumericCaptureOperation |
+private matchedNonNumericUnaryOperand ::= matchedCaptureNonNumericOperation |
                                           matchedNonNumericUnaryOperation |
                                           matchedDotExpression
 matchedNonNumericUnaryOperation ::= nonNumericUnaryPrefixOperator matchedNonNumericUnaryOperand
@@ -1297,7 +1294,7 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                        ]
                      }
 private matchedDotExpression ::= matchedDotOperand matchedDotOperation*
-private matchedDotOperand ::= matchedNonNumericCaptureOperation |
+private matchedDotOperand ::= matchedCaptureNonNumericOperation |
                               matchedNonNumericUnaryOperation |
                               matchedNonNumericAtExpression
 left matchedDotOperation ::= dotInfixOperator matchedDotOperand
@@ -1323,7 +1320,7 @@ atPrefixOperator ::= AT_OPERATOR EOL*
 private nonNumericAtPrefixOperator ::= atPrefixOperator !numeric
 private matchedNonNumericAtExpression ::= matchedNonNumericAtOperation |
                                           matchedNonNumericAtOperand
-private matchedNonNumericAtOperand ::= matchedNonNumericCaptureOperation |
+private matchedNonNumericAtOperand ::= matchedCaptureNonNumericOperation |
                                        matchedNonNumericUnaryOperation |
                                        matchedNonNumericAtOperation |
                                        matchedCallExpression
@@ -1337,7 +1334,7 @@ matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtO
  */
 
 private matchedCallExpression ::= matchedCallOperand matchedCallOperation?
-private matchedCallOperand ::= matchedNonNumericCaptureOperation |
+private matchedCallOperand ::= matchedCaptureNonNumericOperation |
                                matchedNonNumericUnaryOperation |
                                matchedNonNumericAtOperation |
                                noParenthesesNoArgumentsUnqualifiedCallOrVariable |

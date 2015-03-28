@@ -1,15 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirMatchedMatchOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedMatchOperation {
 
@@ -258,6 +259,12 @@ public class ElixirMatchedMatchOperationImpl extends ASTWrapperPsiElement implem
 
   @Override
   @NotNull
+  public List<ElixirMatchedCaptureNonNumericOperation> getMatchedCaptureNonNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedCaptureNonNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirMatchedComparisonOperation> getMatchedComparisonOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedComparisonOperation.class);
   }
@@ -296,12 +303,6 @@ public class ElixirMatchedMatchOperationImpl extends ASTWrapperPsiElement implem
   @NotNull
   public List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericAtOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirMatchedNonNumericCaptureOperation> getMatchedNonNumericCaptureOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override

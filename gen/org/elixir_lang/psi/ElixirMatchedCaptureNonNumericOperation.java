@@ -1,11 +1,12 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation {
+public interface ElixirMatchedCaptureNonNumericOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -125,6 +126,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
+  ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation();
+
+  @Nullable
   ElixirMatchedComparisonOperation getMatchedComparisonOperation();
 
   @Nullable
@@ -147,9 +151,6 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
 
   @Nullable
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();

@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -96,6 +96,7 @@ public interface ElixirTypes {
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
+  IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
@@ -104,7 +105,6 @@ public interface ElixirTypes {
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
-  IElementType MATCHED_NON_NUMERIC_CAPTURE_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_CAPTURE_OPERATION");
   IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
@@ -528,6 +528,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_CALL_OPERATION) {
         return new ElixirMatchedCallOperationImpl(node);
       }
+      else if (type == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
+        return new ElixirMatchedCaptureNonNumericOperationImpl(node);
+      }
       else if (type == MATCHED_COMPARISON_OPERATION) {
         return new ElixirMatchedComparisonOperationImpl(node);
       }
@@ -551,9 +554,6 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_NON_NUMERIC_AT_OPERATION) {
         return new ElixirMatchedNonNumericAtOperationImpl(node);
-      }
-      else if (type == MATCHED_NON_NUMERIC_CAPTURE_OPERATION) {
-        return new ElixirMatchedNonNumericCaptureOperationImpl(node);
       }
       else if (type == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
         return new ElixirMatchedNonNumericUnaryOperationImpl(node);

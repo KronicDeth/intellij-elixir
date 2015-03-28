@@ -1,8 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import org.jetbrains.annotations.Nullable;
 
 public interface ElixirAdjacentExpression extends PsiElement {
 
@@ -124,6 +125,9 @@ public interface ElixirAdjacentExpression extends PsiElement {
   ElixirMatchedCallOperation getMatchedCallOperation();
 
   @Nullable
+  ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation();
+
+  @Nullable
   ElixirMatchedComparisonOperation getMatchedComparisonOperation();
 
   @Nullable
@@ -146,9 +150,6 @@ public interface ElixirAdjacentExpression extends PsiElement {
 
   @Nullable
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
-
-  @Nullable
-  ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation();
 
   @Nullable
   ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();

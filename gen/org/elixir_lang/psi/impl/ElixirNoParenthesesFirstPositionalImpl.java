@@ -1,13 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesFirstPositional {
 
@@ -250,6 +253,12 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
+  public ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation() {
+    return findChildByClass(ElixirMatchedCaptureNonNumericOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedComparisonOperation getMatchedComparisonOperation() {
     return findChildByClass(ElixirMatchedComparisonOperation.class);
   }
@@ -294,12 +303,6 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
   @Nullable
   public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
     return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override

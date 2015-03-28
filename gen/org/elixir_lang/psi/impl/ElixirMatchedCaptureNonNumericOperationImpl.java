@@ -1,22 +1,25 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
-public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericCaptureOperation {
+public class ElixirMatchedCaptureNonNumericOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedCaptureNonNumericOperation {
 
-  public ElixirMatchedNonNumericCaptureOperationImpl(ASTNode node) {
+  public ElixirMatchedCaptureNonNumericOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericCaptureOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedCaptureNonNumericOperation(this);
     else super.accept(visitor);
   }
 
@@ -256,6 +259,12 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
 
   @Override
   @Nullable
+  public ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation() {
+    return findChildByClass(ElixirMatchedCaptureNonNumericOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedComparisonOperation getMatchedComparisonOperation() {
     return findChildByClass(ElixirMatchedComparisonOperation.class);
   }
@@ -300,12 +309,6 @@ public class ElixirMatchedNonNumericCaptureOperationImpl extends ASTWrapperPsiEl
   @Nullable
   public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
     return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericCaptureOperation getMatchedNonNumericCaptureOperation() {
-    return findChildByClass(ElixirMatchedNonNumericCaptureOperation.class);
   }
 
   @Override

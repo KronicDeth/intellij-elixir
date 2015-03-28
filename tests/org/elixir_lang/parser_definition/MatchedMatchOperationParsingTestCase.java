@@ -12,7 +12,7 @@ public class MatchedMatchOperationParsingTestCase extends ParsingTestCase {
      * matchedRelationalOperand
      */
 
-    public void testNonNumericCaptureOperation() {
+    public void testCaptureNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

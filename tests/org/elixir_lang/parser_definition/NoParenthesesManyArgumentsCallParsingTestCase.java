@@ -96,7 +96,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueMatchedNonNumericCaptureOperation() {
+    public void testKeywordValueMatchedCaptureNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -184,7 +184,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalNonNumericCaptureOperation() {
+    public void testPositionalCaptureNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
