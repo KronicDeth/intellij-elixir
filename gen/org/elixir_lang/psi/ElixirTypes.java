@@ -150,7 +150,7 @@ public interface ElixirTypes {
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
-  IElementType AT_OPERATOR = new ElixirTokenType("AT_OPERATOR");
+  IElementType AT_OPERATOR = new ElixirTokenType("@");
   IElementType BASE_WHOLE_NUMBER_PREFIX = new ElixirTokenType("0");
   IElementType BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("b");
   IElementType BIT_STRING_OPERATOR = new ElixirTokenType("BIT_STRING_OPERATOR");
