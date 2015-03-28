@@ -1,3 +1,0 @@
-Elixir File(0,3)
-  ElixirAtomKeywordImpl(ATOM_KEYWORD)(0,3)
-    PsiElement(ElixirTokenType.nil)('nil')(0,3)

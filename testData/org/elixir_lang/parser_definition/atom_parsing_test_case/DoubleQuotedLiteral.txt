@@ -1,8 +1,0 @@
-Elixir File(0,9)
-  ElixirAtomImpl(ATOM)(0,9)
-    PsiElement(ElixirTokenType.COLON)(':')(0,1)
-    ElixirStringLineImpl(STRING_LINE)(1,9)
-      PsiElement(ElixirTokenType.STRING_PROMOTER)('"')(1,2)
-      ElixirInterpolatedStringBodyImpl(INTERPOLATED_STRING_BODY)(2,8)
-        PsiElement(ElixirTokenType.STRING_FRAGMENT)('foobar')(2,8)
-      PsiElement(ElixirTokenType.STRING_TERMINATOR)('"')(8,9)

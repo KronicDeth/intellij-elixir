@@ -1,4 +1,4 @@
 Elixir File(0,2)
-  PsiErrorElement:<atom keyword>, <end of expression>, <matched non numeric unary operation>, <number>, <unary numeric operation>, ElixirTokenType.(, ElixirTokenType.?, ElixirTokenType.ALIAS_TOKEN, ElixirTokenType.AT_OPERATOR, ElixirTokenType.CAPTURE_OPERATOR, ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.COLON, ElixirTokenType.IDENTIFIER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER, ElixirTokenType.TILDE or ElixirTokenType.[ expected, got '.'(0,1)
-    PsiElement(ElixirTokenType..)('.')(0,1)
-  PsiElement(ElixirTokenType.VALID_DECIMAL_DIGITS)('0')(1,2)
+  PsiErrorElement:'"', '"""', '&', ''', ''''', '(', '0', ':', <decimal float>, <decimal whole number>, <end of expression>, <false, nil, true>, <keyword key>, <matched unary non numeric operation>, <unary numeric operation>, '?', '@', Alias, '[', identifier or '~' expected, got '.'(0,1)
+    PsiElement(.)('.')(0,1)
+  PsiElement(VALID_DECIMAL_DIGITS)('0')(1,2)

@@ -1,6 +1,7 @@
 Elixir File(0,16)
-  PsiComment(ElixirTokenType.COMMENT)('# empty tuple')(0,13)
+  PsiComment(COMMENT)('# empty tuple')(0,13)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(13,14)
-    PsiElement(ElixirTokenType.EOL)('\n')(13,14)
-  PsiErrorElement:<atom keyword>, <end of expression>, <matched non numeric unary operation>, <number>, <unary numeric operation>, ElixirTokenType.(, ElixirTokenType.;, ElixirTokenType.?, ElixirTokenType.ALIAS_TOKEN, ElixirTokenType.AT_OPERATOR, ElixirTokenType.CAPTURE_OPERATOR, ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.COLON, ElixirTokenType.EOL, ElixirTokenType.IDENTIFIER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER, ElixirTokenType.TILDE or ElixirTokenType.[ expected, got '{}'(14,16)
-    PsiElement(ElixirTokenType.TUPLE_OPERATOR)('{}')(14,16)
+    PsiElement(EOL)('\n')(13,14)
+  PsiElement(TUPLE_OPERATOR)('{}')(14,16)
+  PsiErrorElement:KEYWORD_PAIR_COLON expected, unexpected end of file(16,16)
+    <empty list>

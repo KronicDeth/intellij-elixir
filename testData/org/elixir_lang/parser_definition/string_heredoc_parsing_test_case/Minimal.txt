@@ -1,7 +1,7 @@
 Elixir File(0,7)
   ElixirStringHeredocImpl(STRING_HEREDOC)(0,7)
-    PsiElement(ElixirTokenType.STRING_HEREDOC_PROMOTER)('"""')(0,3)
-    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
+    PsiElement(""")('"""')(0,3)
+    PsiElement(EOL)('\n')(3,4)
     ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(4,4)
       <empty list>
-    PsiElement(ElixirTokenType.STRING_HEREDOC_TERMINATOR)('"""')(4,7)
+    PsiElement(STRING_HEREDOC_TERMINATOR)('"""')(4,7)

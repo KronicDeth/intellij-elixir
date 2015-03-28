@@ -1,4 +1,4 @@
 Elixir File(0,4)
   ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(0,4)
     ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(0,4)
-      PsiElement(ElixirTokenType.VALID_DECIMAL_DIGITS)('0001')(0,4)
+      PsiElement(VALID_DECIMAL_DIGITS)('0001')(0,4)

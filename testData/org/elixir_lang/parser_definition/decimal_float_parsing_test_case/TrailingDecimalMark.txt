@@ -1,7 +1,7 @@
 Elixir File(0,2)
   ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(0,1)
     ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(0,1)
-      PsiElement(ElixirTokenType.VALID_DECIMAL_DIGITS)('0')(0,1)
-  PsiElement(ElixirTokenType..)('.')(1,2)
-  PsiErrorElement:<atom keyword>, <matched non numeric unary operation>, <number>, <unary numeric operation>, ElixirTokenType.(, ElixirTokenType.?, ElixirTokenType.ALIAS_TOKEN, ElixirTokenType.AT_OPERATOR, ElixirTokenType.CAPTURE_OPERATOR, ElixirTokenType.CHAR_LIST_HEREDOC_PROMOTER, ElixirTokenType.CHAR_LIST_PROMOTER, ElixirTokenType.COLON, ElixirTokenType.EOL, ElixirTokenType.IDENTIFIER, ElixirTokenType.STRING_HEREDOC_PROMOTER, ElixirTokenType.STRING_PROMOTER, ElixirTokenType.TILDE or ElixirTokenType.[ expected, unexpected end of file(2,2)
+      PsiElement(VALID_DECIMAL_DIGITS)('0')(0,1)
+  PsiElement(.)('.')(1,2)
+  PsiErrorElement:'"', '"""', '&', ''', ''''', '(', '0', ':', <decimal float>, <decimal whole number>, <false, nil, true>, <matched unary non numeric operation>, <unary numeric operation>, '?', '@', Alias, EOL, '[', identifier or '~' expected, unexpected end of file(2,2)
     <empty list>

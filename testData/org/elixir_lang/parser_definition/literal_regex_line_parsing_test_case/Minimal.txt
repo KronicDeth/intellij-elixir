@@ -1,10 +1,10 @@
 Elixir File(0,4)
   ElixirLiteralRegexLineImpl(LITERAL_REGEX_LINE)(0,4)
-    PsiElement(ElixirTokenType.TILDE)('~')(0,1)
-    PsiElement(ElixirTokenType.LITERAL_REGEX_SIGIL_NAME)('R')(1,2)
-    PsiElement(ElixirTokenType.REGEX_PROMOTER)('{')(2,3)
+    PsiElement(~)('~')(0,1)
+    PsiElement(LITERAL_REGEX_SIGIL_NAME)('R')(1,2)
+    PsiElement(REGEX_PROMOTER)('{')(2,3)
     ElixirLiteralRegexBodyImpl(LITERAL_REGEX_BODY)(3,3)
       <empty list>
-    PsiElement(ElixirTokenType.REGEX_TERMINATOR)('}')(3,4)
+    PsiElement(REGEX_TERMINATOR)('}')(3,4)
     ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
       <empty list>
