@@ -49,6 +49,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirBinaryWholeNumber> getBinaryWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBinaryWholeNumber.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirCaptureNumericOperation> getCaptureNumericOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureNumericOperation.class);
   }
@@ -73,6 +79,18 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
+  public List<ElixirDecimalFloat> getDecimalFloatList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDecimalFloat.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirDecimalWholeNumber> getDecimalWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirDecimalWholeNumber.class);
+  }
+
+  @Override
+  @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
     return findNotNullChildByClass(ElixirDotInfixOperator.class);
   }
@@ -81,6 +99,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
   @NotNull
   public List<ElixirEmptyBlock> getEmptyBlockList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyBlock.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalWholeNumber> getHexadecimalWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalWholeNumber.class);
   }
 
   @Override
@@ -247,8 +271,8 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirNumber> getNumberList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNumber.class);
+  public List<ElixirOctalWholeNumber> getOctalWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirOctalWholeNumber.class);
   }
 
   @Override
@@ -267,6 +291,12 @@ public class ElixirMatchedDotOperationImpl extends ASTWrapperPsiElement implemen
   @NotNull
   public List<ElixirUnaryNumericOperation> getUnaryNumericOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryNumericOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirUnknownBaseWholeNumber> getUnknownBaseWholeNumberList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnknownBaseWholeNumber.class);
   }
 
   @NotNull

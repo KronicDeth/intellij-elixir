@@ -3,12 +3,6 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
-  /*
-   * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
-   */
-
-  extends(".*WholeNumber")=number
-
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
@@ -1589,21 +1583,15 @@ list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COM
 private listString ::= charListLine | charListHeredoc
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
-   Elixir.flex's NUMBER and CHAR_TOKEN_TOKEN. */
-private numeric ::= charToken | number
-
-//noParenthesesOneExpression ::= dotIdentifier
-
-number ::= binaryWholeNumber |
-           // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
-           decimalFloat |
-           decimalWholeNumber |
-           hexadecimalWholeNumber |
-           octalWholeNumber |
-           unknownBaseWholeNumber
-/*
- * Number Operations - Used in accessExpression
- */
+   Elixir.flex's CHAR_TOKEN_TOKEN and all the different base number rules. */
+private numeric ::= charToken |
+                    binaryWholeNumber |
+                    // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+                    decimalFloat |
+                    decimalWholeNumber |
+                    hexadecimalWholeNumber |
+                    octalWholeNumber |
+                    unknownBaseWholeNumber
 
 private quote ::= (charListLine | stringLine)
 private sigil ::= interpolatedCharListSigilLine |

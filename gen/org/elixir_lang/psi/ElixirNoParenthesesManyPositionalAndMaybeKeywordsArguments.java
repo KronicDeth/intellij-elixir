@@ -22,6 +22,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
@@ -34,7 +37,16 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirCharToken getCharToken();
 
   @Nullable
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -169,7 +181,7 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
@@ -179,6 +191,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject[] quoteArguments();

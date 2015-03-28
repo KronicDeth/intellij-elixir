@@ -21,6 +21,9 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
   List<ElixirAtomKeyword> getAtomKeywordList();
 
   @NotNull
+  List<ElixirBinaryWholeNumber> getBinaryWholeNumberList();
+
+  @NotNull
   List<ElixirCaptureNumericOperation> getCaptureNumericOperationList();
 
   @NotNull
@@ -33,7 +36,16 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
   List<ElixirCharToken> getCharTokenList();
 
   @NotNull
+  List<ElixirDecimalFloat> getDecimalFloatList();
+
+  @NotNull
+  List<ElixirDecimalWholeNumber> getDecimalWholeNumberList();
+
+  @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
+  List<ElixirHexadecimalWholeNumber> getHexadecimalWholeNumberList();
 
   @NotNull
   List<ElixirInterpolatedCharListSigilHeredoc> getInterpolatedCharListSigilHeredocList();
@@ -162,7 +174,7 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
-  List<ElixirNumber> getNumberList();
+  List<ElixirOctalWholeNumber> getOctalWholeNumberList();
 
   @NotNull
   List<ElixirStringHeredoc> getStringHeredocList();
@@ -172,6 +184,9 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
 
   @NotNull
   List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
+
+  @NotNull
+  List<ElixirUnknownBaseWholeNumber> getUnknownBaseWholeNumberList();
 
   @NotNull
   ElixirWhenInfixOperator getWhenInfixOperator();

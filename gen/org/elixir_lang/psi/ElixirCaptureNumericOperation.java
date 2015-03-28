@@ -7,6 +7,9 @@ import org.jetbrains.annotations.Nullable;
 
 public interface ElixirCaptureNumericOperation extends PrefixOperation {
 
+  @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
   @NotNull
   ElixirCapturePrefixOperator getCapturePrefixOperator();
 
@@ -14,7 +17,19 @@ public interface ElixirCaptureNumericOperation extends PrefixOperation {
   ElixirCharToken getCharToken();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
+
+  @Nullable
+  ElixirOctalWholeNumber getOctalWholeNumber();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

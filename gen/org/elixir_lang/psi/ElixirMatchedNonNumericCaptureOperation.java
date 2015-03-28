@@ -20,6 +20,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @NotNull
@@ -35,7 +38,16 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirCharToken getCharToken();
 
   @Nullable
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -167,7 +179,7 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
@@ -177,6 +189,9 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

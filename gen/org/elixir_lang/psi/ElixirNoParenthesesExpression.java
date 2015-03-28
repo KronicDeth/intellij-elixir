@@ -20,6 +20,9 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirAtomKeyword getAtomKeyword();
 
   @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable
@@ -32,10 +35,19 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirCharToken getCharToken();
 
   @Nullable
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
   ElixirEmptyBlock getEmptyBlock();
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
 
   @Nullable
   ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc();
@@ -170,7 +182,7 @@ public interface ElixirNoParenthesesExpression extends Quotable {
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();
@@ -180,6 +192,9 @@ public interface ElixirNoParenthesesExpression extends Quotable {
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

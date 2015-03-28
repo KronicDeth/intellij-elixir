@@ -2,6 +2,7 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ElixirOctalWholeNumberImpl extends ElixirNumberImpl implements ElixirOctalWholeNumber {
+public class ElixirOctalWholeNumberImpl extends ASTWrapperPsiElement implements ElixirOctalWholeNumber {
 
   public ElixirOctalWholeNumberImpl(ASTNode node) {
     super(node);

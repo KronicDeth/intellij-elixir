@@ -46,6 +46,12 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirBinaryWholeNumber getBinaryWholeNumber() {
+    return findChildByClass(ElixirBinaryWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirCaptureNumericOperation getCaptureNumericOperation() {
     return findChildByClass(ElixirCaptureNumericOperation.class);
   }
@@ -70,8 +76,26 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirDecimalFloat getDecimalFloat() {
+    return findChildByClass(ElixirDecimalFloat.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirDecimalWholeNumber getDecimalWholeNumber() {
+    return findChildByClass(ElixirDecimalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyBlock getEmptyBlock() {
     return findChildByClass(ElixirEmptyBlock.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
+    return findChildByClass(ElixirHexadecimalWholeNumber.class);
   }
 
   @Override
@@ -238,8 +262,8 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirNumber getNumber() {
-    return findChildByClass(ElixirNumber.class);
+  public ElixirOctalWholeNumber getOctalWholeNumber() {
+    return findChildByClass(ElixirOctalWholeNumber.class);
   }
 
   @Override
@@ -264,6 +288,12 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
   @NotNull
   public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
     return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber() {
+    return findChildByClass(ElixirUnknownBaseWholeNumber.class);
   }
 
   @NotNull

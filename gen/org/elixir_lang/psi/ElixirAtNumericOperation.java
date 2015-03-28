@@ -11,10 +11,25 @@ public interface ElixirAtNumericOperation extends PrefixOperation {
   ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
   ElixirCharToken getCharToken();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
+
+  @Nullable
+  ElixirOctalWholeNumber getOctalWholeNumber();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

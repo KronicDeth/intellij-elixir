@@ -8,13 +8,28 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirUnaryNumericOperation extends PrefixOperation {
 
   @Nullable
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
   ElixirCharToken getCharToken();
 
   @Nullable
-  ElixirNumber getNumber();
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
+
+  @Nullable
+  ElixirOctalWholeNumber getOctalWholeNumber();
 
   @NotNull
   ElixirUnaryPrefixOperator getUnaryPrefixOperator();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

@@ -48,8 +48,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
-    visitNumber(o);
-    // visitWholeNumber(o);
+    visitWholeNumber(o);
   }
 
   public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {
@@ -106,8 +105,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
-    visitNumber(o);
-    // visitWholeNumber(o);
+    visitWholeNumber(o);
   }
 
   public void visitDotInfixOperator(@NotNull ElixirDotInfixOperator o) {
@@ -159,8 +157,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
-    visitNumber(o);
-    // visitWholeNumber(o);
+    visitWholeNumber(o);
   }
 
   public void visitInInfixOperator(@NotNull ElixirInInfixOperator o) {
@@ -505,17 +502,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitNumber(@NotNull ElixirNumber o) {
-    visitPsiElement(o);
-  }
-
   public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
     visitDigits(o);
   }
 
   public void visitOctalWholeNumber(@NotNull ElixirOctalWholeNumber o) {
-    visitNumber(o);
-    // visitWholeNumber(o);
+    visitWholeNumber(o);
   }
 
   public void visitOpenHexadecimalEscapeSequence(@NotNull ElixirOpenHexadecimalEscapeSequence o) {
@@ -570,8 +562,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
-    visitNumber(o);
-    // visitWholeNumber(o);
+    visitWholeNumber(o);
   }
 
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {
@@ -659,6 +650,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnquoted(@NotNull Unquoted o) {
+    visitElement(o);
+  }
+
+  public void visitWholeNumber(@NotNull WholeNumber o) {
     visitElement(o);
   }
 

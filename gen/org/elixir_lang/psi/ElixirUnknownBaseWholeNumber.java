@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirUnknownBaseWholeNumber extends ElixirNumber, WholeNumber {
+public interface ElixirUnknownBaseWholeNumber extends WholeNumber {
 
   @NotNull
   List<ElixirUnknownBaseDigits> getUnknownBaseDigitsList();

@@ -6,7 +6,6 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
 import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
 
 import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
 import static org.elixir_lang.psi.ElixirTypes.*;
@@ -21,7 +20,7 @@ public class ElixirParser implements PsiParser {
 
   public void parseLight(IElementType t, PsiBuilder b) {
     boolean r;
-    b = adapt_builder_(t, b, this, EXTENDS_SETS_);
+    b = adapt_builder_(t, b, this, null);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == ADDITION_INFIX_OPERATOR) {
       r = additionInfixOperator(b, 0);
@@ -374,9 +373,6 @@ public class ElixirParser implements PsiParser {
     else if (t == NO_PARENTHESES_STRICT) {
       r = noParenthesesStrict(b, 0);
     }
-    else if (t == NUMBER) {
-      r = number(b, 0);
-    }
     else if (t == OCTAL_DIGITS) {
       r = octalDigits(b, 0);
     }
@@ -437,11 +433,6 @@ public class ElixirParser implements PsiParser {
   protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return elixirFile(b, l + 1);
   }
-
-  public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, NUMBER,
-      OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
-  };
 
   /* ********************************************************** */
   // atNumericOperation |
@@ -3987,35 +3978,25 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // binaryWholeNumber |
-  //            // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
-  //            decimalFloat |
-  //            decimalWholeNumber |
-  //            hexadecimalWholeNumber |
-  //            octalWholeNumber |
-  //            unknownBaseWholeNumber
-  public static boolean number(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "number")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, "<number>");
-    r = binaryWholeNumber(b, l + 1);
-    if (!r) r = decimalFloat(b, l + 1);
-    if (!r) r = decimalWholeNumber(b, l + 1);
-    if (!r) r = hexadecimalWholeNumber(b, l + 1);
-    if (!r) r = octalWholeNumber(b, l + 1);
-    if (!r) r = unknownBaseWholeNumber(b, l + 1);
-    exit_section_(b, l, m, NUMBER, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // charToken | number
+  // charToken |
+  //                     binaryWholeNumber |
+  //                     // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+  //                     decimalFloat |
+  //                     decimalWholeNumber |
+  //                     hexadecimalWholeNumber |
+  //                     octalWholeNumber |
+  //                     unknownBaseWholeNumber
   static boolean numeric(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "numeric")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = charToken(b, l + 1);
-    if (!r) r = number(b, l + 1);
+    if (!r) r = binaryWholeNumber(b, l + 1);
+    if (!r) r = decimalFloat(b, l + 1);
+    if (!r) r = decimalWholeNumber(b, l + 1);
+    if (!r) r = hexadecimalWholeNumber(b, l + 1);
+    if (!r) r = octalWholeNumber(b, l + 1);
+    if (!r) r = unknownBaseWholeNumber(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

@@ -28,14 +28,44 @@ public class ElixirAtNumericOperationImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirBinaryWholeNumber getBinaryWholeNumber() {
+    return findChildByClass(ElixirBinaryWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirCharToken getCharToken() {
     return findChildByClass(ElixirCharToken.class);
   }
 
   @Override
   @Nullable
-  public ElixirNumber getNumber() {
-    return findChildByClass(ElixirNumber.class);
+  public ElixirDecimalFloat getDecimalFloat() {
+    return findChildByClass(ElixirDecimalFloat.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirDecimalWholeNumber getDecimalWholeNumber() {
+    return findChildByClass(ElixirDecimalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
+    return findChildByClass(ElixirHexadecimalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirOctalWholeNumber getOctalWholeNumber() {
+    return findChildByClass(ElixirOctalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber() {
+    return findChildByClass(ElixirUnknownBaseWholeNumber.class);
   }
 
   @NotNull

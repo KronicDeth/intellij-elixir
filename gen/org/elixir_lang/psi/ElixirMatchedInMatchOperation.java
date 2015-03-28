@@ -22,6 +22,9 @@ public interface ElixirMatchedInMatchOperation extends InfixOperation {
   List<ElixirAtomKeyword> getAtomKeywordList();
 
   @NotNull
+  List<ElixirBinaryWholeNumber> getBinaryWholeNumberList();
+
+  @NotNull
   List<ElixirCaptureNumericOperation> getCaptureNumericOperationList();
 
   @NotNull
@@ -34,7 +37,16 @@ public interface ElixirMatchedInMatchOperation extends InfixOperation {
   List<ElixirCharToken> getCharTokenList();
 
   @NotNull
+  List<ElixirDecimalFloat> getDecimalFloatList();
+
+  @NotNull
+  List<ElixirDecimalWholeNumber> getDecimalWholeNumberList();
+
+  @NotNull
   List<ElixirEmptyBlock> getEmptyBlockList();
+
+  @NotNull
+  List<ElixirHexadecimalWholeNumber> getHexadecimalWholeNumberList();
 
   @NotNull
   ElixirInMatchInfixOperator getInMatchInfixOperator();
@@ -169,7 +181,7 @@ public interface ElixirMatchedInMatchOperation extends InfixOperation {
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
-  List<ElixirNumber> getNumberList();
+  List<ElixirOctalWholeNumber> getOctalWholeNumberList();
 
   @NotNull
   List<ElixirStringHeredoc> getStringHeredocList();
@@ -179,6 +191,9 @@ public interface ElixirMatchedInMatchOperation extends InfixOperation {
 
   @NotNull
   List<ElixirUnaryNumericOperation> getUnaryNumericOperationList();
+
+  @NotNull
+  List<ElixirUnknownBaseWholeNumber> getUnknownBaseWholeNumberList();
 
   @NotNull
   OtpErlangObject quote();
