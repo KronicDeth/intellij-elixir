@@ -90,7 +90,8 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedWithError();
+        // Parses as just a DecimalFloat
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringLine() {
