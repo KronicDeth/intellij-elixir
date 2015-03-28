@@ -155,7 +155,7 @@ public interface ElixirTypes {
   IElementType BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("b");
   IElementType BIT_STRING_OPERATOR = new ElixirTokenType("BIT_STRING_OPERATOR");
   IElementType CALL = new ElixirTokenType("");
-  IElementType CAPTURE_OPERATOR = new ElixirTokenType("CAPTURE_OPERATOR");
+  IElementType CAPTURE_OPERATOR = new ElixirTokenType("&");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("CHAR_LIST_HEREDOC_PROMOTER");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_HEREDOC_TERMINATOR");
