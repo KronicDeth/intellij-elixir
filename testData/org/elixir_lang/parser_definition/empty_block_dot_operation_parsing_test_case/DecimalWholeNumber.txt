@@ -1,0 +1,8 @@
+Elixir File(0,5)
+  ElixirEmptyBlockImpl(EMPTY_BLOCK)(0,3)
+    PsiElement(()('(')(0,1)
+    PsiElement(;)(';')(1,2)
+    PsiElement())(')')(2,3)
+  PsiElement(.)('.')(3,4)
+  PsiErrorElement:EOL expected, got '2'(4,5)
+    PsiElement(VALID_DECIMAL_DIGITS)('2')(4,5)
