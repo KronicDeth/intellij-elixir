@@ -1,25 +1,22 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericAtOperation {
+public class ElixirMatchedAtNonNumericOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedAtNonNumericOperation {
 
-  public ElixirMatchedNonNumericAtOperationImpl(ASTNode node) {
+  public ElixirMatchedAtNonNumericOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericAtOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedAtNonNumericOperation(this);
     else super.accept(visitor);
   }
 
@@ -235,6 +232,12 @@ public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
+  public ElixirMatchedAtNonNumericOperation getMatchedAtNonNumericOperation() {
+    return findChildByClass(ElixirMatchedAtNonNumericOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedCallOperation getMatchedCallOperation() {
     return findChildByClass(ElixirMatchedCallOperation.class);
   }
@@ -243,12 +246,6 @@ public class ElixirMatchedNonNumericAtOperationImpl extends ASTWrapperPsiElement
   @Nullable
   public ElixirMatchedCaptureNonNumericOperation getMatchedCaptureNonNumericOperation() {
     return findChildByClass(ElixirMatchedCaptureNonNumericOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override

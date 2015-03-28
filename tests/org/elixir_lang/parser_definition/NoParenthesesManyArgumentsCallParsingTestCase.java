@@ -84,7 +84,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueMatchedNonNumericAtOperation() {
+    public void testKeywordValueMatchedAtNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

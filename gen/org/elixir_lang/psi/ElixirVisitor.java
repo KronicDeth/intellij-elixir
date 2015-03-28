@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.NotNull;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -386,6 +386,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitInfixOperation(o);
   }
 
+  public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
+    visitPrefixOperation(o);
+  }
+
   public void visitMatchedCallOperation(@NotNull ElixirMatchedCallOperation o) {
     visitCall(o);
   }
@@ -420,10 +424,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
     visitInfixOperation(o);
-  }
-
-  public void visitMatchedNonNumericAtOperation(@NotNull ElixirMatchedNonNumericAtOperation o) {
-    visitPrefixOperation(o);
   }
 
   public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {

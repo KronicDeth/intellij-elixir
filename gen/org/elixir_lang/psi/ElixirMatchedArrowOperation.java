@@ -1,10 +1,11 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ElixirMatchedArrowOperation extends InfixOperation {
 
@@ -120,6 +121,9 @@ public interface ElixirMatchedArrowOperation extends InfixOperation {
   ElixirMatchedArrowOperation getMatchedArrowOperation();
 
   @NotNull
+  List<ElixirMatchedAtNonNumericOperation> getMatchedAtNonNumericOperationList();
+
+  @NotNull
   List<ElixirMatchedCallOperation> getMatchedCallOperationList();
 
   @NotNull
@@ -136,9 +140,6 @@ public interface ElixirMatchedArrowOperation extends InfixOperation {
 
   @NotNull
   List<ElixirMatchedMultiplicationOperation> getMatchedMultiplicationOperationList();
-
-  @NotNull
-  List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
   List<ElixirMatchedTwoOperation> getMatchedTwoOperationList();

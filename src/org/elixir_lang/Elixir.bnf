@@ -1295,7 +1295,7 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
 private matchedDotExpression ::= matchedDotOperand matchedDotOperation*
 private matchedDotOperand ::= matchedCaptureNonNumericOperation |
                               matchedUnaryNonNumericOperation |
-                              matchedNonNumericAtExpression
+                              matchedAtNonNumericExpression
 left matchedDotOperation ::= dotInfixOperator matchedDotOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
@@ -1316,14 +1316,13 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        ]
                        name = "@"
                      }
-private nonNumericAtPrefixOperator ::= atPrefixOperator !numeric
-private matchedNonNumericAtExpression ::= matchedNonNumericAtOperation |
-                                          matchedNonNumericAtOperand
-private matchedNonNumericAtOperand ::= matchedCaptureNonNumericOperation |
+private matchedAtNonNumericExpression ::= matchedAtNonNumericOperation |
+                                          matchedAtNonNumericOperand
+private matchedAtNonNumericOperand ::= matchedCaptureNonNumericOperation |
                                        matchedUnaryNonNumericOperation |
-                                       matchedNonNumericAtOperation |
+                                       matchedAtNonNumericOperation |
                                        matchedCallExpression
-matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtOperand
+matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedAtNonNumericOperand
                                  { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
@@ -1335,7 +1334,7 @@ matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtO
 private matchedCallExpression ::= matchedCallOperand matchedCallOperation?
 private matchedCallOperand ::= matchedCaptureNonNumericOperation |
                                matchedUnaryNonNumericOperation |
-                               matchedNonNumericAtOperation |
+                               matchedAtNonNumericOperation |
                                noParenthesesNoArgumentsUnqualifiedCallOrVariable |
                                accessExpression
 /*

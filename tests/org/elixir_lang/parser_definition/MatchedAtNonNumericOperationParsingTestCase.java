@@ -3,9 +3,9 @@ package org.elixir_lang.parser_definition;
 /**
  * Created by luke.imhoff on 9/17/14.
  */
-public class MatchedNonNumericAtRightOperationParsingTestCase extends ParsingTestCase {
+public class MatchedAtNonNumericOperationParsingTestCase extends ParsingTestCase {
     /*
-     * matchedNonNumericAtRightOperand
+     * matchedAtNonNumericRightOperand
      */
 
     public void testNoParenthesesManyArgumentsCall() {
@@ -25,7 +25,7 @@ public class MatchedNonNumericAtRightOperationParsingTestCase extends ParsingTes
     }
 
     /*
-     * matchedNonNumericAtLeftOperand
+     * matchedAtNonNumericLeftOperand
      */
 
     public void testCaptureLeftOperation() {
@@ -143,6 +143,6 @@ public class MatchedNonNumericAtRightOperationParsingTestCase extends ParsingTes
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/matched_non_numeric_at_right_operation_parsing_test_case";
+        return super.getTestDataPath() + "/matched_at_non_numeric_operation_parsing_test_case";
     }
 }

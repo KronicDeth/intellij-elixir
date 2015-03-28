@@ -44,7 +44,7 @@ public class MatchedArrowOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testNonNumericAtOperation() {
+    public void testAtNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

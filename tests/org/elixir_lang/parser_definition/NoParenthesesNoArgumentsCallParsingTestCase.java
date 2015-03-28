@@ -16,7 +16,7 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
     }
     
     /*
-     * matchedNonNumericAtLeftOperand
+     * matchedAtNonNumericLeftOperand
      */
 
     public void testCaptureLeftOperationDotIdentifier() {

@@ -1,16 +1,13 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElementVisitor;
+import org.elixir_lang.psi.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedUnaryNonNumericOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedUnaryNonNumericOperation {
 
@@ -229,6 +226,12 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
+  public ElixirMatchedAtNonNumericOperation getMatchedAtNonNumericOperation() {
+    return findChildByClass(ElixirMatchedAtNonNumericOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirMatchedCallOperation getMatchedCallOperation() {
     return findChildByClass(ElixirMatchedCallOperation.class);
   }
@@ -243,12 +246,6 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ASTWrapperPsiElem
   @Nullable
   public ElixirMatchedDotOperation getMatchedDotOperation() {
     return findChildByClass(ElixirMatchedDotOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation() {
-    return findChildByClass(ElixirMatchedNonNumericAtOperation.class);
   }
 
   @Override
