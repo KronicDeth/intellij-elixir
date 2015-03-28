@@ -33,7 +33,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testMultipleNumbersOnLine() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMultipleStringsOnLine() {

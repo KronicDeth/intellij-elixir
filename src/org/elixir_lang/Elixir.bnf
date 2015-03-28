@@ -1514,6 +1514,7 @@ unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE un
 
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
 adjacentExpression ::= expression
+                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 

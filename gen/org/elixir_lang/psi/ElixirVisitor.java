@@ -12,7 +12,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAdjacentExpression(@NotNull ElixirAdjacentExpression o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitAlias(@NotNull ElixirAlias o) {
