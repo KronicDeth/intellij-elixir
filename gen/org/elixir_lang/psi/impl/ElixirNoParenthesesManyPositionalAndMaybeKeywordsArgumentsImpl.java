@@ -312,15 +312,21 @@ public class ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl exte
   }
 
   @Override
+  @Nullable
+  public ElixirMatchedWhenOperation getMatchedWhenOperation() {
+    return findChildByClass(ElixirMatchedWhenOperation.class);
+  }
+
+  @Override
   @NotNull
   public List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesExpression.class);
   }
 
   @Override
-  @Nullable
-  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
+  @NotNull
+  public List<ElixirNoParenthesesKeywords> getNoParenthesesKeywordsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesKeywords.class);
   }
 
   @Override

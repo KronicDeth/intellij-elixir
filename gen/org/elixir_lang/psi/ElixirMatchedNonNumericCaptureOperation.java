@@ -155,6 +155,12 @@ public interface ElixirMatchedNonNumericCaptureOperation extends PrefixOperation
   ElixirMatchedTypeOperation getMatchedTypeOperation();
 
   @Nullable
+  ElixirMatchedWhenOperation getMatchedWhenOperation();
+
+  @Nullable
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();
 
   @Nullable

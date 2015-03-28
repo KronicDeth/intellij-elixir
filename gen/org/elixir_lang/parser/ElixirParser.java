@@ -332,6 +332,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_TYPE_OPERATION) {
       r = matchedTypeOperation(b, 0);
     }
+    else if (t == MATCHED_WHEN_OPERATION) {
+      r = matchedWhenOperation(b, 0);
+    }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
     }
@@ -418,6 +421,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
       r = unqualifiedNoParenthesesManyArgumentsCall(b, 0);
+    }
+    else if (t == WHEN_INFIX_OPERATOR) {
+      r = whenInfixOperator(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -3162,13 +3168,13 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // matchedNonNumericCaptureOperation |
-  //                                             matchedTypeExpression
+  //                                             matchedWhenExpression
   static boolean matchedNonNumericCaptureOperand(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedNonNumericCaptureOperand")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedNonNumericCaptureOperation(b, l + 1);
-    if (!r) r = matchedTypeExpression(b, l + 1);
+    if (!r) r = matchedWhenExpression(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3459,6 +3465,54 @@ public class ElixirParser implements PsiParser {
     r = typeInfixOperator(b, l + 1);
     r = r && matchedTypeExpression(b, l + 1);
     exit_section_(b, l, m, MATCHED_TYPE_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedWhenOperand matchedWhenOperation?
+  static boolean matchedWhenExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedWhenOperand(b, l + 1);
+    r = r && matchedWhenExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedWhenOperation?
+  private static boolean matchedWhenExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenExpression_1")) return false;
+    matchedWhenOperation(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedNonNumericCaptureOperation |
+  //                                // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L173
+  //                                noParenthesesKeywords |
+  //                                matchedTypeExpression
+  static boolean matchedWhenOperand(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenOperand")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedNonNumericCaptureOperation(b, l + 1);
+    if (!r) r = noParenthesesKeywords(b, l + 1);
+    if (!r) r = matchedTypeExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // whenInfixOperator matchedWhenExpression
+  public static boolean matchedWhenOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenOperation")) return false;
+    if (!nextTokenIs(b, "<matched when operation>", EOL, WHEN_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<matched when operation>");
+    r = whenInfixOperator(b, l + 1);
+    r = r && matchedWhenExpression(b, l + 1);
+    exit_section_(b, l, m, MATCHED_WHEN_OPERATION, r, false, null);
     return r;
   }
 
@@ -4359,6 +4413,44 @@ public class ElixirParser implements PsiParser {
     r = r && noParenthesesManyArgumentsStrict(b, l + 1);
     exit_section_(b, m, UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // EOL* WHEN_OPERATOR EOL*
+  public static boolean whenInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "whenInfixOperator")) return false;
+    if (!nextTokenIs(b, "<when>", EOL, WHEN_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<when>");
+    r = whenInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, WHEN_OPERATOR);
+    r = r && whenInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, WHEN_INFIX_OPERATOR, r, false, null);
+    return r;
+  }
+
+  // EOL*
+  private static boolean whenInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "whenInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "whenInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean whenInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "whenInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "whenInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
 }

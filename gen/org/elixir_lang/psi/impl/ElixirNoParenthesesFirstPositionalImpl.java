@@ -310,6 +310,18 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
+  public ElixirMatchedWhenOperation getMatchedWhenOperation() {
+    return findChildByClass(ElixirMatchedWhenOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable() {
     return findChildByClass(ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable.class);
   }

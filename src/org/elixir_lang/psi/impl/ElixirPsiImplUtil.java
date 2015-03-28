@@ -498,6 +498,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
+        return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final InfixOperation infixOperation) {
         PsiElement[] children = infixOperation.getChildren();
 

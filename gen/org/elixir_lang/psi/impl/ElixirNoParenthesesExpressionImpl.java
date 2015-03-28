@@ -316,6 +316,18 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
 
   @Override
   @Nullable
+  public ElixirMatchedWhenOperation getMatchedWhenOperation() {
+    return findChildByClass(ElixirMatchedWhenOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
     return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }

@@ -1,0 +1,1 @@
+~c{one} when ~s{two}

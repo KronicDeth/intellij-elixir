@@ -110,6 +110,7 @@ public interface ElixirTypes {
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
+  IElementType MATCHED_WHEN_OPERATION = new ElixirElementType("MATCHED_WHEN_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
@@ -140,6 +141,7 @@ public interface ElixirTypes {
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
   IElementType UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL = new ElixirElementType("UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL");
+  IElementType WHEN_INFIX_OPERATOR = new ElixirElementType("WHEN_INFIX_OPERATOR");
 
   IElementType ALIAS_TOKEN = new ElixirTokenType("ALIAS_TOKEN");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
@@ -568,6 +570,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_TYPE_OPERATION) {
         return new ElixirMatchedTypeOperationImpl(node);
       }
+      else if (type == MATCHED_WHEN_OPERATION) {
+        return new ElixirMatchedWhenOperationImpl(node);
+      }
       else if (type == MATCH_INFIX_OPERATOR) {
         return new ElixirMatchInfixOperatorImpl(node);
       }
@@ -657,6 +662,9 @@ public interface ElixirTypes {
       }
       else if (type == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
         return new ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(node);
+      }
+      else if (type == WHEN_INFIX_OPERATOR) {
+        return new ElixirWhenInfixOperatorImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

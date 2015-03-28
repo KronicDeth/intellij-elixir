@@ -153,11 +153,14 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
   @Nullable
   ElixirMatchedTypeOperation getMatchedTypeOperation();
 
+  @Nullable
+  ElixirMatchedWhenOperation getMatchedWhenOperation();
+
   @NotNull
   List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
 
-  @Nullable
-  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+  @NotNull
+  List<ElixirNoParenthesesKeywords> getNoParenthesesKeywordsList();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

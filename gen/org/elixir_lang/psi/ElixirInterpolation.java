@@ -162,6 +162,12 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedTypeOperation> getMatchedTypeOperationList();
 
   @NotNull
+  List<ElixirMatchedWhenOperation> getMatchedWhenOperationList();
+
+  @NotNull
+  List<ElixirNoParenthesesKeywords> getNoParenthesesKeywordsList();
+
+  @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();
 
   @NotNull
