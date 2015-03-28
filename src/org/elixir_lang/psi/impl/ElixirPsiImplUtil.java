@@ -1388,75 +1388,45 @@ public class ElixirPsiImplUtil {
         } else if (Macro.isAliases(lastQuotedArgument)) {
             OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
 
+             /*
+              * Use line from last alias, but drop `counter: 0`
+              */
+            OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
+            OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
+            OtpErlangList newMetdata = new OtpErlangList(
+                    new OtpErlangObject[] {
+                            lineTuple
+                    }
+            );
+
+            OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
+            OtpErlangObject[] mergedArguments;
+            int i = 0;
+
             /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
                each __aliases__ need to be combined */
             if (Macro.isAliases(firstQuotedArgument)) {
-                /*
-                 * Use line from last alias, but drop `counter: 0`
-                 */
-                OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
-                OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
-                OtpErlangList newMetdata = new OtpErlangList(
-                        new OtpErlangObject[] {
-                                lineTuple
-                        }
-                );
-
-                /*
-                 * Merge alias names
-                 */
-
                 OtpErlangList firstAliasList = Macro.callArguments((OtpErlangTuple) firstQuotedArgument);
-                OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
+                mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
 
-                OtpErlangObject[] mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
-
-                int i = 0;
                 for (OtpErlangObject alias : firstAliasList) {
                     mergedArguments[i++] = alias;
                 }
-
-                for (OtpErlangObject alias : lastAliasList) {
-                    mergedArguments[i++] = alias;
-                }
-
-                specializedQuoted = quotedFunctionCall(
-                        ALIASES,
-                        newMetdata,
-                        mergedArguments
-                );
-            } else if (Macro.isBlock(firstQuotedArgument)) {
-                /*
-                 * Use line from last alias, but drop `counter: 0`
-                 */
-                OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
-                OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
-                OtpErlangList newMetdata = new OtpErlangList(
-                        new OtpErlangObject[] {
-                                lineTuple
-                        }
-                );
-
-                /*
-                 * Merge alias names
-                 */
-
-                OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
-                OtpErlangObject[] mergedArguments = new OtpErlangObject[1 + lastAliasList.arity()];
-                int i = 0;
+            } else {
+                mergedArguments = new OtpErlangObject[1 + lastAliasList.arity()];
 
                 mergedArguments[i++] = firstQuotedArgument;
-
-                for (OtpErlangObject alias : lastAliasList) {
-                    mergedArguments[i++] = alias;
-                }
-
-                specializedQuoted = quotedFunctionCall(
-                        ALIASES,
-                        newMetdata,
-                        mergedArguments
-                );
             }
+
+            for (OtpErlangObject alias : lastAliasList) {
+                mergedArguments[i++] = alias;
+            }
+
+            specializedQuoted = quotedFunctionCall(
+                    ALIASES,
+                    newMetdata,
+                    mergedArguments
+            );
         } else if (Macro.isAtomKeyword(lastQuotedArgument)) {
             /* After `.` atom keywords (`false`, `nil`, `true`) are just treated as normal identifiers, so
               {:., metadata, [qualifier, atomKeyword]} needs to be promoted to a call */
