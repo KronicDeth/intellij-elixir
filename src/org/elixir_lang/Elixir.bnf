@@ -60,6 +60,7 @@
     STRING_PROMOTER = "\""
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
+    TILDE = "~"
     TRUE = "true"
     TYPE_OPERATOR = "::"
     UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
