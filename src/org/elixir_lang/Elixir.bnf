@@ -43,6 +43,7 @@
     FALSE = "false"
     FN = "fn"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
+    IDENTIFIER = "identifier"
     IN_OPERATOR = "in"
     INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
