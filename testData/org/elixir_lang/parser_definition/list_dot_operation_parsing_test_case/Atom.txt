@@ -1,0 +1,8 @@
+Elixir File(0,7)
+  ElixirListImpl(LIST)(0,2)
+    PsiElement([)('[')(0,1)
+    PsiElement(])(']')(1,2)
+  PsiElement(.)('.')(2,3)
+  PsiErrorElement:EOL expected, got ':'(3,4)
+    PsiElement(:)(':')(3,4)
+  PsiElement(ATOM_FRAGMENT)('two')(4,7)
