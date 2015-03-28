@@ -145,7 +145,7 @@ public interface ElixirTypes {
   IElementType UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL = new ElixirElementType("UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL");
   IElementType WHEN_INFIX_OPERATOR = new ElixirElementType("WHEN_INFIX_OPERATOR");
 
-  IElementType ALIAS_TOKEN = new ElixirTokenType("ALIAS_TOKEN");
+  IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");

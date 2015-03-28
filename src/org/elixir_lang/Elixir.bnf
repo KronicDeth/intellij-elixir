@@ -21,6 +21,7 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    ALIAS_TOKEN = "Alias"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = ""
