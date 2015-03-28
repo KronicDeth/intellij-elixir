@@ -98,7 +98,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testStringHeredoc() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testCharListLine() {
@@ -106,7 +106,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testCharListHeredoc() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     @Override
