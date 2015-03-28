@@ -2,15 +2,15 @@ package org.elixir_lang.parser_definition;
 
 public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     public void testAddition() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testAnd() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testArrow() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testAt() {
@@ -22,7 +22,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testComparison() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testHat() {
@@ -30,15 +30,15 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testIn() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testInMatch() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMatch() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMultiplication() {
@@ -46,23 +46,23 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testOr() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testPipe() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testRelational() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testTwo() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testType() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testUnary() {
@@ -74,7 +74,7 @@ public class MatchedExpressionDotAliasParsingTestcase extends ParsingTestCase {
     }
 
     public void testWhen() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     @Override
