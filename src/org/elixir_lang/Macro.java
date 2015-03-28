@@ -1,6 +1,7 @@
 package org.elixir_lang;
 
 import com.ericsson.otp.erlang.*;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 
 public class Macro {
     public static OtpErlangList callArguments(OtpErlangTuple callExpression) {
@@ -25,6 +26,27 @@ public class Macro {
         }
 
         return aliases;
+    }
+
+    /**
+     * Return whether quoted form contains an Elixir keyword that is just an alias to an atom, such as `false`,
+     * `true`, or `nil`.
+     *
+     * @param macro a quoted form from a {@code quote} method.
+     * @return {@code true} if OtpErlangAtom containing one of the keywords.
+     */
+    public static boolean isAtomKeyword(OtpErlangObject macro) {
+        boolean atomKeyword = false;
+
+        for (OtpErlangAtom knownAtomKeyword : ElixirPsiImplUtil.ATOM_KEYWORDS) {
+            if (macro.equals(knownAtomKeyword)) {
+                atomKeyword = true;
+
+                break;
+            }
+        }
+
+        return atomKeyword;
     }
 
     /**

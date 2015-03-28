@@ -32,7 +32,14 @@ public class ElixirPsiImplUtil {
     };
     public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
+    public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
+    public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
+            FALSE,
+            TRUE,
+            NIL
+    };
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
     public static final int DECIMAL_BASE = 10;
@@ -1381,6 +1388,15 @@ public class ElixirPsiImplUtil {
                         mergedArguments
                 );
             }
+        } else if (Macro.isAtomKeyword(lastQuotedArgument)) {
+            /* After `.` atom keywords (`false`, `nil`, `true`) are just treated as normal identifiers, so
+              {:., metadata, [qualifier, atomKeyword]} needs to be promoted to a call */
+            OtpErlangList callMetadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
+
+            specializedQuoted = quotedFunctionCall(
+                    quotedInfixOperation,
+                    callMetadata
+            );
         } else if (Macro.isLocalCall(lastQuotedArgument)) {
             OtpErlangTuple quotedLocalCall = (OtpErlangTuple) lastQuotedArgument;
             // lastQuotedArgument = {quotedIdentifier, callMetadata, arguments}
