@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -1347,7 +1348,28 @@ public class ElixirPsiImplUtil {
         OtpErlangObject lastQuotedArgument = quotedArgumentList.elementAt(1);
 
         // The final arguments determines whether the whole thing is an alias, so check if first.
-        if (lastQuotedArgument instanceof OtpErlangString) {
+        if (lastQuotedArgument instanceof OtpErlangBinary) {
+            OtpErlangBinary lastBinary = (OtpErlangBinary) lastQuotedArgument;
+            OtpErlangObject identifier = new OtpErlangAtom(
+                    new String(
+                            lastBinary.binaryValue(),
+                            Charset.forName("UTF-8")
+                    )
+            );
+
+            final OtpErlangList metadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
+            OtpErlangTuple quotedRemoteFunctionCall = quotedFunctionCall(
+                            quotedInfixOperation.elementAt(0),
+                            metadata,
+                            quotedArgumentList.elementAt(0),
+                            identifier
+            );
+
+            specializedQuoted = quotedFunctionCall(
+                    quotedRemoteFunctionCall,
+                    metadata
+            );
+        } else if (lastQuotedArgument instanceof OtpErlangString) {
             OtpErlangString lastString = (OtpErlangString) lastQuotedArgument;
             OtpErlangObject identifier = new OtpErlangAtom(lastString.stringValue());
 
