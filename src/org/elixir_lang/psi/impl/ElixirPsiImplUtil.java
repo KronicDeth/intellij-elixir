@@ -1347,7 +1347,23 @@ public class ElixirPsiImplUtil {
         OtpErlangObject lastQuotedArgument = quotedArgumentList.elementAt(1);
 
         // The final arguments determines whether the whole thing is an alias, so check if first.
-        if (Macro.isAliases(lastQuotedArgument)) {
+        if (lastQuotedArgument instanceof OtpErlangString) {
+            OtpErlangString lastString = (OtpErlangString) lastQuotedArgument;
+            OtpErlangObject identifier = new OtpErlangAtom(lastString.stringValue());
+
+            final OtpErlangList metadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
+            OtpErlangTuple quotedRemoteFunctionCall = quotedFunctionCall(
+                            quotedInfixOperation.elementAt(0),
+                            metadata,
+                            quotedArgumentList.elementAt(0),
+                            identifier
+            );
+
+            specializedQuoted = quotedFunctionCall(
+                    quotedRemoteFunctionCall,
+                    metadata
+            );
+        } else if (Macro.isAliases(lastQuotedArgument)) {
             OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
 
             /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
