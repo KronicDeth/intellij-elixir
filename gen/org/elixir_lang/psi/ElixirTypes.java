@@ -236,7 +236,7 @@ public interface ElixirTypes {
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("SIGIL_TERMINATOR");
   IElementType STAB_OPERATOR = new ElixirTokenType("STAB_OPERATOR");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
-  IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("STRING_HEREDOC_PROMOTER");
+  IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("\"\"\"");
   IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_HEREDOC_TERMINATOR");
   IElementType STRING_PROMOTER = new ElixirTokenType("STRING_PROMOTER");
   IElementType STRING_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("STRING_SIGIL_HEREDOC_PROMOTER");
