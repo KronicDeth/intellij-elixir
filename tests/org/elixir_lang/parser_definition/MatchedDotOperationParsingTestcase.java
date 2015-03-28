@@ -54,7 +54,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testAtom() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testAlias() {

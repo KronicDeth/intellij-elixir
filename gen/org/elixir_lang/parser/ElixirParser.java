@@ -3034,15 +3034,26 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // dotInfixOperator matchedDotOperand
+  // dotInfixOperator !atom matchedDotOperand
   public static boolean matchedDotOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation")) return false;
     if (!nextTokenIs(b, "<matched dot operation>", DOT_OPERATOR, EOL)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _LEFT_, "<matched dot operation>");
     r = dotInfixOperator(b, l + 1);
+    r = r && matchedDotOperation_1(b, l + 1);
     r = r && matchedDotOperand(b, l + 1);
     exit_section_(b, l, m, MATCHED_DOT_OPERATION, r, false, null);
+    return r;
+  }
+
+  // !atom
+  private static boolean matchedDotOperation_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedDotOperation_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !atom(b, l + 1);
+    exit_section_(b, l, m, null, r, false, null);
     return r;
   }
 
