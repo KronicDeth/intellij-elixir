@@ -27,6 +27,7 @@
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = ""
     CAPTURE_OPERATOR = "&"
+    CHAR_LIST_HEREDOC_PROMOTER = "'''"
     CHAR_TOKENIZER = "?"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
