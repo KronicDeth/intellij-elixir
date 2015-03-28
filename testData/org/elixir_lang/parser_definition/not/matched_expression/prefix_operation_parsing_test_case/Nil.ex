@@ -1,2 +1,0 @@
-# not(nil)
-not nil

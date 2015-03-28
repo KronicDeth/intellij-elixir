@@ -1,2 +1,0 @@
-# not('CharList')
-not 'CharList'

@@ -1,2 +1,0 @@
-# not(:atom)
-not :identifier

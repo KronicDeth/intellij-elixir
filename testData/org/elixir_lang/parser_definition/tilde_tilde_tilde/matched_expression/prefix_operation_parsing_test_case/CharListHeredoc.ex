@@ -1,5 +1,0 @@
-# ~~~('''\nCharList\nHeredoc''')
-~~~'''
-   CharList
-   Heredoc
-   '''

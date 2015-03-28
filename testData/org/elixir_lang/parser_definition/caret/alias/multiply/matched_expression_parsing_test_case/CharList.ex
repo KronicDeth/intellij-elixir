@@ -1,2 +1,0 @@
-# *(^(Alias), 'CharList')
-^Alias * 'CharList'

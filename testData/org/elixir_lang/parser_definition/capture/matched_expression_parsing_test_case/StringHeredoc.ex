@@ -1,5 +1,0 @@
-# &("""\nString\nHeredoc""")
-&"""
- String
- Heredoc
- """

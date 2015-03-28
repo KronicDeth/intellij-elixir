@@ -1,2 +1,0 @@
-# !('CharList')
-!'CharList'

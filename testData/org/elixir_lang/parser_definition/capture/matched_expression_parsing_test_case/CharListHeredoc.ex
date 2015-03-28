@@ -1,5 +1,0 @@
-# &('''CharList\nHeredoc''')
-&'''
- CharList
- Heredoc
- '''

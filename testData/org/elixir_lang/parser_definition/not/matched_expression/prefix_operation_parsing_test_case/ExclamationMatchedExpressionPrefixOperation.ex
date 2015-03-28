@@ -1,2 +1,0 @@
-# not(!(identifier))
-not !identifier

@@ -1,2 +1,0 @@
-# not(true)
-not true
