@@ -1297,7 +1297,34 @@ private matchedDotOperand ::= matchedCaptureNonNumericOperation |
                               matchedUnaryNonNumericOperation |
                               matchedAtNonNumericExpression
 left matchedDotOperation ::= dotInfixOperator
-                             !(atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc)
+                             !(
+                               atom |
+                               charListHeredoc |
+                               emptyBlock |
+                               interpolatedCharListSigilHeredoc |
+                               interpolatedCharListSigilLine |
+                               interpolatedRegexHeredoc |
+                               interpolatedRegexLine |
+                               interpolatedSigilHeredoc |
+                               interpolatedSigilLine |
+                               interpolatedStringSigilHeredoc |
+                               interpolatedStringSigilLine |
+                               interpolatedWordsHeredoc |
+                               interpolatedWordsLine |
+                               list |
+                               literalCharListSigilHeredoc |
+                               literalCharListSigilLine |
+                               literalRegexHeredoc |
+                               literalRegexLine |
+                               literalSigilHeredoc |
+                               literalSigilLine |
+                               literalStringSigilHeredoc |
+                               literalStringSigilLine |
+                               literalWordsHeredoc |
+                               literalWordsLine |
+                               numeric |
+                               stringHeredoc
+                             )
                              matchedDotOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 

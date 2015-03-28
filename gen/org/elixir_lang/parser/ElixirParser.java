@@ -3035,7 +3035,34 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // dotInfixOperator
-  //                              !(atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc)
+  //                              !(
+  //                                atom |
+  //                                charListHeredoc |
+  //                                emptyBlock |
+  //                                interpolatedCharListSigilHeredoc |
+  //                                interpolatedCharListSigilLine |
+  //                                interpolatedRegexHeredoc |
+  //                                interpolatedRegexLine |
+  //                                interpolatedSigilHeredoc |
+  //                                interpolatedSigilLine |
+  //                                interpolatedStringSigilHeredoc |
+  //                                interpolatedStringSigilLine |
+  //                                interpolatedWordsHeredoc |
+  //                                interpolatedWordsLine |
+  //                                list |
+  //                                literalCharListSigilHeredoc |
+  //                                literalCharListSigilLine |
+  //                                literalRegexHeredoc |
+  //                                literalRegexLine |
+  //                                literalSigilHeredoc |
+  //                                literalSigilLine |
+  //                                literalStringSigilHeredoc |
+  //                                literalStringSigilLine |
+  //                                literalWordsHeredoc |
+  //                                literalWordsLine |
+  //                                numeric |
+  //                                stringHeredoc
+  //                              )
   //                              matchedDotOperand
   public static boolean matchedDotOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation")) return false;
@@ -3049,7 +3076,34 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // !(atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc)
+  // !(
+  //                                atom |
+  //                                charListHeredoc |
+  //                                emptyBlock |
+  //                                interpolatedCharListSigilHeredoc |
+  //                                interpolatedCharListSigilLine |
+  //                                interpolatedRegexHeredoc |
+  //                                interpolatedRegexLine |
+  //                                interpolatedSigilHeredoc |
+  //                                interpolatedSigilLine |
+  //                                interpolatedStringSigilHeredoc |
+  //                                interpolatedStringSigilLine |
+  //                                interpolatedWordsHeredoc |
+  //                                interpolatedWordsLine |
+  //                                list |
+  //                                literalCharListSigilHeredoc |
+  //                                literalCharListSigilLine |
+  //                                literalRegexHeredoc |
+  //                                literalRegexLine |
+  //                                literalSigilHeredoc |
+  //                                literalSigilLine |
+  //                                literalStringSigilHeredoc |
+  //                                literalStringSigilLine |
+  //                                literalWordsHeredoc |
+  //                                literalWordsLine |
+  //                                numeric |
+  //                                stringHeredoc
+  //                              )
   private static boolean matchedDotOperation_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation_1")) return false;
     boolean r;
@@ -3059,15 +3113,60 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc
+  // atom |
+  //                                charListHeredoc |
+  //                                emptyBlock |
+  //                                interpolatedCharListSigilHeredoc |
+  //                                interpolatedCharListSigilLine |
+  //                                interpolatedRegexHeredoc |
+  //                                interpolatedRegexLine |
+  //                                interpolatedSigilHeredoc |
+  //                                interpolatedSigilLine |
+  //                                interpolatedStringSigilHeredoc |
+  //                                interpolatedStringSigilLine |
+  //                                interpolatedWordsHeredoc |
+  //                                interpolatedWordsLine |
+  //                                list |
+  //                                literalCharListSigilHeredoc |
+  //                                literalCharListSigilLine |
+  //                                literalRegexHeredoc |
+  //                                literalRegexLine |
+  //                                literalSigilHeredoc |
+  //                                literalSigilLine |
+  //                                literalStringSigilHeredoc |
+  //                                literalStringSigilLine |
+  //                                literalWordsHeredoc |
+  //                                literalWordsLine |
+  //                                numeric |
+  //                                stringHeredoc
   private static boolean matchedDotOperation_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atom(b, l + 1);
-    if (!r) r = emptyBlock(b, l + 1);
     if (!r) r = charListHeredoc(b, l + 1);
+    if (!r) r = emptyBlock(b, l + 1);
+    if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedCharListSigilLine(b, l + 1);
+    if (!r) r = interpolatedRegexHeredoc(b, l + 1);
+    if (!r) r = interpolatedRegexLine(b, l + 1);
+    if (!r) r = interpolatedSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedSigilLine(b, l + 1);
+    if (!r) r = interpolatedStringSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedStringSigilLine(b, l + 1);
+    if (!r) r = interpolatedWordsHeredoc(b, l + 1);
+    if (!r) r = interpolatedWordsLine(b, l + 1);
     if (!r) r = list(b, l + 1);
+    if (!r) r = literalCharListSigilHeredoc(b, l + 1);
+    if (!r) r = literalCharListSigilLine(b, l + 1);
+    if (!r) r = literalRegexHeredoc(b, l + 1);
+    if (!r) r = literalRegexLine(b, l + 1);
+    if (!r) r = literalSigilHeredoc(b, l + 1);
+    if (!r) r = literalSigilLine(b, l + 1);
+    if (!r) r = literalStringSigilHeredoc(b, l + 1);
+    if (!r) r = literalStringSigilLine(b, l + 1);
+    if (!r) r = literalWordsHeredoc(b, l + 1);
+    if (!r) r = literalWordsLine(b, l + 1);
     if (!r) r = numeric(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
     exit_section_(b, m, null, r);
