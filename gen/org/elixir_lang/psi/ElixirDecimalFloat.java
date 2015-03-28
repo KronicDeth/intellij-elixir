@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirDecimalFloat extends ElixirDecimalNumber, Quotable {
+public interface ElixirDecimalFloat extends Quotable {
 
   @Nullable
   ElixirDecimalFloatExponent getDecimalFloatExponent();

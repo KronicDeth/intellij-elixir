@@ -31,7 +31,6 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_EXPONENT_SIGN = new ElixirElementType("DECIMAL_FLOAT_EXPONENT_SIGN");
   IElementType DECIMAL_FLOAT_FRACTIONAL = new ElixirElementType("DECIMAL_FLOAT_FRACTIONAL");
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
-  IElementType DECIMAL_NUMBER = new ElixirElementType("DECIMAL_NUMBER");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
   IElementType EMPTY_BLOCK = new ElixirElementType("EMPTY_BLOCK");
@@ -334,9 +333,6 @@ public interface ElixirTypes {
       }
       else if (type == DECIMAL_FLOAT_INTEGRAL) {
         return new ElixirDecimalFloatIntegralImpl(node);
-      }
-      else if (type == DECIMAL_NUMBER) {
-        return new ElixirDecimalNumberImpl(node);
       }
       else if (type == DECIMAL_WHOLE_NUMBER) {
         return new ElixirDecimalWholeNumberImpl(node);

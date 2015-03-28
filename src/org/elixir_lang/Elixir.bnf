@@ -7,8 +7,7 @@
    * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
    */
 
-  extends("decimal(Float|WholeNUmber)")=decimalNumber
-  extends("(.*Whole|decimal)Number")=number
+  extends(".*WholeNumber")=number
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -1523,9 +1522,6 @@ decimalFloatExponentSign ::= DUAL_OPERATOR?
 decimalFloatFractional ::= decimalWholeNumber
 decimalFloatIntegral ::= decimalWholeNumber
 
-// decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
-decimalNumber ::= decimalFloat |
-                  decimalWholeNumber
 private escapeSequence ::= hexadecimalEscapeSequence |
                            escapedEOL |
                            /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
@@ -1599,7 +1595,9 @@ private numeric ::= charToken | number
 //noParenthesesOneExpression ::= dotIdentifier
 
 number ::= binaryWholeNumber |
-           decimalNumber |
+           // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+           decimalFloat |
+           decimalWholeNumber |
            hexadecimalWholeNumber |
            octalWholeNumber |
            unknownBaseWholeNumber

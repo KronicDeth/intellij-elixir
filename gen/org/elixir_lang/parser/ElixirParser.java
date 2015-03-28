@@ -92,9 +92,6 @@ public class ElixirParser implements PsiParser {
     else if (t == DECIMAL_FLOAT_INTEGRAL) {
       r = decimalFloatIntegral(b, 0);
     }
-    else if (t == DECIMAL_NUMBER) {
-      r = decimalNumber(b, 0);
-    }
     else if (t == DECIMAL_WHOLE_NUMBER) {
       r = decimalWholeNumber(b, 0);
     }
@@ -442,9 +439,8 @@ public class ElixirParser implements PsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(DECIMAL_FLOAT, DECIMAL_NUMBER),
-    create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_FLOAT, DECIMAL_NUMBER, DECIMAL_WHOLE_NUMBER,
-      HEXADECIMAL_WHOLE_NUMBER, NUMBER, OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
+    create_token_set_(BINARY_WHOLE_NUMBER, DECIMAL_WHOLE_NUMBER, HEXADECIMAL_WHOLE_NUMBER, NUMBER,
+      OCTAL_WHOLE_NUMBER, UNKNOWN_BASE_WHOLE_NUMBER),
   };
 
   /* ********************************************************** */
@@ -986,20 +982,6 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, "<decimal float integral>");
     r = decimalWholeNumber(b, l + 1);
     exit_section_(b, l, m, DECIMAL_FLOAT_INTEGRAL, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // decimalFloat |
-  //                   decimalWholeNumber
-  public static boolean decimalNumber(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "decimalNumber")) return false;
-    if (!nextTokenIs(b, "<decimal number>", INVALID_DECIMAL_DIGITS, VALID_DECIMAL_DIGITS)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, "<decimal number>");
-    r = decimalFloat(b, l + 1);
-    if (!r) r = decimalWholeNumber(b, l + 1);
-    exit_section_(b, l, m, DECIMAL_NUMBER, r, false, null);
     return r;
   }
 
@@ -4006,7 +3988,9 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // binaryWholeNumber |
-  //            decimalNumber |
+  //            // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+  //            decimalFloat |
+  //            decimalWholeNumber |
   //            hexadecimalWholeNumber |
   //            octalWholeNumber |
   //            unknownBaseWholeNumber
@@ -4015,7 +3999,8 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, "<number>");
     r = binaryWholeNumber(b, l + 1);
-    if (!r) r = decimalNumber(b, l + 1);
+    if (!r) r = decimalFloat(b, l + 1);
+    if (!r) r = decimalWholeNumber(b, l + 1);
     if (!r) r = hexadecimalWholeNumber(b, l + 1);
     if (!r) r = octalWholeNumber(b, l + 1);
     if (!r) r = unknownBaseWholeNumber(b, l + 1);
