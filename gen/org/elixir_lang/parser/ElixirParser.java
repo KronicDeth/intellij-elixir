@@ -671,7 +671,7 @@ public class ElixirParser implements PsiParser {
   public static boolean atomKeyword(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atomKeyword")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<atom keyword>");
+    Marker m = enter_section_(b, l, _NONE_, "<false, nil, true>");
     r = consumeToken(b, FALSE);
     if (!r) r = consumeToken(b, NIL);
     if (!r) r = consumeToken(b, TRUE);

@@ -1395,7 +1395,7 @@ private accessExpression ::= atNumericOperation |
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE
-                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
 alias ::= ALIAS_TOKEN
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
