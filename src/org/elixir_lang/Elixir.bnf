@@ -33,6 +33,7 @@
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
+    COLON = ":"
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DECIMAL_MARK = "."

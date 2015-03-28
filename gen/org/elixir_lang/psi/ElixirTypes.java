@@ -169,7 +169,7 @@ public interface ElixirTypes {
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
-  IElementType COLON = new ElixirTokenType("COLON");
+  IElementType COLON = new ElixirTokenType(":");
   IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("COMMENT");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
