@@ -42,7 +42,7 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testList() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testSigil() {

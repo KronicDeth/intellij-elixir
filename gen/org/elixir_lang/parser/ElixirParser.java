@@ -3034,7 +3034,9 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // dotInfixOperator !(atom | emptyBlock | charListHeredoc | stringHeredoc | numeric) matchedDotOperand
+  // dotInfixOperator
+  //                              !(atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc)
+  //                              matchedDotOperand
   public static boolean matchedDotOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation")) return false;
     if (!nextTokenIs(b, "<matched dot operation>", DOT_OPERATOR, EOL)) return false;
@@ -3047,7 +3049,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // !(atom | emptyBlock | charListHeredoc | stringHeredoc | numeric)
+  // !(atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc)
   private static boolean matchedDotOperation_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation_1")) return false;
     boolean r;
@@ -3057,7 +3059,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // atom | emptyBlock | charListHeredoc | stringHeredoc | numeric
+  // atom | emptyBlock | charListHeredoc | list | numeric | stringHeredoc
   private static boolean matchedDotOperation_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotOperation_1_0")) return false;
     boolean r;
@@ -3065,8 +3067,9 @@ public class ElixirParser implements PsiParser {
     r = atom(b, l + 1);
     if (!r) r = emptyBlock(b, l + 1);
     if (!r) r = charListHeredoc(b, l + 1);
-    if (!r) r = stringHeredoc(b, l + 1);
+    if (!r) r = list(b, l + 1);
     if (!r) r = numeric(b, l + 1);
+    if (!r) r = stringHeredoc(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
