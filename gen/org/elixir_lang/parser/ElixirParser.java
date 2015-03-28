@@ -443,7 +443,26 @@ public class ElixirParser implements PsiParser {
   //                              list |
   //                              binaryString |
   //                              listString |
-  //                              sigil |
+  //                              interpolatedCharListSigilLine |
+  //                              interpolatedCharListSigilHeredoc |
+  //                              interpolatedRegexHeredoc |
+  //                              interpolatedSigilHeredoc |
+  //                              interpolatedStringSigilHeredoc |
+  //                              interpolatedWordsHeredoc |
+  //                              interpolatedWordsLine |
+  //                              interpolatedRegexLine |
+  //                              interpolatedSigilLine |
+  //                              interpolatedStringSigilLine |
+  //                              literalCharListSigilLine |
+  //                              literalCharListSigilHeredoc |
+  //                              literalRegexHeredoc |
+  //                              literalSigilHeredoc |
+  //                              literalStringSigilHeredoc |
+  //                              literalWordsHeredoc |
+  //                              literalRegexLine |
+  //                              literalSigilLine |
+  //                              literalStringSigilLine |
+  //                              literalWordsLine |
   //                              atomKeyword |
   //                              atom |
   //                              alias
@@ -459,7 +478,26 @@ public class ElixirParser implements PsiParser {
     if (!r) r = list(b, l + 1);
     if (!r) r = binaryString(b, l + 1);
     if (!r) r = listString(b, l + 1);
-    if (!r) r = sigil(b, l + 1);
+    if (!r) r = interpolatedCharListSigilLine(b, l + 1);
+    if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedRegexHeredoc(b, l + 1);
+    if (!r) r = interpolatedSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedStringSigilHeredoc(b, l + 1);
+    if (!r) r = interpolatedWordsHeredoc(b, l + 1);
+    if (!r) r = interpolatedWordsLine(b, l + 1);
+    if (!r) r = interpolatedRegexLine(b, l + 1);
+    if (!r) r = interpolatedSigilLine(b, l + 1);
+    if (!r) r = interpolatedStringSigilLine(b, l + 1);
+    if (!r) r = literalCharListSigilLine(b, l + 1);
+    if (!r) r = literalCharListSigilHeredoc(b, l + 1);
+    if (!r) r = literalRegexHeredoc(b, l + 1);
+    if (!r) r = literalSigilHeredoc(b, l + 1);
+    if (!r) r = literalStringSigilHeredoc(b, l + 1);
+    if (!r) r = literalWordsHeredoc(b, l + 1);
+    if (!r) r = literalRegexLine(b, l + 1);
+    if (!r) r = literalSigilLine(b, l + 1);
+    if (!r) r = literalStringSigilLine(b, l + 1);
+    if (!r) r = literalWordsLine(b, l + 1);
     if (!r) r = atomKeyword(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
@@ -4181,56 +4219,6 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
-  }
-
-  /* ********************************************************** */
-  // interpolatedCharListSigilLine |
-  //                   interpolatedCharListSigilHeredoc |
-  //                   interpolatedRegexHeredoc |
-  //                   interpolatedSigilHeredoc |
-  //                   interpolatedStringSigilHeredoc |
-  //                   interpolatedWordsHeredoc |
-  //                   interpolatedWordsLine |
-  //                   interpolatedRegexLine |
-  //                   interpolatedSigilLine |
-  //                   interpolatedStringSigilLine |
-  //                   literalCharListSigilLine |
-  //                   literalCharListSigilHeredoc |
-  //                   literalRegexHeredoc |
-  //                   literalSigilHeredoc |
-  //                   literalStringSigilHeredoc |
-  //                   literalWordsHeredoc |
-  //                   literalRegexLine |
-  //                   literalSigilLine |
-  //                   literalStringSigilLine |
-  //                   literalWordsLine
-  static boolean sigil(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "sigil")) return false;
-    if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = interpolatedCharListSigilLine(b, l + 1);
-    if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
-    if (!r) r = interpolatedRegexHeredoc(b, l + 1);
-    if (!r) r = interpolatedSigilHeredoc(b, l + 1);
-    if (!r) r = interpolatedStringSigilHeredoc(b, l + 1);
-    if (!r) r = interpolatedWordsHeredoc(b, l + 1);
-    if (!r) r = interpolatedWordsLine(b, l + 1);
-    if (!r) r = interpolatedRegexLine(b, l + 1);
-    if (!r) r = interpolatedSigilLine(b, l + 1);
-    if (!r) r = interpolatedStringSigilLine(b, l + 1);
-    if (!r) r = literalCharListSigilLine(b, l + 1);
-    if (!r) r = literalCharListSigilHeredoc(b, l + 1);
-    if (!r) r = literalRegexHeredoc(b, l + 1);
-    if (!r) r = literalSigilHeredoc(b, l + 1);
-    if (!r) r = literalStringSigilHeredoc(b, l + 1);
-    if (!r) r = literalWordsHeredoc(b, l + 1);
-    if (!r) r = literalRegexLine(b, l + 1);
-    if (!r) r = literalSigilLine(b, l + 1);
-    if (!r) r = literalStringSigilLine(b, l + 1);
-    if (!r) r = literalWordsLine(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
