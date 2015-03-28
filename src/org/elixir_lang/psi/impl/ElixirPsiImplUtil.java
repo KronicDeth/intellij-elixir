@@ -1425,6 +1425,37 @@ public class ElixirPsiImplUtil {
                         newMetdata,
                         mergedArguments
                 );
+            } else if (Macro.isBlock(firstQuotedArgument)) {
+                /*
+                 * Use line from last alias, but drop `counter: 0`
+                 */
+                OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
+                OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
+                OtpErlangList newMetdata = new OtpErlangList(
+                        new OtpErlangObject[] {
+                                lineTuple
+                        }
+                );
+
+                /*
+                 * Merge alias names
+                 */
+
+                OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
+                OtpErlangObject[] mergedArguments = new OtpErlangObject[1 + lastAliasList.arity()];
+                int i = 0;
+
+                mergedArguments[i++] = firstQuotedArgument;
+
+                for (OtpErlangObject alias : lastAliasList) {
+                    mergedArguments[i++] = alias;
+                }
+
+                specializedQuoted = quotedFunctionCall(
+                        ALIASES,
+                        newMetdata,
+                        mergedArguments
+                );
             }
         } else if (Macro.isAtomKeyword(lastQuotedArgument)) {
             /* After `.` atom keywords (`false`, `nil`, `true`) are just treated as normal identifiers, so

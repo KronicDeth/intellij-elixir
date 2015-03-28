@@ -50,6 +50,26 @@ public class Macro {
     }
 
     /**
+     * Return whether the macro is a __block__ expression representing sequential lines.
+     *
+     * @param macro a quoted form from a {@code quote} method.
+     * @return {@code true} if `{:__block__, _, _}`.
+     */
+    public static boolean isBlock(OtpErlangObject macro) {
+        boolean block = false;
+
+        if (isExpression(macro)) {
+            OtpErlangTuple expression = (OtpErlangTuple) macro;
+
+            if (expression.elementAt(0).equals(ElixirPsiImplUtil.BLOCK)) {
+                block = true;
+            }
+        }
+
+        return block;
+    }
+
+    /**
      * Return whether the macro is an Expr node: `expr :: {expr | atom, Keyword.t, atom | [t]}`.
      *
      * @param macro a quoted form from a {@code quote} method.
