@@ -1377,7 +1377,8 @@ private accessExpression ::= atNumericOperation |
                              list |
                              stringLine |
                              stringHeredoc |
-                             listString |
+                             charListLine |
+                             charListHeredoc |
                              interpolatedCharListSigilLine |
                              interpolatedCharListSigilHeredoc |
                              interpolatedRegexHeredoc |
@@ -1595,7 +1596,6 @@ keywordValue ::= containerExpression
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COMMA?)? CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.KeywordList" methods = [getKeywordPairList quote] }
-private listString ::= charListLine | charListHeredoc
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's CHAR_TOKEN_TOKEN and all the different base number rules. */

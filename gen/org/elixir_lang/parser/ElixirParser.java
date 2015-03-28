@@ -443,7 +443,8 @@ public class ElixirParser implements PsiParser {
   //                              list |
   //                              stringLine |
   //                              stringHeredoc |
-  //                              listString |
+  //                              charListLine |
+  //                              charListHeredoc |
   //                              interpolatedCharListSigilLine |
   //                              interpolatedCharListSigilHeredoc |
   //                              interpolatedRegexHeredoc |
@@ -479,7 +480,8 @@ public class ElixirParser implements PsiParser {
     if (!r) r = list(b, l + 1);
     if (!r) r = stringLine(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
-    if (!r) r = listString(b, l + 1);
+    if (!r) r = charListLine(b, l + 1);
+    if (!r) r = charListHeredoc(b, l + 1);
     if (!r) r = interpolatedCharListSigilLine(b, l + 1);
     if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
     if (!r) r = interpolatedRegexHeredoc(b, l + 1);
@@ -2228,19 +2230,6 @@ public class ElixirParser implements PsiParser {
     r = keywordKeyColonEOL(b, l + 1);
     r = r && keywordValue(b, l + 1);
     exit_section_(b, l, m, LIST_KEYWORD_PAIR, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // charListLine | charListHeredoc
-  static boolean listString(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "listString")) return false;
-    if (!nextTokenIs(b, "", CHAR_LIST_HEREDOC_PROMOTER, CHAR_LIST_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = charListLine(b, l + 1);
-    if (!r) r = charListHeredoc(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
