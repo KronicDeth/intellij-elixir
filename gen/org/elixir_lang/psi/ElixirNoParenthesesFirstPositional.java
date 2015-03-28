@@ -119,6 +119,9 @@ public interface ElixirNoParenthesesFirstPositional extends Quotable {
   ElixirMatchedHatOperation getMatchedHatOperation();
 
   @Nullable
+  ElixirMatchedInMatchOperation getMatchedInMatchOperation();
+
+  @Nullable
   ElixirMatchedInOperation getMatchedInOperation();
 
   @Nullable

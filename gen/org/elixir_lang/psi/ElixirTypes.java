@@ -68,6 +68,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATED_WORDS_LINE = new ElixirElementType("INTERPOLATED_WORDS_LINE");
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_INFIX_OPERATOR = new ElixirElementType("IN_INFIX_OPERATOR");
+  IElementType IN_MATCH_INFIX_OPERATOR = new ElixirElementType("IN_MATCH_INFIX_OPERATOR");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
   IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
   IElementType LIST = new ElixirElementType("LIST");
@@ -99,6 +100,7 @@ public interface ElixirTypes {
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
+  IElementType MATCHED_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_IN_MATCH_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
@@ -444,6 +446,9 @@ public interface ElixirTypes {
       else if (type == IN_INFIX_OPERATOR) {
         return new ElixirInInfixOperatorImpl(node);
       }
+      else if (type == IN_MATCH_INFIX_OPERATOR) {
+        return new ElixirInMatchInfixOperatorImpl(node);
+      }
       else if (type == KEYWORD_KEY) {
         return new ElixirKeywordKeyImpl(node);
       }
@@ -536,6 +541,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_HAT_OPERATION) {
         return new ElixirMatchedHatOperationImpl(node);
+      }
+      else if (type == MATCHED_IN_MATCH_OPERATION) {
+        return new ElixirMatchedInMatchOperationImpl(node);
       }
       else if (type == MATCHED_IN_OPERATION) {
         return new ElixirMatchedInOperationImpl(node);
