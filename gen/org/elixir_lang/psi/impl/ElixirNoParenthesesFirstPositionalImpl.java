@@ -307,12 +307,6 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirMatchedOrOperation getMatchedOrOperation() {
     return findChildByClass(ElixirMatchedOrOperation.class);
   }
@@ -339,6 +333,12 @@ public class ElixirNoParenthesesFirstPositionalImpl extends ASTWrapperPsiElement
   @Nullable
   public ElixirMatchedTypeOperation getMatchedTypeOperation() {
     return findChildByClass(ElixirMatchedTypeOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedUnaryNonNumericOperation getMatchedUnaryNonNumericOperation() {
+    return findChildByClass(ElixirMatchedUnaryNonNumericOperation.class);
   }
 
   @Override

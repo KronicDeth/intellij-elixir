@@ -1245,7 +1245,7 @@ hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                      }
 private matchedHatExpression ::= matchedHatOperand matchedHatOperation*
 private matchedHatOperand ::= matchedCaptureNonNumericOperation |
-                              matchedNonNumericUnaryExpression
+                              matchedUnaryNonNumericExpression
 left matchedHatOperation ::= hatInfixOperator matchedHatOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
@@ -1266,13 +1266,12 @@ unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
                           ]
                           name = "+, -, !, ^, not, ~~~"
                         }
-private nonNumericUnaryPrefixOperator ::= unaryPrefixOperator !numeric
-private matchedNonNumericUnaryExpression ::= matchedNonNumericUnaryOperation |
-                                             matchedNonNumericUnaryOperand
-private matchedNonNumericUnaryOperand ::= matchedCaptureNonNumericOperation |
-                                          matchedNonNumericUnaryOperation |
+private matchedUnaryNonNumericExpression ::= matchedUnaryNonNumericOperation |
+                                             matchedUnaryNonNumericOperand
+private matchedUnaryNonNumericOperand ::= matchedCaptureNonNumericOperation |
+                                          matchedUnaryNonNumericOperation |
                                           matchedDotExpression
-matchedNonNumericUnaryOperation ::= nonNumericUnaryPrefixOperator matchedNonNumericUnaryOperand
+matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedUnaryNonNumericOperand
                                     { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
@@ -1295,7 +1294,7 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                      }
 private matchedDotExpression ::= matchedDotOperand matchedDotOperation*
 private matchedDotOperand ::= matchedCaptureNonNumericOperation |
-                              matchedNonNumericUnaryOperation |
+                              matchedUnaryNonNumericOperation |
                               matchedNonNumericAtExpression
 left matchedDotOperation ::= dotInfixOperator matchedDotOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1321,7 +1320,7 @@ private nonNumericAtPrefixOperator ::= atPrefixOperator !numeric
 private matchedNonNumericAtExpression ::= matchedNonNumericAtOperation |
                                           matchedNonNumericAtOperand
 private matchedNonNumericAtOperand ::= matchedCaptureNonNumericOperation |
-                                       matchedNonNumericUnaryOperation |
+                                       matchedUnaryNonNumericOperation |
                                        matchedNonNumericAtOperation |
                                        matchedCallExpression
 matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtOperand
@@ -1335,7 +1334,7 @@ matchedNonNumericAtOperation ::= nonNumericAtPrefixOperator matchedNonNumericAtO
 
 private matchedCallExpression ::= matchedCallOperand matchedCallOperation?
 private matchedCallOperand ::= matchedCaptureNonNumericOperation |
-                               matchedNonNumericUnaryOperation |
+                               matchedUnaryNonNumericOperation |
                                matchedNonNumericAtOperation |
                                noParenthesesNoArgumentsUnqualifiedCallOrVariable |
                                accessExpression
@@ -1376,7 +1375,8 @@ private accessExpression ::= atNumericOperation |
                              emptyBlock |
                              numeric |
                              list |
-                             binaryString |
+                             stringLine |
+                             stringHeredoc |
                              listString |
                              interpolatedCharListSigilLine |
                              interpolatedCharListSigilHeredoc |
@@ -1517,7 +1517,6 @@ adjacentExpression ::= expression
 atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private binaryString ::= stringLine | stringHeredoc
 private infixComma ::= COMMA EOL*
 
 charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | escapeSequence)

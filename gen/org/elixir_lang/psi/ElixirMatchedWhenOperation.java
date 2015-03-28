@@ -147,9 +147,6 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
   List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
-
-  @NotNull
   List<ElixirMatchedOrOperation> getMatchedOrOperationList();
 
   @NotNull
@@ -163,6 +160,9 @@ public interface ElixirMatchedWhenOperation extends InfixOperation {
 
   @NotNull
   List<ElixirMatchedTypeOperation> getMatchedTypeOperationList();
+
+  @NotNull
+  List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList();
 
   @NotNull
   List<ElixirMatchedWhenOperation> getMatchedWhenOperationList();

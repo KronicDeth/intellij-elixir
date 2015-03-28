@@ -72,7 +72,7 @@ public class MatchedWhenOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testNonNumericUnaryOperation() {
+    public void testUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

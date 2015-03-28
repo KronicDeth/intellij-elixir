@@ -126,7 +126,7 @@ public interface ElixirMatchedDotOperation extends InfixOperation {
   List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
+  List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();

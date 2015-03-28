@@ -144,13 +144,13 @@ public interface ElixirMatchedComparisonOperation extends InfixOperation {
   List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
-
-  @NotNull
   List<ElixirMatchedRelationalOperation> getMatchedRelationalOperationList();
 
   @NotNull
   List<ElixirMatchedTwoOperation> getMatchedTwoOperationList();
+
+  @NotNull
+  List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();

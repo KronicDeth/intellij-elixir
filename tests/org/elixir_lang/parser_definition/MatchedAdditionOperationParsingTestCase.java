@@ -24,7 +24,7 @@ public class MatchedAdditionOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testNonNumericUnaryOperation() {
+    public void testUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

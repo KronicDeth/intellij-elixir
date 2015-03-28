@@ -313,12 +313,6 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirMatchedOrOperation getMatchedOrOperation() {
     return findChildByClass(ElixirMatchedOrOperation.class);
   }
@@ -345,6 +339,12 @@ public class ElixirNoParenthesesExpressionImpl extends ASTWrapperPsiElement impl
   @Nullable
   public ElixirMatchedTypeOperation getMatchedTypeOperation() {
     return findChildByClass(ElixirMatchedTypeOperation.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedUnaryNonNumericOperation getMatchedUnaryNonNumericOperation() {
+    return findChildByClass(ElixirMatchedUnaryNonNumericOperation.class);
   }
 
   @Override

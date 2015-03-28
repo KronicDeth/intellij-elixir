@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
+public interface ElixirMatchedUnaryNonNumericOperation extends PrefixOperation {
 
   @Nullable
   ElixirAlias getAlias();
@@ -123,7 +123,7 @@ public interface ElixirMatchedNonNumericUnaryOperation extends PrefixOperation {
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedUnaryNonNumericOperation getMatchedUnaryNonNumericOperation();
 
   @Nullable
   ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable getNoParenthesesNoArgumentsUnqualifiedCallOrVariable();

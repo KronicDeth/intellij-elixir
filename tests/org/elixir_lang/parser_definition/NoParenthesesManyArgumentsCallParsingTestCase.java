@@ -100,7 +100,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueMatchedNonNumericUnaryOperation() {
+    public void testKeywordValueMatchedUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -188,7 +188,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalNonNumericUnaryOperation() {
+    public void testPositionalUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
 

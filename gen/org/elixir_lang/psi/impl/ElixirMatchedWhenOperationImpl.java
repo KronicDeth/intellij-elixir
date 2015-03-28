@@ -301,12 +301,6 @@ public class ElixirMatchedWhenOperationImpl extends ASTWrapperPsiElement impleme
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryOperation.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirMatchedOrOperation> getMatchedOrOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedOrOperation.class);
   }
@@ -333,6 +327,12 @@ public class ElixirMatchedWhenOperationImpl extends ASTWrapperPsiElement impleme
   @NotNull
   public List<ElixirMatchedTypeOperation> getMatchedTypeOperationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedTypeOperation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedUnaryNonNumericOperation.class);
   }
 
   @Override

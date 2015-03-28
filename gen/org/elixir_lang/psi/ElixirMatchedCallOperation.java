@@ -117,7 +117,7 @@ public interface ElixirMatchedCallOperation extends Call {
   ElixirMatchedNonNumericAtOperation getMatchedNonNumericAtOperation();
 
   @Nullable
-  ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation();
+  ElixirMatchedUnaryNonNumericOperation getMatchedUnaryNonNumericOperation();
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();

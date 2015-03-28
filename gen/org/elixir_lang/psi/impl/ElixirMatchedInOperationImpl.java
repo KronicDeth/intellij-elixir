@@ -283,14 +283,14 @@ public class ElixirMatchedInOperationImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedNonNumericUnaryOperation.class);
+  public List<ElixirMatchedTwoOperation> getMatchedTwoOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedTwoOperation.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirMatchedTwoOperation> getMatchedTwoOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedTwoOperation.class);
+  public List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedUnaryNonNumericOperation.class);
   }
 
   @Override

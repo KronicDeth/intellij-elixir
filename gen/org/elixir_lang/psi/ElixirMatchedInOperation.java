@@ -138,10 +138,10 @@ public interface ElixirMatchedInOperation extends InfixOperation {
   List<ElixirMatchedNonNumericAtOperation> getMatchedNonNumericAtOperationList();
 
   @NotNull
-  List<ElixirMatchedNonNumericUnaryOperation> getMatchedNonNumericUnaryOperationList();
+  List<ElixirMatchedTwoOperation> getMatchedTwoOperationList();
 
   @NotNull
-  List<ElixirMatchedTwoOperation> getMatchedTwoOperationList();
+  List<ElixirMatchedUnaryNonNumericOperation> getMatchedUnaryNonNumericOperationList();
 
   @NotNull
   List<ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable> getNoParenthesesNoArgumentsUnqualifiedCallOrVariableList();

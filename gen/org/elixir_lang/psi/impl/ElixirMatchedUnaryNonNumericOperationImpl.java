@@ -12,14 +12,14 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
 import com.ericsson.otp.erlang.OtpErlangObject;
 
-public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedNonNumericUnaryOperation {
+public class ElixirMatchedUnaryNonNumericOperationImpl extends ASTWrapperPsiElement implements ElixirMatchedUnaryNonNumericOperation {
 
-  public ElixirMatchedNonNumericUnaryOperationImpl(ASTNode node) {
+  public ElixirMatchedUnaryNonNumericOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNonNumericUnaryOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedUnaryNonNumericOperation(this);
     else super.accept(visitor);
   }
 
@@ -253,8 +253,8 @@ public class ElixirMatchedNonNumericUnaryOperationImpl extends ASTWrapperPsiElem
 
   @Override
   @Nullable
-  public ElixirMatchedNonNumericUnaryOperation getMatchedNonNumericUnaryOperation() {
-    return findChildByClass(ElixirMatchedNonNumericUnaryOperation.class);
+  public ElixirMatchedUnaryNonNumericOperation getMatchedUnaryNonNumericOperation() {
+    return findChildByClass(ElixirMatchedUnaryNonNumericOperation.class);
   }
 
   @Override

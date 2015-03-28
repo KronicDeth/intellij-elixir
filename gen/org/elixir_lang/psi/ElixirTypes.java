@@ -105,12 +105,12 @@ public interface ElixirTypes {
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
   IElementType MATCHED_NON_NUMERIC_AT_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_AT_OPERATION");
-  IElementType MATCHED_NON_NUMERIC_UNARY_OPERATION = new ElixirElementType("MATCHED_NON_NUMERIC_UNARY_OPERATION");
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
+  IElementType MATCHED_UNARY_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_UNARY_NON_NUMERIC_OPERATION");
   IElementType MATCHED_WHEN_OPERATION = new ElixirElementType("MATCHED_WHEN_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
@@ -555,9 +555,6 @@ public interface ElixirTypes {
       else if (type == MATCHED_NON_NUMERIC_AT_OPERATION) {
         return new ElixirMatchedNonNumericAtOperationImpl(node);
       }
-      else if (type == MATCHED_NON_NUMERIC_UNARY_OPERATION) {
-        return new ElixirMatchedNonNumericUnaryOperationImpl(node);
-      }
       else if (type == MATCHED_OR_OPERATION) {
         return new ElixirMatchedOrOperationImpl(node);
       }
@@ -572,6 +569,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_TYPE_OPERATION) {
         return new ElixirMatchedTypeOperationImpl(node);
+      }
+      else if (type == MATCHED_UNARY_NON_NUMERIC_OPERATION) {
+        return new ElixirMatchedUnaryNonNumericOperationImpl(node);
       }
       else if (type == MATCHED_WHEN_OPERATION) {
         return new ElixirMatchedWhenOperationImpl(node);
