@@ -9,7 +9,7 @@ public class MatchedAndOperationParsingTestCase extends ParsingTestCase {
     }
 
     /*
-     * matchedRelationalOperand
+     * matchedAndOperand
      */
 
     public void testCaptureNonNumericOperation() {
