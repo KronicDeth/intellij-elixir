@@ -66,31 +66,31 @@ public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
      */
 
     public void testCharToken() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testHexadecimalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testOctalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithError();
     }
 
     public void testDecimalFloat() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithError();
     }
 
     public void testStringLine() {

@@ -1296,7 +1296,7 @@ private matchedDotExpression ::= matchedDotOperand matchedDotOperation*
 private matchedDotOperand ::= matchedCaptureNonNumericOperation |
                               matchedUnaryNonNumericOperation |
                               matchedAtNonNumericExpression
-left matchedDotOperation ::= dotInfixOperator !atom matchedDotOperand
+left matchedDotOperation ::= dotInfixOperator !(atom | numeric) matchedDotOperand
                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
 /*
