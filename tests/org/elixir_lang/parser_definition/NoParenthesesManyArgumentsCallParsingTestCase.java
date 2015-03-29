@@ -128,10 +128,6 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedAroundError();
     }
 
-    public void testPositional() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testPositionalAlias() {
         assertParsedAndQuotedCorrectly();
     }
@@ -173,6 +169,54 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalHatOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalInMatchOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalWhenOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalPipeOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalMatchOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalOrOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalAndOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalComparisonOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalRelationalOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalArrowOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalInOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalTwoOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPositionalAdditionOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
