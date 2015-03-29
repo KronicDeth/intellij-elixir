@@ -1,0 +1,7 @@
+Elixir File(0,7)
+  ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,7)
+    PsiElement(''')(''''')(0,3)
+    PsiElement(EOL)('\n')(3,4)
+    ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(4,4)
+      <empty list>
+    PsiElement(CHAR_LIST_HEREDOC_TERMINATOR)(''''')(4,7)
