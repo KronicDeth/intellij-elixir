@@ -1663,7 +1663,20 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments noParenthesesManyPositionalAndMaybeKeywordsArguments) {
-        return null;
+        PsiElement[] children = noParenthesesManyPositionalAndMaybeKeywordsArguments.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            if (child instanceof Quotable) {
+                Quotable quotable = (Quotable) child;
+                quotedChildren[i++] = quotable.quote();
+            } else {
+                throw new NotImplementedException("Expected all children to be Quotable");
+            }
+        }
+
+        return quotedChildren;
     }
 
     @Contract(pure = true)
