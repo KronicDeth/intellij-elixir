@@ -126,6 +126,7 @@ noParenthesesStrict ::= emptyParentheses |
                                              noParenthesesKeywords |
                                              noParenthesesManyArguments
                                             ) CLOSING_PARENTHESIS
+                        { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 noParenthesesFirstPositional ::= matchedExpression
                                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

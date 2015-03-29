@@ -712,7 +712,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-      return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+        QuotableArguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+
+        if (arguments == null) {
+            arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
+        }
+
+        return arguments;
     }
 
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
@@ -1673,6 +1679,29 @@ public class ElixirPsiImplUtil {
                 quotedFirstArgument,
                 quotedKeywordArguments
         };
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesStrict noParenthesesStrict) {
+        OtpErlangObject[] quotedArguments;
+
+        if (noParenthesesStrict.getEmptyParentheses() != null) {
+            quotedArguments = new OtpErlangObject[0];
+        } else {
+            Quotable noParenthesesKeywords = noParenthesesStrict.getNoParenthesesKeywords();
+
+            if (noParenthesesKeywords != null) {
+                quotedArguments = new OtpErlangObject[]{
+                        noParenthesesKeywords.quote()
+                };
+            } else {
+                QuotableArguments noParenthesesManyArguments = noParenthesesStrict.getNoParenthesesManyArguments();
+                quotedArguments = noParenthesesManyArguments.quoteArguments();
+            }
+        }
+
+        return quotedArguments;
     }
 
     @Contract(pure = true)

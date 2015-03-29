@@ -499,7 +499,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
-    visitPsiElement(o);
+    visitQuotableArguments(o);
   }
 
   public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
