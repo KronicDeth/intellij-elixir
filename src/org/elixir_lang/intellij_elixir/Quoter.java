@@ -87,7 +87,7 @@ public class Quoter {
                 String token = javaString(tokenBinary);
 
                 throw new AssertionError(
-                        "intellij_elixir returned " + message + " on line " + line + " due to " + token  +
+                        "intellij_elixir returned \"" + message + "\" on line " + line + " due to " + token  +
                                 ", use assertQuotesAroundError if error is expect in Elixir natively, " +
                                 "but not in intellij-elixir plugin"
                 );
