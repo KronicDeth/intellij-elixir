@@ -1,7 +1,0 @@
-Elixir File(0,23)
-  PsiComment(COMMENT)('# empty bit string')(0,18)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(18,19)
-    PsiElement(EOL)('\n')(18,19)
-  PsiElement(BIT_STRING_OPERATOR)('<<>>')(19,23)
-  PsiErrorElement:KEYWORD_PAIR_COLON expected, unexpected end of file(23,23)
-    <empty list>

@@ -1,8 +1,0 @@
-Elixir File(0,28)
-  PsiComment(COMMENT)('# Struct Operator')(0,17)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(17,18)
-    PsiElement(EOL)('\n')(17,18)
-  PsiElement(%)('%')(18,19)
-  PsiErrorElement:KEYWORD_PAIR_COLON expected, got 'AStruct'(19,26)
-    PsiElement(Alias)('AStruct')(19,26)
-  PsiElement(TUPLE_OPERATOR)('{}')(26,28)

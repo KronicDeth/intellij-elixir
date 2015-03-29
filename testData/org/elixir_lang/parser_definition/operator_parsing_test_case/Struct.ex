@@ -1,2 +1,0 @@
-# Struct Operator
-%AStruct{}
