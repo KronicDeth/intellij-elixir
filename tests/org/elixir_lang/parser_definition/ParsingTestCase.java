@@ -37,8 +37,8 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
 
-        root.acceptChildren(
-                new PsiElementVisitor() {
+        root.accept(
+                new PsiRecursiveElementWalkingVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
                         if (element instanceof PsiErrorElement) {
@@ -50,7 +50,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
                 }
         );
 
-        assertNotEmpty(errorElementList);
+        assertTrue("No PsiErrorElements found in parsed file PSI", !errorElementList.isEmpty());
 
         Quoter.assertError(myFile);
     }
