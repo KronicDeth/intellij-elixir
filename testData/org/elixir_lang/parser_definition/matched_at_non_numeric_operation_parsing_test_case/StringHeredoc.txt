@@ -1,5 +1,5 @@
 Elixir File(0,26)
-  ElixirMatchedAtNonNumericOperationImpl(MATCHED_AT_NON_NUMERIC_OPERATION)(0,26)
+  ElixirAtNumericOperationImpl(AT_NUMERIC_OPERATION)(0,26)
     ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
       PsiElement(@)('@')(0,1)
     ElixirStringHeredocImpl(STRING_HEREDOC)(1,26)

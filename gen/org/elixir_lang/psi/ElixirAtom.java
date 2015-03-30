@@ -5,13 +5,10 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtom extends Quotable {
+public interface ElixirAtom extends ElixirMatchedExpression, Quotable {
 
   @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
   OtpErlangObject quote();

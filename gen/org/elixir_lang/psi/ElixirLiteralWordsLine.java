@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirLiteralWordsLine extends WordsFragmented, SigilLine {
+public interface ElixirLiteralWordsLine extends ElixirMatchedExpression, WordsFragmented, SigilLine {
 
   @NotNull
   ElixirLiteralWordsBody getLiteralWordsBody();

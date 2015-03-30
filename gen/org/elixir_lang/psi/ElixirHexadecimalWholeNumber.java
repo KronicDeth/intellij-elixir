@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirHexadecimalWholeNumber extends WholeNumber {
+public interface ElixirHexadecimalWholeNumber extends ElixirMatchedExpression, WholeNumber {
 
   @NotNull
   List<ElixirHexadecimalDigits> getHexadecimalDigitsList();

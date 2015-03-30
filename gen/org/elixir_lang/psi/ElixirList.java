@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirList extends KeywordList {
+public interface ElixirList extends ElixirMatchedExpression, KeywordList {
 
   @NotNull
   List<ElixirListKeywordPair> getListKeywordPairList();

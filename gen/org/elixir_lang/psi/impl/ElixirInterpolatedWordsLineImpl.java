@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
@@ -12,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ElixirInterpolatedWordsLineImpl extends ASTWrapperPsiElement implements ElixirInterpolatedWordsLine {
+public class ElixirInterpolatedWordsLineImpl extends ElixirMatchedExpressionImpl implements ElixirInterpolatedWordsLine {
 
   public ElixirInterpolatedWordsLineImpl(ASTNode node) {
     super(node);

@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirCharToken extends Quotable {
+public interface ElixirCharToken extends ElixirMatchedExpression, Quotable {
 
   @Nullable
   ElixirEscapedCharacter getEscapedCharacter();

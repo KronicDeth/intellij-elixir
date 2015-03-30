@@ -8,10 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirKeywordKey extends Quotable {
 
   @Nullable
-  ElixirCharListLine getCharListLine();
-
-  @Nullable
-  ElixirStringLine getStringLine();
+  ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
   OtpErlangObject quote();

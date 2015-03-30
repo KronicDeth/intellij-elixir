@@ -1,18 +1,15 @@
 Elixir File(0,9)
-  ElixirMatchedDotOperationImpl(MATCHED_DOT_OPERATION)(0,9)
-    ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(0,4)
-      PsiElement(~)('~')(0,1)
-      PsiElement(INTERPOLATING_SIGIL_NAME)('x')(1,2)
-      PsiElement(SIGIL_PROMOTER)('{')(2,3)
-      ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(3,3)
-        <empty list>
-      PsiElement(SIGIL_TERMINATOR)('}')(3,4)
-      ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
-        <empty list>
-    ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(4,5)
-      PsiElement(.)('.')(4,5)
-    ElixirMatchedAtNonNumericOperationImpl(MATCHED_AT_NON_NUMERIC_OPERATION)(5,9)
-      ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(5,6)
-        PsiElement(@)('@')(5,6)
-      ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE)(6,9)
-        PsiElement(identifier)('two')(6,9)
+  ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(0,4)
+    PsiElement(~)('~')(0,1)
+    PsiElement(INTERPOLATING_SIGIL_NAME)('x')(1,2)
+    PsiElement(SIGIL_PROMOTER)('{')(2,3)
+    ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(3,3)
+      <empty list>
+    PsiElement(SIGIL_TERMINATOR)('}')(3,4)
+    ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
+      <empty list>
+  PsiElement(.)('.')(4,5)
+  PsiElement(@)('@')(5,6)
+  PsiElement(identifier)('two')(6,9)
+  PsiErrorElement:<no parentheses many arguments> expected, unexpected end of file(9,9)
+    <empty list>

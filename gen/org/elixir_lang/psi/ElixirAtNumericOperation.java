@@ -5,31 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtNumericOperation extends PrefixOperation {
+public interface ElixirAtNumericOperation extends ElixirMatchedExpression, PrefixOperation {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
-  ElixirBinaryWholeNumber getBinaryWholeNumber();
-
-  @Nullable
-  ElixirCharToken getCharToken();
-
-  @Nullable
-  ElixirDecimalFloat getDecimalFloat();
-
-  @Nullable
-  ElixirDecimalWholeNumber getDecimalWholeNumber();
-
-  @Nullable
-  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
-
-  @Nullable
-  ElixirOctalWholeNumber getOctalWholeNumber();
-
-  @Nullable
-  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
+  ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
   OtpErlangObject quote();

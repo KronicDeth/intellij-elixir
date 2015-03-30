@@ -2,14 +2,13 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirDecimalFloatImpl extends ASTWrapperPsiElement implements ElixirDecimalFloat {
+public class ElixirDecimalFloatImpl extends ElixirMatchedExpressionImpl implements ElixirDecimalFloat {
 
   public ElixirDecimalFloatImpl(ASTNode node) {
     super(node);

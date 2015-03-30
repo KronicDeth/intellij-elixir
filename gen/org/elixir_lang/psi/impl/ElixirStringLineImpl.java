@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ElixirStringLineImpl extends ASTWrapperPsiElement implements ElixirStringLine {
+public class ElixirStringLineImpl extends ElixirMatchedExpressionImpl implements ElixirStringLine {
 
   public ElixirStringLineImpl(ASTNode node) {
     super(node);

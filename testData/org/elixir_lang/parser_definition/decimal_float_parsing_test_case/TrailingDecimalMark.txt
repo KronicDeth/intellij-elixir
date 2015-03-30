@@ -1,7 +1,9 @@
 Elixir File(0,2)
-  ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(0,1)
-    ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(0,1)
-      PsiElement(VALID_DECIMAL_DIGITS)('0')(0,1)
-  PsiElement(.)('.')(1,2)
-  PsiErrorElement:'"', '"""', '&', ''', ''''', '(', '0', ':', <decimal float>, <decimal whole number>, <false, nil, true>, <matched unary non numeric operation>, <unary numeric operation>, '?', '@', Alias, EOL, '[', identifier or '~' expected, unexpected end of file(2,2)
-    <empty list>
+  ElixirMatchedDotOperationImpl(MATCHED_DOT_OPERATION)(0,2)
+    ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(0,1)
+      ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(0,1)
+        PsiElement(VALID_DECIMAL_DIGITS)('0')(0,1)
+    ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(1,2)
+      PsiElement(.)('.')(1,2)
+    PsiErrorElement:<matched expression> or EOL expected, unexpected end of file(2,2)
+      <empty list>

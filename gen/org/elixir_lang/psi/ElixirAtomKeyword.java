@@ -4,7 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirAtomKeyword extends Quotable {
+public interface ElixirAtomKeyword extends ElixirMatchedExpression, Quotable {
 
   @NotNull
   OtpErlangObject quote();

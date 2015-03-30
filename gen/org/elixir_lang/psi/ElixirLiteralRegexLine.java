@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirLiteralRegexLine extends RegexFragmented, SigilLine {
+public interface ElixirLiteralRegexLine extends ElixirMatchedExpression, RegexFragmented, SigilLine {
 
   @NotNull
   ElixirLiteralRegexBody getLiteralRegexBody();

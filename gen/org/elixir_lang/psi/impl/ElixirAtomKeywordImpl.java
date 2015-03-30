@@ -2,14 +2,13 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirAtomKeyword;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirAtomKeywordImpl extends ASTWrapperPsiElement implements ElixirAtomKeyword {
+public class ElixirAtomKeywordImpl extends ElixirMatchedExpressionImpl implements ElixirAtomKeyword {
 
   public ElixirAtomKeywordImpl(ASTNode node) {
     super(node);

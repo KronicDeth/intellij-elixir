@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirBinaryWholeNumber extends WholeNumber {
+public interface ElixirBinaryWholeNumber extends ElixirMatchedExpression, WholeNumber {
 
   @NotNull
   List<ElixirBinaryDigits> getBinaryDigitsList();

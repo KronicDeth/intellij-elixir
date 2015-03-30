@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirDecimalWholeNumber extends WholeNumber {
+public interface ElixirDecimalWholeNumber extends ElixirMatchedExpression, WholeNumber {
 
   @NotNull
   List<ElixirDecimalDigits> getDecimalDigitsList();

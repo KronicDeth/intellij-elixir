@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirLiteralCharListSigilHeredoc extends CharListFragmented, SigilHeredoc {
+public interface ElixirLiteralCharListSigilHeredoc extends ElixirMatchedExpression, CharListFragmented, SigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();

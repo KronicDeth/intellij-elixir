@@ -2,7 +2,6 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -17,7 +16,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.ElixirTypes.UNKNOWN_WHOLE_NUMBER_BASE;
 
-public class ElixirUnknownBaseWholeNumberImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseWholeNumber {
+public class ElixirUnknownBaseWholeNumberImpl extends ElixirMatchedExpressionImpl implements ElixirUnknownBaseWholeNumber {
 
   public ElixirUnknownBaseWholeNumberImpl(ASTNode node) {
     super(node);

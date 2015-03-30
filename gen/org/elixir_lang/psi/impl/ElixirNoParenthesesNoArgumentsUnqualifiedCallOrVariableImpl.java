@@ -2,14 +2,13 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable {
+public class ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl extends ElixirMatchedExpressionImpl implements ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable {
 
   public ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(ASTNode node) {
     super(node);

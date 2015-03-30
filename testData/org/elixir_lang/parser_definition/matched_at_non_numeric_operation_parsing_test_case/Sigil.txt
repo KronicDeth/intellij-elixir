@@ -1,5 +1,5 @@
 Elixir File(0,11)
-  ElixirMatchedAtNonNumericOperationImpl(MATCHED_AT_NON_NUMERIC_OPERATION)(0,11)
+  ElixirAtNumericOperationImpl(AT_NUMERIC_OPERATION)(0,11)
     ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
       PsiElement(@)('@')(0,1)
     ElixirInterpolatedRegexLineImpl(INTERPOLATED_REGEX_LINE)(1,11)

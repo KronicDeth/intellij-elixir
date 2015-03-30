@@ -100,6 +100,7 @@ public interface ElixirTypes {
   IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
+  IElementType MATCHED_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_IN_MATCH_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
@@ -539,6 +540,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_DOT_OPERATION) {
         return new ElixirMatchedDotOperationImpl(node);
+      }
+      else if (type == MATCHED_EXPRESSION) {
+        return new ElixirMatchedExpressionImpl(node);
       }
       else if (type == MATCHED_HAT_OPERATION) {
         return new ElixirMatchedHatOperationImpl(node);

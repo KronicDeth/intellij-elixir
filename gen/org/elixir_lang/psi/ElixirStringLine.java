@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirStringLine extends Atomable, InterpolatedString, Quotable {
+public interface ElixirStringLine extends ElixirMatchedExpression, Atomable, InterpolatedString, Quotable {
 
   @NotNull
   ElixirInterpolatedStringBody getInterpolatedStringBody();

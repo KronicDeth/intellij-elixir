@@ -1,4 +1,4 @@
 Elixir File(0,2)
-  PsiErrorElement:'"', '"""', '&', ''', ''''', '(', '0', ':', <decimal float>, <decimal whole number>, <end of expression>, <false, nil, true>, <keyword key>, <matched unary non numeric operation>, <unary numeric operation>, '?', '@', Alias, '[', identifier or '~' expected, got '.'(0,1)
+  PsiErrorElement:'(', <end of expression>, <matched expression> or identifier expected, got '.'(0,1)
     PsiElement(.)('.')(0,1)
   PsiElement(VALID_DECIMAL_DIGITS)('0')(1,2)

@@ -37,7 +37,7 @@ Elixir File(0,900)
   ElixirAdjacentExpressionImpl(ADJACENT_EXPRESSION)(158,163)
     ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl(NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE)(158,163)
       PsiElement(identifier)('start')(158,163)
-  PsiErrorElement:'(', ',', <adjacent expression>, <end of expression>, <matched and operation>, <matched arrow operation>, <matched call operation>, <matched comparison operation>, <matched dot operation>, <matched hat operation>, <matched in match operation>, <matched in operation>, <matched match operation>, <matched multiplication operation>, <matched or operation>, <matched pipe operation>, <matched relational operation>, <matched two operation>, <matched type operation>, <matched when operation>, <no parentheses many arguments>, DUAL_OPERATOR or KEYWORD_PAIR_COLON expected, got ''(163,163)
+  PsiErrorElement:'(', ',', <!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <adjacent expression>, <end of expression>, <in>, <no parentheses many arguments>, <when>, <|>, <||, |||, or> or DUAL_OPERATOR expected, got ''(163,163)
     <empty list>
   PsiElement(DUMMY_BLOCK)(163,544)
     PsiElement(DUMMY_BLOCK)(163,203)

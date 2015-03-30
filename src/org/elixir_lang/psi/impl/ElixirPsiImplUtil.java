@@ -610,23 +610,21 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
-        ElixirCharListLine charListLine = atom.getCharListLine();
+        ElixirMatchedExpression matchedExpression = atom.getMatchedExpression();
 
-        if (charListLine != null) {
+        if (matchedExpression instanceof ElixirCharListLine) {
+            ElixirCharListLine charListLine = (ElixirCharListLine) matchedExpression;
             quoted = charListLine.quoteAsAtom();
+        } else if (matchedExpression instanceof ElixirStringLine) {
+            ElixirStringLine stringLine = (ElixirStringLine) matchedExpression;
+            quoted = stringLine.quoteAsAtom();
         } else {
-            ElixirStringLine stringLine = atom.getStringLine();
+            ASTNode atomNode = atom.getNode();
+            ASTNode atomFragmentNode = atomNode.getLastChildNode();
 
-            if (stringLine != null) {
-                quoted = stringLine.quoteAsAtom();
-            } else {
-                ASTNode atomNode = atom.getNode();
-                ASTNode atomFragmentNode = atomNode.getLastChildNode();
+            assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
 
-                assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
-
-                quoted = new OtpErlangAtom(atomFragmentNode.getText());
-            }
+            quoted = new OtpErlangAtom(atomFragmentNode.getText());
         }
 
         return quoted;
@@ -1316,19 +1314,17 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
-        ElixirCharListLine charListLine = keywordKey.getCharListLine();
+        ElixirMatchedExpression matchedExpression = keywordKey.getMatchedExpression();
         OtpErlangObject quoted;
 
-        if (charListLine != null) {
+        if (matchedExpression instanceof ElixirCharListLine) {
+            ElixirCharListLine charListLine = (ElixirCharListLine) matchedExpression;
             quoted = charListLine.quoteAsAtom();
+        } else if (matchedExpression instanceof ElixirStringLine) {
+            ElixirStringLine stringLine = (ElixirStringLine) matchedExpression;
+            quoted = stringLine.quoteAsAtom();
         } else {
-            ElixirStringLine stringLine = keywordKey.getStringLine();
-
-            if (stringLine != null) {
-                quoted = stringLine.quoteAsAtom();
-            } else {
-                quoted = new OtpErlangAtom(keywordKey.getText());
-            }
+            quoted = new OtpErlangAtom(keywordKey.getText());
         }
 
         return quoted;

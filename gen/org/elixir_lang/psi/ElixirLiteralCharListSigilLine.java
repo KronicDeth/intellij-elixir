@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirLiteralCharListSigilLine extends CharListFragmented, SigilLine {
+public interface ElixirLiteralCharListSigilLine extends ElixirMatchedExpression, CharListFragmented, SigilLine {
 
   @NotNull
   ElixirLiteralCharListBody getLiteralCharListBody();
