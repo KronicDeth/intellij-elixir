@@ -3,11 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
-  extends("matched.*Operation|noParenthesesNoArgumentsUnqualifiedCallOrVariable")=matchedExpression
-  // child of accessExpression
-  extends("atNumericOperation|captureNumericOperation|unaryNumericOperation|emptyBlock|numeric|list|stringLine|stringHeredoc|charListLine|charListHeredoc|interpolatedCharListSigilLine|interpolatedCharListSigilHeredoc|interpolatedRegexHeredoc|interpolatedSigilHeredoc|interpolatedStringSigilHeredoc|interpolatedWordsHeredoc|interpolatedWordsLine|interpolatedRegexLine|interpolatedSigilLine|interpolatedStringSigilLine|literalCharListSigilLine|literalCharListSigilHeredoc|literalRegexHeredoc|literalSigilHeredoc|literalStringSigilHeredoc|literalWordsHeredoc|literalRegexLine|literalSigilLine|literalStringSigilLine|literalWordsLine|atomKeyword|atom|alias")=matchedExpression
-  // children of numeric
-  extends("charToken|.*WholeNumber|decimalFloat")=matchedExpression
+  extends("matched.*Operation|noParenthesesNoArgumentsUnqualifiedCallOrVariable|accessExpression")=matchedExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -1347,39 +1343,40 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
 emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private accessExpression ::= atNumericOperation |
-                             captureNumericOperation |
-                             unaryNumericOperation |
-                             emptyBlock |
-                             numeric |
-                             list |
-                             stringLine |
-                             stringHeredoc |
-                             charListLine |
-                             charListHeredoc |
-                             interpolatedCharListSigilLine |
-                             interpolatedCharListSigilHeredoc |
-                             interpolatedRegexHeredoc |
-                             interpolatedSigilHeredoc |
-                             interpolatedStringSigilHeredoc |
-                             interpolatedWordsHeredoc |
-                             interpolatedWordsLine |
-                             interpolatedRegexLine |
-                             interpolatedSigilLine |
-                             interpolatedStringSigilLine |
-                             literalCharListSigilLine |
-                             literalCharListSigilHeredoc |
-                             literalRegexHeredoc |
-                             literalSigilHeredoc |
-                             literalStringSigilHeredoc |
-                             literalWordsHeredoc |
-                             literalRegexLine |
-                             literalSigilLine |
-                             literalStringSigilLine |
-                             literalWordsLine |
-                             atomKeyword |
-                             atom |
-                             alias
+accessExpression ::= atNumericOperation |
+                     captureNumericOperation |
+                     unaryNumericOperation |
+                     emptyBlock |
+                     numeric |
+                     list |
+                     stringLine |
+                     stringHeredoc |
+                     charListLine |
+                     charListHeredoc |
+                     interpolatedCharListSigilLine |
+                     interpolatedCharListSigilHeredoc |
+                     interpolatedRegexHeredoc |
+                     interpolatedSigilHeredoc |
+                     interpolatedStringSigilHeredoc |
+                     interpolatedWordsHeredoc |
+                     interpolatedWordsLine |
+                     interpolatedRegexLine |
+                     interpolatedSigilLine |
+                     interpolatedStringSigilLine |
+                     literalCharListSigilLine |
+                     literalCharListSigilHeredoc |
+                     literalRegexHeredoc |
+                     literalSigilHeredoc |
+                     literalStringSigilHeredoc |
+                     literalWordsHeredoc |
+                     literalRegexLine |
+                     literalSigilLine |
+                     literalStringSigilLine |
+                     literalWordsLine |
+                     atomKeyword |
+                     atom |
+                     alias
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE

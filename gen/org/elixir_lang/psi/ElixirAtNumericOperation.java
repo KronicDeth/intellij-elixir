@@ -1,17 +1,36 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtNumericOperation extends ElixirMatchedExpression, PrefixOperation {
+public interface ElixirAtNumericOperation extends PrefixOperation {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
 
   @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirBinaryWholeNumber getBinaryWholeNumber();
+
+  @Nullable
+  ElixirCharToken getCharToken();
+
+  @Nullable
+  ElixirDecimalFloat getDecimalFloat();
+
+  @Nullable
+  ElixirDecimalWholeNumber getDecimalWholeNumber();
+
+  @Nullable
+  ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
+
+  @Nullable
+  ElixirOctalWholeNumber getOctalWholeNumber();
+
+  @Nullable
+  ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
   @NotNull
   OtpErlangObject quote();

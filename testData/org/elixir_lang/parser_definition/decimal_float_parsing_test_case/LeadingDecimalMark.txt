@@ -1,4 +1,4 @@
 Elixir File(0,2)
-  PsiErrorElement:'(', <end of expression>, <matched expression> or identifier expected, got '.'(0,1)
+  PsiErrorElement:'(', <access expression>, <end of expression>, <matched expression> or identifier expected, got '.'(0,1)
     PsiElement(.)('.')(0,1)
   PsiElement(VALID_DECIMAL_DIGITS)('0')(1,2)

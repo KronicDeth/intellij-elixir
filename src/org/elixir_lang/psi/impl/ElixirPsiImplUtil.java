@@ -584,6 +584,20 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAccessExpression accessExpression) {
+        PsiElement[] children = accessExpression.getChildren();
+
+        if (children.length != 1) {
+            throw new NotImplementedException("Expecting 1 child in accessExpression");
+        }
+
+        Quotable child = (Quotable) children[0];
+
+        return child.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAdjacentExpression adjacentExpression) {
         PsiElement[] children = adjacentExpression.getChildren();
 
@@ -610,21 +624,23 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
-        ElixirMatchedExpression matchedExpression = atom.getMatchedExpression();
+        ElixirCharListLine charListLine = atom.getCharListLine();
 
-        if (matchedExpression instanceof ElixirCharListLine) {
-            ElixirCharListLine charListLine = (ElixirCharListLine) matchedExpression;
+        if (charListLine != null) {
             quoted = charListLine.quoteAsAtom();
-        } else if (matchedExpression instanceof ElixirStringLine) {
-            ElixirStringLine stringLine = (ElixirStringLine) matchedExpression;
-            quoted = stringLine.quoteAsAtom();
         } else {
-            ASTNode atomNode = atom.getNode();
-            ASTNode atomFragmentNode = atomNode.getLastChildNode();
+            ElixirStringLine stringLine = atom.getStringLine();
 
-            assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
+            if (stringLine != null) {
+                quoted = stringLine.quoteAsAtom();
+            } else {
+                ASTNode atomNode = atom.getNode();
+                ASTNode atomFragmentNode = atomNode.getLastChildNode();
 
-            quoted = new OtpErlangAtom(atomFragmentNode.getText());
+                assert atomFragmentNode.getElementType() == ElixirTypes.ATOM_FRAGMENT;
+
+                quoted = new OtpErlangAtom(atomFragmentNode.getText());
+            }
         }
 
         return quoted;
@@ -1314,17 +1330,19 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirKeywordKey keywordKey) {
-        ElixirMatchedExpression matchedExpression = keywordKey.getMatchedExpression();
+        ElixirCharListLine charListLine = keywordKey.getCharListLine();
         OtpErlangObject quoted;
 
-        if (matchedExpression instanceof ElixirCharListLine) {
-            ElixirCharListLine charListLine = (ElixirCharListLine) matchedExpression;
+        if (charListLine != null) {
             quoted = charListLine.quoteAsAtom();
-        } else if (matchedExpression instanceof ElixirStringLine) {
-            ElixirStringLine stringLine = (ElixirStringLine) matchedExpression;
-            quoted = stringLine.quoteAsAtom();
         } else {
-            quoted = new OtpErlangAtom(keywordKey.getText());
+            ElixirStringLine stringLine = keywordKey.getStringLine();
+
+            if (stringLine != null) {
+                quoted = stringLine.quoteAsAtom();
+            } else {
+                quoted = new OtpErlangAtom(keywordKey.getText());
+            }
         }
 
         return quoted;

@@ -1,13 +1,14 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
 
+  IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
@@ -265,7 +266,10 @@ public interface ElixirTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ADDITION_INFIX_OPERATOR) {
+       if (type == ACCESS_EXPRESSION) {
+        return new ElixirAccessExpressionImpl(node);
+      }
+      else if (type == ADDITION_INFIX_OPERATOR) {
         return new ElixirAdditionInfixOperatorImpl(node);
       }
       else if (type == ADJACENT_EXPRESSION) {

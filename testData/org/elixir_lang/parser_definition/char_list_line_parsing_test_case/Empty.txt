@@ -1,15 +1,17 @@
 Elixir File(0,6)
-  ElixirCharListLineImpl(CHAR_LIST_LINE)(0,2)
-    PsiElement(')(''')(0,1)
-    ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(1,1)
-      <empty list>
-    PsiElement(CHAR_LIST_TERMINATOR)(''')(1,2)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
+    ElixirCharListLineImpl(CHAR_LIST_LINE)(0,2)
+      PsiElement(')(''')(0,1)
+      ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(1,1)
+        <empty list>
+      PsiElement(CHAR_LIST_TERMINATOR)(''')(1,2)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(2,3)
     PsiElement(EOL)('\n')(2,3)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(3,4)
     PsiElement(EOL)('\n')(3,4)
-  ElixirCharListLineImpl(CHAR_LIST_LINE)(4,6)
-    PsiElement(')(''')(4,5)
-    ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(5,5)
-      <empty list>
-    PsiElement(CHAR_LIST_TERMINATOR)(''')(5,6)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(4,6)
+    ElixirCharListLineImpl(CHAR_LIST_LINE)(4,6)
+      PsiElement(')(''')(4,5)
+      ElixirInterpolatedCharListBodyImpl(INTERPOLATED_CHAR_LIST_BODY)(5,5)
+        <empty list>
+      PsiElement(CHAR_LIST_TERMINATOR)(''')(5,6)
