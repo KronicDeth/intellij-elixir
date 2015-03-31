@@ -33,13 +33,19 @@ public class ElixirPsiImplUtil {
     };
     public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
+    public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
     public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
             FALSE,
             TRUE,
             NIL
+    };
+    public static final OtpErlangAtom[] REARRANGED_UNARY_OPERATORS = new OtpErlangAtom[]{
+            EXCLAMATION_POINT,
+            NOT
     };
     public static final OtpErlangAtom UTF_8 = new OtpErlangAtom("utf8");
     public static final int BINARY_BASE = 2;
@@ -1519,6 +1525,79 @@ public class ElixirPsiImplUtil {
         }
 
         return specializedQuoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedInOperation matchedInOperation) {
+        PsiElement[] children = matchedInOperation.getChildren();
+
+        if (children.length != 3) {
+            throw new NotImplementedException("BinaryOperation expected to have 3 children (left operand, operator, right operand");
+        }
+
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Quotable operator = (Quotable) children[1];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = (Quotable) children[2];
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
+
+        OtpErlangObject quoted = null;
+
+        // @see https://github.com/elixir-lang/elixir/blob/6c288be7300509ff7b809002a3563c6a02dc13fa/lib/elixir/src/elixir_parser.yrl#L596-L597
+        // @see https://github.com/elixir-lang/elixir/blob/6c288be7300509ff7b809002a3563c6a02dc13fa/lib/elixir/src/elixir_parser.yrl#L583
+        if (Macro.isExpression(quotedLeftOperand)) {
+            OtpErlangTuple leftExpression = (OtpErlangTuple) quotedLeftOperand;
+            OtpErlangObject leftOperator = leftExpression.elementAt(0);
+
+            for (OtpErlangAtom rearrangedUnaryOperator : REARRANGED_UNARY_OPERATORS) {
+                /* build_op({_Kind, Line, 'in'}, {UOp, _, [Left]}, Right) when ?rearrange_uop(UOp) ->
+                     {UOp, meta(Line), [{'in', meta(Line), [Left, Right]}]}; */
+                if (leftOperator.equals(rearrangedUnaryOperator)) {
+                    OtpErlangObject unaryOperatorArguments = leftExpression.elementAt(2);
+                    OtpErlangObject originalUnaryOperand;
+
+
+                    if (unaryOperatorArguments instanceof OtpErlangString) {
+                        OtpErlangString unaryOperatorPrintableArguments = (OtpErlangString) unaryOperatorArguments;
+                        int codePoint = unaryOperatorPrintableArguments.stringValue().codePointAt(0);
+                        originalUnaryOperand = new OtpErlangLong(codePoint);
+                    } else if (unaryOperatorArguments instanceof OtpErlangList) {
+                        OtpErlangList unaryOperatorArgumentList = (OtpErlangList) unaryOperatorArguments;
+                        originalUnaryOperand = unaryOperatorArgumentList.elementAt(0);
+                    } else {
+                        throw new NotImplementedException("Expected REARRANGED_UNARY_OPERATORS operand to be quoted as an OtpErlangString or OtpErlangList");
+                    }
+
+                    OtpErlangList operatorMetadata = metadata(operator);
+
+                    quoted = quotedFunctionCall(
+                            leftOperator,
+                            operatorMetadata,
+                            quotedFunctionCall(
+                                    quotedOperator,
+                                    operatorMetadata,
+                                    originalUnaryOperand,
+                                    quotedRightOperand
+                            )
+                    );
+                }
+            }
+        }
+
+        if (quoted == null) {
+            quoted = quotedFunctionCall(
+                    quotedOperator,
+                    metadata(operator),
+                    quotedLeftOperand,
+                    quotedRightOperand
+            );
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
