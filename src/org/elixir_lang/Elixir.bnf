@@ -907,6 +907,9 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
 
 matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedInMatchOperation |
+                      /* noParenthesesKeywords needs to be first as matchedExpression will match due to the error
+                         handling built into the Pratt parser. */
+                      matchedWhenNoParenthesesKeywordsOperation |
                       matchedWhenOperation |
                       matchedTypeOperation |
                       matchedPipeOperation |
@@ -980,9 +983,15 @@ whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
                         ]
                         name = "when"
                       }
-/* noParenthesesKeywords needs to be first as matchedExpression will match due to the error handling built into the
-   Pratt parser. */
-matchedWhenOperation ::= matchedExpression whenInfixOperator (noParenthesesKeywords | matchedExpression)
+/* noParenthesesKeywords needs to be in a separate operation so that only matchedWhenNoParenthesesKeywordsOperation is a
+   POSTFIX operation and matchedWhenOperation can remain a BINARY operaton.  With
+   `(noParenthesesKeywords | matchedExpression)` as the right operand, matchdWhenExpression was a POSTFIX operator,
+   which caused the precedence for matchedInMatchOperand and matchedWhenOperation to be wrong as demonstrated in
+   49ffef5a33ca1102213821efb4e2140f97622ca1 by
+   org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
+matchedWhenNoParenthesesKeywordsOperation ::= matchedExpression whenInfixOperator noParenthesesKeywords
+                                              { elementType = matchedWhenOperation rightAssociative = true }
+matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
 
 /*

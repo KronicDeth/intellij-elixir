@@ -5,9 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirMatchedExpression;
+import org.elixir_lang.psi.ElixirMatchedWhenOperation;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.ElixirWhenInfixOperator;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -26,12 +28,6 @@ public class ElixirMatchedWhenOperationImpl extends ElixirMatchedExpressionImpl 
   @NotNull
   public List<ElixirMatchedExpression> getMatchedExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
   }
 
   @Override
