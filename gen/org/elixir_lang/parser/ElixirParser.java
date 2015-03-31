@@ -1,14 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.parser;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiBuilder.Marker;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class ElixirParser implements PsiParser {
@@ -3385,7 +3386,7 @@ public class ElixirParser implements PsiParser {
   // Operator priority table:
   // 0: PREFIX(matchedCaptureNonNumericOperation)
   // 1: BINARY(matchedInMatchOperation)
-  // 2: BINARY(matchedWhenOperation)
+  // 2: POSTFIX(matchedWhenOperation)
   // 3: BINARY(matchedTypeOperation)
   // 4: BINARY(matchedPipeOperation)
   // 5: BINARY(matchedMatchOperation)
@@ -3430,8 +3431,8 @@ public class ElixirParser implements PsiParser {
         r = matchedExpression(b, l, 1);
         exit_section_(b, l, m, MATCHED_IN_MATCH_OPERATION, r, true, null);
       }
-      else if (g < 2 && whenInfixOperator(b, l + 1)) {
-        r = matchedExpression(b, l, 1);
+      else if (g < 2 && matchedWhenOperation_0(b, l + 1)) {
+        r = true;
         exit_section_(b, l, m, MATCHED_WHEN_OPERATION, r, true, null);
       }
       else if (g < 3 && typeInfixOperator(b, l + 1)) {
@@ -3532,6 +3533,28 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !numeric(b, l + 1);
     exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  // whenInfixOperator (noParenthesesKeywords | matchedExpression)
+  private static boolean matchedWhenOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenOperation_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = whenInfixOperator(b, l + 1);
+    r = r && matchedWhenOperation_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // noParenthesesKeywords | matchedExpression
+  private static boolean matchedWhenOperation_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedWhenOperation_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesKeywords(b, l + 1);
+    if (!r) r = matchedExpression(b, l + 1, -1);
+    exit_section_(b, m, null, r);
     return r;
   }
 

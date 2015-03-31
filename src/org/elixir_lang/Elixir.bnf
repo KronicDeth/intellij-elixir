@@ -980,7 +980,9 @@ whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
                         ]
                         name = "when"
                       }
-matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
+/* noParenthesesKeywords needs to be first as matchedExpression will match due to the error handling built into the
+   Pratt parser. */
+matchedWhenOperation ::= matchedExpression whenInfixOperator (noParenthesesKeywords | matchedExpression)
                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
 
 /*
