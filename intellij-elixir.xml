@@ -177,7 +177,8 @@
   </target>
   
   <!-- Modules -->
-  
+
+  <import file="${basedir}/idea.xml"/>
   <import file="${basedir}/module_intellij-elixir.xml"/>
   
   <target name="init" description="Build initialization">

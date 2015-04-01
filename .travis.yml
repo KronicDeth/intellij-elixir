@@ -1,5 +1,6 @@
 cache:
   directories:
+  - cache
   - dependencies
   - "${HOME}/.kiex"
 jdk:

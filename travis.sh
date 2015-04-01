@@ -1,27 +1,13 @@
 #!/bin/bash -x
 
-mkdir -p dependencies
-pushd dependencies
-
 #
 # IntelliJ IDEA Community Edition
 #
 
-idea_version="14.0.2"
-idea_tar_ball="ideaIC-${idea_version}.tar.gz"
-idea_path="idea-IC"
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea
 
-wget --timestamping http://download-cf.jetbrains.com/idea/${idea_tar_ball}
-
-if [ ${idea_tar_ball} -nt ${idea_path} ]; then
-    tar zxf ${idea_tar_ball}
-    rm -rf ${idea_tar_ball}
-
-    # Move the versioned IDEA folder to a known location
-    versioned_idea_path=$(find . -name 'idea-IC*' | head -n 1)
-    rm ${idea_path}
-    ln -s ${versioned_idea_path} ${idea_path}
-fi
+mkdir -p dependencies
+pushd dependencies
 
 #
 # kerl - Erlang version switcher
@@ -53,7 +39,7 @@ erlang_lib=`elixir -e "IO.write :code.lib_dir"`
 popd
 
 # Run the tests
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=${erlang_lib} -Didea.home=dependencies/${idea_path} -Djdk.bin=${JAVA_HOME}/bin test.modules
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=${erlang_lib} -Didea.home=cache/idea -Djdk.bin=${JAVA_HOME}/bin test.modules
 
 # Was our build successful?
 stat=$?

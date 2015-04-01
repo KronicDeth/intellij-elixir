@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="get.idea" name="idea">
+    <dirname property="idea.basedir" file="${ant.file.idea}"/>
+
+    <property name="idea.output.dir" value="${idea.basedir}/dependencies/idea"/>
+    <property name="idea.version" value="14.0.2"/>
+    <property name="idea.tarball" value="ideaIC-${idea.version}.tar.gz"/>
+    <property name="idea.cache" value="${idea.basedir}/cache/idea"/>
+
+    <target name="clean.idea">
+        <delete quiet="true">
+            <fileset dir="${idea.output.dir}"/>
+            <fileset dir="${idea.cache}"/>
+        </delete>
+    </target>
+
+    <target name="get.idea" depends="unpack.idea.tarball" description="Get IntelliJ IDEA Community from Jetbrains">
+        <copy todir="${idea.cache}">
+            <fileset dir="${idea.output.tarball.root.dir}"/>
+        </copy>
+    </target>
+
+    <target name="get.idea.tarball" description="Get IntelliJ IDEA Community tarball from Jetbrains">
+        <mkdir dir="${idea.output.dir}"/>
+        <get dest="${idea.output.dir}"
+             src="http://download-cf.jetbrains.com/idea/${idea.tarball}"
+             usetimestamp="true"
+             verbose="true"/>
+    </target>
+
+    <target name="unpack.idea.tarball" depends="get.idea.tarball" description="tar -xvfz ideaIC-${idea.version}.tar.gz">
+        <untar src="${idea.output.dir}/${idea.tarball}" dest="${idea.output.dir}"/>
+        <path id="idea.output.tarball.root.path">
+            <dirset dir="${idea.output.dir}">
+                <include name="idea-IC-*"/>
+            </dirset>
+        </path>
+        <property name="idea.output.tarball.root.dir" refid="idea.output.tarball.root.path"/>
+    </target>
+</project>

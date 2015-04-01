@@ -2,6 +2,8 @@
 # user-specific project metadata
 /.idea/workspace.xml
 /.idea/shelf/
+# ignore idea.xml output
+/cache
 # ignore travis.sh output
 /dependencies
 # build output
