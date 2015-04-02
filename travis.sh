@@ -6,6 +6,9 @@
 
 ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea install.erlang
 
+# Ensure erlang binaries are on PATH for Elixir
+export PATH=$PWD/cache:$PATH
+
 mkdir -p dependencies
 pushd dependencies
 
