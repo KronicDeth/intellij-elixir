@@ -178,6 +178,7 @@
   
   <!-- Modules -->
 
+  <import file="${basedir}/elixir.xml"/>
   <import file="${basedir}/erlang.xml"/>
   <import file="${basedir}/idea.xml"/>
   <import file="${basedir}/module_intellij-elixir.xml"/>

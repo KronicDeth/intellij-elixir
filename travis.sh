@@ -4,26 +4,10 @@
 # IntelliJ IDEA Community Edition
 #
 
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea install.erlang
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea install.erlang install.elixir
 
-# Ensure erlang binaries are on PATH for Elixir
-export PATH=$PWD/cache:$PATH
-
-mkdir -p dependencies
-pushd dependencies
-
-#
-# kiex - Elixir version switcher
-#
-
-if [ ! -f "$HOME/.kiex/elixirs/elixir-1.0.2.env" ]; then
-  \curl -sSL https://raw.githubusercontent.com/taylor/kiex/master/install | bash -s
-  ~/.kiex/bin/kiex install 1.0.2
-fi
-
-source "$HOME/.kiex/elixirs/elixir-1.0.2.env"
-
-popd
+# Ensure erlang binaries are on PATH for Elixir and Elixir is on path for tests
+export PATH=$PWD/cache/usr/local/bin:$PWD/cache/bin:$PATH
 
 # Run the tests
 ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=cache/lib/erlang/lib -Didea.home=cache/idea -Djdk.bin=${JAVA_HOME}/bin test.modules

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="elixir">
+    <dirname file="${ant.file.elixir}" property="elixir.basedir"/>
+
+    <property name="elixir.output.dir" value="${elixir.basedir}/dependencies/elixir"/>
+    <property name="elixir.version" value="1.0.3"/>
+    <property name="elixir.download.url" value="https://codeload.github.com/elixir-lang/elixir/tar.gz/v${elixir.version}"/>
+
+    <property name="elixir.output.tarball.path" value="${elixir.output.dir}/v${elixir.version}.tar.gz"/>
+    <available file="${elixir.output.tarball.path}" property="elixir.tarball.available"/>
+
+    <property name="elixir.output.tarball.root.dir" value="${elixir.output.dir}/elixir-${elixir.version}"/>
+    <available file="${elixir.output.tarball.root.dir}" property="elixir.tarball.unpacked"/>
+
+    <target name="get.elixir.tarball" description="Get elixir tarball from Github" unless="elixir.tarball.available">
+        <mkdir dir="${elixir.output.dir}"/>
+        <get dest="${elixir.output.dir}/v${elixir.version}.tar.gz"
+             src="${elixir.download.url}"
+             usetimestamp="true"
+             verbose="true"/>
+    </target>
+
+    <target name="install.elixir" depends="make.elixir">
+        <exec dir="${elixir.output.tarball.root.dir}" executable="make">
+            <!-- Override default empty DESTDIR so elixir and erlang are installed in same root -->
+            <env key="DESTDIR" value="${elixir.basedir}/cache"/>
+            <!-- Add root directory of cache so that Elixir can find installed version Erlang -->
+            <env key="PATH" value="${elixir.basedir}/cache/bin:${env.PATH}"/>
+            <arg value="install"/>
+        </exec>
+    </target>
+
+    <target name="make.elixir" depends="unpack.elixir.tarball">
+        <chmod perm="a+x">
+            <filelist dir="${elixir.output.tarball.root.dir}">
+                <file name="rebar"/>
+                <file name="bin/elixir"/>
+                <file name="bin/elixirc"/>
+            </filelist>
+        </chmod>
+        <property environment="env"/>
+        <exec dir="${elixir.output.tarball.root.dir}" executable="make">
+            <!-- Add root directory of cache so that Elixir can find installed version Erlang -->
+            <env key="PATH" value="${elixir.basedir}/cache:${env.PATH}"/>
+        </exec>
+    </target>
+
+    <target name="unpack.elixir.tarball" depends="get.elixir.tarball" unless="elixir.tarball.unpacked">
+        <untar compression="gzip" src="${elixir.output.tarball.path}" dest="${elixir.output.dir}"/>
+    </target>
+</project>
