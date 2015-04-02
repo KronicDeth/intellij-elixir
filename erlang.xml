@@ -3,6 +3,8 @@
     <dirname property="erlang.basedir" file="${ant.file.erlang}"/>
 
     <property name="erlang.cache" value="${erlang.basedir}/cache/erlang"/>
+    <property name="erlang.cache.lib" value="${erlang.basedir}/cache/lib/erlang/lib"/>
+
     <!-- Get tarball from github because erlang.org has an invalid certificate for https -->
     <property name="erlang.download.url" value="https://github.com/erlang/otp/archive"/>
     <property name="erlang.output.dir" value="${erlang.basedir}/dependencies/erlang"/>

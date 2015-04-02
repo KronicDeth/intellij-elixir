@@ -10,7 +10,7 @@ ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml
 export PATH=$PWD/cache/usr/local/bin:$PWD/cache/bin:$PATH
 
 # Run the tests
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=cache/lib/erlang/lib -Didea.home=cache/idea -Djdk.bin=${JAVA_HOME}/bin test.modules
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Djdk.bin=${JAVA_HOME}/bin test.modules
 
 # Was our build successful?
 stat=$?

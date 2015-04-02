@@ -55,14 +55,17 @@
     <exclude name="**/?*.kt"/>
     <exclude name="**/?*.clj"/>
   </patternset>
-  
+
+  <import file="${basedir}/erlang.xml"/>
+  <import file="${basedir}/idea.xml"/>
+
   <!-- JDK definitions -->
 
   <path id="jdk.classpath">
-    <fileset dir="${erlang.lib}">
+    <fileset dir="${erlang.cache.lib}">
       <include name="jinterface-*/priv/OtpErlang.jar"/>
     </fileset>
-    <fileset dir="${idea.home}">
+    <fileset dir="${idea.cache}">
       <include name="lib/annotations.jar"/>
       <include name="lib/asm-all.jar"/>
       <include name="lib/asm-commons.jar"/>
@@ -158,13 +161,13 @@
   <!-- Project Libraries -->
   
   <path id="library.junit.classpath">
-    <pathelement location="${idea.home}/lib/junit.jar"/>
+    <pathelement location="${idea.cache}/lib/junit.jar"/>
   </path>
   
   
   <!-- Global Libraries -->
   <!-- Register Custom Compiler Taskdefs -->
-  <property name="javac2.home" value="${idea.home}/lib"/>
+  <property name="javac2.home" value="${idea.cache}/lib"/>
   <path id="javac2.classpath">
     <pathelement location="${javac2.home}/javac2.jar"/>
     <pathelement location="${javac2.home}/jdom.jar"/>
@@ -179,8 +182,6 @@
   <!-- Modules -->
 
   <import file="${basedir}/elixir.xml"/>
-  <import file="${basedir}/erlang.xml"/>
-  <import file="${basedir}/idea.xml"/>
   <import file="${basedir}/module_intellij-elixir.xml"/>
   
   <target name="init" description="Build initialization">

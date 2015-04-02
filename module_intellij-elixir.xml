@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="module_intellij-elixir" default="compile.module.intellij-elixir">
+
   <dirname property="module.intellij-elixir.basedir" file="${ant.file.module_intellij-elixir}"/>
-  
+
+  <import file="${module.intellij-elixir.basedir}/idea.xml"/>
+
   <property name="module.jdk.home.intellij-elixir" value="${project.jdk.home}"/>
   <property name="module.jdk.bin.intellij-elixir" value="${project.jdk.bin}"/>
   <property name="module.jdk.classpath.intellij-elixir" value="${project.jdk.classpath}"/>
@@ -18,35 +21,35 @@
   <path id="intellij-elixir.module.production.classpath">
     <path refid="${module.jdk.classpath.intellij-elixir}"/>
     <path refid="library.junit.classpath"/>
-    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
   
   <path id="intellij-elixir.runtime.production.module.classpath">
     <pathelement location="${intellij-elixir.output.dir}"/>
     <path refid="library.junit.classpath"/>
-    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
   
   <path id="intellij-elixir.module.classpath">
     <path refid="${module.jdk.classpath.intellij-elixir}"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
     <path refid="library.junit.classpath"/>
-    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
   
   <path id="intellij-elixir.runtime.module.classpath">
     <pathelement location="${intellij-elixir.testoutput.dir}"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
     <path refid="library.junit.classpath"/>
-    <pathelement location="${idea.home}/lib/hamcrest-core-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/hamcrest-library-1.3.jar"/>
-    <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-core-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
+    <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
   
   
@@ -133,7 +136,7 @@
     <path refid="intellij-elixir.module.production.classpath"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
     <pathelement location="${intellij-elixir.testoutput.dir}"/>
-    <pathelement location="${idea.home}/lib/guava-17.0.jar"/>
+    <pathelement location="${idea.cache}/lib/guava-17.0.jar"/>
   </path>
 
   <property name="test" value="tests"/>
@@ -149,7 +152,7 @@
       <classpath>
         <path refid="classpath.test" />
         <pathelement location="${test.build}"/>
-        <pathelement location="${idea.home}/lib/junit-4.11.jar"/>
+        <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
       </classpath>
       <formatter type="brief" usefile="false"/>
       <formatter type="xml"/>
@@ -201,10 +204,10 @@
         <attribute name="Manifest-Version" value="1.0"/>
       </manifest>
     </jar>
-    <copy file="${idea.home}/lib/junit-4.11.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit-4.11.jar"/>
-    <copy file="${idea.home}/lib/hamcrest-core-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-core-1.3.jar"/>
-    <copy file="${idea.home}/lib/hamcrest-library-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-library-1.3.jar"/>
-    <copy file="${idea.home}/lib/junit.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit.jar"/>
+    <copy file="${idea.cache}/lib/junit-4.11.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit-4.11.jar"/>
+    <copy file="${idea.cache}/lib/hamcrest-core-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-core-1.3.jar"/>
+    <copy file="${idea.cache}/lib/hamcrest-library-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-library-1.3.jar"/>
+    <copy file="${idea.cache}/lib/junit.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit.jar"/>
     <zip destfile="${intellij-elixir.plugin.path.jar}">
       <fileset dir="${module.intellij-elixir.basedir}/../temp"/>
     </zip>
