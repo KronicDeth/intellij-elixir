@@ -5,24 +5,10 @@
 #
 
 ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml install.erlang
 
 mkdir -p dependencies
 pushd dependencies
-
-#
-# kerl - Erlang version switcher
-#
-
-erlang_version="17.4"
-
-if [ ! -f "${PWD}/erlang/${erlang_version}/activate" ]; then
-  curl --remote-name https://raw.githubusercontent.com/spawngrid/kerl/master/kerl
-  chmod a+x kerl
-  ./kerl build ${erlang_version} ${erlang_version}
-  ./kerl install ${erlang_version} $PWD/erlang/${erlang_version}
-fi
-
-source "${PWD}/erlang/${erlang_version}/activate"
 
 #
 # kiex - Elixir version switcher
@@ -39,7 +25,7 @@ erlang_lib=`elixir -e "IO.write :code.lib_dir"`
 popd
 
 # Run the tests
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=${erlang_lib} -Didea.home=cache/idea -Djdk.bin=${JAVA_HOME}/bin test.modules
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml -Derlang.lib=cache/lib/erlang/lib -Didea.home=cache/idea -Djdk.bin=${JAVA_HOME}/bin test.modules
 
 # Was our build successful?
 stat=$?
