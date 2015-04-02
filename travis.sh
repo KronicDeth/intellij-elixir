@@ -19,7 +19,6 @@ if [ ! -f "$HOME/.kiex/elixirs/elixir-1.0.2.env" ]; then
 fi
 
 source "$HOME/.kiex/elixirs/elixir-1.0.2.env"
-erlang_lib=`elixir -e "IO.write :code.lib_dir"`
 
 popd
 
