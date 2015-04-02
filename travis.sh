@@ -4,8 +4,7 @@
 # IntelliJ IDEA Community Edition
 #
 
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea
-ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml install.erlang
+ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea install.erlang
 
 mkdir -p dependencies
 pushd dependencies
