@@ -27,9 +27,16 @@
         </exec>
     </target>
 
-    <target name="deps.get.intellij_elixir" depends="checkout.intellij_elixir" unless="intellij_elixir.executable.available">
+    <target name="deps.get.intellij_elixir" depends="local.hex.intellij_elixir" unless="intellij_elixir.executable.available">
         <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
             <arg value="deps.get"/>
+        </exec>
+    </target>
+
+    <target name="local.hex.intellij_elixir" depends="checkout.intellij_elixir">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+            <arg value="local.hex"/>
+            <arg value="--force"/>
         </exec>
     </target>
 
