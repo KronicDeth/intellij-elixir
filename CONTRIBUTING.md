@@ -14,12 +14,21 @@ intellij-elixir's parsed and quoted format matches that of native Elixir's `Code
 1. `mkdir ~/git/KronicDeth`
 2. `cd ~/git/KronicDeth`
 3. `git clone git@github.com:KronicDeth/intellij_elixir.git`
+4. `cd intellij_elixir`
+5. `mix local.hex --force`
+6. `mix deps.get`
+7. `mix release`
 
 ##### Starting
 
-For the tests to find `intellij_elixir`, `intellij_elixir` must be running locally with the short node
-name `intellij_elixir`:
+For the tests to find `intellij_elixir`, `intellij_elixir` must be running locally:
 
-```
-iex --sname intellij_elixir -S mix
-```
+1. `cd ~/git/KronicDeth/intellij_elixir`
+2. `rel/intellij_elixir/bin/intellij_elixir start`
+
+##### Stopping
+
+After the tests are completed you can stop `intellij_elixir`:
+
+1. `cd ~/git/KronicDeth/intellij_elixir`
+2. `rel/intellij_elixir/bin/intellij_elixir stop`
