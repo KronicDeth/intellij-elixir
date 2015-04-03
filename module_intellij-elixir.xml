@@ -79,9 +79,7 @@
   
   <target name="compile.module.intellij-elixir" depends="compile.module.intellij-elixir.production,compile.module.intellij-elixir.tests" description="Compile module intellij-elixir"/>
 
-  <import file="${basedir}/erlang.xml"/>
-
-  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers,install.erlang" description="Compile module intellij-elixir; production classes">
+  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers" description="Compile module intellij-elixir; production classes">
     <mkdir dir="${intellij-elixir.output.dir}"/>
     <javac2 destdir="${intellij-elixir.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
@@ -145,12 +143,13 @@
 
   <import file="${module.intellij-elixir.basedir}/intellij_elixir.xml"/>
 
-  <!-- Add start.intellij_elixir's depends to test.module.intellij-elixir so that the depends aren't just triggered on the antcall -->
-  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,install.elixir,release.intellij_elixir" description="test module">
+  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,release.intellij_elixir" description="test module">
     <mkdir dir="tmp"/>
     <mkdir dir="tmp/results"/>
 
-    <antcall target="start.intellij_elixir"/>
+    <exec executable="${intellij_elixir.executable}">
+      <arg value="start"/>
+    </exec>
 
     <!-- must fork or env won't work -->
     <junit failureproperty="failure_found"
@@ -174,7 +173,9 @@
       </batchtest>
     </junit>
 
-    <antcall target="stop.intellij_elixir"/>
+    <exec executable="${intellij_elixir.executable}">
+      <arg value="stop"/>
+    </exec>
 
     <!-- generate report with junitreport -->
     <junitreport todir="tmp">

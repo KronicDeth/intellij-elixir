@@ -56,13 +56,16 @@
     <exclude name="**/?*.clj"/>
   </patternset>
 
-  <import file="${basedir}/erlang.xml"/>
   <import file="${basedir}/idea.xml"/>
 
   <!-- JDK definitions -->
+  <exec executable="elixir" outputproperty="elixir.code.lib.dir">
+    <arg value="-e"/>
+    <arg value="IO.puts :code.lib_dir"/>
+  </exec>
 
   <path id="jdk.classpath">
-    <fileset dir="${erlang.cache.lib}">
+    <fileset dir="${elixir.code.lib.dir}">
       <include name="jinterface-*/priv/OtpErlang.jar"/>
     </fileset>
     <fileset dir="${idea.cache}">
@@ -187,7 +190,6 @@
   
   <!-- Modules -->
 
-  <import file="${basedir}/elixir.xml"/>
   <import file="${basedir}/intellij_elixir.xml"/>
   <import file="${basedir}/module_intellij-elixir.xml"/>
   

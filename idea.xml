@@ -6,6 +6,12 @@
     <property name="idea.version" value="14.0.2"/>
     <property name="idea.tarball" value="ideaIC-${idea.version}.tar.gz"/>
     <property name="idea.cache" value="${idea.basedir}/cache/idea"/>
+    <property name="idea.tarball.root.basename" value="idea-IC-139.659.2"/>
+
+    <property name="idea.output.tarball.root.dir" value="${idea.output.dir}/${idea.tarball.root.basename}"/>
+    <available file="${idea.output.tarball.root.dir}" property="idea.output.tarball.root.available"/>
+
+    <available file="${idea.output.dir}/${idea.tarball}" property="idea.tarball.available"/>
 
     <target name="clean.idea">
         <delete quiet="true">
@@ -20,7 +26,7 @@
         </copy>
     </target>
 
-    <target name="get.idea.tarball" description="Get IntelliJ IDEA Community tarball from Jetbrains">
+    <target name="get.idea.tarball" description="Get IntelliJ IDEA Community tarball from Jetbrains" unless="idea.tarball.available">
         <mkdir dir="${idea.output.dir}"/>
         <get dest="${idea.output.dir}"
              src="http://download-cf.jetbrains.com/idea/${idea.tarball}"
@@ -28,7 +34,7 @@
              verbose="true"/>
     </target>
 
-    <target name="unpack.idea.tarball" depends="get.idea.tarball" description="tar -xvfz ideaIC-${idea.version}.tar.gz">
+    <target name="unpack.idea.tarball" depends="get.idea.tarball" description="tar -xvfz ideaIC-${idea.version}.tar.gz" unless="idea.output.tarball.root.available">
         <!-- untar task has exception: java.io.IOException: unexpected EOF with 1024 bytes unread  -->
         <exec dir="${idea.output.dir}" executable="tar">
             <arg value="-x"/>
@@ -37,11 +43,5 @@
             <arg value="${idea.output.dir}/${idea.tarball}"/>
             <arg value="-z"/>
         </exec>
-        <path id="idea.output.tarball.root.path">
-            <dirset dir="${idea.output.dir}">
-                <include name="idea-IC-*"/>
-            </dirset>
-        </path>
-        <property name="idea.output.tarball.root.dir" refid="idea.output.tarball.root.path"/>
     </target>
 </project>

@@ -27,36 +27,26 @@
         </exec>
     </target>
 
-    <import file="${intellij_elixir.basedir}/elixir.xml"/>
-
-    <target name="deps.get.intellij_elixir" depends="install.elixir,checkout.intellij_elixir" unless="intellij_elixir.executable.available">
-        <property environment="env"/>
+    <target name="deps.get.intellij_elixir" depends="checkout.intellij_elixir" unless="intellij_elixir.executable.available">
         <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
-            <env key="PATH" value="${intellij_elixir.basedir}/cache/bin:${intellij_elixir.basedir}/cache/usr/local/bin:${env.PATH}"/>
             <arg value="deps.get"/>
         </exec>
     </target>
 
-    <target name="release.intellij_elixir" depends="install.elixir,deps.get.intellij_elixir" unless="intellij_elixir.executable.available">
-        <property environment="env"/>
+    <target name="release.intellij_elixir" depends="deps.get.intellij_elixir" unless="intellij_elixir.executable.available">
         <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
-            <env key="PATH" value="${intellij_elixir.basedir}/cache/bin:${intellij_elixir.basedir}/cache/usr/local/bin:${env.PATH}"/>
             <arg value="release"/>
         </exec>
     </target>
 
-    <target name="start.intellij_elixir" depends="install.elixir,release.intellij_elixir">
-        <property environment="env"/>
+    <target name="start.intellij_elixir" depends="release.intellij_elixir">
         <exec executable="${intellij_elixir.executable}">
-            <env key="PATH" value="${intellij_elixir.basedir}/cache/bin:${intellij_elixir.basedir}/cache/usr/local/bin:${env.PATH}"/>
             <arg value="start"/>
         </exec>
     </target>
 
-     <target name="stop.intellij_elixir" depends="install.elixir,release.intellij_elixir">
-        <property environment="env"/>
+     <target name="stop.intellij_elixir" depends="release.intellij_elixir">
         <exec executable="${intellij_elixir.executable}">
-            <env key="PATH" value="${intellij_elixir.basedir}/cache/bin:${intellij_elixir.basedir}/cache/usr/local/bin:${env.PATH}"/>
             <arg value="stop"/>
         </exec>
     </target>

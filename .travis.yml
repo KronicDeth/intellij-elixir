@@ -2,10 +2,7 @@ cache:
   directories:
   - cache
   - dependencies
-jdk:
-- openjdk7
-- oraclejdk7
-language: java
-install: ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea install.erlang install.elixir release.intellij_elixir
+language: elixir
+install: ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea release.intellij_elixir
 script:  ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml test.modules
 sudo: false
