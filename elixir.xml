@@ -44,7 +44,7 @@
         <property environment="env"/>
         <exec dir="${elixir.output.tarball.root.dir}" executable="make">
             <!-- Add root directory of cache so that Elixir can find installed version Erlang -->
-            <env key="PATH" value="${elixir.basedir}/cache:${env.PATH}"/>
+            <env key="PATH" value="${elixir.basedir}/cache/bin:${env.PATH}"/>
         </exec>
     </target>
 
