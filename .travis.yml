@@ -6,6 +6,7 @@ language: elixir
 before_install:
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"
+- find / -name '*.jar'
 install: ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea release.intellij_elixir
 script:  ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml test.modules
 sudo: false
