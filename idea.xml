@@ -31,8 +31,11 @@
     <target name="unpack.idea.tarball" depends="get.idea.tarball" description="tar -xvfz ideaIC-${idea.version}.tar.gz">
         <!-- untar task has exception: java.io.IOException: unexpected EOF with 1024 bytes unread  -->
         <exec dir="${idea.output.dir}" executable="tar">
-            <arg value="-xvfz"/>
+            <arg value="-x"/>
+            <arg value="-v"/>
+            <arg value="-f"/>
             <arg value="${idea.output.dir}/${idea.tarball}"/>
+            <arg value="-z"/>
         </exec>
         <path id="idea.output.tarball.root.path">
             <dirset dir="${idea.output.dir}">
