@@ -22,7 +22,7 @@
         <mkdir dir="${intellij_elixir.output.dir}"/>
         <exec dir="${intellij_elixir.output.dir}" executable="git">
             <arg value="clone"/>
-            <arg value="git@github.com:KronicDeth/intellij_elixir.git"/>
+            <arg value="https://github.com/KronicDeth/intellij_elixir.git"/>
             <arg value="${intellij_elixir.output.repo.dir}"/>
         </exec>
     </target>
