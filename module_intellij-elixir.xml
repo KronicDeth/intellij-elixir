@@ -169,6 +169,8 @@
       <batchtest todir="tmp/results">
         <fileset dir="${test}">
           <include name="**/*Test*.java"/>
+          <!-- Marked with @Ignore annotation, but not ignored for unknown reason -->
+          <exclude name="org/elixir_lang/parser_definition/ParsingTestCase.java"/>
           <!-- TODO get inspection tests to work with ant -->
           <exclude name="org/elixir_lang/inspection/*TestCase.java"/>
         </fileset>
