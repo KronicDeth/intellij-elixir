@@ -79,6 +79,7 @@
             <filelist dir="${erlang.cache}">
                 <file name="erts/autoconf/config.sub"/>
                 <file name="erts/emulator/utils/gen_git_version"/>
+                <file name="lib/diameter/bin/diameterc"/>
             </filelist>
         </chmod>
         <exec dir="${erlang.cache}" executable="make"/>
