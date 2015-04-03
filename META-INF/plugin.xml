@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,11 +9,15 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>Next Release</h1>
+      <h1>v0.2.1</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
+            <li>
+              No parentheses function calls can occur as the right operand in binary infix operations or the sole
+              operand of unary prefix operation.
+            </li>
             <li>
               Function calls with neither parentheses nor <code>do</code> blocks that have at least 2 arguments: a
               positional argument and keyword arguments or 2 or more positional argument(s) followed by optional keyword
