@@ -64,6 +64,13 @@
     <arg value="IO.puts :code.lib_dir"/>
   </exec>
 
+  <property environment="env"/>
+  <property name="jdk.home" value="${env.JAVA_HOME}"/>
+  <property name="jdk.bin" value="${jdk.home}/bin"/>
+  <property name="project.jdk.bin" value="${jdk.bin}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath"/>
+  <property name="project.jdk.home" value="${jdk.home}"/>
+
   <path id="jdk.classpath">
     <fileset dir="${elixir.code.lib.dir}">
       <include name="jinterface-*/priv/OtpErlang.jar"/>
@@ -158,14 +165,10 @@
       <include name="lib/xpp3-1.1.4-min.jar"/>
       <include name="lib/xstream-1.4.3.jar"/>
     </fileset>
+    <fileset dir="${jdk.home}">
+      <include name="lib/tools.jar"/>
+    </fileset>
   </path>
-
-  <property environment="env"/>
-  <property name="jdk.home" value="${env.JAVA_HOME}"/>
-  <property name="jdk.bin" value="${jdk.home}/bin"/>
-  <property name="project.jdk.bin" value="${jdk.bin}"/>
-  <property name="project.jdk.classpath" value="jdk.classpath"/>
-  <property name="project.jdk.home" value="${jdk.home}"/>
 
   <!-- Project Libraries -->
   
