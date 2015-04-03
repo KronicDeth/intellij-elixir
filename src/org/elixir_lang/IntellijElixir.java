@@ -9,11 +9,11 @@ import java.io.IOException;
  */
 public class IntellijElixir {
     private static OtpNode localNode = null;
-    public static final String REMOTE_NODE = "intellij_elixir";
+    public static final String REMOTE_NODE = "intellij_elixir@127.0.0.1";
 
     public static OtpNode getLocalNode() throws IOException {
         if (localNode == null) {
-            localNode = new OtpNode("intellij-elixir");
+            localNode = new OtpNode("intellij-elixir@127.0.0.1", "intellij_elixir");
         }
 
         return localNode;
