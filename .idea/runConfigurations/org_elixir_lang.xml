@@ -16,9 +16,7 @@
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="moduleWithDependencies" />
     </option>
-    <envs>
-      <env name="INTELLIJ_ELIXIR_PATH" value="$PROJECT_DIR$" />
-    </envs>
+    <envs />
     <patterns />
     <RunnerSettings RunnerId="Debug">
       <option name="DEBUG_PORT" value="" />

@@ -14,6 +14,6 @@ public class MissingEndOfExpressionTestCase extends LightCodeInsightFixtureTestC
 
     @Override
     protected String getTestDataPath() {
-        return System.getenv("INTELLIJ_ELIXIR_PATH") + "/testData/org/elixir_lang/inspection/missing_end_of_expression_test_case";
+        return "testData/org/elixir_lang/inspection/missing_end_of_expression_test_case";
     }
 }

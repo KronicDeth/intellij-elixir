@@ -32,6 +32,6 @@ public class NoParentheseStrictTestCase extends LightCodeInsightFixtureTestCase 
 
     @Override
     protected String getTestDataPath() {
-        return System.getenv("INTELLIJ_ELIXIR_PATH") + "/testData/org/elixir_lang/inspection/no_parentheses_strict_test_case";
+        return "testData/org/elixir_lang/inspection/no_parentheses_strict_test_case";
     }
 }

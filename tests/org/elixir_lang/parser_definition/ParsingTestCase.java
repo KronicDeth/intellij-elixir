@@ -6,7 +6,6 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.junit.Ignore;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.List;
 /**
  * Created by luke.imhoff on 8/7/14.
  */
-@Ignore("abstract")
+@org.junit.Ignore("abstract")
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
         super("", "ex", new ElixirParserDefinition());
