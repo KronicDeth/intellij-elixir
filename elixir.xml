@@ -12,6 +12,9 @@
     <property name="elixir.output.tarball.root.dir" value="${elixir.output.dir}/elixir-${elixir.version}"/>
     <available file="${elixir.output.tarball.root.dir}" property="elixir.tarball.unpacked"/>
 
+    <property name="elixir.mix.path" value="${elixir.basedir}/cache/usr/local/bin/mix"/>
+    <available file="${elixir.mix.path}" property="elixir.mix.available"/>
+
     <target name="get.elixir.tarball" description="Get elixir tarball from Github" unless="elixir.tarball.available">
         <mkdir dir="${elixir.output.dir}"/>
         <get dest="${elixir.output.dir}/v${elixir.version}.tar.gz"
@@ -20,7 +23,7 @@
              verbose="true"/>
     </target>
 
-    <target name="install.elixir" depends="make.elixir">
+    <target name="install.elixir" depends="make.elixir" unless="elixir.mix.available">
         <exec dir="${elixir.output.tarball.root.dir}" executable="make">
             <!-- Override default empty DESTDIR so elixir and erlang are installed in same root -->
             <env key="DESTDIR" value="${elixir.basedir}/cache"/>
@@ -30,7 +33,7 @@
         </exec>
     </target>
 
-    <target name="make.elixir" depends="unpack.elixir.tarball">
+    <target name="make.elixir" depends="unpack.elixir.tarball" unless="elixir.mix.available">
         <chmod perm="a+x">
             <filelist dir="${elixir.output.tarball.root.dir}">
                 <file name="rebar"/>
