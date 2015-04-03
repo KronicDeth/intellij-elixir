@@ -14,14 +14,7 @@
     <available file="${erlang.cache}" property="erlang.cache.available"/>
     <available file="${erlang.cache}/configure" property="erlang.cache.configure.available"/>
     <available file="${erlang.cache}/Makefile" property="erlang.cache.makefile.available"/>
-
-    <path id="erlang.output.tarball.root.path">
-        <dirset dir="${erlang.output.dir}">
-            <include name="otp-OTP-*"/>
-        </dirset>
-    </path>
-    <property name="erlang.output.tarball.root.dir" refid="erlang.output.tarball.root.path"/>
-    <available file="${erlang.output.tarball.root.dir}" property="erlang.output.tarball.root.dir.available"/>
+    <available file="${erlang.basedir}/cache/bin/erl" property="erlang.cache.bin.erl.available"/>
 
     <target name="autoconf.erlang" depends="get.erlang" unless="erlang.cache.configure.available">
         <chmod perm="a+x">
@@ -68,7 +61,7 @@
              verbose="true"/>
     </target>
 
-    <target name="install.erlang" depends="make.erlang">
+    <target name="install.erlang" depends="make.erlang" unless="erlang.cache.bin.erl.available">
         <chmod perm="a+x">
             <filelist dir="${erlang.cache}">
                 <file name="erts/autoconf/config.sub"/>
@@ -81,7 +74,7 @@
         </exec>
     </target>
 
-    <target name="make.erlang" depends="configure.erlang">
+    <target name="make.erlang" depends="configure.erlang" unless="erlang.cache.bin.erl.available">
         <chmod perm="a+x">
             <filelist dir="${erlang.cache}">
                 <file name="erts/autoconf/config.sub"/>
@@ -91,7 +84,7 @@
         <exec dir="${erlang.cache}" executable="make"/>
     </target>
 
-    <target name="unpack.erlang.tarball" depends="get.erlang.tarball" description="tar -xvfz OTP-${erlang.version}.tar.gz" unless="erlang.output.tarball.root.dir.available">
+    <target name="unpack.erlang.tarball" depends="get.erlang.tarball" description="tar -xvfz OTP-${erlang.version}.tar.gz">
         <untar compression="gzip" src="${erlang.output.dir}/OTP-${erlang.version}.tar.gz" dest="${erlang.output.dir}"/>
         <path id="erlang.output.tarball.root.path">
             <dirset dir="${erlang.output.dir}">

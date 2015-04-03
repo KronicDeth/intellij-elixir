@@ -108,6 +108,7 @@
       <include name="lib/jna-utils.jar"/>
       <include name="lib/jna.jar"/>
       <include name="lib/jps-launcher.jar"/>
+      <include name="lib/jps-model.jar"/>
       <include name="lib/jps-server.jar"/>
       <include name="lib/jsch.agentproxy.connector-factory.jar"/>
       <include name="lib/jsch.agentproxy.core.jar"/>
@@ -125,6 +126,7 @@
       <include name="lib/miglayout-swing.jar"/>
       <include name="lib/nanoxml-2.2.3.jar"/>
       <include name="lib/nekohtml-1.9.14.jar"/>
+      <include name="lib/netty-all-4.1.0.Beta3.jar"/>
       <include name="lib/openapi.jar"/>
       <include name="lib/optimizedFileManager.jar"/>
       <include name="lib/oromatcher.jar"/>
@@ -140,6 +142,7 @@
       <include name="lib/rngom-20051226-patched.jar"/>
       <include name="lib/sanselan-0.98-snapshot.jar"/>
       <include name="lib/serviceMessages.jar"/>
+      <include name="lib/snappy-in-java-0.3.jar"/>
       <include name="lib/swingx-core-1.6.2.jar"/>
       <include name="lib/trang-core.jar"/>
       <include name="lib/trove4j.jar"/>
@@ -154,6 +157,9 @@
     </fileset>
   </path>
 
+  <property environment="env"/>
+  <property name="jdk.home" value="${env.JAVA_HOME}"/>
+  <property name="jdk.bin" value="${jdk.home}/bin"/>
   <property name="project.jdk.bin" value="${jdk.bin}"/>
   <property name="project.jdk.classpath" value="jdk.classpath"/>
   <property name="project.jdk.home" value="${jdk.home}"/>
@@ -167,14 +173,14 @@
   
   <!-- Global Libraries -->
   <!-- Register Custom Compiler Taskdefs -->
-  <property name="javac2.home" value="${idea.cache}/lib"/>
-  <path id="javac2.classpath">
-    <pathelement location="${javac2.home}/javac2.jar"/>
-    <pathelement location="${javac2.home}/jdom.jar"/>
-    <pathelement location="${javac2.home}/asm-all.jar"/>
-    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
-  </path>
-  <target name="register.custom.compilers">
+  <target name="register.custom.compilers" depends="get.idea">
+    <property name="javac2.home" value="${idea.cache}/lib"/>
+    <path id="javac2.classpath">
+      <pathelement location="${javac2.home}/javac2.jar"/>
+      <pathelement location="${javac2.home}/jdom.jar"/>
+      <pathelement location="${javac2.home}/asm-all.jar"/>
+      <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+    </path>
     <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
     <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
   </target>
@@ -182,6 +188,7 @@
   <!-- Modules -->
 
   <import file="${basedir}/elixir.xml"/>
+  <import file="${basedir}/intellij_elixir.xml"/>
   <import file="${basedir}/module_intellij-elixir.xml"/>
   
   <target name="init" description="Build initialization">
