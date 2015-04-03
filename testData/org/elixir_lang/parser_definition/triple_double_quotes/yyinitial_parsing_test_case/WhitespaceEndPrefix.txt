@@ -1,7 +1,0 @@
-Elixir File(0,25)
-  ElixirStringHeredocImpl(STRING_HEREDOC)(0,25)
-    PsiElement(ElixirTokenType.STRING_HEREDOC_PROMOTER)('"""')(0,3)
-    PsiElement(ElixirTokenType.EOL)('\n')(3,4)
-    PsiElement(ElixirTokenType.STRING_FRAGMENT)('  hi\n   there"""\n')(4,21)
-    PsiWhiteSpace(' ')(21,22)
-    PsiElement(ElixirTokenType.STRING_HEREDOC_TERMINATOR)('"""')(22,25)

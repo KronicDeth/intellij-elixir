@@ -1,19 +1,22 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
-import com.intellij.psi.PsiElement;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesExpression extends ElixirExpression {
+public interface ElixirNoParenthesesExpression extends Quotable {
 
   @Nullable
-  ElixirCallArgumentsNoParenthesesMany getCallArgumentsNoParenthesesMany();
+  ElixirEmptyParentheses getEmptyParentheses();
+
+  @Nullable
+  ElixirMatchedExpression getMatchedExpression();
+
+  @Nullable
+  ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression();
 
   @NotNull
-  ElixirNoParenthesesMaybeQualifiedIdentifier getNoParenthesesMaybeQualifiedIdentifier();
-
-  @Nullable
-  ElixirNoParenthesesStrict getNoParenthesesStrict();
+  OtpErlangObject quote();
 
 }

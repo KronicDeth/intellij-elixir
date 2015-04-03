@@ -3,6 +3,7 @@ package org.elixir_lang.elixir_flex_lexer.group_heredoc_line_body.quote;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.ElixirFlexLexer;
 import org.elixir_lang.elixir_flex_lexer.TokenTest;
+import org.elixir_lang.psi.ElixirTypes;
 import org.junit.Ignore;
 
 import java.io.IOException;
@@ -30,8 +31,8 @@ public abstract class PromoterTest extends TokenTest {
         return Arrays.asList(
                 new Object[][] {
                         { ";", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY },
-                        { "\n", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
-                        { "\r\n", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
+                        { "\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
+                        { "\r\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START },
                         { "a", fragmentType, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY }
                 }
         );

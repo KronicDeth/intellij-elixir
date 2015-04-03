@@ -1,0 +1,8 @@
+Elixir File(0,4)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
+    ElixirListImpl(LIST)(0,2)
+      PsiElement([)('[')(0,1)
+      PsiElement(])(']')(1,2)
+  PsiElement(.)('.')(2,3)
+  PsiErrorElement:EOL expected, got '2'(3,4)
+    PsiElement(VALID_DECIMAL_DIGITS)('2')(3,4)

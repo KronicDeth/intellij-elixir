@@ -1,16 +1,20 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirList;
+import org.elixir_lang.psi.ElixirListKeywordPair;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.KeywordPair;
+import org.jetbrains.annotations.NotNull;
 
-public class ElixirListImpl extends ElixirMatchedExpressionAccessExpressionImpl implements ElixirList {
+import java.util.List;
+
+public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
 
   public ElixirListImpl(ASTNode node) {
     super(node);
@@ -23,8 +27,17 @@ public class ElixirListImpl extends ElixirMatchedExpressionAccessExpressionImpl 
 
   @Override
   @NotNull
-  public List<ElixirKeywordPair> getKeywordPairList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
+  public List<ElixirListKeywordPair> getListKeywordPairList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirListKeywordPair.class);
+  }
+
+  public List<KeywordPair> getKeywordPairList() {
+    return ElixirPsiImplUtil.getKeywordPairList(this);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

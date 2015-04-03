@@ -1,0 +1,11 @@
+Elixir File(0,17)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,17)
+    ElixirLiteralRegexLineImpl(LITERAL_REGEX_LINE)(0,17)
+      PsiElement(~)('~')(0,1)
+      PsiElement(LITERAL_REGEX_SIGIL_NAME)('R')(1,2)
+      PsiElement(REGEX_PROMOTER)('"')(2,3)
+      ElixirLiteralRegexBodyImpl(LITERAL_REGEX_BODY)(3,16)
+        PsiElement(REGEX_FRAGMENT)('{}[]<>\"/()|'')(3,16)
+      PsiElement(REGEX_TERMINATOR)('"')(16,17)
+      ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
+        <empty list>

@@ -5,19 +5,23 @@ package org.elixir_lang.parser_definition;
  */
 public class CharListHeredocParsingTestCase extends ParsingTestCase {
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testEscapeSequences() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testInterpolation() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMinimal() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testWhitespaceEndPrefix() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

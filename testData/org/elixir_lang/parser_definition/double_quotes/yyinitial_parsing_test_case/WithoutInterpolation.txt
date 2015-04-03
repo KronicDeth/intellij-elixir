@@ -1,5 +1,0 @@
-Elixir File(0,23)
-  ElixirStringImpl(STRING)(0,23)
-    PsiElement(ElixirTokenType.STRING_PROMOTER)('"')(0,1)
-    PsiElement(ElixirTokenType.STRING_FRAGMENT)('without interpolation')(1,22)
-    PsiElement(ElixirTokenType.STRING_TERMINATOR)('"')(22,23)

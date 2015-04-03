@@ -12,10 +12,5 @@ public class ElixirTokenType extends IElementType {
     public ElixirTokenType(@NotNull @NonNls String debugName) {
         super(debugName, ElixirLanguage.INSTANCE);
     }
-
-    @Override
-    public String toString() {
-        return "ElixirTokenType." + super.toString();
-    }
 }
 

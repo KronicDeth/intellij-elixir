@@ -1,0 +1,2 @@
+# mix of valid and invalid binary digits
+0bABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789

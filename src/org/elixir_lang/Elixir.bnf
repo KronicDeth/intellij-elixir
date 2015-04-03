@@ -1,35 +1,34 @@
 {
   parserClass="org.elixir_lang.parser.ElixirParser"
 
- extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-
-  /*
-   * Ordered by rule being extended (extends(regex)=<rule-begin-extended)
-   */
-
-  extends("emptyParentheses|(matched|noParentheses)Expression")=expression
-  extends("charList(Heredoc)?|maxExpression|number.*Operation|number|list|sigil|string(Heredoc)?")=matchedExpressionAccessExpression
-  extends("decimal(Float|WholeNUmber)")=decimalNumber
-  extends("identifierExpression|matchedExpression.*|noParenthesesOneExpression")=matchedExpression
-  extends("atom|dotAlias")=matchedExpressionMaxExpression
-  extends("(.*Whole|decimal)Number")=number
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  // direct children of matchedExpression
+  extends("matched.*Operation|noParenthesesNoArgumentsUnqualifiedCallOrVariable|accessExpression")=matchedExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
   psiImplPackage="org.elixir_lang.psi.impl"
+  psiImplUtilClass="org.elixir_lang.psi.impl.ElixirPsiImplUtil"
 
   elementTypeHolderClass="org.elixir_lang.psi.ElixirTypes"
   elementTypeClass="org.elixir_lang.psi.ElixirElementType"
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    ALIAS_TOKEN = "Alias"
+    AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = ""
+    CAPTURE_OPERATOR = "&"
+    CHAR_LIST_HEREDOC_PROMOTER = "'''"
+    CHAR_LIST_PROMOTER = "'"
+    CHAR_TOKENIZER = "?"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
+    COLON = ":"
     COMMA = ","
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DECIMAL_MARK = "."
@@ -39,6 +38,7 @@
     FALSE = "false"
     FN = "fn"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
+    IDENTIFIER = "identifier"
     IN_OPERATOR = "in"
     INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
@@ -51,9 +51,13 @@
     OPENING_PARENTHESIS = "("
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
+    STRING_HEREDOC_PROMOTER = "\"\"\""
+    STRING_PROMOTER = "\""
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
+    TILDE = "~"
     TRUE = "true"
+    TYPE_OPERATOR = "::"
     UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
     VALID_BINARY_DIGITS = "regexp:[01]+"
     VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
@@ -62,88 +66,1483 @@
 
 // expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
 // lines
-elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
+private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 /*
+ *
+ *
+ * Expression List
+ *
+ *
+ */
+
+private infixSemicolon ::= EOL* SEMICOLON EOL*
+// Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
+endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unquoted" }
+private expression ::= emptyParentheses |
+                       unqualifiedNoParenthesesManyArgumentsCall |
+                       matchedExpression
+private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
+
+/*
+ *
+ *
+ * Function Calls
+ *
+ *
+ */
+
+/*
+ *
+ * No Parentheses
+ *
+ */
+
+/*
+ * Many Arguments
+ */
+
+private noParenthesesCommaExpression ::= matchedExpression (infixComma noParenthesesExpression)+
+/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
+   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
+noParenthesesExpression ::= emptyParentheses |
+                            /* Must be before matchedExpression because noParenthesesExpression is
+                               `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer
+                               than `matchedExpressionDotIdentifier` in matchedExpression. */
+                            /* This will be marked as an error by
+                               {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                            noParenthesesManyStrictNoParenthesesExpression |
+                            matchedExpression !KEYWORD_PAIR_COLON
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+/* Special class for wrapping noParenthesesCall so that
+   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
+   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
+   ElixirNoParenthesesCall. */
+noParenthesesManyStrictNoParenthesesExpression ::= unqualifiedNoParenthesesManyArgumentsCall
+/* Special class for wrapping rules so that
+   {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
+   ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
+   rule classes. */
+noParenthesesStrict ::= emptyParentheses |
+                        OPENING_PARENTHESIS (
+                                             noParenthesesKeywords |
+                                             noParenthesesManyArguments
+                                            ) CLOSING_PARENTHESIS
+                        { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+noParenthesesFirstPositional ::= matchedExpression
+                                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+noParenthesesOnePositionalAndKeywordsArguments ::= noParenthesesFirstPositional infixComma noParenthesesKeywords
+                                                   { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+noParenthesesManyPositionalAndMaybeKeywordsArguments ::= noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
+                                                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+/* 1. (positional, keywords)
+   2. (positional, positional)
+   3. (positional, positional, keywords) */
+noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
+                               noParenthesesManyPositionalAndMaybeKeywordsArguments
+                               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
+                                             noParenthesesStrict
+
+noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER
+                                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
+unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualifiedIdentifier
+                                              noParenthesesManyArgumentsStrict
+                                              {
+                                                implements = "org.elixir_lang.psi.Call"
+                                                methods = [
+                                                  getArguments
+                                                  getIdentifier
+                                                  quote
+                                                ]
+                                              }
+
+/*
+ * 1+ Arguments
+ */
+
+noParenthesesKeywords ::= noParenthesesKeywordPair (infixComma noParenthesesKeywordPair)*
+                          {
+                            implements = "org.elixir_lang.psi.KeywordList"
+                            methods = [
+                              getKeywordPairList
+                              quote
+                            ]
+                          }
+noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
+                             {
+                               implements = "org.elixir_lang.psi.KeywordPair"
+                               methods = [
+                                 getKeywordKey
+                                 getKeywordValue
+                                 quote
+                               ]
+                             }
+
+/*
+ * 0 Arguments
+ */
+
+noParenthesesNoArgumentsUnqualifiedCallOrVariable ::= IDENTIFIER
+                                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ *
+ *
+ * Heredoc
+ *
+ *
+ */
+
+heredocLinePrefix ::= HEREDOC_LINE_WHITE_SPACE_TOKEN? { methods = [excessWhitespace] }
+heredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
+
+/*
+ *
+ * Quote Heredocs
+ *
+ */
+
+/*
+ * CharList Heredoc
+ */
+
+charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
+                    interpolatedCharListHeredocLine*
+                    heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
+                    {
+                      implements = [
+                        "org.elixir_lang.psi.Heredoc"
+                        "org.elixir_lang.psi.InterpolatedCharList"
+                        "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
+                        "org.elixir_lang.psi.Quote"
+                      ]
+                      methods = [
+                        addEscapedCharacterCodePoints
+                        addFragmentCodePoints
+                        addHexadecimalEscapeSequenceCodePoints
+                        getFragmentType
+                        getHeredocLineList
+                        quote
+                        quoteBinary
+                        quoteEmpty
+                        quoteLiteral
+                      ]
+                      pin = 1
+                    }
+interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
+                                    {
+                                      implements = [
+                                        "org.elixir_lang.psi.HeredocLine"
+                                      ]
+                                      methods = [
+                                        getBody
+                                        quote
+                                      ]
+                                    }
+
+/*
+ * String Heredoc
+ */
+
+stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
+                  interpolatedStringHeredocLine*
+                  heredocPrefix STRING_HEREDOC_TERMINATOR
+                  {
+                    implements = [
+                      "org.elixir_lang.psi.Heredoc"
+                      "org.elixir_lang.psi.InterpolatedString"
+                    ]
+                    methods = [
+                      addEscapedCharacterCodePoints
+                      addFragmentCodePoints
+                      addHexadecimalEscapeSequenceCodePoints
+                      getFragmentType
+                      getHeredocLineList
+                      quote
+                      quoteBinary
+                      quoteEmpty
+                      quoteLiteral
+                    ]
+                    pin = 1
+                  }
+interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
+                                  {
+                                    implements = [
+                                      "org.elixir_lang.psi.HeredocLine"
+                                    ]
+                                    methods = [
+                                      getBody
+                                      quote
+                                    ]
+                                  }
+
+/*
+ *
+ * Interpolated Sigil Heredocs
+ *
+ */
+
+sigilModifiers ::= SIGIL_MODIFIER* { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+                                     interpolatedCharListHeredocLine*
+                                     heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                     {
+                                       implements = [
+                                         "org.elixir_lang.psi.CharListFragmented"
+                                         "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
+                                         "org.elixir_lang.psi.SigilHeredoc"
+                                       ]
+                                       methods = [
+                                         addEscapedCharacterCodePoints
+                                         addFragmentCodePoints
+                                         addHexadecimalEscapeSequenceCodePoints
+                                         getFragmentType
+                                         getHeredocLineList
+                                         quote
+                                         quoteBinary
+                                         quoteEmpty
+                                         quoteLiteral
+                                         sigilName
+                                       ]
+                                       pin = 3
+                                     }
+
+interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                             interpolatedRegexHeredocLine*
+                             heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.RegexFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                               pin = 3
+                             }
+interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getBody
+                                     quote
+                                   ]
+                                 }
+interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
+                          { implements = "org.elixir_lang.psi.Body" }
+
+interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+                             interpolatedSigilHeredocLine*
+                             heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.SigilFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                               pin = 3
+                             }
+interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getBody
+                                     quote
+                                   ]
+                                 }
+interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
+                          { implements = "org.elixir_lang.psi.Body" }
+
+interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+                                     interpolatedStringHeredocLine*
+                                     heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                     {
+                                       implements = [
+                                         "org.elixir_lang.psi.StringFragmented"
+                                         "org.elixir_lang.psi.InterpolatedStringHeredocLined"
+                                         "org.elixir_lang.psi.SigilHeredoc"
+                                       ]
+                                       methods = [
+                                         addEscapedCharacterCodePoints
+                                         addFragmentCodePoints
+                                         addHexadecimalEscapeSequenceCodePoints
+                                         getFragmentType
+                                         getHeredocLineList
+                                         quote
+                                         quoteBinary
+                                         quoteEmpty
+                                         quoteLiteral
+                                         sigilName
+                                       ]
+                                       pin = 3
+                                     }
+
+interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                             interpolatedWordsHeredocLine*
+                             heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.WordsFragmented"
+                                 "org.elixir_lang.psi.SigilHeredoc"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getFragmentType
+                                 getHeredocLineList
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                               pin = 3
+                             }
+interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.HeredocLine"
+                                   ]
+                                   methods = [
+                                     getBody
+                                     quote
+                                   ]
+                                 }
+interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
+                          { implements = "org.elixir_lang.psi.Body" }
+
+/*
+ * Literal Sigil Heredocs
+ */
+
+literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
+                                literalCharListHeredocLine*
+                                heredocPrefix CHAR_LIST_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                {
+                                  implements = [
+                                    "org.elixir_lang.psi.CharListFragmented"
+                                    "org.elixir_lang.psi.SigilHeredoc"
+                                  ]
+                                  methods = [
+                                    addEscapedCharacterCodePoints
+                                    addFragmentCodePoints
+                                    addHexadecimalEscapeSequenceCodePoints
+                                    getFragmentType
+                                    getHeredocLineList
+                                    quote
+                                    quoteBinary
+                                    quoteEmpty
+                                    quoteLiteral
+                                    sigilName
+                                  ]
+                                  pin = 3
+                                }
+literalCharListHeredocLine ::= heredocLinePrefix literalCharListBody EOL
+                               {
+                                 implements = [
+                                   "org.elixir_lang.psi.HeredocLine"
+                                 ]
+                                 methods = [
+                                   getBody
+                                   quote
+                                 ]
+                               }
+literalCharListBody ::= CHAR_LIST_FRAGMENT*
+                        { implements = "org.elixir_lang.psi.Body" }
+
+literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
+                        literalRegexHeredocLine*
+                        heredocPrefix REGEX_HEREDOC_TERMINATOR sigilModifiers
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.RegexFragmented"
+                            "org.elixir_lang.psi.SigilHeredoc"
+                          ]
+                          methods = [
+                            addEscapedCharacterCodePoints
+                            addFragmentCodePoints
+                            addHexadecimalEscapeSequenceCodePoints
+                            getFragmentType
+                            getHeredocLineList
+                            quote
+                            quoteBinary
+                            quoteEmpty
+                            quoteLiteral
+                            sigilName
+                          ]
+                          pin = 3
+                        }
+literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
+                            {
+                              implements = [
+                                "org.elixir_lang.psi.HeredocLine"
+                              ]
+                              methods = [
+                                getBody
+                                quote
+                              ]
+                            }
+literalRegexBody ::= REGEX_FRAGMENT*
+                     { implements = "org.elixir_lang.psi.Body" }
+
+literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
+                        literalSigilHeredocLine*
+                        heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.SigilFragmented"
+                            "org.elixir_lang.psi.SigilHeredoc"
+                          ]
+                          methods = [
+                            addEscapedCharacterCodePoints
+                            addFragmentCodePoints
+                            addHexadecimalEscapeSequenceCodePoints
+                            getFragmentType
+                            getHeredocLineList
+                            quote
+                            quoteBinary
+                            quoteEmpty
+                            quoteLiteral
+                            sigilName
+                          ]
+                          pin = 3
+                        }
+literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
+                            {
+                              implements = [
+                                "org.elixir_lang.psi.HeredocLine"
+                              ]
+                              methods = [
+                                getBody
+                                quote
+                              ]
+                            }
+literalSigilBody ::= SIGIL_FRAGMENT*
+                     { implements = "org.elixir_lang.psi.Body" }
+                     
+literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
+                              literalStringHeredocLine*
+                              heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                              {
+                                implements = [
+                                  "org.elixir_lang.psi.StringFragmented"
+                                  "org.elixir_lang.psi.SigilHeredoc"
+                                ]
+                                methods = [
+                                  addEscapedCharacterCodePoints
+                                  addFragmentCodePoints
+                                  addHexadecimalEscapeSequenceCodePoints
+                                  getFragmentType
+                                  getHeredocLineList
+                                  quote
+                                  quoteBinary
+                                  quoteEmpty
+                                  quoteLiteral
+                                  sigilName
+                                ]
+                                pin = 3
+                              }
+literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.HeredocLine"
+                               ]
+                               methods = [
+                                 getBody
+                                 quote
+                               ]
+                             }
+literalStringBody ::= STRING_FRAGMENT*
+                      { implements = "org.elixir_lang.psi.Body" }
+                      
+literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
+                        literalWordsHeredocLine*
+                        heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.WordsFragmented"
+                            "org.elixir_lang.psi.SigilHeredoc"
+                          ]
+                          methods = [
+                            addEscapedCharacterCodePoints
+                            addFragmentCodePoints
+                            addHexadecimalEscapeSequenceCodePoints
+                            getFragmentType
+                            getHeredocLineList
+                            quote
+                            quoteBinary
+                            quoteEmpty
+                            quoteLiteral
+                            sigilName
+                          ]
+                          pin = 3
+                        }
+literalWordsHeredocLine ::= heredocLinePrefix literalWordsBody EOL
+                            {
+                              implements = [
+                                "org.elixir_lang.psi.HeredocLine"
+                              ]
+                              methods = [
+                                getBody
+                                quote
+                              ]
+                            }
+literalWordsBody ::= WORDS_FRAGMENT*
+                     { implements = "org.elixir_lang.psi.Body" }
+
+/*
+ *
+ *
+ * Lines (as opposed to Heredocs)
+ *
+ *
+ */
+
+/*
+ *
+ * Quote Lines
+ *
+ */
+
+
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
+                             { implements =  "org.elixir_lang.psi.Body" }
+charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATOR
+                 {
+                   implements = [
+                     "org.elixir_lang.psi.Atomable"
+                     "org.elixir_lang.psi.InterpolatedCharList"
+                     "org.elixir_lang.psi.Quotable"
+                   ]
+                   methods = [
+                     addEscapedCharacterCodePoints
+                     addFragmentCodePoints
+                     addHexadecimalEscapeSequenceCodePoints
+                     getFragmentType
+                     quote
+                     quoteAsAtom
+                     quoteBinary
+                     quoteEmpty
+                     quoteLiteral
+                   ]
+                 }
+
+interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
+                            { implements = "org.elixir_lang.psi.Body" }
+stringLine ::= STRING_PROMOTER
+               interpolatedStringBody
+               STRING_TERMINATOR
+               {
+                 implements = [
+                   "org.elixir_lang.psi.Atomable"
+                   "org.elixir_lang.psi.InterpolatedString"
+                   "org.elixir_lang.psi.Quotable"
+                 ]
+                 methods = [
+                   addEscapedCharacterCodePoints
+                   addFragmentCodePoints
+                   addHexadecimalEscapeSequenceCodePoints
+                   getFragmentType
+                   quote
+                   quoteAsAtom
+                   quoteBinary
+                   quoteEmpty
+                   quoteLiteral
+                 ]
+               }
+
+/*
+ *
+ * Sigil Lines
+ *
+ */
+
+/*
+ * Interpolated Sigil Lines
+ */
+
+interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+                                  {
+                                    implements = [
+                                      "org.elixir_lang.psi.CharListFragmented"
+                                      "org.elixir_lang.psi.SigilLine"
+                                    ]
+                                    methods = [
+                                      addEscapedCharacterCodePoints
+                                      addFragmentCodePoints
+                                      addHexadecimalEscapeSequenceCodePoints
+                                      getBody
+                                      getFragmentType
+                                      quote
+                                      quoteBinary
+                                      quoteEmpty
+                                      quoteLiteral
+                                      sigilName
+                                    ]
+                                  }
+
+interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR sigilModifiers
+                          {
+                            implements = [
+                              "org.elixir_lang.psi.RegexFragmented"
+                              "org.elixir_lang.psi.SigilLine"
+                            ]
+                            methods = [
+                              addEscapedCharacterCodePoints
+                              addFragmentCodePoints
+                              addHexadecimalEscapeSequenceCodePoints
+                              getBody
+                              getFragmentType
+                              quote
+                              quoteBinary
+                              quoteEmpty
+                              quoteLiteral
+                              sigilName
+                            ]
+                          }
+
+interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR sigilModifiers
+                          {
+                            implements = [
+                              "org.elixir_lang.psi.SigilFragmented"
+                              "org.elixir_lang.psi.SigilLine"
+                            ]
+                            methods = [
+                              addEscapedCharacterCodePoints
+                              addFragmentCodePoints
+                              addHexadecimalEscapeSequenceCodePoints
+                              getBody
+                              getFragmentType
+                              quote
+                              quoteBinary
+                              quoteEmpty
+                              quoteLiteral
+                              sigilName
+                            ]
+                          }
+
+interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+                                {
+                                  implements = [
+                                    "org.elixir_lang.psi.StringFragmented"
+                                    "org.elixir_lang.psi.SigilLine"
+                                  ]
+                                  methods = [
+                                    addEscapedCharacterCodePoints
+                                    addFragmentCodePoints
+                                    addHexadecimalEscapeSequenceCodePoints
+                                    getBody
+                                    getFragmentType
+                                    quote
+                                    quoteBinary
+                                    quoteEmpty
+                                    quoteLiteral
+                                    sigilName
+                                  ]
+                                }
+
+interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER interpolatedWordsBody WORDS_TERMINATOR sigilModifiers
+                          {
+                            implements = [
+                              "org.elixir_lang.psi.WordsFragmented"
+                              "org.elixir_lang.psi.SigilLine"
+                            ]
+                            methods = [
+                              addEscapedCharacterCodePoints
+                              addFragmentCodePoints
+                              addHexadecimalEscapeSequenceCodePoints
+                              getBody
+                              getFragmentType
+                              quote
+                              quoteBinary
+                              quoteEmpty
+                              quoteLiteral
+                              sigilName
+                            ]
+                          }
+/*
+ * Literal Sigils
+ */
+
+literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR sigilModifiers
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.CharListFragmented"
+                                 "org.elixir_lang.psi.SigilLine"
+                               ]
+                               methods = [
+                                 addEscapedCharacterCodePoints
+                                 addFragmentCodePoints
+                                 addHexadecimalEscapeSequenceCodePoints
+                                 getBody
+                                 getFragmentType
+                                 quote
+                                 quoteBinary
+                                 quoteEmpty
+                                 quoteLiteral
+                                 sigilName
+                               ]
+                             }
+
+literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR sigilModifiers
+                     {
+                       implements = [
+                         "org.elixir_lang.psi.RegexFragmented"
+                         "org.elixir_lang.psi.SigilLine"
+                       ]
+                       methods = [
+                         addEscapedCharacterCodePoints
+                         addFragmentCodePoints
+                         addHexadecimalEscapeSequenceCodePoints
+                         getBody
+                         getFragmentType
+                         quote
+                         quoteBinary
+                         quoteEmpty
+                         quoteLiteral
+                         sigilName
+                       ]
+                     }
+
+literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR sigilModifiers
+                     {
+                       implements = [
+                         "org.elixir_lang.psi.SigilFragmented"
+                         "org.elixir_lang.psi.SigilLine"
+                       ]
+                       methods = [
+                         addEscapedCharacterCodePoints
+                         addFragmentCodePoints
+                         addHexadecimalEscapeSequenceCodePoints
+                         getBody
+                         getFragmentType
+                         quote
+                         quoteBinary
+                         quoteEmpty
+                         quoteLiteral
+                         sigilName
+                       ]
+                     }
+
+literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR sigilModifiers
+                           {
+                             implements = [
+                               "org.elixir_lang.psi.StringFragmented"
+                               "org.elixir_lang.psi.SigilLine"
+                             ]
+                             methods = [
+                               addEscapedCharacterCodePoints
+                               addFragmentCodePoints
+                               addHexadecimalEscapeSequenceCodePoints
+                               getBody
+                               getFragmentType
+                               quote
+                               quoteBinary
+                               quoteEmpty
+                               quoteLiteral
+                               sigilName
+                             ]
+                           }
+
+literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWordsBody WORDS_TERMINATOR sigilModifiers
+                      {
+                        implements = [
+                          "org.elixir_lang.psi.WordsFragmented"
+                          "org.elixir_lang.psi.SigilLine"
+                        ]
+                        methods = [
+                          addEscapedCharacterCodePoints
+                          addFragmentCodePoints
+                          addHexadecimalEscapeSequenceCodePoints
+                          getBody
+                          getFragmentType
+                          quote
+                          quoteBinary
+                          quoteEmpty
+                          quoteLiteral
+                          sigilName
+                        ]
+                      }
+
+/*
+ *
+ *
+ * Matched Expressions - ordered by outer-most (lowest precedence) to inner-most (highest precedence)
+ *
+ * See ELIXIR_BNF_DESIGN.md for exanplanation of the naming and nesting pattern used in the matchedExpression rules.
+ *
+ *
+ */
+
+matchedExpression ::= matchedCaptureNonNumericOperation |
+                      matchedInMatchOperation |
+                      /* noParenthesesKeywords needs to be first as matchedExpression will match due to the error
+                         handling built into the Pratt parser. */
+                      matchedWhenNoParenthesesKeywordsOperation |
+                      matchedWhenOperation |
+                      matchedTypeOperation |
+                      matchedPipeOperation |
+                      matchedMatchOperation |
+                      matchedOrOperation |
+                      matchedAndOperation |
+                      matchedComparisonOperation |
+                      matchedRelationalOperation |
+                      matchedArrowOperation |
+                      matchedInOperation |
+                      matchedTwoOperation |
+                      matchedAdditionOperation |
+                      matchedMultiplicationOperation |
+                      matchedHatOperation |
+                      matchedUnaryNonNumericOperation |
+                      matchedDotOperation |
+                      matchedAtNonNumericOperation |
+                      matchedCallOperation |
+                      noParenthesesNoArgumentsUnqualifiedCallOrVariable |
+                      accessExpression
+
+/*
+ * Capture Non-Numeric Operation - non-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
+ *
+ */
+
+capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
+                          {
+                            implements = "org.elixir_lang.psi.Operator"
+                            methods = [
+                              operatorTokenSet
+                              quote
+                            ]
+                            name = "&"
+                          }
+matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedExpression
+                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * In Match Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51
+ */
+
+inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL*
+                    {
+                      implements = "org.elixir_lang.psi.Operator"
+                      methods = [
+                        operatorTokenSet
+                        quote
+                      ]
+                      name = "<-, \\\\"
+                    }
+matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpression
+                            { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * When Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L52
+ */
+
+whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "when"
+                      }
+/* noParenthesesKeywords needs to be in a separate operation so that only matchedWhenNoParenthesesKeywordsOperation is a
+   POSTFIX operation and matchedWhenOperation can remain a BINARY operaton.  With
+   `(noParenthesesKeywords | matchedExpression)` as the right operand, matchdWhenExpression was a POSTFIX operator,
+   which caused the precedence for matchedInMatchOperand and matchedWhenOperation to be wrong as demonstrated in
+   49ffef5a33ca1102213821efb4e2140f97622ca1 by
+   org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
+matchedWhenNoParenthesesKeywordsOperation ::= matchedExpression whenInfixOperator noParenthesesKeywords
+                                              { elementType = matchedWhenOperation rightAssociative = true }
+matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
+                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Type Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L53
+ */
+
+typeInfixOperator ::= EOL* TYPE_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "::"
+                      }
+matchedTypeOperation ::= matchedExpression typeInfixOperator matchedExpression
+                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Pipe Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L54
+ */
+
+pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "|"
+                      }
+matchedPipeOperation ::= matchedExpression pipeInfixOperator matchedExpression
+                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Match Operation - right-associative
+ *
+ * @see see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L56
+ */
+
+matchInfixOperator ::= EOL* MATCH_OPERATOR EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "="
+                       }
+matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
+                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Or Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
+ */
+
+orInfixOperator ::= EOL* OR_OPERATOR EOL*
+                    {
+                      implements = "org.elixir_lang.psi.Operator"
+                      methods = [
+                        operatorTokenSet
+                        quote
+                      ]
+                      name = "||, |||, or"
+                    }
+matchedOrOperation ::= matchedExpression orInfixOperator matchedExpression
+                       { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * And Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
+ */
+andInfixOperator ::= EOL* AND_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "&&, &&&, and"
+                     }
+matchedAndOperation ::= matchedExpression andInfixOperator matchedExpression
+                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Comparison Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59
+ */
+
+comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
+                            {
+                              implements = "org.elixir_lang.psi.Operator"
+                              methods = [
+                                operatorTokenSet
+                                quote
+                              ]
+                              name = "!=, ==, =~, !==, ==="
+                            }
+matchedComparisonOperation ::= matchedExpression comparisonInfixOperator matchedExpression
+                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Relational Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L60
+ */
+
+relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL*
+                            {
+                              implements = "org.elixir_lang.psi.Operator"
+                              methods = [
+                                operatorTokenSet
+                                quote
+                              ]
+                              name = "<, >, <=, >="
+                            }
+matchedRelationalOperation ::= matchedExpression relationalInfixOperator matchedExpression
+                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Arrow Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
+ */
+
+arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
+                       }
+matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
+                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * In Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62
+ */
+
+inInfixOperator ::= EOL* IN_OPERATOR EOL*
+                    {
+                      implements = "org.elixir_lang.psi.Operator"
+                      methods = [
+                        operatorTokenSet
+                        quote
+                      ]
+                      name = "in"
+                    }
+matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
+                       { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Two Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
+ */
+
+twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "++, --, .., <>"
+                     }
+matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
+                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Addition Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L64
+ *
+ */
+
+/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
+   interpreted as unaryOperation */
+additionInfixOperator ::= DUAL_OPERATOR EOL*
+                          {
+                            implements = "org.elixir_lang.psi.Operator"
+                            methods = [
+                              operatorTokenSet
+                              quote
+                            ]
+                            name = "+, -"
+                          }
+matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpression
+                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+
+/*
+ * Multiplication Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65
+ *
+ */
+
+multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
+                                {
+                                  implements = "org.elixir_lang.psi.Operator"
+                                  methods = [
+                                    operatorTokenSet
+                                    quote
+                                  ]
+                                  name = "*, /"
+                                }
+matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
+                                   { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Hat Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66
+ *
+ */
+
+hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "^^^"
+                     }
+matchedHatOperation ::= matchedExpression hatInfixOperator matchedExpression
+                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Unary Non-Numeric Operation - non-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
+ *
+ */
+
+unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
+                        {
+                          implements = "org.elixir_lang.psi.Operator"
+                          methods = [
+                            operatorTokenSet
+                            quote
+                          ]
+                          name = "+, -, !, ^, not, ~~~"
+                        }
+matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedExpression
+                                    { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Dot Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
+ *
+ */
+
+// left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
+dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       name = "."
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                     }
+matchedDotOperation ::= matchedExpression dotInfixOperator
+                        !(
+                          atom |
+                          charListHeredoc |
+                          emptyBlock |
+                          interpolatedCharListSigilHeredoc |
+                          interpolatedCharListSigilLine |
+                          interpolatedRegexHeredoc |
+                          interpolatedRegexLine |
+                          interpolatedSigilHeredoc |
+                          interpolatedSigilLine |
+                          interpolatedStringSigilHeredoc |
+                          interpolatedStringSigilLine |
+                          interpolatedWordsHeredoc |
+                          interpolatedWordsLine |
+                          list |
+                          literalCharListSigilHeredoc |
+                          literalCharListSigilLine |
+                          literalRegexHeredoc |
+                          literalRegexLine |
+                          literalSigilHeredoc |
+                          literalSigilLine |
+                          literalStringSigilHeredoc |
+                          literalStringSigilLine |
+                          literalWordsHeredoc |
+                          literalWordsLine |
+                          numeric |
+                          stringHeredoc
+                        )
+                        matchedExpression
+                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * At Non-Numeric Operation - non-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
+ *
+ */
+
+atPrefixOperator ::= AT_OPERATOR EOL*
+                     {
+                       implements = "org.elixir_lang.psi.Operator"
+                       methods = [
+                         operatorTokenSet
+                         quote
+                       ]
+                       name = "@"
+                     }
+matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
+                                 { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Calls
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L125
+ */
+matchedCallOperation ::= matchedExpression noParenthesesManyArgumentsStrict
+                         {
+                           implements = "org.elixir_lang.psi.Call"
+                           methods = [
+                             getArguments
+                             getIdentifier
+                             quote
+                           ]
+                         }
+
+/*
+ * Access expression
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L200-L223
+ *
+ */
+
+atNumericOperation ::= atPrefixOperator numeric
+                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+captureNumericOperation ::= capturePrefixOperator numeric
+                            { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+unaryNumericOperation ::= unaryPrefixOperator numeric
+                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
+               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+accessExpression ::= atNumericOperation |
+                     captureNumericOperation |
+                     unaryNumericOperation |
+                     emptyBlock |
+                     numeric |
+                     list |
+                     stringLine |
+                     stringHeredoc |
+                     charListLine |
+                     charListHeredoc |
+                     interpolatedCharListSigilLine |
+                     interpolatedCharListSigilHeredoc |
+                     interpolatedRegexHeredoc |
+                     interpolatedSigilHeredoc |
+                     interpolatedStringSigilHeredoc |
+                     interpolatedWordsHeredoc |
+                     interpolatedWordsLine |
+                     interpolatedRegexLine |
+                     interpolatedSigilLine |
+                     interpolatedStringSigilLine |
+                     literalCharListSigilLine |
+                     literalCharListSigilHeredoc |
+                     literalRegexHeredoc |
+                     literalSigilHeredoc |
+                     literalStringSigilHeredoc |
+                     literalWordsHeredoc |
+                     literalRegexLine |
+                     literalSigilLine |
+                     literalStringSigilLine |
+                     literalWordsLine |
+                     atomKeyword |
+                     atom |
+                     alias
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// keywords that map to atoms
+atomKeyword ::= FALSE | NIL | TRUE
+                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
+
+alias ::= ALIAS_TOKEN
+          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ *
+ *
+ * Whole Numbers
+ *
+ *
+ *
+ */
+
+decimalDigits ::= INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS
+                  { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+decimalWholeNumber ::= decimalDigits (DECIMAL_SEPARATOR? decimalDigits)*
+                        {
+                          implements = "org.elixir_lang.psi.WholeNumber"
+                          methods = [
+                            base
+                            digitsList
+                            quote
+                          ]
+                        }
+
+/*
+ *
+ * Base (Non-Decimal) Whole Numbers
+ *
+ */
+
+/*
+ * Binary (2)
+ */
+
+binaryDigits ::= INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS
+                 { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) binaryDigits+
+                     {
+                       implements = "org.elixir_lang.psi.WholeNumber"
+                       methods = [
+                         base
+                         digitsList
+                         quote
+                       ]
+                       pin = 2
+                     }
+
+/*
+ * Hexadecimal (16)
+ */
+
+hexadecimalDigits ::= INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS
+                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) hexadecimalDigits+
+                           {
+                             implements = "org.elixir_lang.psi.WholeNumber"
+                             methods = [
+                               base
+                               digitsList
+                               quote
+                             ]
+                             pin = 2
+                           }
+
+/*
+ * Octal (8)
+ */
+
+octalDigits ::= INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS
+                { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE octalDigits+
+                     {
+                       implements = "org.elixir_lang.psi.WholeNumber"
+                       methods = [
+                         base
+                         digitsList
+                         quote
+                       ]
+                       pin = 2
+                     }
+
+/*
+ * Unknown (1-36)
+ */
+
+unknownBaseDigits ::= INVALID_UNKNOWN_BASE_DIGITS
+                      { implements = "org.elixir_lang.psi.Digits" methods = [base inBase quote validElementType] }
+unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE unknownBaseDigits+
+                           {
+                             implements = "org.elixir_lang.psi.WholeNumber"
+                             methods = [
+                               base
+                               digitsList
+                               quote
+                             ]
+                             pin=2
+                           }
+
+/*
+ *
+ *
  * In alphabetical order
+ *
+ *
  */
 
 // an expression in an expressionList that is NOT preceded by endOfExpression(s)
 adjacentExpression ::= expression
+                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 atom ::= COLON (ATOM_FRAGMENT | quote)
-binaryWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (BINARY_WHOLE_NUMBER_BASE | OBSOLETE_BINARY_WHOLE_NUMBER_BASE) (INVALID_BINARY_DIGITS | VALID_BINARY_DIGITS)+ { pin=2 }
-private binaryString ::= string | stringHeredoc
-private callArgumentsNoParenthesesCommaExpression ::= matchedExpression (COMMA EOL* callArgumentsNoParenthesesExpression)+
-/* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
-   callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-private callArgumentsNoParenthesesExpression ::= emptyParentheses |
-                                                 /* Must be before matchedExpression because noParenthesesExpression is
-                                                    `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict`
-                                                    which is longer than `matchedExpressionDotIdentifier` in
-                                                    matchedExpression. */
-                                                 /* This will be marked as an error by
-                                                    {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-                                                 noParenthesesManyStrictNoParenthesesExpression |
-                                                 matchedExpression !KEYWORD_PAIR_COLON
-callArgumentsNoParenthesesKeywords ::= callArgumentsNoParenthesesKeywordsExpression (COMMA EOL* callArgumentsNoParenthesesKeywordsExpression)*
-callArgumentsNoParenthesesKeywordsExpression ::= keywordKeyColonEOL callArgumentsNoParenthesesExpression
-/* 1. (positional, keywords)
-   2. (positional, positional)
-   3. (positional, positional, keywords) */
-callArgumentsNoParenthesesMany ::= matchedExpression COMMA EOL* callArgumentsNoParenthesesKeywords |
-                                   callArgumentsNoParenthesesCommaExpression (COMMA EOL* callArgumentsNoParenthesesKeywords)?
-private callArgumentsNoParenthesesManyStrict ::= callArgumentsNoParenthesesMany |
-                                                 noParenthesesStrict
-charList ::= CHAR_LIST_PROMOTER
-             interpolatedCharListBody
-             CHAR_LIST_TERMINATOR
-charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
-                    interpolatedCharListBody
-                    CHAR_LIST_HEREDOC_TERMINATOR
+         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+private infixComma ::= COMMA EOL*
+
+charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | escapeSequence)
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 private containerExpression ::= emptyParentheses
-decimalFloat ::= decimalWholeNumber DECIMAL_MARK decimalWholeNumber (EXPONENT_MARK DUAL_OPERATOR? decimalWholeNumber)?
-decimalWholeNumber ::= {VALID_DECIMAL_DIGITS} ({DECIMAL_SEPARATOR}? (INVALID_DECIMAL_DIGITS | VALID_DECIMAL_DIGITS))*
-// decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
-decimalNumber ::= decimalFloat |
-                  decimalWholeNumber
+
+decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+decimalFloatExponent ::= decimalFloatExponentSign decimalWholeNumber
+decimalFloatExponentSign ::= DUAL_OPERATOR?
+decimalFloatFractional ::= decimalWholeNumber
+decimalFloatIntegral ::= decimalWholeNumber
+
+private escapeSequence ::= hexadecimalEscapeSequence |
+                           escapedEOL |
+                           /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                              ("\x") in hexadecimalEscapeSequence  */
+                           escapedCharacter
+hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
+                              {
+                                implements = "org.elixir_lang.psi.EscapeSequence"
+                                methods = [codePoint]
+                                pin = 2
+                              }
+enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLOSING_CURLY
+                                      { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] pin = 1 }
+openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
+                                  { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] }
+escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
+                     { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
+escapedEOL ::= ESCAPE EOL
+               { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] }
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
-// Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
-endOfExpression ::= EOL* SEMICOLON EOL* | EOL
-expression ::= emptyParentheses |
-               /* Must be before matchedExpression because noParenthesesExpression is
-                  `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer than
-                  `matchedExpressionDotIdentifier` in matchedExpression. */
-               noParenthesesExpression |
-               matchedExpression
-private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
-hexadecimalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX (HEXADECIMAL_WHOLE_NUMBER_BASE | OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE) (INVALID_HEXADECIMAL_DIGITS | VALID_HEXADECIMAL_DIGITS)+ { pin=2 }
-identifierExpression ::= IDENTIFIER
-private interpolatedCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER interpolatedCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-private interpolatedHeredocCharListSigil ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_HEREDOC_PROMOTER EOL
-                                             interpolatedCharListBody
-                                             CHAR_LIST_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                     interpolatedRegexBody
-                                     REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private interpolatedHeredocSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                     interpolatedSigilBody
-                                     SIGIL_HEREDOC_PROMOTER SIGIL_MODIFIER*
-private interpolatedHeredocStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                           interpolatedStringBody
-                                           STRING_SIGIL_HEREDOC_TERMINATOR
-private interpolatedHeredocWords ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                     interpolatedWordsBody
-                                     WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private interpolatedRegex ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER interpolatedRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-private interpolatedSigil ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpolatedSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-private interpolatedStringSigil ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER interpolatedStringBody STRING_SIGIL_TERMINATOR
-private interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-private interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | VALID_ESCAPE_SEQUENCE)*
-interpolation ::= INTERPOLATION_START expressionList? INTERPOLATION_END
-keywordKey ::= ALIAS |
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
+                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
@@ -169,210 +1568,31 @@ keywordKey ::= ALIAS |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
+               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
-keywordPair ::=  keywordKeyColonEOL keywordValue
+listKeywordPair ::=  keywordKeyColonEOL keywordValue
+                     {
+                       implements = "org.elixir_lang.psi.KeywordPair"
+                       methods = [
+                         getKeywordKey
+                         getKeywordValue
+                         quote
+                       ]
+                     }
 keywordValue ::= containerExpression
-list ::= OPENING_BRACKET EOL* (keywordPair (COMMA EOL* keywordPair)* COMMA?)? CLOSING_BRACKET
-private listString ::= charList | charListHeredoc
-private literalCharListBody ::= CHAR_LIST_FRAGMENT*
-private literalCharListSigil ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_PROMOTER literalCharListBody CHAR_LIST_SIGIL_TERMINATOR
-private literalHeredocRegex ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
-                                literalRegexBody
-                                REGEX_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
-                                literalSigilBody
-                                SIGIL_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalHeredocStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                      literalStringBody
-                                      STRING_SIGIL_HEREDOC_TERMINATOR
-private literalHeredocWords ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
-                                literalWordsBody
-                                WORDS_HEREDOC_TERMINATOR SIGIL_MODIFIER*
-private literalRegex ::= TILDE LITERAL_SIGIL_NAME REGEX_PROMOTER literalRegexBody REGEX_TERMINATOR SIGIL_MODIFIER*
-private literalRegexBody ::= REGEX_FRAGMENT*
-private literalSigil ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR SIGIL_MODIFIER*
-private literalSigilBody ::= SIGIL_FRAGMENT*
-private literalStringBody ::= STRING_FRAGMENT*
-private literalStringSigil ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER literalStringBody STRING_SIGIL_TERMINATOR
-private literalWords ::=  TILDE LITERAL_SIGIL_NAME WORDS_PROMOTER literal WORDS_TERMINATOR SIGIL_MODIFIER*
-private literalWordsBody ::= WORDS_FRAGMENT*
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COMMA?)? CLOSING_BRACKET
+         { implements = "org.elixir_lang.psi.KeywordList" methods = [getKeywordPairList quote] }
 
-/* order of choices is lower precedence first as lower precedence operation are meant to enclose higher precedence
-   operators.
-   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71 */
-matchedExpression ::= matchedExpressionNoParenthesesExpressionCaptureOperation |
-                      matchedExpressionCaptureOperation |
-                      matchedExpressionInMatchOperation |
-                      matchedExpressionWhenOperation |
-                      matchedExpressionTypeOperation |
-                      matchedExpressionPipeOperation |
-                      matchedExpressionMatchOperation |
-                      matchedExpressionOrOperation |
-                      matchedExpressionAndOperation |
-                      matchedExpressionComparisonOperation |
-                      matchedExpressionRelationalOperation |
-                      matchedExpressionArrowOperation |
-                      matchedExpressionInOperation |
-                      matchedExpressionTwoOperation |
-                      matchedExpressionAdditionOperation |
-                      matchedExpressionMultiplicationOperation |
-                      matchedExpressionHatOperation |
-                      matchedExpressionNoParenthesesExpressionUnaryOperation |
-                      matchedExpressionUnaryOperation |
-                      matchedExpressionDotAlias |
-                      matchedExpressionDotIdentifier |
-                      matchedExpressionNoParenthesesExpressionAtOperation |
-                      matchedExpressionAtOperation |
-                      identifierExpression |
-                      matchedExpressionAccessExpression
-// Specialized for matchedExpression because max_expr had to be specialized to matchedExpressionMaxExpression
-matchedExpressionAccessExpression ::= numberUnaryOperation |
-                                      OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
-                                      /* elixir_tokenizer.erl converts CHAR_TOKENs to their number representation, so `number` in
-                                         elixir_parser.yrl matches Elixir.flex's NUMBER and CHAR_TOKEN. */
-                                      CHAR_TOKEN |
-                                      number |
-                                      list |
-                                      binaryString |
-                                      listString |
-                                      sigil |
-                                      FALSE |
-                                      NIL |
-                                      TRUE |
-                                      matchedExpressionMaxExpression
+/* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
+   Elixir.flex's CHAR_TOKEN_TOKEN and all the different base number rules. */
+private numeric ::= charToken |
+                    binaryWholeNumber |
+                    // decimalFloat starts with decimalWholeNumber, so decimalFloat needs to be first
+                    decimalFloat |
+                    decimalWholeNumber |
+                    hexadecimalWholeNumber |
+                    octalWholeNumber |
+                    unknownBaseWholeNumber
 
-/* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/-
-   is interpreted as unaryOperation */
-matchedExpressionAdditionOperation ::= matchedExpression DUAL_OPERATOR EOL* matchedExpression
-matchedExpressionAndOperation ::= matchedExpression EOL* AND_OPERATOR EOL* matchedExpression
-matchedExpressionArrowOperation ::= matchedExpression EOL* ARROW_OPERATOR EOL* matchedExpression
-matchedExpressionAtOperation ::= AT_OPERATOR EOL* matchedExpression
-// noParenthesesExpression needs to be first because matchedExpression is a prefix rule of noParenthesesExpression
-matchedExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* (number | matchedExpression)
-matchedExpressionNoParenthesesExpressionCaptureOperation ::= CAPTURE_OPERATOR EOL* noParenthesesExpression
-matchedExpressionComparisonOperation ::= matchedExpression EOL* COMPARISON_OPERATOR EOL* matchedExpression
-matchedExpressionDotAlias ::= matchedExpression EOL* DOT_OPERATOR EOL* ALIAS
-matchedExpressionDotIdentifier ::= matchedExpression EOL* DOT_OPERATOR EOL* IDENTIFIER
-matchedExpressionHatOperation ::= matchedExpression EOL* HAT_OPERATOR EOL* matchedExpression
-matchedExpressionInMatchOperation ::= matchedExpression EOL* IN_MATCH_OPERATOR EOL* matchedExpression
-matchedExpressionInOperation ::= matchedExpression EOL* IN_OPERATOR EOL* matchedExpression
-matchedExpressionMatchOperation ::= matchedExpression EOL* MATCH_OPERATOR EOL* matchedExpression { rightAssociative = true }
-/* Specialized for matchedExpression to eliminate left-recursion from max_expr when dot_alias is a child instead of
-   matchedExpressionDotAlias being a direct child of matchedExpression */
-matchedExpressionMaxExpression ::= atom |
-                                   ALIAS
-matchedExpressionMultiplicationOperation ::= matchedExpression EOL* MULTIPLICATION_OPERATOR EOL* matchedExpression
-matchedExpressionNoParenthesesExpressionAtOperation ::= AT_OPERATOR EOL* noParenthesesExpression
-matchedExpressionNoParenthesesExpressionUnaryOperation ::= UNARY_OPERATOR EOL* noParenthesesExpression
-matchedExpressionOrOperation ::= matchedExpression EOL* OR_OPERATOR EOL* matchedExpression
-matchedExpressionPipeOperation ::= matchedExpression EOL* PIPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionRelationalOperation ::= matchedExpression EOL* RELATIONAL_OPERATOR EOL* matchedExpression
-matchedExpressionTwoOperation ::= matchedExpression EOL* TWO_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionTypeOperation ::= matchedExpression EOL* TYPE_OPERATOR EOL* matchedExpression { rightAssociative = true }
-matchedExpressionUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* matchedExpression
-matchedExpressionWhenOperation ::= matchedExpression EOL* WHEN_OPERATOR EOL* matchedExpression { rightAssociative = true }
-
-/* Cannot use `(matchedExpressionDotIdentifier | identifierExpression)` as matchedExpression will be used in place of
-   matchedExpressionDotIdentifier in generated parser. I'm not sure, but it may be due to matchedExpression being the
-   expression root of matchedExpressionDotIdentifier */
-/* Cannot use `(matchedExpression EOL* DOT_OPERATOR EOL*)? IDENTIFIER` because unlike in matchedExpression, this pattern
-   from matchedExpressionDotIdentifier will have the first matchedExpression parse as a matchedExpressionDotIdentifier
-   because calling into matchedExpression does not handle the precedence starting point correctly. */
-/* no EOL* before callArgumentsNoParenthesesManyStrict as first argument must be on same line so that function isn't
-   interpreted as taking no arguments. */
-noParenthesesExpression ::= noParenthesesMaybeQualifiedIdentifier callArgumentsNoParenthesesManyStrict
-/* Special class for wrapping rules so that
-   {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
-   ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid
-   rule classes. */
-noParenthesesStrict ::= emptyParentheses |
-                        OPENING_PARENTHESIS (
-                                             callArgumentsNoParenthesesKeywords |
-                                             callArgumentsNoParenthesesMany
-                                            ) CLOSING_PARENTHESIS
-/* Special class for wrapping noParenthesesExpression so that
-   {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
-   ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
-   ElixirNoParenthesesExpressions. */
-noParenthesesManyStrictNoParenthesesExpression ::= noParenthesesExpression
-noParenthesesMaybeQualifiedIdentifier ::= noParenthesesQualifier* IDENTIFIER
-noParenthesesQualifier ::= noParenthesesQualifierHead noParenthesesQualifierTail*
-noParenthesesQualifierAtOperation ::= AT_OPERATOR EOL* noParenthesesQualifierHead
-private noParenthesesQualifierHead ::= (
-                                noParenthesesQualifierAtOperation |
-                                noParenthesesQualifierNumberCaptureOperation |
-                                noParenthesesQualifierNumberUnaryOperation |
-                                noParenthesesQualifierNumberAtOperation |
-                                OPENING_PARENTHESIS EOL* SEMICOLON EOL* CLOSING_PARENTHESIS |
-                                CHAR_TOKEN |
-                                number |
-                                list |
-                                binaryString |
-                                listString |
-                                sigil |
-                                FALSE |
-                                NIL |
-                                TRUE |
-                                atom |
-                                ALIAS |
-                                IDENTIFER
-                               ) EOL* DOT_OPERATOR EOL* &(noParenthesesQualifierTail | IDENTIFIER)
-noParenthesesQualifierNumberCaptureOperation ::= CAPTURE_OPERATOR EOL* number
-noParenthesesQualifierNumberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
-noParenthesesQualifierNumberAtOperation ::= AT_OPERATOR EOL* number
-
-// The second through second-to-last part of the qualifier is anything that can be treated as an Alias or identifier
-private noParenthesesQualifierTail ::= (
-                                binaryString |
-                                listString |
-                                sigil |
-                                FALSE |
-                                NIL |
-                                TRUE |
-                                atom |
-                                ALIAS |
-                                IDENTIFIER
-                               ) EOL* DOT_OPERATOR EOL &(noParenthesesQualifierTail | IDENTIFIER)
-
-//noParenthesesOneExpression ::= dotIdentifier
-
-number ::= binaryWholeNumber |
-           decimalNumber |
-           hexadecimalWholeNumber |
-           octalWholeNumber |
-           unknownBaseWholeNumber
-/*
- * Number Operations - Used in accessExpression
- */
-
-numberUnaryOperation ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL* number
-
-octalWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX OCTAL_WHOLE_NUMBER_BASE (INVALID_OCTAL_DIGITS | VALID_OCTAL_DIGITS)+ { pin=2 }
-
-private quote ::= (charList | string)
-sigil ::= interpolatedCharListSigil |
-          interpolatedHeredocCharListSigil |
-          interpolatedHeredocRegex |
-          interpolatedHeredocSigil |
-          interpolatedHeredocStringSigil |
-          interpolatedHeredocWords |
-          interpolatedRegex |
-          interpolatedSigil |
-          interpolatedStringSigil |
-          literalCharListSigil |
-          literalHeredocRegex |
-          literalHeredocSigil |
-          literalHeredocStringSigil |
-          literalHeredocWords |
-          literalRegex |
-          literalSigil |
-          literalStringSigil |
-          literalWords
-string ::= STRING_PROMOTER
-           interpolatedStringBody
-           STRING_TERMINATOR
-stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringBody
-                  STRING_HEREDOC_TERMINATOR
-
-unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE INVALID_UNKNOWN_BASE_DIGITS+ { pin=2 }
+private quote ::= (charListLine | stringLine)

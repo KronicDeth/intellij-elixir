@@ -4,36 +4,68 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 11/22/14.
  */
 public class ListParsingTestCase extends ParsingTestCase {
+    public void testAliasColon() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testDotDotDotColon() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testAliasWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
+    }
+
+    public void testCharListColon() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCharListWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testEmptyBinary() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testEmptyMapColon() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testEmptyTupleColon() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierColon() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testIdentifierWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testKeywordKey() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordKeyEOLColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     public void testKeywordPair() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testStringColon() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testStringWhitespaceColon() {
-        doTest(true);
+        assertParsedWithError();
     }
 
     @Override

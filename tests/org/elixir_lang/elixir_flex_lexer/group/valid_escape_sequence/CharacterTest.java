@@ -23,7 +23,8 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
     public static final int MINIMUM_PRINTABLE_CHAR = 32;
     public static final int MAXIMUM_PRINTABLE_CHAR = 126;
-    public static final int PRINTABLE_CHAR_COUNT = MAXIMUM_PRINTABLE_CHAR - MINIMUM_PRINTABLE_CHAR + 1;
+    // -1 for x
+    public static final int PRINTABLE_CHAR_COUNT = MAXIMUM_PRINTABLE_CHAR - MINIMUM_PRINTABLE_CHAR + 1 - 1;
 
     /*
      * Methods
@@ -33,8 +34,11 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public static CharSequence[] dataPoints() {
         CharSequence[] charSequences = new CharSequence[PRINTABLE_CHAR_COUNT];
 
+        int i = 0;
         for (char c = MINIMUM_PRINTABLE_CHAR; c <= MAXIMUM_PRINTABLE_CHAR; c++) {
-            charSequences[c - MINIMUM_PRINTABLE_CHAR] = "\\" + c;
+            if (c != 'x') {
+                charSequences[i++] = "\\" + c;
+            }
         }
 
         return charSequences;
@@ -52,8 +56,12 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public void validCharacterCode(CharSequence charSequence) throws IOException {
         reset(charSequence);
 
-        assertEquals(ElixirTypes.VALID_ESCAPE_SEQUENCE, flexLexer.advance());
+        assertEquals(ElixirTypes.ESCAPE, flexLexer.advance());
+        assertEquals(ElixirFlexLexer.ESCAPE_SEQUENCE, flexLexer.yystate());
+
+        assertEquals(ElixirTypes.ESCAPED_CHARACTER_TOKEN, flexLexer.advance());
         assertEquals(ElixirFlexLexer.GROUP, flexLexer.yystate());
+
         assertTrue("Failure: expected all of \"" + charSequence + "\" to be consumed", flexLexer.advance() == null);
     };
 }

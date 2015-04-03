@@ -5,70 +5,56 @@ package org.elixir_lang.parser_definition;
  */
 public class GeneralParsingTestCase extends ParsingTestCase {
     public void testBlankPrefix() {
-        doTest(true);
-    }
-
-    public void testCharToken() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCommentAfterNumber() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testComments() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testCommentEOL() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEmpty() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEOLPosix() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testEOLWindows() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testMultipleNumbersOnLine() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMultipleStringsOnLine() {
-        doTest(true);
-    }
-
-    public void testNumber() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
     public void testNoEOLAtEOF() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testParentheses() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPygment() {
+        // TODO change to assertParsedAndQuotedAroundError() prior to 1.0 once parser is complete
         doTest(true);
     }
 
     public void testRealistic() {
-        doTest(true);
-    }
-
-    public void testSigilTerminatorEscape() {
-        doTest(true);
-    }
-
-    public void testValidEscapeSequences() {
+        // TODO change to assertParsedAndQuotedCorrectly() prior to 1.0 once parser is complete
         doTest(true);
     }
 

@@ -1,6 +1,0 @@
-Elixir File(0,6)
-  PsiElement(ElixirTokenType.STRING_HEREDOC_PROMOTER)('"""')(0,3)
-  PsiErrorElement:ElixirTokenType.EOL expected, got '"'(3,4)
-    PsiElement(BAD_CHARACTER)('"')(3,4)
-  PsiElement(BAD_CHARACTER)('"')(4,5)
-  PsiElement(BAD_CHARACTER)('"')(5,6)

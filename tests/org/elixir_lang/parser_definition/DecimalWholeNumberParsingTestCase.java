@@ -4,8 +4,29 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 8/3/14.
  */
 public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
-    public void testValid() {
-        doTest(true);
+    public void testInvalidAndValidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testInvalidDigits() {
+        // No QuotedAroundError because InvalidDigits is valid Alias
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnderscoreSeparated() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testTrailingUnderscore() {
+        assertParsedWithError();
+    }
+
+    public void testValidDigits() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testZeroPrefix() {
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

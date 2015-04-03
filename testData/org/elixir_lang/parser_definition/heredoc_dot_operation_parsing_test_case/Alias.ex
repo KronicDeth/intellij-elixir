@@ -1,0 +1,6 @@
+'''
+One
+'''.Alias
+"""
+One
+""".Alias

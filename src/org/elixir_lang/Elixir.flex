@@ -105,6 +105,13 @@ import org.elixir_lang.psi.ElixirTypes;
 %}
 
 /*
+ * Curly / Tuple
+ */
+
+OPENING_CURLY = "{"
+CLOSING_CURLY = "}"
+
+/*
  * Operator
  *
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
@@ -126,7 +133,7 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_HAT_OPERATOR = "^^^"
-THREE_TOKEN_MAP_OPERATOR = "%{}"
+THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
@@ -155,7 +162,7 @@ TWO_TOKEN_OR_OPERATOR = "or" |
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
-TWO_TOKEN_TUPLE_OPERATOR = "{}"
+TWO_TOKEN_TUPLE_OPERATOR = {OPENING_CURLY} {CLOSING_CURLY}
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          "--" |
@@ -283,20 +290,20 @@ EOL = \n|\r\n
 
 ESCAPE = "\\"
 
-ESCAPED_CHARACTER = {ESCAPE} .
+ESCAPED_CHARACTER_TOKEN = {ESCAPE} .
 ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
                          {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
 ESCAPED_EOL = {ESCAPE} {EOL}
 
 VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
-                        {ESCAPED_CHARACTER} |
+                        {ESCAPED_CHARACTER_TOKEN} |
                         {ESCAPED_EOL}
 
 /*
  * Char tokens
  */
 
-CHAR_TOKEN = "?" ({VALID_ESCAPE_SEQUENCE} | .)
+CHAR_TOKENIZER = "?"
 
 /*
  * White Space
@@ -365,7 +372,7 @@ ALIAS_HEAD = [A-Z]
 ALIAS = {ALIAS_HEAD} {IDENTIFIER_TAIL}
 
 /*
- * Interpolation
+ * Parent
  */
 
 INTERPOLATION_START = "#{"
@@ -505,15 +512,20 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
 %state CALL_OR_KEYWORD_PAIR_MAYBE
+%state CHAR_TOKENIZATION
 %state DECIMAL_EXPONENT
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
+%state ESCAPE_IN_LITERAL_GROUP
+%state ESCAPE_SEQUENCE
+%state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
+%state HEXADECIMAL_ESCAPE_SEQUENCE
 %state HEXADECIMAL_WHOLE_NUMBER
 %state INTERPOLATION
 %state KEYWORD_PAIR_MAYBE
@@ -536,7 +548,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ASSOCIATION_OPERATOR; }
   {ALIAS}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.ALIAS; }
+                                               return ElixirTypes.ALIAS_TOKEN; }
   {AT_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AT_OPERATOR; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
@@ -551,7 +563,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
   {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
-  {CHAR_TOKEN}                               { return ElixirTypes.CHAR_TOKEN; }
+  {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
+                                                          return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
      and ':' being leftover */
   {COLON} / {TYPE_OPERATOR}                  { pushAndBegin(ATOM_START);
@@ -698,6 +711,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {EOL}|.               { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
+<CHAR_TOKENIZATION> {
+  {ESCAPE} { yybegin(ESCAPE_SEQUENCE);
+             return ElixirTypes.ESCAPE; }
+  {EOL}|.  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+             yybegin(stackFrame.getLastLexicalState());
+             return ElixirTypes.CHAR_LIST_FRAGMENT; }
+}
+
 <DECIMAL_EXPONENT_SIGN> {
   {DUAL_OPERATOR} { yybegin(DECIMAL_EXPONENT);
                     return ElixirTypes.DUAL_OPERATOR; }
@@ -710,8 +731,20 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DECIMAL_WHOLE_NUMBER> {
-  {DECIMAL_MARK} { yybegin(DECIMAL_FRACTION);
-                   return ElixirTypes.DECIMAL_MARK; }
+  /*
+   Error handling with {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} can only occur after at least one valid decimal
+   digit after the decimal mark because {INVALID_DECIMAL_DIGITS} and {DECIMAL_SEPARATOR} will be parsed as an
+   identifier immediately after `.`
+
+   ```
+   iex> Code.string_to_quoted("1._")
+   {:ok, {{:., [line: 1], [1, :_]}, [line: 1], []}}
+   iex> Code.string_to_quoted("1.a")
+   {:ok, {{:., [line: 1], [1, :a]}, [line: 1], []}}
+   ```
+  */
+  {DECIMAL_MARK} / {VALID_DECIMAL_DIGITS} { yybegin(DECIMAL_FRACTION);
+                                            return ElixirTypes.DECIMAL_MARK; }
 }
 
 <DECIMAL_EXPONENT,
@@ -724,27 +757,54 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              handleInState(stackFrame.getLastLexicalState()); }
 }
 
+<ESCAPE_IN_LITERAL_GROUP> {
+  {EOL}|. {
+            yybegin(GROUP);
+            return fragmentType();
+          }
+}
+
+<ESCAPE_SEQUENCE> {
+  {EOL}                           { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                    yybegin(stackFrame.getLastLexicalState());
+                                    return ElixirTypes.EOL; }
+  {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
+                                    return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
+  .                               { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                    yybegin(stackFrame.getLastLexicalState());
+                                    return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
+}
+
+<EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE> {
+  {CLOSING_CURLY}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             yybegin(stackFrame.getLastLexicalState());
+                             return ElixirTypes.CLOSING_CURLY; }
+  {HEXADECIMAL_DIGIT}{1,6} { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+}
+
 <GROUP,
  GROUP_HEREDOC_LINE_BODY> {
-  {INTERPOLATION_START}   {
-                            if (isInterpolating()) {
-                             pushAndBegin(INTERPOLATION);
-                             return ElixirTypes.INTERPOLATION_START;
-                            } else {
-                             return fragmentType();
-                            }
+  {INTERPOLATION_START} {
+                          if (isInterpolating()) {
+                           pushAndBegin(INTERPOLATION);
+                           return ElixirTypes.INTERPOLATION_START;
+                          } else {
+                           return fragmentType();
                           }
-  {VALID_ESCAPE_SEQUENCE} {
-                            if (isInterpolating()) {
-                              return ElixirTypes.VALID_ESCAPE_SEQUENCE;
-                            } else {
-                              return fragmentType();
-                            }
-                          }
+                        }
 }
 
 // Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
 <GROUP> {
+  {ESCAPE}           {
+                       if (isInterpolating()) {
+                         pushAndBegin(ESCAPE_SEQUENCE);
+                         return ElixirTypes.ESCAPE;
+                       } else {
+                         yybegin(ESCAPE_IN_LITERAL_GROUP);
+                         return fragmentType();
+                       }
+                     }
   {GROUP_TERMINATOR} {
                        if (isTerminator(yytext())) {
                          if (isSigil()) {
@@ -782,9 +842,17 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
+  {ESCAPE} {
+             if (isInterpolating()) {
+               pushAndBegin(ESCAPE_SEQUENCE);
+               return ElixirTypes.ESCAPE;
+             } else {
+               return fragmentType();
+             }
+           }
   {EOL} {
           yybegin(GROUP_HEREDOC_LINE_START);
-          return fragmentType();
+          return ElixirTypes.EOL;
         }
   .     { return fragmentType(); }
 }
@@ -792,15 +860,47 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <GROUP_HEREDOC_LINE_START> {
   {WHITE_SPACE}+ / {GROUP_HEREDOC_TERMINATOR} {
                                                   yybegin(GROUP_HEREDOC_END);
-                                                  return TokenType.WHITE_SPACE;
+                                                  return ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE;
+                                              }
+  {WHITE_SPACE}+                              {
+                                                yybegin(GROUP_HEREDOC_LINE_BODY);
+                                                return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
                                               }
   {GROUP_HEREDOC_TERMINATOR}                  { handleInState(GROUP_HEREDOC_END); }
   {EOL}|.                                     { handleInState(GROUP_HEREDOC_LINE_BODY); }
 }
 
 <GROUP_HEREDOC_START> {
-  {EOL} { yybegin(GROUP_HEREDOC_LINE_START);
-          return ElixirTypes.EOL; }
+  // parse immediate terminator as a terminator and let parser handle errors for missing EOL
+  {GROUP_HEREDOC_TERMINATOR} {
+                               // Similar to GROUP_HEREDOC_END's GROUP_HEREDOC_TERMINATOR rule, but...
+                               if (isTerminator(yytext())) {
+                                 if (isSigil()) {
+                                   yybegin(SIGIL_MODIFIERS);
+                                   return terminatorType();
+                                 } else {
+                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                   yybegin(stackFrame.getLastLexicalState());
+                                   return stackFrame.terminatorType();
+                                 }
+                               } else {
+                                 /* ...returns BAD_CHARACTER instead of going to GROUP_HEREDOC_LINE_BODY when the wrong
+                                    type of terminator */
+                                 return TokenType.BAD_CHARACTER;
+                               }
+                             }
+  {EOL}                      { yybegin(GROUP_HEREDOC_LINE_START);
+                               return ElixirTypes.EOL; }
+}
+
+<HEXADECIMAL_ESCAPE_SEQUENCE> {
+  {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
+                             return ElixirTypes.OPENING_CURLY; }
+  {HEXADECIMAL_DIGIT}{1,2} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             yybegin(stackFrame.getLastLexicalState());
+                             return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <HEXADECIMAL_WHOLE_NUMBER> {

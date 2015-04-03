@@ -1,25 +1,31 @@
 package org.elixir_lang.parser_definition;
 
-import org.junit.Test;
-
 /**
  * Created by luke.imhoff on 9/17/14.
  */
 public class AtomParsingTestCase extends ParsingTestCase {
-    public void testDoubleQuoted() {
-        doTest(true);
+    public void testDoubleQuotedLiteral() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testDoubleQuotedInterpolation() {
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testLiteral() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testOperator() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
-    public void testSingleQuoted() {
-        doTest(true);
+    public void testSingleQuotedLiteral() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testSingleQuotedInterpolation() {
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

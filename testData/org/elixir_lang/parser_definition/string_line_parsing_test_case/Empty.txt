@@ -1,0 +1,7 @@
+Elixir File(0,2)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
+    ElixirStringLineImpl(STRING_LINE)(0,2)
+      PsiElement(")('"')(0,1)
+      ElixirInterpolatedStringBodyImpl(INTERPOLATED_STRING_BODY)(1,1)
+        <empty list>
+      PsiElement(STRING_TERMINATOR)('"')(1,2)

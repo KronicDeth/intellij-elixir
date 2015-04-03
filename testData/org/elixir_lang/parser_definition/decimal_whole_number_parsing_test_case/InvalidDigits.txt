@@ -1,0 +1,7 @@
+Elixir File(0,102)
+  PsiComment(COMMENT)('# all invalid decimal digits (parses as an Alias)')(0,49)
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(49,50)
+    PsiElement(EOL)('\n')(49,50)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(50,102)
+    ElixirAliasImpl(ALIAS)(50,102)
+      PsiElement(Alias)('ABCDEFGHIJKLMNOPQRSTUVQXYZabcdefghijklmnopqrstuvqxyz')(50,102)

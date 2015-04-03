@@ -1,0 +1,2 @@
+# mix of valid and invalid hexadecimal digits
+0X01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz

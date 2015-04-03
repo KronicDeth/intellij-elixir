@@ -1,16 +1,18 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import java.util.List;
-import org.jetbrains.annotations.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
-import static org.elixir_lang.psi.ElixirTypes.*;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirAtom;
+import org.elixir_lang.psi.ElixirCharListLine;
+import org.elixir_lang.psi.ElixirStringLine;
+import org.elixir_lang.psi.ElixirVisitor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirAtomImpl extends ElixirMatchedExpressionMaxExpressionImpl implements ElixirAtom {
+public class ElixirAtomImpl extends ASTWrapperPsiElement implements ElixirAtom {
 
   public ElixirAtomImpl(ASTNode node) {
     super(node);
@@ -23,8 +25,19 @@ public class ElixirAtomImpl extends ElixirMatchedExpressionMaxExpressionImpl imp
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  public ElixirCharListLine getCharListLine() {
+    return findChildByClass(ElixirCharListLine.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStringLine getStringLine() {
+    return findChildByClass(ElixirStringLine.class);
+  }
+
+  @NotNull
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

@@ -4,20 +4,36 @@ package org.elixir_lang.parser_definition;
  * Created by luke.imhoff on 8/3/14.
  */
 public class HexadecimalWholeNumberParsingTestCase extends ParsingTestCase {
+    public void testInvalidAndValidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testInvalidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testObsoleteInvalidAndValidDigits() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testObsoleteInvalidDigits() {
+        assertParsedAndQuotedAroundError();
     }
 
     public void testObsoleteNoDigits() {
-        doTest(true);
+        assertParsedAndQuotedAroundError();
     }
 
-    public void testObsoleteValid() {
-        doTest(true);
+    public void testObsoleteValidDigits() {
+        assertParsedAndQuotedAroundError();
     }
 
-    public void testValid() {
-        doTest(true);
+    public void testValidDigits() {
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

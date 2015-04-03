@@ -1,0 +1,2 @@
+# mix of valid and invalid decimal digits
+1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz

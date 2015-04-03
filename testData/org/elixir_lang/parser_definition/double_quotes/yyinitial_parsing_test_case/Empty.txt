@@ -1,4 +1,0 @@
-Elixir File(0,2)
-  ElixirStringImpl(STRING)(0,2)
-    PsiElement(ElixirTokenType.STRING_PROMOTER)('"')(0,1)
-    PsiElement(ElixirTokenType.STRING_TERMINATOR)('"')(1,2)

@@ -1,4 +1,0 @@
-  """
-  without
-  interpolation
-  """

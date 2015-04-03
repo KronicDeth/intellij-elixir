@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="intellij_elixir">
+    <dirname file="${ant.file.intellij_elixir}" property="intellij_elixir.basedir"/>
+
+    <property name="intellij_elixir.sha1" value="5a32afec9096ba4b8bb28612ba0b05f964ea392e"/>
+    <property name="intellij_elixir.output.dir" value="${intellij_elixir.basedir}/dependencies/intellij_elixir"/>
+
+    <property name="intellij_elixir.output.repo.dir" value="${intellij_elixir.output.dir}/git/KronicDeth/intellij_elixir"/>
+    <available file="${intellij_elixir.output.repo.dir}" property="intellij_elixir.output.repo.available"/>
+
+    <property name="intellij_elixir.executable" value="${intellij_elixir.output.repo.dir}/rel/intellij_elixir/bin/intellij_elixir"/>
+    <available file="${intellij_elixir.executable}" property="intellij_elixir.executable.available"/>
+
+    <target name="checkout.intellij_elixir" depends="clone.intellij_elixir">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="git">
+            <arg value="checkout"/>
+            <arg value="${intellij_elixir.sha1}"/>
+        </exec>
+    </target>
+
+    <target name="clone.intellij_elixir" unless="intellij_elixir.output.repo.available">
+        <mkdir dir="${intellij_elixir.output.dir}"/>
+        <exec dir="${intellij_elixir.output.dir}" executable="git">
+            <arg value="clone"/>
+            <arg value="https://github.com/KronicDeth/intellij_elixir.git"/>
+            <arg value="${intellij_elixir.output.repo.dir}"/>
+        </exec>
+    </target>
+
+    <target name="deps.get.intellij_elixir" depends="local.hex.intellij_elixir" unless="intellij_elixir.executable.available">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+            <arg value="deps.get"/>
+        </exec>
+    </target>
+
+    <target name="local.hex.intellij_elixir" depends="checkout.intellij_elixir">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+            <arg value="local.hex"/>
+            <arg value="--force"/>
+        </exec>
+    </target>
+
+    <target name="release.intellij_elixir" depends="deps.get.intellij_elixir" unless="intellij_elixir.executable.available">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+            <arg value="release"/>
+        </exec>
+    </target>
+
+    <target name="start.intellij_elixir" depends="release.intellij_elixir">
+        <exec executable="${intellij_elixir.executable}">
+            <arg value="start"/>
+        </exec>
+    </target>
+
+     <target name="stop.intellij_elixir" depends="release.intellij_elixir">
+        <exec executable="${intellij_elixir.executable}">
+            <arg value="stop"/>
+        </exec>
+    </target>
+</project>

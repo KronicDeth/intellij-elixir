@@ -1,8 +1,0 @@
-Elixir File(0,28)
-  PsiComment(ElixirTokenType.COMMENT)('# Struct Operator')(0,17)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(17,18)
-    PsiElement(ElixirTokenType.EOL)('\n')(17,18)
-  PsiErrorElement:<end of expression>, <expression>, ElixirTokenType.; or ElixirTokenType.EOL expected, got '%'(18,19)
-    PsiElement(ElixirTokenType.%)('%')(18,19)
-  PsiElement(ElixirTokenType.ALIAS)('AStruct')(19,26)
-  PsiElement(ElixirTokenType.TUPLE_OPERATOR)('{}')(26,28)

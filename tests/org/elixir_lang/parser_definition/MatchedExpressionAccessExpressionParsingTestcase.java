@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class MatchedExpressionAccessExpressionParsingTestcase extends ParsingTestCase {
     public void testRegularKeywords() {
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override

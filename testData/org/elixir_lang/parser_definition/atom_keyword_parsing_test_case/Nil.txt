@@ -1,0 +1,4 @@
+Elixir File(0,3)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
+    ElixirAtomKeywordImpl(ATOM_KEYWORD)(0,3)
+      PsiElement(nil)('nil')(0,3)
