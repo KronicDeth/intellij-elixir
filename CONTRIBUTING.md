@@ -15,9 +15,10 @@ intellij-elixir's parsed and quoted format matches that of native Elixir's `Code
 2. `cd ~/git/KronicDeth`
 3. `git clone git@github.com:KronicDeth/intellij_elixir.git`
 4. `cd intellij_elixir`
-5. `mix local.hex --force`
-6. `mix deps.get`
-7. `mix release`
+5. `git checkout v0.1.0`
+6. `mix local.hex --force`
+7. `mix deps.get`
+8. `mix release`
 
 ##### Starting
 
