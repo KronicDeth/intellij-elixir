@@ -54,11 +54,6 @@ public class Quoter {
         }
     }
 
-    public static void assertCodeEquals(String expectedCode, OtpErlangMap quotedMessageMap) {
-        String actualCode = code(quotedMessageMap);
-        assertEquals("code mismatch", expectedCode, actualCode);
-    }
-
     public static void assertQuotedCorrectly(PsiFile file) {
         final String text = file.getText();
 
@@ -68,9 +63,7 @@ public class Quoter {
 
             OtpErlangAtom status = (OtpErlangAtom) quotedMessage.elementAt(0);
             String statusString = status.atomValue();
-            OtpErlangMap map = (OtpErlangMap) quotedMessage.elementAt(1);
-            assertCodeEquals(text, map);
-            OtpErlangObject expectedQuoted = quoted(map);
+            OtpErlangObject expectedQuoted = quotedMessage.elementAt(1);
 
             if (statusString.equals("ok")) {
                 OtpErlangObject actualQuoted = ElixirPsiImplUtil.quote(file);
@@ -223,27 +216,44 @@ public class Quoter {
         final OtpNode otpNode = IntellijElixir.getLocalNode();
         final OtpMbox otpMbox = otpNode.createMbox();
 
-        OtpErlangObject quoteMessage = Quoter.quoteMessage(code, otpMbox.self());
-        otpMbox.send(REMOTE_NAME, IntellijElixir.REMOTE_NODE, quoteMessage);
+        // @see http://joedevivo.com/ef2015/#sec-22
+        OtpErlangAtom label = new OtpErlangAtom("$gen_call");
+        OtpErlangRef ref = otpNode.createRef();
+        OtpErlangTuple returnAddress = new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        otpMbox.self(),
+                        ref
+                }
+        );
+        OtpErlangObject request = elixirString(code);
+        OtpErlangObject message = new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        label,
+                        returnAddress,
+                        request
+                }
+        );
 
-        return (OtpErlangTuple) otpMbox.receive(TIMEOUT_IN_MILLISECONDS);
-    }
+        otpMbox.send(REMOTE_NAME, IntellijElixir.REMOTE_NODE, message);
 
-    @NotNull
-    public static OtpErlangObject quoted(@NotNull OtpErlangMap quotedMessageMap) {
-        return quotedMessageMap.get(QUOTED_KEY);
-    }
+        OtpErlangObject received = otpMbox.receive(TIMEOUT_IN_MILLISECONDS);
 
-    public static OtpErlangObject quoteMessage(final String text, final OtpErlangPid self) {
-        final OtpErlangAtom[] messageKeys = new OtpErlangAtom[]{
-                new OtpErlangAtom("quote"),
-                new OtpErlangAtom("for")
-        };
-        final OtpErlangObject[] messageValues = new OtpErlangObject[]{
-                elixirString(text),
-                self
-        };
+        if (received instanceof OtpErlangTuple) {
+            OtpErlangTuple tuple = (OtpErlangTuple) received;
 
-        return new OtpErlangMap(messageKeys, messageValues);
+            if (tuple.arity() == 2) {
+                OtpErlangObject first = tuple.elementAt(0);
+
+                if (first.equals(ref)) {
+                    return (OtpErlangTuple) tuple.elementAt(1);
+                } else {
+                    throw new NotImplementedException("Expected response's ref to match request");
+                }
+            } else {
+                throw new NotImplementedException("Expected 2 element tuple respond from $gen_call");
+            }
+        } else {
+            throw new NotImplementedException("Expected tuple response from $gen_call");
+        }
     }
 }
