@@ -24,6 +24,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertQuotedAroundError();
     }
 
+    protected void assertParsedAndQuotedAroundExit() {
+        doTest(true);
+        assertQuotedAroundExit();
+    }
+
     protected void assertParsedAndQuotedCorrectly() {
         doTest(true);
         assertQuotedCorrectly();
@@ -57,6 +62,11 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     protected void assertQuotedAroundError() {
         assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
         Quoter.assertError(myFile);
+    }
+
+    protected void assertQuotedAroundExit() {
+        assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
+        Quoter.assertExit(myFile);
     }
 
     protected void assertQuotedCorrectly() {

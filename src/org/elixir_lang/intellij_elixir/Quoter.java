@@ -2,18 +2,25 @@ package org.elixir_lang.intellij_elixir;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.psi.PsiFile;
+import com.sun.tools.javac.jvm.Gen;
 import org.apache.commons.lang.NotImplementedException;
+import org.elixir_lang.GenericServer;
 import org.elixir_lang.IntellijElixir;
+import org.elixir_lang.RPC;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * Created by luke.imhoff on 12/31/14.
@@ -52,6 +59,24 @@ public class Quoter {
         } catch (OtpErlangExit e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void assertExit(PsiFile file) {
+        final String text = file.getText();
+        Object exception = null;
+
+        try {
+            Quoter.quote(text);
+        }
+        catch (IOException ioExeption) {
+            exception = ioExeption;
+        } catch (OtpErlangDecodeException otpErlangDecodeException) {
+            exception = otpErlangDecodeException;
+        } catch (OtpErlangExit otpErlangExit) {
+            exception = otpErlangExit;
+        }
+
+        assertThat(exception, instanceOf(OtpErlangExit.class));
     }
 
     public static void assertQuotedCorrectly(PsiFile file) {
@@ -215,45 +240,16 @@ public class Quoter {
     public static OtpErlangTuple quote(@NotNull String code) throws IOException, OtpErlangExit, OtpErlangDecodeException {
         final OtpNode otpNode = IntellijElixir.getLocalNode();
         final OtpMbox otpMbox = otpNode.createMbox();
-
-        // @see http://joedevivo.com/ef2015/#sec-22
-        OtpErlangAtom label = new OtpErlangAtom("$gen_call");
-        OtpErlangRef ref = otpNode.createRef();
-        OtpErlangTuple returnAddress = new OtpErlangTuple(
-                new OtpErlangObject[]{
-                        otpMbox.self(),
-                        ref
-                }
-        );
         OtpErlangObject request = elixirString(code);
-        OtpErlangObject message = new OtpErlangTuple(
-                new OtpErlangObject[]{
-                        label,
-                        returnAddress,
-                        request
-                }
+
+        return (OtpErlangTuple) GenericServer.call(
+                otpMbox,
+                otpNode,
+                REMOTE_NAME,
+                IntellijElixir.REMOTE_NODE,
+                request,
+                TIMEOUT_IN_MILLISECONDS
         );
-
-        otpMbox.send(REMOTE_NAME, IntellijElixir.REMOTE_NODE, message);
-
-        OtpErlangObject received = otpMbox.receive(TIMEOUT_IN_MILLISECONDS);
-
-        if (received instanceof OtpErlangTuple) {
-            OtpErlangTuple tuple = (OtpErlangTuple) received;
-
-            if (tuple.arity() == 2) {
-                OtpErlangObject first = tuple.elementAt(0);
-
-                if (first.equals(ref)) {
-                    return (OtpErlangTuple) tuple.elementAt(1);
-                } else {
-                    throw new NotImplementedException("Expected response's ref to match request");
-                }
-            } else {
-                throw new NotImplementedException("Expected 2 element tuple respond from $gen_call");
-            }
-        } else {
-            throw new NotImplementedException("Expected tuple response from $gen_call");
-        }
     }
+
 }
