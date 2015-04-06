@@ -2150,9 +2150,13 @@ public class ElixirPsiImplUtil {
         codePointList = ensureCodePointList(codePointList);
 
         ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirHexadecimalEscapeSequence) child.getPsi();
-        codePointList.add(
-                hexadecimalEscapeSequence.codePoint()
-        );
+        int codePoint = hexadecimalEscapeSequence.codePoint();
+
+        if (codePoint != -1) {
+            codePointList.add(codePoint);
+        } else {
+            addChildTextCodePoints(codePointList, child);
+        }
 
         return codePointList;
     }
