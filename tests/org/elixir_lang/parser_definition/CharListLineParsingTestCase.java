@@ -8,6 +8,10 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEmptyHexadecimalEscapeSequence() {
+        assertParsedAndQuotedAroundExit();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }

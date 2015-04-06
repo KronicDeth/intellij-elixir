@@ -8,6 +8,10 @@ public class StringHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testEmptyHexadecimalEscapeSequence() {
+        assertParsedAndQuotedAroundExit();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
