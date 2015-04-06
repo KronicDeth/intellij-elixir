@@ -2,7 +2,7 @@
 <project name="intellij_elixir">
     <dirname file="${ant.file.intellij_elixir}" property="intellij_elixir.basedir"/>
 
-    <property name="intellij_elixir.sha1" value="v0.1.0"/>
+    <property name="intellij_elixir.sha1" value="v0.1.1"/>
     <property name="intellij_elixir.output.dir" value="${intellij_elixir.basedir}/dependencies/intellij_elixir"/>
 
     <property name="intellij_elixir.output.repo.dir" value="${intellij_elixir.output.dir}/git/KronicDeth/intellij_elixir"/>
