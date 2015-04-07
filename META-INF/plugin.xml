@@ -9,6 +9,18 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>Next Release</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <code>\x</code> is marked an error in CharLists, CharList Heredocs, Strings, and String Heredocs, but not
+              in any sigils.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.2.1</h1>
       <ul>
         <li>
