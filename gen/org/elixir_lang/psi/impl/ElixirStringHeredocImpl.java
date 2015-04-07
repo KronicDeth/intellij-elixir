@@ -33,8 +33,8 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
-  public List<ElixirInterpolatedStringHeredocLine> getInterpolatedStringHeredocLineList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolatedStringHeredocLine.class);
+  public List<ElixirStringHeredocLine> getStringHeredocLineList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStringHeredocLine.class);
   }
 
   @NotNull

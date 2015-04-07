@@ -5,7 +5,7 @@ package org.elixir_lang.parser_definition;
  */
 public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCase {
     public void testFunctionEOLPositional() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testOneKeyword() {
@@ -77,7 +77,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testKeywordValueEOLComma() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testKeywordValueList() {
@@ -165,7 +165,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalEOLComma() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testPositionalHatOperation() {
@@ -253,7 +253,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testPositionalsEOLComma() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testPositionalSigil() {

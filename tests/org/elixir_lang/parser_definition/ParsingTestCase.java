@@ -24,14 +24,32 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         assertQuotedAroundError();
     }
 
+    protected void assertParsedAndQuotedAroundExit() {
+        doTest(true);
+        assertQuotedAroundExit();
+    }
+
     protected void assertParsedAndQuotedCorrectly() {
         doTest(true);
+        assertWithoutLocalError();
         assertQuotedCorrectly();
     }
 
-    protected void assertParsedWithError() {
+    protected void assertParsedWithLocalErrorAndRemoteExit() {
         doTest(true);
 
+        assertWithLocalError();
+        Quoter.assertExit(myFile);
+    }
+
+    protected void assertParsedWithErrors() {
+        doTest(true);
+
+        assertWithLocalError();
+        Quoter.assertError(myFile);
+    }
+
+    protected void assertWithLocalError() {
         final FileViewProvider fileViewProvider = myFile.getViewProvider();
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
@@ -50,8 +68,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         );
 
         assertTrue("No PsiErrorElements found in parsed file PSI", !errorElementList.isEmpty());
-
-        Quoter.assertError(myFile);
     }
 
     protected void assertQuotedAroundError() {
@@ -59,8 +75,34 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Quoter.assertError(myFile);
     }
 
+    protected void assertQuotedAroundExit() {
+        assertInstanceOf(ElixirPsiImplUtil.quote(myFile), OtpErlangObject.class);
+        Quoter.assertExit(myFile);
+    }
+
     protected void assertQuotedCorrectly() {
         Quoter.assertQuotedCorrectly(myFile);
+    }
+
+    protected void assertWithoutLocalError() {
+        final FileViewProvider fileViewProvider = myFile.getViewProvider();
+        PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
+        final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
+
+        root.accept(
+                new PsiRecursiveElementWalkingVisitor() {
+                    @Override
+                    public void visitElement(PsiElement element) {
+                        if (element instanceof PsiErrorElement) {
+                            errorElementList.add(element);
+                        }
+
+                        super.visitElement(element);
+                    }
+                }
+        );
+
+        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
 
     @Override

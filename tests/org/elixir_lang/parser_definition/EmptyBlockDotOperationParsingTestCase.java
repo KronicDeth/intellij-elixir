@@ -39,11 +39,11 @@ public class EmptyBlockDotOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testList() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testSigil() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testAtomKeyword() {
@@ -51,7 +51,7 @@ public class EmptyBlockDotOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testAtom() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testAlias() {
@@ -63,31 +63,31 @@ public class EmptyBlockDotOperationParsingTestCase extends ParsingTestCase {
      */
 
     public void testCharToken() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testHexadecimalWholeNumber() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testOctalWholeNumber() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testDecimalFloat() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testStringLine() {
@@ -95,7 +95,7 @@ public class EmptyBlockDotOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStringHeredoc() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testCharListLine() {
@@ -103,7 +103,7 @@ public class EmptyBlockDotOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testCharListHeredoc() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     @Override

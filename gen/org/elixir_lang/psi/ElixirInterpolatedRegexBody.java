@@ -14,9 +14,12 @@ public interface ElixirInterpolatedRegexBody extends Body {
   List<ElixirEscapedEOL> getEscapedEOLList();
 
   @NotNull
-  List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList();
+  List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList();
 
   @NotNull
   List<ElixirInterpolation> getInterpolationList();
+
+  @NotNull
+  List<ElixirSigilHexadecimalEscapeSequence> getSigilHexadecimalEscapeSequenceList();
 
 }

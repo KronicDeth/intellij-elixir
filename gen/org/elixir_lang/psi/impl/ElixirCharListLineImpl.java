@@ -8,7 +8,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirCharListLine;
-import org.elixir_lang.psi.ElixirInterpolatedCharListBody;
+import org.elixir_lang.psi.ElixirQuoteCharListBody;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,8 +27,8 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
 
   @Override
   @NotNull
-  public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
-    return findNotNullChildByClass(ElixirInterpolatedCharListBody.class);
+  public ElixirQuoteCharListBody getQuoteCharListBody() {
+    return findNotNullChildByClass(ElixirQuoteCharListBody.class);
   }
 
   @NotNull

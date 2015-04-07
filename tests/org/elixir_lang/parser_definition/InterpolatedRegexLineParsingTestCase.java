@@ -20,6 +20,10 @@ public class InterpolatedRegexLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEmptyHexadecimalEscapeSequence() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }

@@ -4,21 +4,18 @@ package org.elixir_lang.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirEnclosedHexadecimalEscapeSequence;
-import org.elixir_lang.psi.ElixirHexadecimalEscapeSequence;
-import org.elixir_lang.psi.ElixirOpenHexadecimalEscapeSequence;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement implements ElixirHexadecimalEscapeSequence {
+public class ElixirQuoteHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement implements ElixirQuoteHexadecimalEscapeSequence {
 
-  public ElixirHexadecimalEscapeSequenceImpl(ASTNode node) {
+  public ElixirQuoteHexadecimalEscapeSequenceImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHexadecimalEscapeSequence(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitQuoteHexadecimalEscapeSequence(this);
     else super.accept(visitor);
   }
 
@@ -26,6 +23,12 @@ public class ElixirHexadecimalEscapeSequenceImpl extends ASTWrapperPsiElement im
   @Nullable
   public ElixirEnclosedHexadecimalEscapeSequence getEnclosedHexadecimalEscapeSequence() {
     return findChildByClass(ElixirEnclosedHexadecimalEscapeSequence.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirHexadecimalEscapePrefix getHexadecimalEscapePrefix() {
+    return findNotNullChildByClass(ElixirHexadecimalEscapePrefix.class);
   }
 
   @Override

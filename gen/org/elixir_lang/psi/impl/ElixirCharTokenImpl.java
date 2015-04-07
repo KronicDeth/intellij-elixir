@@ -34,8 +34,8 @@ public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirC
 
   @Override
   @Nullable
-  public ElixirHexadecimalEscapeSequence getHexadecimalEscapeSequence() {
-    return findChildByClass(ElixirHexadecimalEscapeSequence.class);
+  public ElixirQuoteHexadecimalEscapeSequence getQuoteHexadecimalEscapeSequence() {
+    return findChildByClass(ElixirQuoteHexadecimalEscapeSequence.class);
   }
 
   @NotNull

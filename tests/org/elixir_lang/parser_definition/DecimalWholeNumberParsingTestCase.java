@@ -18,7 +18,7 @@ public class DecimalWholeNumberParsingTestCase extends ParsingTestCase {
     }
 
     public void testTrailingUnderscore() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testValidDigits() {
