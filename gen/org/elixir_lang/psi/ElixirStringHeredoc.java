@@ -16,7 +16,7 @@ public interface ElixirStringHeredoc extends Heredoc, InterpolatedString {
   ElixirHeredocPrefix getHeredocPrefix();
 
   @NotNull
-  List<ElixirInterpolatedStringHeredocLine> getInterpolatedStringHeredocLineList();
+  List<ElixirStringHeredocLine> getStringHeredocLineList();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);

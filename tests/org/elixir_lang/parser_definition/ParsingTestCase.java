@@ -31,13 +31,25 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected void assertParsedAndQuotedCorrectly() {
         doTest(true);
-        assertWithoutError();
+        assertWithoutLocalError();
         assertQuotedCorrectly();
     }
 
-    protected void assertParsedWithError() {
+    protected void assertParsedWithLocalErrorAndRemoteExit() {
         doTest(true);
 
+        assertWithLocalError();
+        Quoter.assertExit(myFile);
+    }
+
+    protected void assertParsedWithErrors() {
+        doTest(true);
+
+        assertWithLocalError();
+        Quoter.assertError(myFile);
+    }
+
+    protected void assertWithLocalError() {
         final FileViewProvider fileViewProvider = myFile.getViewProvider();
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
@@ -56,8 +68,6 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         );
 
         assertTrue("No PsiErrorElements found in parsed file PSI", !errorElementList.isEmpty());
-
-        Quoter.assertError(myFile);
     }
 
     protected void assertQuotedAroundError() {
@@ -74,7 +84,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         Quoter.assertQuotedCorrectly(myFile);
     }
 
-    protected void assertWithoutError() {
+    protected void assertWithoutLocalError() {
         final FileViewProvider fileViewProvider = myFile.getViewProvider();
         PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
         final List<PsiElement> errorElementList = new LinkedList<PsiElement>();

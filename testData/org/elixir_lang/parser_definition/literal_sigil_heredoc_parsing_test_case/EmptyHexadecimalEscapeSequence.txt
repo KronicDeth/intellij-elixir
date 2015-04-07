@@ -9,12 +9,9 @@ Elixir File(0,16)
         ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(6,8)
           PsiElement(HEREDOC_LINE_WHITE_SPACE_TOKEN)('  ')(6,8)
         ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(8,10)
-          ElixirHexadecimalEscapeSequenceImpl(HEXADECIMAL_ESCAPE_SEQUENCE)(8,10)
+          ElixirHexadecimalEscapePrefixImpl(HEXADECIMAL_ESCAPE_PREFIX)(8,10)
             PsiElement(ESCAPE)('\')(8,9)
             PsiElement(x)('x')(9,10)
-            PsiErrorElement:OPENING_CURLY or VALID_HEXADECIMAL_DIGITS expected, got '
-'(10,10)
-              <empty list>
         PsiElement(EOL)('\n')(10,11)
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(11,13)
         PsiElement(HEREDOC_PREFIX_WHITE_SPACE)('  ')(11,13)

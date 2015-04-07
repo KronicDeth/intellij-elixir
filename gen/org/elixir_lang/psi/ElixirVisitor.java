@@ -67,8 +67,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitCharListHeredoc(@NotNull ElixirCharListHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedCharList(o);
-    // visitInterpolatedCharListHeredocLined(o);
     // visitQuote(o);
+  }
+
+  public void visitCharListHeredocLine(@NotNull ElixirCharListHeredocLine o) {
+    visitHeredocLine(o);
   }
 
   public void visitCharListLine(@NotNull ElixirCharListLine o) {
@@ -157,8 +160,8 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitDigits(o);
   }
 
-  public void visitHexadecimalEscapeSequence(@NotNull ElixirHexadecimalEscapeSequence o) {
-    visitEscapeSequence(o);
+  public void visitHexadecimalEscapePrefix(@NotNull ElixirHexadecimalEscapePrefix o) {
+    visitPsiElement(o);
   }
 
   public void visitHexadecimalWholeNumber(@NotNull ElixirHexadecimalWholeNumber o) {
@@ -552,8 +555,24 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitQuoteCharListBody(@NotNull ElixirQuoteCharListBody o) {
+    visitBody(o);
+  }
+
+  public void visitQuoteHexadecimalEscapeSequence(@NotNull ElixirQuoteHexadecimalEscapeSequence o) {
+    visitEscapeSequence(o);
+  }
+
+  public void visitQuoteStringBody(@NotNull ElixirQuoteStringBody o) {
+    visitBody(o);
+  }
+
   public void visitRelationalInfixOperator(@NotNull ElixirRelationalInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitSigilHexadecimalEscapeSequence(@NotNull ElixirSigilHexadecimalEscapeSequence o) {
+    visitEscapeSequence(o);
   }
 
   public void visitSigilModifiers(@NotNull ElixirSigilModifiers o) {
@@ -563,6 +582,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedString(o);
+  }
+
+  public void visitStringHeredocLine(@NotNull ElixirStringHeredocLine o) {
+    visitHeredocLine(o);
   }
 
   public void visitStringLine(@NotNull ElixirStringLine o) {

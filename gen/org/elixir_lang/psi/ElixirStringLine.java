@@ -12,7 +12,7 @@ import java.util.List;
 public interface ElixirStringLine extends Atomable, InterpolatedString, Quotable {
 
   @NotNull
-  ElixirInterpolatedStringBody getInterpolatedStringBody();
+  ElixirQuoteStringBody getQuoteStringBody();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);

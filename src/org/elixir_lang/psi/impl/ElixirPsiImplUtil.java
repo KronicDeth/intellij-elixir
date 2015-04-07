@@ -218,19 +218,30 @@ public class ElixirPsiImplUtil {
     }
 
     // @return -1 if codePoint cannot be parsed.
-    public static int codePoint(@NotNull ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence) {
-        EscapedHexadecimalDigits escapedHexadecimalDigits = hexadecimalEscapeSequence.getEnclosedHexadecimalEscapeSequence();
-        int parsedCodePoint = -1;
+    public static int codePoint(@NotNull ElixirQuoteHexadecimalEscapeSequence quoteHexadecimalEscapeSequence) {
+        EscapeSequence escapeSequence = quoteHexadecimalEscapeSequence.getEnclosedHexadecimalEscapeSequence();
 
-        if (escapedHexadecimalDigits == null) {
-            escapedHexadecimalDigits = hexadecimalEscapeSequence.getOpenHexadecimalEscapeSequence();
+        if (escapeSequence == null) {
+            escapeSequence = quoteHexadecimalEscapeSequence.getOpenHexadecimalEscapeSequence();
         }
 
-        if (escapedHexadecimalDigits != null) {
-            parsedCodePoint = escapedHexadecimalDigits.codePoint();
+        int parsedCodePoint = -1;
+
+        if (escapeSequence != null) {
+            parsedCodePoint = escapeSequence.codePoint();
         }
 
         return parsedCodePoint;
+    }
+
+    public static int codePoint(@NotNull ElixirSigilHexadecimalEscapeSequence sigilHexadecimalEscapeSequence) {
+        EscapeSequence escapeSequence = sigilHexadecimalEscapeSequence.getEnclosedHexadecimalEscapeSequence();
+
+        if (escapeSequence == null) {
+            escapeSequence = sigilHexadecimalEscapeSequence.getOpenHexadecimalEscapeSequence();
+        }
+
+        return escapeSequence.codePoint();
     }
 
     /*
@@ -661,9 +672,9 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirCharListLine charListLine) {
-        ElixirInterpolatedCharListBody interpolatedCharListBody = charListLine.getInterpolatedCharListBody();
+        ElixirQuoteCharListBody quoteCharListBody = charListLine.getQuoteCharListBody();
 
-        return quotedChildNodes(charListLine, childNodes(interpolatedCharListBody));
+        return quotedChildNodes(charListLine, childNodes(quoteCharListBody));
     }
 
     @Contract(pure = true)
@@ -739,6 +750,10 @@ public class ElixirPsiImplUtil {
         }
 
         return arguments;
+    }
+
+    public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
+        return charListHeredocLine.getQuoteCharListBody();
     }
 
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
@@ -821,6 +836,10 @@ public class ElixirPsiImplUtil {
         return literalWordsLine.getLiteralWordsBody();
     }
 
+    public static Body getBody(ElixirStringHeredocLine stringHeredocLine) {
+        return stringHeredocLine.getQuoteStringBody();
+    }
+
     public static IElementType getFragmentType(@SuppressWarnings("unused") CharListFragmented charListFragmented) {
         return ElixirTypes.CHAR_LIST_FRAGMENT;
     }
@@ -862,6 +881,18 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
+
+    public static List<HeredocLine> getHeredocLineList(ElixirCharListHeredoc charListHeredoc) {
+        List<ElixirCharListHeredocLine> charListHeredocLines = charListHeredoc.getCharListHeredocLineList();
+        List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(charListHeredocLines.size());
+
+        for (HeredocLine heredocLine : charListHeredocLines) {
+            heredocLineList.add(heredocLine);
+        }
+
+        return heredocLineList;
+    }
+
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedRegexHeredoc interpolatedRegexHeredoc) {
         List<ElixirInterpolatedRegexHeredocLine> interpolatedRegexHeredocLines = interpolatedRegexHeredoc.getInterpolatedRegexHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedRegexHeredocLines.size());
@@ -951,7 +982,7 @@ public class ElixirPsiImplUtil {
     }
  
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
-        List<ElixirInterpolatedStringHeredocLine> stringHeredocLineList = stringHeredoc.getInterpolatedStringHeredocLineList();
+        List<ElixirStringHeredocLine> stringHeredocLineList = stringHeredoc.getStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
 
         for (HeredocLine heredocLine : stringHeredocLineList) {
@@ -1243,8 +1274,8 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStringLine stringLine) {
-        ElixirInterpolatedStringBody interpolatedStringBody = stringLine.getInterpolatedStringBody();
-        return quotedChildNodes(stringLine, childNodes(interpolatedStringBody));
+        ElixirQuoteStringBody quoteStringBody = stringLine.getQuoteStringBody();
+        return quotedChildNodes(stringLine, childNodes(quoteStringBody));
     }
 
     @Contract(pure = true)
@@ -2149,14 +2180,9 @@ public class ElixirPsiImplUtil {
     public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Quote parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
         codePointList = ensureCodePointList(codePointList);
 
-        ElixirHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirHexadecimalEscapeSequence) child.getPsi();
-        int codePoint = hexadecimalEscapeSequence.codePoint();
+        ElixirQuoteHexadecimalEscapeSequence hexadecimalEscapeSequence = (ElixirQuoteHexadecimalEscapeSequence) child.getPsi();
 
-        if (codePoint != -1) {
-            codePointList.add(codePoint);
-        } else {
-            addChildTextCodePoints(codePointList, child);
-        }
+        codePointList.add(hexadecimalEscapeSequence.codePoint());
 
         return codePointList;
     }
@@ -2208,8 +2234,8 @@ public class ElixirPsiImplUtil {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_EOL) {
                     continue;
-                } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_SEQUENCE) {
-                    codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
+                } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
+                    codePointList = addChildTextCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
                     if (codePointList != null) {
                         quotedParentList.add(elixirString(codePointList));
@@ -2218,6 +2244,9 @@ public class ElixirPsiImplUtil {
 
                     ElixirInterpolation childElement = (ElixirInterpolation) child.getPsi();
                     quotedParentList.add(childElement.quote());
+                } else if (elementType == ElixirTypes.QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE ||
+                           elementType == ElixirTypes.SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
+                    codePointList = parent.addHexadecimalEscapeSequenceCodePoints(codePointList, child);
                 } else {
                     throw new NotImplementedException("Can't quote " + child);
                 }

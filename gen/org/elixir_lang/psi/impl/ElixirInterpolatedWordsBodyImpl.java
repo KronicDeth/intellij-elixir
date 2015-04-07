@@ -35,14 +35,20 @@ public class ElixirInterpolatedWordsBodyImpl extends ASTWrapperPsiElement implem
 
   @Override
   @NotNull
-  public List<ElixirHexadecimalEscapeSequence> getHexadecimalEscapeSequenceList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapeSequence.class);
+  public List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapePrefix.class);
   }
 
   @Override
   @NotNull
   public List<ElixirInterpolation> getInterpolationList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirInterpolation.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirSigilHexadecimalEscapeSequence> getSigilHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigilHexadecimalEscapeSequence.class);
   }
 
 }

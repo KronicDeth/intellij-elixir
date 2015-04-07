@@ -23,6 +23,7 @@ public interface ElixirTypes {
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
+  IElementType CHAR_LIST_HEREDOC_LINE = new ElixirElementType("CHAR_LIST_HEREDOC_LINE");
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
   IElementType COMPARISON_INFIX_OPERATOR = new ElixirElementType("COMPARISON_INFIX_OPERATOR");
@@ -44,7 +45,7 @@ public interface ElixirTypes {
   IElementType HEREDOC_LINE_PREFIX = new ElixirElementType("HEREDOC_LINE_PREFIX");
   IElementType HEREDOC_PREFIX = new ElixirElementType("HEREDOC_PREFIX");
   IElementType HEXADECIMAL_DIGITS = new ElixirElementType("HEXADECIMAL_DIGITS");
-  IElementType HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("HEXADECIMAL_ESCAPE_SEQUENCE");
+  IElementType HEXADECIMAL_ESCAPE_PREFIX = new ElixirElementType("HEXADECIMAL_ESCAPE_PREFIX");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
   IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
   IElementType INTERPOLATED_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_CHAR_LIST_HEREDOC_LINE");
@@ -132,9 +133,14 @@ public interface ElixirTypes {
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
+  IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
+  IElementType QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE");
+  IElementType QUOTE_STRING_BODY = new ElixirElementType("QUOTE_STRING_BODY");
   IElementType RELATIONAL_INFIX_OPERATOR = new ElixirElementType("RELATIONAL_INFIX_OPERATOR");
+  IElementType SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
+  IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
@@ -311,6 +317,9 @@ public interface ElixirTypes {
       else if (type == CHAR_LIST_HEREDOC) {
         return new ElixirCharListHeredocImpl(node);
       }
+      else if (type == CHAR_LIST_HEREDOC_LINE) {
+        return new ElixirCharListHeredocLineImpl(node);
+      }
       else if (type == CHAR_LIST_LINE) {
         return new ElixirCharListLineImpl(node);
       }
@@ -374,8 +383,8 @@ public interface ElixirTypes {
       else if (type == HEXADECIMAL_DIGITS) {
         return new ElixirHexadecimalDigitsImpl(node);
       }
-      else if (type == HEXADECIMAL_ESCAPE_SEQUENCE) {
-        return new ElixirHexadecimalEscapeSequenceImpl(node);
+      else if (type == HEXADECIMAL_ESCAPE_PREFIX) {
+        return new ElixirHexadecimalEscapePrefixImpl(node);
       }
       else if (type == HEXADECIMAL_WHOLE_NUMBER) {
         return new ElixirHexadecimalWholeNumberImpl(node);
@@ -638,14 +647,29 @@ public interface ElixirTypes {
       else if (type == PIPE_INFIX_OPERATOR) {
         return new ElixirPipeInfixOperatorImpl(node);
       }
+      else if (type == QUOTE_CHAR_LIST_BODY) {
+        return new ElixirQuoteCharListBodyImpl(node);
+      }
+      else if (type == QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE) {
+        return new ElixirQuoteHexadecimalEscapeSequenceImpl(node);
+      }
+      else if (type == QUOTE_STRING_BODY) {
+        return new ElixirQuoteStringBodyImpl(node);
+      }
       else if (type == RELATIONAL_INFIX_OPERATOR) {
         return new ElixirRelationalInfixOperatorImpl(node);
+      }
+      else if (type == SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE) {
+        return new ElixirSigilHexadecimalEscapeSequenceImpl(node);
       }
       else if (type == SIGIL_MODIFIERS) {
         return new ElixirSigilModifiersImpl(node);
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);
+      }
+      else if (type == STRING_HEREDOC_LINE) {
+        return new ElixirStringHeredocLineImpl(node);
       }
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);

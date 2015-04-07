@@ -39,15 +39,15 @@ public class NumericDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testEmptyBlock() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testList() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testSigil() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testAtomKeyword() {
@@ -55,7 +55,7 @@ public class NumericDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testAtom() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testAlias() {
@@ -67,7 +67,7 @@ public class NumericDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testStringHeredoc() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testCharListLine() {
@@ -75,7 +75,7 @@ public class NumericDotOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testCharListHeredoc() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     @Override

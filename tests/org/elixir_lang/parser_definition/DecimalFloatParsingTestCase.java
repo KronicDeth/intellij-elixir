@@ -37,11 +37,11 @@ public class DecimalFloatParsingTestCase extends ParsingTestCase {
     }
 
     public void testLeadingDecimalMark() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     public void testTrailingDecimalMark() {
-        assertParsedWithError();
+        assertParsedWithErrors();
     }
 
     @Override

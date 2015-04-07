@@ -7,7 +7,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
-import org.elixir_lang.psi.ElixirInterpolatedStringBody;
+import org.elixir_lang.psi.ElixirQuoteStringBody;
 import org.elixir_lang.psi.ElixirStringLine;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +27,8 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
 
   @Override
   @NotNull
-  public ElixirInterpolatedStringBody getInterpolatedStringBody() {
-    return findNotNullChildByClass(ElixirInterpolatedStringBody.class);
+  public ElixirQuoteStringBody getQuoteStringBody() {
+    return findNotNullChildByClass(ElixirQuoteStringBody.class);
   }
 
   @NotNull

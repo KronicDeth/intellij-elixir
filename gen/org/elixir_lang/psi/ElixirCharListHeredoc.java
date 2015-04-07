@@ -10,13 +10,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirCharListHeredoc extends Heredoc, InterpolatedCharList, InterpolatedCharListHeredocLined, Quote {
+public interface ElixirCharListHeredoc extends Heredoc, InterpolatedCharList, Quote {
+
+  @NotNull
+  List<ElixirCharListHeredocLine> getCharListHeredocLineList();
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
-
-  @NotNull
-  List<ElixirInterpolatedCharListHeredocLine> getInterpolatedCharListHeredocLineList();
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);

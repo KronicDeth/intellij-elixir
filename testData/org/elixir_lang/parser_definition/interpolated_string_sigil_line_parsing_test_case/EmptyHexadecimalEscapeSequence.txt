@@ -5,11 +5,9 @@ Elixir File(0,6)
       PsiElement(INTERPOLATING_STRING_SIGIL_NAME)('s')(1,2)
       PsiElement(STRING_SIGIL_PROMOTER)(''')(2,3)
       ElixirInterpolatedStringBodyImpl(INTERPOLATED_STRING_BODY)(3,5)
-        ElixirHexadecimalEscapeSequenceImpl(HEXADECIMAL_ESCAPE_SEQUENCE)(3,5)
+        ElixirHexadecimalEscapePrefixImpl(HEXADECIMAL_ESCAPE_PREFIX)(3,5)
           PsiElement(ESCAPE)('\')(3,4)
           PsiElement(x)('x')(4,5)
-          PsiErrorElement:OPENING_CURLY or VALID_HEXADECIMAL_DIGITS expected, got '''(5,5)
-            <empty list>
       PsiElement(STRING_SIGIL_TERMINATOR)(''')(5,6)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(6,6)
         <empty list>

@@ -212,13 +212,12 @@ heredocPrefix ::= HEREDOC_PREFIX_WHITE_SPACE?
  */
 
 charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
-                    interpolatedCharListHeredocLine*
+                    charListHeredocLine*
                     heredocPrefix CHAR_LIST_HEREDOC_TERMINATOR
                     {
                       implements = [
                         "org.elixir_lang.psi.Heredoc"
                         "org.elixir_lang.psi.InterpolatedCharList"
-                        "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
                         "org.elixir_lang.psi.Quote"
                       ]
                       methods = [
@@ -234,23 +233,23 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                       ]
                       pin = 1
                     }
-interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
-                                    {
-                                      implements = [
-                                        "org.elixir_lang.psi.HeredocLine"
-                                      ]
-                                      methods = [
-                                        getBody
-                                        quote
-                                      ]
-                                    }
+charListHeredocLine ::= heredocLinePrefix quoteCharListBody EOL
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.HeredocLine"
+                          ]
+                          methods = [
+                            getBody
+                            quote
+                          ]
+                        }
 
 /*
  * String Heredoc
  */
 
 stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
-                  interpolatedStringHeredocLine*
+                  stringHeredocLine*
                   heredocPrefix STRING_HEREDOC_TERMINATOR
                   {
                     implements = [
@@ -270,16 +269,16 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                     ]
                     pin = 1
                   }
-interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
-                                  {
-                                    implements = [
-                                      "org.elixir_lang.psi.HeredocLine"
-                                    ]
-                                    methods = [
-                                      getBody
-                                      quote
-                                    ]
-                                  }
+stringHeredocLine ::= heredocLinePrefix quoteStringBody EOL
+                      {
+                        implements = [
+                          "org.elixir_lang.psi.HeredocLine"
+                        ]
+                        methods = [
+                          getBody
+                          quote
+                        ]
+                      }
 
 /*
  *
@@ -312,6 +311,18 @@ interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CH
                                        ]
                                        pin = 3
                                      }
+interpolatedCharListHeredocLine ::= heredocLinePrefix interpolatedCharListBody EOL
+                                    {
+                                      implements = [
+                                        "org.elixir_lang.psi.HeredocLine"
+                                      ]
+                                      methods = [
+                                        getBody
+                                        quote
+                                      ]
+                                    }
+interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
+                             { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
                              interpolatedRegexHeredocLine*
@@ -345,7 +356,7 @@ interpolatedRegexHeredocLine ::= heredocLinePrefix interpolatedRegexBody EOL
                                      quote
                                    ]
                                  }
-interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | escapeSequence)*
+interpolatedRegexBody ::= (interpolation | REGEX_FRAGMENT | sigilEscapeSequence)*
                           { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
@@ -380,32 +391,44 @@ interpolatedSigilHeredocLine ::= heredocLinePrefix interpolatedSigilBody EOL
                                      quote
                                    ]
                                  }
-interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | escapeSequence)*
+interpolatedSigilBody ::= (interpolation | SIGIL_FRAGMENT | sigilEscapeSequence)*
                           { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
-                                     interpolatedStringHeredocLine*
-                                     heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
-                                     {
-                                       implements = [
-                                         "org.elixir_lang.psi.StringFragmented"
-                                         "org.elixir_lang.psi.InterpolatedStringHeredocLined"
-                                         "org.elixir_lang.psi.SigilHeredoc"
-                                       ]
-                                       methods = [
-                                         addEscapedCharacterCodePoints
-                                         addFragmentCodePoints
-                                         addHexadecimalEscapeSequenceCodePoints
-                                         getFragmentType
-                                         getHeredocLineList
-                                         quote
-                                         quoteBinary
-                                         quoteEmpty
-                                         quoteLiteral
-                                         sigilName
-                                       ]
-                                       pin = 3
-                                     }
+                                   interpolatedStringHeredocLine*
+                                   heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
+                                   {
+                                     implements = [
+                                       "org.elixir_lang.psi.StringFragmented"
+                                       "org.elixir_lang.psi.InterpolatedStringHeredocLined"
+                                       "org.elixir_lang.psi.SigilHeredoc"
+                                     ]
+                                     methods = [
+                                       addEscapedCharacterCodePoints
+                                       addFragmentCodePoints
+                                       addHexadecimalEscapeSequenceCodePoints
+                                       getFragmentType
+                                       getHeredocLineList
+                                       quote
+                                       quoteBinary
+                                       quoteEmpty
+                                       quoteLiteral
+                                       sigilName
+                                     ]
+                                     pin = 3
+                                   }
+interpolatedStringHeredocLine ::= heredocLinePrefix interpolatedStringBody EOL
+                                  {
+                                    implements = [
+                                      "org.elixir_lang.psi.HeredocLine"
+                                    ]
+                                    methods = [
+                                      getBody
+                                      quote
+                                    ]
+                                  }
+interpolatedStringBody ::= (interpolation | STRING_FRAGMENT | sigilEscapeSequence)*
+                           { implements = "org.elixir_lang.psi.Body" }
 
 interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                              interpolatedWordsHeredocLine*
@@ -439,7 +462,7 @@ interpolatedWordsHeredocLine ::= heredocLinePrefix interpolatedWordsBody EOL
                                      quote
                                    ]
                                  }
-interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | escapeSequence)*
+interpolatedWordsBody ::= (interpolation | WORDS_FRAGMENT | sigilEscapeSequence)*
                           { implements = "org.elixir_lang.psi.Body" }
 
 /*
@@ -636,9 +659,9 @@ literalWordsBody ::= WORDS_FRAGMENT*
  */
 
 
-interpolatedCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | escapeSequence)*
-                             { implements =  "org.elixir_lang.psi.Body" }
-charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATOR
+quoteCharListBody ::= (interpolation | CHAR_LIST_FRAGMENT | quoteEscapeSequence)*
+                      { implements =  "org.elixir_lang.psi.Body" }
+charListLine ::= CHAR_LIST_PROMOTER quoteCharListBody CHAR_LIST_TERMINATOR
                  {
                    implements = [
                      "org.elixir_lang.psi.Atomable"
@@ -658,11 +681,9 @@ charListLine ::= CHAR_LIST_PROMOTER interpolatedCharListBody CHAR_LIST_TERMINATO
                    ]
                  }
 
-interpolatedStringBody ::=  (interpolation | STRING_FRAGMENT | escapeSequence)*
-                            { implements = "org.elixir_lang.psi.Body" }
-stringLine ::= STRING_PROMOTER
-               interpolatedStringBody
-               STRING_TERMINATOR
+quoteStringBody ::=  (interpolation | STRING_FRAGMENT | quoteEscapeSequence)*
+                     { implements = "org.elixir_lang.psi.Body" }
+stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
                {
                  implements = [
                    "org.elixir_lang.psi.Atomable"
@@ -1507,7 +1528,7 @@ atom ::= COLON (ATOM_FRAGMENT | quote)
 
 private infixComma ::= COMMA EOL*
 
-charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | escapeSequence)
+charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses
@@ -1519,17 +1540,17 @@ decimalFloatExponentSign ::= DUAL_OPERATOR?
 decimalFloatFractional ::= decimalWholeNumber
 decimalFloatIntegral ::= decimalWholeNumber
 
-private escapeSequence ::= hexadecimalEscapeSequence |
-                           escapedEOL |
-                           /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-                              ("\x") in hexadecimalEscapeSequence  */
-                           escapedCharacter
-hexadecimalEscapeSequence ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
-                              {
-                                implements = "org.elixir_lang.psi.EscapeSequence"
-                                methods = [codePoint]
-                                pin = 2
-                              }
+/*
+ *
+ * Escape Sequences
+ *
+ */
+
+/*
+ * Shared subrules
+ */
+
+hexadecimalEscapePrefix ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE
 enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLOSING_CURLY
                                       { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] pin = 1 }
 openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
@@ -1538,6 +1559,40 @@ escapedCharacter ::= ESCAPE ESCAPED_CHARACTER_TOKEN
                      { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] pin = 1 }
 escapedEOL ::= ESCAPE EOL
                { implements = "org.elixir_lang.psi.EscapeSequence" methods = [codePoint] }
+
+/*
+ * Quotes (charListHeredoc, charListLine, stringHeredoc, stringLine)
+ */
+
+private quoteEscapeSequence ::= quoteHexadecimalEscapeSequence |
+                                escapedEOL |
+                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                                   ("\x") in hexadecimalEscapeSequence  */
+                                escapedCharacter
+quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
+                                   {
+                                     implements = "org.elixir_lang.psi.EscapeSequence"
+                                     methods = [codePoint]
+                                     pin = 1
+                                   }
+
+/*
+ * Sigil
+ */
+
+private sigilEscapeSequence ::= sigilHexadecimalEscapeSequence |
+                                hexadecimalEscapePrefix |
+                                escapedEOL |
+                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                                   ("\x") in hexadecimalEscapeSequence  */
+                                escapedCharacter
+// Does not pin so that hexadecimalEscapePrefix can match separately as `\x` is valid for sigils
+sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
+                                   {
+                                     implements = "org.elixir_lang.psi.EscapeSequence"
+                                     methods = [codePoint]
+                                   }
+
 emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
