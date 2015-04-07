@@ -31,6 +31,7 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected void assertParsedAndQuotedCorrectly() {
         doTest(true);
+        assertWithoutError();
         assertQuotedCorrectly();
     }
 
@@ -71,6 +72,27 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
 
     protected void assertQuotedCorrectly() {
         Quoter.assertQuotedCorrectly(myFile);
+    }
+
+    protected void assertWithoutError() {
+        final FileViewProvider fileViewProvider = myFile.getViewProvider();
+        PsiFile root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
+        final List<PsiElement> errorElementList = new LinkedList<PsiElement>();
+
+        root.accept(
+                new PsiRecursiveElementWalkingVisitor() {
+                    @Override
+                    public void visitElement(PsiElement element) {
+                        if (element instanceof PsiErrorElement) {
+                            errorElementList.add(element);
+                        }
+
+                        super.visitElement(element);
+                    }
+                }
+        );
+
+        assertTrue("PsiErrorElements found in parsed file PSI", errorElementList.isEmpty());
     }
 
     @Override
