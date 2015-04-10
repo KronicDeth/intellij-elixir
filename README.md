@@ -10,6 +10,37 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 
 ## Features
 
+### New Elixir Module
+
+#### Unqualified
+
+1. Right-click a directory (such as `lib` or `test` in the standard `mix new` layout)
+2. Select New > Elixir File.
+3. Enter an unqualified Module name, such as `MyModule`.
+
+An underscored file (`lib/my_module.ex`) with the given module name will be created:
+
+```elixir
+defmodule MyModule do
+
+end
+```
+
+#### Qualified
+
+1. Right-click a directory (such as `lib` or `test` in the standard `mix new` layout).
+2. Select New > Elixir File.
+3. Enter a qualified Module name, such as `MyNamespace.MyModule`.
+
+An underscored file will be created in an underscored directory (`lib/my_namespace/my_module.ex`) with the given module
+name will be created:
+
+```elixir
+defmodule MyNamspace.MyModule do
+
+end
+```
+
 ### Syntax Highlighting
 
 Syntax highlighting for the following tokens:
