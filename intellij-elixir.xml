@@ -90,11 +90,14 @@
       <include name="lib/commons-httpclient-3.1-patched.jar"/>
       <include name="lib/commons-logging-1.1.3.jar"/>
       <include name="lib/commons-net-3.1.jar"/>
+      <include name="lib/ecj-4.4.jar"/>
       <include name="lib/extensions.jar"/>
       <include name="lib/fluent-hc-4.3.2.jar"/>
       <include name="lib/forms_rt.jar"/>
+      <include name="lib/freemarker.jar"/>
       <include name="lib/groovy-all-2.2.1.jar"/>
       <include name="lib/gson-2.2.4.jar"/>
+      <include name="lib/guava-17.0.jar"/>
       <include name="lib/hamcrest-core-1.3.jar"/>
       <include name="lib/hamcrest-library-1.3.jar"/>
       <include name="lib/httpclient-4.3.2.jar"/>
@@ -120,6 +123,7 @@
       <include name="lib/jps-launcher.jar"/>
       <include name="lib/jps-model.jar"/>
       <include name="lib/jps-server.jar"/>
+      <include name="lib/jsch-0.1.51.jar"/>
       <include name="lib/jsch.agentproxy.connector-factory.jar"/>
       <include name="lib/jsch.agentproxy.core.jar"/>
       <include name="lib/jsch.agentproxy.pageant.jar"/>
@@ -129,6 +133,7 @@
       <include name="lib/jsr166e.jar"/>
       <include name="lib/jsr173_1.0_api.jar"/>
       <include name="lib/junit-4.11.jar"/>
+      <include name="lib/junit.jar"/>
       <include name="lib/jzlib-1.1.1.jar"/>
       <include name="lib/log4j.jar"/>
       <include name="lib/markdownj-core-0.4.2-SNAPSHOT.jar"/>
@@ -150,6 +155,7 @@
       <include name="lib/resources_en.jar"/>
       <include name="lib/rhino-js-1_7R4.jar"/>
       <include name="lib/rngom-20051226-patched.jar"/>
+      <include name="lib/rt/jps-plugin-system.jar"/>
       <include name="lib/sanselan-0.98-snapshot.jar"/>
       <include name="lib/serviceMessages.jar"/>
       <include name="lib/snappy-in-java-0.3.jar"/>
@@ -159,6 +165,7 @@
       <include name="lib/trove4j_src.jar"/>
       <include name="lib/util.jar"/>
       <include name="lib/velocity.jar"/>
+      <include name="lib/winp-1.21-patched.jar"/>
       <include name="lib/xbean.jar"/>
       <include name="lib/xerces.jar"/>
       <include name="lib/xmlrpc-2.0.jar"/>
