@@ -24,6 +24,10 @@ public class CreateElixirModuleActionTest extends LightCodeInsightFixtureTestCas
         checkModuleFile("Foo.Bar", "foo/bar.ex");
     }
 
+    public void testCamelCaseAliasDotCamelCaseAliasIsLowerCaseUnderscored() throws IOException {
+        checkModuleFile("CamelCaseOne.CamelCaseTwo", "camel_case_one/camel_case_two.ex");
+    }
+
     private void checkModuleFile(final String moduleName, String path) throws IOException {
         ActionManager actionManager = ActionManager.getInstance();
         final CreateElixirModuleAction elixirNewFileAction = (CreateElixirModuleAction) actionManager.getAction("Elixir.NewFile");
