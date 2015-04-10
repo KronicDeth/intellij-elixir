@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>Next Release</h1>
+      <h1>v0.3.0</h1>
       <ul>
         <li>
           <p>Enhancements</p>
@@ -17,6 +17,20 @@
             <li>
               <code>\x</code> is marked an error in CharLists, CharList Heredocs, Strings, and String Heredocs, but not
               in any sigils.
+            </li>
+            <li>
+              New Elixir File will automatically underscore the camel case module name when creating the file name and
+              will convert qualifying aliases before the last <code>.</code> to directories.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              New Elixir File validates that the name is a valid Alias, so each `.` separated part must start with a
+              capital letter.  Previous New Elixir File validated that the name was a valid path, and so forced the name
+              to be lowercase.
             </li>
           </ul>
         </li>
