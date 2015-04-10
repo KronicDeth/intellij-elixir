@@ -103,8 +103,7 @@ public class CreateElixirModuleAction extends CreateFromTemplateAction<ElixirFil
    * @link com.intellij.psi.impl.file.JavaDirectoryServiceImpl.createClassFromTemplate
    */
   private ElixirFile createModuleFromTemplate(PsiDirectory directory, String basename, String moduleName, String templateName) {
-    Project project = directory.getProject();
-    FileTemplateManager fileTemplateManager = FileTemplateManager.getInstance(project);
+    FileTemplateManager fileTemplateManager = FileTemplateManager.getInstance();
     FileTemplate template = fileTemplateManager.getInternalTemplate(templateName);
 
     Properties defaultProperties = fileTemplateManager.getDefaultProperties();
