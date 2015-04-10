@@ -158,8 +158,8 @@
   </project-components>
 
   <actions>
-    <action id="Elixir.NewErlangFile" class="org.elixir_lang.action.CreateElixirModuleAction"
-            text="Elixir File" description="Create new Elixir file">
+    <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
+            text="Elixir File" description="Create new Elixir Module">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
     </action>
   </actions>
