@@ -148,6 +148,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
+    <moduleConfigurationEditorProvider implementation="org.elixir_lang.ModuleConfigurationEditorProvider" order="first"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <internalFileTemplate name="Elixir Module"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
