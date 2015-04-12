@@ -1,10 +1,12 @@
 package org.elixir_lang.mix;
 
+import com.intellij.ide.util.importProject.LibraryDescriptor;
 import com.intellij.ide.util.importProject.ModuleDescriptor;
 import com.intellij.ide.util.importProject.ProjectDescriptor;
 import com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot;
 import com.intellij.ide.util.projectWizard.importSources.DetectedSourceRoot;
 import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuilder;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +25,6 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
 
         File mixFile = childByName.get("mix.exs");
 
-        DirectoryProcessingResult directoryProcessingResults = DirectoryProcessingResult.PROCESS_CHILDREN;
-
         if (mixFile != null && mixFile.isFile()) {
             result.add(
                     new DetectedProjectRoot(dir) {
@@ -35,11 +35,10 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
                         }
                     }
             );
-
-            directoryProcessingResults = DirectoryProcessingResult.SKIP_CHILDREN;
         }
 
-        return directoryProcessingResults;
+        // Process children so that deps will also be identified so they can be registered as libraries.
+        return DirectoryProcessingResult.PROCESS_CHILDREN;
     }
 
     /**
@@ -55,10 +54,50 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
             List<ModuleDescriptor> modules = projectDescriptor.getModules();
             if (modules.isEmpty()) {
                 modules = new ArrayList<ModuleDescriptor>();
+
+                DetectedProjectRoot commonRoot = null;
+
                 for (DetectedProjectRoot root : roots) {
-                    modules.add(new ModuleDescriptor(root.getDirectory(), ModuleType.getInstance(), ContainerUtil.<DetectedSourceRoot>emptyList()));
+                    if (commonRoot == null) {
+                        commonRoot = root;
+                    } else {
+                        if (FileUtil.isAncestor(root.getDirectory(), commonRoot.getDirectory(), false)) {
+                            commonRoot = root;
+                        }
+                    }
                 }
+
+                List<DetectedProjectRoot> libraryRoots = new ArrayList<DetectedProjectRoot>();
+
+                for (DetectedProjectRoot root : roots) {
+                    if (root != commonRoot) {
+                        libraryRoots.add(root);
+                    }
+                }
+
+                modules.add(
+                        new ModuleDescriptor(
+                                commonRoot.getDirectory(),
+                                ModuleType.getInstance(),
+                                ContainerUtil.<DetectedSourceRoot>emptyList()
+                        )
+                );
                 projectDescriptor.setModules(modules);
+
+                List<LibraryDescriptor> libraries = new ArrayList<LibraryDescriptor>();
+
+                for (DetectedProjectRoot libraryRoot : libraryRoots) {
+                    File libraryRootDirectory = libraryRoot.getDirectory();
+
+                    libraries.add(
+                            new LibraryDescriptor(
+                                    libraryRootDirectory.getName(),
+                                    Arrays.asList(libraryRootDirectory)
+                            )
+                    );
+                }
+
+                projectDescriptor.setLibraries(libraries);
             }
         }
     }
