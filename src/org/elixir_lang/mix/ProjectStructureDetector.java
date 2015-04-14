@@ -1,14 +1,10 @@
 package org.elixir_lang.mix;
 
-import com.intellij.ide.util.importProject.LibraryDescriptor;
 import com.intellij.ide.util.importProject.ModuleDescriptor;
 import com.intellij.ide.util.importProject.ProjectDescriptor;
 import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.ProjectJdkForModuleStep;
-import com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot;
-import com.intellij.ide.util.projectWizard.importSources.DetectedSourceRoot;
 import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuilder;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.SdkType;
 import org.jetbrains.annotations.NotNull;
@@ -20,29 +16,21 @@ import java.util.*;
 public class ProjectStructureDetector extends com.intellij.ide.util.projectWizard.importSources.ProjectStructureDetector {
     @NotNull
     @Override
-    public DirectoryProcessingResult detectRoots(@NotNull File dir, @NotNull File[] children, @NotNull File base, @NotNull List<DetectedProjectRoot> result) {
-        Map<String, File> childByName = new HashMap<String, File>(children.length);
+    public DirectoryProcessingResult detectRoots(@NotNull File dir, @NotNull File[] children, @NotNull File base, @NotNull List<com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot> result) {
+        DirectoryProcessingResult directoryProcessingResult = DirectoryProcessingResult.PROCESS_CHILDREN;
 
         for (File child : children) {
-            childByName.put(child.getName(), child);
+            String childName = child.getName();
+
+            if (childName.equals("mix.exs") && child.isFile()) {
+                result.add(new DetectedProjectRoot(dir));
+                directoryProcessingResult = DirectoryProcessingResult.SKIP_CHILDREN;
+
+                break;
+            }
         }
 
-        File mixFile = childByName.get("mix.exs");
-
-        if (mixFile != null && mixFile.isFile()) {
-            result.add(
-                    new DetectedProjectRoot(dir) {
-                        @NotNull
-                        @Override
-                        public String getRootTypeName() {
-                            return "Elixir";
-                        }
-                    }
-            );
-        }
-
-        // Process children so that deps will also be identified so they can be registered as libraries.
-        return DirectoryProcessingResult.PROCESS_CHILDREN;
+        return directoryProcessingResult;
     }
 
     /**
@@ -64,55 +52,38 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
      * @see  org.intellij.erlang.editor.ErlangProjectStructureDetector.setupProjectStructure
      */
     @Override
-    public void setupProjectStructure(@NotNull Collection<DetectedProjectRoot> roots, @NotNull ProjectDescriptor projectDescriptor, @NotNull ProjectFromSourcesBuilder builder) {
+    public void setupProjectStructure(@NotNull Collection<com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot> roots, @NotNull ProjectDescriptor projectDescriptor, @NotNull ProjectFromSourcesBuilder builder) {
         if (!roots.isEmpty() && !builder.hasRootsFromOtherDetectors(this)) {
             List<ModuleDescriptor> modules = projectDescriptor.getModules();
             if (modules.isEmpty()) {
-                modules = new ArrayList<ModuleDescriptor>();
+                modules = new ArrayList<ModuleDescriptor>(roots.size());
 
-                DetectedProjectRoot commonRoot = null;
+                for (com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot root : roots) {
+                    File rootDirectory = root.getDirectory();
+                    Collection<DetectedSourceRoot> sourceRoots = new ArrayList<DetectedSourceRoot>(2);
 
-                for (DetectedProjectRoot root : roots) {
-                    if (commonRoot == null) {
-                        commonRoot = root;
-                    } else {
-                        if (FileUtil.isAncestor(root.getDirectory(), commonRoot.getDirectory(), false)) {
-                            commonRoot = root;
-                        }
+                    File lib = new File(rootDirectory, "lib");
+
+                    if (lib.isDirectory()) {
+                        sourceRoots.add(new DetectedSourceRoot(lib));
                     }
-                }
 
-                List<DetectedProjectRoot> libraryRoots = new ArrayList<DetectedProjectRoot>();
+                    File test = new File(rootDirectory, "test");
 
-                for (DetectedProjectRoot root : roots) {
-                    if (root != commonRoot) {
-                        libraryRoots.add(root);
+                    if (test.isDirectory()) {
+                        sourceRoots.add(new DetectedSourceRoot(test));
                     }
-                }
 
-                modules.add(
-                        new ModuleDescriptor(
-                                commonRoot.getDirectory(),
-                                ModuleType.getInstance(),
-                                ContainerUtil.<DetectedSourceRoot>emptyList()
-                        )
-                );
-                projectDescriptor.setModules(modules);
-
-                List<LibraryDescriptor> libraries = new ArrayList<LibraryDescriptor>();
-
-                for (DetectedProjectRoot libraryRoot : libraryRoots) {
-                    File libraryRootDirectory = libraryRoot.getDirectory();
-
-                    libraries.add(
-                            new LibraryDescriptor(
-                                    libraryRootDirectory.getName(),
-                                    Arrays.asList(libraryRootDirectory)
+                    modules.add(
+                            new ModuleDescriptor(
+                                    rootDirectory,
+                                    ModuleType.getInstance(),
+                                    sourceRoots
                             )
                     );
                 }
 
-                projectDescriptor.setLibraries(libraries);
+                projectDescriptor.setModules(modules);
             }
         }
     }
