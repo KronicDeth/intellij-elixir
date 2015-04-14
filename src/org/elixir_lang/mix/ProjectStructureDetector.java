@@ -3,13 +3,17 @@ package org.elixir_lang.mix;
 import com.intellij.ide.util.importProject.LibraryDescriptor;
 import com.intellij.ide.util.importProject.ModuleDescriptor;
 import com.intellij.ide.util.importProject.ProjectDescriptor;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.ProjectJdkForModuleStep;
 import com.intellij.ide.util.projectWizard.importSources.DetectedProjectRoot;
 import com.intellij.ide.util.projectWizard.importSources.DetectedSourceRoot;
 import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuilder;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.util.containers.ContainerUtil;
+import org.elixir_lang.SdkType;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
@@ -39,6 +43,17 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
 
         // Process children so that deps will also be identified so they can be registered as libraries.
         return DirectoryProcessingResult.PROCESS_CHILDREN;
+    }
+
+    /**
+     * @link package org.intellij.erlang.editor.ErlangProjectStructureDetector#createWizardSteps
+     */
+    @Override
+    public List<ModuleWizardStep> createWizardSteps(ProjectFromSourcesBuilder builder, ProjectDescriptor projectDescriptor, Icon stepIcon) {
+        /* ProjectJdkForModuleStep should actually be called ProjectSdkForModuleStep since it uses the Sdk type, and
+           doesn't assume a Jdk. */
+        ProjectJdkForModuleStep projectJdkForModuleStep = new ProjectJdkForModuleStep(builder.getContext(), SdkType.getInstance());
+        return Collections.<ModuleWizardStep>singletonList(projectJdkForModuleStep);
     }
 
     /**

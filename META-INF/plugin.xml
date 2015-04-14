@@ -164,6 +164,7 @@
                      level="ERROR" shortName="MissingEndOfExpression"/>
     <moduleType id="ELIXIR_MIX_PROJECT" implementationClass="org.elixir_lang.mix.ModuleType"/>
     <projectStructureDetector implementation="org.elixir_lang.mix.ProjectStructureDetector"/>
+    <sdkType implementation="org.elixir_lang.SdkType"/>
   </extensions>
 
   <application-components>
