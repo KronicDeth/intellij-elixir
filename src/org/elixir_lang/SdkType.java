@@ -1,12 +1,12 @@
 package org.elixir_lang;
 
-import com.intellij.openapi.projectRoots.AdditionalDataConfigurable;
-import com.intellij.openapi.projectRoots.SdkAdditionalData;
-import com.intellij.openapi.projectRoots.SdkModel;
-import com.intellij.openapi.projectRoots.SdkModificator;
+import com.intellij.openapi.projectRoots.*;
+import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
 import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,6 +74,28 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
     @Override
     public String suggestSdkName(String currentSdkName, String sdkHome) {
         return "Elixir " + getVersionString(sdkHome);
+    }
+
+    @Override
+    public void setupSdkPaths(@NotNull Sdk sdk) {
+        SdkModificator sdkModificator = sdk.getSdkModificator();
+
+        String sdkHome = sdkModificator.getHomePath();
+        File lib = new File(sdkHome, "lib");
+
+        for (File library : lib.listFiles()) {
+            File beams = new File(library, "ebin");
+
+            if (beams.isDirectory()) {
+                VirtualFile libraryVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(library);
+
+                if (libraryVirtualFile != null) {
+                    sdkModificator.addRoot(libraryVirtualFile, OrderRootType.CLASSES);
+                }
+            }
+        }
+
+        sdkModificator.commitChanges();
     }
 
     /*
