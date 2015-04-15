@@ -121,6 +121,14 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
 
     @Override
     public void updateProject(@NotNull Project project, @NotNull ModifiableModelsProvider modelsProvider, @NotNull ModulesProvider modulesProvider) {
+        updateProjectLibraries(project);
+    }
+
+    /*
+     * Private
+     */
+
+    private void updateProjectLibraries(@NotNull Project project) {
         LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
 
         for (Library library : libraryTable.getLibraries()) {
