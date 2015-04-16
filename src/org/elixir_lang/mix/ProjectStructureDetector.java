@@ -1,5 +1,6 @@
 package org.elixir_lang.mix;
 
+import com.intellij.ide.projectView.actions.MarkRootActionBase;
 import com.intellij.ide.util.importProject.LibraryDescriptor;
 import com.intellij.ide.util.importProject.ModuleDescriptor;
 import com.intellij.ide.util.importProject.ProjectDescriptor;
@@ -7,21 +8,27 @@ import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.ProjectJdkForModuleStep;
 import com.intellij.ide.util.projectWizard.importSources.ProjectFromSourcesBuilder;
 import com.intellij.ide.util.projectWizard.importSources.impl.ProjectFromSourcesBuilderImpl;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModifiableModelsProvider;
-import com.intellij.openapi.roots.OrderRootType;
+import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.impl.DirectoryIndex;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.roots.libraries.LibraryTablesRegistrar;
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
+import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.SdkType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class ProjectStructureDetector extends com.intellij.ide.util.projectWizard.importSources.ProjectStructureDetector implements ProjectFromSourcesBuilderImpl.ProjectConfigurationUpdater {
     @NotNull
@@ -119,14 +126,79 @@ public class ProjectStructureDetector extends com.intellij.ide.util.projectWizar
         }
     }
 
+    /**
+     *
+     * @param project
+     * @param modelsProvider
+     * @param modulesProvider
+     * @see com.intellij.ide.projectView.actions.MarkRootActionBase#actionPerformed(AnActionEvent)
+     * @see com.intellij.ide.projectView.actions.MarkRootActionBase#findContentEntry(ModuleRootModel, VirtualFile)
+     * @see com.intellij.ide.projectView.actions.MarkRootActionBase#findParentModule
+     * @see com.intellij.ide.projectView.actions.MarkRootActionBase.modifyRoots
+     */
     @Override
-    public void updateProject(@NotNull Project project, @NotNull ModifiableModelsProvider modelsProvider, @NotNull ModulesProvider modulesProvider) {
+    public void updateProject(@NotNull final Project project, @NotNull ModifiableModelsProvider modelsProvider, @NotNull ModulesProvider modulesProvider) {
         updateProjectLibraries(project);
+        excludeOutputDirectories(project, modelsProvider);
     }
 
     /*
      * Private
      */
+
+    private static void excludeDirectory(@NotNull final Project project, @NotNull ModifiableModelsProvider modelsProvider, DirectoryIndex directoryIndex, VirtualFile child) {
+        Module module = directoryIndex.getInfoForFile(child).getModule();
+        final ModifiableRootModel moduleModel = modelsProvider.getModuleModifiableModel(module);
+
+        ContentEntry contentEntry = MarkRootActionBase.findContentEntry(moduleModel, child);
+
+        if (contentEntry != null) {
+            excludeDirectoryFromContentEntry(project, child, moduleModel, contentEntry);
+        }
+    }
+
+    private static void excludeDirectoryFromContentEntry(@NotNull final Project project, VirtualFile child, final ModifiableRootModel moduleModel, ContentEntry contentEntry) {
+        unmarkDirectoryAsSoureFromContentEntry(child, contentEntry);
+
+        contentEntry.addExcludeFolder(child);
+
+        ApplicationManager.getApplication().runWriteAction(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        moduleModel.commit();
+                        project.save();
+                    }
+                }
+        );
+    }
+
+    private static void excludeOutputDirectories(@NotNull final Project project, @NotNull ModifiableModelsProvider modelsProvider) {
+        VirtualFile baseDir = project.getBaseDir();
+        DirectoryIndex directoryIndex = DirectoryIndex.getInstance(project);
+
+        for (VirtualFile child : baseDir.getChildren()) {
+            String childName = child.getName();
+
+            // _build is for mix
+            // rel is for exrm
+            if (childName.equals("_build") || childName.equals("rel")) {
+                excludeDirectory(project, modelsProvider, directoryIndex, child);
+            }
+        }
+    }
+
+    private static void unmarkDirectoryAsSoureFromContentEntry(VirtualFile child, ContentEntry contentEntry) {
+        final SourceFolder[] sourceFolders = contentEntry.getSourceFolders();
+
+        for (SourceFolder sourceFolder : sourceFolders) {
+            if(Comparing.equal(sourceFolder.getFile(), child)) {
+                contentEntry.removeSourceFolder(sourceFolder);
+            }
+
+            break;
+        }
+    }
 
     private void updateProjectLibraries(@NotNull Project project) {
         LibraryTable libraryTable = LibraryTablesRegistrar.getInstance().getLibraryTable(project);
