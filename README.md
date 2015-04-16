@@ -38,6 +38,18 @@ If you've already created a project with `mix new`, you can load it as an Elixir
 14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
 15. Choose whether to open in a New Window or in This Window.
 
+##### Project Structure
+
+![Project View](/screenshots/Project%20View.png?raw=true "Project View")
+
+* Excluded
+  * `_build` (Output from `mix`)
+  * `rel` (Output from `exrm`)
+* Sources
+  * `lib`
+* Test Sources
+  * `test`
+
 ### New Elixir Module
 
 #### Unqualified
