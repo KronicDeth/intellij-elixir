@@ -1,0 +1,9 @@
+<!-- Extensions that use extension points that are only available in IntelliJ IDEA, but not in the language-specific
+     IDEs need to be declared here so that they are optional.  Extension points that are only available in IntelliJ IDEA
+     are declared in https://github.com/JetBrains/intellij-community/blob/432621e024f9a2a97d24351eb9dfa5bc03184aac/resources/src/idea/RichPlatformPlugin.xml#L29-L88.
+     Thanks to Sergey Ignatov (@ignatov) for explaining this distinction. -->
+<idea-plugin version="2">
+  <extensions defaultExtensionNs="com.intellij">
+      <projectStructureDetector implementation="org.elixir_lang.mix.ProjectStructureDetector"/>
+  </extensions>
+</idea-plugin>

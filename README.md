@@ -10,6 +10,66 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 
 ## Features
 
+### Project
+
+#### From Existing Directory
+**NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
+  IDEs, like Rubymine.**
+
+If you've already created a project with `mix new`, you can load it as an Elixir project into the plugin.
+
+1. File > New > Project From Existing Sources...
+2. Select the root directory of your project.
+3. Leave the default selection, "Create project from existing sources"
+4. Click Next
+5. Project name will be filled with the basename of the root directory.  Customize it if you like.
+6. Project location will be the root directory.
+7. Click Next.
+8. If you previously opened the directory in IntelliJ or another JetBrains IDE, you'll be prompted to overwrite the
+   .idea directory.  Click Yes.
+9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
+   `mix.exs`.  Uncheck any project roots that you don't want added.
+10. Click Next.      
+10. Select a Project SDK directory by clicking Configure.
+11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+    homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
+    about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+13. Click Next after you select SDK name from the Project SDK list.
+14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
+15. Choose whether to open in a New Window or in This Window.
+
+##### Project Structure
+
+![Project View](/screenshots/Project%20View.png?raw=true "Project View")
+
+* Excluded
+  * `_build` (Output from `mix`)
+  * `rel` (Output from `exrm`)
+* Sources
+  * `lib`
+* Test Sources
+  * `test`
+
+###### Project Settings
+
+![Project Settings](/screenshots/project_structure/project_settings/Project.png?raw=true "Project Settings")
+
+The Project Settings include
+* Project Name
+* Project SDK
+
+###### Module Settings
+
+
+![Module Settings](/screenshots/project_structure/project_settings/Module.png?raw=true "Module Settings")
+
+The Module Settings include Marking directories as
+* Excluded
+* Sources
+* Tests
+
 ### New Elixir Module
 
 #### Unqualified
