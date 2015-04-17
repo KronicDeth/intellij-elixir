@@ -144,7 +144,6 @@
 
   <!-- please see http://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
        on how to target different products -->
-  <depends>com.intellij.modules.lang</depends>
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
@@ -164,6 +163,7 @@
                      implementationClass="org.elixir_lang.inspection.MissingEndOfExpression" language="Elixir"
                      level="ERROR" shortName="MissingEndOfExpression"/>
     <moduleType id="ELIXIR_MIX_PROJECT" implementationClass="org.elixir_lang.mix.ModuleType"/>
+    <projectStructureDetector implementation="org.elixir_lang.mix.ProjectStructureDetector"/>
     <sdkType implementation="org.elixir_lang.SdkType"/>
   </extensions>
 
