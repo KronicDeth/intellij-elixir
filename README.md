@@ -58,6 +58,16 @@ The Project Settings include
 * Project Name
 * Project SDK
 
+###### Module Settings
+
+
+![Module Settings](/screenshots/project_structure/project_settings/Module.png?raw=true "Module Settings")
+
+The Module Settings include Marking directories as
+* Excluded
+* Sources
+* Tests
+
 ### New Elixir Module
 
 #### Unqualified
