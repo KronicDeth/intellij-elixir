@@ -13,6 +13,8 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 ### Project
 
 #### From Existing Directory
+**NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
+  IDEs, like Rubymine.**
 
 If you've already created a project with `mix new`, you can load it as an Elixir project into the plugin.
 
