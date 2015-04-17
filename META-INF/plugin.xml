@@ -9,6 +9,17 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v0.3.1</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              File > New > Project From Existing Sources can be used in IntelliJ to setup the excludes, sources, tests,
+              SDK and libraries for an Elixir project that has already been created with <code>mix new</code>.
+            </li>
+          </ul>
+        </li>
       <h1>v0.3.0</h1>
       <ul>
         <li>
