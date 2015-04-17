@@ -50,6 +50,14 @@ If you've already created a project with `mix new`, you can load it as an Elixir
 * Test Sources
   * `test`
 
+###### Project Settings
+
+![Project Settings](/screenshots/project_structure/project_settings/Project.png?raw=true "Project Settings")
+
+The Project Settings include
+* Project Name
+* Project SDK
+
 ### New Elixir Module
 
 #### Unqualified
