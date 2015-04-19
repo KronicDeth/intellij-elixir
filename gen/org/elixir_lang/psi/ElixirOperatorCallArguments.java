@@ -10,6 +10,12 @@ public interface ElixirOperatorCallArguments extends QuotableArguments {
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
 
+  @Nullable
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @Nullable
+  ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
+
   @NotNull
   OtpErlangObject[] quoteArguments();
 

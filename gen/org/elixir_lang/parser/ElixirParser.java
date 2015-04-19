@@ -2848,9 +2848,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedExpression
+  // noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
+  //                                      matchedExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+  //                                      unqualifiedNoParenthesesManyArgumentsCall
   static boolean noParenthesesOneArgument(PsiBuilder b, int l) {
-    return matchedExpression(b, l + 1, -1);
+    if (!recursion_guard_(b, l, "noParenthesesOneArgument")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesKeywords(b, l + 1);
+    if (!r) r = matchedExpression(b, l + 1, -1);
+    if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

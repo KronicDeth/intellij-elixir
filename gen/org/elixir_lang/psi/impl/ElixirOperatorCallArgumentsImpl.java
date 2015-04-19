@@ -5,9 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirMatchedExpression;
-import org.elixir_lang.psi.ElixirOperatorCallArguments;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +24,18 @@ public class ElixirOperatorCallArgumentsImpl extends ASTWrapperPsiElement implem
   @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
     return findChildByClass(ElixirMatchedExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
+    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull
