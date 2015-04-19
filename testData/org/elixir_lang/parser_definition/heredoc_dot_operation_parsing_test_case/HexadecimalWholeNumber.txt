@@ -13,7 +13,7 @@ Elixir File(0,31)
         <empty list>
       PsiElement(CHAR_LIST_HEREDOC_TERMINATOR)(''''')(8,11)
   PsiElement(.)('.')(11,12)
-  PsiErrorElement:EOL expected, got '0'(12,13)
+  PsiErrorElement:<operator identifier> or EOL expected, got '0'(12,13)
     PsiElement(0)('0')(12,13)
   PsiElement(DUMMY_BLOCK)(13,29)
     PsiElement(x)('x')(13,14)
