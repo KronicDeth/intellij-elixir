@@ -1,6 +1,6 @@
-package org.elixir_lang.parser_definition;
+package org.elixir_lang.parser_definition.matched_dot_operator_call_operation;
 
-public class MatchedDotOperatorCallOperationParsingTestcase extends ParsingTestCase {
+public class NoArgumentsParsingTestCase extends ParsingTestCase {
     /*
      * matchedDotOperand
      */
@@ -103,6 +103,6 @@ public class MatchedDotOperatorCallOperationParsingTestcase extends ParsingTestC
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/matched_dot_operator_call_operation_parsing_test_case";
+        return super.getTestDataPath() + "/no_arguments_parsing_test_case";
     }
 }
