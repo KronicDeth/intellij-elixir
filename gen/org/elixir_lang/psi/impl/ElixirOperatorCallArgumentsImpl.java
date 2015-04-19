@@ -5,9 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import org.elixir_lang.psi.ElixirMatchedExpression;
 import org.elixir_lang.psi.ElixirOperatorCallArguments;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirOperatorCallArgumentsImpl extends ASTWrapperPsiElement implements ElixirOperatorCallArguments {
 
@@ -18,6 +20,12 @@ public class ElixirOperatorCallArgumentsImpl extends ASTWrapperPsiElement implem
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitOperatorCallArguments(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findChildByClass(ElixirMatchedExpression.class);
   }
 
   @NotNull

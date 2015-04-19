@@ -1872,7 +1872,15 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirOperatorCallArguments operatorCallArguments) {
-        return new OtpErlangObject[0];
+        PsiElement[] children = operatorCallArguments.getChildren();
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[children.length];
+
+        for (int i = 0; i < children.length; i++) {
+            Quotable child = (Quotable) children[i];
+            quotedArguments[i] = child.quote();
+        }
+
+        return quotedArguments;
     }
 
     @Contract(pure = true)

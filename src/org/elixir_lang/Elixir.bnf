@@ -1318,8 +1318,12 @@ operatorIdentifier ::= AND_OPERATOR |
                        UNARY_OPERATOR |
                        WHEN_OPERATOR
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-// TODO allow no arguments or noParenthesesManyArgumentsStrict
-operatorCallArguments ::= { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+private noParenthesesOneArgument ::= matchedExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L192
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L194
+operatorCallArguments ::= noParenthesesOneArgument?
+                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
 matchedDotOperatorCallOperation ::= matchedExpression dotInfixOperator operatorIdentifier operatorCallArguments
                                     {
                                       // Cannot use Call interface because the identifier (matchedExpression dotInfixOperator operatorIdentifier) can't be encapsulated n

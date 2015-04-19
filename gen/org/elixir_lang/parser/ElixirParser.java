@@ -2848,6 +2848,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // matchedExpression
+  static boolean noParenthesesOneArgument(PsiBuilder b, int l) {
+    return matchedExpression(b, l + 1, -1);
+  }
+
+  /* ********************************************************** */
   // noParenthesesFirstPositional infixComma noParenthesesKeywords
   public static boolean noParenthesesOnePositionalAndKeywordsArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesOnePositionalAndKeywordsArguments")) return false;
@@ -2984,9 +2990,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // noParenthesesOneArgument?
   public static boolean operatorCallArguments(PsiBuilder b, int l) {
-    Marker m = enter_section_(b);
-    exit_section_(b, m, OPERATOR_CALL_ARGUMENTS, true);
+    if (!recursion_guard_(b, l, "operatorCallArguments")) return false;
+    Marker m = enter_section_(b, l, _NONE_, "<operator call arguments>");
+    noParenthesesOneArgument(b, l + 1);
+    exit_section_(b, l, m, OPERATOR_CALL_ARGUMENTS, true, false, null);
     return true;
   }
 
