@@ -171,6 +171,7 @@
           <include name="**/*Test*.java"/>
           <!-- Marked with @Ignore annotation, but not ignored for unknown reason -->
           <exclude name="org/elixir_lang/parser_definition/ParsingTestCase.java"/>
+          <exclude name="org/elixir_lang/parser_definition/**/ParsingTestCase.java"/>
           <!-- TODO get inspection tests to work with ant -->
           <exclude name="org/elixir_lang/inspection/*TestCase.java"/>
           <!-- Causes ERROR: Problems during index shutdown. TODO get fix from https://devnet.jetbrains.com/message/5539376#5539376 -->
