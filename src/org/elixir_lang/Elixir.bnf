@@ -946,6 +946,8 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedMultiplicationOperation |
                       matchedHatOperation |
                       matchedUnaryNonNumericOperation |
+                      // Must be before matchedDotOperation so that the right operand can be restricted to operatorIdentifier
+                      matchedDotOperatorCallOperation |
                       matchedDotOperation |
                       matchedAtNonNumericOperation |
                       matchedCallOperation |
@@ -1274,11 +1276,11 @@ matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedExpressi
                                     { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
- * Dot Operation
+ * Dot Operation with operator as right-operand
  *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
- *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L561-L565
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
 // left-associative (see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69)
@@ -1291,6 +1293,55 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                          quote
                        ]
                      }
+
+operatorIdentifier ::= AND_OPERATOR |
+                       ARROW_OPERATOR |
+                       // NOT ASSOCIATION_OPERATOR
+                       AT_OPERATOR |
+                       // NOT BIT_STRING_OPERATOR because it is a special form
+                       CAPTURE_OPERATOR |
+                       COMPARISON_OPERATOR |
+                       DUAL_OPERATOR |
+                       HAT_OPERATOR |
+                       IN_MATCH_OPERATOR |
+                       IN_OPERATOR |
+                       // NOT MAP_OPERATOR because it is a special form
+                       MATCH_OPERATOR |
+                       MULTIPLICATION_OPERATOR |
+                       OR_OPERATOR |
+                       PIPE_OPERATOR |
+                       RELATIONAL_OPERATOR |
+                       STAB_OPERATOR |
+                       STRUCT_OPERATOR |
+                       // NOT TUPLE_OPERATOR because it is a special form
+                       TWO_OPERATOR |
+                       UNARY_OPERATOR |
+                       WHEN_OPERATOR
+                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+private noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
+                                     matchedExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+                                     unqualifiedNoParenthesesManyArgumentsCall // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L192
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L194
+operatorCallArguments ::= noParenthesesOneArgument?
+                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
+matchedDotOperatorCallOperation ::= matchedExpression dotInfixOperator operatorIdentifier operatorCallArguments
+                                    {
+                                      // Cannot use Call interface because the identifier (matchedExpression dotInfixOperator operatorIdentifier) can't be encapsulated n
+                                      implements = "org.elixir_lang.psi.Quotable"
+                                      methods = [
+                                        quote
+                                      ]
+                                    }
+/*
+ * Dot Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L69
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
+ *
+ */
+
 matchedDotOperation ::= matchedExpression dotInfixOperator
                         !(
                           atom |
@@ -1327,7 +1378,8 @@ matchedDotOperation ::= matchedExpression dotInfixOperator
  * At Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
- *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
  */
 
 atPrefixOperator ::= AT_OPERATOR EOL*

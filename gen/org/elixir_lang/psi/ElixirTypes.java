@@ -102,6 +102,7 @@ public interface ElixirTypes {
   IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
+  IElementType MATCHED_DOT_OPERATOR_CALL_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATOR_CALL_OPERATION");
   IElementType MATCHED_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION");
   IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_IN_MATCH_OPERATION");
@@ -131,6 +132,8 @@ public interface ElixirTypes {
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
+  IElementType OPERATOR_CALL_ARGUMENTS = new ElixirElementType("OPERATOR_CALL_ARGUMENTS");
+  IElementType OPERATOR_IDENTIFIER = new ElixirElementType("OPERATOR_IDENTIFIER");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
   IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
@@ -554,6 +557,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_DOT_OPERATION) {
         return new ElixirMatchedDotOperationImpl(node);
       }
+      else if (type == MATCHED_DOT_OPERATOR_CALL_OPERATION) {
+        return new ElixirMatchedDotOperatorCallOperationImpl(node);
+      }
       else if (type == MATCHED_EXPRESSION) {
         return new ElixirMatchedExpressionImpl(node);
       }
@@ -640,6 +646,12 @@ public interface ElixirTypes {
       }
       else if (type == OPEN_HEXADECIMAL_ESCAPE_SEQUENCE) {
         return new ElixirOpenHexadecimalEscapeSequenceImpl(node);
+      }
+      else if (type == OPERATOR_CALL_ARGUMENTS) {
+        return new ElixirOperatorCallArgumentsImpl(node);
+      }
+      else if (type == OPERATOR_IDENTIFIER) {
+        return new ElixirOperatorIdentifierImpl(node);
       }
       else if (type == OR_INFIX_OPERATOR) {
         return new ElixirOrInfixOperatorImpl(node);

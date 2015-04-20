@@ -10,7 +10,7 @@ Elixir File(0,15)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(7,7)
         <empty list>
   PsiElement(.)('.')(7,8)
-  PsiErrorElement:EOL expected, got '~'(8,9)
+  PsiErrorElement:<operator identifier> or EOL expected, got '~'(8,9)
     PsiElement(~)('~')(8,9)
   PsiElement(INTERPOLATING_STRING_SIGIL_NAME)('s')(9,10)
   PsiElement(STRING_SIGIL_PROMOTER)('{')(10,11)
