@@ -3105,14 +3105,28 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // emptyParentheses
+  // emptyParentheses | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484
+  //                          OPENING_PARENTHESIS unqualifiedNoParenthesesManyArgumentsCall CLOSING_PARENTHESIS
   public static boolean parenthesesArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = emptyParentheses(b, l + 1);
+    if (!r) r = parenthesesArguments_1(b, l + 1);
     exit_section_(b, m, PARENTHESES_ARGUMENTS, r);
+    return r;
+  }
+
+  // OPENING_PARENTHESIS unqualifiedNoParenthesesManyArgumentsCall CLOSING_PARENTHESIS
+  private static boolean parenthesesArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_PARENTHESIS);
+    r = r && unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    r = r && consumeToken(b, CLOSING_PARENTHESIS);
+    exit_section_(b, m, null, r);
     return r;
   }
 

@@ -7,8 +7,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirEmptyParentheses;
 import org.elixir_lang.psi.ElixirParenthesesArguments;
+import org.elixir_lang.psi.ElixirUnqualifiedNoParenthesesManyArgumentsCall;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement implements ElixirParenthesesArguments {
 
@@ -22,9 +24,15 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
-    return findNotNullChildByClass(ElixirEmptyParentheses.class);
+    return findChildByClass(ElixirEmptyParentheses.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
+    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull

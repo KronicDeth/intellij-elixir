@@ -1,1 +1,2 @@
 (;).()
+(;).(function positional, key: value)

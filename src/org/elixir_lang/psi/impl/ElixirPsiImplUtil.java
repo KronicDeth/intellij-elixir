@@ -1769,13 +1769,17 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final QuotableCall quotableCall) {
         OtpErlangObject quotedIdentifier = quotableCall.quoteIdentifier();
         OtpErlangObject[] quotedArguments = quotableCall.quoteArguments();
+        OtpErlangList metadata;
 
-        assert Macro.isExpression(quotedIdentifier);
-
-        OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
-        /* Grab metadata from quotedIdentifier so line of quotedFunctionCall is line of identifier or `.` in identifier,
-           which can differ from the line of QuotableCall when there are newlines on either side of `.`. */
-        OtpErlangList metadata = Macro.metadata(expression);
+        if (Macro.isExpression(quotedIdentifier)) {
+            OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
+            /* Grab metadata from quotedIdentifier so line of quotedFunctionCall is line of identifier or `.` in
+               identifier, which can differ from the line of QuotableCall when there are newlines on either side of
+               `.`. */
+            metadata = Macro.metadata(expression);
+        } else {
+            metadata = metadata(quotableCall);
+        }
 
         return quotedFunctionCall(
                 quotedIdentifier,
@@ -1902,7 +1906,21 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
-        return new OtpErlangObject[0];
+        ElixirEmptyParentheses emptyParentheses = parenthesesArguments.getEmptyParentheses();
+        OtpErlangObject[] quotedArguments;
+
+        if (emptyParentheses != null) {
+            quotedArguments = new OtpErlangObject[0];
+        } else {
+            Quotable quotable = parenthesesArguments.getUnqualifiedNoParenthesesManyArgumentsCall();
+            OtpErlangObject quoted = quotable.quote();
+
+            quotedArguments = new OtpErlangObject[] {
+                    quoted
+            };
+        }
+
+        return quotedArguments;
     }
 
     @Contract(pure = true)
