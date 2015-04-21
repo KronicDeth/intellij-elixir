@@ -25,4 +25,9 @@ public interface ElixirMatchedCallOperation extends ElixirMatchedExpression, Cal
   @NotNull
   OtpErlangObject quote();
 
+  @NotNull
+  OtpErlangObject[] quoteArguments();
+
+  OtpErlangObject quoteIdentifier();
+
 }

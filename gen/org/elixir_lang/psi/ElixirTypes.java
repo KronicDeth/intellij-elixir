@@ -101,6 +101,7 @@ public interface ElixirTypes {
   IElementType MATCHED_CALL_OPERATION = new ElixirElementType("MATCHED_CALL_OPERATION");
   IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
+  IElementType MATCHED_DOT_CALL_OPERATION = new ElixirElementType("MATCHED_DOT_CALL_OPERATION");
   IElementType MATCHED_DOT_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATION");
   IElementType MATCHED_DOT_OPERATOR_CALL_OPERATION = new ElixirElementType("MATCHED_DOT_OPERATOR_CALL_OPERATION");
   IElementType MATCHED_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION");
@@ -135,6 +136,7 @@ public interface ElixirTypes {
   IElementType OPERATOR_CALL_ARGUMENTS = new ElixirElementType("OPERATOR_CALL_ARGUMENTS");
   IElementType OPERATOR_IDENTIFIER = new ElixirElementType("OPERATOR_IDENTIFIER");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
+  IElementType PARENTHESES_ARGUMENTS = new ElixirElementType("PARENTHESES_ARGUMENTS");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
   IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
   IElementType QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -554,6 +556,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_COMPARISON_OPERATION) {
         return new ElixirMatchedComparisonOperationImpl(node);
       }
+      else if (type == MATCHED_DOT_CALL_OPERATION) {
+        return new ElixirMatchedDotCallOperationImpl(node);
+      }
       else if (type == MATCHED_DOT_OPERATION) {
         return new ElixirMatchedDotOperationImpl(node);
       }
@@ -655,6 +660,9 @@ public interface ElixirTypes {
       }
       else if (type == OR_INFIX_OPERATOR) {
         return new ElixirOrInfixOperatorImpl(node);
+      }
+      else if (type == PARENTHESES_ARGUMENTS) {
+        return new ElixirParenthesesArgumentsImpl(node);
       }
       else if (type == PIPE_INFIX_OPERATOR) {
         return new ElixirPipeInfixOperatorImpl(node);

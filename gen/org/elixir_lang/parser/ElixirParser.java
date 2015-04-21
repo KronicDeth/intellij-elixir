@@ -297,7 +297,7 @@ public class ElixirParser implements PsiParser {
       r = matchedAtNonNumericOperation(b, 0);
     }
     else if (t == MATCHED_CALL_OPERATION) {
-      r = matchedExpression(b, 0, 20);
+      r = matchedExpression(b, 0, 21);
     }
     else if (t == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
       r = matchedCaptureNonNumericOperation(b, 0);
@@ -305,11 +305,14 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_COMPARISON_OPERATION) {
       r = matchedExpression(b, 0, 8);
     }
+    else if (t == MATCHED_DOT_CALL_OPERATION) {
+      r = matchedExpression(b, 0, 17);
+    }
     else if (t == MATCHED_DOT_OPERATION) {
-      r = matchedExpression(b, 0, 18);
+      r = matchedExpression(b, 0, 19);
     }
     else if (t == MATCHED_DOT_OPERATOR_CALL_OPERATION) {
-      r = matchedExpression(b, 0, 17);
+      r = matchedExpression(b, 0, 18);
     }
     else if (t == MATCHED_EXPRESSION) {
       r = matchedExpression(b, 0, -1);
@@ -404,6 +407,9 @@ public class ElixirParser implements PsiParser {
     else if (t == OR_INFIX_OPERATOR) {
       r = orInfixOperator(b, 0);
     }
+    else if (t == PARENTHESES_ARGUMENTS) {
+      r = parenthesesArguments(b, 0);
+    }
     else if (t == PIPE_INFIX_OPERATOR) {
       r = pipeInfixOperator(b, 0);
     }
@@ -471,10 +477,11 @@ public class ElixirParser implements PsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ACCESS_EXPRESSION, MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION,
       MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_CALL_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION, MATCHED_COMPARISON_OPERATION,
-      MATCHED_DOT_OPERATION, MATCHED_DOT_OPERATOR_CALL_OPERATION, MATCHED_EXPRESSION, MATCHED_HAT_OPERATION,
-      MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION,
-      MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_RELATIONAL_OPERATION, MATCHED_TWO_OPERATION,
-      MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_WHEN_OPERATION, NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE),
+      MATCHED_DOT_CALL_OPERATION, MATCHED_DOT_OPERATION, MATCHED_DOT_OPERATOR_CALL_OPERATION, MATCHED_EXPRESSION,
+      MATCHED_HAT_OPERATION, MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION,
+      MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_RELATIONAL_OPERATION,
+      MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_WHEN_OPERATION,
+      NO_PARENTHESES_NO_ARGUMENTS_UNQUALIFIED_CALL_OR_VARIABLE),
   };
 
   /* ********************************************************** */
@@ -3098,6 +3105,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // emptyParentheses
+  public static boolean parenthesesArguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments")) return false;
+    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = emptyParentheses(b, l + 1);
+    exit_section_(b, m, PARENTHESES_ARGUMENTS, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // EOL* PIPE_OPERATOR EOL*
   public static boolean pipeInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pipeInfixOperator")) return false;
@@ -3639,12 +3658,13 @@ public class ElixirParser implements PsiParser {
   // 15: BINARY(matchedMultiplicationOperation)
   // 16: BINARY(matchedHatOperation)
   // 17: PREFIX(matchedUnaryNonNumericOperation)
-  // 18: POSTFIX(matchedDotOperatorCallOperation)
-  // 19: BINARY(matchedDotOperation)
-  // 20: PREFIX(matchedAtNonNumericOperation)
-  // 21: POSTFIX(matchedCallOperation)
-  // 22: ATOM(noParenthesesNoArgumentsUnqualifiedCallOrVariable)
-  // 23: ATOM(accessExpression)
+  // 18: POSTFIX(matchedDotCallOperation)
+  // 19: POSTFIX(matchedDotOperatorCallOperation)
+  // 20: BINARY(matchedDotOperation)
+  // 21: PREFIX(matchedAtNonNumericOperation)
+  // 22: POSTFIX(matchedCallOperation)
+  // 23: ATOM(noParenthesesNoArgumentsUnqualifiedCallOrVariable)
+  // 24: ATOM(accessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "matchedExpression")) return false;
     addVariant(b, "<matched expression>");
@@ -3730,15 +3750,19 @@ public class ElixirParser implements PsiParser {
         r = matchedExpression(b, l, 16);
         exit_section_(b, l, m, MATCHED_HAT_OPERATION, r, true, null);
       }
-      else if (g < 18 && matchedDotOperatorCallOperation_0(b, l + 1)) {
+      else if (g < 18 && matchedDotCallOperation_0(b, l + 1)) {
+        r = true;
+        exit_section_(b, l, m, MATCHED_DOT_CALL_OPERATION, r, true, null);
+      }
+      else if (g < 19 && matchedDotOperatorCallOperation_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_DOT_OPERATOR_CALL_OPERATION, r, true, null);
       }
-      else if (g < 19 && matchedDotOperation_0(b, l + 1)) {
-        r = matchedExpression(b, l, 19);
+      else if (g < 20 && matchedDotOperation_0(b, l + 1)) {
+        r = matchedExpression(b, l, 20);
         exit_section_(b, l, m, MATCHED_DOT_OPERATION, r, true, null);
       }
-      else if (g < 21 && noParenthesesManyArgumentsStrict(b, l + 1)) {
+      else if (g < 22 && noParenthesesManyArgumentsStrict(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_CALL_OPERATION, r, true, null);
       }
@@ -3824,6 +3848,17 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !numeric(b, l + 1);
     exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  // dotInfixOperator parenthesesArguments
+  private static boolean matchedDotCallOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedDotCallOperation_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = dotInfixOperator(b, l + 1);
+    r = r && parenthesesArguments(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -3981,7 +4016,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedAtNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 20);
+    r = p && matchedExpression(b, l, 21);
     exit_section_(b, l, m, MATCHED_AT_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }

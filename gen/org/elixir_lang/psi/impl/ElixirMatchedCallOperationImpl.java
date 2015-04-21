@@ -52,4 +52,13 @@ public class ElixirMatchedCallOperationImpl extends ElixirMatchedExpressionImpl 
     return ElixirPsiImplUtil.quote(this);
   }
 
+  @NotNull
+  public OtpErlangObject[] quoteArguments() {
+    return ElixirPsiImplUtil.quoteArguments(this);
+  }
+
+  public OtpErlangObject quoteIdentifier() {
+    return ElixirPsiImplUtil.quoteIdentifier(this);
+  }
+
 }

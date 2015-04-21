@@ -158,6 +158,8 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   getArguments
                                                   getIdentifier
                                                   quote
+                                                  quoteArguments
+                                                  quoteIdentifier
                                                 ]
                                               }
 
@@ -946,6 +948,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedMultiplicationOperation |
                       matchedHatOperation |
                       matchedUnaryNonNumericOperation |
+                      matchedDotCallOperation |
                       // Must be before matchedDotOperation so that the right operand can be restricted to operatorIdentifier
                       matchedDotOperatorCallOperation |
                       matchedDotOperation |
@@ -1294,6 +1297,20 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                        ]
                      }
 
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
+parenthesesArguments ::= emptyParentheses // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484
+                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+matchedDotCallOperation ::= matchedExpression dotInfixOperator // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L430
+                            parenthesesArguments // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254
+                            {
+                              implements = "org.elixir_lang.psi.QuotableCall"
+                              methods = [
+                                quote
+                                quoteArguments
+                                quoteIdentifier
+                              ]
+                            }
+
 operatorIdentifier ::= AND_OPERATOR |
                        ARROW_OPERATOR |
                        // NOT ASSOCIATION_OPERATOR
@@ -1407,6 +1424,8 @@ matchedCallOperation ::= matchedExpression noParenthesesManyArgumentsStrict
                              getArguments
                              getIdentifier
                              quote
+                             quoteArguments
+                             quoteIdentifier
                            ]
                          }
 

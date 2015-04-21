@@ -417,6 +417,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
+  public void visitMatchedDotCallOperation(@NotNull ElixirMatchedDotCallOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotableCall(o);
+  }
+
   public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {
     visitMatchedExpression(o);
     // visitInfixOperation(o);
@@ -562,6 +567,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitOrInfixOperator(@NotNull ElixirOrInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitParenthesesArguments(@NotNull ElixirParenthesesArguments o) {
+    visitQuotableArguments(o);
   }
 
   public void visitPipeInfixOperator(@NotNull ElixirPipeInfixOperator o) {
