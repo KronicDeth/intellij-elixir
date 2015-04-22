@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirParenthesesArguments extends QuotableArguments {
 
   @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
+  ElixirKeywords getKeywords();
 
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();

@@ -1916,14 +1916,17 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
-        ElixirEmptyParentheses emptyParentheses = parenthesesArguments.getEmptyParentheses();
+        PsiElement[] children = parenthesesArguments.getChildren();
+
+        assert children.length <= 1;
+
         OtpErlangObject[] quotedArguments;
 
-        if (emptyParentheses != null) {
+        if (children.length == 0) {
             quotedArguments = new OtpErlangObject[0];
         } else {
-            Quotable quotable = parenthesesArguments.getUnqualifiedNoParenthesesManyArgumentsCall();
-            OtpErlangObject quoted = quotable.quote();
+            Quotable child = (Quotable) children[0];
+            OtpErlangObject quoted = child.quote();
 
             quotedArguments = new OtpErlangObject[] {
                     quoted
