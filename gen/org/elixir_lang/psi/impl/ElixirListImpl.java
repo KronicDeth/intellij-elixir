@@ -9,6 +9,7 @@ import org.elixir_lang.psi.ElixirKeywords;
 import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
 
@@ -22,9 +23,9 @@ public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirKeywords getKeywords() {
-    return findNotNullChildByClass(ElixirKeywords.class);
+    return findChildByClass(ElixirKeywords.class);
   }
 
   @NotNull

@@ -2110,42 +2110,33 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (keywordPair (infixComma keywordPair)* COMMA?)?
+  // keywordPair (infixComma keywordPair)* COMMA?
   public static boolean keywords(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "keywords")) return false;
-    Marker m = enter_section_(b, l, _NONE_, "<keywords>");
-    keywords_0(b, l + 1);
-    exit_section_(b, l, m, KEYWORDS, true, false, null);
-    return true;
-  }
-
-  // keywordPair (infixComma keywordPair)* COMMA?
-  private static boolean keywords_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "keywords_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, "<keywords>");
     r = keywordPair(b, l + 1);
-    r = r && keywords_0_1(b, l + 1);
-    r = r && keywords_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && keywords_1(b, l + 1);
+    r = r && keywords_2(b, l + 1);
+    exit_section_(b, l, m, KEYWORDS, r, false, null);
     return r;
   }
 
   // (infixComma keywordPair)*
-  private static boolean keywords_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "keywords_0_1")) return false;
+  private static boolean keywords_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywords_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!keywords_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "keywords_0_1", c)) break;
+      if (!keywords_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "keywords_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // infixComma keywordPair
-  private static boolean keywords_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "keywords_0_1_0")) return false;
+  private static boolean keywords_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywords_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = infixComma(b, l + 1);
@@ -2155,14 +2146,14 @@ public class ElixirParser implements PsiParser {
   }
 
   // COMMA?
-  private static boolean keywords_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "keywords_0_2")) return false;
+  private static boolean keywords_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "keywords_2")) return false;
     consumeToken(b, COMMA);
     return true;
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET EOL* keywords CLOSING_BRACKET
+  // OPENING_BRACKET EOL* keywords? CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     if (!nextTokenIs(b, OPENING_BRACKET)) return false;
@@ -2170,7 +2161,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_BRACKET);
     r = r && list_1(b, l + 1);
-    r = r && keywords(b, l + 1);
+    r = r && list_2(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;
@@ -2185,6 +2176,13 @@ public class ElixirParser implements PsiParser {
       if (!empty_element_parsed_guard_(b, "list_1", c)) break;
       c = current_position_(b);
     }
+    return true;
+  }
+
+  // keywords?
+  private static boolean list_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_2")) return false;
+    keywords(b, l + 1);
     return true;
   }
 

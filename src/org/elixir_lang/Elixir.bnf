@@ -1695,7 +1695,7 @@ keywordPair ::=  keywordKeyColonEOL containerExpression
                  }
 /* @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L500
    @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L502-L503 */
-keywords ::= (keywordPair (infixComma keywordPair)* COMMA?)?
+keywords ::= keywordPair (infixComma keywordPair)* COMMA?
              { implements = "org.elixir_lang.psi.QuotableKeywordList" methods = [quotableKeywordPairList quote] }
 
 /*
@@ -1720,7 +1720,7 @@ emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-list ::= OPENING_BRACKET EOL* keywords CLOSING_BRACKET
+list ::= OPENING_BRACKET EOL* keywords? CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches

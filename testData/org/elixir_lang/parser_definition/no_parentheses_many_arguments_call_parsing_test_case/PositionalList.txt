@@ -9,8 +9,6 @@ Elixir File(0,53)
           ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(11,13)
             ElixirListImpl(LIST)(11,13)
               PsiElement([)('[')(11,12)
-              ElixirKeywordsImpl(KEYWORDS)(12,12)
-                <empty list>
               PsiElement(])(']')(12,13)
         PsiElement(,)(',')(13,14)
         PsiWhiteSpace(' ')(14,15)

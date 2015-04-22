@@ -5,6 +5,4 @@ Elixir File(0,7)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(5,7)
     ElixirListImpl(LIST)(5,7)
       PsiElement([)('[')(5,6)
-      ElixirKeywordsImpl(KEYWORDS)(6,6)
-        <empty list>
       PsiElement(])(']')(6,7)

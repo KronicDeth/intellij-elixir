@@ -1371,7 +1371,16 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        return list.getKeywords().quote();
+        ElixirKeywords keywords = list.getKeywords();
+        OtpErlangObject quoted;
+
+        if (keywords != null) {
+            quoted = keywords.quote();
+        } else {
+            quoted = new OtpErlangList();
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
