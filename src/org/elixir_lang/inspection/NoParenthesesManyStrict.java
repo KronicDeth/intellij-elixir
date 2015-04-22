@@ -64,6 +64,8 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                                 if (grandparent instanceof ElixirKeywordPair) {
                                     elementWithAmbiguousComma = element;
                                 }
+                            } else if (parent instanceof ElixirKeywordPair) {
+                                elementWithAmbiguousComma = element;
                             }
                         }
 
