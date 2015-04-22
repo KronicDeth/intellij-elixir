@@ -1603,7 +1603,8 @@ private infixComma ::= COMMA EOL*
 charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private containerExpression ::= emptyParentheses
+private containerExpression ::= emptyParentheses |
+                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

@@ -7,6 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements ElixirKeywordPair {
 
@@ -20,15 +21,21 @@ public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements Elixi
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
-    return findNotNullChildByClass(ElixirEmptyParentheses.class);
+    return findChildByClass(ElixirEmptyParentheses.class);
   }
 
   @Override
   @NotNull
   public ElixirKeywordKey getKeywordKey() {
     return findNotNullChildByClass(ElixirKeywordKey.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findChildByClass(ElixirMatchedExpression.class);
   }
 
   public Quotable getKeywordValue() {

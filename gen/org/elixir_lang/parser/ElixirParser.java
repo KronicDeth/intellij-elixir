@@ -896,9 +896,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // emptyParentheses
+  // emptyParentheses |
+  //                                 matchedExpression
   static boolean containerExpression(PsiBuilder b, int l) {
-    return emptyParentheses(b, l + 1);
+    if (!recursion_guard_(b, l, "containerExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = emptyParentheses(b, l + 1);
+    if (!r) r = matchedExpression(b, l + 1, -1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
