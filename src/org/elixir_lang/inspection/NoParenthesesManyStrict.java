@@ -5,6 +5,9 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
+import org.elixir_lang.psi.ElixirKeywordPair;
+import org.elixir_lang.psi.ElixirMatchedCallOperation;
+import org.elixir_lang.psi.ElixirMatchedDotOperation;
 import org.elixir_lang.psi.ElixirNoParenthesesManyStrictNoParenthesesExpression;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +51,24 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                 new PsiRecursiveElementWalkingVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
+                        PsiElement elementWithAmbiguousComma = null;
+
                         if (element instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
-                            int ambiguousCommaIndex = element.getText().indexOf(",");
+                            elementWithAmbiguousComma = element;
+                        } else if (element instanceof ElixirMatchedCallOperation) {
+                            PsiElement parent = element.getParent();
+
+                            if (parent instanceof ElixirMatchedDotOperation) {
+                                PsiElement grandparent = parent.getParent();
+
+                                if (grandparent instanceof ElixirKeywordPair) {
+                                    elementWithAmbiguousComma = element;
+                                }
+                            }
+                        }
+
+                        if (elementWithAmbiguousComma != null) {
+                            int ambiguousCommaIndex = elementWithAmbiguousComma.getText().indexOf(",");
                             TextRange ambiguousCommaTextRange = new TextRange(
                                     ambiguousCommaIndex,
                                     ambiguousCommaIndex + 1
@@ -62,6 +81,7 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                                     ambiguousCommaTextRange
                             );
                         }
+
                         super.visitElement(element);
                     }
                 }
