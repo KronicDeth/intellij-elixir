@@ -409,8 +409,8 @@ public class ElixirPsiImplUtil {
     /* TODO determine what counter means in Code.string_to_quoted("Foo")
        {:ok, {:__aliases__, [counter: 0, line: 1], [:Foo]}} */
     public static OtpErlangList metadata(PsiElement element, int counter) {
-        /* KeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
-           same order than detect a OtpErlangList is a KeywordList */
+        /* QuotableKeywordList should be compared by sorting keys, but Elixir does counter first, so it's simpler to just use
+           same order than detect a OtpErlangList is a QuotableKeywordList */
         final OtpErlangObject[] keywordListElements = {
                 keywordTuple("counter", counter),
                 lineNumberKeywordTuple(element)
@@ -976,21 +976,24 @@ public class ElixirPsiImplUtil {
         return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
     }
 
-    public static List<KeywordPair> getKeywordPairList(ElixirList list) {
-        List<ElixirListKeywordPair> listKeywordPairList = list.getListKeywordPairList();
-        List<KeywordPair> keywordPairList = new ArrayList<KeywordPair>(listKeywordPairList.size());
+    public static Quotable getKeywordValue(ElixirKeywordPair keywordPair) {
+        PsiElement[] children = keywordPair.getChildren();
 
-        keywordPairList.addAll(listKeywordPairList);
+        assert children.length == 2;
 
-        return keywordPairList;
-    }
-
-    public static List<KeywordPair> getKeywordPairList(ElixirNoParenthesesKeywords noParenthesesKeywords) {
-        return new ArrayList<KeywordPair>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
+        return (Quotable) children[1];
     }
 
     public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
         return noParenthesesKeywordPair.getNoParenthesesExpression();
+    }
+
+    public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
+        return new ArrayList<QuotableKeywordPair>(keywords.getKeywordPairList());
+    }
+
+    public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirNoParenthesesKeywords noParenthesesKeywords) {
+        return new ArrayList<QuotableKeywordPair>(noParenthesesKeywords.getNoParenthesesKeywordPairList());
     }
 
     @NotNull
@@ -1311,13 +1314,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final KeywordList keywordList) {
-        List<KeywordPair> keywordPairList = keywordList.getKeywordPairList();
+    public static OtpErlangObject quote(@NotNull final QuotableKeywordList quotableKeywordList) {
+        List<QuotableKeywordPair> keywordPairList = quotableKeywordList.quotableKeywordPairList();
         List<OtpErlangObject> quotedKeywordPairList = new ArrayList<OtpErlangObject>(keywordPairList.size());
 
-        for (KeywordPair keywordPair : keywordPairList) {
+        for (QuotableKeywordPair quotableKeywordPair : keywordPairList) {
             quotedKeywordPairList.add(
-                    keywordPair.quote()
+                    quotableKeywordPair.quote()
             );
         }
 
@@ -1329,11 +1332,11 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final KeywordPair keywordPair) {
-        Quotable keywordKey = keywordPair.getKeywordKey();
+    public static OtpErlangObject quote(@NotNull final QuotableKeywordPair quotableKeywordPair) {
+        Quotable keywordKey = quotableKeywordPair.getKeywordKey();
         OtpErlangObject quotedKeywordKey = keywordKey.quote();
 
-        Quotable keywordValue = keywordPair.getKeywordValue();
+        Quotable keywordValue = quotableKeywordPair.getKeywordValue();
         OtpErlangObject quotedKeywordValue = keywordValue.quote();
 
         OtpErlangObject[] elements = {
@@ -1367,10 +1370,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirKeywordValue keywordValue) {
-        ElixirEmptyParentheses emptyParentheses = keywordValue.getEmptyParentheses();
-
-        return emptyParentheses.quote();
+    public static OtpErlangObject quote(@NotNull final ElixirList list) {
+        return list.getKeywords().quote();
     }
 
     @Contract(pure = true)

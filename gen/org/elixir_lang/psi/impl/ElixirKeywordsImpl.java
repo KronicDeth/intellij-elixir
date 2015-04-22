@@ -5,26 +5,34 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.ElixirKeywordPair;
 import org.elixir_lang.psi.ElixirKeywords;
-import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.QuotableKeywordPair;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
+import java.util.List;
 
-  public ElixirListImpl(ASTNode node) {
+public class ElixirKeywordsImpl extends ASTWrapperPsiElement implements ElixirKeywords {
+
+  public ElixirKeywordsImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitList(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitKeywords(this);
     else super.accept(visitor);
   }
 
   @Override
   @NotNull
-  public ElixirKeywords getKeywords() {
-    return findNotNullChildByClass(ElixirKeywords.class);
+  public List<ElixirKeywordPair> getKeywordPairList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirKeywordPair.class);
+  }
+
+  public List<QuotableKeywordPair> quotableKeywordPairList() {
+    return ElixirPsiImplUtil.quotableKeywordPairList(this);
   }
 
   @NotNull

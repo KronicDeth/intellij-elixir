@@ -70,10 +70,10 @@ public interface ElixirTypes {
   IElementType INTERPOLATION = new ElixirElementType("INTERPOLATION");
   IElementType IN_INFIX_OPERATOR = new ElixirElementType("IN_INFIX_OPERATOR");
   IElementType IN_MATCH_INFIX_OPERATOR = new ElixirElementType("IN_MATCH_INFIX_OPERATOR");
+  IElementType KEYWORDS = new ElixirElementType("KEYWORDS");
   IElementType KEYWORD_KEY = new ElixirElementType("KEYWORD_KEY");
-  IElementType KEYWORD_VALUE = new ElixirElementType("KEYWORD_VALUE");
+  IElementType KEYWORD_PAIR = new ElixirElementType("KEYWORD_PAIR");
   IElementType LIST = new ElixirElementType("LIST");
-  IElementType LIST_KEYWORD_PAIR = new ElixirElementType("LIST_KEYWORD_PAIR");
   IElementType LITERAL_CHAR_LIST_BODY = new ElixirElementType("LITERAL_CHAR_LIST_BODY");
   IElementType LITERAL_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("LITERAL_CHAR_LIST_HEREDOC_LINE");
   IElementType LITERAL_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("LITERAL_CHAR_LIST_SIGIL_HEREDOC");
@@ -463,17 +463,17 @@ public interface ElixirTypes {
       else if (type == IN_MATCH_INFIX_OPERATOR) {
         return new ElixirInMatchInfixOperatorImpl(node);
       }
+      else if (type == KEYWORDS) {
+        return new ElixirKeywordsImpl(node);
+      }
       else if (type == KEYWORD_KEY) {
         return new ElixirKeywordKeyImpl(node);
       }
-      else if (type == KEYWORD_VALUE) {
-        return new ElixirKeywordValueImpl(node);
+      else if (type == KEYWORD_PAIR) {
+        return new ElixirKeywordPairImpl(node);
       }
       else if (type == LIST) {
         return new ElixirListImpl(node);
-      }
-      else if (type == LIST_KEYWORD_PAIR) {
-        return new ElixirListKeywordPairImpl(node);
       }
       else if (type == LITERAL_CHAR_LIST_BODY) {
         return new ElixirLiteralCharListBodyImpl(node);

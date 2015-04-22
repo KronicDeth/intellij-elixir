@@ -20,4 +20,6 @@ Elixir File(0,36)
               ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(34,36)
                 ElixirListImpl(LIST)(34,36)
                   PsiElement([)('[')(34,35)
+                  ElixirKeywordsImpl(KEYWORDS)(35,35)
+                    <empty list>
                   PsiElement(])(']')(35,36)

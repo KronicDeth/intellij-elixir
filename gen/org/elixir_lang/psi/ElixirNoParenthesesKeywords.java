@@ -6,12 +6,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirNoParenthesesKeywords extends KeywordList {
+public interface ElixirNoParenthesesKeywords extends QuotableKeywordList {
 
   @NotNull
   List<ElixirNoParenthesesKeywordPair> getNoParenthesesKeywordPairList();
 
-  List<KeywordPair> getKeywordPairList();
+  List<QuotableKeywordPair> quotableKeywordPairList();
 
   @NotNull
   OtpErlangObject quote();

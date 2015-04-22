@@ -276,16 +276,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitKeywordValue(@NotNull ElixirKeywordValue o) {
-    visitQuotable(o);
+  public void visitKeywordPair(@NotNull ElixirKeywordPair o) {
+    visitQuotableKeywordPair(o);
+  }
+
+  public void visitKeywords(@NotNull ElixirKeywords o) {
+    visitQuotableKeywordList(o);
   }
 
   public void visitList(@NotNull ElixirList o) {
-    visitKeywordList(o);
-  }
-
-  public void visitListKeywordPair(@NotNull ElixirListKeywordPair o) {
-    visitKeywordPair(o);
+    visitQuotable(o);
   }
 
   public void visitLiteralCharListBody(@NotNull ElixirLiteralCharListBody o) {
@@ -509,11 +509,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesKeywordPair(@NotNull ElixirNoParenthesesKeywordPair o) {
-    visitKeywordPair(o);
+    visitQuotableKeywordPair(o);
   }
 
   public void visitNoParenthesesKeywords(@NotNull ElixirNoParenthesesKeywords o) {
-    visitKeywordList(o);
+    visitQuotableKeywordList(o);
   }
 
   public void visitNoParenthesesManyArguments(@NotNull ElixirNoParenthesesManyArguments o) {
@@ -684,14 +684,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitElement(o);
   }
 
-  public void visitKeywordList(@NotNull KeywordList o) {
-    visitElement(o);
-  }
-
-  public void visitKeywordPair(@NotNull KeywordPair o) {
-    visitElement(o);
-  }
-
   public void visitOperator(@NotNull Operator o) {
     visitElement(o);
   }
@@ -705,6 +697,14 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQuotableArguments(@NotNull QuotableArguments o) {
+    visitElement(o);
+  }
+
+  public void visitQuotableKeywordList(@NotNull QuotableKeywordList o) {
+    visitElement(o);
+  }
+
+  public void visitQuotableKeywordPair(@NotNull QuotableKeywordPair o) {
     visitElement(o);
   }
 
