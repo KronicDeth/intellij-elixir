@@ -3101,7 +3101,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS (unqualifiedNoParenthesesManyArgumentsCall | keywords)? CLOSING_PARENTHESIS
+  // OPENING_PARENTHESIS EOL* (unqualifiedNoParenthesesManyArgumentsCall | keywords)? EOL* CLOSING_PARENTHESIS
   public static boolean parenthesesArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
@@ -3109,27 +3109,53 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_PARENTHESIS);
     r = r && parenthesesArguments_1(b, l + 1);
+    r = r && parenthesesArguments_2(b, l + 1);
+    r = r && parenthesesArguments_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_PARENTHESIS);
     exit_section_(b, m, PARENTHESES_ARGUMENTS, r);
     return r;
   }
 
-  // (unqualifiedNoParenthesesManyArgumentsCall | keywords)?
+  // EOL*
   private static boolean parenthesesArguments_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments_1")) return false;
-    parenthesesArguments_1_0(b, l + 1);
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "parenthesesArguments_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // (unqualifiedNoParenthesesManyArgumentsCall | keywords)?
+  private static boolean parenthesesArguments_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_2")) return false;
+    parenthesesArguments_2_0(b, l + 1);
     return true;
   }
 
   // unqualifiedNoParenthesesManyArgumentsCall | keywords
-  private static boolean parenthesesArguments_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "parenthesesArguments_1_0")) return false;
+  private static boolean parenthesesArguments_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = keywords(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  // EOL*
+  private static boolean parenthesesArguments_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesArguments_3")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "parenthesesArguments_3", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
