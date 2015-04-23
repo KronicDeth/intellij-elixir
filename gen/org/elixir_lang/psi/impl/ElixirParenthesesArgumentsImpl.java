@@ -5,12 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirKeywords;
-import org.elixir_lang.psi.ElixirParenthesesArguments;
-import org.elixir_lang.psi.ElixirUnqualifiedNoParenthesesManyArgumentsCall;
-import org.elixir_lang.psi.ElixirVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement implements ElixirParenthesesArguments {
 
@@ -27,6 +27,12 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
   @Nullable
   public ElixirKeywords getKeywords() {
     return findChildByClass(ElixirKeywords.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @Override

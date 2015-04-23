@@ -3101,7 +3101,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS EOL* (unqualifiedNoParenthesesManyArgumentsCall | keywords)? EOL* CLOSING_PARENTHESIS
+  // OPENING_PARENTHESIS EOL* (unqualifiedNoParenthesesManyArgumentsCall | keywords | parenthesesPositionalArguments)? EOL* CLOSING_PARENTHESIS
   public static boolean parenthesesArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
@@ -3128,20 +3128,21 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // (unqualifiedNoParenthesesManyArgumentsCall | keywords)?
+  // (unqualifiedNoParenthesesManyArgumentsCall | keywords | parenthesesPositionalArguments)?
   private static boolean parenthesesArguments_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments_2")) return false;
     parenthesesArguments_2_0(b, l + 1);
     return true;
   }
 
-  // unqualifiedNoParenthesesManyArgumentsCall | keywords
+  // unqualifiedNoParenthesesManyArgumentsCall | keywords | parenthesesPositionalArguments
   private static boolean parenthesesArguments_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parenthesesArguments_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = keywords(b, l + 1);
+    if (!r) r = parenthesesPositionalArguments(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3156,6 +3157,47 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  /* ********************************************************** */
+  // matchedExpression
+  static boolean parenthesesPositionalArgument(PsiBuilder b, int l) {
+    return matchedExpression(b, l + 1, -1);
+  }
+
+  /* ********************************************************** */
+  // parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
+  static boolean parenthesesPositionalArguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesPositionalArguments")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = parenthesesPositionalArgument(b, l + 1);
+    r = r && parenthesesPositionalArguments_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (infixComma parenthesesPositionalArgument)*
+  private static boolean parenthesesPositionalArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesPositionalArguments_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!parenthesesPositionalArguments_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "parenthesesPositionalArguments_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // infixComma parenthesesPositionalArgument
+  private static boolean parenthesesPositionalArguments_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parenthesesPositionalArguments_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = infixComma(b, l + 1);
+    r = r && parenthesesPositionalArgument(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

@@ -1918,19 +1918,12 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
         PsiElement[] children = parenthesesArguments.getChildren();
 
-        assert children.length <= 1;
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[children.length];
 
-        OtpErlangObject[] quotedArguments;
-
-        if (children.length == 0) {
-            quotedArguments = new OtpErlangObject[0];
-        } else {
-            Quotable child = (Quotable) children[0];
-            OtpErlangObject quoted = child.quote();
-
-            quotedArguments = new OtpErlangObject[] {
-                    quoted
-            };
+        for (int i = 0; i < children.length; i++) {
+            Quotable quotableChild = (Quotable) children[i];
+            OtpErlangObject quotedChild = quotableChild.quote();
+            quotedArguments[i] = quotedChild;
         }
 
         return quotedArguments;

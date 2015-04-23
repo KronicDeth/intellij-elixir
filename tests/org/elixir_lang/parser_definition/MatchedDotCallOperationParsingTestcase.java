@@ -1,6 +1,30 @@
 package org.elixir_lang.parser_definition;
 
 public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
+    public void testMatchedCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedCallOperationInMiddle() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testMatchedDotMatchedCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedDotMatchedCallOperationInMiddle() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testMatchedWhenNoParenthesesKeywordsOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedWhenNoParenthesesKeywordsOperationInMiddle() {
+        assertParsedAndQuotedAroundError();
+    }
+
   public void testAssociativity() {
         assertParsedAndQuotedCorrectly();
     }
