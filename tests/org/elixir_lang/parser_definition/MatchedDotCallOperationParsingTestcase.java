@@ -37,6 +37,10 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEOLs() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testList() {
         assertParsedAndQuotedCorrectly();
     }
