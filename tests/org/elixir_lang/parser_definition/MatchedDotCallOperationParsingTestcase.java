@@ -5,12 +5,20 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedCallOperationAtEnd() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testMatchedCallOperationInMiddle() {
         assertParsedAndQuotedAroundError();
     }
 
     public void testMatchedDotMatchedCallOperation() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedDotMatchedCallOperationAtEnd() {
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMatchedDotMatchedCallOperationInMiddle() {
@@ -21,9 +29,14 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedWhenNoParenthesesKeywordsOperationAtEnd() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedWhenNoParenthesesKeywordsOperationInMiddle() {
         assertParsedAndQuotedAroundError();
     }
+
 
   public void testAssociativity() {
         assertParsedAndQuotedCorrectly();
