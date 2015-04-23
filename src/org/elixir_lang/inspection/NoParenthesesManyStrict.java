@@ -5,10 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
-import org.elixir_lang.psi.ElixirKeywordPair;
-import org.elixir_lang.psi.ElixirMatchedCallOperation;
-import org.elixir_lang.psi.ElixirMatchedDotOperation;
-import org.elixir_lang.psi.ElixirNoParenthesesManyStrictNoParenthesesExpression;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,14 +55,16 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                         } else if (element instanceof ElixirMatchedCallOperation) {
                             PsiElement parent = element.getParent();
 
-                            if (parent instanceof ElixirMatchedDotOperation) {
+                            if (parent instanceof ElixirKeywordPair) {
+                                elementWithAmbiguousComma = element;
+                            } else if (parent instanceof ElixirParenthesesArguments) {
+                                elementWithAmbiguousComma = element;
+                            } else  if (parent instanceof ElixirMatchedDotOperation) {
                                 PsiElement grandparent = parent.getParent();
 
                                 if (grandparent instanceof ElixirKeywordPair) {
                                     elementWithAmbiguousComma = element;
                                 }
-                            } else if (parent instanceof ElixirKeywordPair) {
-                                elementWithAmbiguousComma = element;
                             }
                         }
 
