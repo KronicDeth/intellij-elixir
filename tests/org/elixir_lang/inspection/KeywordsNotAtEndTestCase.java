@@ -18,6 +18,12 @@ public class KeywordsNotAtEndTestCase extends LightCodeInsightFixtureTestCase {
         myFixture.checkHighlighting();
     }
 
+    public void testMatchedWhenNoParenthesesKeywordsOperationInMiddle() {
+        myFixture.configureByFiles("MatchedWhenNoParenthesesKeywordsOperationInMiddle.ex");
+        myFixture.enableInspections(KeywordsNotAtEnd.class);
+        myFixture.checkHighlighting();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/inspection/keywords_not_at_end_test_case";
