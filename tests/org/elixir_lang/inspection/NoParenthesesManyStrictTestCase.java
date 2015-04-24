@@ -24,6 +24,12 @@ public class NoParenthesesManyStrictTestCase extends LightCodeInsightFixtureTest
         myFixture.checkHighlighting();
     }
 
+    public void testMatchedDotMatchedCallOperationAtEnd() {
+        myFixture.configureByFiles("MatchedDotMatchedCallOperationAtEnd.ex");
+        myFixture.enableInspections(NoParenthesesManyStrict.class);
+        myFixture.checkHighlighting();
+    }
+
     public void testMatchedDotMatchedCallOperationKeywordValue() {
         myFixture.configureByFiles("MatchedDotMatchedCallOperationKeywordValue.ex");
         myFixture.enableInspections(NoParenthesesManyStrict.class);

@@ -62,7 +62,7 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                             } else  if (parent instanceof ElixirMatchedDotOperation) {
                                 PsiElement grandparent = parent.getParent();
 
-                                if (grandparent instanceof ElixirKeywordPair) {
+                                if (grandparent instanceof ElixirKeywordPair || grandparent instanceof ElixirParenthesesArguments) {
                                     elementWithAmbiguousComma = element;
                                 }
                             }
