@@ -25,6 +25,10 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testMatchedDotOperatorCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedWhenNoParenthesesKeywordsOperation() {
         assertParsedAndQuotedCorrectly();
     }
