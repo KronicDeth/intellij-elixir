@@ -42,3 +42,7 @@
   :atom,
   Alias
 )
+0b0.(
+  one,
+  key: value
+)

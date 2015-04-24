@@ -42,3 +42,7 @@ true.(
   :atom,
   Alias
 )
+true.(
+  one,
+  key: value
+)

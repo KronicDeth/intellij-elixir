@@ -119,7 +119,7 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testDecimalFloat() {

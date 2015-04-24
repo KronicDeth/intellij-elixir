@@ -50,3 +50,9 @@ One
   :atom,
   Alias
 )
+'''
+One
+'''.(
+  one,
+  key: value
+)

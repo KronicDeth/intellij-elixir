@@ -1297,12 +1297,22 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                        ]
                      }
 
-private parenthesesPositionalArgument ::= matchedExpression // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477
+private parenthesesPositionalArgument ::= /* Must exclude matchedExpression when followed by KEYWORD_PAIR_COLON so that
+                                             <matchedExpression>: is parsed as a keywordKeyColonEOL in keywords in
+                                             parenthesesArguments.
+
+                                             @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477 */
+                                          matchedExpression !KEYWORD_PAIR_COLON
 // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L481-L482
 private parenthesesPositionalArguments ::= parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
-parenthesesArguments ::= OPENING_PARENTHESIS EOL* (unqualifiedNoParenthesesManyArgumentsCall | keywords | parenthesesPositionalArguments)? EOL* CLOSING_PARENTHESIS // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-486
+parenthesesArguments ::= OPENING_PARENTHESIS EOL*
+                         (
+                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+                          keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
+                          parenthesesPositionalArguments (infixComma keywords)?)? EOL* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
+                         CLOSING_PARENTHESIS
                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 matchedDotCallOperation ::= matchedExpression dotInfixOperator // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L430
                             parenthesesArguments // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254
