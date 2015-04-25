@@ -305,6 +305,38 @@ function(first_positional, second_positional)
   </figcaption>
 </figure>
 
+#### Keywords appear before the end of list.
+
+```elixir
+one.(
+  one,
+  two positional, key: value,
+  three
+)
+```
+
+Keywords can only appear at the end of an argument list, so either surround the no parentheses expression argument with
+parentheses, or move the the keywords to the end of the list if it wasn't meant to be a no parentheses expression.
+
+```elixir
+one.(
+  one
+  two(positional, key: value),
+  three
+)
+```
+
+OR
+
+```elixir
+one.(
+  one,
+  two,
+  three,
+  key: value
+)
+```
+
 #### Missing End-of-Expression
 
 End-of-expressions (`;` or new lines) missing between expressions.
