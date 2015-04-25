@@ -337,6 +337,33 @@ one.(
 )
 ```
 
+<figure>
+  <img alt="Keywords Not At End" src="/screenshots/inspection/elixir/keywords_not_at_end/preferences.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Preferences &gt; Inspections &gt; Elixir &gt; Keywords Not At End
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Keywords Not At End error" src="/screenshots/inspection/elixir/keywords_not_at_end/error.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Keywords Not At End inspection marks the error over the keywords that need to be surrounded by parentheses or moved
+    to the end of the list. 
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Keywords Not At End inspection" src="/screenshots/inspection/elixir/keywords_not_at_end/inspection.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Mousing over the keywords marked as an error in red (or over the red square in the right gutter) will
+    show the inspection describing the error.
+  </figcaption>
+</figure>
+
+
 #### Missing End-of-Expression
 
 End-of-expressions (`;` or new lines) missing between expressions.
