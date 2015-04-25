@@ -5,21 +5,25 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirKeywordKey;
-import org.elixir_lang.psi.ElixirKeywordValue;
-import org.elixir_lang.psi.ElixirListKeywordPair;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirListKeywordPairImpl extends ASTWrapperPsiElement implements ElixirListKeywordPair {
+public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements ElixirKeywordPair {
 
-  public ElixirListKeywordPairImpl(ASTNode node) {
+  public ElixirKeywordPairImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitListKeywordPair(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitKeywordPair(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirEmptyParentheses getEmptyParentheses() {
+    return findChildByClass(ElixirEmptyParentheses.class);
   }
 
   @Override
@@ -29,9 +33,13 @@ public class ElixirListKeywordPairImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
-  @NotNull
-  public ElixirKeywordValue getKeywordValue() {
-    return findNotNullChildByClass(ElixirKeywordValue.class);
+  @Nullable
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findChildByClass(ElixirMatchedExpression.class);
+  }
+
+  public Quotable getKeywordValue() {
+    return ElixirPsiImplUtil.getKeywordValue(this);
   }
 
   @NotNull

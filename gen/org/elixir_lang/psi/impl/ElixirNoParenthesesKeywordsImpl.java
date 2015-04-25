@@ -9,7 +9,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirNoParenthesesKeywordPair;
 import org.elixir_lang.psi.ElixirNoParenthesesKeywords;
 import org.elixir_lang.psi.ElixirVisitor;
-import org.elixir_lang.psi.KeywordPair;
+import org.elixir_lang.psi.QuotableKeywordPair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -31,8 +31,8 @@ public class ElixirNoParenthesesKeywordsImpl extends ASTWrapperPsiElement implem
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesKeywordPair.class);
   }
 
-  public List<KeywordPair> getKeywordPairList() {
-    return ElixirPsiImplUtil.getKeywordPairList(this);
+  public List<QuotableKeywordPair> quotableKeywordPairList() {
+    return ElixirPsiImplUtil.quotableKeywordPairList(this);
   }
 
   @NotNull

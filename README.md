@@ -162,13 +162,15 @@ allows the grammar because they contain correctable errors:
 * [Empty Parentheses](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L299) (`()`)
 * [Keyword Lists](http://elixir-lang.org/getting_started/7.html#7.1-keyword-lists)
   * Keyword Keys - Aliases, identifiers, quotes, or operators when followed immediately by a colon and horizontal or vertical space.
-  * Keyword Values *PARTIAL SUPPORT* - Only empty parentheses (`()`).
+  * Keyword Values - Empty parentheses (`()`) and matched expressions.
 * [Matched Expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L113-L122),
   in other words, unary and binary operations on variable, function, and macro names and values (numbers, strings,
   char lists, sigils, heredocs, `true`, `false`, and `nil`).
 * [No Parentheses expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125), which
   are function calls with neither parentheses nor `do` blocks that have either (1) a positional argument and keyword
   arguments OR (2) two or more positional arguments with optional keyword arguments.
+* Anonymous function calls `.()` with either no arguments; a no parentheses arguments expression as an argument; keywords
+  as an argument; positional argument(s); or positional arguments followed by keywords as arguments.
 
 ### Inspections
 
@@ -302,6 +304,65 @@ function(first_positional, second_positional)
     show the inspection describing the error.
   </figcaption>
 </figure>
+
+#### Keywords appear before the end of list.
+
+```elixir
+one.(
+  one,
+  two positional, key: value,
+  three
+)
+```
+
+Keywords can only appear at the end of an argument list, so either surround the no parentheses expression argument with
+parentheses, or move the the keywords to the end of the list if it wasn't meant to be a no parentheses expression.
+
+```elixir
+one.(
+  one
+  two(positional, key: value),
+  three
+)
+```
+
+OR
+
+```elixir
+one.(
+  one,
+  two,
+  three,
+  key: value
+)
+```
+
+<figure>
+  <img alt="Keywords Not At End" src="/screenshots/inspection/elixir/keywords_not_at_end/preferences.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Preferences &gt; Inspections &gt; Elixir &gt; Keywords Not At End
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Keywords Not At End error" src="/screenshots/inspection/elixir/keywords_not_at_end/error.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Keywords Not At End inspection marks the error over the keywords that need to be surrounded by parentheses or moved
+    to the end of the list. 
+  </figcaption>
+</figure>
+
+<figure>
+  <img alt="Keywords Not At End inspection" src="/screenshots/inspection/elixir/keywords_not_at_end/inspection.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Mousing over the keywords marked as an error in red (or over the red square in the right gutter) will
+    show the inspection describing the error.
+  </figcaption>
+</figure>
+
 
 #### Missing End-of-Expression
 

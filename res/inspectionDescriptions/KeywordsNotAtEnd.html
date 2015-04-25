@@ -1,0 +1,44 @@
+<html>
+<body>
+Keywords appear before the end of a list.  Move keywords after positional arguments.
+<!-- tooltip end -->
+Keywords appear before end of list or argument, so they are followed by positional arguments, which is a syntax error
+in Elixir.
+
+<code>
+<pre>
+one.(
+  one,
+  two positional, key: value,
+  three
+)
+</pre>
+</code>
+
+Either surround the no parentheses expression argument with parentheses, or move the the keywords to the end of the list
+if it wasn't meant to be a no parentheses expression.
+
+<code>
+<pre>
+one.(
+  one
+  two(positional, key: value),
+  three
+)
+</pre>
+</code>
+
+OR
+
+<code>
+<pre>
+one.(
+  one,
+  two,
+  three,
+  key: value
+)
+</pre>
+</code>
+</body>
+</html>

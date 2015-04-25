@@ -158,6 +158,8 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   getArguments
                                                   getIdentifier
                                                   quote
+                                                  quoteArguments
+                                                  quoteIdentifier
                                                 ]
                                               }
 
@@ -167,15 +169,15 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
 
 noParenthesesKeywords ::= noParenthesesKeywordPair (infixComma noParenthesesKeywordPair)*
                           {
-                            implements = "org.elixir_lang.psi.KeywordList"
+                            implements = "org.elixir_lang.psi.QuotableKeywordList"
                             methods = [
-                              getKeywordPairList
+                              quotableKeywordPairList
                               quote
                             ]
                           }
 noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
                              {
-                               implements = "org.elixir_lang.psi.KeywordPair"
+                               implements = "org.elixir_lang.psi.QuotableKeywordPair"
                                methods = [
                                  getKeywordKey
                                  getKeywordValue
@@ -946,6 +948,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedMultiplicationOperation |
                       matchedHatOperation |
                       matchedUnaryNonNumericOperation |
+                      matchedDotCallOperation |
                       // Must be before matchedDotOperation so that the right operand can be restricted to operatorIdentifier
                       matchedDotOperatorCallOperation |
                       matchedDotOperation |
@@ -1294,6 +1297,28 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
                        ]
                      }
 
+private parenthesesPositionalArgument ::= /* Must exclude matchedExpression when followed by KEYWORD_PAIR_COLON so that
+                                             <matchedExpression>: is parsed as a keywordKeyColonEOL in keywords in
+                                             parenthesesArguments.
+
+                                             @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477 */
+                                          matchedExpression !KEYWORD_PAIR_COLON
+// @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L481-L482
+private parenthesesPositionalArguments ::= parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
+parenthesesArguments ::= OPENING_PARENTHESIS EOL*
+                         (
+                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L485
+                          keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
+                          parenthesesPositionalArguments (infixComma keywords)?)? EOL* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
+                         CLOSING_PARENTHESIS
+                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+matchedDotCallOperation ::= matchedExpression dotInfixOperator // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L430
+                            parenthesesArguments // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254
+                            parenthesesArguments? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L255
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 operatorIdentifier ::= AND_OPERATOR |
                        ARROW_OPERATOR |
                        // NOT ASSOCIATION_OPERATOR
@@ -1407,6 +1432,8 @@ matchedCallOperation ::= matchedExpression noParenthesesManyArgumentsStrict
                              getArguments
                              getIdentifier
                              quote
+                             quoteArguments
+                             quoteIdentifier
                            ]
                          }
 
@@ -1583,7 +1610,8 @@ private infixComma ::= COMMA EOL*
 charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private containerExpression ::= emptyParentheses
+private containerExpression ::= emptyParentheses |
+                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -1629,27 +1657,10 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
                                    }
 
 /*
- * Sigil
+ * Keywords
  */
 
-private sigilEscapeSequence ::= sigilHexadecimalEscapeSequence |
-                                hexadecimalEscapePrefix |
-                                escapedEOL |
-                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-                                   ("\x") in hexadecimalEscapeSequence  */
-                                escapedCharacter
-// Does not pin so that hexadecimalEscapePrefix can match separately as `\x` is valid for sigils
-sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
-                                   {
-                                     implements = "org.elixir_lang.psi.EscapeSequence"
-                                     methods = [codePoint]
-                                   }
-
-emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
-                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
-                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-keywordKey ::= ALIAS_TOKEN |
+ keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
@@ -1676,20 +1687,48 @@ keywordKey ::= ALIAS_TOKEN |
                WHEN_OPERATOR |
                quote
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
-listKeywordPair ::=  keywordKeyColonEOL keywordValue
-                     {
-                       implements = "org.elixir_lang.psi.KeywordPair"
-                       methods = [
-                         getKeywordKey
-                         getKeywordValue
-                         quote
-                       ]
-                     }
-keywordValue ::= containerExpression
-                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-list ::= OPENING_BRACKET EOL* (listKeywordPair (infixComma listKeywordPair)* COMMA?)? CLOSING_BRACKET
-         { implements = "org.elixir_lang.psi.KeywordList" methods = [getKeywordPairList quote] }
+
+/* @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499 */
+keywordPair ::=  keywordKeyColonEOL containerExpression
+                 {
+                   implements = "org.elixir_lang.psi.QuotableKeywordPair"
+                   methods = [
+                     getKeywordKey
+                     getKeywordValue
+                     quote
+                   ]
+                 }
+/* @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L500
+   @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L502-L503 */
+keywords ::= keywordPair (infixComma keywordPair)* COMMA?
+             { implements = "org.elixir_lang.psi.QuotableKeywordList" methods = [quotableKeywordPairList quote] }
+
+/*
+ * Sigil
+ */
+
+private sigilEscapeSequence ::= sigilHexadecimalEscapeSequence |
+                                hexadecimalEscapePrefix |
+                                escapedEOL |
+                                /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
+                                   ("\x") in hexadecimalEscapeSequence  */
+                                escapedCharacter
+// Does not pin so that hexadecimalEscapePrefix can match separately as `\x` is valid for sigils
+sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
+                                   {
+                                     implements = "org.elixir_lang.psi.EscapeSequence"
+                                     methods = [codePoint]
+                                   }
+
+emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
+                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+list ::= OPENING_BRACKET EOL* keywords? CLOSING_BRACKET
+         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
    Elixir.flex's CHAR_TOKEN_TOKEN and all the different base number rules. */

@@ -4,7 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirNoParenthesesKeywordPair extends KeywordPair {
+public interface ElixirNoParenthesesKeywordPair extends QuotableKeywordPair {
 
   @NotNull
   ElixirKeywordKey getKeywordKey();

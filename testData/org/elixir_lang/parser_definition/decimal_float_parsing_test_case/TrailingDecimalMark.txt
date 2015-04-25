@@ -6,5 +6,5 @@ Elixir File(0,2)
           PsiElement(VALID_DECIMAL_DIGITS)('0')(0,1)
     ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(1,2)
       PsiElement(.)('.')(1,2)
-    PsiErrorElement:<access expression>, <matched expression>, <operator identifier> or EOL expected, unexpected end of file(2,2)
+    PsiErrorElement:'(', <access expression>, <matched expression>, <operator identifier> or EOL expected, unexpected end of file(2,2)
       <empty list>

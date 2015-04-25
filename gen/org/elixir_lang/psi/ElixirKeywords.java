@@ -4,10 +4,14 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirKeywordValue extends Quotable {
+import java.util.List;
+
+public interface ElixirKeywords extends QuotableKeywordList {
 
   @NotNull
-  ElixirEmptyParentheses getEmptyParentheses();
+  List<ElixirKeywordPair> getKeywordPairList();
+
+  List<QuotableKeywordPair> quotableKeywordPairList();
 
   @NotNull
   OtpErlangObject quote();

@@ -25,4 +25,9 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Call {
   @NotNull
   OtpErlangObject quote();
 
+  @NotNull
+  OtpErlangObject[] quoteArguments();
+
+  OtpErlangObject quoteIdentifier();
+
 }

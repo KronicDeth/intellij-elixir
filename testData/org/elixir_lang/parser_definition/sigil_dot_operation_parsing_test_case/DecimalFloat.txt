@@ -10,7 +10,7 @@ Elixir File(0,8)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>
   PsiElement(.)('.')(4,5)
-  PsiErrorElement:<operator identifier> or EOL expected, got '2'(5,6)
+  PsiErrorElement:'(', <operator identifier> or EOL expected, got '2'(5,6)
     PsiElement(VALID_DECIMAL_DIGITS)('2')(5,6)
   PsiElement(DECIMAL_MARK)('.')(6,7)
   PsiElement(VALID_DECIMAL_DIGITS)('3')(7,8)
