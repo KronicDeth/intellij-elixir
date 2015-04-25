@@ -21,6 +21,12 @@
             <li>
               Operators can be qualified function names.
             </li>
+            <li>
+              Anonymous function calls (<code>.(...)</code>)
+            </li>
+            <li>
+              Inspection that marks errors when keywords aren't at end of list.
+            </li>
           </ul>
         </li>
       <h1>v0.3.0</h1>
