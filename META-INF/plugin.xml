@@ -177,7 +177,8 @@
                      implementationClass="org.elixir_lang.inspection.MissingEndOfExpression" language="Elixir"
                      level="ERROR" shortName="MissingEndOfExpression"/>
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
-                     groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"/>
+                     groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
+                     language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
     <moduleType id="ELIXIR_MIX_PROJECT" implementationClass="org.elixir_lang.mix.ModuleType"/>
     <projectStructureDetector implementation="org.elixir_lang.mix.ProjectStructureDetector"/>
     <sdkType implementation="org.elixir_lang.SdkType"/>
