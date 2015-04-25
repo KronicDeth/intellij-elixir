@@ -162,7 +162,7 @@ allows the grammar because they contain correctable errors:
 * [Empty Parentheses](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L299) (`()`)
 * [Keyword Lists](http://elixir-lang.org/getting_started/7.html#7.1-keyword-lists)
   * Keyword Keys - Aliases, identifiers, quotes, or operators when followed immediately by a colon and horizontal or vertical space.
-  * Keyword Values *PARTIAL SUPPORT* - Only empty parentheses (`()`).
+  * Keyword Values - Empty parentheses (`()`) and matched expressions.
 * [Matched Expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L113-L122),
   in other words, unary and binary operations on variable, function, and macro names and values (numbers, strings,
   char lists, sigils, heredocs, `true`, `false`, and `nil`).
