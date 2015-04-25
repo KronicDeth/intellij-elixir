@@ -4,7 +4,9 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirMatchedDotCallOperation extends ElixirMatchedExpression, QuotableCall {
+import java.util.List;
+
+public interface ElixirMatchedDotCallOperation extends ElixirMatchedExpression, Quotable {
 
   @NotNull
   ElixirDotInfixOperator getDotInfixOperator();
@@ -13,15 +15,9 @@ public interface ElixirMatchedDotCallOperation extends ElixirMatchedExpression, 
   ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
-  ElixirParenthesesArguments getParenthesesArguments();
+  List<ElixirParenthesesArguments> getParenthesesArgumentsList();
 
   @NotNull
   OtpErlangObject quote();
-
-  @NotNull
-  OtpErlangObject[] quoteArguments();
-
-  @NotNull
-  OtpErlangObject quoteIdentifier();
 
 }

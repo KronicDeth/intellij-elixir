@@ -419,7 +419,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedDotCallOperation(@NotNull ElixirMatchedDotCallOperation o) {
     visitMatchedExpression(o);
-    // visitQuotableCall(o);
+    // visitQuotable(o);
   }
 
   public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {

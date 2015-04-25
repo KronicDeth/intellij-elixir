@@ -702,18 +702,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirMatchedDotOperatorCallOperation matchedDotOperatorCallOperation) {
-        return matchedDotOperatorCallOperation.getOperatorCallArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirMatchedDotCallOperation matchedDotCallOperation) {
-        return matchedDotCallOperation.getParenthesesArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
         QuotableArguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
 
@@ -1404,6 +1392,48 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotCallOperation matchedDotCallOperation) {
+        PsiElement[] children = matchedDotCallOperation.getChildren();
+
+        Quotable leftOperand = (Quotable) children[0];
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Quotable operator = (Quotable) children[1];
+        OtpErlangObject quotedOperator = operator.quote();
+        OtpErlangList operatorMetadata = metadata(operator);
+
+        OtpErlangTuple quotedIdentifier = quotedFunctionCall(
+                quotedOperator,
+                operatorMetadata,
+                quotedLeftOperand
+        );
+
+        QuotableArguments firstArguments = (QuotableArguments) children[2];
+        OtpErlangObject[] quotedFirstArguments = firstArguments.quoteArguments();
+
+        OtpErlangObject firstQuotedFunctionCall = anchoredQuotedFunctionCall(
+                matchedDotCallOperation,
+                quotedIdentifier,
+                quotedFirstArguments
+        );
+        OtpErlangObject quoted = firstQuotedFunctionCall;
+
+        if (children.length == 4) {
+            QuotableArguments secondArguments = (QuotableArguments) children[3];
+            OtpErlangObject[] quotedSecondArguments = secondArguments.quoteArguments();
+
+            quoted = quotedFunctionCall(
+                    firstQuotedFunctionCall,
+                    operatorMetadata,
+                    quotedSecondArguments
+            );
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedDotOperation matchedDotOperation) {
         // get basic quoting of aliases, etc
         OtpErlangTuple quotedInfixOperation = (OtpErlangTuple) quote((InfixOperation) matchedDotOperation);
@@ -1779,6 +1809,11 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final QuotableCall quotableCall) {
         OtpErlangObject quotedIdentifier = quotableCall.quoteIdentifier();
         OtpErlangObject[] quotedArguments = quotableCall.quoteArguments();
+        return anchoredQuotedFunctionCall(quotableCall, quotedIdentifier, quotedArguments);
+    }
+
+    @NotNull
+    public static OtpErlangObject anchoredQuotedFunctionCall(PsiElement anchor, OtpErlangObject quotedIdentifier, OtpErlangObject... quotedArguments) {
         OtpErlangList metadata;
 
         if (Macro.isExpression(quotedIdentifier)) {
@@ -1788,7 +1823,7 @@ public class ElixirPsiImplUtil {
                `.`. */
             metadata = Macro.metadata(expression);
         } else {
-            metadata = metadata(quotableCall);
+            metadata = metadata(anchor);
         }
 
         return quotedFunctionCall(
@@ -1820,12 +1855,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject[] quoteArguments(Call call) {
         return call.getArguments().quoteArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirMatchedDotCallOperation matchedDotCallOperation) {
-        return matchedDotCallOperation.getParenthesesArguments().quoteArguments();
     }
 
     @Contract(pure = true)
@@ -1980,26 +2009,6 @@ public class ElixirPsiImplUtil {
             quotedIdentifier = identifier.quote();
         }
         return quotedIdentifier;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quoteIdentifier(@NotNull final ElixirMatchedDotCallOperation matchedDotCallOperation) {
-        PsiElement[] children =  matchedDotCallOperation.getChildren();
-
-        assert children.length == 3;
-
-        Quotable leftOperand = (Quotable) children[0];
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
-
-        Quotable operator = (Quotable) children[1];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(operator),
-                quotedLeftOperand
-        );
     }
 
     @Contract(pure = true)

@@ -46,3 +46,8 @@
   one,
   key: value
 )
+1.2e-3.(
+  one
+)(
+  two
+)

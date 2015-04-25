@@ -42,3 +42,8 @@
   :atom,
   Alias
 )
+0o1.(
+  one
+)(
+  two
+)

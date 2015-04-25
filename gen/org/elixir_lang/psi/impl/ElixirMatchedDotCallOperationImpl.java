@@ -4,8 +4,11 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ElixirMatchedDotCallOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedDotCallOperation {
 
@@ -32,23 +35,13 @@ public class ElixirMatchedDotCallOperationImpl extends ElixirMatchedExpressionIm
 
   @Override
   @NotNull
-  public ElixirParenthesesArguments getParenthesesArguments() {
-    return findNotNullChildByClass(ElixirParenthesesArguments.class);
+  public List<ElixirParenthesesArguments> getParenthesesArgumentsList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirParenthesesArguments.class);
   }
 
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
-  }
-
-  @NotNull
-  public OtpErlangObject[] quoteArguments() {
-    return ElixirPsiImplUtil.quoteArguments(this);
-  }
-
-  @NotNull
-  public OtpErlangObject quoteIdentifier() {
-    return ElixirPsiImplUtil.quoteIdentifier(this);
   }
 
 }

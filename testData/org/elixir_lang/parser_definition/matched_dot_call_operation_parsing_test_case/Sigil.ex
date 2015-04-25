@@ -46,3 +46,8 @@
   one,
   key: value
 )
+~c{one}.(
+  one
+)(
+  two
+)

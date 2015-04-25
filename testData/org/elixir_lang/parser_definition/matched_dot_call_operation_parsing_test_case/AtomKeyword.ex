@@ -46,3 +46,8 @@ true.(
   one,
   key: value
 )
+true.(
+  one
+)(
+  two
+)

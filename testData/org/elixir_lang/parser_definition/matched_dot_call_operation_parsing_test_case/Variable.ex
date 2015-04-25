@@ -46,3 +46,8 @@ one.(
   one,
   key: value
 )
+one.(
+  one
+)(
+  two
+)

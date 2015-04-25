@@ -46,3 +46,8 @@
   one,
   key: value
 )
+0z1.(
+  one
+)(
+  two
+)

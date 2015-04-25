@@ -3990,15 +3990,23 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // dotInfixOperator parenthesesArguments
+  // dotInfixOperator parenthesesArguments parenthesesArguments?
   private static boolean matchedDotCallOperation_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedDotCallOperation_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = dotInfixOperator(b, l + 1);
     r = r && parenthesesArguments(b, l + 1);
+    r = r && matchedDotCallOperation_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  // parenthesesArguments?
+  private static boolean matchedDotCallOperation_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedDotCallOperation_0_2")) return false;
+    parenthesesArguments(b, l + 1);
+    return true;
   }
 
   // dotInfixOperator operatorIdentifier operatorCallArguments
