@@ -1,43 +1,43 @@
-varaible &one
-varaible one \\ default
-varaible one when guard
-varaible one :: type
-varaible one | new
-varaible one = two
-varaible one || two
-varaible one && two
-varaible one != two
-varaible one < two
-varaible one |> two
-varaible one + two
-varaible one * two
-varaible one ^^^ two
-varaible !one
-varaible One.Two
-varaible One.two
-varaible @one
-varaible one
-varaible @1
-varaible &1
-varaible !1
-varaible (;)
-varaible ?1
-varaible 0b10
-varaible 1.2e-3
-varaible 1
-varaible 0xFF
-varaible 0o7
-varaible []
-varaible "StringLine"
-varaible """
-      String
-      Heredoc
-      """
-varaible 'CharListLine'
-varaible '''
-      CharListLine
-      '''
-varaible ~x{sigil}modifiers
-varaible nil
-varaible :atom
-varaible One
+variable &one
+variable one \\ default
+variable one when guard
+variable one :: type
+variable one | new
+variable one = two
+variable one || two
+variable one && two
+variable one != two
+variable one < two
+variable one |> two
+variable one + two
+variable one * two
+variable one ^^^ two
+variable !one
+variable One.Two
+variable One.two
+variable @one
+variable one
+variable @1
+variable &1
+variable !1
+variable (;)
+variable ?1
+variable 0b10
+variable 1.2e-3
+variable 1
+variable 0xFF
+variable 0o7
+variable []
+variable "StringLine"
+variable """
+         String
+         Heredoc
+         """
+variable 'CharListLine'
+variable '''
+         CharListLine
+         '''
+variable ~x{sigil}modifiers
+variable nil
+variable :atom
+variable One
