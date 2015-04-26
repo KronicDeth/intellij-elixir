@@ -81,6 +81,10 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testDecimalFloatDecimalFloat() {
+        assertParsedWithErrors();
+    }
+
     public void testDecimalWholeNumber() {
         assertParsedAndQuotedAroundError();
     }
