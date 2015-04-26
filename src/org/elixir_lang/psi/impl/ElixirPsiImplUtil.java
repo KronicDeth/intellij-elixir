@@ -2024,8 +2024,14 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quoteIdentifier(@NotNull ElixirMatchedCallOperation matchedCallOperation) {
         Quotable identifier = (Quotable) matchedCallOperation.getFirstChild();
+        OtpErlangObject quoted = identifier.quote();
 
-        return identifier.quote();
+        if (Macro.isVariable(quoted)) {
+            OtpErlangTuple tuple = (OtpErlangTuple) quoted;
+            quoted = tuple.elementAt(0);
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
