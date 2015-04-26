@@ -1,6 +1,6 @@
-package org.elixir_lang.parser_definition;
+package org.elixir_lang.parser_definition.matched_call_operation;
 
-public class MatchedCallOperationParsingTestCase extends ParsingTestCase {
+public class NoParenthesesManyArgumentsStrictParsingTestCase extends ParsingTestCase {
     /*
      * matchedCallOperation
      */
@@ -103,6 +103,6 @@ public class MatchedCallOperationParsingTestCase extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/matched_call_operation_parsing_test_case";
+        return super.getTestDataPath() + "/no_parentheses_many_arguments_strict_parsing_test_case";
     }
 }
