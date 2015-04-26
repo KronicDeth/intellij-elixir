@@ -404,7 +404,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedCallOperation(@NotNull ElixirMatchedCallOperation o) {
     visitMatchedExpression(o);
-    // visitCall(o);
+    // visitQuotableCall(o);
   }
 
   public void visitMatchedCaptureNonNumericOperation(@NotNull ElixirMatchedCaptureNonNumericOperation o) {

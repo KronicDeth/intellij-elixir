@@ -3901,7 +3901,7 @@ public class ElixirParser implements PsiParser {
         r = matchedExpression(b, l, 20);
         exit_section_(b, l, m, MATCHED_DOT_OPERATION, r, true, null);
       }
-      else if (g < 22 && noParenthesesManyArgumentsStrict(b, l + 1)) {
+      else if (g < 22 && matchedCallOperation_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_CALL_OPERATION, r, true, null);
       }
@@ -4186,6 +4186,17 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !numeric(b, l + 1);
     exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  // noParenthesesManyArgumentsStrict | matchedExpression
+  private static boolean matchedCallOperation_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedCallOperation_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesManyArgumentsStrict(b, l + 1);
+    if (!r) r = matchedExpression(b, l + 1, -1);
+    exit_section_(b, m, null, r);
     return r;
   }
 

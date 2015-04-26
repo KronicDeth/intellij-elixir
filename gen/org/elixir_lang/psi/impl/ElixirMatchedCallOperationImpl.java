@@ -4,9 +4,12 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirMatchedCallOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedCallOperation {
 
@@ -21,8 +24,8 @@ public class ElixirMatchedCallOperationImpl extends ElixirMatchedExpressionImpl 
 
   @Override
   @NotNull
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @Override
@@ -38,16 +41,6 @@ public class ElixirMatchedCallOperationImpl extends ElixirMatchedExpressionImpl 
   }
 
   @NotNull
-  public QuotableArguments getArguments() {
-    return ElixirPsiImplUtil.getArguments(this);
-  }
-
-  @NotNull
-  public Quotable getIdentifier() {
-    return ElixirPsiImplUtil.getIdentifier(this);
-  }
-
-  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -57,6 +50,7 @@ public class ElixirMatchedCallOperationImpl extends ElixirMatchedExpressionImpl 
     return ElixirPsiImplUtil.quoteArguments(this);
   }
 
+  @NotNull
   public OtpErlangObject quoteIdentifier() {
     return ElixirPsiImplUtil.quoteIdentifier(this);
   }

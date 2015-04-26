@@ -1425,12 +1425,10 @@ matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L125
  */
-matchedCallOperation ::= matchedExpression noParenthesesManyArgumentsStrict
+matchedCallOperation ::= matchedExpression (noParenthesesManyArgumentsStrict | matchedExpression)
                          {
-                           implements = "org.elixir_lang.psi.Call"
+                           implements = "org.elixir_lang.psi.QuotableCall"
                            methods = [
-                             getArguments
-                             getIdentifier
                              quote
                              quoteArguments
                              quoteIdentifier

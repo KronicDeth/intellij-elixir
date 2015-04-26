@@ -5,10 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedCallOperation extends ElixirMatchedExpression, Call {
+import java.util.List;
+
+public interface ElixirMatchedCallOperation extends ElixirMatchedExpression, QuotableCall {
 
   @NotNull
-  ElixirMatchedExpression getMatchedExpression();
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
@@ -17,17 +19,12 @@ public interface ElixirMatchedCallOperation extends ElixirMatchedExpression, Cal
   ElixirNoParenthesesStrict getNoParenthesesStrict();
 
   @NotNull
-  QuotableArguments getArguments();
-
-  @NotNull
-  Quotable getIdentifier();
-
-  @NotNull
   OtpErlangObject quote();
 
   @NotNull
   OtpErlangObject[] quoteArguments();
 
+  @NotNull
   OtpErlangObject quoteIdentifier();
 
 }

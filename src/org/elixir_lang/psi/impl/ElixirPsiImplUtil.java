@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.sun.org.apache.xpath.internal.operations.Quo;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
@@ -696,12 +697,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
-        return matchedCallOperation.getNoParenthesesManyArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
         QuotableArguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
 
@@ -950,12 +945,6 @@ public class ElixirPsiImplUtil {
         }
 
         return heredocLineList;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static Quotable getIdentifier(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
-        return (Quotable) matchedCallOperation.getFirstChild();
     }
 
     @Contract(pure = true)
@@ -1859,6 +1848,26 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject[] quoteArguments(ElixirMatchedCallOperation matchedCallOperation) {
+        PsiElement arguments = matchedCallOperation.getLastChild();
+        OtpErlangObject[] quotedArguments;
+
+        if (arguments instanceof QuotableArguments) {
+            QuotableArguments quotableArguments = (QuotableArguments) arguments;
+            quotedArguments = quotableArguments.quoteArguments();
+        } else {
+            Quotable quotable = (Quotable) arguments;
+            OtpErlangObject quoted = quotable.quote();
+            quotedArguments = new OtpErlangObject[] {
+                    quoted
+            };
+        }
+
+        return quotedArguments;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
         QuotableArguments quotableArguments;
 
@@ -2009,6 +2018,14 @@ public class ElixirPsiImplUtil {
             quotedIdentifier = identifier.quote();
         }
         return quotedIdentifier;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quoteIdentifier(@NotNull ElixirMatchedCallOperation matchedCallOperation) {
+        Quotable identifier = (Quotable) matchedCallOperation.getFirstChild();
+
+        return identifier.quote();
     }
 
     @Contract(pure = true)
