@@ -12,6 +12,9 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 
 ### Project
 
+**NOTE: The Project Settings is just bookkeeping and visual now.  No other features currently take advantage
+of the SDK setting or the marked directories.  Theses Project Settings will be used for later features. **
+
 #### From Existing Directory
 **NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
   IDEs, like Rubymine.**
