@@ -8,6 +8,11 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 [PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
 [WebStorm](http://www.jetbrains.com/webstorm/))
 
+**The parser is incomplete until [v1.0.0](https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0).  If you see
+an odd error from valid Elixir code, it is most likely due to the incomplete parser.  Please subscribe to notifications
+or comment on [Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the
+parser is complete.**
+
 ## Features
 
 ### Project

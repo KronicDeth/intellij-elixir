@@ -9,6 +9,16 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <strong>
+        The parser is incomplete until
+        <a href="https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0">
+          v1.0.0
+        </a>.  If you see an odd error from valid Elixir code, it is most likely due to the incomplete parser.  Please
+        subscribe to notifications or comment on
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/6">
+          Issue #6
+        </a> if you want to be notified when the parser is complete.
+      </strong>
       <h1>v0.3.1</h1>
       <ul>
         <li>
