@@ -219,7 +219,7 @@
     <mkdir dir="${tmp.dir.intellij-elixir}/lib"/>
     <jar destfile="${tmp.dir.intellij-elixir}/lib/intellij-elixir.jar" duplicate="preserve">
       <zipfileset dir="${module.intellij-elixir.basedir}/out/production/intellij-elixir"/>
-      <zipfileset file="${module.intellij-elixir.basedir}/META-INF/plugin.xml" prefix="META-INF"/>
+      <zipfileset file="/META-INF/plugin.xml" prefix="META-INF"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
         <attribute name="Manifest-Version" value="1.0"/>
