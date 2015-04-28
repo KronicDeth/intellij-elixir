@@ -18,7 +18,7 @@ parser is complete.**
 ### Project
 
 **NOTE: The Project Settings is just bookkeeping and visual now.  No other features currently take advantage
-of the SDK setting or the marked directories.  Theses Project Settings will be used for later features. **
+of the SDK setting or the marked directories.  Theses Project Settings will be used for later features.**
 
 #### From Existing Directory
 **NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
