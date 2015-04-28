@@ -28,6 +28,5 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="JInterface" level="project" />
-    <orderEntry type="library" name="intellij-elixir" level="application" />
   </component>
 </module>
