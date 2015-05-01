@@ -38,6 +38,8 @@
     <path refid="${module.jdk.classpath.intellij-elixir}"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
     <path refid="library.junit.classpath"/>
+    <pathelement location="#{basedir}/tests/objenesis-2.1.jar"/>
+    <pathelement location="#{basedir}/tests/mockito-2.1.jar"/>
     <pathelement location="${idea.cache}/lib/hamcrest-core-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
@@ -161,6 +163,8 @@
       <env key="INTELLIJ_ELIXIR_PATH" value="${module.intellij-elixir.basedir}"/>
       <classpath>
         <path refid="classpath.test" />
+        <pathelement location="${basedir}/tests/mockito-core-2.0.7-beta.jar"/>
+        <pathelement location="${basedir}/tests/objenesis-2.1.jar"/>
         <pathelement location="${test.build}"/>
         <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
       </classpath>
