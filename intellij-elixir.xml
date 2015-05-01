@@ -172,6 +172,10 @@
       <include name="lib/xpp3-1.1.4-min.jar"/>
       <include name="lib/xstream-1.4.3.jar"/>
     </fileset>
+    <fileset dir="${basedir}/tests">
+      <include name="mockito-core-2.0.7-beta.jar"/>
+      <include name="objenesis.jar"/>
+    </fileset>
     <fileset dir="${jdk.home}">
       <include name="lib/tools.jar"/>
     </fileset>

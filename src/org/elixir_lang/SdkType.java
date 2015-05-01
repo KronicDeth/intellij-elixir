@@ -63,7 +63,14 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
     @Nullable
     @Override
     public String suggestHomePath() {
-        return suggestHomePaths().iterator().next();
+        Iterator<String> iterator = suggestHomePaths().iterator();
+        String suggestedHomePath = null;
+
+        if (iterator.hasNext()) {
+            suggestedHomePath = iterator.next();
+        }
+
+        return suggestedHomePath;
     }
 
     @Override
