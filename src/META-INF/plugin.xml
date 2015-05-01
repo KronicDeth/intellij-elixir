@@ -19,6 +19,28 @@
           Issue #6
         </a> if you want to be notified when the parser is complete.
       </strong>
+      <h1>v0.3.2</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Fix
+              <code>
+                NoSuchElementException
+              </code>
+              when no suggested SDK home paths are available.  Thanks to
+              <a href="https://github.com/zyuyou">
+                zyuyou
+              </a>
+              for
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/120">
+              reporting
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.3.1</h1>
       <ul>
         <li>

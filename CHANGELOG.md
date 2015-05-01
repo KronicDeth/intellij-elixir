@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.2
+* Bug Fixes
+  * [#121](https://github.com/KronicDeth/intellij-elixir/pull/121) - Fix `NoSuchElementException` when no suggested SDK home paths are available.  Thanks to [@zyuyou](https://github.com/zyuyou) for [reporting](https://github.com/KronicDeth/intellij-elixir/issues/120) - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v0.3.1
 * Enhancements
   * [#112](https://github.com/KronicDeth/intellij-elixir/pull/112) - File > New > Project From Existing Sources can be used in IntelliJ to setup the excludes, sources, tests, SDK and libraries for an Elixir project that has already been created with `mix new`. - [@KronicDeth](https://github.com/KronicDeth)
