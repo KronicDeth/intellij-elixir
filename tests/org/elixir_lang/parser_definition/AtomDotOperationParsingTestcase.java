@@ -4,7 +4,7 @@ package org.elixir_lang.parser_definition;
  * atom is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
  * atom is left of `.` and the right operand varies based on the test name.
  */
-public class AtomDotOperationParsingTestcase extends ParsingTestCase {
+public class AtomDotOperationParsingTestCase extends ParsingTestCase {
     /*
      * matchedDotOperand
      */

@@ -103,6 +103,6 @@ public class UnqualifiedNoParenthesesManyArgumentsCallParsingTestCase extends Pa
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/qualified_no_parentheses_many_arguments_call_parsing_test_case";
+        return super.getTestDataPath() + "/unqualified_no_parentheses_many_arguments_call_parsing_test_case";
     }
 }

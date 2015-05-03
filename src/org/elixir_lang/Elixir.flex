@@ -517,6 +517,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
+%state DUAL_OPERATION
 %state ESCAPE_IN_LITERAL_GROUP
 %state ESCAPE_SEQUENCE
 %state EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE
@@ -581,7 +582,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.COMPARISON_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE
   {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
-  {DUAL_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  {DUAL_OPERATOR}                            { pushAndBegin(DUAL_OPERATION);
                                                return ElixirTypes.DUAL_OPERATOR; }
   {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FALSE; }
@@ -755,6 +756,13 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<DUAL_OPERATION> {
+  {WHITE_SPACE}+ { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                   yybegin(stackFrame.getLastLexicalState());
+                   return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
+  {EOL}|.        { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {

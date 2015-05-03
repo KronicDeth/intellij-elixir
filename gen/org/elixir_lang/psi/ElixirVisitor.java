@@ -402,6 +402,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPrefixOperation(o);
   }
 
+  public void visitMatchedCallArguments(@NotNull ElixirMatchedCallArguments o) {
+    visitPsiElement(o);
+  }
+
   public void visitMatchedCallOperation(@NotNull ElixirMatchedCallOperation o) {
     visitMatchedExpression(o);
     // visitQuotableCall(o);
@@ -418,16 +422,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitMatchedDotCallOperation(@NotNull ElixirMatchedDotCallOperation o) {
-    visitMatchedExpression(o);
-    // visitQuotable(o);
-  }
-
-  public void visitMatchedDotOperation(@NotNull ElixirMatchedDotOperation o) {
-    visitMatchedExpression(o);
-    // visitInfixOperation(o);
-  }
-
-  public void visitMatchedDotOperatorCallOperation(@NotNull ElixirMatchedDotOperatorCallOperation o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -471,6 +465,16 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
+  public void visitMatchedQualifiedAliasOperation(@NotNull ElixirMatchedQualifiedAliasOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedQualifiedCallOperation(@NotNull ElixirMatchedQualifiedCallOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
   public void visitMatchedRelationalOperation(@NotNull ElixirMatchedRelationalOperation o) {
     visitMatchedExpression(o);
     // visitInfixOperation(o);
@@ -489,6 +493,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedUnaryNonNumericOperation(@NotNull ElixirMatchedUnaryNonNumericOperation o) {
     visitMatchedExpression(o);
     // visitPrefixOperation(o);
+  }
+
+  public void visitMatchedUnqualifiedCallOperation(@NotNull ElixirMatchedUnqualifiedCallOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
   }
 
   public void visitMatchedWhenOperation(@NotNull ElixirMatchedWhenOperation o) {
@@ -532,11 +541,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitNoParenthesesNoArgumentsUnqualifiedCallOrVariable(@NotNull ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable o) {
-    visitMatchedExpression(o);
-    // visitQuotable(o);
-  }
-
   public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
     visitQuotableArguments(o);
   }
@@ -555,14 +559,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitOpenHexadecimalEscapeSequence(@NotNull ElixirOpenHexadecimalEscapeSequence o) {
     visitEscapedHexadecimalDigits(o);
-  }
-
-  public void visitOperatorCallArguments(@NotNull ElixirOperatorCallArguments o) {
-    visitQuotableArguments(o);
-  }
-
-  public void visitOperatorIdentifier(@NotNull ElixirOperatorIdentifier o) {
-    visitQuotable(o);
   }
 
   public void visitOrInfixOperator(@NotNull ElixirOrInfixOperator o) {
@@ -591,6 +587,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitRelationalInfixOperator(@NotNull ElixirRelationalInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitRelativeIdentifier(@NotNull ElixirRelativeIdentifier o) {
+    visitQuotable(o);
   }
 
   public void visitSigilHexadecimalEscapeSequence(@NotNull ElixirSigilHexadecimalEscapeSequence o) {
@@ -642,6 +642,11 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {
     visitCall(o);
+  }
+
+  public void visitVariable(@NotNull ElixirVariable o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
   }
 
   public void visitWhenInfixOperator(@NotNull ElixirWhenInfixOperator o) {
