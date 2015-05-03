@@ -1359,21 +1359,34 @@ matchedCallArguments ::= parenthesesArguments parenthesesArguments? | // @see ht
                             @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
                          !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
 
-/* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
-   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230 */
-matchedQualifiedCallOperation ::= matchedExpression dotInfixOperator relativeIdentifier matchedCallArguments?
-                                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+/*
+ * Dot (Anonymous function) Call Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
+ */
 
-// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L388
-matchedQualifiedAliasOperation ::= matchedExpression dotInfixOperator alias
-                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
 matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-matchedUnqualifiedCallOperation ::= variable matchedCallArguments
-                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+/*
+ * Qualified Alias Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L388
+ */
+
+matchedQualifiedAliasOperation ::= matchedExpression dotInfixOperator alias
+                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+
+/*
+ * Qualified Call Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
+ */
+
+matchedQualifiedCallOperation ::= matchedExpression dotInfixOperator relativeIdentifier matchedCallArguments?
+                                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * At Non-Numeric Operation - non-associative
@@ -1394,6 +1407,13 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                      }
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
                                  { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Unqualified Call Operation
+ */
+
+matchedUnqualifiedCallOperation ::= variable matchedCallArguments
+                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * Calls
