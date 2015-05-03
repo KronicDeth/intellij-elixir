@@ -299,9 +299,6 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_CALL_ARGUMENTS) {
       r = matchedCallArguments(b, 0);
     }
-    else if (t == MATCHED_CALL_OPERATION) {
-      r = matchedCallOperation(b, 0);
-    }
     else if (t == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
       r = matchedCaptureNonNumericOperation(b, 0);
     }
@@ -479,12 +476,12 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ACCESS_EXPRESSION, MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION,
-      MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_CALL_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION, MATCHED_COMPARISON_OPERATION,
-      MATCHED_DOT_CALL_OPERATION, MATCHED_EXPRESSION, MATCHED_HAT_OPERATION, MATCHED_IN_MATCH_OPERATION,
-      MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION,
-      MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS_OPERATION, MATCHED_QUALIFIED_CALL_OPERATION, MATCHED_RELATIONAL_OPERATION,
-      MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_CALL_OPERATION,
-      MATCHED_WHEN_OPERATION, VARIABLE),
+      MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION, MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL_OPERATION,
+      MATCHED_EXPRESSION, MATCHED_HAT_OPERATION, MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION,
+      MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION,
+      MATCHED_QUALIFIED_ALIAS_OPERATION, MATCHED_QUALIFIED_CALL_OPERATION, MATCHED_RELATIONAL_OPERATION, MATCHED_TWO_OPERATION,
+      MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_CALL_OPERATION, MATCHED_WHEN_OPERATION,
+      VARIABLE),
   };
 
   /* ********************************************************** */
@@ -2675,29 +2672,6 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokens(b, 0, DUAL_OPERATOR, SIGNIFICANT_WHITE_SPACE);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // matchedExpression (noParenthesesManyArgumentsStrict | matchedExpression)
-  public static boolean matchedCallOperation(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedCallOperation")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, "<matched call operation>");
-    r = matchedExpression(b, l + 1, -1);
-    r = r && matchedCallOperation_1(b, l + 1);
-    exit_section_(b, l, m, MATCHED_CALL_OPERATION, r, false, null);
-    return r;
-  }
-
-  // noParenthesesManyArgumentsStrict | matchedExpression
-  private static boolean matchedCallOperation_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedCallOperation_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = noParenthesesManyArgumentsStrict(b, l + 1);
-    if (!r) r = matchedExpression(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
   }

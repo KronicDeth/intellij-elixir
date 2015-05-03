@@ -1846,26 +1846,6 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirMatchedCallOperation matchedCallOperation) {
-        PsiElement arguments = matchedCallOperation.getLastChild();
-        OtpErlangObject[] quotedArguments;
-
-        if (arguments instanceof QuotableArguments) {
-            QuotableArguments quotableArguments = (QuotableArguments) arguments;
-            quotedArguments = quotableArguments.quoteArguments();
-        } else {
-            Quotable quotable = (Quotable) arguments;
-            OtpErlangObject quoted = quotable.quote();
-            quotedArguments = new OtpErlangObject[] {
-                    quoted
-            };
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
         QuotableArguments quotableArguments;
 
@@ -2002,20 +1982,6 @@ if (quoted == null) {
             quotedIdentifier = identifier.quote();
         }
         return quotedIdentifier;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quoteIdentifier(@NotNull ElixirMatchedCallOperation matchedCallOperation) {
-        Quotable identifier = (Quotable) matchedCallOperation.getFirstChild();
-        OtpErlangObject quoted = identifier.quote();
-
-        if (Macro.isVariable(quoted)) {
-            OtpErlangTuple tuple = (OtpErlangTuple) quoted;
-            quoted = tuple.elementAt(0);
-        }
-
-        return quoted;
     }
 
     @Contract(pure = true)

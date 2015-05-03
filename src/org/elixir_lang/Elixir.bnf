@@ -1416,22 +1416,6 @@ matchedUnqualifiedCallOperation ::= variable matchedCallArguments
                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
- * Calls
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L125
- */
-matchedCallOperation ::= matchedExpression (noParenthesesManyArgumentsStrict | matchedExpression)
-                         {
-                           implements = "org.elixir_lang.psi.QuotableCall"
-                           methods = [
-                             quote
-                             quoteArguments
-                             quoteIdentifier
-                           ]
-                         }
-
-/*
  * Access expression
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L200-L223
