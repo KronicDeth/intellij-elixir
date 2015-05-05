@@ -20,7 +20,7 @@
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
-    CALL = ""
+    CALL = "<zero-width-call>"
     CAPTURE_OPERATOR = "&"
     CHAR_LIST_HEREDOC_PROMOTER = "'''"
     CHAR_LIST_PROMOTER = "'"
