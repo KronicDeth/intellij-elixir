@@ -2603,7 +2603,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
+  // CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
   //                          noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
   //                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
   //                          /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
@@ -2627,20 +2627,21 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // parenthesesArguments parenthesesArguments?
+  // CALL parenthesesArguments parenthesesArguments?
   private static boolean matchedCallArguments_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedCallArguments_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parenthesesArguments(b, l + 1);
-    r = r && matchedCallArguments_0_1(b, l + 1);
+    r = consumeToken(b, CALL);
+    r = r && parenthesesArguments(b, l + 1);
+    r = r && matchedCallArguments_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // parenthesesArguments?
-  private static boolean matchedCallArguments_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedCallArguments_0_1")) return false;
+  private static boolean matchedCallArguments_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedCallArguments_0_2")) return false;
     parenthesesArguments(b, l + 1);
     return true;
   }

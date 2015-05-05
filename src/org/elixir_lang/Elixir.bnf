@@ -1346,7 +1346,7 @@ parenthesesArguments ::= OPENING_PARENTHESIS EOL*
                          CLOSING_PARENTHESIS
                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-matchedCallArguments ::= parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
+matchedCallArguments ::= CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
                          noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
                          unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
                          /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
