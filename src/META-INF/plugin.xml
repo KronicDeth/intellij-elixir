@@ -19,6 +19,39 @@
           Issue #6
         </a> if you want to be notified when the parser is complete.
       </strong>
+      <h1>Next Release</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>Remote function calls (<code>Alias.function</code>, <code>:atom.function</code>, etc) and local function calls (<code>function</code>) with...</p>
+              <ul>
+                <li>
+                  <p>No Parentheses with...</p>
+                  <ul>
+                    <li>No Arguments (<code>Alias.function</code>)</li>
+                    <li>Keywords (<code>Alias.function key: value</code>)</li>
+                    <li>
+                      Nested No Parentheses Call (<code>Alias.function Inner.function positional, key: value</code>)
+                    </li>
+                    <li>Positional and Keyword arguments (<code>Alias.function positional, key: value</code>)</li>
+                    <li>Matched Expression (<code>Alias.function 1 + 2</code>)</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Parentheses with...</p>
+                  <li>No arguments (<code>Alias.function()</code>)</li>
+                  <li>No Parentheses Call (<code>Alias.function(Inner.function positional, key: value</code>)</li>
+                  <li>Keywords (<code>Alias.function(key: value)</code>)</li>
+                  <li>Positional and Keyword arguments (<code>Alias.function(positional, key: value)</code>)</li>
+                  <li>Trailing parentheses for quoting (<code>def unquote(variable)(positional)</code>)</li>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.3.2</h1>
       <ul>
         <li>

@@ -1,5 +1,22 @@
 # Changelog
 
+## Next Release
+* Enhancements
+  * [#122](https://github.com/KronicDeth/intellij-elixir/pull/122) - [@KronicDeth](https://github.com/KronicDeth)
+    * Remote function calls (`Alias.function`, `:atom.function`, etc) and local function calls (`function`) with...
+      * No Parentheses with...
+        * No Arguments (`Alias.function`)
+        * Keywords (`Alias.function key: value`)
+        * Nested No Parentheses Call (`Alias.function Inner.function positional, key: value`)
+        * Positional and Keyword arguments (`Alias.function positional, key: value`)
+        * Matched Expression (`Alias.function 1 + 2`)
+      * Parentheses with...
+        * No arguments (`Alias.function()`)
+        * No Parentheses Call (`Alias.function(Inner.function positional, key: value`)
+        * Keywords (`Alias.function(key: value)`)
+        * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
+        * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
+        
 ## v0.3.2
 * Bug Fixes
   * [#121](https://github.com/KronicDeth/intellij-elixir/pull/121) - Fix `NoSuchElementException` when no suggested SDK home paths are available.  Thanks to [@zyuyou](https://github.com/zyuyou) for [reporting](https://github.com/KronicDeth/intellij-elixir/issues/120) - [@KronicDeth](https://github.com/KronicDeth)
