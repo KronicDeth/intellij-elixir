@@ -2,6 +2,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
@@ -16,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -696,12 +696,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
-        return matchedCallOperation.getNoParenthesesManyArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
         QuotableArguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
 
@@ -950,12 +944,6 @@ public class ElixirPsiImplUtil {
         }
 
         return heredocLineList;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static Quotable getIdentifier(@NotNull final ElixirMatchedCallOperation matchedCallOperation) {
-        return (Quotable) matchedCallOperation.getFirstChild();
     }
 
     @Contract(pure = true)
@@ -1215,10 +1203,31 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(ElixirOperatorIdentifier operatorIdentifier) {
-        String operatorIdentifierText = operatorIdentifier.getText();
+    public static OtpErlangObject quote(ElixirRelativeIdentifier relativeIdentifier) {
+        PsiElement[] children = relativeIdentifier.getChildren();
+        OtpErlangObject quotedRelativeIdentifier;
 
-        return new OtpErlangAtom(operatorIdentifierText);
+        // Only tokens
+        if (children.length == 0) {
+            ASTNode relativeIdentifierNode = relativeIdentifier.getNode();
+            // take first node to avoid SIGNIFICANT_WHITE_SPACE after DUAL_OPERATOR
+            ASTNode operatorNode = relativeIdentifierNode.getFirstChildNode();
+            quotedRelativeIdentifier = new OtpErlangAtom(operatorNode.getText());
+        } else {
+            assert children.length == 1;
+
+            PsiElement child = children[0];
+
+            if (child instanceof Atomable) {
+                Atomable atomable = (Atomable) child;
+                quotedRelativeIdentifier = atomable.quoteAsAtom();
+            } else {
+                Quotable quotable = (Quotable) child;
+                quotedRelativeIdentifier = quotable.quote();
+            }
+        }
+
+        return quotedRelativeIdentifier;
     }
 
     @Contract(pure = true)
@@ -1373,25 +1382,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotOperatorCallOperation matchedDotOperatorCallOperation) {
-        PsiElement[] children = matchedDotOperatorCallOperation.getChildren();
-        PsiElement[] infixOperationChildren = Arrays.copyOf(children, 3);
-
-        OtpErlangTuple quotedIdentifier = (OtpErlangTuple) quoteInfixOperationChildren(infixOperationChildren);
-        OtpErlangList identifierMetadata = Macro.metadata(quotedIdentifier);
-
-        QuotableArguments quotableArguments = (QuotableArguments) children[3];
-        OtpErlangObject[] quotedArguments = quotableArguments.quoteArguments();
-
-        return quotedFunctionCall(
-                quotedIdentifier,
-                identifierMetadata,
-                quotedArguments
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedDotCallOperation matchedDotCallOperation) {
         PsiElement[] children = matchedDotCallOperation.getChildren();
 
@@ -1430,171 +1420,6 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedDotOperation matchedDotOperation) {
-        // get basic quoting of aliases, etc
-        OtpErlangTuple quotedInfixOperation = (OtpErlangTuple) quote((InfixOperation) matchedDotOperation);
-        // by default, no specialization
-        OtpErlangObject specializedQuoted = quotedInfixOperation;
-
-        OtpErlangList quotedArgumentList = Macro.callArguments((OtpErlangTuple) quotedInfixOperation);
-        OtpErlangObject lastQuotedArgument = quotedArgumentList.elementAt(1);
-
-        // The final arguments determines whether the whole thing is an alias, so check if first.
-        if (lastQuotedArgument instanceof OtpErlangBinary) {
-            OtpErlangBinary lastBinary = (OtpErlangBinary) lastQuotedArgument;
-            OtpErlangObject identifier = new OtpErlangAtom(
-                    new String(
-                            lastBinary.binaryValue(),
-                            Charset.forName("UTF-8")
-                    )
-            );
-
-            final OtpErlangList metadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
-            OtpErlangTuple quotedRemoteFunctionCall = quotedFunctionCall(
-                            quotedInfixOperation.elementAt(0),
-                            metadata,
-                            quotedArgumentList.elementAt(0),
-                            identifier
-            );
-
-            specializedQuoted = quotedFunctionCall(
-                    quotedRemoteFunctionCall,
-                    metadata
-            );
-        } else if (lastQuotedArgument instanceof OtpErlangString) {
-            OtpErlangString lastString = (OtpErlangString) lastQuotedArgument;
-            OtpErlangObject identifier = new OtpErlangAtom(lastString.stringValue());
-
-            final OtpErlangList metadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
-            OtpErlangTuple quotedRemoteFunctionCall = quotedFunctionCall(
-                            quotedInfixOperation.elementAt(0),
-                            metadata,
-                            quotedArgumentList.elementAt(0),
-                            identifier
-            );
-
-            specializedQuoted = quotedFunctionCall(
-                    quotedRemoteFunctionCall,
-                    metadata
-            );
-        } else if (Macro.isAliases(lastQuotedArgument)) {
-            OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
-
-             /*
-              * Use line from last alias, but drop `counter: 0`
-              */
-            OtpErlangList lastMetadata = Macro.metadata((OtpErlangTuple) lastQuotedArgument);
-            OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(lastMetadata, new OtpErlangAtom("line"), 0);
-            OtpErlangList newMetdata = new OtpErlangList(
-                    new OtpErlangObject[] {
-                            lineTuple
-                    }
-            );
-
-            OtpErlangList lastAliasList = Macro.callArguments((OtpErlangTuple) lastQuotedArgument);
-            OtpErlangObject[] mergedArguments;
-            int i = 0;
-
-            /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
-               each __aliases__ need to be combined */
-            if (Macro.isAliases(firstQuotedArgument)) {
-                OtpErlangList firstAliasList = Macro.callArguments((OtpErlangTuple) firstQuotedArgument);
-                mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
-
-                for (OtpErlangObject alias : firstAliasList) {
-                    mergedArguments[i++] = alias;
-                }
-            } else {
-                mergedArguments = new OtpErlangObject[1 + lastAliasList.arity()];
-
-                mergedArguments[i++] = firstQuotedArgument;
-            }
-
-            for (OtpErlangObject alias : lastAliasList) {
-                mergedArguments[i++] = alias;
-            }
-
-            specializedQuoted = quotedFunctionCall(
-                    ALIASES,
-                    newMetdata,
-                    mergedArguments
-            );
-        } else if (Macro.isAtomKeyword(lastQuotedArgument)) {
-            /* After `.` atom keywords (`false`, `nil`, `true`) are just treated as normal identifiers, so
-              {:., metadata, [qualifier, atomKeyword]} needs to be promoted to a call */
-            OtpErlangList callMetadata = (OtpErlangList) quotedInfixOperation.elementAt(1);
-
-            specializedQuoted = quotedFunctionCall(
-                    quotedInfixOperation,
-                    callMetadata
-            );
-        } else if (Macro.isLocalCall(lastQuotedArgument)) {
-            OtpErlangTuple quotedLocalCall = (OtpErlangTuple) lastQuotedArgument;
-            // lastQuotedArgument = {quotedIdentifier, callMetadata, arguments}
-            OtpErlangObject quotedIdentifier = quotedLocalCall.elementAt(0);
-
-            // quotedInfixOperation = {:., dotMetadata, [firstQuotedArgument, lastQuotedArgument]}
-            OtpErlangObject firstQuotedArgument = quotedArgumentList.elementAt(0);
-
-            // {:., dotMetadata, [firstQuotedArgument, quotedIdentifier]}
-            final OtpErlangObject newMetadata = quotedInfixOperation.elementAt(1);
-            OtpErlangTuple quotedRemoteFunction = new OtpErlangTuple(
-                    new OtpErlangObject[] {
-                            quotedInfixOperation.elementAt(0),
-                            newMetadata,
-                            new OtpErlangList(
-                                    new OtpErlangObject[]{
-                                            firstQuotedArgument,
-                                            quotedIdentifier
-                                    }
-                            )
-                    }
-            );
-
-            specializedQuoted = new OtpErlangTuple(
-                    new OtpErlangObject[] {
-                            quotedRemoteFunction,
-                            newMetadata,
-                            quotedLocalCall.elementAt(2)
-                    }
-            );
-        } else if (Macro.isVariable(lastQuotedArgument)) {
-            OtpErlangTuple lastExpression = (OtpErlangTuple) lastQuotedArgument;
-            OtpErlangObject context = lastExpression.elementAt(2);
-
-            // Variables are turned into remote calls and only the atom is used as the second argument to `.`.
-            if (context.equals(NIL)) {
-                OtpErlangObject identifier = lastExpression.elementAt(0);
-
-                OtpErlangObject[] mergedArguments = new OtpErlangObject[]{
-                        quotedArgumentList.elementAt(0),
-                        identifier
-                };
-                OtpErlangList mergedArgumentList = new OtpErlangList(mergedArguments);
-
-                OtpErlangTuple quotedRemoteFunction = new OtpErlangTuple(
-                        new OtpErlangObject[]{
-                                quotedInfixOperation.elementAt(0),
-                                quotedInfixOperation.elementAt(1),
-                                mergedArgumentList
-                        }
-                );
-
-                /* The quotedRemoteFunction is not a complete call yet because a call is the {function, metadata, args}
-                   where quotedRemoteFunction is function */
-
-                specializedQuoted = quotedFunctionCall(
-                        quotedRemoteFunction,
-                        (OtpErlangList) quotedRemoteFunction.elementAt(1)
-                );
-            }
-        }
-
-        return specializedQuoted;
     }
 
     @Contract(pure = true)
@@ -1657,8 +1482,7 @@ public class ElixirPsiImplUtil {
                 }
             }
         }
-
-        if (quoted == null) {
+if (quoted == null) {
             quoted = quotedFunctionCall(
                     quotedOperator,
                     metadata(operator),
@@ -1668,6 +1492,169 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedAliasOperation matchedQualifiedAliasOperation) {
+        PsiElement[] children = matchedQualifiedAliasOperation.getChildren();
+
+        assert children.length == 3;
+
+        Quotable alias = (Quotable) children[2];
+        OtpErlangTuple quotedAlias = (OtpErlangTuple) alias.quote();
+
+        Quotable matchedExpression = (Quotable) children[0];
+        OtpErlangObject quotedMatchedExpression = matchedExpression.quote();
+
+        /*
+         * Use line from last alias, but drop `counter: 0`
+         */
+        OtpErlangList aliasMetadata = Macro.metadata(quotedAlias);
+        OtpErlangTuple lineTuple = (OtpErlangTuple) org.elixir_lang.List.keyfind(
+                aliasMetadata,
+                new OtpErlangAtom("line"),
+                0
+        );
+        OtpErlangList qualifiedAliasMetdata = new OtpErlangList(
+                new OtpErlangObject[] {
+                        lineTuple
+                }
+        );
+
+        OtpErlangList lastAliasList = Macro.callArguments(quotedAlias);
+        OtpErlangObject[] mergedArguments;
+        int i = 0;
+
+        /* if both aliases, then the counter: 0 needs to be removed from the metadata data and the arguments for
+           each __aliases__ need to be combined */
+        if (Macro.isAliases(quotedMatchedExpression)) {
+            OtpErlangList firstAliasList = Macro.callArguments((OtpErlangTuple) quotedMatchedExpression);
+            mergedArguments = new OtpErlangObject[firstAliasList.arity() + lastAliasList.arity()];
+
+            for (OtpErlangObject firstAliasElement : firstAliasList) {
+                mergedArguments[i++] = firstAliasElement;
+            }
+        } else {
+            mergedArguments = new OtpErlangObject[1 + lastAliasList.arity()];
+
+            mergedArguments[i++] = quotedMatchedExpression;
+        }
+
+        for (OtpErlangObject lastAliasElement : lastAliasList) {
+            mergedArguments[i++] = lastAliasElement;
+        }
+
+        return quotedFunctionCall(
+                ALIASES,
+                qualifiedAliasMetdata,
+                mergedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedCallOperation matchedQualifiedCallOperation) {
+        Quotable matchedExpression = (Quotable) matchedQualifiedCallOperation.getFirstChild();
+        OtpErlangObject quotedIdentifier = matchedExpression.quote();
+
+        ElixirRelativeIdentifier relativeIdentifier = matchedQualifiedCallOperation.getRelativeIdentifier();
+        OtpErlangObject quotedRelativeIdentifier = relativeIdentifier.quote();
+
+        quotedIdentifier = quotedFunctionCall(
+                ".",
+                metadata(relativeIdentifier),
+                quotedIdentifier,
+                quotedRelativeIdentifier
+        );
+
+        ElixirMatchedCallArguments matchedCallArguments = matchedQualifiedCallOperation.getMatchedCallArguments();
+        OtpErlangObject quoted;
+
+        if (matchedCallArguments != null) {
+            quoted = quotedFunctionCallWithMatchedCallArguments(quotedIdentifier, matchedCallArguments);
+        } else {
+            OtpErlangList callMetadata = Macro.metadata((OtpErlangTuple) quotedIdentifier);
+
+            quoted = quotedFunctionCall(
+                    quotedIdentifier,
+                    callMetadata
+            );
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static OtpErlangObject quotedFunctionCallWithMatchedCallArguments(
+            @NotNull OtpErlangObject quotedIdentifier,
+            @NotNull ElixirMatchedCallArguments matchedCallArguments
+    ) {
+        if (Macro.isVariable(quotedIdentifier)) {
+            OtpErlangTuple variable = (OtpErlangTuple) quotedIdentifier;
+            quotedIdentifier = variable.elementAt(0);
+        }
+
+        List<ElixirParenthesesArguments> parenthesesArgumentsLists = matchedCallArguments.getParenthesesArgumentsList();
+        OtpErlangList callMetadata;
+
+        if (Macro.isExpression(quotedIdentifier)) {
+            OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
+            callMetadata = Macro.metadata(expression);
+        } else {
+            callMetadata = metadata(matchedCallArguments);
+        }
+
+        OtpErlangObject quoted = null;
+
+        if (!parenthesesArgumentsLists.isEmpty()) {
+            for (ElixirParenthesesArguments parenthesesArguments : parenthesesArgumentsLists) {
+                quoted = quotedFunctionCall(
+                        quotedIdentifier,
+                        callMetadata,
+                        parenthesesArguments.quoteArguments()
+                );
+
+                // function call is identifier for second call
+                quotedIdentifier = quoted;
+            }
+        } else {
+            PsiElement[] matchedCallArgumentsChildren = matchedCallArguments.getChildren();
+
+            assert matchedCallArgumentsChildren.length == 1;
+
+            PsiElement matchedCallArgumentsChild = matchedCallArgumentsChildren[0];
+            OtpErlangObject[] quotedArguments;
+
+            if (matchedCallArgumentsChild instanceof Quotable) {
+                Quotable quotable = (Quotable) matchedCallArgumentsChild;
+                quotedArguments = new OtpErlangObject[]{
+                        quotable.quote()
+                };
+            } else {
+                QuotableArguments quotableArguments = (QuotableArguments) matchedCallArgumentsChild;
+                quotedArguments = quotableArguments.quoteArguments();
+            }
+
+            quoted = quotedFunctionCall(
+                    quotedIdentifier,
+                    callMetadata,
+                    quotedArguments
+            );
+        }
+
+        return quoted;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedCallOperation matchedUnqualifiedCallOperation) {
+        Quotable identifier = matchedUnqualifiedCallOperation.getVariable();
+        OtpErlangObject quotedIdentifier = identifier.quote();
+        ElixirMatchedCallArguments matchedCallArguments = matchedUnqualifiedCallOperation.getMatchedCallArguments();
+
+        return quotedFunctionCallWithMatchedCallArguments(quotedIdentifier, matchedCallArguments);
     }
 
     @Contract(pure = true)
@@ -1715,7 +1702,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariable noParenthesesNoArgumentsUnqualifiedCallOrVariable) {
+    public static OtpErlangObject quote(@NotNull final ElixirVariable noParenthesesNoArgumentsUnqualifiedCallOrVariable) {
         /* @note quotedFunctionCall cannot be used here because in the 3-tuple for function calls, the elements are
            {name, metadata, arguments}, while for an ambiguous call or variable, the elements are
            {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are [] when
@@ -1930,20 +1917,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirOperatorCallArguments operatorCallArguments) {
-        PsiElement[] children = operatorCallArguments.getChildren();
-        OtpErlangObject[] quotedArguments = new OtpErlangObject[children.length];
-
-        for (int i = 0; i < children.length; i++) {
-            Quotable child = (Quotable) children[i];
-            quotedArguments[i] = child.quote();
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
         PsiElement[] children = parenthesesArguments.getChildren();
 
@@ -2003,7 +1976,7 @@ public class ElixirPsiImplUtil {
         Quotable identifier = call.getIdentifier();
         OtpErlangObject quotedIdentifier;
 
-        if (identifier instanceof ElixirNoParenthesesNoArgumentsUnqualifiedCallOrVariableImpl) {
+        if (identifier instanceof ElixirVariable) {
             quotedIdentifier = new OtpErlangAtom(identifier.getText());
         } else {
             quotedIdentifier = identifier.quote();

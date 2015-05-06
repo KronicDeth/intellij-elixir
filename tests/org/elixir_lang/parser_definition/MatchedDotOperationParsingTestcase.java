@@ -1,7 +1,19 @@
 package org.elixir_lang.parser_definition;
 
 public class MatchedDotOperationParsingTestcase extends ParsingTestCase {
-  public void testAssociativity() {
+    public void testAliasDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAliasDotIdentifierDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierDotIdentifierDotIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAssociativity() {
         assertParsedAndQuotedCorrectly();
     }
 

@@ -1,0 +1,16 @@
+0x1.relative_identifier(
+  0x2,
+  key: 0x3
+)
+0x1.relative_identifier(
+  0x2,
+  key: 0x3
+)(
+  0x4,
+  key: 0x5
+)
+0x1.relative_identifier key: 0x2
+0x1.relative_identifier unqualified 0x2,
+                                    key: 0x3
+0x1.relative_identifier 0x2,
+                        key: 0x3

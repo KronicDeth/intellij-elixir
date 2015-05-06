@@ -1,0 +1,2 @@
+:atom positional,
+      key: value

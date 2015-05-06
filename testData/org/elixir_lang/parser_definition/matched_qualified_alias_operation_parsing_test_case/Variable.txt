@@ -1,0 +1,8 @@
+Elixir File(0,14)
+  ElixirMatchedQualifiedAliasOperationImpl(MATCHED_QUALIFIED_ALIAS_OPERATION)(0,14)
+    ElixirVariableImpl(VARIABLE)(0,8)
+      PsiElement(identifier)('variable')(0,8)
+    ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(8,9)
+      PsiElement(.)('.')(8,9)
+    ElixirAliasImpl(ALIAS)(9,14)
+      PsiElement(Alias)('Alias')(9,14)
