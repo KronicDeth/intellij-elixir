@@ -11,6 +11,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
   ElixirAlias getAlias();
 
   @Nullable
+  ElixirAtBracketOperation getAtBracketOperation();
+
+  @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable

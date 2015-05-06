@@ -41,6 +41,9 @@ public class ElixirParser implements PsiParser {
     else if (t == ARROW_INFIX_OPERATOR) {
       r = arrowInfixOperator(b, 0);
     }
+    else if (t == AT_BRACKET_OPERATION) {
+      r = atBracketOperation(b, 0);
+    }
     else if (t == AT_NUMERIC_OPERATION) {
       r = atNumericOperation(b, 0);
     }
@@ -58,6 +61,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == BINARY_WHOLE_NUMBER) {
       r = binaryWholeNumber(b, 0);
+    }
+    else if (t == BRACKET_ARGUMENTS) {
+      r = bracketArguments(b, 0);
     }
     else if (t == CAPTURE_NUMERIC_OPERATION) {
       r = captureNumericOperation(b, 0);
@@ -617,6 +623,20 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // atPrefixOperator accessExpression bracketArguments
+  public static boolean atBracketOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atBracketOperation")) return false;
+    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && accessExpression(b, l + 1);
+    r = r && bracketArguments(b, l + 1);
+    exit_section_(b, m, AT_BRACKET_OPERATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // atPrefixOperator numeric
   public static boolean atNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atNumericOperation")) return false;
@@ -744,6 +764,68 @@ public class ElixirParser implements PsiParser {
     }
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // CALL OPENING_BRACKET EOL*
+  //                      (
+  //                        keywords |
+  //                        containerExpression infixComma?
+  //                      )
+  //                      CLOSING_BRACKET
+  public static boolean bracketArguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments")) return false;
+    if (!nextTokenIs(b, CALL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, CALL, OPENING_BRACKET);
+    r = r && bracketArguments_2(b, l + 1);
+    r = r && bracketArguments_3(b, l + 1);
+    r = r && consumeToken(b, CLOSING_BRACKET);
+    exit_section_(b, m, BRACKET_ARGUMENTS, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean bracketArguments_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "bracketArguments_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // keywords |
+  //                        containerExpression infixComma?
+  private static boolean bracketArguments_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = keywords(b, l + 1);
+    if (!r) r = bracketArguments_3_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // containerExpression infixComma?
+  private static boolean bracketArguments_3_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_3_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = containerExpression(b, l + 1);
+    r = r && bracketArguments_3_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // infixComma?
+  private static boolean bracketArguments_3_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bracketArguments_3_1_1")) return false;
+    infixComma(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -4167,7 +4249,8 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // atNumericOperation |
+  // atBracketOperation |
+  //                      atNumericOperation |
   //                      captureNumericOperation |
   //                      unaryNumericOperation |
   //                      emptyBlock |
@@ -4204,7 +4287,8 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "accessExpression")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<access expression>");
-    r = atNumericOperation(b, l + 1);
+    r = atBracketOperation(b, l + 1);
+    if (!r) r = atNumericOperation(b, l + 1);
     if (!r) r = captureNumericOperation(b, l + 1);
     if (!r) r = unaryNumericOperation(b, l + 1);
     if (!r) r = emptyBlock(b, l + 1);

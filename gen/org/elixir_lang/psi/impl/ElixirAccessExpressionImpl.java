@@ -27,6 +27,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirAtBracketOperation getAtBracketOperation() {
+    return findChildByClass(ElixirAtBracketOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
     return findChildByClass(ElixirAtNumericOperation.class);
   }

@@ -32,6 +32,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAtBracketOperation(@NotNull ElixirAtBracketOperation o) {
+    visitPsiElement(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -54,6 +58,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitBinaryWholeNumber(@NotNull ElixirBinaryWholeNumber o) {
     visitWholeNumber(o);
+  }
+
+  public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
+    visitPsiElement(o);
   }
 
   public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {

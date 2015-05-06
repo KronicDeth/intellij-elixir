@@ -16,10 +16,12 @@ public interface ElixirTypes {
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
+  IElementType AT_BRACKET_OPERATION = new ElixirElementType("AT_BRACKET_OPERATION");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
+  IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -302,6 +304,9 @@ public interface ElixirTypes {
       else if (type == ATOM_KEYWORD) {
         return new ElixirAtomKeywordImpl(node);
       }
+      else if (type == AT_BRACKET_OPERATION) {
+        return new ElixirAtBracketOperationImpl(node);
+      }
       else if (type == AT_NUMERIC_OPERATION) {
         return new ElixirAtNumericOperationImpl(node);
       }
@@ -313,6 +318,9 @@ public interface ElixirTypes {
       }
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
+      }
+      else if (type == BRACKET_ARGUMENTS) {
+        return new ElixirBracketArgumentsImpl(node);
       }
       else if (type == CAPTURE_NUMERIC_OPERATION) {
         return new ElixirCaptureNumericOperationImpl(node);
