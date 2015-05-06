@@ -705,11 +705,11 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <CALL_OR_KEYWORD_PAIR_MAYBE> {
-  {OPENING_PARENTHESIS} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                          handleInState(stackFrame.getLastLexicalState());
-                          // zero-width token
-                          return ElixirTypes.CALL; }
-  {EOL}|.               { handleInState(KEYWORD_PAIR_MAYBE); }
+  {OPENING_BRACKET}|{OPENING_PARENTHESIS} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                            handleInState(stackFrame.getLastLexicalState());
+                                            // zero-width token
+                                            return ElixirTypes.CALL; }
+  {EOL}|.                                 { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
 <CHAR_TOKENIZATION> {
