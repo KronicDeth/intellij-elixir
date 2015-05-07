@@ -1,0 +1,8 @@
+identifier.()[key: value]
+identifier.() [key: value]
+identifier.()[()]
+identifier.() [()]
+identifier.()[matched_expression]
+identifier.() [matched_expression]
+identifier.()[matched_expression,]
+identifier.() [matched_expression,]

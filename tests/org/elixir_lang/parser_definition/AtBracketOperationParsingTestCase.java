@@ -8,11 +8,27 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
      * matchedExpression
      */
 
+    public void testMatchedDotCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedQualifiedAliasOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
     public void testMatchedQualifiedCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedQualifiedIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedUnqualifiedCallOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchedUnqualifiedIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 

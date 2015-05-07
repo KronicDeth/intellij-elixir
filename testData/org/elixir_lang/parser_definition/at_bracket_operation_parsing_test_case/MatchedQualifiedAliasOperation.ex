@@ -1,0 +1,8 @@
+Qualified.Alias[key: value]
+Qualified.Alias [key: value]
+Qualified.Alias[()]
+Qualified.Alias [()]
+Qualified.Alias[matched_expression]
+Qualified.Alias [matched_expression]
+Qualified.Alias[matched_expression,]
+Qualified.Alias [matched_expression,]

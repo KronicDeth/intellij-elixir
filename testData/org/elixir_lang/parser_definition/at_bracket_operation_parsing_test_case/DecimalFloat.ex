@@ -1,0 +1,8 @@
+1.2e-3[key: value]
+1.2e-3 [key: value]
+1.2e-3[()]
+1.2e-3 [()]
+1.2e-3[matched_expression]
+1.2e-3 [matched_expression]
+1.2e-3[matched_expression,]
+1.2e-3 [matched_expression,]
