@@ -16,7 +16,6 @@ public interface ElixirTypes {
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
-  IElementType AT_BRACKET_OPERATION = new ElixirElementType("AT_BRACKET_OPERATION");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
@@ -100,6 +99,7 @@ public interface ElixirTypes {
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
   IElementType MATCHED_AT_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_AT_NON_NUMERIC_OPERATION");
+  IElementType MATCHED_BRACKET_OPERATION = new ElixirElementType("MATCHED_BRACKET_OPERATION");
   IElementType MATCHED_CALL_ARGUMENTS = new ElixirElementType("MATCHED_CALL_ARGUMENTS");
   IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
@@ -303,9 +303,6 @@ public interface ElixirTypes {
       }
       else if (type == ATOM_KEYWORD) {
         return new ElixirAtomKeywordImpl(node);
-      }
-      else if (type == AT_BRACKET_OPERATION) {
-        return new ElixirAtBracketOperationImpl(node);
       }
       else if (type == AT_NUMERIC_OPERATION) {
         return new ElixirAtNumericOperationImpl(node);
@@ -555,6 +552,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_AT_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedAtNonNumericOperationImpl(node);
+      }
+      else if (type == MATCHED_BRACKET_OPERATION) {
+        return new ElixirMatchedBracketOperationImpl(node);
       }
       else if (type == MATCHED_CALL_ARGUMENTS) {
         return new ElixirMatchedCallArgumentsImpl(node);

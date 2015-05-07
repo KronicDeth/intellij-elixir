@@ -543,6 +543,18 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBracketArguments bracketArguments) {
+        PsiElement[] children = bracketArguments.getChildren();
+
+        assert children.length == 1;
+
+        Quotable child = (Quotable) children[0];
+
+        return child.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Digits digits) {
         final String text = digits.getText();
         final int base = digits.base();
@@ -1378,6 +1390,26 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
+    }
+
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedBracketOperation matchedBracketOperation) {
+        PsiElement[] children = matchedBracketOperation.getChildren();
+
+        assert children.length == 2;
+
+        Quotable matchedExpression = (Quotable) children[0];
+        OtpErlangObject quotedMatchedExpression = matchedExpression.quote();
+        Quotable bracketArguments = (Quotable) children[1];
+        OtpErlangObject quotedBracketArguments = bracketArguments.quote();
+
+        return quotedFunctionCall(
+                "Elixir.Access",
+                "get",
+                metadata(bracketArguments),
+                quotedMatchedExpression,
+                quotedBracketArguments
+        );
     }
 
     @Contract(pure = true)

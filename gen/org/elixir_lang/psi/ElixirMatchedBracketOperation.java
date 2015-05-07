@@ -3,17 +3,13 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ElixirBracketArguments extends Quotable {
+public interface ElixirMatchedBracketOperation extends ElixirMatchedExpression, Quotable {
 
-  @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
+  @NotNull
+  ElixirBracketArguments getBracketArguments();
 
-  @Nullable
-  ElixirKeywords getKeywords();
-
-  @Nullable
+  @NotNull
   ElixirMatchedExpression getMatchedExpression();
 
   @NotNull

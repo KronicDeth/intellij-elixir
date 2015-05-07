@@ -952,6 +952,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedDotCallOperation |
                       matchedQualifiedAliasOperation |
                       matchedQualifiedCallOperation |
+                      matchedBracketOperation |
                       matchedAtNonNumericOperation |
                       matchedUnqualifiedCallOperation |
                       variable |
@@ -1389,6 +1390,23 @@ matchedQualifiedCallOperation ::= matchedExpression dotInfixOperator relativeIde
                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
+ * Bracket Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L238
+ */
+
+bracketArguments ::= OPENING_BRACKET EOL*
+                     (
+                      keywords |
+                      containerExpression infixComma?
+                     )
+                     CLOSING_BRACKET
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+matchedBracketOperation ::= matchedExpression bracketArguments
+                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
  * At Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
@@ -1432,8 +1450,7 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
 emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-accessExpression ::= atBracketOperation |
-                     atNumericOperation |
+accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
                      emptyBlock |
@@ -1467,22 +1484,6 @@ accessExpression ::= atBracketOperation |
                      atom |
                      alias
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-
-/*
- * At Bracket Operation
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L242-L243
- */
-
-bracketArguments ::= CALL OPENING_BRACKET EOL*
-                     (
-                       keywords |
-                       containerExpression infixComma?
-                     )
-                     CLOSING_BRACKET
-
-atBracketOperation ::= atPrefixOperator accessExpression bracketArguments
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE

@@ -32,10 +32,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitAtBracketOperation(@NotNull ElixirAtBracketOperation o) {
-    visitPsiElement(o);
-  }
-
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -61,7 +57,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {
@@ -408,6 +404,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
     visitMatchedExpression(o);
     // visitPrefixOperation(o);
+  }
+
+  public void visitMatchedBracketOperation(@NotNull ElixirMatchedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
   }
 
   public void visitMatchedCallArguments(@NotNull ElixirMatchedCallArguments o) {
