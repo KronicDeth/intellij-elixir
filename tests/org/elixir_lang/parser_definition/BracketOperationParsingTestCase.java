@@ -3,7 +3,7 @@ package org.elixir_lang.parser_definition;
 /**
  * Created by luke.imhoff on 9/17/14.
  */
-public class AtBracketOperationParsingTestCase extends ParsingTestCase {
+public class BracketOperationParsingTestCase extends ParsingTestCase {
     /*
      * matchedExpression
      */
@@ -118,6 +118,6 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return super.getTestDataPath() + "/at_bracket_operation_parsing_test_case";
+        return super.getTestDataPath() + "/bracket_operation_parsing_test_case";
     }
 }
