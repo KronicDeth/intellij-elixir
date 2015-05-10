@@ -951,6 +951,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedUnaryNonNumericOperation |
                       matchedDotCallOperation |
                       matchedQualifiedAliasOperation |
+                      matchedQualifiedBracketOperation |
                       matchedQualifiedCallOperation |
                       matchedBracketOperation |
                       matchedAtNonNumericOperation |
@@ -1378,6 +1379,12 @@ matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArgume
 matchedQualifiedAliasOperation ::= matchedExpression dotInfixOperator alias
                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+/*
+ * Qualified Identifier Bracket Operation
+ */
+
+matchedQualifiedBracketOperation ::= matchedExpression dotInfixOperator relativeIdentifier CALL bracketArguments
+                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * Qualified Call Operation

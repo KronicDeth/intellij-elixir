@@ -36,10 +36,6 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
      * accessExpression
      */
 
-    public void testBracketAtOperation() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testAtNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }

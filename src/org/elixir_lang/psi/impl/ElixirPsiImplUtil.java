@@ -1603,6 +1603,41 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedBracketOperation matchedQualifiedBracketOperation) {
+        Quotable matchedExpression = (Quotable) matchedQualifiedBracketOperation.getFirstChild();
+        OtpErlangObject quotedIdentifier = matchedExpression.quote();
+
+        ElixirRelativeIdentifier relativeIdentifier = matchedQualifiedBracketOperation.getRelativeIdentifier();
+        OtpErlangObject quotedRelativeIdentifier = relativeIdentifier.quote();
+
+        quotedIdentifier = quotedFunctionCall(
+                ".",
+                metadata(relativeIdentifier),
+                quotedIdentifier,
+                quotedRelativeIdentifier
+        );
+
+        OtpErlangList callMetadata = Macro.metadata((OtpErlangTuple) quotedIdentifier);
+
+        OtpErlangObject quotedContainer = quotedFunctionCall(
+                quotedIdentifier,
+                callMetadata
+        );
+
+        Quotable bracketArguments = matchedQualifiedBracketOperation.getBracketArguments();
+        OtpErlangObject quotedBracketArguments = bracketArguments.quote();
+
+        return quotedFunctionCall(
+                "Elixir.Access",
+                "get",
+                metadata(bracketArguments),
+                quotedContainer,
+                quotedBracketArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedCallOperation matchedQualifiedCallOperation) {
         Quotable matchedExpression = (Quotable) matchedQualifiedCallOperation.getFirstChild();
         OtpErlangObject quotedIdentifier = matchedExpression.quote();

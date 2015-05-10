@@ -113,6 +113,7 @@ public interface ElixirTypes {
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
   IElementType MATCHED_QUALIFIED_ALIAS_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_ALIAS_OPERATION");
+  IElementType MATCHED_QUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_BRACKET_OPERATION");
   IElementType MATCHED_QUALIFIED_CALL_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_CALL_OPERATION");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
@@ -594,6 +595,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_QUALIFIED_ALIAS_OPERATION) {
         return new ElixirMatchedQualifiedAliasOperationImpl(node);
+      }
+      else if (type == MATCHED_QUALIFIED_BRACKET_OPERATION) {
+        return new ElixirMatchedQualifiedBracketOperationImpl(node);
       }
       else if (type == MATCHED_QUALIFIED_CALL_OPERATION) {
         return new ElixirMatchedQualifiedCallOperationImpl(node);
