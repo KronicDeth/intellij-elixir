@@ -5,11 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirKeywords;
-import org.elixir_lang.psi.ElixirList;
-import org.elixir_lang.psi.ElixirVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
 
@@ -23,9 +24,21 @@ public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
   }
 
   @Override
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
+  }
+
+  @Override
   @Nullable
   public ElixirKeywords getKeywords() {
     return findChildByClass(ElixirKeywords.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @NotNull

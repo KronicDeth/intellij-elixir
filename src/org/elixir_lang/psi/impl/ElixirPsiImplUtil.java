@@ -1380,16 +1380,33 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirList list) {
-        ElixirKeywords keywords = list.getKeywords();
-        OtpErlangObject quoted;
+        PsiElement[] listArguments = list.getChildren();
+        List<OtpErlangObject> quotedListArgumentList = new ArrayList<OtpErlangObject>(listArguments.length);
 
-        if (keywords != null) {
-            quoted = keywords.quote();
-        } else {
-            quoted = new OtpErlangList();
+        if (listArguments.length > 0) {
+            for (int i = 0; i < listArguments.length - 1; i++) {
+                Quotable listArgument = (Quotable) listArguments[i];
+                quotedListArgumentList.add(listArgument.quote());
+            }
+
+            PsiElement lastListArgument = listArguments[listArguments.length - 1];
+
+            if (lastListArgument instanceof ElixirKeywords) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) lastListArgument;
+
+                for (Quotable keywordPair : quotableKeywordList.quotableKeywordPairList()) {
+                    quotedListArgumentList.add(keywordPair.quote());
+                }
+            } else {
+                Quotable quotable = (Quotable) lastListArgument;
+                quotedListArgumentList.add(quotable.quote());
+            }
         }
 
-        return quoted;
+        OtpErlangObject[] quotedListArguments = new OtpErlangObject[quotedListArgumentList.size()];
+        quotedListArgumentList.toArray(quotedListArguments);
+
+        return new OtpErlangList(quotedListArguments);
     }
 
     @NotNull

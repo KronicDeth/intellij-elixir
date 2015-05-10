@@ -1607,7 +1607,7 @@ charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses |
-                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
+                                matchedExpression !KEYWORD_PAIR_COLON // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
@@ -1723,7 +1723,19 @@ emptyParentheses ::= OPENING_PARENTHESIS EOL* CLOSING_PARENTHESIS
 interpolation ::= INTERPOLATION_START elixirFile INTERPOLATION_END
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-list ::= OPENING_BRACKET EOL* keywords? CLOSING_BRACKET
+/*
+ * List
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L476-L484
+ */
+
+private containerArgumentsBase ::= containerExpression (infixComma containerExpression)*
+private containerArguments ::= containerArgumentsBase (infixComma keywords | infixComma)?
+
+private listArguments ::= keywords |
+                          containerArguments
+
+list ::= OPENING_BRACKET EOL* listArguments? CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches
