@@ -1,0 +1,8 @@
+Module.when[key: value]
+Module.when [key: value]
+Module.when[()]
+Module.when [()]
+Module.when[matched_expression]
+Module.when [matched_expression]
+Module.when[matched_expression,]
+Module.when [matched_expression,]

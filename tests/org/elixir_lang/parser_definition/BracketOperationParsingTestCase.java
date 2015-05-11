@@ -8,6 +8,82 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
      * matchedExpression
      */
 
+    public void testAndOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testArrowOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testAtOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testCaptureOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testComparisonOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testDualOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testHatOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testInMatchOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testInOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMatchOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMultiplicationOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testOrOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testPipeOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testRelationalOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testStabOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testStructOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testTwoOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnaryOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testWhenOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedDotCallOperation() {
         assertParsedAndQuotedCorrectly();
     }

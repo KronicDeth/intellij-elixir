@@ -511,12 +511,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state ATOM_START
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
+%state CALL_MAYBE
 %state CALL_OR_KEYWORD_PAIR_MAYBE
 %state CHAR_TOKENIZATION
 %state DECIMAL_EXPONENT
 %state DECIMAL_EXPONENT_SIGN
 %state DECIMAL_FRACTION
 %state DECIMAL_WHOLE_NUMBER
+%state DOT_OPERATION
 %state DUAL_OPERATION
 %state ESCAPE_IN_LITERAL_GROUP
 %state ESCAPE_SEQUENCE
@@ -581,7 +583,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE
-  {DOT_OPERATOR}                             { return ElixirTypes.DOT_OPERATOR; }
+  {DOT_OPERATOR}                             { pushAndBegin(DOT_OPERATION);
+                                               return ElixirTypes.DOT_OPERATOR; }
   {DUAL_OPERATOR}                            { pushAndBegin(DUAL_OPERATION);
                                                return ElixirTypes.DUAL_OPERATOR; }
   {FALSE}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -704,11 +707,19 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
-<CALL_OR_KEYWORD_PAIR_MAYBE> {
+<CALL_MAYBE, CALL_OR_KEYWORD_PAIR_MAYBE> {
   {OPENING_BRACKET}|{OPENING_PARENTHESIS} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                             handleInState(stackFrame.getLastLexicalState());
                                             // zero-width token
                                             return ElixirTypes.CALL; }
+}
+
+<CALL_MAYBE> {
+  {EOL}|.                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                            handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<CALL_OR_KEYWORD_PAIR_MAYBE> {
   {EOL}|.                                 { handleInState(KEYWORD_PAIR_MAYBE); }
 }
 
@@ -756,6 +767,64 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {VALID_DECIMAL_DIGITS}   { return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<DOT_OPERATION> {
+  {AND_OPERATOR}               { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.AND_OPERATOR; }
+  {ARROW_OPERATOR}             { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.ARROW_OPERATOR; }
+  {AT_OPERATOR}                { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.AT_OPERATOR; }
+  {CAPTURE_OPERATOR}           { yybegin(CALL_MAYBE);
+                                return ElixirTypes.CAPTURE_OPERATOR; }
+  {COMPARISON_OPERATOR}        { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.COMPARISON_OPERATOR; }
+  {DUAL_OPERATOR}              { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.DUAL_OPERATOR; }
+  {HAT_OPERATOR}               { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.HAT_OPERATOR; }
+  {IN_MATCH_OPERATOR}          { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.IN_MATCH_OPERATOR; }
+  {IN_OPERATOR}                { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.IN_OPERATOR; }
+  {MATCH_OPERATOR}             { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.MATCH_OPERATOR; }
+  {MULTIPLICATION_OPERATOR}    { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {OR_OPERATOR}                { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.OR_OPERATOR; }
+  {PIPE_OPERATOR}              { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.PIPE_OPERATOR; }
+  {RELATIONAL_OPERATOR}        { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.RELATIONAL_OPERATOR; }
+  {STAB_OPERATOR}              { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.STAB_OPERATOR; }
+  {STRUCT_OPERATOR}            { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.STRUCT_OPERATOR; }
+  {TWO_OPERATOR}               { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.TWO_OPERATOR; }
+  {UNARY_OPERATOR}             { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.UNARY_OPERATOR; }
+  {WHEN_OPERATOR}              { yybegin(CALL_MAYBE);
+                                 return ElixirTypes.WHEN_OPERATOR; }
+
+  /*
+   * Emulates strip_space in elixir_tokenizer.erl
+   */
+
+  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {EOL}                        { return ElixirTypes.EOL; }
+
+  /* Be better than strip_space and handle_dot and ignore comments so that IDENTIFIER and operators are parsed the same
+     after dots.
+
+     @see https://groups.google.com/forum/#!topic/elixir-lang-core/nnI4oUB-63U
+   */
+  {COMMENT}                    { return ElixirTypes.COMMENT; }
+
+  .                            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <DUAL_OPERATION> {
