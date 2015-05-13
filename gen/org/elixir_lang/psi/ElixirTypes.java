@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -99,8 +99,8 @@ public interface ElixirTypes {
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
   IElementType MATCHED_AT_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_AT_NON_NUMERIC_OPERATION");
+  IElementType MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL");
   IElementType MATCHED_BRACKET_OPERATION = new ElixirElementType("MATCHED_BRACKET_OPERATION");
-  IElementType MATCHED_CALL_ARGUMENTS = new ElixirElementType("MATCHED_CALL_ARGUMENTS");
   IElementType MATCHED_CAPTURE_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_CAPTURE_NON_NUMERIC_OPERATION");
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_CALL_OPERATION = new ElixirElementType("MATCHED_DOT_CALL_OPERATION");
@@ -110,16 +110,22 @@ public interface ElixirTypes {
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
+  IElementType MATCHED_NO_PARENTHESES_ARGUMENTS = new ElixirElementType("MATCHED_NO_PARENTHESES_ARGUMENTS");
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
+  IElementType MATCHED_PARENTHESES_ARGUMENTS = new ElixirElementType("MATCHED_PARENTHESES_ARGUMENTS");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
   IElementType MATCHED_QUALIFIED_ALIAS_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_ALIAS_OPERATION");
   IElementType MATCHED_QUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_BRACKET_OPERATION");
-  IElementType MATCHED_QUALIFIED_CALL_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_CALL_OPERATION");
+  IElementType MATCHED_QUALIFIED_NO_ARGUMENTS_CALL = new ElixirElementType("MATCHED_QUALIFIED_NO_ARGUMENTS_CALL");
+  IElementType MATCHED_QUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_QUALIFIED_NO_PARENTHESES_CALL");
+  IElementType MATCHED_QUALIFIED_PARENTHESES_CALL = new ElixirElementType("MATCHED_QUALIFIED_PARENTHESES_CALL");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
   IElementType MATCHED_UNARY_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_UNARY_NON_NUMERIC_OPERATION");
-  IElementType MATCHED_UNQUALIFIED_CALL_OPERATION = new ElixirElementType("MATCHED_UNQUALIFIED_CALL_OPERATION");
+  IElementType MATCHED_UNQUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_UNQUALIFIED_BRACKET_OPERATION");
+  IElementType MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL");
+  IElementType MATCHED_UNQUALIFIED_PARENTHESES_CALL = new ElixirElementType("MATCHED_UNQUALIFIED_PARENTHESES_CALL");
   IElementType MATCHED_WHEN_OPERATION = new ElixirElementType("MATCHED_WHEN_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
@@ -224,6 +230,7 @@ public interface ElixirTypes {
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("MAP_OPERATOR");
+  IElementType MATCHEDPARENTHESESARGUMENTS_1_0 = new ElixirTokenType("matchedParenthesesArguments_1_0");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NIL = new ElixirTokenType("nil");
@@ -554,11 +561,11 @@ public interface ElixirTypes {
       else if (type == MATCHED_AT_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedAtNonNumericOperationImpl(node);
       }
+      else if (type == MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL) {
+        return new ElixirMatchedAtUnqualifiedNoParenthesesCallImpl(node);
+      }
       else if (type == MATCHED_BRACKET_OPERATION) {
         return new ElixirMatchedBracketOperationImpl(node);
-      }
-      else if (type == MATCHED_CALL_ARGUMENTS) {
-        return new ElixirMatchedCallArgumentsImpl(node);
       }
       else if (type == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedCaptureNonNumericOperationImpl(node);
@@ -587,8 +594,14 @@ public interface ElixirTypes {
       else if (type == MATCHED_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedMultiplicationOperationImpl(node);
       }
+      else if (type == MATCHED_NO_PARENTHESES_ARGUMENTS) {
+        return new ElixirMatchedNoParenthesesArgumentsImpl(node);
+      }
       else if (type == MATCHED_OR_OPERATION) {
         return new ElixirMatchedOrOperationImpl(node);
+      }
+      else if (type == MATCHED_PARENTHESES_ARGUMENTS) {
+        return new ElixirMatchedParenthesesArgumentsImpl(node);
       }
       else if (type == MATCHED_PIPE_OPERATION) {
         return new ElixirMatchedPipeOperationImpl(node);
@@ -599,8 +612,14 @@ public interface ElixirTypes {
       else if (type == MATCHED_QUALIFIED_BRACKET_OPERATION) {
         return new ElixirMatchedQualifiedBracketOperationImpl(node);
       }
-      else if (type == MATCHED_QUALIFIED_CALL_OPERATION) {
-        return new ElixirMatchedQualifiedCallOperationImpl(node);
+      else if (type == MATCHED_QUALIFIED_NO_ARGUMENTS_CALL) {
+        return new ElixirMatchedQualifiedNoArgumentsCallImpl(node);
+      }
+      else if (type == MATCHED_QUALIFIED_NO_PARENTHESES_CALL) {
+        return new ElixirMatchedQualifiedNoParenthesesCallImpl(node);
+      }
+      else if (type == MATCHED_QUALIFIED_PARENTHESES_CALL) {
+        return new ElixirMatchedQualifiedParenthesesCallImpl(node);
       }
       else if (type == MATCHED_RELATIONAL_OPERATION) {
         return new ElixirMatchedRelationalOperationImpl(node);
@@ -614,8 +633,14 @@ public interface ElixirTypes {
       else if (type == MATCHED_UNARY_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedUnaryNonNumericOperationImpl(node);
       }
-      else if (type == MATCHED_UNQUALIFIED_CALL_OPERATION) {
-        return new ElixirMatchedUnqualifiedCallOperationImpl(node);
+      else if (type == MATCHED_UNQUALIFIED_BRACKET_OPERATION) {
+        return new ElixirMatchedUnqualifiedBracketOperationImpl(node);
+      }
+      else if (type == MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL) {
+        return new ElixirMatchedUnqualifiedNoParenthesesCallImpl(node);
+      }
+      else if (type == MATCHED_UNQUALIFIED_PARENTHESES_CALL) {
+        return new ElixirMatchedUnqualifiedParenthesesCallImpl(node);
       }
       else if (type == MATCHED_WHEN_OPERATION) {
         return new ElixirMatchedWhenOperationImpl(node);

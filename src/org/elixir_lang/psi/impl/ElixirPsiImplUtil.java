@@ -1409,6 +1409,51 @@ public class ElixirPsiImplUtil {
         return new OtpErlangList(quotedListArguments);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedAtUnqualifiedNoParenthesesCall matchedAtUnqualifiedNoParenthesesCall) {
+        Quotable operator = matchedAtUnqualifiedNoParenthesesCall.getAtPrefixOperator();
+        OtpErlangObject quotedOperator = operator.quote();
+
+        ASTNode node = matchedAtUnqualifiedNoParenthesesCall.getNode();
+        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+
+        assert identifierNodes.length == 1;
+
+        ASTNode identifierNode = identifierNodes[0];
+        String identifier = identifierNode.getText();
+
+        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedAtUnqualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
+        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+
+        assert matchedNoParenthesesArgumentsChildren.length == 1;
+
+        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        OtpErlangObject[] quotedArguments;
+
+        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
+            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+            quotedArguments = new OtpErlangObject[]{
+                    quotable.quote()
+            };
+        } else {
+            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            quotedArguments = quotableArguments.quoteArguments();
+        }
+
+        OtpErlangObject quotedOperand =  quotedFunctionCall(
+                identifier,
+                metadata(operator),
+                quotedArguments
+        );
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedOperand
+        );
+    }
+
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedBracketOperation matchedBracketOperation) {
         PsiElement[] children = matchedBracketOperation.getChildren();
@@ -1638,94 +1683,99 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedCallOperation matchedQualifiedCallOperation) {
-        Quotable matchedExpression = (Quotable) matchedQualifiedCallOperation.getFirstChild();
-        OtpErlangObject quotedIdentifier = matchedExpression.quote();
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedNoArgumentsCall matchedQualifiedNoArgumentsCall) {
+        Quotable qualifier = (Quotable) matchedQualifiedNoArgumentsCall.getMatchedExpression();
+        OtpErlangObject quotedQualifier = qualifier.quote();
 
-        ElixirRelativeIdentifier relativeIdentifier = matchedQualifiedCallOperation.getRelativeIdentifier();
+        Quotable relativeIdentifier = matchedQualifiedNoArgumentsCall.getRelativeIdentifier();
         OtpErlangObject quotedRelativeIdentifier = relativeIdentifier.quote();
 
-        quotedIdentifier = quotedFunctionCall(
+        OtpErlangTuple quotedIdentifier = quotedFunctionCall(
                 ".",
                 metadata(relativeIdentifier),
-                quotedIdentifier,
+                quotedQualifier,
                 quotedRelativeIdentifier
         );
 
-        ElixirMatchedCallArguments matchedCallArguments = matchedQualifiedCallOperation.getMatchedCallArguments();
-        OtpErlangObject quoted;
-
-        if (matchedCallArguments != null) {
-            quoted = quotedFunctionCallWithMatchedCallArguments(quotedIdentifier, matchedCallArguments);
-        } else {
-            OtpErlangList callMetadata = Macro.metadata((OtpErlangTuple) quotedIdentifier);
-
-            quoted = quotedFunctionCall(
-                    quotedIdentifier,
-                    callMetadata
-            );
-        }
-
-        return quoted;
+        return quotedFunctionCall(
+                quotedIdentifier,
+                metadata(relativeIdentifier)
+        );
     }
 
     @Contract(pure = true)
     @NotNull
-    private static OtpErlangObject quotedFunctionCallWithMatchedCallArguments(
-            @NotNull OtpErlangObject quotedIdentifier,
-            @NotNull ElixirMatchedCallArguments matchedCallArguments
-    ) {
-        if (Macro.isVariable(quotedIdentifier)) {
-            OtpErlangTuple variable = (OtpErlangTuple) quotedIdentifier;
-            quotedIdentifier = variable.elementAt(0);
-        }
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedNoParenthesesCall matchedQualifiedNoParenthesesCall) {
+        Quotable qualifier = (Quotable) matchedQualifiedNoParenthesesCall.getMatchedExpression();
+        OtpErlangObject quotedQualifier = qualifier.quote();
 
-        List<ElixirParenthesesArguments> parenthesesArgumentsLists = matchedCallArguments.getParenthesesArgumentsList();
-        OtpErlangList callMetadata;
+        Quotable relativeIdentifier = matchedQualifiedNoParenthesesCall.getRelativeIdentifier();
+        OtpErlangObject quotedRelativeIdentifier = relativeIdentifier.quote();
 
-        if (Macro.isExpression(quotedIdentifier)) {
-            OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
-            callMetadata = Macro.metadata(expression);
+        OtpErlangTuple quotedIdentifier = quotedFunctionCall(
+                ".",
+                metadata(relativeIdentifier),
+                quotedQualifier,
+                quotedRelativeIdentifier
+        );
+
+        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedQualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
+        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+
+        assert matchedNoParenthesesArgumentsChildren.length == 1;
+
+        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        OtpErlangObject[] quotedArguments;
+
+        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
+            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+            quotedArguments = new OtpErlangObject[]{
+                    quotable.quote()
+            };
         } else {
-            callMetadata = metadata(matchedCallArguments);
+            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            quotedArguments = quotableArguments.quoteArguments();
         }
+
+        return quotedFunctionCall(
+                quotedIdentifier,
+                metadata(relativeIdentifier),
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedQualifiedParenthesesCall matchedQualifiedParenthesesCall) {
+        Quotable qualifier = (Quotable) matchedQualifiedParenthesesCall.getMatchedExpression();
+        OtpErlangObject quotedQualifier = qualifier.quote();
+
+        Quotable relativeIdentifier = matchedQualifiedParenthesesCall.getRelativeIdentifier();
+        OtpErlangObject quotedRelativeIdentifier = relativeIdentifier.quote();
+
+        OtpErlangList metadata = metadata(relativeIdentifier);
+        OtpErlangObject quotedIdentifier = quotedFunctionCall(
+                ".",
+                metadata,
+                quotedQualifier,
+                quotedRelativeIdentifier
+        );
+
+        ElixirMatchedParenthesesArguments matchedParenthesesArguments = matchedQualifiedParenthesesCall.getMatchedParenthesesArguments();
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
 
         OtpErlangObject quoted = null;
 
-        if (!parenthesesArgumentsLists.isEmpty()) {
-            for (ElixirParenthesesArguments parenthesesArguments : parenthesesArgumentsLists) {
-                quoted = quotedFunctionCall(
-                        quotedIdentifier,
-                        callMetadata,
-                        parenthesesArguments.quoteArguments()
-                );
-
-                // function call is identifier for second call
-                quotedIdentifier = quoted;
-            }
-        } else {
-            PsiElement[] matchedCallArgumentsChildren = matchedCallArguments.getChildren();
-
-            assert matchedCallArgumentsChildren.length == 1;
-
-            PsiElement matchedCallArgumentsChild = matchedCallArgumentsChildren[0];
-            OtpErlangObject[] quotedArguments;
-
-            if (matchedCallArgumentsChild instanceof Quotable) {
-                Quotable quotable = (Quotable) matchedCallArgumentsChild;
-                quotedArguments = new OtpErlangObject[]{
-                        quotable.quote()
-                };
-            } else {
-                QuotableArguments quotableArguments = (QuotableArguments) matchedCallArgumentsChild;
-                quotedArguments = quotableArguments.quoteArguments();
-            }
-
+        for (ElixirParenthesesArguments parenthesesArguments : parenthesesArgumentsList) {
             quoted = quotedFunctionCall(
                     quotedIdentifier,
-                    callMetadata,
-                    quotedArguments
-            );
+                    metadata,
+                    parenthesesArguments.quoteArguments()
+
+                    );
+
+            // function call is identifier for second call
+            quotedIdentifier = quoted;
         }
 
         return quoted;
@@ -1733,12 +1783,80 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedCallOperation matchedUnqualifiedCallOperation) {
-        Quotable identifier = matchedUnqualifiedCallOperation.getVariable();
-        OtpErlangObject quotedIdentifier = identifier.quote();
-        ElixirMatchedCallArguments matchedCallArguments = matchedUnqualifiedCallOperation.getMatchedCallArguments();
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedBracketOperation matchedUnqualifiedBracketOperation) {
+        ASTNode node = matchedUnqualifiedBracketOperation.getNode();
+        OtpErlangObject quotedIdentifier = new OtpErlangAtom(node.getFirstChildNode().getText());
+        OtpErlangObject quotedContainer = quotedVariable(quotedIdentifier, metadata(matchedUnqualifiedBracketOperation));
 
-        return quotedFunctionCallWithMatchedCallArguments(quotedIdentifier, matchedCallArguments);
+        Quotable bracketArguments = matchedUnqualifiedBracketOperation.getBracketArguments();
+        OtpErlangObject quotedBrackArguments = bracketArguments.quote();
+
+        return quotedFunctionCall(
+                "Elixir.Access",
+                "get",
+                metadata(bracketArguments),
+                quotedContainer,
+                quotedBrackArguments
+        );
+    }
+
+    /* Replaces `nil` argument in variables with the quoted ElixirMatchdNotParenthesesArguments.
+     *
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedNoParenthesesCall matchedUnqualifiedNoParenthesesCall) {
+        String identifier = matchedUnqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+
+        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedUnqualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
+        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+
+        assert matchedNoParenthesesArgumentsChildren.length == 1;
+
+        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        OtpErlangObject[] quotedArguments;
+
+        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
+            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+            quotedArguments = new OtpErlangObject[]{
+                    quotable.quote()
+            };
+        } else {
+            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            quotedArguments = quotableArguments.quoteArguments();
+        }
+
+        return quotedFunctionCall(
+                identifier,
+                metadata(matchedUnqualifiedNoParenthesesCall),
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall) {
+        ASTNode identifierNode = matchedUnqualifiedParenthesesCall.getNode().getFirstChildNode();
+        OtpErlangList metadata = metadata(matchedUnqualifiedParenthesesCall);
+        OtpErlangObject quotedIdentifier = new OtpErlangAtom(identifierNode.getText());
+
+        ElixirMatchedParenthesesArguments matchedParenthesesArguments = matchedUnqualifiedParenthesesCall.getMatchedParenthesesArguments();
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
+
+        OtpErlangObject quoted = null;
+
+        for (ElixirParenthesesArguments parenthesesArguments : parenthesesArgumentsList) {
+            quoted = quotedFunctionCall(
+                    quotedIdentifier,
+                    metadata,
+                    parenthesesArguments.quoteArguments()
+            );
+
+            // function call is identifier for second call
+            quotedIdentifier = quoted;
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)

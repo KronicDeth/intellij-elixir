@@ -1,5 +1,5 @@
 Elixir File(0,10)
-  ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,10)
+  ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,10)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
       ElixirAtomKeywordImpl(ATOM_KEYWORD)(0,4)
         PsiElement(true)('true')(0,4)

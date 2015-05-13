@@ -1,5 +1,5 @@
 Elixir File(0,20)
-  ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,20)
+  ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,20)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,9)
       ElixirInterpolatedRegexLineImpl(INTERPOLATED_REGEX_LINE)(0,9)
         PsiElement(~)('~')(0,1)

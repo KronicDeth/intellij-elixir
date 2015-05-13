@@ -1,5 +1,5 @@
 Elixir File(0,49)
-  ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,49)
+  ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,49)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,38)
       ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(0,38)
         PsiElement(0)('0')(0,1)

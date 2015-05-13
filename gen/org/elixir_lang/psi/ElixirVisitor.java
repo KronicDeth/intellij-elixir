@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -406,13 +406,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPrefixOperation(o);
   }
 
-  public void visitMatchedBracketOperation(@NotNull ElixirMatchedBracketOperation o) {
+  public void visitMatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCall o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
 
-  public void visitMatchedCallArguments(@NotNull ElixirMatchedCallArguments o) {
-    visitPsiElement(o);
+  public void visitMatchedBracketOperation(@NotNull ElixirMatchedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
   }
 
   public void visitMatchedCaptureNonNumericOperation(@NotNull ElixirMatchedCaptureNonNumericOperation o) {
@@ -459,9 +460,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
+  public void visitMatchedNoParenthesesArguments(@NotNull ElixirMatchedNoParenthesesArguments o) {
+    visitPsiElement(o);
+  }
+
   public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
     visitMatchedExpression(o);
     // visitInfixOperation(o);
+  }
+
+  public void visitMatchedParenthesesArguments(@NotNull ElixirMatchedParenthesesArguments o) {
+    visitPsiElement(o);
   }
 
   public void visitMatchedPipeOperation(@NotNull ElixirMatchedPipeOperation o) {
@@ -479,7 +488,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
-  public void visitMatchedQualifiedCallOperation(@NotNull ElixirMatchedQualifiedCallOperation o) {
+  public void visitMatchedQualifiedNoArgumentsCall(@NotNull ElixirMatchedQualifiedNoArgumentsCall o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedQualifiedNoParenthesesCall(@NotNull ElixirMatchedQualifiedNoParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedQualifiedParenthesesCall(@NotNull ElixirMatchedQualifiedParenthesesCall o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -504,7 +523,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPrefixOperation(o);
   }
 
-  public void visitMatchedUnqualifiedCallOperation(@NotNull ElixirMatchedUnqualifiedCallOperation o) {
+  public void visitMatchedUnqualifiedBracketOperation(@NotNull ElixirMatchedUnqualifiedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedUnqualifiedNoParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedUnqualifiedParenthesesCall(@NotNull ElixirMatchedUnqualifiedParenthesesCall o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
