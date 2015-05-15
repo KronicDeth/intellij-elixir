@@ -1,6 +1,6 @@
 # Changelog
 
-## Next Release
+## v0.3.3
 * Enhancements
   * [#122](https://github.com/KronicDeth/intellij-elixir/pull/122) - [@KronicDeth](https://github.com/KronicDeth)
     * Remote function calls (`Alias.function`, `:atom.function`, etc) and local function calls (`function`) with...
