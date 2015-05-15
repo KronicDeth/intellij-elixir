@@ -179,6 +179,20 @@ allows the grammar because they contain correctable errors:
   arguments OR (2) two or more positional arguments with optional keyword arguments.
 * Anonymous function calls `.()` with either no arguments; a no parentheses arguments expression as an argument; keywords
   as an argument; positional argument(s); or positional arguments followed by keywords as arguments.
+* Remote function calls (`Alias.function`, `:atom.function`, etc) and local function calls (`function`) with...
+  * No Parentheses with...
+    * No Arguments (`Alias.function`)
+    * Keywords (`Alias.function key: value`)
+    * Nested No Parentheses Call (`Alias.function Inner.function positional, key: value`)
+    * Positional and Keyword arguments (`Alias.function positional, key: value`)
+    * Matched Expression (`Alias.function 1 + 2`)
+  * Parentheses with...
+    * No arguments (`Alias.function()`)
+    * No Parentheses Call (`Alias.function(Inner.function positional, key: value`)
+    * Keywords (`Alias.function(key: value)`)
+    * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
+    * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
+* Bracket expression (`variable[key]`)    
 
 ### Inspections
 
