@@ -1,0 +1,8 @@
+0x1[key: value]
+0x1 [key: value]
+0x1[()]
+0x1 [()]
+0x1[matched_expression]
+0x1 [matched_expression]
+0x1[matched_expression,]
+0x1 [matched_expression,]

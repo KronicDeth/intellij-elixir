@@ -1,17 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 import com.ericsson.otp.erlang.OtpErlangObject;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedQualifiedCallOperation extends ElixirMatchedExpression, Quotable {
+public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, Quotable {
 
   @NotNull
   ElixirDotInfixOperator getDotInfixOperator();
-
-  @Nullable
-  ElixirMatchedCallArguments getMatchedCallArguments();
 
   @NotNull
   ElixirMatchedExpression getMatchedExpression();

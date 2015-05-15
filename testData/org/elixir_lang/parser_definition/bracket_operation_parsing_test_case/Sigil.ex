@@ -1,0 +1,8 @@
+~x{sigil}modifiers[key: value]
+~x{sigil}modifiers [key: value]
+~x{sigil}modifiers[()]
+~x{sigil}modifiers [()]
+~x{sigil}modifiers[matched_expression]
+~x{sigil}modifiers [matched_expression]
+~x{sigil}modifiers[matched_expression,]
+~x{sigil}modifiers [matched_expression,]

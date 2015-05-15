@@ -1,5 +1,5 @@
 Elixir File(0,14)
-  ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,14)
+  ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,14)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
       ElixirDecimalFloatImpl(DECIMAL_FLOAT)(0,3)
         ElixirDecimalFloatIntegralImpl(DECIMAL_FLOAT_INTEGRAL)(0,1)

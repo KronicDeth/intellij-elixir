@@ -1,5 +1,5 @@
 Elixir File(0,41)
-  ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,41)
+  ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,41)
     ElixirVariableImpl(VARIABLE)(0,20)
       PsiElement(identifier)('qualifier_identifier')(0,20)
     ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(20,21)

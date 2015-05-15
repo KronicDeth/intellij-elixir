@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
  * Created by luke.imhoff on 12/7/14.
  */
 @RunWith(Parameterized.class)
-public class CallTest extends Test {
+public class ParenthesesCallTest extends Test {
     /*
      * Fields
      */
@@ -29,7 +29,7 @@ public class CallTest extends Test {
      * Constructors
      */
 
-    public CallTest(CharSequence identifierCharSequence, List<TokenTypeState> tokenTypeStates) {
+    public ParenthesesCallTest(CharSequence identifierCharSequence, List<TokenTypeState> tokenTypeStates) {
         this.identifierCharSequence = identifierCharSequence;
         this.tokenTypeStates = tokenTypeStates;
     }

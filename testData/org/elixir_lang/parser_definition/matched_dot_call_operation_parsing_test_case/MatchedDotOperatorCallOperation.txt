@@ -1,6 +1,6 @@
 Elixir File(0,9)
   ElixirMatchedDotCallOperationImpl(MATCHED_DOT_CALL_OPERATION)(0,9)
-    ElixirMatchedQualifiedCallOperationImpl(MATCHED_QUALIFIED_CALL_OPERATION)(0,6)
+    ElixirMatchedQualifiedNoArgumentsCallImpl(MATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,6)
       ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
         ElixirAliasImpl(ALIAS)(0,3)
           PsiElement(Alias)('One')(0,3)
