@@ -16,6 +16,7 @@
         * Keywords (`Alias.function(key: value)`)
         * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
         * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
+  * [#125](https://github.com/KronicDeth/intellij-elixir/pull/122) - Bracket expression (`foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
         
 ## v0.3.2
 * Bug Fixes

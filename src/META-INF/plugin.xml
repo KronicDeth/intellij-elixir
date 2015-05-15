@@ -49,6 +49,7 @@
                 </li>
               </ul>
             </li>
+            <li>Bracket expressions (<code>foo[key]</code>)</li>
           </ul>
         </li>
       </ul>
