@@ -1,0 +1,8 @@
+@0o1[key: value]
+@0o1 [key: value]
+@0o1[()]
+@0o1 [()]
+@0o1[matched_expression]
+@0o1 [matched_expression]
+@0o1[matched_expression,]
+@0o1 [matched_expression,]

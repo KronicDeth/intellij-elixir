@@ -959,6 +959,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedQualifiedBracketOperation |
                       matchedQualifiedParenthesesCall |
                       matchedQualifiedNoArgumentsCall |
+                      matchedAtUnqualifiedBracketOperation |
                       matchedAtNonNumericOperation | // after matchedQualified because @ binds only before `.`
                       matchedUnqualifiedParenthesesCall |
                       matchedUnqualifiedBracketOperation |
@@ -1455,6 +1456,15 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
 matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeIdentifier !CALL
                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+
+/*
+ * At Unqualified Bracket Operation
+ *
+ * Needed so that At consumes Unqualified identifier, but brackets consume both of them.
+ */
+
+matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracketArguments
+                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
  * Unqualified Parentheses Call

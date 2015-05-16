@@ -299,6 +299,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_AT_NON_NUMERIC_OPERATION) {
       r = matchedAtNonNumericOperation(b, 0);
     }
+    else if (t == MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION) {
+      r = matchedAtUnqualifiedBracketOperation(b, 0);
+    }
     else if (t == MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL) {
       r = matchedAtUnqualifiedNoParenthesesCall(b, 0);
     }
@@ -503,13 +506,14 @@ public class ElixirParser implements PsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ACCESS_EXPRESSION, MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION,
-      MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_BRACKET_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-      MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL_OPERATION, MATCHED_EXPRESSION, MATCHED_HAT_OPERATION,
-      MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION,
-      MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS_OPERATION, MATCHED_QUALIFIED_BRACKET_OPERATION,
-      MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL, MATCHED_RELATIONAL_OPERATION,
-      MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_BRACKET_OPERATION,
-      MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION, VARIABLE),
+      MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_BRACKET_OPERATION,
+      MATCHED_CAPTURE_NON_NUMERIC_OPERATION, MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL_OPERATION, MATCHED_EXPRESSION,
+      MATCHED_HAT_OPERATION, MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION,
+      MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS_OPERATION,
+      MATCHED_QUALIFIED_BRACKET_OPERATION, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL,
+      MATCHED_RELATIONAL_OPERATION, MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION,
+      MATCHED_UNQUALIFIED_BRACKET_OPERATION, MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION,
+      VARIABLE),
   };
 
   /* ********************************************************** */
@@ -4105,11 +4109,12 @@ public class ElixirParser implements PsiParser {
   // 24: POSTFIX(matchedQualifiedBracketOperation)
   // 25: POSTFIX(matchedQualifiedParenthesesCall)
   // 26: POSTFIX(matchedQualifiedNoArgumentsCall)
-  // 27: PREFIX(matchedAtNonNumericOperation)
-  // 28: ATOM(matchedUnqualifiedParenthesesCall)
-  // 29: ATOM(matchedUnqualifiedBracketOperation)
-  // 30: ATOM(variable)
-  // 31: ATOM(accessExpression)
+  // 27: ATOM(matchedAtUnqualifiedBracketOperation)
+  // 28: PREFIX(matchedAtNonNumericOperation)
+  // 29: ATOM(matchedUnqualifiedParenthesesCall)
+  // 30: ATOM(matchedUnqualifiedBracketOperation)
+  // 31: ATOM(variable)
+  // 32: ATOM(accessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "matchedExpression")) return false;
     addVariant(b, "<matched expression>");
@@ -4119,6 +4124,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = matchedUnaryNonNumericOperation(b, l + 1);
     if (!r) r = matchedAtUnqualifiedNoParenthesesCall(b, l + 1);
     if (!r) r = matchedUnqualifiedNoParenthesesCall(b, l + 1);
+    if (!r) r = matchedAtUnqualifiedBracketOperation(b, l + 1);
     if (!r) r = matchedAtNonNumericOperation(b, l + 1);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = matchedUnqualifiedBracketOperation(b, l + 1);
@@ -4426,6 +4432,19 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
+  // atPrefixOperator IDENTIFIER CALL bracketArguments
+  public static boolean matchedAtUnqualifiedBracketOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedAtUnqualifiedBracketOperation")) return false;
+    if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && consumeTokens(b, 0, IDENTIFIER, CALL);
+    r = r && bracketArguments(b, l + 1);
+    exit_section_(b, m, MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, r);
+    return r;
+  }
+
   public static boolean matchedAtNonNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtNonNumericOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
@@ -4433,7 +4452,7 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedAtNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 27);
+    r = p && matchedExpression(b, l, 28);
     exit_section_(b, l, m, MATCHED_AT_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }
