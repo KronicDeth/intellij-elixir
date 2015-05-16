@@ -2,7 +2,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.PsiBuilder;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;

@@ -3,8 +3,6 @@ package org.elixir_lang;
 import com.ericsson.otp.erlang.*;
 import org.apache.commons.lang.NotImplementedException;
 
-import java.io.IOException;
-
 /**
  * Emulates behavior of the `gen` Module in Erlang
  */
