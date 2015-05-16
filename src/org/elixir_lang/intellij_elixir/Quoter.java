@@ -2,25 +2,19 @@ package org.elixir_lang.intellij_elixir;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.psi.PsiFile;
-import com.sun.tools.javac.jvm.Gen;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.GenericServer;
 import org.elixir_lang.IntellijElixir;
-import org.elixir_lang.RPC;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * Created by luke.imhoff on 12/31/14.
