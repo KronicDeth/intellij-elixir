@@ -1410,6 +1410,36 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMatchedAtUnqualifiedBracketOperation matchedAtUnqualifiedBracketOperation) {
+        Quotable operator = matchedAtUnqualifiedBracketOperation.getAtPrefixOperator();
+        OtpErlangObject quotedOperator = operator.quote();
+
+        ASTNode node = matchedAtUnqualifiedBracketOperation.getNode();
+        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+
+        assert identifierNodes.length == 1;
+
+        ASTNode identifierNode = identifierNodes[0];
+        String identifier = identifierNode.getText();
+        OtpErlangList metadata = metadata(matchedAtUnqualifiedBracketOperation);
+
+        OtpErlangObject quotedOperand = quotedVariable(identifier, metadata);
+        OtpErlangTuple quotedContainer = quotedFunctionCall(quotedOperator, metadata, quotedOperand);
+
+        Quotable bracketArguments = matchedAtUnqualifiedBracketOperation.getBracketArguments();
+        OtpErlangObject quotedBracketArguments = bracketArguments.quote();
+
+        return quotedFunctionCall(
+                "Elixir.Access",
+                "get",
+                metadata(bracketArguments),
+                quotedContainer,
+                quotedBracketArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMatchedAtUnqualifiedNoParenthesesCall matchedAtUnqualifiedNoParenthesesCall) {
         Quotable operator = matchedAtUnqualifiedNoParenthesesCall.getAtPrefixOperator();
         OtpErlangObject quotedOperator = operator.quote();

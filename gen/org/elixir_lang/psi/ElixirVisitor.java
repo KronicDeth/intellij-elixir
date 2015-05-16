@@ -406,6 +406,11 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitPrefixOperation(o);
   }
 
+  public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
   public void visitMatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCall o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
