@@ -1,5 +1,9 @@
 # Changelog
 
+## Next Release
+* Enhancements
+  * [#126](https://github.com/KronicDeth/intellij-elixir/pull/126) - Bracket at expression (`@foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v0.3.3
 * Enhancements
   * [#122](https://github.com/KronicDeth/intellij-elixir/pull/122) - [@KronicDeth](https://github.com/KronicDeth)
@@ -16,7 +20,7 @@
         * Keywords (`Alias.function(key: value)`)
         * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
         * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
-  * [#125](https://github.com/KronicDeth/intellij-elixir/pull/122) - Bracket expression (`foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
+  * [#125](https://github.com/KronicDeth/intellij-elixir/pull/125) - Bracket expression (`foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
         
 ## v0.3.2
 * Bug Fixes

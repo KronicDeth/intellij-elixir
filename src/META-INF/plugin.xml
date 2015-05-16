@@ -19,6 +19,15 @@
           Issue #6
         </a> if you want to be notified when the parser is complete.
       </strong>
+      <h1>Next Release</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>Bracket at expression (<code>@foo[key]</code>)</li>
+          </ul>
+        </li>
+      </ul>
       <h1>v0.3.3</h1>
       <ul>
         <li>
