@@ -1,0 +1,8 @@
+@Module.in[key: value]
+@Module.in [key: value]
+@Module.in[()]
+@Module.in [()]
+@Module.in[matched_expression]
+@Module.in [matched_expression]
+@Module.in[matched_expression,]
+@Module.in [matched_expression,]
