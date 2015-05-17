@@ -27,6 +27,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirAnonymousFunction getAnonymousFunction() {
+    return findChildByClass(ElixirAnonymousFunction.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
     return findChildByClass(ElixirAtNumericOperation.class);
   }

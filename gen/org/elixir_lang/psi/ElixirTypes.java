@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
+  IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
@@ -153,6 +154,13 @@ public interface ElixirTypes {
   IElementType RELATIVE_IDENTIFIER = new ElixirElementType("RELATIVE_IDENTIFIER");
   IElementType SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
+  IElementType STAB = new ElixirElementType("STAB");
+  IElementType STAB_BODY = new ElixirElementType("STAB_BODY");
+  IElementType STAB_EXPRESSION = new ElixirElementType("STAB_EXPRESSION");
+  IElementType STAB_INFIX_OPERATOR = new ElixirElementType("STAB_INFIX_OPERATOR");
+  IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
+  IElementType STAB_PARENTHESES_MANY_ARGUMENTS = new ElixirElementType("STAB_PARENTHESES_MANY_ARGUMENTS");
+  IElementType STAB_SIGNATURE = new ElixirElementType("STAB_SIGNATURE");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
@@ -303,6 +311,9 @@ public interface ElixirTypes {
       }
       else if (type == AND_INFIX_OPERATOR) {
         return new ElixirAndInfixOperatorImpl(node);
+      }
+      else if (type == ANONYMOUS_FUNCTION) {
+        return new ElixirAnonymousFunctionImpl(node);
       }
       else if (type == ARROW_INFIX_OPERATOR) {
         return new ElixirArrowInfixOperatorImpl(node);
@@ -723,6 +734,27 @@ public interface ElixirTypes {
       }
       else if (type == SIGIL_MODIFIERS) {
         return new ElixirSigilModifiersImpl(node);
+      }
+      else if (type == STAB) {
+        return new ElixirStabImpl(node);
+      }
+      else if (type == STAB_BODY) {
+        return new ElixirStabBodyImpl(node);
+      }
+      else if (type == STAB_EXPRESSION) {
+        return new ElixirStabExpressionImpl(node);
+      }
+      else if (type == STAB_INFIX_OPERATOR) {
+        return new ElixirStabInfixOperatorImpl(node);
+      }
+      else if (type == STAB_OPERATION) {
+        return new ElixirStabOperationImpl(node);
+      }
+      else if (type == STAB_PARENTHESES_MANY_ARGUMENTS) {
+        return new ElixirStabParenthesesManyArgumentsImpl(node);
+      }
+      else if (type == STAB_SIGNATURE) {
+        return new ElixirStabSignatureImpl(node);
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);

@@ -1,5 +1,6 @@
 package org.elixir_lang.psi;
 
+import com.ericsson.otp.erlang.OtpErlangList;
 import com.intellij.psi.tree.TokenSet;
 
 /**

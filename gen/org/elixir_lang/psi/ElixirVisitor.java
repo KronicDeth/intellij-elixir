@@ -28,6 +28,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAnonymousFunction(@NotNull ElixirAnonymousFunction o) {
+    visitQuotable(o);
+  }
+
   public void visitArrowInfixOperator(@NotNull ElixirArrowInfixOperator o) {
     visitOperator(o);
   }
@@ -644,6 +648,34 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitStab(@NotNull ElixirStab o) {
+    visitQuotableArguments(o);
+  }
+
+  public void visitStabBody(@NotNull ElixirStabBody o) {
+    visitQuotable(o);
+  }
+
+  public void visitStabExpression(@NotNull ElixirStabExpression o) {
+    visitQuotable(o);
+  }
+
+  public void visitStabInfixOperator(@NotNull ElixirStabInfixOperator o) {
+    visitOperator(o);
+  }
+
+  public void visitStabOperation(@NotNull ElixirStabOperation o) {
+    visitInfixOperation(o);
+  }
+
+  public void visitStabParenthesesManyArguments(@NotNull ElixirStabParenthesesManyArguments o) {
+    visitQuotableArguments(o);
+  }
+
+  public void visitStabSignature(@NotNull ElixirStabSignature o) {
+    visitQuotable(o);
+  }
+
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedString(o);
@@ -729,6 +761,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitInfixOperation(@NotNull InfixOperation o) {
     visitElement(o);
   }
 

@@ -1516,12 +1516,57 @@ captureNumericOperation ::= capturePrefixOperator numeric
 unaryNumericOperation ::= unaryPrefixOperator numeric
                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+/*
+ * Stab Operation
+ */
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L430-L432
+stabParenthesesManyArguments ::= OPENING_PARENTHESIS EOL*
+                                 (
+                                  noParenthesesKeywords |
+                                  noParenthesesManyArguments
+                                 )? EOL*
+                                 CLOSING_PARENTHESIS
+                                 { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+
+stabSignature ::= (stabParenthesesManyArguments (whenInfixOperator expression)?)?
+                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+stabInfixOperator ::= STAB_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "->"
+                      }
+stabBody ::= expression?
+             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+stabOperation ::= stabSignature stabInfixOperator stabBody
+                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+// @note `expression` is second as it is more general and semi-recursive
+stabExpression ::= stabOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L275-280
+                   expression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L274
+                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
+stab ::= stabExpression (endOfExpression stabExpression)*
+         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
+anonymousFunction ::= FN endOfExpression? stab END endOfExpression?
+                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
+                     anonymousFunction |
                      emptyBlock |
                      numeric |
                      list |
