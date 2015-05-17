@@ -1325,8 +1325,19 @@ public class ElixirPsiImplUtil {
             Quotable child = (Quotable) children[0];
 
             quoted = child.quote();
+            boolean unary = false;
 
             if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
+                unary = true;
+            } else if (child instanceof ElixirAccessExpression) {
+                PsiElement grandChild = child.getFirstChild();
+
+                if (grandChild instanceof ElixirUnaryNumericOperation) {
+                    unary = true;
+                }
+            }
+
+            if (unary) {
                 OtpErlangList blockMetadata = new OtpErlangList();
 
                 // Cannot use block as unary operation quoting is odd and is a single-element __block__

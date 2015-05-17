@@ -14,7 +14,7 @@
 #fn -> one + two end
 #fn -> one * two end
 #fn -> one ^^^ two end
-fn -> not one end
+#fn -> not one end
 #fn -> Module.function positional, key: value end
 #fn -> @function positional, key: value end
 #fn -> function positional, key: value end
@@ -29,7 +29,7 @@ fn -> not one end
 #fn -> variable end
 #fn -> @1 end
 #fn -> &1 end
-#fn -> !1 end
+fn -> !1 end
 #fn -> fn -> end end
 #fn -> (;) end
 #fn -> 1 end
