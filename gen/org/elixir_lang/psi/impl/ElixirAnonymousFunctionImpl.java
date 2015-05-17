@@ -5,14 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirAnonymousFunction;
 import org.elixir_lang.psi.ElixirEndOfExpression;
 import org.elixir_lang.psi.ElixirStab;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements ElixirAnonymousFunction {
 
@@ -26,9 +24,9 @@ public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements
   }
 
   @Override
-  @NotNull
-  public List<ElixirEndOfExpression> getEndOfExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
+  @Nullable
+  public ElixirEndOfExpression getEndOfExpression() {
+    return findChildByClass(ElixirEndOfExpression.class);
   }
 
   @Override

@@ -34,6 +34,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
+    public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
     public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
     public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
@@ -652,10 +653,28 @@ public class ElixirPsiImplUtil {
         QuotableArguments stab = anonymousFunction.getStab();
         OtpErlangObject[] quotedArguments = stab.quoteArguments();
 
-        return quotedFunctionCall(
-                "fn",
-                metadata(anonymousFunction),
-                quotedArguments
+        OtpErlangList metadata = metadata(anonymousFunction);
+        OtpErlangObject quotedFunctionArguments = null;
+
+        if (quotedArguments.length == 1) {
+            OtpErlangObject quotedArgument = quotedArguments[0];
+
+            if (quotedArgument.equals(NIL)) {
+                quotedFunctionArguments = NIL;
+
+            }
+        }
+
+        if (quotedFunctionArguments == null) {
+            quotedFunctionArguments = quotedFunctionArguments(quotedArguments);
+        }
+
+        return new OtpErlangTuple(
+                new OtpErlangObject[] {
+                        FN,
+                        metadata,
+                        quotedFunctionArguments
+                }
         );
     }
 

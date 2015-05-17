@@ -635,7 +635,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // FN endOfExpression? stab END endOfExpression?
+  // FN endOfExpression? stab END
   public static boolean anonymousFunction(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "anonymousFunction")) return false;
     if (!nextTokenIs(b, FN)) return false;
@@ -645,7 +645,6 @@ public class ElixirParser implements PsiParser {
     r = r && anonymousFunction_1(b, l + 1);
     r = r && stab(b, l + 1);
     r = r && consumeToken(b, END);
-    r = r && anonymousFunction_4(b, l + 1);
     exit_section_(b, m, ANONYMOUS_FUNCTION, r);
     return r;
   }
@@ -653,13 +652,6 @@ public class ElixirParser implements PsiParser {
   // endOfExpression?
   private static boolean anonymousFunction_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "anonymousFunction_1")) return false;
-    endOfExpression(b, l + 1);
-    return true;
-  }
-
-  // endOfExpression?
-  private static boolean anonymousFunction_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "anonymousFunction_4")) return false;
     endOfExpression(b, l + 1);
     return true;
   }
