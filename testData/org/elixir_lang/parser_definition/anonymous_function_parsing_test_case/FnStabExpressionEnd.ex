@@ -1,5 +1,5 @@
 #fn -> () end
-fn -> function positional, key: value end
+#fn -> function positional, key: value end
 #fn -> &one end
 #fn -> one \\ default end
 #fn -> one when key: value end
@@ -14,7 +14,7 @@ fn -> function positional, key: value end
 #fn -> one + two end
 #fn -> one * two end
 #fn -> one ^^^ two end
-#fn -> not one end
+fn -> not one end
 #fn -> Module.function positional, key: value end
 #fn -> @function positional, key: value end
 #fn -> function positional, key: value end

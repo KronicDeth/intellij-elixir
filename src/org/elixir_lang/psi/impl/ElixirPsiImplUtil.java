@@ -1325,6 +1325,17 @@ public class ElixirPsiImplUtil {
             Quotable child = (Quotable) children[0];
 
             quoted = child.quote();
+
+            if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
+                OtpErlangList blockMetadata = new OtpErlangList();
+
+                // Cannot use block as unary operation quoting is odd and is a single-element __block__
+                quoted = quotedFunctionCall(
+                        BLOCK,
+                        blockMetadata,
+                        quoted
+                );
+            }
         } else {
             quoted = NIL;
         }
