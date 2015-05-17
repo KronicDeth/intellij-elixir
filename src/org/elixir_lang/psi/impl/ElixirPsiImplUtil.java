@@ -1317,12 +1317,19 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
         PsiElement[] children = stabBody.getChildren();
+        OtpErlangObject quoted;
 
-        assert children.length == 1;
+        if (children.length > 0) {
+            assert children.length == 1;
 
-        Quotable child = (Quotable) children[0];
+            Quotable child = (Quotable) children[0];
 
-        return child.quote();
+            quoted = child.quote();
+        } else {
+            quoted = NIL;
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
