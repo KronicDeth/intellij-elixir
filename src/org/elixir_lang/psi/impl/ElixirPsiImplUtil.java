@@ -1449,10 +1449,6 @@ public class ElixirPsiImplUtil {
                 quotedListElements = new OtpErlangObject[]{
                         quotedWhenOperation
                 };
-            } else if (quotedArguments.length == 1) {
-                quotedListElements = new OtpErlangObject[]{
-                        new OtpErlangList(quotedArguments)
-                };
             } else {
                 quotedListElements = quotedArguments;
             }
@@ -2366,15 +2362,9 @@ if (quoted == null) {
         OtpErlangObject[] quotedArguments;
 
         if (noParenthesesKeywords != null) {
-            List<QuotableKeywordPair> quotableKeywordPairList = noParenthesesKeywords.quotableKeywordPairList();
-            quotedArguments = new OtpErlangObject[quotableKeywordPairList.size()];
-
-            int i = 0;
-            for (QuotableKeywordPair quotableKeywordPair : quotableKeywordPairList) {
-                OtpErlangObject quotedKeywordPair = quotableKeywordPair.quote();
-
-                quotedArguments[i++] = quotedKeywordPair;
-            }
+            quotedArguments = new OtpErlangObject[]{
+                    noParenthesesKeywords.quote()
+            };
         } else {
             ElixirNoParenthesesManyArguments noParenthesesManyArguments = stabParenthesesManyArguments.getNoParenthesesManyArguments();
             quotedArguments = noParenthesesManyArguments.quoteArguments();
