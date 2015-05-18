@@ -1387,6 +1387,29 @@ public class ElixirPsiImplUtil {
                             quoted
                     }
             );
+        } else {
+            boolean unary = false;
+
+            if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
+                unary = true;
+            } else if (child instanceof ElixirAccessExpression) {
+                PsiElement grandChild = child.getFirstChild();
+
+                if (grandChild instanceof ElixirUnaryNumericOperation) {
+                    unary = true;
+                }
+            }
+
+            if (unary) {
+                OtpErlangList blockMetadata = new OtpErlangList();
+
+                // Cannot use block as unary operation quoting is odd and is a single-element __block__
+                quoted = quotedFunctionCall(
+                        BLOCK,
+                        blockMetadata,
+                        quoted
+                );
+            }
         }
 
         return quoted;
