@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirStab extends QuotableArguments {
+public interface ElixirStab extends Quotable {
 
   @NotNull
   List<ElixirEndOfExpression> getEndOfExpressionList();
@@ -15,6 +15,6 @@ public interface ElixirStab extends QuotableArguments {
   List<ElixirStabExpression> getStabExpressionList();
 
   @NotNull
-  OtpErlangObject[] quoteArguments();
+  OtpErlangObject quote();
 
 }

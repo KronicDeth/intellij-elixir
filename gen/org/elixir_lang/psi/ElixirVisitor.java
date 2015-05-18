@@ -649,7 +649,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitStab(@NotNull ElixirStab o) {
-    visitQuotableArguments(o);
+    visitQuotable(o);
   }
 
   public void visitStabBody(@NotNull ElixirStabBody o) {

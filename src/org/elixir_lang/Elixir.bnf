@@ -1554,7 +1554,7 @@ stabExpression ::= stabOperation | // @see https://github.com/elixir-lang/elixir
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
 stab ::= stabExpression (endOfExpression stabExpression)*
-         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpression? stab END

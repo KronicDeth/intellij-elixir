@@ -38,8 +38,8 @@ public class ElixirStabImpl extends ASTWrapperPsiElement implements ElixirStab {
   }
 
   @NotNull
-  public OtpErlangObject[] quoteArguments() {
-    return ElixirPsiImplUtil.quoteArguments(this);
+  public OtpErlangObject quote() {
+    return ElixirPsiImplUtil.quote(this);
   }
 
 }

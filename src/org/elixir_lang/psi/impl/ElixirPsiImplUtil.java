@@ -650,30 +650,16 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAnonymousFunction anonymousFunction) {
-        QuotableArguments stab = anonymousFunction.getStab();
-        OtpErlangObject[] quotedArguments = stab.quoteArguments();
+        Quotable stab = anonymousFunction.getStab();
+        OtpErlangObject quotedStab = stab.quote();
 
         OtpErlangList metadata = metadata(anonymousFunction);
-        OtpErlangObject quotedFunctionArguments = null;
-
-        if (quotedArguments.length == 1) {
-            OtpErlangObject quotedArgument = quotedArguments[0];
-
-            if (quotedArgument.equals(NIL)) {
-                quotedFunctionArguments = NIL;
-
-            }
-        }
-
-        if (quotedFunctionArguments == null) {
-            quotedFunctionArguments = quotedFunctionArguments(quotedArguments);
-        }
 
         return new OtpErlangTuple(
                 new OtpErlangObject[] {
                         FN,
                         metadata,
-                        quotedFunctionArguments
+                        quotedStab
                 }
         );
     }
@@ -1334,6 +1320,18 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(ElixirStab stab) {
+        List<ElixirStabExpression> stabExpressionList = stab.getStabExpressionList();
+
+        assert stabExpressionList.size() == 1;
+
+        ElixirStabExpression stabExpression = stabExpressionList.get(0);
+
+        return stabExpression.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
         PsiElement[] children = stabBody.getChildren();
         OtpErlangObject quoted;
@@ -1381,8 +1379,17 @@ public class ElixirPsiImplUtil {
         assert children.length == 1;
 
         Quotable child = (Quotable) children[0];
+        OtpErlangObject quoted = child.quote();
 
-        return child.quote();
+        if (child instanceof ElixirStabOperation) {
+            quoted = new OtpErlangList(
+                    new OtpErlangObject[]{
+                            quoted
+                    }
+            );
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
@@ -2320,20 +2327,6 @@ if (quoted == null) {
             Quotable quotableChild = (Quotable) children[i];
             OtpErlangObject quotedChild = quotableChild.quote();
             quotedArguments[i] = quotedChild;
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirStab stab) {
-        List<ElixirStabExpression> stabExpressionList = stab.getStabExpressionList();
-        OtpErlangObject[] quotedArguments = new OtpErlangObject[stabExpressionList.size()];
-
-        int i = 0;
-        for (ElixirStabExpression stabExpression : stabExpressionList) {
-            quotedArguments[i++] = stabExpression.quote();
         }
 
         return quotedArguments;
