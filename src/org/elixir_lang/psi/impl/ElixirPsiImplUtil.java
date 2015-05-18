@@ -1450,7 +1450,9 @@ public class ElixirPsiImplUtil {
                         quotedWhenOperation
                 };
             } else {
-                quotedListElements = quotedArguments;
+                quotedListElements = new OtpErlangObject[]{
+                        new OtpErlangList(quotedArguments)
+                };
             }
         } else {
             quotedListElements = new OtpErlangObject[0];
