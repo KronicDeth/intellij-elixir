@@ -33,6 +33,10 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testFnStabExpressionListEnd() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testFnStabSignatureStabExpressionEnd() {
         assertParsedAndQuotedCorrectly();
     }

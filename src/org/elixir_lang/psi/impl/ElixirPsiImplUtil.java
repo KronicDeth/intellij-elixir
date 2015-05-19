@@ -1334,14 +1334,11 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
         PsiElement[] children = stabBody.getChildren();
-        OtpErlangObject quoted;
+        OtpErlangObject quoted = null;
 
-        if (children.length > 0) {
-            assert children.length == 1;
-
+        if (children.length == 1) {
             Quotable child = (Quotable) children[0];
 
-            quoted = child.quote();
             boolean unary = false;
 
             if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
@@ -1361,11 +1358,26 @@ public class ElixirPsiImplUtil {
                 quoted = quotedFunctionCall(
                         BLOCK,
                         blockMetadata,
-                        quoted
+                        child.quote()
                 );
             }
-        } else {
-            quoted = NIL;
+        }
+
+        if (quoted == null) {
+            Deque<OtpErlangObject> quotedChildren = new ArrayDeque<OtpErlangObject>();
+
+            for (PsiElement child : children) {
+                // skip endOfExpression
+                if (isUnquoted(child)) {
+                    continue;
+                }
+
+                Quotable quotableChild = (Quotable) child;
+                OtpErlangObject quotedChild = quotableChild.quote();
+                quotedChildren.add(quotedChild);
+            }
+
+            quoted = block(quotedChildren);
         }
 
         return quoted;

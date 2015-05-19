@@ -3,18 +3,25 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ElixirStabBody extends Quotable {
 
-  @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
+  @NotNull
+  List<ElixirAdjacentExpression> getAdjacentExpressionList();
 
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  @NotNull
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
-  @Nullable
-  ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
+  @NotNull
+  List<ElixirEndOfExpression> getEndOfExpressionList();
+
+  @NotNull
+  List<ElixirMatchedExpression> getMatchedExpressionList();
+
+  @NotNull
+  List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
 
   @NotNull
   OtpErlangObject quote();

@@ -3885,11 +3885,11 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // expression?
+  // expressionList?
   public static boolean stabBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<stab body>");
-    expression(b, l + 1);
+    expressionList(b, l + 1);
     exit_section_(b, l, m, STAB_BODY, true, false, null);
     return true;
   }

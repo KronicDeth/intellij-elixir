@@ -5,9 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirStabBody {
 
@@ -21,21 +23,33 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
+  @NotNull
+  public List<ElixirAdjacentExpression> getAdjacentExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAdjacentExpression.class);
   }
 
   @Override
-  @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
 
   @Override
-  @Nullable
-  public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
-    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
+  @NotNull
+  public List<ElixirEndOfExpression> getEndOfExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull
