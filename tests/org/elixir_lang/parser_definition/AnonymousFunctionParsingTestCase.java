@@ -17,6 +17,10 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testFnNoParenthesesStabExpressionEnd() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testFnPositionalsAndKeywordsInParenthesesStabEnd() {
         assertParsedAndQuotedCorrectly();
     }
