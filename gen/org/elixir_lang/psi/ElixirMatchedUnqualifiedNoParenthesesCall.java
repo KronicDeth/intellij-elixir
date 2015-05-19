@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatchedExpression, Quotable {
 
   @NotNull
-  ElixirMatchedNoParenthesesArguments getMatchedNoParenthesesArguments();
+  ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
   OtpErlangObject quote();

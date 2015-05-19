@@ -338,9 +338,6 @@ public class ElixirParser implements PsiParser {
     else if (t == MATCHED_MULTIPLICATION_OPERATION) {
       r = matchedExpression(b, 0, 14);
     }
-    else if (t == MATCHED_NO_PARENTHESES_ARGUMENTS) {
-      r = matchedNoParenthesesArguments(b, 0);
-    }
     else if (t == MATCHED_OR_OPERATION) {
       r = matchedExpression(b, 0, 6);
     }
@@ -415,6 +412,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesManyStrictNoParenthesesExpression(b, 0);
+    }
+    else if (t == NO_PARENTHESES_ONE_ARGUMENT) {
+      r = noParenthesesOneArgument(b, 0);
     }
     else if (t == NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS) {
       r = noParenthesesOnePositionalAndKeywordsArguments(b, 0);
@@ -2853,60 +2853,6 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
-  //                                   unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
-  //                                   /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
-  //                                      but having a rule that starts with matchedExpression is only legal in a rule that extends
-  //                                      matchedExpression.
-  //                                      @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
-  //                                   noParenthesesManyArgumentsStrict |
-  //                                   /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
-  //                                   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
-  //                                   !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
-  public static boolean matchedNoParenthesesArguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedNoParenthesesArguments")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<matched no parentheses arguments>");
-    r = noParenthesesKeywords(b, l + 1);
-    if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
-    if (!r) r = noParenthesesManyArgumentsStrict(b, l + 1);
-    if (!r) r = matchedNoParenthesesArguments_3(b, l + 1);
-    exit_section_(b, l, m, MATCHED_NO_PARENTHESES_ARGUMENTS, r, false, null);
-    return r;
-  }
-
-  // !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
-  private static boolean matchedNoParenthesesArguments_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedNoParenthesesArguments_3")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = matchedNoParenthesesArguments_3_0(b, l + 1);
-    r = r && matchedExpression(b, l + 1, -1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE)
-  private static boolean matchedNoParenthesesArguments_3_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedNoParenthesesArguments_3_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_, null);
-    r = !matchedNoParenthesesArguments_3_0_0(b, l + 1);
-    exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE
-  private static boolean matchedNoParenthesesArguments_3_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedNoParenthesesArguments_3_0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, DUAL_OPERATOR, SIGNIFICANT_WHITE_SPACE);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
   // /*
   //  * Dot (Anonymous function) Call Operation
@@ -3195,6 +3141,60 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
     exit_section_(b, m, NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
+  //                              unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
+  //                              /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
+  //                                 but having a rule that starts with matchedExpression is only legal in a rule that extends
+  //                                 matchedExpression.
+  //                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
+  //                              noParenthesesManyArgumentsStrict |
+  //                              /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
+  //                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
+  //                              !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+  public static boolean noParenthesesOneArgument(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesOneArgument")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<no parentheses one argument>");
+    r = noParenthesesKeywords(b, l + 1);
+    if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
+    if (!r) r = noParenthesesManyArgumentsStrict(b, l + 1);
+    if (!r) r = noParenthesesOneArgument_3(b, l + 1);
+    exit_section_(b, l, m, NO_PARENTHESES_ONE_ARGUMENT, r, false, null);
+    return r;
+  }
+
+  // !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+  private static boolean noParenthesesOneArgument_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesOneArgument_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesOneArgument_3_0(b, l + 1);
+    r = r && matchedExpression(b, l + 1, -1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE)
+  private static boolean noParenthesesOneArgument_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesOneArgument_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !noParenthesesOneArgument_3_0_0(b, l + 1);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE
+  private static boolean noParenthesesOneArgument_3_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesOneArgument_3_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, DUAL_OPERATOR, SIGNIFICANT_WHITE_SPACE);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -4587,19 +4587,19 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // dotInfixOperator relativeIdentifier matchedNoParenthesesArguments
+  // dotInfixOperator relativeIdentifier noParenthesesOneArgument
   private static boolean matchedQualifiedNoParenthesesCall_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedQualifiedNoParenthesesCall_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = dotInfixOperator(b, l + 1);
     r = r && relativeIdentifier(b, l + 1);
-    r = r && matchedNoParenthesesArguments(b, l + 1);
+    r = r && noParenthesesOneArgument(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // atPrefixOperator IDENTIFIER matchedNoParenthesesArguments
+  // atPrefixOperator IDENTIFIER noParenthesesOneArgument
   public static boolean matchedAtUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtUnqualifiedNoParenthesesCall")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
@@ -4607,19 +4607,19 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
     r = r && consumeToken(b, IDENTIFIER);
-    r = r && matchedNoParenthesesArguments(b, l + 1);
+    r = r && noParenthesesOneArgument(b, l + 1);
     exit_section_(b, m, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
   }
 
-  // IDENTIFIER matchedNoParenthesesArguments
+  // IDENTIFIER noParenthesesOneArgument
   public static boolean matchedUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedNoParenthesesCall")) return false;
     if (!nextTokenIsFast(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, IDENTIFIER);
-    r = r && matchedNoParenthesesArguments(b, l + 1);
+    r = r && noParenthesesOneArgument(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
   }

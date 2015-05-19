@@ -1355,17 +1355,18 @@ parenthesesArguments ::= OPENING_PARENTHESIS EOL*
                          CLOSING_PARENTHESIS
                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-matchedNoParenthesesArguments ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
-                                  unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
-                                  /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
-                                     but having a rule that starts with matchedExpression is only legal in a rule that extends
-                                     matchedExpression.
+// call_args_no_parens_one
+noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
+                             unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
+                             /* This should NOT be in matchedExpression as it's not in matched_expr, but in no_parens_expr,
+                                but having a rule that starts with matchedExpression is only legal in a rule that extends
+                                matchedExpression.
 
-                                     @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
-                                  noParenthesesManyArgumentsStrict |
-                                  /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
-                                  @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
-                                  !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
+                             noParenthesesManyArgumentsStrict |
+                             /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
+                             !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
@@ -1385,7 +1386,7 @@ matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArgume
  */
 
 
-matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier matchedNoParenthesesArguments
+matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument
                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1396,7 +1397,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER matchedNoParenthesesArguments
+matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument
                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 /*
  * Unqualified No Parentheses Call
@@ -1404,7 +1405,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER matchedNoP
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER matchedNoParenthesesArguments
+matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*

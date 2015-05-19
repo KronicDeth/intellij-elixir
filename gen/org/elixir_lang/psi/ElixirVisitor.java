@@ -469,10 +469,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
-  public void visitMatchedNoParenthesesArguments(@NotNull ElixirMatchedNoParenthesesArguments o) {
-    visitPsiElement(o);
-  }
-
   public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
     visitMatchedExpression(o);
     // visitInfixOperation(o);
@@ -585,6 +581,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {
     visitPsiElement(o);
   }
 

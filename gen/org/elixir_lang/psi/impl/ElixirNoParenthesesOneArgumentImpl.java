@@ -8,14 +8,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNoParenthesesArgumentsImpl extends ASTWrapperPsiElement implements ElixirMatchedNoParenthesesArguments {
+public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesOneArgument {
 
-  public ElixirMatchedNoParenthesesArgumentsImpl(ASTNode node) {
+  public ElixirNoParenthesesOneArgumentImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNoParenthesesArguments(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesOneArgument(this);
     else super.accept(visitor);
   }
 

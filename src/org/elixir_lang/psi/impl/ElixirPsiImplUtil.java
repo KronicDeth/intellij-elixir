@@ -1661,21 +1661,21 @@ public class ElixirPsiImplUtil {
         ASTNode identifierNode = identifierNodes[0];
         String identifier = identifierNode.getText();
 
-        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedAtUnqualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
-        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+        ElixirNoParenthesesOneArgument noParenthesesOneArgument = matchedAtUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] noParenthesesOneArgumentChildren = noParenthesesOneArgument.getChildren();
 
-        assert matchedNoParenthesesArgumentsChildren.length == 1;
+        assert noParenthesesOneArgumentChildren.length == 1;
 
-        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        PsiElement noParenthesesOneArgumentChild = noParenthesesOneArgumentChildren[0];
         OtpErlangObject[] quotedArguments;
 
-        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
-            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+        if (noParenthesesOneArgumentChild instanceof Quotable) {
+            Quotable quotable = (Quotable) noParenthesesOneArgumentChild;
             quotedArguments = new OtpErlangObject[]{
                     quotable.quote()
             };
         } else {
-            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            QuotableArguments quotableArguments = (QuotableArguments) noParenthesesOneArgumentChild;
             quotedArguments = quotableArguments.quoteArguments();
         }
 
@@ -1957,21 +1957,21 @@ if (quoted == null) {
                 quotedRelativeIdentifier
         );
 
-        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedQualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
-        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+        ElixirNoParenthesesOneArgument noParenthesesOneArgument = matchedQualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] noParenthesesOneArgumentChildren = noParenthesesOneArgument.getChildren();
 
-        assert matchedNoParenthesesArgumentsChildren.length == 1;
+        assert noParenthesesOneArgumentChildren.length == 1;
 
-        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        PsiElement parenthesesOneArgumentChild = noParenthesesOneArgumentChildren[0];
         OtpErlangObject[] quotedArguments;
 
-        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
-            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+        if (parenthesesOneArgumentChild instanceof Quotable) {
+            Quotable quotable = (Quotable) parenthesesOneArgumentChild;
             quotedArguments = new OtpErlangObject[]{
                     quotable.quote()
             };
         } else {
-            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            QuotableArguments quotableArguments = (QuotableArguments) parenthesesOneArgumentChild;
             quotedArguments = quotableArguments.quoteArguments();
         }
 
@@ -2046,21 +2046,21 @@ if (quoted == null) {
     public static OtpErlangObject quote(@NotNull final ElixirMatchedUnqualifiedNoParenthesesCall matchedUnqualifiedNoParenthesesCall) {
         String identifier = matchedUnqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
 
-        ElixirMatchedNoParenthesesArguments matchedNoParenthesesArguments = matchedUnqualifiedNoParenthesesCall.getMatchedNoParenthesesArguments();
-        PsiElement[] matchedNoParenthesesArgumentsChildren = matchedNoParenthesesArguments.getChildren();
+        ElixirNoParenthesesOneArgument noParenthesesOneArgument = matchedUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] noParenthesesOneArgumentChildren = noParenthesesOneArgument.getChildren();
 
-        assert matchedNoParenthesesArgumentsChildren.length == 1;
+        assert noParenthesesOneArgumentChildren.length == 1;
 
-        PsiElement matchedNoParenthesesArgumentsChild = matchedNoParenthesesArgumentsChildren[0];
+        PsiElement noParenthesesOneArgumentChild = noParenthesesOneArgumentChildren[0];
         OtpErlangObject[] quotedArguments;
 
-        if (matchedNoParenthesesArgumentsChild instanceof Quotable) {
-            Quotable quotable = (Quotable) matchedNoParenthesesArgumentsChild;
+        if (noParenthesesOneArgumentChild instanceof Quotable) {
+            Quotable quotable = (Quotable) noParenthesesOneArgumentChild;
             quotedArguments = new OtpErlangObject[]{
                     quotable.quote()
             };
         } else {
-            QuotableArguments quotableArguments = (QuotableArguments) matchedNoParenthesesArgumentsChild;
+            QuotableArguments quotableArguments = (QuotableArguments) noParenthesesOneArgumentChild;
             quotedArguments = quotableArguments.quoteArguments();
         }
 

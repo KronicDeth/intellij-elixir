@@ -32,8 +32,8 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends ElixirMatchedEx
 
   @Override
   @NotNull
-  public ElixirMatchedNoParenthesesArguments getMatchedNoParenthesesArguments() {
-    return findNotNullChildByClass(ElixirMatchedNoParenthesesArguments.class);
+  public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
+    return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
   }
 
   @Override

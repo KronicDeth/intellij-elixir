@@ -10,7 +10,7 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   ElixirAtPrefixOperator getAtPrefixOperator();
 
   @NotNull
-  ElixirMatchedNoParenthesesArguments getMatchedNoParenthesesArguments();
+  ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
   OtpErlangObject quote();
