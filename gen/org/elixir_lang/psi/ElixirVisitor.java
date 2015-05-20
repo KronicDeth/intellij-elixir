@@ -552,6 +552,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitNoParenthesesArguments(@NotNull ElixirNoParenthesesArguments o) {
+    visitQuotableArguments(o);
+  }
+
   public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
     visitQuotable(o);
   }
@@ -585,7 +589,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {
-    visitPsiElement(o);
+    visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
@@ -664,12 +668,20 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitStabNoParenthesesSignature(@NotNull ElixirStabNoParenthesesSignature o) {
+    visitQuotable(o);
+  }
+
   public void visitStabOperation(@NotNull ElixirStabOperation o) {
     visitInfixOperation(o);
   }
 
   public void visitStabParenthesesManyArguments(@NotNull ElixirStabParenthesesManyArguments o) {
     visitQuotableArguments(o);
+  }
+
+  public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
+    visitQuotable(o);
   }
 
   public void visitStabSignature(@NotNull ElixirStabSignature o) {

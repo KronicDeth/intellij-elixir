@@ -1367,6 +1367,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                              /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
                              !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+                             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
@@ -1530,9 +1531,22 @@ stabParenthesesManyArguments ::= OPENING_PARENTHESIS EOL*
                                  CLOSING_PARENTHESIS
                                  { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
+noParenthesesArguments ::= noParenthesesOneArgument |
+                           noParenthesesManyArguments
+                           { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-stabSignature ::= (stabParenthesesManyArguments (whenInfixOperator expression)?)?
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L276-L277
+stabNoParenthesesSignature ::= noParenthesesArguments
+                               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L278-L281
+stabParenthesesSignature ::= stabParenthesesManyArguments (whenInfixOperator expression)?
+                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+stabSignature ::= (stabParenthesesSignature |
+                   stabNoParenthesesSignature)?
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 stabInfixOperator ::= STAB_OPERATOR EOL*
                       {
                         implements = "org.elixir_lang.psi.Operator"

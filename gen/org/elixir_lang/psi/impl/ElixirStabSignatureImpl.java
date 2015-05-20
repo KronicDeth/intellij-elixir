@@ -5,7 +5,10 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirStabNoParenthesesSignature;
+import org.elixir_lang.psi.ElixirStabParenthesesSignature;
+import org.elixir_lang.psi.ElixirStabSignature;
+import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,32 +25,14 @@ public class ElixirStabSignatureImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
+  public ElixirStabNoParenthesesSignature getStabNoParenthesesSignature() {
+    return findChildByClass(ElixirStabNoParenthesesSignature.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirStabParenthesesManyArguments getStabParenthesesManyArguments() {
-    return findChildByClass(ElixirStabParenthesesManyArguments.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
-    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirWhenInfixOperator getWhenInfixOperator() {
-    return findChildByClass(ElixirWhenInfixOperator.class);
+  public ElixirStabParenthesesSignature getStabParenthesesSignature() {
+    return findChildByClass(ElixirStabParenthesesSignature.class);
   }
 
   @NotNull

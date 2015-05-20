@@ -389,6 +389,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
     }
+    else if (t == NO_PARENTHESES_ARGUMENTS) {
+      r = noParenthesesArguments(b, 0);
+    }
     else if (t == NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesExpression(b, 0);
     }
@@ -473,11 +476,17 @@ public class ElixirParser implements PsiParser {
     else if (t == STAB_INFIX_OPERATOR) {
       r = stabInfixOperator(b, 0);
     }
+    else if (t == STAB_NO_PARENTHESES_SIGNATURE) {
+      r = stabNoParenthesesSignature(b, 0);
+    }
     else if (t == STAB_OPERATION) {
       r = stabOperation(b, 0);
     }
     else if (t == STAB_PARENTHESES_MANY_ARGUMENTS) {
       r = stabParenthesesManyArguments(b, 0);
+    }
+    else if (t == STAB_PARENTHESES_SIGNATURE) {
+      r = stabParenthesesSignature(b, 0);
     }
     else if (t == STAB_SIGNATURE) {
       r = stabSignature(b, 0);
@@ -2927,6 +2936,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // noParenthesesOneArgument |
+  //                            noParenthesesManyArguments
+  public static boolean noParenthesesArguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesArguments")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<no parentheses arguments>");
+    r = noParenthesesOneArgument(b, l + 1);
+    if (!r) r = noParenthesesManyArguments(b, l + 1);
+    exit_section_(b, l, m, NO_PARENTHESES_ARGUMENTS, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // matchedExpression (infixComma noParenthesesExpression)+
   static boolean noParenthesesCommaExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesCommaExpression")) return false;
@@ -3934,10 +3956,20 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // noParenthesesArguments
+  public static boolean stabNoParenthesesSignature(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabNoParenthesesSignature")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<stab no parentheses signature>");
+    r = noParenthesesArguments(b, l + 1);
+    exit_section_(b, l, m, STAB_NO_PARENTHESES_SIGNATURE, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // stabSignature stabInfixOperator stabBody
   public static boolean stabOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperation")) return false;
-    if (!nextTokenIs(b, "<stab operation>", OPENING_PARENTHESIS, STAB_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<stab operation>");
     r = stabSignature(b, l + 1);
@@ -4015,7 +4047,39 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (stabParenthesesManyArguments (whenInfixOperator expression)?)?
+  // stabParenthesesManyArguments (whenInfixOperator expression)?
+  public static boolean stabParenthesesSignature(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabParenthesesSignature")) return false;
+    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stabParenthesesManyArguments(b, l + 1);
+    r = r && stabParenthesesSignature_1(b, l + 1);
+    exit_section_(b, m, STAB_PARENTHESES_SIGNATURE, r);
+    return r;
+  }
+
+  // (whenInfixOperator expression)?
+  private static boolean stabParenthesesSignature_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabParenthesesSignature_1")) return false;
+    stabParenthesesSignature_1_0(b, l + 1);
+    return true;
+  }
+
+  // whenInfixOperator expression
+  private static boolean stabParenthesesSignature_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabParenthesesSignature_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = whenInfixOperator(b, l + 1);
+    r = r && expression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // (stabParenthesesSignature |
+  //                    stabNoParenthesesSignature)?
   public static boolean stabSignature(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabSignature")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<stab signature>");
@@ -4024,31 +4088,14 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // stabParenthesesManyArguments (whenInfixOperator expression)?
+  // stabParenthesesSignature |
+  //                    stabNoParenthesesSignature
   private static boolean stabSignature_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabSignature_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = stabParenthesesManyArguments(b, l + 1);
-    r = r && stabSignature_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (whenInfixOperator expression)?
-  private static boolean stabSignature_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabSignature_0_1")) return false;
-    stabSignature_0_1_0(b, l + 1);
-    return true;
-  }
-
-  // whenInfixOperator expression
-  private static boolean stabSignature_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabSignature_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = whenInfixOperator(b, l + 1);
-    r = r && expression(b, l + 1);
+    r = stabParenthesesSignature(b, l + 1);
+    if (!r) r = stabNoParenthesesSignature(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

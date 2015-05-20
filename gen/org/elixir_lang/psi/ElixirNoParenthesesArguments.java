@@ -5,15 +5,15 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirStabSignature extends Quotable {
+public interface ElixirNoParenthesesArguments extends QuotableArguments {
 
   @Nullable
-  ElixirStabNoParenthesesSignature getStabNoParenthesesSignature();
+  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
 
   @Nullable
-  ElixirStabParenthesesSignature getStabParenthesesSignature();
+  ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
-  OtpErlangObject quote();
+  OtpErlangObject[] quoteArguments();
 
 }
