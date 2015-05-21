@@ -1437,8 +1437,9 @@ public class ElixirPsiImplUtil {
         // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
         // TODO unwrap_splice
         OtpErlangObject[] unwrappedWhen = unwrapWhen(quotedArguments);
+        OtpErlangList quotedArgumentList = new OtpErlangList(unwrappedWhen);
 
-        return new OtpErlangList(unwrappedWhen);
+        return elixirCharList(quotedArgumentList);
     }
 
     @Contract(pure = true)
@@ -2398,7 +2399,12 @@ if (quoted == null) {
             };
         } else {
             ElixirNoParenthesesManyArguments noParenthesesManyArguments = stabParenthesesManyArguments.getNoParenthesesManyArguments();
-            quotedArguments = noParenthesesManyArguments.quoteArguments();
+
+            if (noParenthesesManyArguments != null) {
+                quotedArguments = noParenthesesManyArguments.quoteArguments();
+            } else {
+                quotedArguments = new OtpErlangObject[0];
+            }
         }
 
         return quotedArguments;
@@ -2907,7 +2913,7 @@ if (quoted == null) {
                         // Start
                         System.arraycopy(quotedArguments, 0, unwrappedArguments, 0, quotedArguments.length - 1);
                         // ++ End
-                        System.arraycopy(operandList.elements(), 0, unwrappedArguments, quotedArguments.length, 2);
+                        System.arraycopy(operandList.elements(), 0, unwrappedArguments, quotedArguments.length - 1, 2);
 
                         unwrapped = new OtpErlangObject[1];
 
