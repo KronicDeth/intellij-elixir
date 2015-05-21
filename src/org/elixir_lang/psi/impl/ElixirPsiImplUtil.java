@@ -1436,7 +1436,7 @@ public class ElixirPsiImplUtil {
 
         // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
         // TODO unwrap_splice
-        OtpErlangObject[] unwrappedWhen = unwrapWhen(quotedArguments);
+        OtpErlangObject[] unwrappedWhen = quotedArguments;//unwrapWhen(quotedArguments);
         OtpErlangList quotedArgumentList = new OtpErlangList(unwrappedWhen);
 
         return elixirCharList(quotedArgumentList);
