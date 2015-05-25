@@ -1522,15 +1522,6 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
  * Stab Operation
  */
 
-// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L430-L432
-stabParenthesesManyArguments ::= OPENING_PARENTHESIS EOL*
-                                 (
-                                  noParenthesesKeywords |
-                                  noParenthesesManyArguments
-                                 )? EOL*
-                                 CLOSING_PARENTHESIS
-                                 { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
-
 noParenthesesArguments ::= noParenthesesOneArgument |
                            noParenthesesManyArguments
                            { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
@@ -1539,8 +1530,14 @@ noParenthesesArguments ::= noParenthesesOneArgument |
 stabNoParenthesesSignature ::= noParenthesesArguments
                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L278-L281
-stabParenthesesSignature ::= stabParenthesesManyArguments (whenInfixOperator expression)?
+/*
+ * `fn (unquote_splicing([1,2,3])) -> end` is valid, but not obvious from elixir_parser.yrl that appears to only allow
+ * keywords or many arguments.
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L278-L281
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L430-L432
+ */
+stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)?
                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 stabSignature ::= (stabParenthesesSignature |

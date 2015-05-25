@@ -482,9 +482,6 @@ public class ElixirParser implements PsiParser {
     else if (t == STAB_OPERATION) {
       r = stabOperation(b, 0);
     }
-    else if (t == STAB_PARENTHESES_MANY_ARGUMENTS) {
-      r = stabParenthesesManyArguments(b, 0);
-    }
     else if (t == STAB_PARENTHESES_SIGNATURE) {
       r = stabParenthesesSignature(b, 0);
     }
@@ -3980,80 +3977,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_PARENTHESIS EOL*
-  //                                  (
-  //                                   noParenthesesKeywords |
-  //                                   noParenthesesManyArguments
-  //                                  )? EOL*
-  //                                  CLOSING_PARENTHESIS
-  public static boolean stabParenthesesManyArguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabParenthesesManyArguments")) return false;
-    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && stabParenthesesManyArguments_1(b, l + 1);
-    r = r && stabParenthesesManyArguments_2(b, l + 1);
-    r = r && stabParenthesesManyArguments_3(b, l + 1);
-    r = r && consumeToken(b, CLOSING_PARENTHESIS);
-    exit_section_(b, m, STAB_PARENTHESES_MANY_ARGUMENTS, r);
-    return r;
-  }
-
-  // EOL*
-  private static boolean stabParenthesesManyArguments_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabParenthesesManyArguments_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "stabParenthesesManyArguments_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // (
-  //                                   noParenthesesKeywords |
-  //                                   noParenthesesManyArguments
-  //                                  )?
-  private static boolean stabParenthesesManyArguments_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabParenthesesManyArguments_2")) return false;
-    stabParenthesesManyArguments_2_0(b, l + 1);
-    return true;
-  }
-
-  // noParenthesesKeywords |
-  //                                   noParenthesesManyArguments
-  private static boolean stabParenthesesManyArguments_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabParenthesesManyArguments_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = noParenthesesKeywords(b, l + 1);
-    if (!r) r = noParenthesesManyArguments(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // EOL*
-  private static boolean stabParenthesesManyArguments_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabParenthesesManyArguments_3")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "stabParenthesesManyArguments_3", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
-  // stabParenthesesManyArguments (whenInfixOperator expression)?
+  // parenthesesArguments (whenInfixOperator expression)?
   public static boolean stabParenthesesSignature(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabParenthesesSignature")) return false;
     if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = stabParenthesesManyArguments(b, l + 1);
+    r = parenthesesArguments(b, l + 1);
     r = r && stabParenthesesSignature_1(b, l + 1);
     exit_section_(b, m, STAB_PARENTHESES_SIGNATURE, r);
     return r;

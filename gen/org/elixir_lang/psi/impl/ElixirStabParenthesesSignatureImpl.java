@@ -34,8 +34,8 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
 
   @Override
   @NotNull
-  public ElixirStabParenthesesManyArguments getStabParenthesesManyArguments() {
-    return findNotNullChildByClass(ElixirStabParenthesesManyArguments.class);
+  public ElixirParenthesesArguments getParenthesesArguments() {
+    return findNotNullChildByClass(ElixirParenthesesArguments.class);
   }
 
   @Override

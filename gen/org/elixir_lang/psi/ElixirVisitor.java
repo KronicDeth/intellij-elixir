@@ -676,10 +676,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitInfixOperation(o);
   }
 
-  public void visitStabParenthesesManyArguments(@NotNull ElixirStabParenthesesManyArguments o) {
-    visitQuotableArguments(o);
-  }
-
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
     visitQuotable(o);
   }

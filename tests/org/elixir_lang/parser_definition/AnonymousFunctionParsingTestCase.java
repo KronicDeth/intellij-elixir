@@ -69,6 +69,10 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testSpliceOnStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/anonymous_function_parsing_test_case";

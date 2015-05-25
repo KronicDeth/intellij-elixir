@@ -1435,7 +1435,6 @@ public class ElixirPsiImplUtil {
         OtpErlangObject[] quotedArguments = noParenthesesArguments.quoteArguments();
 
         // https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L277
-        // TODO unwrap_splice
         OtpErlangObject[] unwrappedWhen = unwrapWhen(quotedArguments);
         OtpErlangList quotedArgumentList = new OtpErlangList(unwrappedWhen);
 
@@ -2382,29 +2381,6 @@ if (quoted == null) {
             Quotable quotableChild = (Quotable) children[i];
             OtpErlangObject quotedChild = quotableChild.quote();
             quotedArguments[i] = quotedChild;
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirStabParenthesesManyArguments stabParenthesesManyArguments) {
-        ElixirNoParenthesesKeywords noParenthesesKeywords = stabParenthesesManyArguments.getNoParenthesesKeywords();
-        OtpErlangObject[] quotedArguments;
-
-        if (noParenthesesKeywords != null) {
-            quotedArguments = new OtpErlangObject[]{
-                    noParenthesesKeywords.quote()
-            };
-        } else {
-            ElixirNoParenthesesManyArguments noParenthesesManyArguments = stabParenthesesManyArguments.getNoParenthesesManyArguments();
-
-            if (noParenthesesManyArguments != null) {
-                quotedArguments = noParenthesesManyArguments.quoteArguments();
-            } else {
-                quotedArguments = new OtpErlangObject[0];
-            }
         }
 
         return quotedArguments;
