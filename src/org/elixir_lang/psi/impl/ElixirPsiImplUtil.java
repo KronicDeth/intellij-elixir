@@ -2523,7 +2523,7 @@ if (quoted == null) {
         Quotable leftOperand = (Quotable) children[0];
         OtpErlangObject quotedLeftOperand = leftOperand.quote();
 
-        Quotable operator = (Quotable) children[1];
+        Operator operator = (Operator) children[1];
         OtpErlangObject quotedOperator = operator.quote();
 
         Quotable rightOperand = (Quotable) children[2];
