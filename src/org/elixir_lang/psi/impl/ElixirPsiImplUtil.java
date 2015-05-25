@@ -1106,18 +1106,6 @@ public class ElixirPsiImplUtil {
         return quoted;
     }
 
-    public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyBlock emptyBlock) {
-        // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
-        //   arguments are given while empty block is quoted as `{__block__, [], []}`
-        return new OtpErlangTuple(
-                new OtpErlangObject[]{
-                        BLOCK,
-                        new OtpErlangList(),
-                        new OtpErlangList()
-                }
-        );
-    }
-
     public static OtpErlangObject quote(@SuppressWarnings("unused") ElixirEmptyParentheses emptyParentheses) {
         return new OtpErlangAtom("nil");
     }
@@ -1338,29 +1326,34 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quoted = null;
 
         if (children.length == 1) {
-            Quotable child = (Quotable) children[0];
+            PsiElement child = children[0];
 
-            boolean unary = false;
+            // having only an unquoted child is the same as 0 effective children, so skip to the `if (quoted == null)`
+            if (!isUnquoted(child)) {
 
-            if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
-                unary = true;
-            } else if (child instanceof ElixirAccessExpression) {
-                PsiElement grandChild = child.getFirstChild();
+                boolean unary = false;
 
-                if (grandChild instanceof ElixirUnaryNumericOperation) {
+                if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
                     unary = true;
+                } else if (child instanceof ElixirAccessExpression) {
+                    PsiElement grandChild = child.getFirstChild();
+
+                    if (grandChild instanceof ElixirUnaryNumericOperation) {
+                        unary = true;
+                    }
                 }
-            }
 
-            if (unary) {
-                OtpErlangList blockMetadata = new OtpErlangList();
+                if (unary) {
+                    OtpErlangList blockMetadata = new OtpErlangList();
+                    Quotable quotable = (Quotable) child;
 
-                // Cannot use block as unary operation quoting is odd and is a single-element __block__
-                quoted = quotedFunctionCall(
-                        BLOCK,
-                        blockMetadata,
-                        child.quote()
-                );
+                    // Cannot use block as unary operation quoting is odd and is a single-element __block__
+                    quoted = quotedFunctionCall(
+                            BLOCK,
+                            blockMetadata,
+                            quotable.quote()
+                    );
+                }
             }
         }
 
@@ -2123,6 +2116,29 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier noParenthesesManyArgumentsUnqualifiedIdentifier) {
         return new OtpErlangAtom(noParenthesesManyArgumentsUnqualifiedIdentifier.getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirParentheticalStab parentheticalStab) {
+        Quotable stab = parentheticalStab.getStab();
+        OtpErlangObject quoted;
+
+        if (stab != null) {
+            quoted = stab.quote();
+        } else {
+            // @note CANNOT use quotedFunctionCall because it requires metadata and gives nil instead of [] when no
+            //   arguments are given while empty block is quoted as `{__block__, [], []}`
+            quoted = new OtpErlangTuple(
+                    new OtpErlangObject[]{
+                            BLOCK,
+                            new OtpErlangList(),
+                            new OtpErlangList()
+                    }
+            );
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)

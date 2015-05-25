@@ -37,7 +37,6 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
-  IElementType EMPTY_BLOCK = new ElixirElementType("EMPTY_BLOCK");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -147,6 +146,7 @@ public interface ElixirTypes {
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
   IElementType PARENTHESES_ARGUMENTS = new ElixirElementType("PARENTHESES_ARGUMENTS");
+  IElementType PARENTHETICAL_STAB = new ElixirElementType("PARENTHETICAL_STAB");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
   IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
   IElementType QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -385,9 +385,6 @@ public interface ElixirTypes {
       }
       else if (type == DOT_INFIX_OPERATOR) {
         return new ElixirDotInfixOperatorImpl(node);
-      }
-      else if (type == EMPTY_BLOCK) {
-        return new ElixirEmptyBlockImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
@@ -715,6 +712,9 @@ public interface ElixirTypes {
       }
       else if (type == PARENTHESES_ARGUMENTS) {
         return new ElixirParenthesesArgumentsImpl(node);
+      }
+      else if (type == PARENTHETICAL_STAB) {
+        return new ElixirParentheticalStabImpl(node);
       }
       else if (type == PIPE_INFIX_OPERATOR) {
         return new ElixirPipeInfixOperatorImpl(node);

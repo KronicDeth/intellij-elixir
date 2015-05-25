@@ -1544,7 +1544,7 @@ stabSignature ::= (stabParenthesesSignature |
                    stabNoParenthesesSignature)?
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-stabInfixOperator ::= STAB_OPERATOR EOL*
+stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
                       {
                         implements = "org.elixir_lang.psi.Operator"
                         methods = [
@@ -1579,14 +1579,17 @@ stab ::= stabExpression (endOfExpression stabExpression)*
 anonymousFunction ::= FN endOfExpression? stab END
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-emptyBlock ::= OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
-               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
+parentheticalStab ::= OPENING_PARENTHESIS
+                      (infixSemicolon? stab infixSemicolon? | infixSemicolon)
+                      CLOSING_PARENTHESIS
+                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
                      anonymousFunction |
-                     emptyBlock |
+                     parentheticalStab |
                      numeric |
                      list |
                      stringLine |

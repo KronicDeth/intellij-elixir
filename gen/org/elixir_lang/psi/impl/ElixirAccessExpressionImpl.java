@@ -93,12 +93,6 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
     return findChildByClass(ElixirHexadecimalWholeNumber.class);
   }
@@ -233,6 +227,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
   @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
     return findChildByClass(ElixirOctalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirParentheticalStab getParentheticalStab() {
+    return findChildByClass(ElixirParentheticalStab.class);
   }
 
   @Override

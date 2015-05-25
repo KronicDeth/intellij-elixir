@@ -1,0 +1,6 @@
+Elixir File(0,3)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
+    ElixirParentheticalStabImpl(PARENTHETICAL_STAB)(0,3)
+      PsiElement(()('(')(0,1)
+      PsiElement(;)(';')(1,2)
+      PsiElement())(')')(2,3)

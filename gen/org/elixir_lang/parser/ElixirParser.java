@@ -110,9 +110,6 @@ public class ElixirParser implements PsiParser {
     else if (t == DOT_INFIX_OPERATOR) {
       r = dotInfixOperator(b, 0);
     }
-    else if (t == EMPTY_BLOCK) {
-      r = emptyBlock(b, 0);
-    }
     else if (t == EMPTY_PARENTHESES) {
       r = emptyParentheses(b, 0);
     }
@@ -439,6 +436,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == PARENTHESES_ARGUMENTS) {
       r = parenthesesArguments(b, 0);
+    }
+    else if (t == PARENTHETICAL_STAB) {
+      r = parentheticalStab(b, 0);
     }
     else if (t == PIPE_INFIX_OPERATOR) {
       r = pipeInfixOperator(b, 0);
@@ -1384,20 +1384,6 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
-  }
-
-  /* ********************************************************** */
-  // OPENING_PARENTHESIS infixSemicolon CLOSING_PARENTHESIS
-  public static boolean emptyBlock(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "emptyBlock")) return false;
-    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, OPENING_PARENTHESIS);
-    r = r && infixSemicolon(b, l + 1);
-    r = r && consumeToken(b, CLOSING_PARENTHESIS);
-    exit_section_(b, m, EMPTY_BLOCK, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -3547,6 +3533,59 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // OPENING_PARENTHESIS
+  //                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
+  //                       CLOSING_PARENTHESIS
+  public static boolean parentheticalStab(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab")) return false;
+    if (!nextTokenIs(b, OPENING_PARENTHESIS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_PARENTHESIS);
+    r = r && parentheticalStab_1(b, l + 1);
+    r = r && consumeToken(b, CLOSING_PARENTHESIS);
+    exit_section_(b, m, PARENTHETICAL_STAB, r);
+    return r;
+  }
+
+  // infixSemicolon? stab infixSemicolon? | infixSemicolon
+  private static boolean parentheticalStab_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = parentheticalStab_1_0(b, l + 1);
+    if (!r) r = infixSemicolon(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // infixSemicolon? stab infixSemicolon?
+  private static boolean parentheticalStab_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = parentheticalStab_1_0_0(b, l + 1);
+    r = r && stab(b, l + 1);
+    r = r && parentheticalStab_1_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // infixSemicolon?
+  private static boolean parentheticalStab_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0_0")) return false;
+    infixSemicolon(b, l + 1);
+    return true;
+  }
+
+  // infixSemicolon?
+  private static boolean parentheticalStab_1_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "parentheticalStab_1_0_2")) return false;
+    infixSemicolon(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
   // EOL* PIPE_OPERATOR EOL*
   public static boolean pipeInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pipeInfixOperator")) return false;
@@ -3928,25 +3967,38 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // STAB_OPERATOR EOL*
+  // EOL* STAB_OPERATOR EOL*
   public static boolean stabInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabInfixOperator")) return false;
-    if (!nextTokenIs(b, STAB_OPERATOR)) return false;
+    if (!nextTokenIs(b, "<->>", EOL, STAB_OPERATOR)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, STAB_OPERATOR);
-    r = r && stabInfixOperator_1(b, l + 1);
-    exit_section_(b, m, STAB_INFIX_OPERATOR, r);
+    Marker m = enter_section_(b, l, _NONE_, "<->>");
+    r = stabInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, STAB_OPERATOR);
+    r = r && stabInfixOperator_2(b, l + 1);
+    exit_section_(b, l, m, STAB_INFIX_OPERATOR, r, false, null);
     return r;
   }
 
   // EOL*
-  private static boolean stabInfixOperator_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabInfixOperator_1")) return false;
+  private static boolean stabInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabInfixOperator_0")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "stabInfixOperator_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "stabInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean stabInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "stabInfixOperator_2", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -4744,7 +4796,7 @@ public class ElixirParser implements PsiParser {
   //                      captureNumericOperation |
   //                      unaryNumericOperation |
   //                      anonymousFunction |
-  //                      emptyBlock |
+  //                      parentheticalStab |
   //                      numeric |
   //                      list |
   //                      stringLine |
@@ -4782,7 +4834,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = captureNumericOperation(b, l + 1);
     if (!r) r = unaryNumericOperation(b, l + 1);
     if (!r) r = anonymousFunction(b, l + 1);
-    if (!r) r = emptyBlock(b, l + 1);
+    if (!r) r = parentheticalStab(b, l + 1);
     if (!r) r = numeric(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = stringLine(b, l + 1);

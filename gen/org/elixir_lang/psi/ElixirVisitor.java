@@ -128,10 +128,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitEmptyBlock(@NotNull ElixirEmptyBlock o) {
-    visitQuotable(o);
-  }
-
   public void visitEmptyParentheses(@NotNull ElixirEmptyParentheses o) {
     visitQuotable(o);
   }
@@ -618,6 +614,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitParenthesesArguments(@NotNull ElixirParenthesesArguments o) {
     visitQuotableArguments(o);
+  }
+
+  public void visitParentheticalStab(@NotNull ElixirParentheticalStab o) {
+    visitQuotable(o);
   }
 
   public void visitPipeInfixOperator(@NotNull ElixirPipeInfixOperator o) {

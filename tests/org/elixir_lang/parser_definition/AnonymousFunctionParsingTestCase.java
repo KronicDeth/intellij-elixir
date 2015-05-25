@@ -61,10 +61,6 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testFnStabSignatureStabExpressionEnd() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testFnUnqualifiedNoParenthesesManyArgumentsCallStabExpressionEnd() {
         assertParsedAndQuotedCorrectly();
     }
