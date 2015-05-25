@@ -1645,7 +1645,7 @@ public class ElixirPsiImplUtil {
         OtpErlangObject[] quotedListArguments = new OtpErlangObject[quotedListArgumentList.size()];
         quotedListArgumentList.toArray(quotedListArguments);
 
-        return new OtpErlangList(quotedListArguments);
+        return elixirCharList(new OtpErlangList(quotedListArguments));
     }
 
     @Contract(pure = true)
