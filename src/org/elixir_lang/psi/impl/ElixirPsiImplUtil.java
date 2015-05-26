@@ -1310,13 +1310,29 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStab stab) {
-        List<ElixirStabExpression> stabExpressionList = stab.getStabExpressionList();
+        Deque<OtpErlangObject> quotedChildren = new ArrayDeque<OtpErlangObject>();
 
-        assert stabExpressionList.size() == 1;
+        ElixirStabBody stabBody = stab.getStabBody();
+        OtpErlangObject quoted;
 
-        ElixirStabExpression stabExpression = stabExpressionList.get(0);
+        if (stabBody != null) {
+            // TODO port quote(ElixirStabExpression)'s unary handling
+            quoted = stabBody.quote();
+        } else {
+            List<ElixirStabOperation> stabOperationList = stab.getStabOperationList();
 
-        return stabExpression.quote();
+            for (ElixirStabOperation stabOperation : stabOperationList) {
+                quotedChildren.add(stabOperation.quote());
+            }
+
+            int size = quotedChildren.size();
+
+            OtpErlangObject[] quotedArray = new OtpErlangObject[size];
+            quotedArray = quotedChildren.toArray(quotedArray);
+            quoted = new OtpErlangList(quotedArray);
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)
@@ -1379,50 +1395,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirStabExpression stabExpression) {
-        PsiElement[] children = stabExpression.getChildren();
-
-        assert children.length == 1;
-
-        Quotable child = (Quotable) children[0];
-        OtpErlangObject quoted = child.quote();
-
-        if (child instanceof ElixirStabOperation) {
-            quoted = new OtpErlangList(
-                    new OtpErlangObject[]{
-                            quoted
-                    }
-            );
-        } else {
-            boolean unary = false;
-
-            if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
-                unary = true;
-            } else if (child instanceof ElixirAccessExpression) {
-                PsiElement grandChild = child.getFirstChild();
-
-                if (grandChild instanceof ElixirUnaryNumericOperation) {
-                    unary = true;
-                }
-            }
-
-            if (unary) {
-                OtpErlangList blockMetadata = new OtpErlangList();
-
-                // Cannot use block as unary operation quoting is odd and is a single-element __block__
-                quoted = quotedFunctionCall(
-                        BLOCK,
-                        blockMetadata,
-                        quoted
-                );
-            }
-        }
-
-        return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabNoParenthesesSignature stabNoParenthesesSignature) {
         QuotableArguments noParenthesesArguments = stabNoParenthesesSignature.getNoParenthesesArguments();
         OtpErlangObject[] quotedArguments = noParenthesesArguments.quoteArguments();
@@ -1432,6 +1404,32 @@ public class ElixirPsiImplUtil {
         OtpErlangList quotedArgumentList = new OtpErlangList(unwrappedWhen);
 
         return elixirCharList(quotedArgumentList);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
+        Quotable leftOperand = stabOperation.getStabSignature();
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+
+        Operator operator = stabOperation.getStabInfixOperator();
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = stabOperation.getStabBody();
+        OtpErlangObject quotedRightOperand;
+
+        if (rightOperand != null) {
+            quotedRightOperand = rightOperand.quote();
+        } else {
+            quotedRightOperand = NIL;
+        }
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedLeftOperand,
+                quotedRightOperand
+        );
     }
 
     @Contract(pure = true)

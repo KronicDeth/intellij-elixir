@@ -660,10 +660,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitStabExpression(@NotNull ElixirStabExpression o) {
-    visitQuotable(o);
-  }
-
   public void visitStabInfixOperator(@NotNull ElixirStabInfixOperator o) {
     visitOperator(o);
   }
@@ -673,7 +669,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitStabOperation(@NotNull ElixirStabOperation o) {
-    visitInfixOperation(o);
+    visitQuotable(o);
   }
 
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
@@ -769,10 +765,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
-    visitElement(o);
-  }
-
-  public void visitInfixOperation(@NotNull InfixOperation o) {
     visitElement(o);
   }
 

@@ -1,6 +1,10 @@
 package org.elixir_lang.parser_definition;
 
 public class ParentheticalStabParsingTestCase extends ParsingTestCase {
+    public void testBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
     }
@@ -26,6 +30,10 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedExpressionStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testMultiStab() {
         assertParsedAndQuotedCorrectly();
     }
 

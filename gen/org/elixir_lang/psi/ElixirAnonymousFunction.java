@@ -3,12 +3,13 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public interface ElixirAnonymousFunction extends Quotable {
 
-  @Nullable
-  ElixirEndOfExpression getEndOfExpression();
+  @NotNull
+  List<ElixirEndOfExpression> getEndOfExpressionList();
 
   @NotNull
   ElixirStab getStab();

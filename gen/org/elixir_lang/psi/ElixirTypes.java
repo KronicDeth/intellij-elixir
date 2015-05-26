@@ -157,7 +157,6 @@ public interface ElixirTypes {
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
   IElementType STAB = new ElixirElementType("STAB");
   IElementType STAB_BODY = new ElixirElementType("STAB_BODY");
-  IElementType STAB_EXPRESSION = new ElixirElementType("STAB_EXPRESSION");
   IElementType STAB_INFIX_OPERATOR = new ElixirElementType("STAB_INFIX_OPERATOR");
   IElementType STAB_NO_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_NO_PARENTHESES_SIGNATURE");
   IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
@@ -745,9 +744,6 @@ public interface ElixirTypes {
       }
       else if (type == STAB_BODY) {
         return new ElixirStabBodyImpl(node);
-      }
-      else if (type == STAB_EXPRESSION) {
-        return new ElixirStabExpressionImpl(node);
       }
       else if (type == STAB_INFIX_OPERATOR) {
         return new ElixirStabInfixOperatorImpl(node);

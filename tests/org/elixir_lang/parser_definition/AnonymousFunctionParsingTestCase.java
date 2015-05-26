@@ -1,6 +1,10 @@
 package org.elixir_lang.parser_definition;
 
 public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
+    public void testBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testFnEmptyParenthesesStabEnd() {
         assertParsedAndQuotedCorrectly();
     }
@@ -22,6 +26,10 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnMatchedExpressionStabEnd() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testFnMultiStabEnd() {
         assertParsedAndQuotedCorrectly();
     }
 

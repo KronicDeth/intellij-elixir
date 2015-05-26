@@ -6,11 +6,9 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirEndOfExpression;
-import org.elixir_lang.psi.ElixirStab;
-import org.elixir_lang.psi.ElixirStabExpression;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,9 +30,15 @@ public class ElixirStabImpl extends ASTWrapperPsiElement implements ElixirStab {
   }
 
   @Override
+  @Nullable
+  public ElixirStabBody getStabBody() {
+    return findChildByClass(ElixirStabBody.class);
+  }
+
+  @Override
   @NotNull
-  public List<ElixirStabExpression> getStabExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStabExpression.class);
+  public List<ElixirStabOperation> getStabOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirStabOperation.class);
   }
 
   @NotNull

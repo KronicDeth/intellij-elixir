@@ -7,6 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements ElixirStabOperation {
 
@@ -20,9 +21,9 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirStabBody getStabBody() {
-    return findNotNullChildByClass(ElixirStabBody.class);
+    return findChildByClass(ElixirStabBody.class);
   }
 
   @Override

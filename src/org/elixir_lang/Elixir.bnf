@@ -1560,29 +1560,29 @@ stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L687-L702
  *    for grouping stab followed by expression into stab, so it is equivalent to expr_list (expressionList)
  */
-stabBody ::= elixirFile
+private stabOperationPrefix ::= stabSignature stabInfixOperator
+private stabBodyExpression ::= !stabOperationPrefix expression
+stabBody ::= stabBodyExpression (endOfExpression+ stabBodyExpression)*
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-stabOperation ::= stabSignature stabInfixOperator stabBody
-                  { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
-
-// @note `expression` is second as it is more general and semi-recursive
-stabExpression ::= stabOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L275-280
-                   expression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L274
-                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+stabOperation ::= stabOperationPrefix stabBody?
+                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
-stab ::= stabExpression (endOfExpression stabExpression)*
+stab ::= stabOperation (endOfExpression stabOperation)* |
+         stabBody
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
-anonymousFunction ::= FN endOfExpression? stab END
+anonymousFunction ::= FN endOfExpression?
+                      stab
+                      endOfExpression* END
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
-parentheticalStab ::= OPENING_PARENTHESIS
+parentheticalStab ::= OPENING_PARENTHESIS EOL*
                       (infixSemicolon? stab infixSemicolon? | infixSemicolon)
-                      CLOSING_PARENTHESIS
+                      EOL* CLOSING_PARENTHESIS
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 accessExpression ::= atNumericOperation |
