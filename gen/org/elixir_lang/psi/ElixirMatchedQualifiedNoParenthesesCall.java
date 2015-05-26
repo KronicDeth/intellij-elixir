@@ -13,7 +13,7 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
   ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
-  ElixirMatchedNoParenthesesArguments getMatchedNoParenthesesArguments();
+  ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();

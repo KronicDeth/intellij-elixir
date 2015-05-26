@@ -11,6 +11,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
   ElixirAlias getAlias();
 
   @Nullable
+  ElixirAnonymousFunction getAnonymousFunction();
+
+  @Nullable
   ElixirAtNumericOperation getAtNumericOperation();
 
   @Nullable
@@ -39,9 +42,6 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
 
   @Nullable
   ElixirDecimalWholeNumber getDecimalWholeNumber();
-
-  @Nullable
-  ElixirEmptyBlock getEmptyBlock();
 
   @Nullable
   ElixirHexadecimalWholeNumber getHexadecimalWholeNumber();
@@ -111,6 +111,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
 
   @Nullable
   ElixirOctalWholeNumber getOctalWholeNumber();
+
+  @Nullable
+  ElixirParentheticalStab getParentheticalStab();
 
   @Nullable
   ElixirStringHeredoc getStringHeredoc();

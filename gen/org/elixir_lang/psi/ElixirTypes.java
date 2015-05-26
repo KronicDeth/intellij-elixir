@@ -13,6 +13,7 @@ public interface ElixirTypes {
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = new ElixirElementType("ALIAS");
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
+  IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
@@ -36,7 +37,6 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
-  IElementType EMPTY_BLOCK = new ElixirElementType("EMPTY_BLOCK");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -111,7 +111,6 @@ public interface ElixirTypes {
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
   IElementType MATCHED_MULTIPLICATION_OPERATION = new ElixirElementType("MATCHED_MULTIPLICATION_OPERATION");
-  IElementType MATCHED_NO_PARENTHESES_ARGUMENTS = new ElixirElementType("MATCHED_NO_PARENTHESES_ARGUMENTS");
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_PARENTHESES_ARGUMENTS = new ElixirElementType("MATCHED_PARENTHESES_ARGUMENTS");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
@@ -130,6 +129,7 @@ public interface ElixirTypes {
   IElementType MATCHED_WHEN_OPERATION = new ElixirElementType("MATCHED_WHEN_OPERATION");
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
+  IElementType NO_PARENTHESES_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ARGUMENTS");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
   IElementType NO_PARENTHESES_KEYWORDS = new ElixirElementType("NO_PARENTHESES_KEYWORDS");
@@ -138,6 +138,7 @@ public interface ElixirTypes {
   IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER");
   IElementType NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
+  IElementType NO_PARENTHESES_ONE_ARGUMENT = new ElixirElementType("NO_PARENTHESES_ONE_ARGUMENT");
   IElementType NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
@@ -145,6 +146,7 @@ public interface ElixirTypes {
   IElementType OPEN_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("OPEN_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType OR_INFIX_OPERATOR = new ElixirElementType("OR_INFIX_OPERATOR");
   IElementType PARENTHESES_ARGUMENTS = new ElixirElementType("PARENTHESES_ARGUMENTS");
+  IElementType PARENTHETICAL_STAB = new ElixirElementType("PARENTHETICAL_STAB");
   IElementType PIPE_INFIX_OPERATOR = new ElixirElementType("PIPE_INFIX_OPERATOR");
   IElementType QUOTE_CHAR_LIST_BODY = new ElixirElementType("QUOTE_CHAR_LIST_BODY");
   IElementType QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE");
@@ -153,6 +155,13 @@ public interface ElixirTypes {
   IElementType RELATIVE_IDENTIFIER = new ElixirElementType("RELATIVE_IDENTIFIER");
   IElementType SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("SIGIL_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType SIGIL_MODIFIERS = new ElixirElementType("SIGIL_MODIFIERS");
+  IElementType STAB = new ElixirElementType("STAB");
+  IElementType STAB_BODY = new ElixirElementType("STAB_BODY");
+  IElementType STAB_INFIX_OPERATOR = new ElixirElementType("STAB_INFIX_OPERATOR");
+  IElementType STAB_NO_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_NO_PARENTHESES_SIGNATURE");
+  IElementType STAB_OPERATION = new ElixirElementType("STAB_OPERATION");
+  IElementType STAB_PARENTHESES_SIGNATURE = new ElixirElementType("STAB_PARENTHESES_SIGNATURE");
+  IElementType STAB_SIGNATURE = new ElixirElementType("STAB_SIGNATURE");
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
@@ -304,6 +313,9 @@ public interface ElixirTypes {
       else if (type == AND_INFIX_OPERATOR) {
         return new ElixirAndInfixOperatorImpl(node);
       }
+      else if (type == ANONYMOUS_FUNCTION) {
+        return new ElixirAnonymousFunctionImpl(node);
+      }
       else if (type == ARROW_INFIX_OPERATOR) {
         return new ElixirArrowInfixOperatorImpl(node);
       }
@@ -372,9 +384,6 @@ public interface ElixirTypes {
       }
       else if (type == DOT_INFIX_OPERATOR) {
         return new ElixirDotInfixOperatorImpl(node);
-      }
-      else if (type == EMPTY_BLOCK) {
-        return new ElixirEmptyBlockImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
@@ -598,9 +607,6 @@ public interface ElixirTypes {
       else if (type == MATCHED_MULTIPLICATION_OPERATION) {
         return new ElixirMatchedMultiplicationOperationImpl(node);
       }
-      else if (type == MATCHED_NO_PARENTHESES_ARGUMENTS) {
-        return new ElixirMatchedNoParenthesesArgumentsImpl(node);
-      }
       else if (type == MATCHED_OR_OPERATION) {
         return new ElixirMatchedOrOperationImpl(node);
       }
@@ -655,6 +661,9 @@ public interface ElixirTypes {
       else if (type == MULTIPLICATION_INFIX_OPERATOR) {
         return new ElixirMultiplicationInfixOperatorImpl(node);
       }
+      else if (type == NO_PARENTHESES_ARGUMENTS) {
+        return new ElixirNoParenthesesArgumentsImpl(node);
+      }
       else if (type == NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesExpressionImpl(node);
       }
@@ -679,6 +688,9 @@ public interface ElixirTypes {
       else if (type == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(node);
       }
+      else if (type == NO_PARENTHESES_ONE_ARGUMENT) {
+        return new ElixirNoParenthesesOneArgumentImpl(node);
+      }
       else if (type == NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS) {
         return new ElixirNoParenthesesOnePositionalAndKeywordsArgumentsImpl(node);
       }
@@ -699,6 +711,9 @@ public interface ElixirTypes {
       }
       else if (type == PARENTHESES_ARGUMENTS) {
         return new ElixirParenthesesArgumentsImpl(node);
+      }
+      else if (type == PARENTHETICAL_STAB) {
+        return new ElixirParentheticalStabImpl(node);
       }
       else if (type == PIPE_INFIX_OPERATOR) {
         return new ElixirPipeInfixOperatorImpl(node);
@@ -723,6 +738,27 @@ public interface ElixirTypes {
       }
       else if (type == SIGIL_MODIFIERS) {
         return new ElixirSigilModifiersImpl(node);
+      }
+      else if (type == STAB) {
+        return new ElixirStabImpl(node);
+      }
+      else if (type == STAB_BODY) {
+        return new ElixirStabBodyImpl(node);
+      }
+      else if (type == STAB_INFIX_OPERATOR) {
+        return new ElixirStabInfixOperatorImpl(node);
+      }
+      else if (type == STAB_NO_PARENTHESES_SIGNATURE) {
+        return new ElixirStabNoParenthesesSignatureImpl(node);
+      }
+      else if (type == STAB_OPERATION) {
+        return new ElixirStabOperationImpl(node);
+      }
+      else if (type == STAB_PARENTHESES_SIGNATURE) {
+        return new ElixirStabParenthesesSignatureImpl(node);
+      }
+      else if (type == STAB_SIGNATURE) {
+        return new ElixirStabSignatureImpl(node);
       }
       else if (type == STRING_HEREDOC) {
         return new ElixirStringHeredocImpl(node);

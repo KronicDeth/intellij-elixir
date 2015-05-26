@@ -4,8 +4,8 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirMatchedNoParenthesesArguments;
 import org.elixir_lang.psi.ElixirMatchedUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +22,8 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends ElixirMatched
 
   @Override
   @NotNull
-  public ElixirMatchedNoParenthesesArguments getMatchedNoParenthesesArguments() {
-    return findNotNullChildByClass(ElixirMatchedNoParenthesesArguments.class);
+  public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
+    return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
   }
 
   @NotNull

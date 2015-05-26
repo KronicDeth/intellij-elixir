@@ -27,6 +27,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirAnonymousFunction getAnonymousFunction() {
+    return findChildByClass(ElixirAnonymousFunction.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
     return findChildByClass(ElixirAtNumericOperation.class);
   }
@@ -83,12 +89,6 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
   @Nullable
   public ElixirDecimalWholeNumber getDecimalWholeNumber() {
     return findChildByClass(ElixirDecimalWholeNumber.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirEmptyBlock getEmptyBlock() {
-    return findChildByClass(ElixirEmptyBlock.class);
   }
 
   @Override
@@ -227,6 +227,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
   @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
     return findChildByClass(ElixirOctalWholeNumber.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirParentheticalStab getParentheticalStab() {
+    return findChildByClass(ElixirParentheticalStab.class);
   }
 
   @Override

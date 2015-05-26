@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
@@ -8,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedNoParenthesesArgumentsImpl extends ASTWrapperPsiElement implements ElixirMatchedNoParenthesesArguments {
+public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesOneArgument {
 
-  public ElixirMatchedNoParenthesesArgumentsImpl(ASTNode node) {
+  public ElixirNoParenthesesOneArgumentImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedNoParenthesesArguments(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesOneArgument(this);
     else super.accept(visitor);
   }
 
@@ -47,6 +48,11 @@ public class ElixirMatchedNoParenthesesArgumentsImpl extends ASTWrapperPsiElemen
   @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
+  }
+
+  @NotNull
+  public OtpErlangObject[] quoteArguments() {
+    return ElixirPsiImplUtil.quoteArguments(this);
   }
 
 }
