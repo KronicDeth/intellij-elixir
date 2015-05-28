@@ -137,9 +137,9 @@ public class BinaryIntegerTest extends TokenTest {
                 { "x", ElixirTypes.INVALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
                 { "y", ElixirTypes.INVALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
                 { "z", ElixirTypes.INVALID_BINARY_DIGITS, ElixirFlexLexer.BINARY_WHOLE_NUMBER },
-                { "{", TokenType.BAD_CHARACTER, INITIAL_STATE },
+                { "{", ElixirTypes.OPENING_CURLY, INITIAL_STATE },
                 { "|", ElixirTypes.PIPE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE },
-                { "}", TokenType.BAD_CHARACTER, INITIAL_STATE },
+                { "}", ElixirTypes.CLOSING_CURLY, INITIAL_STATE },
                 { "~", ElixirTypes.TILDE, ElixirFlexLexer.SIGIL }
         });
     }

@@ -382,6 +382,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitSigilLine(o);
   }
 
+  public void visitMapArguments(@NotNull ElixirMapArguments o) {
+    visitQuotable(o);
+  }
+
+  public void visitMapOperation(@NotNull ElixirMapOperation o) {
+    visitQuotable(o);
+  }
+
   public void visitMatchInfixOperator(@NotNull ElixirMatchInfixOperator o) {
     visitOperator(o);
   }

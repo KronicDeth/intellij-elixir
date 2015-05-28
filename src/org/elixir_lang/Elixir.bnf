@@ -42,6 +42,7 @@
     IN_OPERATOR = "in"
     INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
+    MAP_OPERATOR = "%{}"
     NIL = "nil"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
@@ -1519,6 +1520,31 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
+ *
+ * Map
+ *
+ */
+
+/*
+ * https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L430-L430
+ * shows that '%{}' is injected by the Elixir native tokenizer when '%{' is encountered.  Since Elixir.flex can't inject
+ * text, this parser is matching MAP_OPERATOR as just '%' as mapArguments contains the '{'.
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L521-L522
+ */
+private mapPrefixOperator ::= STRUCT_OPERATOR EOL*
+
+mapArguments ::= OPENING_CURLY EOL*
+                 CLOSING_CURLY
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+
+mapOperation ::= mapPrefixOperator mapArguments
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+private map ::= mapOperation
+
+/*
  * Stab Operation
  */
 
@@ -1592,6 +1618,7 @@ accessExpression ::= atNumericOperation |
                      parentheticalStab |
                      numeric |
                      list |
+                     map |
                      stringLine |
                      stringHeredoc |
                      charListLine |

@@ -225,6 +225,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirMapOperation getMapOperation() {
+    return findChildByClass(ElixirMapOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
     return findChildByClass(ElixirOctalWholeNumber.class);
   }

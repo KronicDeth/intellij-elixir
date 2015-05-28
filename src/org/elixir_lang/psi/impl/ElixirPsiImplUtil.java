@@ -385,6 +385,11 @@ public class ElixirPsiImplUtil {
     }
 
     /* Returns the 0-indexed line number for the element */
+    public static int lineNumber(ASTNode node) {
+        return document(node.getPsi()).getLineNumber(node.getStartOffset());
+    }
+
+    /* Returns the 0-indexed line number for the element */
     public static int lineNumber(Operator operator) {
         ASTNode node = operatorTokenNode(operator);
 
@@ -396,6 +401,13 @@ public class ElixirPsiImplUtil {
         int textOffset = element.getTextOffset();
 
         return document(element).getLineNumber(textOffset);
+    }
+
+    public static OtpErlangTuple lineNumberKeywordTuple(ASTNode node) {
+        return keywordTuple(
+                "line",
+                lineNumber(node) + 1
+        );
     }
 
     public static OtpErlangTuple lineNumberKeywordTuple(Operator operator) {
@@ -411,6 +423,14 @@ public class ElixirPsiImplUtil {
                 // Elixir metadata lines are 1-indexed while getLineNumber is 0-indexed
                 lineNumber(element) + 1
         );
+    }
+
+    public static OtpErlangList metadata(ASTNode node) {
+        OtpErlangObject[] keywordListElements = {
+                lineNumberKeywordTuple(node)
+        };
+
+        return new OtpErlangList(keywordListElements);
     }
 
     public static OtpErlangList metadata(Operator operator) {
@@ -1636,6 +1656,30 @@ public class ElixirPsiImplUtil {
         quotedListArgumentList.toArray(quotedListArguments);
 
         return elixirCharList(new OtpErlangList(quotedListArguments));
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMapArguments mapArguments) {
+        ASTNode node = mapArguments.getNode();
+        ASTNode[] openingCurlies = node.getChildren(TokenSet.create(ElixirTypes.OPENING_CURLY));
+
+        assert openingCurlies.length == 1;
+
+        ASTNode openingCurly = openingCurlies[0];
+
+        return quotedFunctionCall(
+                "%{}",
+                metadata(openingCurly)
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMapOperation mapOperation) {
+        Quotable mapArguments = mapOperation.getMapArguments();
+
+        return mapArguments.quote();
     }
 
     @Contract(pure = true)
