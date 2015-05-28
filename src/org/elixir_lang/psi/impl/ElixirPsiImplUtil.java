@@ -389,39 +389,10 @@ public class ElixirPsiImplUtil {
         return document(node.getPsi()).getLineNumber(node.getStartOffset());
     }
 
-    /* Returns the 0-indexed line number for the element */
-    public static int lineNumber(Operator operator) {
-        ASTNode node = operatorTokenNode(operator);
-
-        return document(operator).getLineNumber(node.getStartOffset());
-    }
-
-    /* Returns the 0-indexed line number for the element */
-    public static int lineNumber(PsiElement element) {
-        int textOffset = element.getTextOffset();
-
-        return document(element).getLineNumber(textOffset);
-    }
-
     public static OtpErlangTuple lineNumberKeywordTuple(ASTNode node) {
         return keywordTuple(
                 "line",
                 lineNumber(node) + 1
-        );
-    }
-
-    public static OtpErlangTuple lineNumberKeywordTuple(Operator operator) {
-        return keywordTuple(
-                "line",
-                lineNumber(operator) + 1
-        );
-    }
-
-    public static OtpErlangTuple lineNumberKeywordTuple(PsiElement element) {
-        return keywordTuple(
-                "line",
-                // Elixir metadata lines are 1-indexed while getLineNumber is 0-indexed
-                lineNumber(element) + 1
         );
     }
 
@@ -434,19 +405,11 @@ public class ElixirPsiImplUtil {
     }
 
     public static OtpErlangList metadata(Operator operator) {
-        OtpErlangObject[] keywordListElements = {
-                lineNumberKeywordTuple(operator)
-        };
-
-        return new OtpErlangList(keywordListElements);
+        return metadata(operatorTokenNode(operator));
     }
 
     public static OtpErlangList metadata(PsiElement element) {
-        final OtpErlangObject[] keywordListElements = {
-                lineNumberKeywordTuple(element)
-        };
-
-        return new OtpErlangList(keywordListElements);
+        return metadata(element.getNode());
     }
 
     /* TODO determine what counter means in Code.string_to_quoted("Foo")
@@ -456,7 +419,7 @@ public class ElixirPsiImplUtil {
            same order than detect a OtpErlangList is a QuotableKeywordList */
         final OtpErlangObject[] keywordListElements = {
                 keywordTuple("counter", counter),
-                lineNumberKeywordTuple(element)
+                lineNumberKeywordTuple(element.getNode())
         };
 
         return new OtpErlangList(keywordListElements);
