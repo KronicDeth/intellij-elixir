@@ -1631,9 +1631,20 @@ public class ElixirPsiImplUtil {
 
         ASTNode openingCurly = openingCurlies[0];
 
+        ElixirKeywords keywords = mapArguments.getKeywords();
+        OtpErlangObject[] quotedArguments;
+
+        if (keywords != null) {
+            OtpErlangList quotedKeywords = (OtpErlangList) keywords.quote();
+            quotedArguments = quotedKeywords.elements();
+        } else {
+            quotedArguments = new OtpErlangObject[0];
+        }
+
         return quotedFunctionCall(
                 "%{}",
-                metadata(openingCurly)
+                metadata(openingCurly),
+                quotedArguments
         );
     }
 

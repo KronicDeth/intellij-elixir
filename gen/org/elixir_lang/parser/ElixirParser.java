@@ -2832,6 +2832,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY EOL*
+  //                  keywords? EOL* // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
   //                  CLOSING_CURLY
   public static boolean mapArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments")) return false;
@@ -2840,6 +2841,8 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && mapArguments_1(b, l + 1);
+    r = r && mapArguments_2(b, l + 1);
+    r = r && mapArguments_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, MAP_ARGUMENTS, r);
     return r;
@@ -2852,6 +2855,25 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!consumeToken(b, EOL)) break;
       if (!empty_element_parsed_guard_(b, "mapArguments_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // keywords?
+  private static boolean mapArguments_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapArguments_2")) return false;
+    keywords(b, l + 1);
+    return true;
+  }
+
+  // EOL*
+  private static boolean mapArguments_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapArguments_3")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "mapArguments_3", c)) break;
       c = current_position_(b);
     }
     return true;
