@@ -1,7 +1,7 @@
 package org.elixir_lang.parser_definition;
 
 public class MapOperationParsingTestCase extends ParsingTestCase {
-    public void testAssociations() {
+    public void testAssociationOperation() {
         assertParsedAndQuotedCorrectly();
     }
 
