@@ -7,6 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirAssociationsBase;
+import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.ElixirContainerAssociationOperation;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,12 @@ public class ElixirAssociationsBaseImpl extends ASTWrapperPsiElement implements 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAssociationsBase(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirAtom> getAtomList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
   }
 
   @Override

@@ -820,9 +820,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // containerAssociationOperation
+  // containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
+  //                                    mapExpression
   static boolean associationsExpression(PsiBuilder b, int l) {
-    return containerAssociationOperation(b, l + 1);
+    if (!recursion_guard_(b, l, "associationsExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = containerAssociationOperation(b, l + 1);
+    if (!r) r = mapExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3018,6 +3025,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // maxExpression
+  static boolean mapExpression(PsiBuilder b, int l) {
+    return maxExpression(b, l + 1);
+  }
+
+  /* ********************************************************** */
   // mapPrefixOperator mapArguments
   public static boolean mapOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapOperation")) return false;
@@ -3127,6 +3140,12 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "matchedParenthesesArguments_0_2")) return false;
     parenthesesArguments(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // atom
+  static boolean maxExpression(PsiBuilder b, int l) {
+    return atom(b, l + 1);
   }
 
   /* ********************************************************** */

@@ -9,6 +9,9 @@ import java.util.List;
 public interface ElixirAssociationsBase extends Quotable {
 
   @NotNull
+  List<ElixirAtom> getAtomList();
+
+  @NotNull
   List<ElixirContainerAssociationOperation> getContainerAssociationOperationList();
 
   @NotNull
