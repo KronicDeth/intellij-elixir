@@ -24,6 +24,12 @@ public class ElixirAssociationsBaseImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
+  public List<ElixirAlias> getAliasList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAlias.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirAtom> getAtomList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtom.class);
   }

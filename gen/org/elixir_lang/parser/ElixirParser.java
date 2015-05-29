@@ -3145,17 +3145,20 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
-  //                           /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230 */
-  //                           matchedQualifiedParenthesesCall |
-  //                           matchedUnqualifiedParenthesesCall
+  // matchedQualifiedAliasOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
+  //                           alias
   static boolean maxExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = atom(b, l + 1);
+    r = matchedExpression(b, l + 1, 22);
     if (!r) r = matchedExpression(b, l + 1, 24);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
+    if (!r) r = atom(b, l + 1);
+    if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
