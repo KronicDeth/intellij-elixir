@@ -15,6 +15,9 @@ public interface ElixirAssociationsBase extends Quotable {
   List<ElixirContainerAssociationOperation> getContainerAssociationOperationList();
 
   @NotNull
+  List<ElixirMatchedExpression> getMatchedExpressionList();
+
+  @NotNull
   OtpErlangObject quote();
 
 }

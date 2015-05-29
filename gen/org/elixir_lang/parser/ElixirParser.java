@@ -2960,8 +2960,9 @@ public class ElixirParser implements PsiParser {
   /* ********************************************************** */
   // OPENING_CURLY EOL*
   //                  (
-  //                   associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
-  //                   keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   // Must be before associations so identifiers as keyword keys match before maxExpression in associations
+  //                   keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
   //                  )? EOL*
   //                  CLOSING_CURLY
   public static boolean mapArguments(PsiBuilder b, int l) {
@@ -2991,8 +2992,9 @@ public class ElixirParser implements PsiParser {
   }
 
   // (
-  //                   associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
-  //                   keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   // Must be before associations so identifiers as keyword keys match before maxExpression in associations
+  //                   keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
   //                  )?
   private static boolean mapArguments_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments_2")) return false;
@@ -3000,14 +3002,14 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
-  //                   keywords
+  // keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associations
   private static boolean mapArguments_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = associations(b, l + 1);
-    if (!r) r = keywords(b, l + 1);
+    r = keywords(b, l + 1);
+    if (!r) r = associations(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3143,9 +3145,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // atom
+  // atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
+  //                           /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230 */
+  //                           matchedQualifiedParenthesesCall |
+  //                           matchedUnqualifiedParenthesesCall
   static boolean maxExpression(PsiBuilder b, int l) {
-    return atom(b, l + 1);
+    if (!recursion_guard_(b, l, "maxExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atom(b, l + 1);
+    if (!r) r = matchedExpression(b, l + 1, 24);
+    if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

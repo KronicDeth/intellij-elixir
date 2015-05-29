@@ -1541,7 +1541,10 @@ containerAssociationOperation ::= containerExpression associationInfixOperator c
                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
-private maxExpression ::= atom // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
+private maxExpression ::= atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
+                          /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230 */
+                          matchedQualifiedParenthesesCall |
+                          matchedUnqualifiedParenthesesCall
 
 /* Anything that can hold a map.
  *
@@ -1558,8 +1561,9 @@ associations ::= associationsBase infixComma?
 
 mapArguments ::= OPENING_CURLY EOL*
                  (
-                  associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
-                  keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                  // Must be before associations so identifiers as keyword keys match before maxExpression in associations
+                  keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                  associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
                  )? EOL*
                  CLOSING_CURLY
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
