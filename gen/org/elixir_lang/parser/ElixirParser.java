@@ -44,6 +44,12 @@ public class ElixirParser implements PsiParser {
     else if (t == ARROW_INFIX_OPERATOR) {
       r = arrowInfixOperator(b, 0);
     }
+    else if (t == ASSOCIATIONS) {
+      r = associations(b, 0);
+    }
+    else if (t == ASSOCIATIONS_BASE) {
+      r = associationsBase(b, 0);
+    }
     else if (t == AT_NUMERIC_OPERATION) {
       r = atNumericOperation(b, 0);
     }
@@ -85,6 +91,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == COMPARISON_INFIX_OPERATOR) {
       r = comparisonInfixOperator(b, 0);
+    }
+    else if (t == CONTAINER_ASSOCIATION_OPERATION) {
+      r = containerAssociationOperation(b, 0);
     }
     else if (t == DECIMAL_DIGITS) {
       r = decimalDigits(b, 0);
@@ -719,6 +728,104 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // EOL* ASSOCIATION_OPERATOR EOL*
+  static boolean associationInfixOperator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationInfixOperator")) return false;
+    if (!nextTokenIs(b, "", ASSOCIATION_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = associationInfixOperator_0(b, l + 1);
+    r = r && consumeToken(b, ASSOCIATION_OPERATOR);
+    r = r && associationInfixOperator_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean associationInfixOperator_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationInfixOperator_0")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "associationInfixOperator_0", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // EOL*
+  private static boolean associationInfixOperator_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationInfixOperator_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "associationInfixOperator_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // associationsBase infixComma?
+  public static boolean associations(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associations")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<associations>");
+    r = associationsBase(b, l + 1);
+    r = r && associations_1(b, l + 1);
+    exit_section_(b, l, m, ASSOCIATIONS, r, false, null);
+    return r;
+  }
+
+  // infixComma?
+  private static boolean associations_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associations_1")) return false;
+    infixComma(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // associationsExpression (infixComma associationsExpression)*
+  public static boolean associationsBase(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationsBase")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<associations base>");
+    r = associationsExpression(b, l + 1);
+    r = r && associationsBase_1(b, l + 1);
+    exit_section_(b, l, m, ASSOCIATIONS_BASE, r, false, null);
+    return r;
+  }
+
+  // (infixComma associationsExpression)*
+  private static boolean associationsBase_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationsBase_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!associationsBase_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "associationsBase_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // infixComma associationsExpression
+  private static boolean associationsBase_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "associationsBase_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = infixComma(b, l + 1);
+    r = r && associationsExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // containerAssociationOperation
+  static boolean associationsExpression(PsiBuilder b, int l) {
+    return containerAssociationOperation(b, l + 1);
+  }
+
+  /* ********************************************************** */
   // atPrefixOperator numeric
   public static boolean atNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atNumericOperation")) return false;
@@ -1140,6 +1247,19 @@ public class ElixirParser implements PsiParser {
     r = infixComma(b, l + 1);
     r = r && containerExpression(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // containerExpression associationInfixOperator containerExpression
+  public static boolean containerAssociationOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "containerAssociationOperation")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, "<container association operation>");
+    r = containerExpression(b, l + 1);
+    r = r && associationInfixOperator(b, l + 1);
+    r = r && containerExpression(b, l + 1);
+    exit_section_(b, l, m, CONTAINER_ASSOCIATION_OPERATION, r, false, null);
     return r;
   }
 
@@ -2832,7 +2952,10 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY EOL*
-  //                  keywords? EOL* // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                  (
+  //                   associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
+  //                   keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                  )? EOL*
   //                  CLOSING_CURLY
   public static boolean mapArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments")) return false;
@@ -2860,11 +2983,26 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // keywords?
+  // (
+  //                   associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
+  //                   keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                  )?
   private static boolean mapArguments_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments_2")) return false;
-    keywords(b, l + 1);
+    mapArguments_2_0(b, l + 1);
     return true;
+  }
+
+  // associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
+  //                   keywords
+  private static boolean mapArguments_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapArguments_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = associations(b, l + 1);
+    if (!r) r = keywords(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // EOL*

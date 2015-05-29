@@ -15,6 +15,8 @@ public interface ElixirTypes {
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
   IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
+  IElementType ASSOCIATIONS = new ElixirElementType("ASSOCIATIONS");
+  IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
@@ -29,6 +31,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
   IElementType COMPARISON_INFIX_OPERATOR = new ElixirElementType("COMPARISON_INFIX_OPERATOR");
+  IElementType CONTAINER_ASSOCIATION_OPERATION = new ElixirElementType("CONTAINER_ASSOCIATION_OPERATION");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_FLOAT_EXPONENT = new ElixirElementType("DECIMAL_FLOAT_EXPONENT");
@@ -321,6 +324,12 @@ public interface ElixirTypes {
       else if (type == ARROW_INFIX_OPERATOR) {
         return new ElixirArrowInfixOperatorImpl(node);
       }
+      else if (type == ASSOCIATIONS) {
+        return new ElixirAssociationsImpl(node);
+      }
+      else if (type == ASSOCIATIONS_BASE) {
+        return new ElixirAssociationsBaseImpl(node);
+      }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
       }
@@ -362,6 +371,9 @@ public interface ElixirTypes {
       }
       else if (type == COMPARISON_INFIX_OPERATOR) {
         return new ElixirComparisonInfixOperatorImpl(node);
+      }
+      else if (type == CONTAINER_ASSOCIATION_OPERATION) {
+        return new ElixirContainerAssociationOperationImpl(node);
       }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);

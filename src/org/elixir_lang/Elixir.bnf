@@ -1534,8 +1534,23 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
  */
 private mapPrefixOperator ::= STRUCT_OPERATOR EOL*
 
+private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
+containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
+                                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+private associationsExpression ::= containerAssociationOperation // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
+associationsBase ::= associationsExpression (infixComma associationsExpression)*
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+associations ::= associationsBase infixComma?
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 mapArguments ::= OPENING_CURLY EOL*
-                 keywords? EOL* // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                 (
+                  associations | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
+                  keywords // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                 )? EOL*
                  CLOSING_CURLY
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 

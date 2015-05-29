@@ -36,6 +36,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAssociations(@NotNull ElixirAssociations o) {
+    visitQuotable(o);
+  }
+
+  public void visitAssociationsBase(@NotNull ElixirAssociationsBase o) {
+    visitQuotable(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -94,6 +102,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitComparisonInfixOperator(@NotNull ElixirComparisonInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitContainerAssociationOperation(@NotNull ElixirContainerAssociationOperation o) {
+    visitQuotable(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {

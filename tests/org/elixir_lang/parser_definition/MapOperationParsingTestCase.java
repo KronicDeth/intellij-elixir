@@ -1,6 +1,10 @@
 package org.elixir_lang.parser_definition;
 
 public class MapOperationParsingTestCase extends ParsingTestCase {
+    public void testAssociations() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
     }
@@ -11,6 +15,14 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
 
     public void testKeywords() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testQualifiedNoParenthesesCallAssociation() {
+        assertParsedAndQuotedAroundError();
+    }
+
+    public void testUnqualifiedNoParenthesesCallAssociation() {
+        assertParsedAndQuotedAroundError();
     }
 
     @Override

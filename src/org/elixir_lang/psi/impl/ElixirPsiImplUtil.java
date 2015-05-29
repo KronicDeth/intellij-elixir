@@ -650,6 +650,30 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAssociations associations) {
+        Quotable associationBase = associations.getAssociationsBase();
+
+        return associationBase.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAssociationsBase associationsBase) {
+        PsiElement[] children = associationsBase.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+        int i = 0;
+
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return new OtpErlangList(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
         ElixirCharListLine charListLine = atom.getCharListLine();
@@ -714,6 +738,26 @@ public class ElixirPsiImplUtil {
         }
 
         return new OtpErlangLong(codePoint);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirContainerAssociationOperation containerAssociationOperation) {
+        PsiElement[] children = containerAssociationOperation.getChildren();
+
+        // associationInfixOperator is private so not a PsiElement
+        assert children.length == 2;
+
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return new OtpErlangTuple(quotedChildren);
     }
 
     /* Returns a virtual PsiElement representing the spaces at the end of charListHeredocLineWhitespace that are not
@@ -1631,11 +1675,15 @@ public class ElixirPsiImplUtil {
 
         ASTNode openingCurly = openingCurlies[0];
 
-        ElixirKeywords keywords = mapArguments.getKeywords();
+        PsiElement[] children = mapArguments.getChildren();
+
         OtpErlangObject[] quotedArguments;
 
-        if (keywords != null) {
-            OtpErlangList quotedKeywords = (OtpErlangList) keywords.quote();
+        if (children.length > 0) {
+            assert children.length == 1;
+
+            Quotable child = (Quotable) children[0];
+            OtpErlangList quotedKeywords = (OtpErlangList) child.quote();
             quotedArguments = quotedKeywords.elements();
         } else {
             quotedArguments = new OtpErlangObject[0];

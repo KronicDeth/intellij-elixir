@@ -3,15 +3,13 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMapArguments extends Quotable {
+import java.util.List;
 
-  @Nullable
-  ElixirAssociations getAssociations();
+public interface ElixirAssociationsBase extends Quotable {
 
-  @Nullable
-  ElixirKeywords getKeywords();
+  @NotNull
+  List<ElixirContainerAssociationOperation> getContainerAssociationOperationList();
 
   @NotNull
   OtpErlangObject quote();
