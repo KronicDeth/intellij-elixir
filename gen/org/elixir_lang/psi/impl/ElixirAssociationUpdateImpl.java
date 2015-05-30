@@ -6,11 +6,9 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirAssociationUpdate;
-import org.elixir_lang.psi.ElixirMatchedExpression;
-import org.elixir_lang.psi.ElixirPipeInfixOperator;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -23,6 +21,18 @@ public class ElixirAssociationUpdateImpl extends ASTWrapperPsiElement implements
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitAssociationUpdate(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
   }
 
   @Override

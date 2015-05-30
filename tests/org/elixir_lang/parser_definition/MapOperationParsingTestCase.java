@@ -37,6 +37,10 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedPipeMapExpression() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedPipeMatchedAssociationMatched() {
         assertParsedAndQuotedCorrectly();
     }
