@@ -17,6 +17,7 @@ public interface ElixirTypes {
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ASSOCIATIONS = new ElixirElementType("ASSOCIATIONS");
   IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
+  IElementType ASSOCIATION_UPDATE = new ElixirElementType("ASSOCIATION_UPDATE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
@@ -99,10 +100,13 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
   IElementType MAP_ARGUMENTS = new ElixirElementType("MAP_ARGUMENTS");
+  IElementType MAP_CONSTRUCTION_ARGUMENTS = new ElixirElementType("MAP_CONSTRUCTION_ARGUMENTS");
   IElementType MAP_OPERATION = new ElixirElementType("MAP_OPERATION");
+  IElementType MAP_UPDATE_ARGUMENTS = new ElixirElementType("MAP_UPDATE_ARGUMENTS");
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
+  IElementType MATCHED_ASSOCIATION_OPERATION = new ElixirElementType("MATCHED_ASSOCIATION_OPERATION");
   IElementType MATCHED_AT_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_AT_NON_NUMERIC_OPERATION");
   IElementType MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION");
   IElementType MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL");
@@ -329,6 +333,9 @@ public interface ElixirTypes {
       }
       else if (type == ASSOCIATIONS_BASE) {
         return new ElixirAssociationsBaseImpl(node);
+      }
+      else if (type == ASSOCIATION_UPDATE) {
+        return new ElixirAssociationUpdateImpl(node);
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
@@ -576,8 +583,14 @@ public interface ElixirTypes {
       else if (type == MAP_ARGUMENTS) {
         return new ElixirMapArgumentsImpl(node);
       }
+      else if (type == MAP_CONSTRUCTION_ARGUMENTS) {
+        return new ElixirMapConstructionArgumentsImpl(node);
+      }
       else if (type == MAP_OPERATION) {
         return new ElixirMapOperationImpl(node);
+      }
+      else if (type == MAP_UPDATE_ARGUMENTS) {
+        return new ElixirMapUpdateArgumentsImpl(node);
       }
       else if (type == MATCHED_ADDITION_OPERATION) {
         return new ElixirMatchedAdditionOperationImpl(node);
@@ -587,6 +600,9 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_ARROW_OPERATION) {
         return new ElixirMatchedArrowOperationImpl(node);
+      }
+      else if (type == MATCHED_ASSOCIATION_OPERATION) {
+        return new ElixirMatchedAssociationOperationImpl(node);
       }
       else if (type == MATCHED_AT_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedAtNonNumericOperationImpl(node);

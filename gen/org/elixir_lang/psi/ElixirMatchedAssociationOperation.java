@@ -6,10 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirContainerAssociationOperation extends AssociationOperation {
-
-  @NotNull
-  List<ElixirEmptyParentheses> getEmptyParenthesesList();
+public interface ElixirMatchedAssociationOperation extends ElixirMatchedExpression, AssociationOperation {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();

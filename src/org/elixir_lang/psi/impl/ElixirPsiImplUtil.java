@@ -557,6 +557,26 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final AssociationOperation associationOperation) {
+        PsiElement[] children = associationOperation.getChildren();
+
+        // associationInfixOperator is private so not a PsiElement
+        assert children.length == 2;
+
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return new OtpErlangTuple(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final InfixOperation infixOperation) {
         PsiElement[] children = infixOperation.getChildren();
 
@@ -670,6 +690,35 @@ public class ElixirPsiImplUtil {
         }
 
         return new OtpErlangList(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirAssociationUpdate associationUpdate) {
+        PsiElement[] children = associationUpdate.getChildren();
+
+        assert children.length == 3;
+
+        Quotable currentMap = (Quotable) children[0];
+        OtpErlangObject quotedCurrentMap = currentMap.quote();
+
+        Operator pipeOperator = (Operator) children[1];
+        OtpErlangObject quotedPipeOperator = pipeOperator.quote();
+
+        Quotable mapUpdate = (Quotable) children[2];
+        OtpErlangObject quotedMapUpdate = mapUpdate.quote();
+        OtpErlangObject quotedMapUpdates = new OtpErlangList(
+                new OtpErlangObject[]{
+                        quotedMapUpdate
+                }
+        );
+
+        return quotedFunctionCall(
+                quotedPipeOperator,
+                metadata(pipeOperator),
+                quotedCurrentMap,
+                quotedMapUpdates
+        );
     }
 
     @Contract(pure = true)
@@ -1675,26 +1724,22 @@ public class ElixirPsiImplUtil {
 
         ASTNode openingCurly = openingCurlies[0];
 
-        PsiElement[] children = mapArguments.getChildren();
-
         OtpErlangObject[] quotedArguments;
 
-        if (children.length > 0) {
-            List<OtpErlangObject> quotedChildList = new ArrayList<OtpErlangObject>();
+        ElixirMapUpdateArguments mapUpdateArguments = mapArguments.getMapUpdateArguments();
 
-            for (PsiElement child : children) {
-                Quotable quotableChild = (Quotable) child;
-                OtpErlangList quotedChild = (OtpErlangList) quotableChild.quote();
-
-                for (OtpErlangObject element : quotedChild.elements()) {
-                    quotedChildList.add(element);
-                }
-            }
-
-            quotedArguments = new OtpErlangObject[quotedChildList.size()];
-            quotedArguments = quotedChildList.toArray(quotedArguments);
+        if (mapUpdateArguments != null) {
+            quotedArguments = new OtpErlangObject[]{
+                    mapUpdateArguments.quote()
+            };
         } else {
-            quotedArguments = new OtpErlangObject[0];
+            ElixirMapConstructionArguments mapConstructionArguments = mapArguments.getMapConstructionArguments();
+
+            if (mapConstructionArguments != null) {
+                quotedArguments = mapConstructionArguments.quoteArguments();
+            } else {
+                quotedArguments = new OtpErlangObject[0];
+            }
         }
 
         return quotedFunctionCall(
@@ -1710,6 +1755,12 @@ public class ElixirPsiImplUtil {
         Quotable mapArguments = mapOperation.getMapArguments();
 
         return mapArguments.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMapUpdateArguments mapUpdateArguments) {
+        return mapUpdateArguments.getAssociationUpdate().quote();
     }
 
     @Contract(pure = true)
@@ -2351,6 +2402,26 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject[] quoteArguments(Call call) {
         return call.getArguments().quoteArguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirMapConstructionArguments mapConstructionArguments) {
+        PsiElement[] children = mapConstructionArguments.getChildren();
+        List<OtpErlangObject> quotedChildList = new ArrayList<OtpErlangObject>();
+
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+            OtpErlangList quotedChild = (OtpErlangList) quotableChild.quote();
+
+            for (OtpErlangObject element : quotedChild.elements()) {
+                quotedChildList.add(element);
+            }
+        }
+
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[quotedChildList.size()];
+
+        return quotedChildList.toArray(quotedArguments);
     }
 
     @Contract(pure = true)

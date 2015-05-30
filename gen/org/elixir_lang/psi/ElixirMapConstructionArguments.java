@@ -5,15 +5,18 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMapArguments extends Quotable {
+public interface ElixirMapConstructionArguments extends QuotableArguments {
 
   @Nullable
-  ElixirMapConstructionArguments getMapConstructionArguments();
+  ElixirAssociations getAssociations();
 
   @Nullable
-  ElixirMapUpdateArguments getMapUpdateArguments();
+  ElixirAssociationsBase getAssociationsBase();
+
+  @Nullable
+  ElixirKeywords getKeywords();
 
   @NotNull
-  OtpErlangObject quote();
+  OtpErlangObject[] quoteArguments();
 
 }

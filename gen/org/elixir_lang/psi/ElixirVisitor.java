@@ -36,6 +36,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAssociationUpdate(@NotNull ElixirAssociationUpdate o) {
+    visitInfixOperation(o);
+  }
+
   public void visitAssociations(@NotNull ElixirAssociations o) {
     visitQuotable(o);
   }
@@ -105,7 +109,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitContainerAssociationOperation(@NotNull ElixirContainerAssociationOperation o) {
-    visitQuotable(o);
+    visitAssociationOperation(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
@@ -398,7 +402,15 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitMapConstructionArguments(@NotNull ElixirMapConstructionArguments o) {
+    visitQuotableArguments(o);
+  }
+
   public void visitMapOperation(@NotNull ElixirMapOperation o) {
+    visitQuotable(o);
+  }
+
+  public void visitMapUpdateArguments(@NotNull ElixirMapUpdateArguments o) {
     visitQuotable(o);
   }
 
@@ -419,6 +431,11 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedArrowOperation(@NotNull ElixirMatchedArrowOperation o) {
     visitMatchedExpression(o);
     // visitInfixOperation(o);
+  }
+
+  public void visitMatchedAssociationOperation(@NotNull ElixirMatchedAssociationOperation o) {
+    visitMatchedExpression(o);
+    // visitAssociationOperation(o);
   }
 
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
@@ -752,6 +769,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAssociationOperation(@NotNull AssociationOperation o) {
+    visitElement(o);
+  }
+
   public void visitAtomable(@NotNull Atomable o) {
     visitElement(o);
   }
@@ -785,6 +806,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitInfixOperation(@NotNull InfixOperation o) {
     visitElement(o);
   }
 
