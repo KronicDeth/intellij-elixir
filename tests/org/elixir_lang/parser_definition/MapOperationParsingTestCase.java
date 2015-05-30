@@ -5,6 +5,10 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testAssociationOperations() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEmpty() {
         assertParsedAndQuotedCorrectly();
     }
