@@ -3113,14 +3113,23 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // associationUpdate
+  // associationUpdate // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530
+  //                        infixComma?
   public static boolean mapUpdateArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapUpdateArguments")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<map update arguments>");
     r = associationUpdate(b, l + 1);
+    r = r && mapUpdateArguments_1(b, l + 1);
     exit_section_(b, l, m, MAP_UPDATE_ARGUMENTS, r, false, null);
     return r;
+  }
+
+  // infixComma?
+  private static boolean mapUpdateArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapUpdateArguments_1")) return false;
+    infixComma(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */

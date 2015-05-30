@@ -33,6 +33,10 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMapUpdateArgumentsWithTrailingComma() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedPipeMatchedAssociationMatched() {
         assertParsedAndQuotedCorrectly();
     }

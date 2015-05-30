@@ -37,7 +37,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAssociationUpdate(@NotNull ElixirAssociationUpdate o) {
-    visitInfixOperation(o);
+    visitQuotable(o);
   }
 
   public void visitAssociations(@NotNull ElixirAssociations o) {
@@ -806,10 +806,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
-    visitElement(o);
-  }
-
-  public void visitInfixOperation(@NotNull InfixOperation o) {
     visitElement(o);
   }
 

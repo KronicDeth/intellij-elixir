@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirAssociationUpdate extends InfixOperation {
+public interface ElixirAssociationUpdate extends Quotable {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
