@@ -114,7 +114,7 @@ noParenthesesExpression ::= emptyParentheses |
                             /* This will be marked as an error by
                                {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
                             noParenthesesManyStrictNoParenthesesExpression |
-                            matchedExpression !KEYWORD_PAIR_COLON
+                            matchedExpression
                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 /* Special class for wrapping noParenthesesCall so that
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
@@ -148,7 +148,7 @@ noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
-noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER
+noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER !KEYWORD_PAIR_COLON
                                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
@@ -191,7 +191,7 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  * 0 Arguments
  */
 
-variable ::= IDENTIFIER
+variable ::= IDENTIFIER !KEYWORD_PAIR_COLON
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1338,12 +1338,8 @@ relativeIdentifier ::= IDENTIFIER |
                        stringLine
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private parenthesesPositionalArgument ::= /* Must exclude matchedExpression when followed by KEYWORD_PAIR_COLON so that
-                                             <matchedExpression>: is parsed as a keywordKeyColonEOL in keywords in
-                                             parenthesesArguments.
-
-                                             @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477 */
-                                          matchedExpression !KEYWORD_PAIR_COLON
+private parenthesesPositionalArgument ::= // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477
+                                          matchedExpression
 // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L481-L482
 private parenthesesPositionalArguments ::= parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
 
@@ -1551,7 +1547,7 @@ private maxExpression ::= matchedQualifiedAliasOperation | // @see https://githu
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L500
  */
-private mapExpression ::= maxExpression !KEYWORD_PAIR_COLON
+private mapExpression ::= maxExpression
 
 private associationsExpression ::= containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
                                    mapExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L506
@@ -1651,9 +1647,9 @@ accessExpression ::= atNumericOperation |
                      numeric |
                      list |
                      map |
-                     stringLine |
+                     stringLine !KEYWORD_PAIR_COLON |
                      stringHeredoc |
-                     charListLine |
+                     charListLine !KEYWORD_PAIR_COLON |
                      charListHeredoc |
                      interpolatedCharListSigilLine |
                      interpolatedCharListSigilHeredoc |
@@ -1684,7 +1680,7 @@ accessExpression ::= atNumericOperation |
 atomKeyword ::= FALSE | NIL | TRUE
                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
-alias ::= ALIAS_TOKEN
+alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1802,7 +1798,7 @@ charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses |
-                                matchedExpression !KEYWORD_PAIR_COLON // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
+                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
