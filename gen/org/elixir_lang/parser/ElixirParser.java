@@ -2962,6 +2962,7 @@ public class ElixirParser implements PsiParser {
   //                  (
   //                   // Must be before associations so identifiers as keyword keys match before maxExpression in associations
   //                   keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
   //                   associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
   //                  )? EOL*
   //                  CLOSING_CURLY
@@ -2994,6 +2995,7 @@ public class ElixirParser implements PsiParser {
   // (
   //                   // Must be before associations so identifiers as keyword keys match before maxExpression in associations
   //                   keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
   //                   associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
   //                  )?
   private static boolean mapArguments_2(PsiBuilder b, int l) {
@@ -3003,13 +3005,27 @@ public class ElixirParser implements PsiParser {
   }
 
   // keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                   associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
   //                   associations
   private static boolean mapArguments_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapArguments_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = keywords(b, l + 1);
+    if (!r) r = mapArguments_2_0_1(b, l + 1);
     if (!r) r = associations(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // associationsBase infixComma keywords
+  private static boolean mapArguments_2_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapArguments_2_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = associationsBase(b, l + 1);
+    r = r && infixComma(b, l + 1);
+    r = r && keywords(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -3027,9 +3043,25 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // maxExpression
+  // maxExpression !KEYWORD_PAIR_COLON
   static boolean mapExpression(PsiBuilder b, int l) {
-    return maxExpression(b, l + 1);
+    if (!recursion_guard_(b, l, "mapExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxExpression(b, l + 1);
+    r = r && mapExpression_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !KEYWORD_PAIR_COLON
+  private static boolean mapExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !consumeToken(b, KEYWORD_PAIR_COLON);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */

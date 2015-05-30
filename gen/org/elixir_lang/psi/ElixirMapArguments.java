@@ -11,6 +11,9 @@ public interface ElixirMapArguments extends Quotable {
   ElixirAssociations getAssociations();
 
   @Nullable
+  ElixirAssociationsBase getAssociationsBase();
+
+  @Nullable
   ElixirKeywords getKeywords();
 
   @NotNull

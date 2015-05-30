@@ -1680,11 +1680,19 @@ public class ElixirPsiImplUtil {
         OtpErlangObject[] quotedArguments;
 
         if (children.length > 0) {
-            assert children.length == 1;
+            List<OtpErlangObject> quotedChildList = new ArrayList<OtpErlangObject>();
 
-            Quotable child = (Quotable) children[0];
-            OtpErlangList quotedKeywords = (OtpErlangList) child.quote();
-            quotedArguments = quotedKeywords.elements();
+            for (PsiElement child : children) {
+                Quotable quotableChild = (Quotable) child;
+                OtpErlangList quotedChild = (OtpErlangList) quotableChild.quote();
+
+                for (OtpErlangObject element : quotedChild.elements()) {
+                    quotedChildList.add(element);
+                }
+            }
+
+            quotedArguments = new OtpErlangObject[quotedChildList.size()];
+            quotedArguments = quotedChildList.toArray(quotedArguments);
         } else {
             quotedArguments = new OtpErlangObject[0];
         }

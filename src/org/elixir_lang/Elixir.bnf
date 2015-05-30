@@ -1551,7 +1551,7 @@ private maxExpression ::= matchedQualifiedAliasOperation | // @see https://githu
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L500
  */
-private mapExpression ::= maxExpression
+private mapExpression ::= maxExpression !KEYWORD_PAIR_COLON
 
 private associationsExpression ::= containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
                                    mapExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L506
@@ -1564,6 +1564,7 @@ mapArguments ::= OPENING_CURLY EOL*
                  (
                   // Must be before associations so identifiers as keyword keys match before maxExpression in associations
                   keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                  associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
                   associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
                  )? EOL*
                  CLOSING_CURLY

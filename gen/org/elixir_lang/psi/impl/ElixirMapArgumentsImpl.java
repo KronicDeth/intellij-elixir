@@ -5,10 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirAssociations;
-import org.elixir_lang.psi.ElixirKeywords;
-import org.elixir_lang.psi.ElixirMapArguments;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +24,12 @@ public class ElixirMapArgumentsImpl extends ASTWrapperPsiElement implements Elix
   @Nullable
   public ElixirAssociations getAssociations() {
     return findChildByClass(ElixirAssociations.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAssociationsBase getAssociationsBase() {
+    return findChildByClass(ElixirAssociationsBase.class);
   }
 
   @Override
