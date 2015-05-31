@@ -1733,7 +1733,7 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final ElixirMapUpdateArguments mapUpdateArguments) {
         PsiElement[] children = mapUpdateArguments.getChildren();
 
-        assert children.length == 3;
+        assert children.length >= 3;
 
         Quotable currentMap = (Quotable) children[0];
         OtpErlangObject quotedCurrentMap = currentMap.quote();
@@ -1741,13 +1741,26 @@ public class ElixirPsiImplUtil {
         Operator pipeOperator = (Operator) children[1];
         OtpErlangObject quotedPipeOperator = pipeOperator.quote();
 
-        Quotable mapUpdate = (Quotable) children[2];
-        OtpErlangObject quotedMapUpdate = mapUpdate.quote();
-        OtpErlangObject quotedMapUpdates = new OtpErlangList(
-                new OtpErlangObject[]{
-                        quotedMapUpdate
+        List<OtpErlangObject> quotedRightOperandList = new ArrayList<OtpErlangObject>();
+
+        for (int i = 2; i < children.length; i++) {
+            Quotable child = (Quotable) children[i];
+            OtpErlangObject quotedChild = child.quote();
+
+            if (quotedChild instanceof OtpErlangList) {
+                OtpErlangList quotedList = (OtpErlangList) quotedChild;
+
+                for (OtpErlangObject quotedElement : quotedList.elements()) {
+                    quotedRightOperandList.add(quotedElement);
                 }
-        );
+            } else {
+                quotedRightOperandList.add(quotedChild);
+            }
+        }
+
+        OtpErlangObject[] quotedRightOperands = new OtpErlangObject[quotedRightOperandList.size()];
+        quotedRightOperands = quotedRightOperandList.toArray(quotedRightOperands);
+        OtpErlangObject quotedMapUpdates = new OtpErlangList(quotedRightOperands);
 
         return quotedFunctionCall(
                 quotedPipeOperator,

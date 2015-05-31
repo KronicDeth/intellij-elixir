@@ -3026,29 +3026,13 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
-  //                              associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
-  //                              associations
+  // mapTailArguments
   public static boolean mapConstructionArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapConstructionArguments")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<map construction arguments>");
-    r = keywords(b, l + 1);
-    if (!r) r = mapConstructionArguments_1(b, l + 1);
-    if (!r) r = associations(b, l + 1);
+    r = mapTailArguments(b, l + 1);
     exit_section_(b, l, m, MAP_CONSTRUCTION_ARGUMENTS, r, false, null);
-    return r;
-  }
-
-  // associationsBase infixComma keywords
-  private static boolean mapConstructionArguments_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapConstructionArguments_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = associationsBase(b, l + 1);
-    r = r && infixComma(b, l + 1);
-    r = r && keywords(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -3097,39 +3081,43 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedMatchOperation pipeInfixOperator
-  //                       (matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
-  //                        mapExpression) // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L510
-  //                       infixComma?
+  // keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+  //                              associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
+  //                              associations
+  static boolean mapTailArguments(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapTailArguments")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = keywords(b, l + 1);
+    if (!r) r = mapTailArguments_1(b, l + 1);
+    if (!r) r = associations(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // associationsBase infixComma keywords
+  private static boolean mapTailArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapTailArguments_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = associationsBase(b, l + 1);
+    r = r && infixComma(b, l + 1);
+    r = r && keywords(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // matchedMatchOperation pipeInfixOperator mapTailArguments
   public static boolean mapUpdateArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapUpdateArguments")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<map update arguments>");
     r = matchedExpression(b, l + 1, 5);
     r = r && pipeInfixOperator(b, l + 1);
-    r = r && mapUpdateArguments_2(b, l + 1);
-    r = r && mapUpdateArguments_3(b, l + 1);
+    r = r && mapTailArguments(b, l + 1);
     exit_section_(b, l, m, MAP_UPDATE_ARGUMENTS, r, false, null);
     return r;
-  }
-
-  // matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
-  //                        mapExpression
-  private static boolean mapUpdateArguments_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapUpdateArguments_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = matchedAssociationOperation(b, l + 1);
-    if (!r) r = mapExpression(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // infixComma?
-  private static boolean mapUpdateArguments_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapUpdateArguments_3")) return false;
-    infixComma(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */

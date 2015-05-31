@@ -5,18 +5,19 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 public interface ElixirMapUpdateArguments extends Quotable {
 
   @Nullable
-  ElixirAlias getAlias();
+  ElixirAssociations getAssociations();
 
   @Nullable
-  ElixirAtom getAtom();
+  ElixirAssociationsBase getAssociationsBase();
+
+  @Nullable
+  ElixirKeywords getKeywords();
 
   @NotNull
-  List<ElixirMatchedExpression> getMatchedExpressionList();
+  ElixirMatchedMatchOperation getMatchedMatchOperation();
 
   @NotNull
   ElixirPipeInfixOperator getPipeInfixOperator();
