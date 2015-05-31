@@ -5,10 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirAssociationUpdate;
-import org.elixir_lang.psi.ElixirMapUpdateArguments;
-import org.elixir_lang.psi.ElixirVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implements ElixirMapUpdateArguments {
 
@@ -22,9 +24,27 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
   }
 
   @Override
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
+  }
+
+  @Override
   @NotNull
-  public ElixirAssociationUpdate getAssociationUpdate() {
-    return findNotNullChildByClass(ElixirAssociationUpdate.class);
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirPipeInfixOperator getPipeInfixOperator() {
+    return findNotNullChildByClass(ElixirPipeInfixOperator.class);
   }
 
   @NotNull

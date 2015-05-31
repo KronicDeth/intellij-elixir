@@ -17,7 +17,6 @@ public interface ElixirTypes {
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
   IElementType ASSOCIATIONS = new ElixirElementType("ASSOCIATIONS");
   IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
-  IElementType ASSOCIATION_UPDATE = new ElixirElementType("ASSOCIATION_UPDATE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
@@ -333,9 +332,6 @@ public interface ElixirTypes {
       }
       else if (type == ASSOCIATIONS_BASE) {
         return new ElixirAssociationsBaseImpl(node);
-      }
-      else if (type == ASSOCIATION_UPDATE) {
-        return new ElixirAssociationUpdateImpl(node);
       }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);

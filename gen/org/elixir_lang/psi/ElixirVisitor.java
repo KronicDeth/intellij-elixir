@@ -36,10 +36,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitAssociationUpdate(@NotNull ElixirAssociationUpdate o) {
-    visitQuotable(o);
-  }
-
   public void visitAssociations(@NotNull ElixirAssociations o) {
     visitQuotable(o);
   }

@@ -1564,14 +1564,11 @@ associations ::= associationsBase infixComma?
 matchedAssociationOperation ::= matchedExpression associationInfixOperator matchedMatchOperation
                                 { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
-associationUpdate ::= matchedMatchOperation pipeInfixOperator
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530-L533
+mapUpdateArguments ::= matchedMatchOperation pipeInfixOperator
                       (matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
                        mapExpression) // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L510
-                      infixComma? // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L531
-                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530-L533
-mapUpdateArguments ::= associationUpdate // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530
+                      infixComma? // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 mapConstructionArguments ::= // Must be before associations so identifiers as keyword keys match before maxExpression in associations

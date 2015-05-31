@@ -694,35 +694,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirAssociationUpdate associationUpdate) {
-        PsiElement[] children = associationUpdate.getChildren();
-
-        assert children.length == 3;
-
-        Quotable currentMap = (Quotable) children[0];
-        OtpErlangObject quotedCurrentMap = currentMap.quote();
-
-        Operator pipeOperator = (Operator) children[1];
-        OtpErlangObject quotedPipeOperator = pipeOperator.quote();
-
-        Quotable mapUpdate = (Quotable) children[2];
-        OtpErlangObject quotedMapUpdate = mapUpdate.quote();
-        OtpErlangObject quotedMapUpdates = new OtpErlangList(
-                new OtpErlangObject[]{
-                        quotedMapUpdate
-                }
-        );
-
-        return quotedFunctionCall(
-                quotedPipeOperator,
-                metadata(pipeOperator),
-                quotedCurrentMap,
-                quotedMapUpdates
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAtom atom) {
         OtpErlangObject quoted;
         ElixirCharListLine charListLine = atom.getCharListLine();
@@ -1760,7 +1731,30 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirMapUpdateArguments mapUpdateArguments) {
-        return mapUpdateArguments.getAssociationUpdate().quote();
+        PsiElement[] children = mapUpdateArguments.getChildren();
+
+        assert children.length == 3;
+
+        Quotable currentMap = (Quotable) children[0];
+        OtpErlangObject quotedCurrentMap = currentMap.quote();
+
+        Operator pipeOperator = (Operator) children[1];
+        OtpErlangObject quotedPipeOperator = pipeOperator.quote();
+
+        Quotable mapUpdate = (Quotable) children[2];
+        OtpErlangObject quotedMapUpdate = mapUpdate.quote();
+        OtpErlangObject quotedMapUpdates = new OtpErlangList(
+                new OtpErlangObject[]{
+                        quotedMapUpdate
+                }
+        );
+
+        return quotedFunctionCall(
+                quotedPipeOperator,
+                metadata(pipeOperator),
+                quotedCurrentMap,
+                quotedMapUpdates
+        );
     }
 
     @Contract(pure = true)

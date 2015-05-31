@@ -44,9 +44,6 @@ public class ElixirParser implements PsiParser {
     else if (t == ARROW_INFIX_OPERATOR) {
       r = arrowInfixOperator(b, 0);
     }
-    else if (t == ASSOCIATION_UPDATE) {
-      r = associationUpdate(b, 0);
-    }
     else if (t == ASSOCIATIONS) {
       r = associations(b, 0);
     }
@@ -786,33 +783,6 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     return true;
-  }
-
-  /* ********************************************************** */
-  // matchedMatchOperation pipeInfixOperator
-  //                       (matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
-  //                        mapExpression)
-  public static boolean associationUpdate(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "associationUpdate")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<association update>");
-    r = matchedExpression(b, l + 1, 5);
-    r = r && pipeInfixOperator(b, l + 1);
-    r = r && associationUpdate_2(b, l + 1);
-    exit_section_(b, l, m, ASSOCIATION_UPDATE, r, false, null);
-    return r;
-  }
-
-  // matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
-  //                        mapExpression
-  private static boolean associationUpdate_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "associationUpdate_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = matchedAssociationOperation(b, l + 1);
-    if (!r) r = mapExpression(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -3127,21 +3097,37 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // associationUpdate // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530
-  //                        infixComma?
+  // matchedMatchOperation pipeInfixOperator
+  //                       (matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
+  //                        mapExpression) // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L510
+  //                       infixComma?
   public static boolean mapUpdateArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapUpdateArguments")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<map update arguments>");
-    r = associationUpdate(b, l + 1);
-    r = r && mapUpdateArguments_1(b, l + 1);
+    r = matchedExpression(b, l + 1, 5);
+    r = r && pipeInfixOperator(b, l + 1);
+    r = r && mapUpdateArguments_2(b, l + 1);
+    r = r && mapUpdateArguments_3(b, l + 1);
     exit_section_(b, l, m, MAP_UPDATE_ARGUMENTS, r, false, null);
     return r;
   }
 
+  // matchedAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L508
+  //                        mapExpression
+  private static boolean mapUpdateArguments_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapUpdateArguments_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedAssociationOperation(b, l + 1);
+    if (!r) r = mapExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
   // infixComma?
-  private static boolean mapUpdateArguments_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapUpdateArguments_1")) return false;
+  private static boolean mapUpdateArguments_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapUpdateArguments_3")) return false;
     infixComma(b, l + 1);
     return true;
   }
