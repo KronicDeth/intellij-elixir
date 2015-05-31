@@ -2,15 +2,13 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirMapOperation extends Quotable {
+public interface ElixirMapPrefixOperator extends Operator {
 
   @NotNull
-  ElixirMapArguments getMapArguments();
-
-  @NotNull
-  ElixirMapPrefixOperator getMapPrefixOperator();
+  TokenSet operatorTokenSet();
 
   @NotNull
   OtpErlangObject quote();

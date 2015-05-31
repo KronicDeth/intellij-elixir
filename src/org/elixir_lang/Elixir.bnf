@@ -1528,7 +1528,15 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L521-L522
  */
-private mapPrefixOperator ::= STRUCT_OPERATOR EOL*
+mapPrefixOperator ::= STRUCT_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "%"
+                      }
 
 private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
 
@@ -1586,7 +1594,11 @@ mapArguments ::= OPENING_CURLY EOL*
 mapOperation ::= mapPrefixOperator mapArguments
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private map ::= mapOperation
+structOperation ::= mapPrefixOperator mapExpression EOL* mapArguments
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+private map ::= mapOperation |
+                structOperation
 
 /*
  * Stab Operation

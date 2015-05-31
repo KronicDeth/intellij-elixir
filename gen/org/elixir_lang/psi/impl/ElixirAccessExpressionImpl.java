@@ -255,6 +255,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirStructOperation getStructOperation() {
+    return findChildByClass(ElixirStructOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
   }

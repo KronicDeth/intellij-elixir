@@ -5,33 +5,25 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirMapArguments;
-import org.elixir_lang.psi.ElixirMapOperation;
+import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.psi.ElixirMapPrefixOperator;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirMapOperationImpl extends ASTWrapperPsiElement implements ElixirMapOperation {
+public class ElixirMapPrefixOperatorImpl extends ASTWrapperPsiElement implements ElixirMapPrefixOperator {
 
-  public ElixirMapOperationImpl(ASTNode node) {
+  public ElixirMapPrefixOperatorImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMapOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMapPrefixOperator(this);
     else super.accept(visitor);
   }
 
-  @Override
   @NotNull
-  public ElixirMapArguments getMapArguments() {
-    return findNotNullChildByClass(ElixirMapArguments.class);
-  }
-
-  @Override
-  @NotNull
-  public ElixirMapPrefixOperator getMapPrefixOperator() {
-    return findNotNullChildByClass(ElixirMapPrefixOperator.class);
+  public TokenSet operatorTokenSet() {
+    return ElixirPsiImplUtil.operatorTokenSet(this);
   }
 
   @NotNull

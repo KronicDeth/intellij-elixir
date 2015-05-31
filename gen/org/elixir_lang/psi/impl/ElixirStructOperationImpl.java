@@ -5,21 +5,31 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirMapArguments;
-import org.elixir_lang.psi.ElixirMapOperation;
-import org.elixir_lang.psi.ElixirMapPrefixOperator;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirMapOperationImpl extends ASTWrapperPsiElement implements ElixirMapOperation {
+public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements ElixirStructOperation {
 
-  public ElixirMapOperationImpl(ASTNode node) {
+  public ElixirStructOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMapOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStructOperation(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAlias getAlias() {
+    return findChildByClass(ElixirAlias.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirAtom getAtom() {
+    return findChildByClass(ElixirAtom.class);
   }
 
   @Override
@@ -32,6 +42,12 @@ public class ElixirMapOperationImpl extends ASTWrapperPsiElement implements Elix
   @NotNull
   public ElixirMapPrefixOperator getMapPrefixOperator() {
     return findNotNullChildByClass(ElixirMapPrefixOperator.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findChildByClass(ElixirMatchedExpression.class);
   }
 
   @NotNull

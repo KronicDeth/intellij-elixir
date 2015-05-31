@@ -503,6 +503,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMapPrefixOperator mapPrefixOperator) {
+        return TokenSet.create(ElixirTypes.STRUCT_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMatchInfixOperator matchInfixOperator) {
         return TokenSet.create(ElixirTypes.MATCH_OPERATOR);
     }
@@ -1544,6 +1550,30 @@ public class ElixirPsiImplUtil {
     public static OtpErlangObject quote(@NotNull final ElixirStringLine stringLine) {
         ElixirQuoteStringBody quoteStringBody = stringLine.getQuoteStringBody();
         return quotedChildNodes(stringLine, childNodes(quoteStringBody));
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirStructOperation structOperation) {
+        PsiElement[] children = structOperation.getChildren();
+
+        assert children.length == 3;
+
+        Operator operator = (Operator) children[0];
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable name = (Quotable) children[1];
+        OtpErlangObject quotedName = name.quote();
+
+        Quotable mapArguments = (Quotable) children[2];
+        OtpErlangObject quotedMapArguments = mapArguments.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedName,
+                quotedMapArguments
+        );
     }
 
     @Contract(pure = true)

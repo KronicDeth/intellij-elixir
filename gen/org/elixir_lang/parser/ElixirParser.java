@@ -302,6 +302,9 @@ public class ElixirParser implements PsiParser {
     else if (t == MAP_OPERATION) {
       r = mapOperation(b, 0);
     }
+    else if (t == MAP_PREFIX_OPERATOR) {
+      r = mapPrefixOperator(b, 0);
+    }
     else if (t == MAP_UPDATE_ARGUMENTS) {
       r = mapUpdateArguments(b, 0);
     }
@@ -514,6 +517,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == STRING_LINE) {
       r = stringLine(b, 0);
+    }
+    else if (t == STRUCT_OPERATION) {
+      r = structOperation(b, 0);
     }
     else if (t == TWO_INFIX_OPERATOR) {
       r = twoInfixOperator(b, 0);
@@ -2948,9 +2954,17 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // mapOperation
+  // mapOperation |
+  //                 structOperation
   static boolean map(PsiBuilder b, int l) {
-    return mapOperation(b, l + 1);
+    if (!recursion_guard_(b, l, "map")) return false;
+    if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = mapOperation(b, l + 1);
+    if (!r) r = structOperation(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3054,14 +3068,14 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // STRUCT_OPERATOR EOL*
-  static boolean mapPrefixOperator(PsiBuilder b, int l) {
+  public static boolean mapPrefixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapPrefixOperator")) return false;
     if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, STRUCT_OPERATOR);
     r = r && mapPrefixOperator_1(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, m, MAP_PREFIX_OPERATOR, r);
     return r;
   }
 
@@ -4546,6 +4560,33 @@ public class ElixirParser implements PsiParser {
     r = r && consumeToken(b, STRING_TERMINATOR);
     exit_section_(b, m, STRING_LINE, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // mapPrefixOperator mapExpression EOL* mapArguments
+  public static boolean structOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structOperation")) return false;
+    if (!nextTokenIs(b, STRUCT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = mapPrefixOperator(b, l + 1);
+    r = r && mapExpression(b, l + 1);
+    r = r && structOperation_2(b, l + 1);
+    r = r && mapArguments(b, l + 1);
+    exit_section_(b, m, STRUCT_OPERATION, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean structOperation_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "structOperation_2")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "structOperation_2", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */

@@ -101,6 +101,7 @@ public interface ElixirTypes {
   IElementType MAP_ARGUMENTS = new ElixirElementType("MAP_ARGUMENTS");
   IElementType MAP_CONSTRUCTION_ARGUMENTS = new ElixirElementType("MAP_CONSTRUCTION_ARGUMENTS");
   IElementType MAP_OPERATION = new ElixirElementType("MAP_OPERATION");
+  IElementType MAP_PREFIX_OPERATOR = new ElixirElementType("MAP_PREFIX_OPERATOR");
   IElementType MAP_UPDATE_ARGUMENTS = new ElixirElementType("MAP_UPDATE_ARGUMENTS");
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
@@ -172,6 +173,7 @@ public interface ElixirTypes {
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
+  IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
@@ -584,6 +586,9 @@ public interface ElixirTypes {
       else if (type == MAP_OPERATION) {
         return new ElixirMapOperationImpl(node);
       }
+      else if (type == MAP_PREFIX_OPERATOR) {
+        return new ElixirMapPrefixOperatorImpl(node);
+      }
       else if (type == MAP_UPDATE_ARGUMENTS) {
         return new ElixirMapUpdateArgumentsImpl(node);
       }
@@ -796,6 +801,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);
+      }
+      else if (type == STRUCT_OPERATION) {
+        return new ElixirStructOperationImpl(node);
       }
       else if (type == TWO_INFIX_OPERATOR) {
         return new ElixirTwoInfixOperatorImpl(node);

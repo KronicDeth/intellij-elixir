@@ -406,6 +406,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitMapPrefixOperator(@NotNull ElixirMapPrefixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitMapUpdateArguments(@NotNull ElixirMapUpdateArguments o) {
     visitQuotable(o);
   }
@@ -721,6 +725,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitAtomable(o);
     // visitInterpolatedString(o);
     // visitQuotable(o);
+  }
+
+  public void visitStructOperation(@NotNull ElixirStructOperation o) {
+    visitQuotable(o);
   }
 
   public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
