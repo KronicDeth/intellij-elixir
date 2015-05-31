@@ -1556,14 +1556,6 @@ associationsBase ::= associationsExpression (infixComma associationsExpression)*
 associations ::= associationsBase infixComma?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-/* matchedMatchOperation is used because it is the next precedence level after matchedPipeOperation.  Due to Pratt parsing
-   table, matchedMatchOperation will capture matchedMatchOperation or anything after it in matchedExpression, which is
-   exactly what we want so that the pipe operation consume to left operand and the entire association operration to the
-   right. */
-
-matchedAssociationOperation ::= matchedExpression associationInfixOperator matchedMatchOperation
-                                { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
-
 /*
  * Arguments at tail of mapUpdateArguments and mapConstructionArguments
  *

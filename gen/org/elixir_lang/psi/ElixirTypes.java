@@ -105,7 +105,6 @@ public interface ElixirTypes {
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
-  IElementType MATCHED_ASSOCIATION_OPERATION = new ElixirElementType("MATCHED_ASSOCIATION_OPERATION");
   IElementType MATCHED_AT_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_AT_NON_NUMERIC_OPERATION");
   IElementType MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION");
   IElementType MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL");
@@ -596,9 +595,6 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_ARROW_OPERATION) {
         return new ElixirMatchedArrowOperationImpl(node);
-      }
-      else if (type == MATCHED_ASSOCIATION_OPERATION) {
-        return new ElixirMatchedAssociationOperationImpl(node);
       }
       else if (type == MATCHED_AT_NON_NUMERIC_OPERATION) {
         return new ElixirMatchedAtNonNumericOperationImpl(node);

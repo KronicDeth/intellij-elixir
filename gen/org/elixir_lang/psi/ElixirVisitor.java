@@ -429,11 +429,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
-  public void visitMatchedAssociationOperation(@NotNull ElixirMatchedAssociationOperation o) {
-    visitMatchedExpression(o);
-    // visitAssociationOperation(o);
-  }
-
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
     visitMatchedExpression(o);
     // visitPrefixOperation(o);
