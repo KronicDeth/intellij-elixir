@@ -42,6 +42,7 @@
     IN_OPERATOR = "in"
     INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
+    MAP_OPERATOR = "%{}"
     NIL = "nil"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
@@ -113,7 +114,7 @@ noParenthesesExpression ::= emptyParentheses |
                             /* This will be marked as an error by
                                {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
                             noParenthesesManyStrictNoParenthesesExpression |
-                            matchedExpression !KEYWORD_PAIR_COLON
+                            matchedExpression
                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 /* Special class for wrapping noParenthesesCall so that
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
@@ -147,7 +148,7 @@ noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
-noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER
+noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER !KEYWORD_PAIR_COLON
                                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
@@ -190,7 +191,7 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  * 0 Arguments
  */
 
-variable ::= IDENTIFIER
+variable ::= IDENTIFIER !KEYWORD_PAIR_COLON
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1337,12 +1338,8 @@ relativeIdentifier ::= IDENTIFIER |
                        stringLine
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private parenthesesPositionalArgument ::= /* Must exclude matchedExpression when followed by KEYWORD_PAIR_COLON so that
-                                             <matchedExpression>: is parsed as a keywordKeyColonEOL in keywords in
-                                             parenthesesArguments.
-
-                                             @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477 */
-                                          matchedExpression !KEYWORD_PAIR_COLON
+private parenthesesPositionalArgument ::= // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477
+                                          matchedExpression
 // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L481-L482
 private parenthesesPositionalArguments ::= parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
 
@@ -1519,6 +1516,91 @@ unaryNumericOperation ::= unaryPrefixOperator numeric
                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
+ *
+ * Map
+ *
+ */
+
+/*
+ * https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L430-L430
+ * shows that '%{}' is injected by the Elixir native tokenizer when '%{' is encountered.  Since Elixir.flex can't inject
+ * text, this parser is matching MAP_OPERATOR as just '%' as mapArguments contains the '{'.
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L521-L522
+ */
+mapPrefixOperator ::= STRUCT_OPERATOR EOL*
+                      {
+                        implements = "org.elixir_lang.psi.Operator"
+                        methods = [
+                          operatorTokenSet
+                          quote
+                        ]
+                        name = "%"
+                      }
+
+private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
+containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
+                                  { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
+private maxExpression ::= matchedQualifiedAliasOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
+                          alias // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+
+/* Anything that can hold a map.
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L500
+ */
+private mapExpression ::= maxExpression
+
+private associationsExpression ::= containerAssociationOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
+                                   mapExpression // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L506
+associationsBase ::= associationsExpression (infixComma associationsExpression)*
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+associations ::= associationsBase infixComma?
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Arguments at tail of mapUpdateArguments and mapConstructionArguments
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524-L526
+ */
+private mapTailArguments ::= // Must be before associations so identifiers as keyword keys match before maxExpression in associations
+                             keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L524
+                             associationsBase infixComma keywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L526
+                             associations // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L525
+
+// @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L530-L533
+mapUpdateArguments ::= matchedMatchOperation pipeInfixOperator mapTailArguments
+                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+mapConstructionArguments ::= mapTailArguments
+                             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+mapArguments ::= OPENING_CURLY EOL*
+                 (
+                  // Must be before mapConstructionArguments, so that PIPE_OPERATOR is used for updates and not matchedExpression.
+                  mapUpdateArguments |
+                  mapConstructionArguments
+                 )? EOL*
+                 CLOSING_CURLY
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+
+mapOperation ::= mapPrefixOperator mapArguments
+                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+structOperation ::= mapPrefixOperator mapExpression EOL* mapArguments
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+private map ::= mapOperation |
+                structOperation
+
+/*
  * Stab Operation
  */
 
@@ -1592,9 +1674,10 @@ accessExpression ::= atNumericOperation |
                      parentheticalStab |
                      numeric |
                      list |
-                     stringLine |
+                     map |
+                     stringLine !KEYWORD_PAIR_COLON |
                      stringHeredoc |
-                     charListLine |
+                     charListLine !KEYWORD_PAIR_COLON |
                      charListHeredoc |
                      interpolatedCharListSigilLine |
                      interpolatedCharListSigilHeredoc |
@@ -1625,7 +1708,7 @@ accessExpression ::= atNumericOperation |
 atomKeyword ::= FALSE | NIL | TRUE
                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
-alias ::= ALIAS_TOKEN
+alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1743,7 +1826,7 @@ charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses |
-                                matchedExpression !KEYWORD_PAIR_COLON // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
+                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

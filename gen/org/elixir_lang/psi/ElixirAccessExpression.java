@@ -110,6 +110,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
   ElixirLiteralWordsLine getLiteralWordsLine();
 
   @Nullable
+  ElixirMapOperation getMapOperation();
+
+  @Nullable
   ElixirOctalWholeNumber getOctalWholeNumber();
 
   @Nullable
@@ -120,6 +123,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
 
   @Nullable
   ElixirStringLine getStringLine();
+
+  @Nullable
+  ElixirStructOperation getStructOperation();
 
   @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();

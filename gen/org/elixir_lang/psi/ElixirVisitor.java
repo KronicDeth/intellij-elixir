@@ -36,6 +36,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitAssociations(@NotNull ElixirAssociations o) {
+    visitQuotable(o);
+  }
+
+  public void visitAssociationsBase(@NotNull ElixirAssociationsBase o) {
+    visitQuotable(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -94,6 +102,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitComparisonInfixOperator(@NotNull ElixirComparisonInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitContainerAssociationOperation(@NotNull ElixirContainerAssociationOperation o) {
+    visitAssociationOperation(o);
   }
 
   public void visitDecimalDigits(@NotNull ElixirDecimalDigits o) {
@@ -380,6 +392,26 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitLiteralWordsLine(@NotNull ElixirLiteralWordsLine o) {
     visitWordsFragmented(o);
     // visitSigilLine(o);
+  }
+
+  public void visitMapArguments(@NotNull ElixirMapArguments o) {
+    visitQuotable(o);
+  }
+
+  public void visitMapConstructionArguments(@NotNull ElixirMapConstructionArguments o) {
+    visitQuotableArguments(o);
+  }
+
+  public void visitMapOperation(@NotNull ElixirMapOperation o) {
+    visitQuotable(o);
+  }
+
+  public void visitMapPrefixOperator(@NotNull ElixirMapPrefixOperator o) {
+    visitOperator(o);
+  }
+
+  public void visitMapUpdateArguments(@NotNull ElixirMapUpdateArguments o) {
+    visitQuotable(o);
   }
 
   public void visitMatchInfixOperator(@NotNull ElixirMatchInfixOperator o) {
@@ -695,6 +727,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
+  public void visitStructOperation(@NotNull ElixirStructOperation o) {
+    visitQuotable(o);
+  }
+
   public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
     visitOperator(o);
   }
@@ -730,6 +766,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitWhenInfixOperator(@NotNull ElixirWhenInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitAssociationOperation(@NotNull AssociationOperation o) {
+    visitElement(o);
   }
 
   public void visitAtomable(@NotNull Atomable o) {

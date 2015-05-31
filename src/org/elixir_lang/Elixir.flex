@@ -594,6 +594,16 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {HAT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.HAT_OPERATOR; }
   {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
+  /* Must be before {OPENING_CURLY} so entire "{}" is matched instead of just "{"
+
+     For tuple rule, OPENING_CURLY will be lexed.  This is just for when the operator needs to be one token for
+     keywords key */
+  {TUPLE_OPERATOR} / {COLON}{SPACE}          { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.TUPLE_OPERATOR; }
+  {OPENING_CURLY}                            { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
+                                               pushAndBegin(YYINITIAL);
+                                               return ElixirTypes.OPENING_CURLY; }
   {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
   // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -617,7 +627,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.IDENTIFIER; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
-  {MAP_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  /* For map rule, STRUCT_OPERATOR EOL* OPENING_CURLY will be lexed.  This is just for when the operator needs to be one
+     token for keywords key */
+  {MAP_OPERATOR} / {COLON}{SPACE}            { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MAP_OPERATOR; }
   {MATCH_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MATCH_OPERATOR; }
@@ -634,8 +647,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.STRUCT_OPERATOR; }
   {TILDE}                                    { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE; }
-  {TUPLE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.TUPLE_OPERATOR; }
   {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR; }
   {VALID_DECIMAL_DIGITS}                     { pushAndBegin(DECIMAL_WHOLE_NUMBER);
@@ -1037,6 +1048,17 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {INVALID_UNKNOWN_BASE_DIGITS} { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS; }
   {EOL}|.                       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                   handleInState(stackFrame.getLastLexicalState()); }
+}
+
+/* Only rules for <YYINITIAL>, but not <INTERPOLATION> go here. */
+<YYINITIAL> {
+  {CLOSING_CURLY} { // protect from too many "}"
+                    if (!stack.empty()) {
+                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                      yybegin(stackFrame.getLastLexicalState());
+                    }
+
+                    return ElixirTypes.CLOSING_CURLY; }
 }
 
 // MUST go last so that . mapping to BAD_CHARACTER is the rule of last resort for the listed states

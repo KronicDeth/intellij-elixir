@@ -15,6 +15,8 @@ public interface ElixirTypes {
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
   IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
+  IElementType ASSOCIATIONS = new ElixirElementType("ASSOCIATIONS");
+  IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
@@ -29,6 +31,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_LINE = new ElixirElementType("CHAR_LIST_LINE");
   IElementType CHAR_TOKEN = new ElixirElementType("CHAR_TOKEN");
   IElementType COMPARISON_INFIX_OPERATOR = new ElixirElementType("COMPARISON_INFIX_OPERATOR");
+  IElementType CONTAINER_ASSOCIATION_OPERATION = new ElixirElementType("CONTAINER_ASSOCIATION_OPERATION");
   IElementType DECIMAL_DIGITS = new ElixirElementType("DECIMAL_DIGITS");
   IElementType DECIMAL_FLOAT = new ElixirElementType("DECIMAL_FLOAT");
   IElementType DECIMAL_FLOAT_EXPONENT = new ElixirElementType("DECIMAL_FLOAT_EXPONENT");
@@ -95,6 +98,11 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_HEREDOC = new ElixirElementType("LITERAL_WORDS_HEREDOC");
   IElementType LITERAL_WORDS_HEREDOC_LINE = new ElixirElementType("LITERAL_WORDS_HEREDOC_LINE");
   IElementType LITERAL_WORDS_LINE = new ElixirElementType("LITERAL_WORDS_LINE");
+  IElementType MAP_ARGUMENTS = new ElixirElementType("MAP_ARGUMENTS");
+  IElementType MAP_CONSTRUCTION_ARGUMENTS = new ElixirElementType("MAP_CONSTRUCTION_ARGUMENTS");
+  IElementType MAP_OPERATION = new ElixirElementType("MAP_OPERATION");
+  IElementType MAP_PREFIX_OPERATOR = new ElixirElementType("MAP_PREFIX_OPERATOR");
+  IElementType MAP_UPDATE_ARGUMENTS = new ElixirElementType("MAP_UPDATE_ARGUMENTS");
   IElementType MATCHED_ADDITION_OPERATION = new ElixirElementType("MATCHED_ADDITION_OPERATION");
   IElementType MATCHED_AND_OPERATION = new ElixirElementType("MATCHED_AND_OPERATION");
   IElementType MATCHED_ARROW_OPERATION = new ElixirElementType("MATCHED_ARROW_OPERATION");
@@ -165,6 +173,7 @@ public interface ElixirTypes {
   IElementType STRING_HEREDOC = new ElixirElementType("STRING_HEREDOC");
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
+  IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
@@ -239,7 +248,7 @@ public interface ElixirTypes {
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
-  IElementType MAP_OPERATOR = new ElixirTokenType("MAP_OPERATOR");
+  IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
   IElementType MATCHEDPARENTHESESARGUMENTS_1_0 = new ElixirTokenType("matchedParenthesesArguments_1_0");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
@@ -319,6 +328,12 @@ public interface ElixirTypes {
       else if (type == ARROW_INFIX_OPERATOR) {
         return new ElixirArrowInfixOperatorImpl(node);
       }
+      else if (type == ASSOCIATIONS) {
+        return new ElixirAssociationsImpl(node);
+      }
+      else if (type == ASSOCIATIONS_BASE) {
+        return new ElixirAssociationsBaseImpl(node);
+      }
       else if (type == ATOM) {
         return new ElixirAtomImpl(node);
       }
@@ -360,6 +375,9 @@ public interface ElixirTypes {
       }
       else if (type == COMPARISON_INFIX_OPERATOR) {
         return new ElixirComparisonInfixOperatorImpl(node);
+      }
+      else if (type == CONTAINER_ASSOCIATION_OPERATION) {
+        return new ElixirContainerAssociationOperationImpl(node);
       }
       else if (type == DECIMAL_DIGITS) {
         return new ElixirDecimalDigitsImpl(node);
@@ -558,6 +576,21 @@ public interface ElixirTypes {
       }
       else if (type == LITERAL_WORDS_LINE) {
         return new ElixirLiteralWordsLineImpl(node);
+      }
+      else if (type == MAP_ARGUMENTS) {
+        return new ElixirMapArgumentsImpl(node);
+      }
+      else if (type == MAP_CONSTRUCTION_ARGUMENTS) {
+        return new ElixirMapConstructionArgumentsImpl(node);
+      }
+      else if (type == MAP_OPERATION) {
+        return new ElixirMapOperationImpl(node);
+      }
+      else if (type == MAP_PREFIX_OPERATOR) {
+        return new ElixirMapPrefixOperatorImpl(node);
+      }
+      else if (type == MAP_UPDATE_ARGUMENTS) {
+        return new ElixirMapUpdateArgumentsImpl(node);
       }
       else if (type == MATCHED_ADDITION_OPERATION) {
         return new ElixirMatchedAdditionOperationImpl(node);
@@ -768,6 +801,9 @@ public interface ElixirTypes {
       }
       else if (type == STRING_LINE) {
         return new ElixirStringLineImpl(node);
+      }
+      else if (type == STRUCT_OPERATION) {
+        return new ElixirStructOperationImpl(node);
       }
       else if (type == TWO_INFIX_OPERATOR) {
         return new ElixirTwoInfixOperatorImpl(node);
