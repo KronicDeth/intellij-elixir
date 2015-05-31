@@ -261,6 +261,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirTuple getTuple() {
+    return findChildByClass(ElixirTuple.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
     return findChildByClass(ElixirUnaryNumericOperation.class);
   }

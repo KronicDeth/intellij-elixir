@@ -1578,6 +1578,22 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirTuple tuple) {
+        ASTNode node = tuple.getNode();
+        ASTNode[] openingCurlies = node.getChildren(TokenSet.create(ElixirTypes.OPENING_CURLY));
+
+        assert openingCurlies.length == 1;
+
+        ASTNode openingCurly = openingCurlies[0];
+
+        return quotedFunctionCall(
+                "{}",
+                metadata(openingCurly)
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Heredoc heredoc) {
         ElixirHeredocPrefix heredocPrefix = heredoc.getHeredocPrefix();
         int prefixLength = heredocPrefix.getTextLength();

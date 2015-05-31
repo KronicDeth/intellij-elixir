@@ -731,6 +731,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitTuple(@NotNull ElixirTuple o) {
+    visitQuotable(o);
+  }
+
   public void visitTwoInfixOperator(@NotNull ElixirTwoInfixOperator o) {
     visitOperator(o);
   }

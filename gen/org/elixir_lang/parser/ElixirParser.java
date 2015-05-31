@@ -521,6 +521,9 @@ public class ElixirParser implements PsiParser {
     else if (t == STRUCT_OPERATION) {
       r = structOperation(b, 0);
     }
+    else if (t == TUPLE) {
+      r = tuple(b, 0);
+    }
     else if (t == TWO_INFIX_OPERATOR) {
       r = twoInfixOperator(b, 0);
     }
@@ -4590,6 +4593,33 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // OPENING_CURLY EOL*
+  //           CLOSING_CURLY
+  public static boolean tuple(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple")) return false;
+    if (!nextTokenIs(b, OPENING_CURLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_CURLY);
+    r = r && tuple_1(b, l + 1);
+    r = r && consumeToken(b, CLOSING_CURLY);
+    exit_section_(b, m, TUPLE, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean tuple_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "tuple_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // EOL* TWO_OPERATOR EOL*
   public static boolean twoInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "twoInfixOperator")) return false;
@@ -5261,6 +5291,7 @@ public class ElixirParser implements PsiParser {
   //                      numeric |
   //                      list |
   //                      map |
+  //                      tuple |
   //                      stringLine !KEYWORD_PAIR_COLON |
   //                      stringHeredoc |
   //                      charListLine !KEYWORD_PAIR_COLON |
@@ -5300,9 +5331,10 @@ public class ElixirParser implements PsiParser {
     if (!r) r = numeric(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = map(b, l + 1);
-    if (!r) r = accessExpression_8(b, l + 1);
+    if (!r) r = tuple(b, l + 1);
+    if (!r) r = accessExpression_9(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
-    if (!r) r = accessExpression_10(b, l + 1);
+    if (!r) r = accessExpression_11(b, l + 1);
     if (!r) r = charListHeredoc(b, l + 1);
     if (!r) r = interpolatedCharListSigilLine(b, l + 1);
     if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
@@ -5332,19 +5364,19 @@ public class ElixirParser implements PsiParser {
   }
 
   // stringLine !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_8")) return false;
+  private static boolean accessExpression_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_9")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = stringLine(b, l + 1);
-    r = r && accessExpression_8_1(b, l + 1);
+    r = r && accessExpression_9_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_8_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_8_1")) return false;
+  private static boolean accessExpression_9_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_9_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);
@@ -5353,19 +5385,19 @@ public class ElixirParser implements PsiParser {
   }
 
   // charListLine !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_10(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_10")) return false;
+  private static boolean accessExpression_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_11")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = charListLine(b, l + 1);
-    r = r && accessExpression_10_1(b, l + 1);
+    r = r && accessExpression_11_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_10_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_10_1")) return false;
+  private static boolean accessExpression_11_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_11_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);

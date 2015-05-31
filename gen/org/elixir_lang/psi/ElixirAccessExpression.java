@@ -128,6 +128,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
   ElixirStructOperation getStructOperation();
 
   @Nullable
+  ElixirTuple getTuple();
+
+  @Nullable
   ElixirUnaryNumericOperation getUnaryNumericOperation();
 
   @Nullable

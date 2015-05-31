@@ -1667,6 +1667,14 @@ parentheticalStab ::= OPENING_PARENTHESIS EOL*
                       EOL* CLOSING_PARENTHESIS
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+/*
+ * Tuple
+ */
+
+tuple ::= OPENING_CURLY EOL*
+          CLOSING_CURLY
+          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
@@ -1675,6 +1683,7 @@ accessExpression ::= atNumericOperation |
                      numeric |
                      list |
                      map |
+                     tuple |
                      stringLine !KEYWORD_PAIR_COLON |
                      stringHeredoc |
                      charListLine !KEYWORD_PAIR_COLON |
