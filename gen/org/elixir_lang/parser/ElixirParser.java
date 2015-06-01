@@ -859,6 +859,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // atPrefixOperator maxExpression
+  public static boolean atMaxExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atMaxExpression")) return false;
+    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && maxExpression(b, l + 1);
+    exit_section_(b, m, MATCHED_AT_NON_NUMERIC_OPERATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // atPrefixOperator numeric
   public static boolean atNumericOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atNumericOperation")) return false;
@@ -3051,9 +3064,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // maxExpression
+  // maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
+  //                           atMaxExpression
   static boolean mapExpression(PsiBuilder b, int l) {
-    return maxExpression(b, l + 1);
+    if (!recursion_guard_(b, l, "mapExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxExpression(b, l + 1);
+    if (!r) r = atMaxExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
