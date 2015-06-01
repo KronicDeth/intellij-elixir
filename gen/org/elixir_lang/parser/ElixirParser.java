@@ -3209,7 +3209,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedQualifiedAliasOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  // matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
@@ -3218,12 +3218,52 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "maxExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpression(b, l + 1, 22);
+    r = maxExpression_0(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1, 24);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedQualifiedBracketOperation maxQualifiedAlias+
+  private static boolean maxExpression_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 23);
+    r = r && maxExpression_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // maxQualifiedAlias+
+  private static boolean maxExpression_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxQualifiedAlias(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!maxQualifiedAlias(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "maxExpression_0_1", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // dotInfixOperator alias
+  public static boolean maxQualifiedAlias(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxQualifiedAlias")) return false;
+    if (!nextTokenIs(b, "<max qualified alias>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max qualified alias>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && alias(b, l + 1);
+    exit_section_(b, l, m, MATCHED_QUALIFIED_ALIAS_OPERATION, r, false, null);
     return r;
   }
 

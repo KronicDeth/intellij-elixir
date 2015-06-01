@@ -1,0 +1,33 @@
+%One.Two{}
+%One.Two.Three{}
+%One.two[key].Three{}
+%One.two().Three{}
+%One.two.Three{}
+%@one[key].Two{}
+%@one.Two{}
+%one().Two{}
+%one[key].Two{}
+%one.Two{}
+%@1.Two{}
+%&1.Two{}
+%^1.Two{}
+%fn -> end.Two{}
+%(->).Two{}
+%?1.Two{}
+%0b10.Two{}
+%0x1.Two{}
+%1.Two{}
+%1.2e-3.Four{}
+%[1].Two{}
+%%{}.Two{}
+%"One".Two{}
+%"""
+ One
+ """.Two{}
+%'One'.Two{}
+%'''
+ One
+ '''.Two{}
+%~x{one}.Two{}
+%false.Two{}
+%:one.Two{}

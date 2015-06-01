@@ -1544,8 +1544,23 @@ private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
 containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
                                   { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
+left maxQualifiedAlias ::= dotInfixOperator alias
+                           {
+                             elementType = matchedQualifiedAliasOperation
+                             implements = "org.elixir_lang.psi.Quotable"
+                             methods = "quote"
+                           }
+
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
-private maxExpression ::= matchedQualifiedAliasOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+private maxExpression ::= /* matchedQualifiedBracketOperation because it is in the Pratt-parsing table for
+                             matchedExpression will match matchedQualifiedBracketOperation or anything after it in
+                             matchedExpression.  matchedQualifiedBracketOperation is used because it is the next rule
+                             after matchedQualifiedAliasOperation. maxQualifiedAlias needs to be `left` and `+` to
+                             emulate the POSTFIX behavior for matchedQualifiedAliasOperation.
+
+                             matchedQualifiedAliasOperation cannot be used because the Pratt-parsing table will allow
+                             matchedQualifiedAliasOperation to match it or any lower rule. */
+                          matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
