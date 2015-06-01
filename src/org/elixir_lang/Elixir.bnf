@@ -1549,6 +1549,9 @@ left maxDotCall ::= dotInfixOperator parenthesesArguments parenthesesArguments?
 left maxQualifiedAlias ::= dotInfixOperator alias
                            { elementType = matchedQualifiedAliasOperation }
 
+left maxQualifiedParenthesesCall ::= dotInfixOperator relativeIdentifier matchedParenthesesArguments
+                                     { elementType = matchedQualifiedParenthesesCall }
+
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
 private maxExpression ::= /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
                              take a `.`. */
@@ -1562,7 +1565,9 @@ private maxExpression ::= /* matchedBracketOperation because it is first rule af
                              matchedQualifiedAliasOperation cannot be used because the Pratt-parsing table will allow
                              matchedQualifiedAliasOperation to match it or any lower rule. */
                           matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-                          matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                          /* matchedQualifiedNoArgumentsCall because it is first rule after
+                            matchedQualifiedParenthesesCall */
+                          matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
                           alias // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231

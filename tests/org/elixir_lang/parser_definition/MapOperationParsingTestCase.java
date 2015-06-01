@@ -69,6 +69,10 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMaxQualifiedParenthesesCallStruct() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testQualifiedNoParenthesesCallAssociation() {
         assertParsedAndQuotedAroundError();
     }
