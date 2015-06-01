@@ -3209,7 +3209,36 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  // dotInfixOperator parenthesesArguments parenthesesArguments?
+  public static boolean maxDotCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxDotCall")) return false;
+    if (!nextTokenIs(b, "<max dot call>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max dot call>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && parenthesesArguments(b, l + 1);
+    r = r && maxDotCall_2(b, l + 1);
+    exit_section_(b, l, m, MATCHED_DOT_CALL_OPERATION, r, false, null);
+    return r;
+  }
+
+  // parenthesesArguments?
+  private static boolean maxDotCall_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxDotCall_2")) return false;
+    parenthesesArguments(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedBracketOperation maxDotCall |
+  //                           /* matchedQualifiedBracketOperation because it is in the Pratt-parsing table for
+  //                              matchedExpression will match matchedQualifiedBracketOperation or anything after it in
+  //                              matchedExpression.  matchedQualifiedBracketOperation is used because it is the next rule
+  //                              after matchedQualifiedAliasOperation. maxQualifiedAlias needs to be `left` and `+` to
+  //                              emulate the POSTFIX behavior for matchedQualifiedAliasOperation.
+  //                              matchedQualifiedAliasOperation cannot be used because the Pratt-parsing table will allow
+  //                              matchedQualifiedAliasOperation to match it or any lower rule. */
+  //                           matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
@@ -3219,6 +3248,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = maxExpression_0(b, l + 1);
+    if (!r) r = maxExpression_1(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1, 24);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = atom(b, l + 1);
@@ -3227,27 +3257,38 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // matchedQualifiedBracketOperation maxQualifiedAlias+
+  // matchedBracketOperation maxDotCall
   private static boolean maxExpression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxExpression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 21);
+    r = r && maxDotCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedQualifiedBracketOperation maxQualifiedAlias+
+  private static boolean maxExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
     r = matchedExpression(b, l + 1, 23);
-    r = r && maxExpression_0_1(b, l + 1);
+    r = r && maxExpression_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // maxQualifiedAlias+
-  private static boolean maxExpression_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "maxExpression_0_1")) return false;
+  private static boolean maxExpression_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_1_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = maxQualifiedAlias(b, l + 1);
     int c = current_position_(b);
     while (r) {
       if (!maxQualifiedAlias(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "maxExpression_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "maxExpression_1_1", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
