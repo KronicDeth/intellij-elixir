@@ -3253,6 +3253,7 @@ public class ElixirParser implements PsiParser {
   //                            accessExpression
   //                           ) maxQualifiedNoArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
   //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           variable | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
   //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
   //                           alias
   static boolean maxExpression(PsiBuilder b, int l) {
@@ -3264,6 +3265,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = maxExpression_2(b, l + 1);
     if (!r) r = maxExpression_3(b, l + 1);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
+    if (!r) r = variable(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);

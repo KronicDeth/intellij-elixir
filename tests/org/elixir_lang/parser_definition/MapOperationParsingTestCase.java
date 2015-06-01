@@ -93,6 +93,10 @@ public class MapOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
+    public void testVariableStruct() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/map_operation_parsing_test_case";
