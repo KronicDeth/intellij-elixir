@@ -5,9 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirTuple;
-import org.elixir_lang.psi.ElixirVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple {
 
@@ -18,6 +21,24 @@ public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitTuple(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirKeywords getKeywords() {
+    return findChildByClass(ElixirKeywords.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @NotNull

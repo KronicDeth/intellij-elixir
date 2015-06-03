@@ -4797,6 +4797,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // OPENING_CURLY EOL*
+  //           containerArguments? EOL*
   //           CLOSING_CURLY
   public static boolean tuple(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tuple")) return false;
@@ -4805,6 +4806,8 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, OPENING_CURLY);
     r = r && tuple_1(b, l + 1);
+    r = r && tuple_2(b, l + 1);
+    r = r && tuple_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_CURLY);
     exit_section_(b, m, TUPLE, r);
     return r;
@@ -4817,6 +4820,25 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!consumeToken(b, EOL)) break;
       if (!empty_element_parsed_guard_(b, "tuple_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // containerArguments?
+  private static boolean tuple_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_2")) return false;
+    containerArguments(b, l + 1);
+    return true;
+  }
+
+  // EOL*
+  private static boolean tuple_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_3")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "tuple_3", c)) break;
       c = current_position_(b);
     }
     return true;

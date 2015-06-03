@@ -1715,6 +1715,7 @@ parentheticalStab ::= OPENING_PARENTHESIS EOL*
  */
 
 tuple ::= OPENING_CURLY EOL*
+          containerArguments? EOL*
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 

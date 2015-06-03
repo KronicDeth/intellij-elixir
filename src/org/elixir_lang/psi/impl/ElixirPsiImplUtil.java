@@ -1586,10 +1586,29 @@ public class ElixirPsiImplUtil {
 
         ASTNode openingCurly = openingCurlies[0];
 
-        return quotedFunctionCall(
-                "{}",
-                metadata(openingCurly)
-        );
+        PsiElement[] children = tuple.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        OtpErlangObject quoted;
+
+        // 2-tuples are literals in quoted form
+        if (quotedChildren.length == 2) {
+            quoted = new OtpErlangTuple(quotedChildren);
+        } else {
+            quoted = quotedFunctionCall(
+                    "{}",
+                    metadata(openingCurly),
+                    quotedChildren
+            );
+        }
+
+        return quoted;
     }
 
     @Contract(pure = true)

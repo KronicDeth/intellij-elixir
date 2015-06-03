@@ -5,6 +5,26 @@ public class TupleParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testOne() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testOneWithTrailingComma() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testTwo() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testTwoWithKeywords() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testThree() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/tuple_parsing_test_case";
