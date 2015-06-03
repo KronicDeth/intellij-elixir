@@ -174,6 +174,7 @@ public interface ElixirTypes {
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
+  IElementType TUPLE = new ElixirElementType("TUPLE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
@@ -804,6 +805,9 @@ public interface ElixirTypes {
       }
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);
+      }
+      else if (type == TUPLE) {
+        return new ElixirTupleImpl(node);
       }
       else if (type == TWO_INFIX_OPERATOR) {
         return new ElixirTwoInfixOperatorImpl(node);

@@ -521,6 +521,9 @@ public class ElixirParser implements PsiParser {
     else if (t == STRUCT_OPERATION) {
       r = structOperation(b, 0);
     }
+    else if (t == TUPLE) {
+      r = tuple(b, 0);
+    }
     else if (t == TWO_INFIX_OPERATOR) {
       r = twoInfixOperator(b, 0);
     }
@@ -852,6 +855,19 @@ public class ElixirParser implements PsiParser {
     r = containerAssociationOperation(b, l + 1);
     if (!r) r = mapExpression(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // atPrefixOperator maxExpression
+  public static boolean atMaxExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atMaxExpression")) return false;
+    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && maxExpression(b, l + 1);
+    exit_section_(b, m, MATCHED_AT_NON_NUMERIC_OPERATION, r);
     return r;
   }
 
@@ -3048,9 +3064,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // maxExpression
+  // maxExpression | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L498-L499
+  //                           atMaxExpression
   static boolean mapExpression(PsiBuilder b, int l) {
-    return maxExpression(b, l + 1);
+    if (!recursion_guard_(b, l, "mapExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxExpression(b, l + 1);
+    if (!r) r = atMaxExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3206,21 +3229,204 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // matchedQualifiedAliasOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-  //                           matchedQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  // dotInfixOperator parenthesesArguments parenthesesArguments?
+  public static boolean maxDotCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxDotCall")) return false;
+    if (!nextTokenIs(b, "<max dot call>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max dot call>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && parenthesesArguments(b, l + 1);
+    r = r && maxDotCall_2(b, l + 1);
+    exit_section_(b, l, m, MATCHED_DOT_CALL_OPERATION, r, false, null);
+    return r;
+  }
+
+  // parenthesesArguments?
+  private static boolean maxDotCall_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxDotCall_2")) return false;
+    parenthesesArguments(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // matchedBracketOperation maxDotCall |
+  //                           /* matchedQualifiedBracketOperation because it is in the Pratt-parsing table for
+  //                              matchedExpression will match matchedQualifiedBracketOperation or anything after it in
+  //                              matchedExpression.  matchedQualifiedBracketOperation is used because it is the next rule
+  //                              after matchedQualifiedAliasOperation. maxQualifiedAlias needs to be `left` and `+` to
+  //                              emulate the POSTFIX behavior for matchedQualifiedAliasOperation.
+  //                              matchedQualifiedAliasOperation cannot be used because the Pratt-parsing table will allow
+  //                              matchedQualifiedAliasOperation to match it or any lower rule. */
+  //                           matchedQualifiedBracketOperation maxQualifiedAlias+ | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           /* matchedQualifiedNoArgumentsCall because it is first rule after
+  //                             matchedQualifiedParenthesesCall */
+  //                           matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
+  //                              because all those rules are ATOM or PREFIX so they won't also match lower rules */
+  //                           (
+  //                            matchedAtUnqualifiedBracketOperation |
+  //                            matchedAtNonNumericOperation |
+  //                            matchedUnqualifiedParenthesesCall |
+  //                            matchedUnqualifiedBracketOperation |
+  //                            variable |
+  //                            accessExpression
+  //                           ) maxQualifiedNoArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
   //                           matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+  //                           variable | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L499
   //                           atom | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L228
   //                           alias
   static boolean maxExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "maxExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpression(b, l + 1, 22);
-    if (!r) r = matchedExpression(b, l + 1, 24);
+    r = maxExpression_0(b, l + 1);
+    if (!r) r = maxExpression_1(b, l + 1);
+    if (!r) r = maxExpression_2(b, l + 1);
+    if (!r) r = maxExpression_3(b, l + 1);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
+    if (!r) r = variable(b, l + 1);
     if (!r) r = atom(b, l + 1);
     if (!r) r = alias(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedBracketOperation maxDotCall
+  private static boolean maxExpression_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 21);
+    r = r && maxDotCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedQualifiedBracketOperation maxQualifiedAlias+
+  private static boolean maxExpression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 23);
+    r = r && maxExpression_1_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // maxQualifiedAlias+
+  private static boolean maxExpression_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_1_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxQualifiedAlias(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!maxQualifiedAlias(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "maxExpression_1_1", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall
+  private static boolean maxExpression_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 25);
+    r = r && maxQualifiedParenthesesCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (
+  //                            matchedAtUnqualifiedBracketOperation |
+  //                            matchedAtNonNumericOperation |
+  //                            matchedUnqualifiedParenthesesCall |
+  //                            matchedUnqualifiedBracketOperation |
+  //                            variable |
+  //                            accessExpression
+  //                           ) maxQualifiedNoArgumentsCall
+  private static boolean maxExpression_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_3")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = maxExpression_3_0(b, l + 1);
+    r = r && maxQualifiedNoArgumentsCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedAtUnqualifiedBracketOperation |
+  //                            matchedAtNonNumericOperation |
+  //                            matchedUnqualifiedParenthesesCall |
+  //                            matchedUnqualifiedBracketOperation |
+  //                            variable |
+  //                            accessExpression
+  private static boolean maxExpression_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxExpression_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedAtUnqualifiedBracketOperation(b, l + 1);
+    if (!r) r = matchedAtNonNumericOperation(b, l + 1);
+    if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
+    if (!r) r = matchedUnqualifiedBracketOperation(b, l + 1);
+    if (!r) r = variable(b, l + 1);
+    if (!r) r = accessExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // dotInfixOperator alias
+  public static boolean maxQualifiedAlias(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxQualifiedAlias")) return false;
+    if (!nextTokenIs(b, "<max qualified alias>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max qualified alias>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && alias(b, l + 1);
+    exit_section_(b, l, m, MATCHED_QUALIFIED_ALIAS_OPERATION, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // dotInfixOperator relativeIdentifier !CALL
+  public static boolean maxQualifiedNoArgumentsCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxQualifiedNoArgumentsCall")) return false;
+    if (!nextTokenIs(b, "<max qualified no arguments call>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max qualified no arguments call>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && relativeIdentifier(b, l + 1);
+    r = r && maxQualifiedNoArgumentsCall_2(b, l + 1);
+    exit_section_(b, l, m, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, r, false, null);
+    return r;
+  }
+
+  // !CALL
+  private static boolean maxQualifiedNoArgumentsCall_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxQualifiedNoArgumentsCall_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !consumeToken(b, CALL);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // dotInfixOperator relativeIdentifier matchedParenthesesArguments
+  public static boolean maxQualifiedParenthesesCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "maxQualifiedParenthesesCall")) return false;
+    if (!nextTokenIs(b, "<max qualified parentheses call>", DOT_OPERATOR, EOL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<max qualified parentheses call>");
+    r = dotInfixOperator(b, l + 1);
+    r = r && relativeIdentifier(b, l + 1);
+    r = r && matchedParenthesesArguments(b, l + 1);
+    exit_section_(b, l, m, MATCHED_QUALIFIED_PARENTHESES_CALL, r, false, null);
     return r;
   }
 
@@ -4590,6 +4796,55 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // OPENING_CURLY EOL*
+  //           containerArguments? EOL*
+  //           CLOSING_CURLY
+  public static boolean tuple(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple")) return false;
+    if (!nextTokenIs(b, OPENING_CURLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OPENING_CURLY);
+    r = r && tuple_1(b, l + 1);
+    r = r && tuple_2(b, l + 1);
+    r = r && tuple_3(b, l + 1);
+    r = r && consumeToken(b, CLOSING_CURLY);
+    exit_section_(b, m, TUPLE, r);
+    return r;
+  }
+
+  // EOL*
+  private static boolean tuple_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "tuple_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // containerArguments?
+  private static boolean tuple_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_2")) return false;
+    containerArguments(b, l + 1);
+    return true;
+  }
+
+  // EOL*
+  private static boolean tuple_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tuple_3")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "tuple_3", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // EOL* TWO_OPERATOR EOL*
   public static boolean twoInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "twoInfixOperator")) return false;
@@ -5261,6 +5516,7 @@ public class ElixirParser implements PsiParser {
   //                      numeric |
   //                      list |
   //                      map |
+  //                      tuple |
   //                      stringLine !KEYWORD_PAIR_COLON |
   //                      stringHeredoc |
   //                      charListLine !KEYWORD_PAIR_COLON |
@@ -5300,9 +5556,10 @@ public class ElixirParser implements PsiParser {
     if (!r) r = numeric(b, l + 1);
     if (!r) r = list(b, l + 1);
     if (!r) r = map(b, l + 1);
-    if (!r) r = accessExpression_8(b, l + 1);
+    if (!r) r = tuple(b, l + 1);
+    if (!r) r = accessExpression_9(b, l + 1);
     if (!r) r = stringHeredoc(b, l + 1);
-    if (!r) r = accessExpression_10(b, l + 1);
+    if (!r) r = accessExpression_11(b, l + 1);
     if (!r) r = charListHeredoc(b, l + 1);
     if (!r) r = interpolatedCharListSigilLine(b, l + 1);
     if (!r) r = interpolatedCharListSigilHeredoc(b, l + 1);
@@ -5332,19 +5589,19 @@ public class ElixirParser implements PsiParser {
   }
 
   // stringLine !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_8")) return false;
+  private static boolean accessExpression_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_9")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = stringLine(b, l + 1);
-    r = r && accessExpression_8_1(b, l + 1);
+    r = r && accessExpression_9_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_8_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_8_1")) return false;
+  private static boolean accessExpression_9_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_9_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);
@@ -5353,19 +5610,19 @@ public class ElixirParser implements PsiParser {
   }
 
   // charListLine !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_10(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_10")) return false;
+  private static boolean accessExpression_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_11")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = charListLine(b, l + 1);
-    r = r && accessExpression_10_1(b, l + 1);
+    r = r && accessExpression_11_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // !KEYWORD_PAIR_COLON
-  private static boolean accessExpression_10_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "accessExpression_10_1")) return false;
+  private static boolean accessExpression_11_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "accessExpression_11_1")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !consumeTokenSmart(b, KEYWORD_PAIR_COLON);
