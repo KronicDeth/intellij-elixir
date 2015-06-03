@@ -27,6 +27,7 @@
             <li>Bracket at expression (<code>@foo[key]</code>)</li>
             <li>Anonymous functions (<code>fn end</code>), stab clauses (<code>-&gt;</code>), and parentheticals (<code>1 + 2</code>)</li>
             <li>Maps (<code>%{}</code>) and structs (<code>%User{}</code>)</li>
+            <li>Tuples (<code>{}</code>)</li>
           </ul>
         </li>
       </ul>
