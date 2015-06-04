@@ -23,6 +23,7 @@ public interface ElixirTypes {
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
+  IElementType BIT_STRING = new ElixirElementType("BIT_STRING");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
@@ -354,6 +355,9 @@ public interface ElixirTypes {
       }
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
+      }
+      else if (type == BIT_STRING) {
+        return new ElixirBitStringImpl(node);
       }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);

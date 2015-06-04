@@ -1721,6 +1721,15 @@ tuple ::= OPENING_CURLY EOL*
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+/*
+ * Bit String
+ */
+
+bitString ::= OPENING_BIT EOL*
+              (containerArguments EOL*)?
+              CLOSING_BIT
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
@@ -1730,6 +1739,7 @@ accessExpression ::= atNumericOperation |
                      list |
                      map |
                      tuple |
+                     bitString |
                      stringLine !KEYWORD_PAIR_COLON |
                      stringHeredoc |
                      charListLine !KEYWORD_PAIR_COLON |
