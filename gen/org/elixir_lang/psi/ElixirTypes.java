@@ -206,6 +206,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
+  IElementType CLOSING_BIT = new ElixirTokenType(">>");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
@@ -257,6 +258,7 @@ public interface ElixirTypes {
   IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");
   IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
+  IElementType OPENING_BIT = new ElixirTokenType("<<");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_CURLY = new ElixirTokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
