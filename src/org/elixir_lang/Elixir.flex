@@ -563,7 +563,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.AT_OPERATOR; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
-  {BIT_STRING_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  /* For bitString rule, OPENING_BIT will be lexed.  This is just for when the operator needs to be one token for
+     keywords key */
+  {BIT_STRING_OPERATOR} / {COLON}{SPACE}     { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.CAPTURE_OPERATOR; }

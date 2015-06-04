@@ -151,7 +151,8 @@ public class BracketCallTest extends Test {
                         {
                                 "<<>>",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.BIT_STRING_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_BIT, INITIAL_STATE),
+                                        new TokenTypeState(ElixirTypes.CLOSING_BIT, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, INITIAL_STATE)
                                 )
                         },

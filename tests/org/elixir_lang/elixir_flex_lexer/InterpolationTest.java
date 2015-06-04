@@ -92,7 +92,7 @@ public class InterpolationTest extends TokenTest {
                         { "<-", ElixirTypes.IN_MATCH_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<<", ElixirTypes.OPENING_BIT, INITIAL_STATE, true },
                         { "<<<", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
-                        { "<<>>", ElixirTypes.BIT_STRING_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                        { "<<>>", ElixirTypes.OPENING_BIT, INITIAL_STATE, false },
                         { "<<~", ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<=", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "<>", ElixirTypes.TWO_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
