@@ -26,6 +26,9 @@ public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotabl
   ElixirBinaryWholeNumber getBinaryWholeNumber();
 
   @Nullable
+  ElixirBitString getBitString();
+
+  @Nullable
   ElixirCaptureNumericOperation getCaptureNumericOperation();
 
   @Nullable

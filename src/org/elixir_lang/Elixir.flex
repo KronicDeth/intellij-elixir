@@ -372,6 +372,13 @@ ALIAS_HEAD = [A-Z]
 ALIAS = {ALIAS_HEAD} {IDENTIFIER_TAIL}
 
 /*
+ * Bit Strings
+ */
+
+CLOSING_BIT = ">>"
+OPENING_BIT = "<<"
+
+/*
  * Parent
  */
 
@@ -556,10 +563,17 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.AT_OPERATOR; }
   {BASE_WHOLE_NUMBER_PREFIX} / {BASE_WHOLE_NUMBER_BASE} { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX; }
-  {BIT_STRING_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+  /* For bitString rule, OPENING_BIT will be lexed.  This is just for when the operator needs to be one token for
+     keywords key */
+  {BIT_STRING_OPERATOR} / {COLON}{SPACE}     { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
+                                               pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR; }
   {CAPTURE_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.CAPTURE_OPERATOR; }
+  /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT} and must be
+     before {COMPARISON_OPERATOR} as {COMPARISON_OPERATOR} includes ">" which would match the begining of {CLOSING_BIT}
+   */
+  {CLOSING_BIT}                              { return ElixirTypes.CLOSING_BIT; }
   {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
   {EOL}                                      { return ElixirTypes.EOL; }
@@ -580,6 +594,11 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.COLON; }
   {COMMA}                                    { return ElixirTypes.COMMA; }
   {COMMENT}                                  { return ElixirTypes.COMMENT; }
+  /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT}; must be after
+     {ARROW_OPERATOR} because {ARROW_OPERATOR} includes "<<<", which is a longer match than {OPENING_BIT}'s "<<"; and
+     must be before {COMPARISON_OPERATOR} as {COMPARISON_OPERATOR} includes "<" which would match the begining of
+     {OPENING_BIT}. */
+  {OPENING_BIT}                              { return ElixirTypes.OPENING_BIT; }
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE

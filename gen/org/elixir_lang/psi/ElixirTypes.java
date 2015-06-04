@@ -23,6 +23,7 @@ public interface ElixirTypes {
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
+  IElementType BIT_STRING = new ElixirElementType("BIT_STRING");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
@@ -206,6 +207,7 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
+  IElementType CLOSING_BIT = new ElixirTokenType(">>");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
   IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
@@ -257,6 +259,7 @@ public interface ElixirTypes {
   IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");
   IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
+  IElementType OPENING_BIT = new ElixirTokenType("<<");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_CURLY = new ElixirTokenType("OPENING_CURLY");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
@@ -352,6 +355,9 @@ public interface ElixirTypes {
       }
       else if (type == BINARY_WHOLE_NUMBER) {
         return new ElixirBinaryWholeNumberImpl(node);
+      }
+      else if (type == BIT_STRING) {
+        return new ElixirBitStringImpl(node);
       }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);

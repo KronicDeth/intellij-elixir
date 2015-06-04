@@ -68,6 +68,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitWholeNumber(o);
   }
 
+  public void visitBitString(@NotNull ElixirBitString o) {
+    visitQuotable(o);
+  }
+
   public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
     visitQuotable(o);
   }

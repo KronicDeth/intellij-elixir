@@ -57,6 +57,12 @@ public class ElixirAccessExpressionImpl extends ElixirMatchedExpressionImpl impl
 
   @Override
   @Nullable
+  public ElixirBitString getBitString() {
+    return findChildByClass(ElixirBitString.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirCaptureNumericOperation getCaptureNumericOperation() {
     return findChildByClass(ElixirCaptureNumericOperation.class);
   }

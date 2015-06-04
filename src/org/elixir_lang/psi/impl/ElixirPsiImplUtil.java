@@ -591,6 +591,32 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBitString bitString) {
+        ASTNode node = bitString.getNode();
+        ASTNode[] openingBits = node.getChildren(TokenSet.create(ElixirTypes.OPENING_BIT));
+
+        assert openingBits.length == 1;
+
+        ASTNode openingBit = openingBits[0];
+
+        PsiElement[] children = bitString.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return quotedFunctionCall(
+                    "<<>>",
+                    metadata(openingBit),
+                    quotedChildren
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBracketArguments bracketArguments) {
         PsiElement[] children = bracketArguments.getChildren();
 

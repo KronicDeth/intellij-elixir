@@ -25,6 +25,7 @@
     CHAR_LIST_HEREDOC_PROMOTER = "'''"
     CHAR_LIST_PROMOTER = "'"
     CHAR_TOKENIZER = "?"
+    CLOSING_BIT = ">>"
     CLOSING_BRACKET = "]"
     // TODO remove once CLOSING_PARENTHESIS is used in emptyParentheses rule
     CLOSING_PARENTHESIS = ")"
@@ -47,6 +48,7 @@
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
     OCTAL_WHOLE_NUMBER_BASE = "o"
+    OPENING_BIT = "<<"
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
@@ -1719,6 +1721,15 @@ tuple ::= OPENING_CURLY EOL*
           CLOSING_CURLY
           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+/*
+ * Bit String
+ */
+
+bitString ::= OPENING_BIT EOL*
+              (containerArguments EOL*)?
+              CLOSING_BIT
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 accessExpression ::= atNumericOperation |
                      captureNumericOperation |
                      unaryNumericOperation |
@@ -1728,6 +1739,7 @@ accessExpression ::= atNumericOperation |
                      list |
                      map |
                      tuple |
+                     bitString |
                      stringLine !KEYWORD_PAIR_COLON |
                      stringHeredoc |
                      charListLine !KEYWORD_PAIR_COLON |
