@@ -115,12 +115,16 @@ Syntax highlighting for the following tokens:
 
 * [Aliases](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L454), in other words, module names.
 * [Atoms](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L238-L303) (`:`, `:''`, or `:""`)
+* Anonymous functions (`fn end`)
+* Access/Bracket expressions (`foo[key]` and `@foo[key]`)
+* Binaries/Bit Strings (`<<>>`)
 * [Character Tokens](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L166-L221) (`?<character>` or `?<escape_sequence>`)
 * [Comments](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`#`)
 * [End of Lines](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L305-L332) (`;`, `\n`, `\r\n`)
 * [Escape Sequences](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_interpolation.erl#L71-L116) (`\\<character>`, `\\x<hexadecimal>`, or `\\x{<hexadecimal>}`)
 * [Heredocs](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L223-L229) (`"""` or `'''`)
 * [Identifiers](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L460-L470), in other words, variable, function and macro names.
+* Maps (`%{}` and `%{ current | <update> }`)
 * Numbers
   * Binary (`0b`) with invalid digit highlighting and missing digit recovery
   * Decimal with invalid digit highlighting
@@ -151,6 +155,7 @@ Syntax highlighting for the following tokens:
   * Type (`::`)
   * Unary (`+`, `-`, `!`, `^`, `not`, and `~~~`)
   * When (`when`)
+* Parentheticals (`(1 + 2)`)
 * [Regular Keywords](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L963-L968) (`end`, `false`, `fn`, `nil`, and `true`)
 * [Sigils](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`~`)
   * CharList Sigils (`~c` and `~C`)
@@ -158,7 +163,9 @@ Syntax highlighting for the following tokens:
   * String Sigils (`~s` and `~S`)
   * Word Sigils (`~w` and `~W`)
   * Custom Sigils (`~<lower_case_character>` and `~<UPPER_CASE_CHARACTER>`)
+* Stabs (`->`)
 * [Strings and Char List](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L231-L236) (`"` or `'`)
+* [Tuples] (`{}`)
   
 The syntax highlighting colors can be customized in the Color Settings page for Elixir (Preferences > Editor > Color & Fonts > Elixir).
 
