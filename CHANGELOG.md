@@ -6,6 +6,7 @@
   * [#127](https://github.com/KronicDeth/intellij-elixir/pull/127) - Anonymous functions (`fn end`), stab clauses (`->`), and parentheticals (`(1 + 2)`) - [@KronicDeth](https://github.com/KronicDeth)
   * [#128](https://github.com/KronicDeth/intellij-elixir/pull/128) - Maps (`%{}`) and structs (`%User{}`) - [@KronicDeth](https://github.com/KronicDeth)
   * [#129](https://github.com/KronicDeth/intellij-elixir/pull/129) - Tuples (`{}`) - [@KronicDeth](https://github.com/KronicDeth)
+  * [#130](https://github.com/KronicDeth/intellij-elixir/pull/130) - Bit strings (`<<>>`) - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.3.3
 * Enhancements
