@@ -164,6 +164,7 @@ Syntax highlighting for the following tokens:
   * Word Sigils (`~w` and `~W`)
   * Custom Sigils (`~<lower_case_character>` and `~<UPPER_CASE_CHARACTER>`)
 * Stabs (`->`)
+* Structs (`%MyStruct{}`)
 * [Strings and Char List](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L231-L236) (`"` or `'`)
 * [Tuples] (`{}`)
   
