@@ -17,6 +17,9 @@ public interface ElixirStabParenthesesSignature extends Quotable {
   ElixirParenthesesArguments getParenthesesArguments();
 
   @Nullable
+  ElixirUnqualifiedNoArgumentsBlock getUnqualifiedNoArgumentsBlock();
+
+  @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
   @Nullable

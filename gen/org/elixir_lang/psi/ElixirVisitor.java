@@ -140,6 +140,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitWholeNumber(o);
   }
 
+  public void visitDoBlock(@NotNull ElixirDoBlock o) {
+    visitQuotableArguments(o);
+  }
+
   public void visitDotInfixOperator(@NotNull ElixirDotInfixOperator o) {
     visitOperator(o);
   }
@@ -761,6 +765,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitWholeNumber(o);
+  }
+
+  public void visitUnqualifiedNoArgumentsBlock(@NotNull ElixirUnqualifiedNoArgumentsBlock o) {
+    visitQuotable(o);
   }
 
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {

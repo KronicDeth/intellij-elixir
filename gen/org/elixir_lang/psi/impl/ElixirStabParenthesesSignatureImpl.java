@@ -40,6 +40,12 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
 
   @Override
   @Nullable
+  public ElixirUnqualifiedNoArgumentsBlock getUnqualifiedNoArgumentsBlock() {
+    return findChildByClass(ElixirUnqualifiedNoArgumentsBlock.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }

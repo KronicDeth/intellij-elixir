@@ -42,6 +42,12 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
 
   @Override
   @NotNull
+  public List<ElixirUnqualifiedNoArgumentsBlock> getUnqualifiedNoArgumentsBlockList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoArgumentsBlock.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }

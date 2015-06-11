@@ -32,6 +32,7 @@ public class ElixirPsiImplUtil {
     };
     public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
@@ -609,9 +610,9 @@ public class ElixirPsiImplUtil {
         }
 
         return quotedFunctionCall(
-                    "<<>>",
-                    metadata(openingBit),
-                    quotedChildren
+                "<<>>",
+                metadata(openingBit),
+                quotedChildren
         );
     }
 
@@ -1639,6 +1640,28 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoArgumentsBlock unqualifiedNoArgumentsBlock) {
+       PsiElement[] children = unqualifiedNoArgumentsBlock.getChildren();
+
+        assert children.length == 2;
+
+        Quotable call = (Quotable) children[0];
+        OtpErlangTuple quotedCall = (OtpErlangTuple) call.quote();
+
+        QuotableArguments blockArguments = (QuotableArguments) children[1];
+        OtpErlangObject[] quotedArguments = blockArguments.quoteArguments();
+
+        OtpErlangList callMetadata = Macro.metadata(quotedCall);
+
+        return quotedFunctionCall(
+                quotedCall.elementAt(0),
+                callMetadata,
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final Heredoc heredoc) {
         ElixirHeredocPrefix heredocPrefix = heredoc.getHeredocPrefix();
         int prefixLength = heredocPrefix.getTextLength();
@@ -2500,6 +2523,25 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject[] quoteArguments(Call call) {
         return call.getArguments().quoteArguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
+        /* `[[{do, nil}]]`
+           @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272 */
+        return new OtpErlangObject[]{
+            new OtpErlangList(
+                    new OtpErlangObject[]{
+                            new OtpErlangTuple(
+                                    new OtpErlangObject[]{
+                                            DO,
+                                            NIL
+                                    }
+                            )
+                    }
+            )
+        };
     }
 
     @Contract(pure = true)

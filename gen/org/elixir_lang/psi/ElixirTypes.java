@@ -41,6 +41,7 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
+  IElementType DO_BLOCK = new ElixirElementType("DO_BLOCK");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -182,6 +183,7 @@ public interface ElixirTypes {
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
+  IElementType UNQUALIFIED_NO_ARGUMENTS_BLOCK = new ElixirElementType("UNQUALIFIED_NO_ARGUMENTS_BLOCK");
   IElementType UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL = new ElixirElementType("UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL");
   IElementType VARIABLE = new ElixirElementType("VARIABLE");
   IElementType WHEN_INFIX_OPERATOR = new ElixirElementType("WHEN_INFIX_OPERATOR");
@@ -410,6 +412,9 @@ public interface ElixirTypes {
       }
       else if (type == DOT_INFIX_OPERATOR) {
         return new ElixirDotInfixOperatorImpl(node);
+      }
+      else if (type == DO_BLOCK) {
+        return new ElixirDoBlockImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
@@ -833,6 +838,9 @@ public interface ElixirTypes {
       }
       else if (type == UNKNOWN_BASE_WHOLE_NUMBER) {
         return new ElixirUnknownBaseWholeNumberImpl(node);
+      }
+      else if (type == UNQUALIFIED_NO_ARGUMENTS_BLOCK) {
+        return new ElixirUnqualifiedNoArgumentsBlockImpl(node);
       }
       else if (type == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
         return new ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(node);

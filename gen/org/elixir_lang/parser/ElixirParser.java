@@ -119,6 +119,9 @@ public class ElixirParser implements PsiParser {
     else if (t == DECIMAL_WHOLE_NUMBER) {
       r = decimalWholeNumber(b, 0);
     }
+    else if (t == DO_BLOCK) {
+      r = doBlock(b, 0);
+    }
     else if (t == DOT_INFIX_OPERATOR) {
       r = dotInfixOperator(b, 0);
     }
@@ -544,6 +547,9 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
       r = unknownBaseWholeNumber(b, 0);
+    }
+    else if (t == UNQUALIFIED_NO_ARGUMENTS_BLOCK) {
+      r = unqualifiedNoArgumentsBlock(b, 0);
     }
     else if (t == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
       r = unqualifiedNoParenthesesManyArgumentsCall(b, 0);
@@ -1064,6 +1070,12 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // unqualifiedNoArgumentsBlock
+  static boolean blockExpression(PsiBuilder b, int l) {
+    return unqualifiedNoArgumentsBlock(b, l + 1);
+  }
+
+  /* ********************************************************** */
   // OPENING_BRACKET EOL*
   //                      (
   //                       keywords |
@@ -1520,6 +1532,32 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // DO endOfExpression* END
+  public static boolean doBlock(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock")) return false;
+    if (!nextTokenIs(b, DO)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, DO);
+    r = r && doBlock_1(b, l + 1);
+    r = r && consumeToken(b, END);
+    exit_section_(b, m, DO_BLOCK, r);
+    return r;
+  }
+
+  // endOfExpression*
+  private static boolean doBlock_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!endOfExpression(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "doBlock_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
   // EOL* DOT_OPERATOR EOL*
   public static boolean dotInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "dotInfixOperator")) return false;
@@ -1690,6 +1728,7 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // emptyParentheses |
+  //                        unmatchedExpression |
   //                        unqualifiedNoParenthesesManyArgumentsCall |
   //                        matchedExpression
   static boolean expression(PsiBuilder b, int l) {
@@ -1697,6 +1736,7 @@ public class ElixirParser implements PsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = emptyParentheses(b, l + 1);
+    if (!r) r = unmatchedExpression(b, l + 1);
     if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1, -1);
     exit_section_(b, m, null, r);
@@ -5074,6 +5114,25 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // blockExpression
+  static boolean unmatchedExpression(PsiBuilder b, int l) {
+    return blockExpression(b, l + 1);
+  }
+
+  /* ********************************************************** */
+  // variable doBlock
+  public static boolean unqualifiedNoArgumentsBlock(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unqualifiedNoArgumentsBlock")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = variable(b, l + 1);
+    r = r && doBlock(b, l + 1);
+    exit_section_(b, m, UNQUALIFIED_NO_ARGUMENTS_BLOCK, r);
     return r;
   }
 
