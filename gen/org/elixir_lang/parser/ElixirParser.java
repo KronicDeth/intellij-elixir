@@ -2482,6 +2482,7 @@ public class ElixirParser implements PsiParser {
   //                BIT_STRING_OPERATOR |
   //                CAPTURE_OPERATOR |
   //                COMPARISON_OPERATOR |
+  //                DO |
   //                DUAL_OPERATOR |
   //                HAT_OPERATOR |
   //                IDENTIFIER |
@@ -2512,6 +2513,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, BIT_STRING_OPERATOR);
     if (!r) r = consumeToken(b, CAPTURE_OPERATOR);
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
+    if (!r) r = consumeToken(b, DO);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IDENTIFIER);
@@ -4392,6 +4394,7 @@ public class ElixirParser implements PsiParser {
   //                        // NOT BIT_STRING_OPERATOR because it is a special form
   //                        CAPTURE_OPERATOR |
   //                        COMPARISON_OPERATOR |
+  //                        DO |
   //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
   //                        HAT_OPERATOR |
   //                        IN_MATCH_OPERATOR |
@@ -4421,7 +4424,8 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, AT_OPERATOR);
     if (!r) r = consumeToken(b, CAPTURE_OPERATOR);
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
-    if (!r) r = relativeIdentifier_6(b, l + 1);
+    if (!r) r = consumeToken(b, DO);
+    if (!r) r = relativeIdentifier_7(b, l + 1);
     if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
@@ -4443,19 +4447,19 @@ public class ElixirParser implements PsiParser {
   }
 
   // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_6")) return false;
+  private static boolean relativeIdentifier_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_7")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DUAL_OPERATOR);
-    r = r && relativeIdentifier_6_1(b, l + 1);
+    r = r && relativeIdentifier_7_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_6_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_6_1")) return false;
+  private static boolean relativeIdentifier_7_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_7_1")) return false;
     consumeToken(b, SIGNIFICANT_WHITE_SPACE);
     return true;
   }

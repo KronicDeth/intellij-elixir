@@ -34,6 +34,7 @@
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DECIMAL_MARK = "."
     DECIMAL_SEPARATOR = "_"
+    DO = "do"
     DOT_OPERATOR = "."
     END = "end"
     FALSE = "false"
@@ -1319,6 +1320,7 @@ relativeIdentifier ::= IDENTIFIER |
                        // NOT BIT_STRING_OPERATOR because it is a special form
                        CAPTURE_OPERATOR |
                        COMPARISON_OPERATOR |
+                       DO |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
                        HAT_OPERATOR |
                        IN_MATCH_OPERATOR |
@@ -1940,7 +1942,7 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
  * Keywords
  */
 
- keywordKey ::= ALIAS_TOKEN |
+keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
@@ -1948,6 +1950,7 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
                BIT_STRING_OPERATOR |
                CAPTURE_OPERATOR |
                COMPARISON_OPERATOR |
+               DO |
                DUAL_OPERATOR |
                HAT_OPERATOR |
                IDENTIFIER |

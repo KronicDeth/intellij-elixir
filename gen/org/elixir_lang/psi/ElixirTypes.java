@@ -217,6 +217,7 @@ public interface ElixirTypes {
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DECIMAL_MARK = new ElixirTokenType("DECIMAL_MARK");
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
+  IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
   IElementType END = new ElixirTokenType("end");

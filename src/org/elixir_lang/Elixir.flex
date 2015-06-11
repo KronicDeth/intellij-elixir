@@ -117,6 +117,9 @@ CLOSING_CURLY = "}"
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
  */
 
+// Separates operators that look like {IDENTIFIER} from the next token
+IDENTIFIER_OPERATOR_SEPARATOR = {EOL}|{OPENING_BRACKET}|{OPENING_PARENTHESIS}|{WHITE_SPACE}
+
 FOUR_TOKEN_BITSTRING_OPERATOR = "<<>>"
 FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
@@ -438,6 +441,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  * Regular Keywords
  */
 
+DO = "do"
 END = "end"
 FALSE = "false"
 FN = "fn"
@@ -576,6 +580,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {CLOSING_BIT}                              { return ElixirTypes.CLOSING_BIT; }
   {CLOSING_BRACKET}                          { return ElixirTypes.CLOSING_BRACKET; }
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
+  {DO}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.DO; }
   {EOL}                                      { return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
@@ -800,61 +806,65 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DOT_OPERATION> {
-  {AND_OPERATOR}               { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.AND_OPERATOR; }
-  {ARROW_OPERATOR}             { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.ARROW_OPERATOR; }
-  {AT_OPERATOR}                { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.AT_OPERATOR; }
-  {CAPTURE_OPERATOR}           { yybegin(CALL_MAYBE);
-                                return ElixirTypes.CAPTURE_OPERATOR; }
-  {COMPARISON_OPERATOR}        { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.COMPARISON_OPERATOR; }
-  {DUAL_OPERATOR}              { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.DUAL_OPERATOR; }
-  {HAT_OPERATOR}               { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.HAT_OPERATOR; }
-  {IN_MATCH_OPERATOR}          { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.IN_MATCH_OPERATOR; }
-  {IN_OPERATOR}                { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.IN_OPERATOR; }
-  {MATCH_OPERATOR}             { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.MATCH_OPERATOR; }
-  {MULTIPLICATION_OPERATOR}    { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
-  {OR_OPERATOR}                { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.OR_OPERATOR; }
-  {PIPE_OPERATOR}              { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.PIPE_OPERATOR; }
-  {RELATIONAL_OPERATOR}        { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.RELATIONAL_OPERATOR; }
-  {STAB_OPERATOR}              { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.STAB_OPERATOR; }
-  {STRUCT_OPERATOR}            { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.STRUCT_OPERATOR; }
-  {TWO_OPERATOR}               { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.TWO_OPERATOR; }
-  {UNARY_OPERATOR}             { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.UNARY_OPERATOR; }
-  {WHEN_OPERATOR}              { yybegin(CALL_MAYBE);
-                                 return ElixirTypes.WHEN_OPERATOR; }
+  {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_OPERATOR; }
+  {ARROW_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.ARROW_OPERATOR; }
+  {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AT_OPERATOR; }
+  {CAPTURE_OPERATOR}                                { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.CAPTURE_OPERATOR; }
+  {COMPARISON_OPERATOR}                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.COMPARISON_OPERATOR; }
+  {DO} / {IDENTIFIER_OPERATOR_SEPARATOR}            { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.DO; }
+  {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.DUAL_OPERATOR; }
+  {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.HAT_OPERATOR; }
+  {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.IN_MATCH_OPERATOR; }
+  // Ensure that it is just `in`
+  {IN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR}   { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.IN_OPERATOR; }
+  {MATCH_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.MATCH_OPERATOR; }
+  {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.OR_OPERATOR; }
+  {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.PIPE_OPERATOR; }
+  {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.RELATIONAL_OPERATOR; }
+  {STAB_OPERATOR}                                   { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.STAB_OPERATOR; }
+  {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.STRUCT_OPERATOR; }
+  {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.TWO_OPERATOR; }
+  {UNARY_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.UNARY_OPERATOR; }
+  // Ensure that is just `when`
+  {WHEN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR} { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.WHEN_OPERATOR; }
 
   /*
    * Emulates strip_space in elixir_tokenizer.erl
    */
 
-  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
-  {EOL}                        { return ElixirTypes.EOL; }
+  {ESCAPED_EOL}|{WHITE_SPACE}+                      { return TokenType.WHITE_SPACE; }
+  {EOL}                                             { return ElixirTypes.EOL; }
 
   /* Be better than strip_space and handle_dot and ignore comments so that IDENTIFIER and operators are parsed the same
      after dots.
 
      @see https://groups.google.com/forum/#!topic/elixir-lang-core/nnI4oUB-63U
    */
-  {COMMENT}                    { return ElixirTypes.COMMENT; }
+  {COMMENT}                                         { return ElixirTypes.COMMENT; }
 
-  .                            { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                                 handleInState(stackFrame.getLastLexicalState()); }
+  .                                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                                      handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <DUAL_OPERATION> {

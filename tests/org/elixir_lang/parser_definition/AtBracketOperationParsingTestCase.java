@@ -28,6 +28,10 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testDo() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testDualOperator() {
         assertParsedAndQuotedCorrectly();
     }
