@@ -2528,6 +2528,15 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
+        ElixirStab stab = doBlock.getStab();
+        OtpErlangObject doValue;
+
+        if (stab != null) {
+            doValue = stab.quote();
+        } else {
+            doValue = NIL;
+        }
+
         /* `[[{do, nil}]]`
            @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272 */
         return new OtpErlangObject[]{
@@ -2536,7 +2545,7 @@ if (quoted == null) {
                             new OtpErlangTuple(
                                     new OtpErlangObject[]{
                                             DO,
-                                            NIL
+                                            doValue
                                     }
                             )
                     }

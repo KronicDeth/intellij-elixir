@@ -5,6 +5,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnqualifiedNoArgumentsStabBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/unmatched_expression_parsing_test_case";

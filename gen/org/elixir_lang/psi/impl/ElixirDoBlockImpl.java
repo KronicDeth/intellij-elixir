@@ -8,8 +8,10 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirEndOfExpression;
+import org.elixir_lang.psi.ElixirStab;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,6 +30,12 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
   @NotNull
   public List<ElixirEndOfExpression> getEndOfExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEndOfExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStab getStab() {
+    return findChildByClass(ElixirStab.class);
   }
 
   @NotNull
