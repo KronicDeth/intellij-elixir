@@ -16,4 +16,6 @@
 9876543210.% Qualifier.qualified positional, key: value
 9876543210.<> Qualifier.qualified positional, key: value
 9876543210.^ Qualifier.qualified positional, key: value
+9876543210.after Qualifier.qualified positional, key: value
+9876543210.do Qualifier.qualified positional, key: value
 9876543210.when Qualifier.qualified positional, key: value

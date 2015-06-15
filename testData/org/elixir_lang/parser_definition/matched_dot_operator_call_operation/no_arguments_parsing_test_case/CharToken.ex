@@ -16,4 +16,6 @@
 ?c.%
 ?c.<>
 ?c.^
+?c.after
+?c.do
 ?c.when

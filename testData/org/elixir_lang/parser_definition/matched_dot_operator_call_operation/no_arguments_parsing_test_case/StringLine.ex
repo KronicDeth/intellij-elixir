@@ -16,4 +16,6 @@
 "String".%
 "String".<>
 "String".^
+"String".after
+"String".do
 "String".when

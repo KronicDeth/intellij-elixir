@@ -16,4 +16,6 @@ variable.->
 variable.%
 variable.<>
 variable.^
+variable.after
+variable.do
 variable.when

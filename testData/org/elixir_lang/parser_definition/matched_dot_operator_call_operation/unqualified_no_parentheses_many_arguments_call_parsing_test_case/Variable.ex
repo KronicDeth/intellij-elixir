@@ -16,4 +16,6 @@ variable.-> unqualified positional, key: value
 variable.% unqualified positional, key: value
 variable.<> unqualified positional, key: value
 variable.^ unqualified positional, key: value
+variable.after unqualified positional, key: value
+variable.do unqualified positional, key: value
 variable.when unqualified positional, key: value

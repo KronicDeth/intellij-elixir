@@ -16,6 +16,7 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"

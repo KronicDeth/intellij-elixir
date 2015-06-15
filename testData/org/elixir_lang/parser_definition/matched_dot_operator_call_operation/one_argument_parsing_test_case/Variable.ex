@@ -16,4 +16,6 @@ variable.-> positional
 variable.% positional
 variable.<> positional
 variable.^ positional
+variable.after positional
+variable.do positional
 variable.when positional

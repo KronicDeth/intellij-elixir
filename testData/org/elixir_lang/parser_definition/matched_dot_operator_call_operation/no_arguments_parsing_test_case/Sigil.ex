@@ -16,4 +16,6 @@
 ~x{}i.%
 ~x{}i.<>
 ~x{}i.^
+~x{}i.after
+~x{}i.do
 ~x{}i.when

@@ -123,6 +123,7 @@ public class YYInitialTest extends TokenTest {
                         { "]", ElixirTypes.CLOSING_BRACKET, INITIAL_STATE, true },
                         { "^", ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "_identifier", ElixirTypes.IDENTIFIER, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
+                        { "after", ElixirTypes.AFTER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                         { "and", ElixirTypes.AND_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true},
                         { "defmodule", ElixirTypes.IDENTIFIER, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE, true },
                         { "do", ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },

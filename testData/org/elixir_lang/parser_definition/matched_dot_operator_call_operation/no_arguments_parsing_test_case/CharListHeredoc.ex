@@ -73,4 +73,12 @@ Heredoc
 '''
 CharList
 Heredoc
+'''.after
+'''
+CharList
+Heredoc
+'''.do
+'''
+CharList
+Heredoc
 '''.when

@@ -264,6 +264,12 @@ ATOM_START = [a-zA-Z_]
 COLON = :
 
 /*
+ * Block Identifiers
+ */
+
+AFTER = "after"
+
+/*
  * Containers
  */
 
@@ -555,6 +561,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    Rules that aren't dependent on detecting the end of INTERPOLATION can be shared between <YYINITIAL> and
    <INTERPOLATION> */
 <YYINITIAL, INTERPOLATION> {
+  {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AFTER; }
   {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -806,6 +814,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DOT_OPERATION> {
+  {AFTER} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.DO; }
   {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                                  { yybegin(CALL_MAYBE);

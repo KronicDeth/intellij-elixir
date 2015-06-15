@@ -8,6 +8,10 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
      * matchedExpression
      */
 
+    public void testAfter() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testAndOperator() {
         assertParsedAndQuotedCorrectly();
     }
