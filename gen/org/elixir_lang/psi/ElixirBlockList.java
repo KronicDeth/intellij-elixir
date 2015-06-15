@@ -3,20 +3,13 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirDoBlock extends QuotableArguments {
-
-  @Nullable
-  ElixirBlockList getBlockList();
+public interface ElixirBlockList extends QuotableArguments {
 
   @NotNull
-  List<ElixirEndOfExpression> getEndOfExpressionList();
-
-  @Nullable
-  ElixirStab getStab();
+  List<ElixirBlockItem> getBlockItemList();
 
   @NotNull
   OtpErlangObject[] quoteArguments();

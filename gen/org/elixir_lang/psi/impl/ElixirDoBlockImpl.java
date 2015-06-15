@@ -6,10 +6,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirEndOfExpression;
-import org.elixir_lang.psi.ElixirStab;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +21,12 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDoBlock(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirBlockList getBlockList() {
+    return findChildByClass(ElixirBlockList.class);
   }
 
   @Override

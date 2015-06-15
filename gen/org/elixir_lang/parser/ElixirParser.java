@@ -71,6 +71,15 @@ public class ElixirParser implements PsiParser {
     else if (t == BIT_STRING) {
       r = bitString(b, 0);
     }
+    else if (t == BLOCK_IDENTIFIER) {
+      r = blockIdentifier(b, 0);
+    }
+    else if (t == BLOCK_ITEM) {
+      r = blockItem(b, 0);
+    }
+    else if (t == BLOCK_LIST) {
+      r = blockList(b, 0);
+    }
     else if (t == BRACKET_ARGUMENTS) {
       r = bracketArguments(b, 0);
     }
@@ -1076,6 +1085,56 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
+  // AFTER
+  public static boolean blockIdentifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockIdentifier")) return false;
+    if (!nextTokenIs(b, AFTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, AFTER);
+    exit_section_(b, m, BLOCK_IDENTIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // blockIdentifier endOfExpression?
+  public static boolean blockItem(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockItem")) return false;
+    if (!nextTokenIs(b, AFTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = blockIdentifier(b, l + 1);
+    r = r && blockItem_1(b, l + 1);
+    exit_section_(b, m, BLOCK_ITEM, r);
+    return r;
+  }
+
+  // endOfExpression?
+  private static boolean blockItem_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockItem_1")) return false;
+    endOfExpression(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // blockItem+
+  public static boolean blockList(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockList")) return false;
+    if (!nextTokenIs(b, AFTER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = blockItem(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!blockItem(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "blockList", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, BLOCK_LIST, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // OPENING_BRACKET EOL*
   //                      (
   //                       keywords |
@@ -1532,8 +1591,11 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // DO EOL*
-  //             stab? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+  // DO endOfExpression*
+  //             (
+  //              stab | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+  //              blockList // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+  //             )
   //             endOfExpression*  // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272
   //             END
   public static boolean doBlock(PsiBuilder b, int l) {
@@ -1550,23 +1612,28 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // EOL*
+  // endOfExpression*
   private static boolean doBlock_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, EOL)) break;
+      if (!endOfExpression(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "doBlock_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
-  // stab?
+  // stab | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+  //              blockList
   private static boolean doBlock_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock_2")) return false;
-    stab(b, l + 1);
-    return true;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stab(b, l + 1);
+    if (!r) r = blockList(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // endOfExpression*

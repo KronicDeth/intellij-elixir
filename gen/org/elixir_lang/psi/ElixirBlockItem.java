@@ -5,20 +5,15 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-public interface ElixirDoBlock extends QuotableArguments {
-
-  @Nullable
-  ElixirBlockList getBlockList();
+public interface ElixirBlockItem extends Quotable {
 
   @NotNull
-  List<ElixirEndOfExpression> getEndOfExpressionList();
+  ElixirBlockIdentifier getBlockIdentifier();
 
   @Nullable
-  ElixirStab getStab();
+  ElixirEndOfExpression getEndOfExpression();
 
   @NotNull
-  OtpErlangObject[] quoteArguments();
+  OtpErlangObject quote();
 
 }

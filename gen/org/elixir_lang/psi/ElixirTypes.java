@@ -24,6 +24,9 @@ public interface ElixirTypes {
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType BIT_STRING = new ElixirElementType("BIT_STRING");
+  IElementType BLOCK_IDENTIFIER = new ElixirElementType("BLOCK_IDENTIFIER");
+  IElementType BLOCK_ITEM = new ElixirElementType("BLOCK_ITEM");
+  IElementType BLOCK_LIST = new ElixirElementType("BLOCK_LIST");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
@@ -362,6 +365,15 @@ public interface ElixirTypes {
       }
       else if (type == BIT_STRING) {
         return new ElixirBitStringImpl(node);
+      }
+      else if (type == BLOCK_IDENTIFIER) {
+        return new ElixirBlockIdentifierImpl(node);
+      }
+      else if (type == BLOCK_ITEM) {
+        return new ElixirBlockItemImpl(node);
+      }
+      else if (type == BLOCK_LIST) {
+        return new ElixirBlockListImpl(node);
       }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);

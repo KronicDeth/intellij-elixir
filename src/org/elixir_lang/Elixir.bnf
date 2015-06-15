@@ -1782,17 +1782,41 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
 
 /*
  *
+ *
  * Unmatched Expressions
+ *
  *
  */
 
 /*
+ *
  * Block Expression
+ *
  */
 
+/*
+ * Block Identifier
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L946
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L977-L981
+ */
+blockIdentifier ::= AFTER
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313-L314
+blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L316-L317
+blockList ::= blockItem+
+              { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= DO EOL*
-            stab? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+doBlock ::= DO endOfExpression*
+            (
+             stab | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+             blockList // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+            )
             endOfExpression*  // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272
             END
             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }

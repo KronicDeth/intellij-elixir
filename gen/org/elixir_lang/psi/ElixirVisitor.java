@@ -72,6 +72,18 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitBlockIdentifier(@NotNull ElixirBlockIdentifier o) {
+    visitQuotable(o);
+  }
+
+  public void visitBlockItem(@NotNull ElixirBlockItem o) {
+    visitQuotable(o);
+  }
+
+  public void visitBlockList(@NotNull ElixirBlockList o) {
+    visitQuotableArguments(o);
+  }
+
   public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
     visitQuotable(o);
   }

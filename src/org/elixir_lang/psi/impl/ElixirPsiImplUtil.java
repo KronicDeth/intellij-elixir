@@ -618,6 +618,25 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockIdentifier blockIdentifier) {
+        return new OtpErlangAtom(blockIdentifier.getNode().getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockItem blockItem) {
+        Quotable blockIdentifier = blockItem.getBlockIdentifier();
+
+        return new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        blockIdentifier.quote(),
+                        NIL
+                }
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBracketArguments bracketArguments) {
         PsiElement[] children = bracketArguments.getChildren();
 
@@ -2521,6 +2540,20 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirBlockList blockList) {
+        List<ElixirBlockItem> blockItemList = blockList.getBlockItemList();
+        OtpErlangObject[] quotedBlockItems = new OtpErlangObject[blockItemList.size()];
+
+        int i = 0;
+        for (ElixirBlockItem blockItem : blockItemList) {
+            quotedBlockItems[i++] = blockItem.quote();
+        }
+
+        return quotedBlockItems;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject[] quoteArguments(Call call) {
         return call.getArguments().quoteArguments();
     }
@@ -2529,27 +2562,48 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
         ElixirStab stab = doBlock.getStab();
-        OtpErlangObject doValue;
+        OtpErlangObject[] quotedKeywordPairs = null;
+        OtpErlangObject doValue = null;
 
         if (stab != null) {
             doValue = stab.quote();
         } else {
-            doValue = NIL;
+            ElixirBlockList blockList = doBlock.getBlockList();
+
+            if (blockList != null) {
+                OtpErlangObject[] blockListQuotedArguments = blockList.quoteArguments();
+
+                OtpErlangTuple quotedDoKeywordPair = new OtpErlangTuple(
+                        new OtpErlangObject[]{
+                                DO,
+                                NIL
+                        }
+                );
+                quotedKeywordPairs = new OtpErlangObject[1 + blockListQuotedArguments.length];
+
+                int i = 0;
+                quotedKeywordPairs[i++] = quotedDoKeywordPair;
+                System.arraycopy(blockListQuotedArguments, 0, quotedKeywordPairs, i, blockListQuotedArguments.length);
+            } else {
+                doValue = NIL;
+            }
         }
 
-        /* `[[{do, nil}]]`
-           @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272 */
+        if (quotedKeywordPairs == null) {
+           /* `{do, <doValue>}
+               @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272 */
+            quotedKeywordPairs = new OtpErlangObject[]{
+                    new OtpErlangTuple(
+                            new OtpErlangObject[]{
+                                    DO,
+                                    doValue
+                            }
+                    )
+            };
+        }
+
         return new OtpErlangObject[]{
-            new OtpErlangList(
-                    new OtpErlangObject[]{
-                            new OtpErlangTuple(
-                                    new OtpErlangObject[]{
-                                            DO,
-                                            doValue
-                                    }
-                            )
-                    }
-            )
+                new OtpErlangList(quotedKeywordPairs)
         };
     }
 
