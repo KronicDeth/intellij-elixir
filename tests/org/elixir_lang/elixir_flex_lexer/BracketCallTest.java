@@ -178,6 +178,13 @@ public class BracketCallTest extends Test {
                                 )
                         },
                         {
+                                "else",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.ELSE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_BRACKET, INITIAL_STATE)
+                                )
+                        },
+                        {
                                 "end",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),

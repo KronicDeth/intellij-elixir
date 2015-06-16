@@ -268,6 +268,7 @@ COLON = :
  */
 
 AFTER = "after"
+ELSE = "else"
 
 /*
  * Containers
@@ -590,6 +591,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {CLOSING_PARENTHESIS}                      { return ElixirTypes.CLOSING_PARENTHESIS; }
   {DO}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DO; }
+  {ELSE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.ELSE; }
   {EOL}                                      { return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
@@ -830,6 +833,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.DO; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
+  {ELSE} / {IDENTIFIER_OPERATOR_SEPARATOR}          { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.ELSE; }
   {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.HAT_OPERATOR; }
   {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
