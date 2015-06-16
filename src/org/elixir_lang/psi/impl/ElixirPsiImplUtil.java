@@ -626,11 +626,17 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBlockItem blockItem) {
         Quotable blockIdentifier = blockItem.getBlockIdentifier();
+        Quotable stab = blockItem.getStab();
+        OtpErlangObject quotedValue = NIL;
+
+        if (stab != null) {
+            quotedValue = stab.quote();
+        }
 
         return new OtpErlangTuple(
                 new OtpErlangObject[]{
                         blockIdentifier.quote(),
-                        NIL
+                        quotedValue
                 }
         );
     }
