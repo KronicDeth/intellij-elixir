@@ -13,6 +13,14 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnqualifiedNoArgumentsCatchBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnqualifiedNoArgumentsCatchStabBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testUnqualifiedNoArgumentsElseBlock() {
         assertParsedAndQuotedCorrectly();
     }
@@ -30,6 +38,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testUnqualifiedNoArgumentsStabAfterStabBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnqualifiedNoArgumentsStabCatchStabBlock() {
         assertParsedAndQuotedCorrectly();
     }
 

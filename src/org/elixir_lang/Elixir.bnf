@@ -1325,6 +1325,7 @@ relativeIdentifier ::= IDENTIFIER |
                        AT_OPERATOR |
                        // NOT BIT_STRING_OPERATOR because it is a special form
                        CAPTURE_OPERATOR |
+                       CATCH |
                        COMPARISON_OPERATOR |
                        DO |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
@@ -1806,7 +1807,7 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L946
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L977-L981
  */
-blockIdentifier ::= AFTER | ELSE | RESCUE
+blockIdentifier ::= AFTER | CATCH | ELSE | RESCUE
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313-L314
