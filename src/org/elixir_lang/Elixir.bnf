@@ -1315,6 +1315,7 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
 relativeIdentifier ::= IDENTIFIER |
+                       AFTER |
                        AND_OPERATOR |
                        ARROW_OPERATOR |
                        // NOT ASSOCIATION_OPERATOR
