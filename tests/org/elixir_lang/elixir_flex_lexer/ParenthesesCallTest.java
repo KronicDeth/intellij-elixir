@@ -192,6 +192,13 @@ public class ParenthesesCallTest extends Test {
                                 )
                         },
                         {
+                                "rescue",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.RESCUE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
                                 "!==",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.COMPARISON_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),

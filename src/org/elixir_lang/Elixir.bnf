@@ -55,6 +55,7 @@
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
+    RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";

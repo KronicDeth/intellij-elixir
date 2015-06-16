@@ -279,6 +279,7 @@ public interface ElixirTypes {
   IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
   IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");
+  IElementType RESCUE = new ElixirTokenType("rescue");
   IElementType SEMICOLON = new ElixirTokenType(";");
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("SIGIL_HEREDOC_PROMOTER");

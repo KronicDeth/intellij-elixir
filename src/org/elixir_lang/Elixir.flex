@@ -269,6 +269,7 @@ COLON = :
 
 AFTER = "after"
 ELSE = "else"
+RESCUE = "rescue"
 
 /*
  * Containers
@@ -650,6 +651,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_OPERATOR; }
+  // Must be before {IDENTIFIER} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.RESCUE; }
   // Must be before {IDENTIFIER} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
   {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TRUE; }
@@ -852,6 +856,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR; }
+  {RESCUE} / {IDENTIFIER_OPERATOR_SEPARATOR}        { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.RESCUE; }
   {STAB_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
