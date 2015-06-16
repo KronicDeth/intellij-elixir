@@ -1085,14 +1085,14 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // AFTER | ELSE
+  // AFTER | ELSE | RESCUE
   public static boolean blockIdentifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockIdentifier")) return false;
-    if (!nextTokenIs(b, "<block identifier>", AFTER, ELSE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<block identifier>");
     r = consumeToken(b, AFTER);
     if (!r) r = consumeToken(b, ELSE);
+    if (!r) r = consumeToken(b, RESCUE);
     exit_section_(b, l, m, BLOCK_IDENTIFIER, r, false, null);
     return r;
   }
@@ -1102,7 +1102,6 @@ public class ElixirParser implements PsiParser {
   //               (stab endOfExpression?)?
   public static boolean blockItem(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem")) return false;
-    if (!nextTokenIs(b, "<block item>", AFTER, ELSE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<block item>");
     r = blockIdentifier(b, l + 1);
@@ -1148,7 +1147,6 @@ public class ElixirParser implements PsiParser {
   // blockItem+
   public static boolean blockList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockList")) return false;
-    if (!nextTokenIs(b, "<block list>", AFTER, ELSE)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<block list>");
     r = blockItem(b, l + 1);
@@ -4579,6 +4577,7 @@ public class ElixirParser implements PsiParser {
   //                        OR_OPERATOR |
   //                        PIPE_OPERATOR |
   //                        RELATIONAL_OPERATOR |
+  //                        RESCUE |
   //                        STAB_OPERATOR |
   //                        STRUCT_OPERATOR |
   //                        // NOT TUPLE_OPERATOR because it is a special form
@@ -4610,6 +4609,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, OR_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
+    if (!r) r = consumeToken(b, RESCUE);
     if (!r) r = consumeToken(b, STAB_OPERATOR);
     if (!r) r = consumeToken(b, STRUCT_OPERATOR);
     if (!r) r = consumeToken(b, TWO_OPERATOR);

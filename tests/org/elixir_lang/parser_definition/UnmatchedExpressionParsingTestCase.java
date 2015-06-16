@@ -21,11 +21,23 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnqualifiedNoArgumentsRescueBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnqualifiedNoArgumentsRescueStabBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testUnqualifiedNoArgumentsStabAfterStabBlock() {
         assertParsedAndQuotedCorrectly();
     }
 
     public void testUnqualifiedNoArgumentsStabElseStabBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testUnqualifiedNoArgumentsStabRescueStabBlock() {
         assertParsedAndQuotedCorrectly();
     }
 
