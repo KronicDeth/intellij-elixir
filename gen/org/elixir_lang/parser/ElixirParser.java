@@ -1085,14 +1085,15 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // AFTER
+  // AFTER | ELSE
   public static boolean blockIdentifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockIdentifier")) return false;
-    if (!nextTokenIs(b, AFTER)) return false;
+    if (!nextTokenIs(b, "<block identifier>", AFTER, ELSE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, "<block identifier>");
     r = consumeToken(b, AFTER);
-    exit_section_(b, m, BLOCK_IDENTIFIER, r);
+    if (!r) r = consumeToken(b, ELSE);
+    exit_section_(b, l, m, BLOCK_IDENTIFIER, r, false, null);
     return r;
   }
 
@@ -1101,13 +1102,13 @@ public class ElixirParser implements PsiParser {
   //               (stab endOfExpression?)?
   public static boolean blockItem(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem")) return false;
-    if (!nextTokenIs(b, AFTER)) return false;
+    if (!nextTokenIs(b, "<block item>", AFTER, ELSE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, "<block item>");
     r = blockIdentifier(b, l + 1);
     r = r && blockItem_1(b, l + 1);
     r = r && blockItem_2(b, l + 1);
-    exit_section_(b, m, BLOCK_ITEM, r);
+    exit_section_(b, l, m, BLOCK_ITEM, r, false, null);
     return r;
   }
 
@@ -1147,9 +1148,9 @@ public class ElixirParser implements PsiParser {
   // blockItem+
   public static boolean blockList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockList")) return false;
-    if (!nextTokenIs(b, AFTER)) return false;
+    if (!nextTokenIs(b, "<block list>", AFTER, ELSE)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, "<block list>");
     r = blockItem(b, l + 1);
     int c = current_position_(b);
     while (r) {
@@ -1157,7 +1158,7 @@ public class ElixirParser implements PsiParser {
       if (!empty_element_parsed_guard_(b, "blockList", c)) break;
       c = current_position_(b);
     }
-    exit_section_(b, m, BLOCK_LIST, r);
+    exit_section_(b, l, m, BLOCK_LIST, r, false, null);
     return r;
   }
 
@@ -4568,6 +4569,7 @@ public class ElixirParser implements PsiParser {
   //                        COMPARISON_OPERATOR |
   //                        DO |
   //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
+  //                        ELSE |
   //                        HAT_OPERATOR |
   //                        IN_MATCH_OPERATOR |
   //                        IN_OPERATOR |
@@ -4599,6 +4601,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
     if (!r) r = consumeToken(b, DO);
     if (!r) r = relativeIdentifier_8(b, l + 1);
+    if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
