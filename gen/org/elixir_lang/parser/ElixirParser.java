@@ -1619,11 +1619,8 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // DO endOfExpression*
-  //             (
-  //              stab | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-  //              blockList // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
-  //             )
-  //             endOfExpression*  // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272
+  //             stab? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+  //             blockList? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
   //             END
   public static boolean doBlock(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock")) return false;
@@ -1634,6 +1631,8 @@ public class ElixirParser implements PsiParser {
     r = r && doBlock_1(b, l + 1);
     r = r && doBlock_2(b, l + 1);
     r = r && doBlock_3(b, l + 1);
+    r = r && doBlock_4(b, l + 1);
+    r = r && doBlock_5(b, l + 1);
     r = r && consumeToken(b, END);
     exit_section_(b, m, DO_BLOCK, r);
     return r;
@@ -1651,16 +1650,11 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // stab | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-  //              blockList
+  // stab?
   private static boolean doBlock_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = stab(b, l + 1);
-    if (!r) r = blockList(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    stab(b, l + 1);
+    return true;
   }
 
   // endOfExpression*
@@ -1670,6 +1664,25 @@ public class ElixirParser implements PsiParser {
     while (true) {
       if (!endOfExpression(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "doBlock_3", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // blockList?
+  private static boolean doBlock_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock_4")) return false;
+    blockList(b, l + 1);
+    return true;
+  }
+
+  // endOfExpression*
+  private static boolean doBlock_5(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "doBlock_5")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!endOfExpression(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "doBlock_5", c)) break;
       c = current_position_(b);
     }
     return true;

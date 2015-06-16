@@ -2568,43 +2568,33 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
         ElixirStab stab = doBlock.getStab();
-        OtpErlangObject[] quotedKeywordPairs = null;
-        OtpErlangObject doValue = null;
+        OtpErlangObject doValue = NIL;
+        OtpErlangObject[] quotedKeywordPairs;
 
         if (stab != null) {
             doValue = stab.quote();
-        } else {
-            ElixirBlockList blockList = doBlock.getBlockList();
-
-            if (blockList != null) {
-                OtpErlangObject[] blockListQuotedArguments = blockList.quoteArguments();
-
-                OtpErlangTuple quotedDoKeywordPair = new OtpErlangTuple(
-                        new OtpErlangObject[]{
-                                DO,
-                                NIL
-                        }
-                );
-                quotedKeywordPairs = new OtpErlangObject[1 + blockListQuotedArguments.length];
-
-                int i = 0;
-                quotedKeywordPairs[i++] = quotedDoKeywordPair;
-                System.arraycopy(blockListQuotedArguments, 0, quotedKeywordPairs, i, blockListQuotedArguments.length);
-            } else {
-                doValue = NIL;
-            }
         }
 
-        if (quotedKeywordPairs == null) {
-           /* `{do, <doValue>}
-               @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272 */
+        OtpErlangTuple quotedDoKeywordPair = new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        DO,
+                        doValue
+                }
+        );
+
+        ElixirBlockList blockList = doBlock.getBlockList();
+
+        if (blockList != null) {
+            OtpErlangObject[] blockListQuotedArguments = blockList.quoteArguments();
+
+            quotedKeywordPairs = new OtpErlangObject[1 + blockListQuotedArguments.length];
+
+            int i = 0;
+            quotedKeywordPairs[i++] = quotedDoKeywordPair;
+            System.arraycopy(blockListQuotedArguments, 0, quotedKeywordPairs, i, blockListQuotedArguments.length);
+        } else {
             quotedKeywordPairs = new OtpErlangObject[]{
-                    new OtpErlangTuple(
-                            new OtpErlangObject[]{
-                                    DO,
-                                    doValue
-                            }
-                    )
+                    quotedDoKeywordPair
             };
         }
 
