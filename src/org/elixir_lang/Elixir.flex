@@ -268,6 +268,7 @@ COLON = :
  */
 
 AFTER = "after"
+CATCH = "catch"
 ELSE = "else"
 RESCUE = "rescue"
 
@@ -582,6 +583,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {BIT_STRING_OPERATOR} / {COLON}{SPACE}     { // Definitely a Keyword pair, but KEYWORD_PAIR_MAYBE state will still work.
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR; }
+  {CATCH}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.CATCH; }
   {CAPTURE_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.CAPTURE_OPERATOR; }
   /* Must be after {BIT_STRING_OPERATOR} as {BIT_STRING_OPERATOR} combines {OPENING_BIT} {CLOSING_BIT} and must be
@@ -829,6 +832,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.ARROW_OPERATOR; }
   {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AT_OPERATOR; }
+  {CATCH} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.CATCH; }
   {CAPTURE_OPERATOR}                                { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CAPTURE_OPERATOR; }
   {COMPARISON_OPERATOR}                             { yybegin(CALL_MAYBE);

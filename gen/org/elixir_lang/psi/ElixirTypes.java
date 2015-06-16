@@ -203,6 +203,7 @@ public interface ElixirTypes {
   IElementType BIT_STRING_OPERATOR = new ElixirTokenType("BIT_STRING_OPERATOR");
   IElementType CALL = new ElixirTokenType("<zero-width-call>");
   IElementType CAPTURE_OPERATOR = new ElixirTokenType("&");
+  IElementType CATCH = new ElixirTokenType("catch");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("'''");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_HEREDOC_TERMINATOR");

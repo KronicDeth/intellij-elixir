@@ -23,6 +23,7 @@
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = "<zero-width-call>"
     CAPTURE_OPERATOR = "&"
+    CATCH = "catch"
     CHAR_LIST_HEREDOC_PROMOTER = "'''"
     CHAR_LIST_PROMOTER = "'"
     CHAR_TOKENIZER = "?"

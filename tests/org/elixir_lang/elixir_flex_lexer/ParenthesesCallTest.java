@@ -171,6 +171,13 @@ public class ParenthesesCallTest extends Test {
                                 )
                         },
                         {
+                                "catch",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.CATCH, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
                                 "do",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
