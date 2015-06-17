@@ -1827,8 +1827,19 @@ doBlock ::= DO endOfExpression*
             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
-blockExpression ::= variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152
-                                @todo matchedQualifiedNoArgumentsCall */
+blockExpression ::= (
+                     /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
+                        because all those rules are ATOM or PREFIX so they won't also match lower rules */
+                     (
+                       matchedAtUnqualifiedBracketOperation |
+                       matchedAtNonNumericOperation |
+                       matchedUnqualifiedParenthesesCall |
+                       matchedUnqualifiedBracketOperation |
+                       variable |
+                       accessExpression
+                     ) maxQualifiedNoArgumentsCall+ |
+                     variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152 */
+                    )
                     doBlock
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148

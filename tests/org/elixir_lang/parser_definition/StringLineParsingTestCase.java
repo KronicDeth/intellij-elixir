@@ -8,10 +8,6 @@ public class StringLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEmptyHexadecimalEscapeSequence() {
-        assertParsedWithLocalErrorAndRemoteExit();
-    }
-
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }

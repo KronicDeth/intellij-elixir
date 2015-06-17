@@ -7,7 +7,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirBlockExpression;
 import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirVariable;
+import org.elixir_lang.psi.ElixirMatchedExpression;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,8 +30,8 @@ public class ElixirBlockExpressionImpl extends ASTWrapperPsiElement implements E
 
   @Override
   @NotNull
-  public ElixirVariable getVariable() {
-    return findNotNullChildByClass(ElixirVariable.class);
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findNotNullChildByClass(ElixirMatchedExpression.class);
   }
 
   @NotNull

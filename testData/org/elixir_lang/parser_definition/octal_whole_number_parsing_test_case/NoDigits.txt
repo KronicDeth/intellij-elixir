@@ -6,21 +6,27 @@ Elixir File(0,84)
     ElixirOctalWholeNumberImpl(OCTAL_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(o)('o')(35,36)
-      PsiErrorElement:<octal digits> expected, got '
-'(36,36)
-        <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
+    PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <end of expression>, <in>, <max qualified no arguments call>, <octal digits>, <when>, <|>, <||, |||, or>, DUAL_OPERATOR, EOL or '[' expected, got '
+'(36,36)
+      <empty list>
     PsiElement(EOL)('\n')(36,37)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(37,38)
+    PsiErrorElement:<end of expression> or EOL expected, got '
+'(37,37)
+      <empty list>
     PsiElement(EOL)('\n')(37,38)
   PsiComment(COMMENT)('# No digits should recover at ;')(38,69)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(69,70)
+    PsiErrorElement:<end of expression> or EOL expected, got '
+'(69,69)
+      <empty list>
     PsiElement(EOL)('\n')(69,70)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(70,72)
     ElixirOctalWholeNumberImpl(OCTAL_WHOLE_NUMBER)(70,72)
       PsiElement(0)('0')(70,71)
       PsiElement(o)('o')(71,72)
-      PsiErrorElement:<octal digits> expected, got ';'(72,72)
+      PsiErrorElement:<max qualified no arguments call> or <octal digits> expected, got ';'(72,72)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(;)(';')(72,73)

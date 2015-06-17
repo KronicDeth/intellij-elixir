@@ -10,7 +10,7 @@ public interface ElixirBlockExpression extends Quotable {
   ElixirDoBlock getDoBlock();
 
   @NotNull
-  ElixirVariable getVariable();
+  ElixirMatchedExpression getMatchedExpression();
 
   @NotNull
   OtpErlangObject quote();
