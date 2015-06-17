@@ -22,6 +22,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirBlockExpression getBlockExpression() {
+    return findChildByClass(ElixirBlockExpression.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
   }
@@ -30,12 +36,6 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
   @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
     return findChildByClass(ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnqualifiedNoArgumentsBlock getUnqualifiedNoArgumentsBlock() {
-    return findChildByClass(ElixirUnqualifiedNoArgumentsBlock.class);
   }
 
   @Override

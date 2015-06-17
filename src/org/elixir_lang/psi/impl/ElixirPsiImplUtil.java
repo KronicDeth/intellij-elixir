@@ -618,6 +618,28 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockExpression blockExpression) {
+        PsiElement[] children = blockExpression.getChildren();
+
+        assert children.length == 2;
+
+        Quotable call = (Quotable) children[0];
+        OtpErlangTuple quotedCall = (OtpErlangTuple) call.quote();
+
+        QuotableArguments blockArguments = (QuotableArguments) children[1];
+        OtpErlangObject[] quotedArguments = blockArguments.quoteArguments();
+
+        OtpErlangList callMetadata = Macro.metadata(quotedCall);
+
+        return quotedFunctionCall(
+                quotedCall.elementAt(0),
+                callMetadata,
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBlockIdentifier blockIdentifier) {
         return new OtpErlangAtom(blockIdentifier.getNode().getText());
     }
@@ -1661,28 +1683,6 @@ public class ElixirPsiImplUtil {
         }
 
         return quoted;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoArgumentsBlock unqualifiedNoArgumentsBlock) {
-       PsiElement[] children = unqualifiedNoArgumentsBlock.getChildren();
-
-        assert children.length == 2;
-
-        Quotable call = (Quotable) children[0];
-        OtpErlangTuple quotedCall = (OtpErlangTuple) call.quote();
-
-        QuotableArguments blockArguments = (QuotableArguments) children[1];
-        OtpErlangObject[] quotedArguments = blockArguments.quoteArguments();
-
-        OtpErlangList callMetadata = Macro.metadata(quotedCall);
-
-        return quotedFunctionCall(
-                quotedCall.elementAt(0),
-                callMetadata,
-                quotedArguments
-        );
     }
 
     @Contract(pure = true)

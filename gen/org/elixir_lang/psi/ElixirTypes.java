@@ -24,6 +24,7 @@ public interface ElixirTypes {
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType BIT_STRING = new ElixirElementType("BIT_STRING");
+  IElementType BLOCK_EXPRESSION = new ElixirElementType("BLOCK_EXPRESSION");
   IElementType BLOCK_IDENTIFIER = new ElixirElementType("BLOCK_IDENTIFIER");
   IElementType BLOCK_ITEM = new ElixirElementType("BLOCK_ITEM");
   IElementType BLOCK_LIST = new ElixirElementType("BLOCK_LIST");
@@ -186,7 +187,6 @@ public interface ElixirTypes {
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
   IElementType UNKNOWN_BASE_WHOLE_NUMBER = new ElixirElementType("UNKNOWN_BASE_WHOLE_NUMBER");
-  IElementType UNQUALIFIED_NO_ARGUMENTS_BLOCK = new ElixirElementType("UNQUALIFIED_NO_ARGUMENTS_BLOCK");
   IElementType UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL = new ElixirElementType("UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL");
   IElementType VARIABLE = new ElixirElementType("VARIABLE");
   IElementType WHEN_INFIX_OPERATOR = new ElixirElementType("WHEN_INFIX_OPERATOR");
@@ -368,6 +368,9 @@ public interface ElixirTypes {
       }
       else if (type == BIT_STRING) {
         return new ElixirBitStringImpl(node);
+      }
+      else if (type == BLOCK_EXPRESSION) {
+        return new ElixirBlockExpressionImpl(node);
       }
       else if (type == BLOCK_IDENTIFIER) {
         return new ElixirBlockIdentifierImpl(node);
@@ -854,9 +857,6 @@ public interface ElixirTypes {
       }
       else if (type == UNKNOWN_BASE_WHOLE_NUMBER) {
         return new ElixirUnknownBaseWholeNumberImpl(node);
-      }
-      else if (type == UNQUALIFIED_NO_ARGUMENTS_BLOCK) {
-        return new ElixirUnqualifiedNoArgumentsBlockImpl(node);
       }
       else if (type == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
         return new ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(node);

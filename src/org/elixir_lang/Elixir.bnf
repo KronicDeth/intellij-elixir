@@ -1826,12 +1826,11 @@ doBlock ::= DO endOfExpression*
             END
             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-unqualifiedNoArgumentsBlock ::= variable doBlock
-                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
-private blockExpression ::= unqualifiedNoArgumentsBlock /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152
-                                                           @todo matchedQualifiedNoArgumentsCall */
+blockExpression ::= variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152
+                                @todo matchedQualifiedNoArgumentsCall */
+                    doBlock
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
 private unmatchedExpression ::= blockExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
 

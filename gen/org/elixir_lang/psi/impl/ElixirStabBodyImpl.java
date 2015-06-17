@@ -24,6 +24,12 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
 
   @Override
   @NotNull
+  public List<ElixirBlockExpression> getBlockExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBlockExpression.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
@@ -38,12 +44,6 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
   @NotNull
   public List<ElixirMatchedExpression> getMatchedExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirUnqualifiedNoArgumentsBlock> getUnqualifiedNoArgumentsBlockList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnqualifiedNoArgumentsBlock.class);
   }
 
   @Override

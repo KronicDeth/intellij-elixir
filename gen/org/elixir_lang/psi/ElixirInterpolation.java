@@ -12,6 +12,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirAdjacentExpression> getAdjacentExpressionList();
 
   @NotNull
+  List<ElixirBlockExpression> getBlockExpressionList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
@@ -19,9 +22,6 @@ public interface ElixirInterpolation extends Quotable {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
-
-  @NotNull
-  List<ElixirUnqualifiedNoArgumentsBlock> getUnqualifiedNoArgumentsBlockList();
 
   @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();

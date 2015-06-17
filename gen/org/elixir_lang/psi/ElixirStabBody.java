@@ -9,6 +9,9 @@ import java.util.List;
 public interface ElixirStabBody extends Quotable {
 
   @NotNull
+  List<ElixirBlockExpression> getBlockExpressionList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
@@ -16,9 +19,6 @@ public interface ElixirStabBody extends Quotable {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
-
-  @NotNull
-  List<ElixirUnqualifiedNoArgumentsBlock> getUnqualifiedNoArgumentsBlockList();
 
   @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();

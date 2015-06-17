@@ -22,6 +22,12 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
 
   @Override
   @Nullable
+  public ElixirBlockExpression getBlockExpression() {
+    return findChildByClass(ElixirBlockExpression.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
   }
@@ -36,12 +42,6 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
   @NotNull
   public ElixirParenthesesArguments getParenthesesArguments() {
     return findNotNullChildByClass(ElixirParenthesesArguments.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnqualifiedNoArgumentsBlock getUnqualifiedNoArgumentsBlock() {
-    return findChildByClass(ElixirUnqualifiedNoArgumentsBlock.class);
   }
 
   @Override

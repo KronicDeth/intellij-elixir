@@ -8,13 +8,13 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirAdjacentExpression extends Quotable {
 
   @Nullable
+  ElixirBlockExpression getBlockExpression();
+
+  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
-
-  @Nullable
-  ElixirUnqualifiedNoArgumentsBlock getUnqualifiedNoArgumentsBlock();
 
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();

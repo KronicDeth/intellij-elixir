@@ -72,6 +72,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitBlockExpression(@NotNull ElixirBlockExpression o) {
+    visitQuotable(o);
+  }
+
   public void visitBlockIdentifier(@NotNull ElixirBlockIdentifier o) {
     visitQuotable(o);
   }
@@ -777,10 +781,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnknownBaseWholeNumber(@NotNull ElixirUnknownBaseWholeNumber o) {
     visitWholeNumber(o);
-  }
-
-  public void visitUnqualifiedNoArgumentsBlock(@NotNull ElixirUnqualifiedNoArgumentsBlock o) {
-    visitQuotable(o);
   }
 
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {

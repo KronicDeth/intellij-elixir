@@ -71,6 +71,9 @@ public class ElixirParser implements PsiParser {
     else if (t == BIT_STRING) {
       r = bitString(b, 0);
     }
+    else if (t == BLOCK_EXPRESSION) {
+      r = blockExpression(b, 0);
+    }
     else if (t == BLOCK_IDENTIFIER) {
       r = blockIdentifier(b, 0);
     }
@@ -556,9 +559,6 @@ public class ElixirParser implements PsiParser {
     }
     else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
       r = unknownBaseWholeNumber(b, 0);
-    }
-    else if (t == UNQUALIFIED_NO_ARGUMENTS_BLOCK) {
-      r = unqualifiedNoArgumentsBlock(b, 0);
     }
     else if (t == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
       r = unqualifiedNoParenthesesManyArgumentsCall(b, 0);
@@ -1079,9 +1079,18 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // unqualifiedNoArgumentsBlock
-  static boolean blockExpression(PsiBuilder b, int l) {
-    return unqualifiedNoArgumentsBlock(b, l + 1);
+  // variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152
+  //                                 @todo matchedQualifiedNoArgumentsCall */
+  //                     doBlock
+  public static boolean blockExpression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockExpression")) return false;
+    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = variable(b, l + 1);
+    r = r && doBlock(b, l + 1);
+    exit_section_(b, m, BLOCK_EXPRESSION, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -5260,19 +5269,6 @@ public class ElixirParser implements PsiParser {
   // blockExpression
   static boolean unmatchedExpression(PsiBuilder b, int l) {
     return blockExpression(b, l + 1);
-  }
-
-  /* ********************************************************** */
-  // variable doBlock
-  public static boolean unqualifiedNoArgumentsBlock(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unqualifiedNoArgumentsBlock")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = variable(b, l + 1);
-    r = r && doBlock(b, l + 1);
-    exit_section_(b, m, UNQUALIFIED_NO_ARGUMENTS_BLOCK, r);
-    return r;
   }
 
   /* ********************************************************** */

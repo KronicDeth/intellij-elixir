@@ -5,20 +5,20 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import org.elixir_lang.psi.ElixirBlockExpression;
 import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirUnqualifiedNoArgumentsBlock;
 import org.elixir_lang.psi.ElixirVariable;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirUnqualifiedNoArgumentsBlockImpl extends ASTWrapperPsiElement implements ElixirUnqualifiedNoArgumentsBlock {
+public class ElixirBlockExpressionImpl extends ASTWrapperPsiElement implements ElixirBlockExpression {
 
-  public ElixirUnqualifiedNoArgumentsBlockImpl(ASTNode node) {
+  public ElixirBlockExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnqualifiedNoArgumentsBlock(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBlockExpression(this);
     else super.accept(visitor);
   }
 
