@@ -1828,6 +1828,9 @@ doBlock ::= DO endOfExpression*
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
 blockExpression ::= (
+                     /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
+                        take a `.`. */
+                     matchedBracketOperation maxDotCall |
                      /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
                         because all those rules are ATOM or PREFIX so they won't also match lower rules */
                      (

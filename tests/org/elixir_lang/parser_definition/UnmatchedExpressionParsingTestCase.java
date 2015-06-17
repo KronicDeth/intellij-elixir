@@ -1,6 +1,10 @@
 package org.elixir_lang.parser_definition;
 
 public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
+    public void testDotCallBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testQualifiedNoArgumentsCallBlock() {
         assertParsedAndQuotedCorrectly();
     }

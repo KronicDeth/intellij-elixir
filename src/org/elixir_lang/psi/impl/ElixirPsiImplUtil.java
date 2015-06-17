@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
@@ -627,9 +628,23 @@ public class ElixirPsiImplUtil {
         OtpErlangTuple quotedCall = (OtpErlangTuple) call.quote();
 
         QuotableArguments blockArguments = (QuotableArguments) children[1];
-        OtpErlangObject[] quotedArguments = blockArguments.quoteArguments();
+        OtpErlangObject[] quotedBlockArguments = blockArguments.quoteArguments();
 
         OtpErlangList callMetadata = Macro.metadata(quotedCall);
+        OtpErlangObject[] quotedArguments;
+
+        if (Macro.isVariable(quotedCall)) {
+            quotedArguments = quotedBlockArguments;
+        } else {
+            OtpErlangList quotedCallArguments = Macro.callArguments(quotedCall);
+
+            OtpErlangObject[] quotedCallArgumentElements = quotedCallArguments.elements();
+
+            quotedArguments = (OtpErlangObject[]) ArrayUtils.addAll(
+                    quotedCallArgumentElements,
+                    quotedBlockArguments
+            );
+        }
 
         return quotedFunctionCall(
                 quotedCall.elementAt(0),
