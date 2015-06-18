@@ -7,7 +7,7 @@ Elixir File(0,78)
       PsiElement(0)('0')(34,35)
       PsiElement(b)('b')(35,36)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
-    PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <binary digits>, <end of expression>, <in>, <max dot call>, <max qualified no arguments call>, <when>, <|>, <||, |||, or>, DUAL_OPERATOR, EOL or '[' expected, got '
+    PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <binary digits>, <end of expression>, <in>, <max dot call>, <max qualified no arguments call>, <max qualified parentheses call>, <when>, <|>, <||, |||, or>, DUAL_OPERATOR, EOL or '[' expected, got '
 '(36,36)
       <empty list>
     PsiElement(EOL)('\n')(36,37)
@@ -26,7 +26,7 @@ Elixir File(0,78)
     ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(70,72)
       PsiElement(0)('0')(70,71)
       PsiElement(b)('b')(71,72)
-      PsiErrorElement:<.>, <binary digits>, <max dot call>, <max qualified no arguments call> or '[' expected, got ';'(72,72)
+      PsiErrorElement:<.>, <binary digits>, <max dot call>, <max qualified no arguments call>, <max qualified parentheses call> or '[' expected, got ';'(72,72)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(;)(';')(72,73)

@@ -424,7 +424,7 @@ Elixir File(0,531)
       ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(312,314)
         PsiElement(0)('0')(312,313)
         PsiElement(b)('b')(313,314)
-        PsiErrorElement:<.>, <binary digits>, <max dot call>, <max qualified no arguments call> or '[' expected, got '('(314,314)
+        PsiErrorElement:<.>, <binary digits>, <max dot call>, <max qualified no arguments call>, <max qualified parentheses call> or '[' expected, got '('(314,314)
           <empty list>
   ElixirAdjacentExpressionImpl(ADJACENT_EXPRESSION)(314,317)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(314,317)
