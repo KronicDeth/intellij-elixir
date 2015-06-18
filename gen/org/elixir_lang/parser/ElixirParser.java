@@ -1096,6 +1096,7 @@ public class ElixirParser implements PsiParser {
   //                        variable |
   //                        accessExpression
   //                      ) maxQualifiedNoArgumentsCall+ |
+  //                      matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                      variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152 */
   //                     )
   //                     doBlock
@@ -1123,6 +1124,7 @@ public class ElixirParser implements PsiParser {
   //                        variable |
   //                        accessExpression
   //                      ) maxQualifiedNoArgumentsCall+ |
+  //                      matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
   //                      variable
   private static boolean blockExpression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockExpression_0")) return false;
@@ -1131,6 +1133,7 @@ public class ElixirParser implements PsiParser {
     r = blockExpression_0_0(b, l + 1);
     if (!r) r = blockExpression_0_1(b, l + 1);
     if (!r) r = blockExpression_0_2(b, l + 1);
+    if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = variable(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
