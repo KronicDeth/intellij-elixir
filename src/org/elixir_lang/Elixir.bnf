@@ -1826,15 +1826,19 @@ doBlock ::= DO endOfExpression*
             END
             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
+left blockNoParenthesesCall ::= noParenthesesArguments
+                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
 blockExpression ::= (
                      /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
                         take a `.`. */
                      matchedBracketOperation maxDotCall |
+                     matchedBracketOperation blockNoParenthesesCall |
                      /* matchedQualifiedNoArgumentsCall because it is first rule after
                         matchedQualifiedParenthesesCall */
                      matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-                     /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
+                     /* matchedAtUnqualifiedBracketOperation and all rules through accessExpression are necessary
                         because all those rules are ATOM or PREFIX so they won't also match lower rules */
                      (
                        matchedAtUnqualifiedBracketOperation |

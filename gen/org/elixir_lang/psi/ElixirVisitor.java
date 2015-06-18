@@ -88,6 +88,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotableArguments(o);
   }
 
+  public void visitBlockNoParenthesesCall(@NotNull ElixirBlockNoParenthesesCall o) {
+    visitQuotable(o);
+  }
+
   public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
     visitQuotable(o);
   }

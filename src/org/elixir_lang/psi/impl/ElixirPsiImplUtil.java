@@ -680,6 +680,36 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockNoParenthesesCall blockNoParenthesesCall) {
+        PsiElement[] children = blockNoParenthesesCall.getChildren();
+
+        assert children.length == 2;
+
+        Quotable quotableCall = (Quotable) children[0];
+        OtpErlangTuple quotedCall = (OtpErlangTuple) quotableCall.quote();
+        OtpErlangList callMetadata = Macro.metadata(quotedCall);
+
+        QuotableArguments noParenthesesArguments = (QuotableArguments) children[1];
+        OtpErlangObject[] quotedNoParenthesesArguments = noParenthesesArguments.quoteArguments();
+
+        OtpErlangList quotedCallArguments = Macro.callArguments(quotedCall);
+
+        OtpErlangObject[] quotedCallArgumentElements = quotedCallArguments.elements();
+
+        OtpErlangObject[] quotedArguments = (OtpErlangObject[]) ArrayUtils.addAll(
+                quotedCallArgumentElements,
+                quotedNoParenthesesArguments
+        );
+
+        return quotedFunctionCall(
+                quotedCall.elementAt(0),
+                callMetadata,
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirBracketArguments bracketArguments) {
         PsiElement[] children = bracketArguments.getChildren();
 

@@ -5,11 +5,9 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirBlockExpression;
-import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirMatchedExpression;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirBlockExpressionImpl extends ASTWrapperPsiElement implements ElixirBlockExpression {
 
@@ -23,15 +21,21 @@ public class ElixirBlockExpressionImpl extends ASTWrapperPsiElement implements E
   }
 
   @Override
+  @Nullable
+  public ElixirBlockNoParenthesesCall getBlockNoParenthesesCall() {
+    return findChildByClass(ElixirBlockNoParenthesesCall.class);
+  }
+
+  @Override
   @NotNull
   public ElixirDoBlock getDoBlock() {
     return findNotNullChildByClass(ElixirDoBlock.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+    return findChildByClass(ElixirMatchedExpression.class);
   }
 
   @NotNull

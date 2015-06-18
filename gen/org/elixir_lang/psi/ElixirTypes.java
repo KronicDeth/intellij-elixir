@@ -28,6 +28,7 @@ public interface ElixirTypes {
   IElementType BLOCK_IDENTIFIER = new ElixirElementType("BLOCK_IDENTIFIER");
   IElementType BLOCK_ITEM = new ElixirElementType("BLOCK_ITEM");
   IElementType BLOCK_LIST = new ElixirElementType("BLOCK_LIST");
+  IElementType BLOCK_NO_PARENTHESES_CALL = new ElixirElementType("BLOCK_NO_PARENTHESES_CALL");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
@@ -380,6 +381,9 @@ public interface ElixirTypes {
       }
       else if (type == BLOCK_LIST) {
         return new ElixirBlockListImpl(node);
+      }
+      else if (type == BLOCK_NO_PARENTHESES_CALL) {
+        return new ElixirBlockNoParenthesesCallImpl(node);
       }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);

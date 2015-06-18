@@ -83,6 +83,9 @@ public class ElixirParser implements PsiParser {
     else if (t == BLOCK_LIST) {
       r = blockList(b, 0);
     }
+    else if (t == BLOCK_NO_PARENTHESES_CALL) {
+      r = blockNoParenthesesCall(b, 0);
+    }
     else if (t == BRACKET_ARGUMENTS) {
       r = bracketArguments(b, 0);
     }
@@ -1083,10 +1086,11 @@ public class ElixirParser implements PsiParser {
   //                      /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
   //                         take a `.`. */
   //                      matchedBracketOperation maxDotCall |
+  //                      matchedBracketOperation blockNoParenthesesCall |
   //                      /* matchedQualifiedNoArgumentsCall because it is first rule after
   //                         matchedQualifiedParenthesesCall */
   //                      matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-  //                      /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
+  //                      /* matchedAtUnqualifiedBracketOperation and all rules through accessExpression are necessary
   //                         because all those rules are ATOM or PREFIX so they won't also match lower rules */
   //                      (
   //                        matchedAtUnqualifiedBracketOperation |
@@ -1111,10 +1115,11 @@ public class ElixirParser implements PsiParser {
   }
 
   // matchedBracketOperation maxDotCall |
+  //                      matchedBracketOperation blockNoParenthesesCall |
   //                      /* matchedQualifiedNoArgumentsCall because it is first rule after
   //                         matchedQualifiedParenthesesCall */
   //                      matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-  //                      /* matchedAtUnqualifiedBracketOperation and all rules thrugh accessExpression are necessary
+  //                      /* matchedAtUnqualifiedBracketOperation and all rules through accessExpression are necessary
   //                         because all those rules are ATOM or PREFIX so they won't also match lower rules */
   //                      (
   //                        matchedAtUnqualifiedBracketOperation |
@@ -1133,6 +1138,7 @@ public class ElixirParser implements PsiParser {
     r = blockExpression_0_0(b, l + 1);
     if (!r) r = blockExpression_0_1(b, l + 1);
     if (!r) r = blockExpression_0_2(b, l + 1);
+    if (!r) r = blockExpression_0_3(b, l + 1);
     if (!r) r = matchedUnqualifiedParenthesesCall(b, l + 1);
     if (!r) r = variable(b, l + 1);
     exit_section_(b, m, null, r);
@@ -1150,9 +1156,20 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall
+  // matchedBracketOperation blockNoParenthesesCall
   private static boolean blockExpression_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockExpression_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, 21);
+    r = r && blockNoParenthesesCall(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall
+  private static boolean blockExpression_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockExpression_0_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedExpression(b, l + 1, 25);
@@ -1169,12 +1186,12 @@ public class ElixirParser implements PsiParser {
   //                        variable |
   //                        accessExpression
   //                      ) maxQualifiedNoArgumentsCall+
-  private static boolean blockExpression_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "blockExpression_0_2")) return false;
+  private static boolean blockExpression_0_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockExpression_0_3")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = blockExpression_0_2_0(b, l + 1);
-    r = r && blockExpression_0_2_1(b, l + 1);
+    r = blockExpression_0_3_0(b, l + 1);
+    r = r && blockExpression_0_3_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1185,8 +1202,8 @@ public class ElixirParser implements PsiParser {
   //                        matchedUnqualifiedBracketOperation |
   //                        variable |
   //                        accessExpression
-  private static boolean blockExpression_0_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "blockExpression_0_2_0")) return false;
+  private static boolean blockExpression_0_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockExpression_0_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = matchedAtUnqualifiedBracketOperation(b, l + 1);
@@ -1200,15 +1217,15 @@ public class ElixirParser implements PsiParser {
   }
 
   // maxQualifiedNoArgumentsCall+
-  private static boolean blockExpression_0_2_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "blockExpression_0_2_1")) return false;
+  private static boolean blockExpression_0_3_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockExpression_0_3_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = maxQualifiedNoArgumentsCall(b, l + 1);
     int c = current_position_(b);
     while (r) {
       if (!maxQualifiedNoArgumentsCall(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "blockExpression_0_2_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "blockExpression_0_3_1", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, m, null, r);
@@ -1289,6 +1306,17 @@ public class ElixirParser implements PsiParser {
       c = current_position_(b);
     }
     exit_section_(b, l, m, BLOCK_LIST, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // noParenthesesArguments
+  public static boolean blockNoParenthesesCall(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "blockNoParenthesesCall")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _LEFT_, "<block no parentheses call>");
+    r = noParenthesesArguments(b, l + 1);
+    exit_section_(b, l, m, BLOCK_NO_PARENTHESES_CALL, r, false, null);
     return r;
   }
 
