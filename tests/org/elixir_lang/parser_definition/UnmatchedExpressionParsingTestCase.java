@@ -21,6 +21,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testCaptureUnqualifiedNoParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testDotCallBlock() {
         assertParsedAndQuotedCorrectly();
     }
