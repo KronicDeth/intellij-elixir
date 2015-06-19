@@ -30,6 +30,8 @@ public interface ElixirTypes {
   IElementType BLOCK_LIST = new ElixirElementType("BLOCK_LIST");
   IElementType BLOCK_NO_PARENTHESES_CALL = new ElixirElementType("BLOCK_NO_PARENTHESES_CALL");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
+  IElementType CAPTURE_BLOCK_OPERATION = new ElixirElementType("CAPTURE_BLOCK_OPERATION");
+  IElementType CAPTURE_EXPRESSION_OPERATION = new ElixirElementType("CAPTURE_EXPRESSION_OPERATION");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -387,6 +389,12 @@ public interface ElixirTypes {
       }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);
+      }
+      else if (type == CAPTURE_BLOCK_OPERATION) {
+        return new ElixirCaptureBlockOperationImpl(node);
+      }
+      else if (type == CAPTURE_EXPRESSION_OPERATION) {
+        return new ElixirCaptureExpressionOperationImpl(node);
       }
       else if (type == CAPTURE_NUMERIC_OPERATION) {
         return new ElixirCaptureNumericOperationImpl(node);

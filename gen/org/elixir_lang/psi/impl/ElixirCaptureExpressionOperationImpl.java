@@ -9,14 +9,14 @@ import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement implements ElixirStabParenthesesSignature {
+public class ElixirCaptureExpressionOperationImpl extends ASTWrapperPsiElement implements ElixirCaptureExpressionOperation {
 
-  public ElixirStabParenthesesSignatureImpl(ASTNode node) {
+  public ElixirCaptureExpressionOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStabParenthesesSignature(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitCaptureExpressionOperation(this);
     else super.accept(visitor);
   }
 
@@ -33,6 +33,12 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
+  @NotNull
+  public ElixirCapturePrefixOperator getCapturePrefixOperator() {
+    return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
+  }
+
+  @Override
   @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
@@ -45,21 +51,9 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
   }
 
   @Override
-  @NotNull
-  public ElixirParenthesesArguments getParenthesesArguments() {
-    return findNotNullChildByClass(ElixirParenthesesArguments.class);
-  }
-
-  @Override
   @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirWhenInfixOperator getWhenInfixOperator() {
-    return findChildByClass(ElixirWhenInfixOperator.class);
   }
 
   @NotNull

@@ -96,6 +96,14 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitCaptureBlockOperation(@NotNull ElixirCaptureBlockOperation o) {
+    visitPrefixOperation(o);
+  }
+
+  public void visitCaptureExpressionOperation(@NotNull ElixirCaptureExpressionOperation o) {
+    visitPrefixOperation(o);
+  }
+
   public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {
     visitPrefixOperation(o);
   }

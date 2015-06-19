@@ -89,6 +89,12 @@ public class ElixirParser implements PsiParser {
     else if (t == BRACKET_ARGUMENTS) {
       r = bracketArguments(b, 0);
     }
+    else if (t == CAPTURE_BLOCK_OPERATION) {
+      r = captureBlockOperation(b, 0);
+    }
+    else if (t == CAPTURE_EXPRESSION_OPERATION) {
+      r = captureExpressionOperation(b, 0);
+    }
     else if (t == CAPTURE_NUMERIC_OPERATION) {
       r = captureNumericOperation(b, 0);
     }
@@ -1387,6 +1393,32 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "bracketArguments_2_1_1")) return false;
     infixComma(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // capturePrefixOperator blockExpression
+  public static boolean captureBlockOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureBlockOperation")) return false;
+    if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = capturePrefixOperator(b, l + 1);
+    r = r && blockExpression(b, l + 1);
+    exit_section_(b, m, CAPTURE_BLOCK_OPERATION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // capturePrefixOperator expression
+  public static boolean captureExpressionOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "captureExpressionOperation")) return false;
+    if (!nextTokenIs(b, CAPTURE_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = capturePrefixOperator(b, l + 1);
+    r = r && expression(b, l + 1);
+    exit_section_(b, m, CAPTURE_EXPRESSION_OPERATION, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -5423,9 +5455,16 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // blockExpression
+  // blockExpression | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
+  //                                 captureBlockOperation
   static boolean unmatchedExpression(PsiBuilder b, int l) {
-    return blockExpression(b, l + 1);
+    if (!recursion_guard_(b, l, "unmatchedExpression")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = blockExpression(b, l + 1);
+    if (!r) r = captureBlockOperation(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

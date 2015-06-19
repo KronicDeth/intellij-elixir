@@ -11,6 +11,9 @@ public interface ElixirStabParenthesesSignature extends Quotable {
   ElixirBlockExpression getBlockExpression();
 
   @Nullable
+  ElixirCaptureBlockOperation getCaptureBlockOperation();
+
+  @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
   @Nullable

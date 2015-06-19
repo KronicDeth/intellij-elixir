@@ -12,6 +12,9 @@ public interface ElixirStabBody extends Quotable {
   List<ElixirBlockExpression> getBlockExpressionList();
 
   @NotNull
+  List<ElixirCaptureBlockOperation> getCaptureBlockOperationList();
+
+  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
