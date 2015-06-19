@@ -5,6 +5,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testCaptureQualifiedNoArgumentsCallBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testDotCallBlock() {
         assertParsedAndQuotedCorrectly();
     }
