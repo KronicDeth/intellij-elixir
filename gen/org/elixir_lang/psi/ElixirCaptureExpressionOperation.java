@@ -26,6 +26,9 @@ public interface ElixirCaptureExpressionOperation extends PrefixOperation {
   ElixirMatchedExpression getMatchedExpression();
 
   @Nullable
+  ElixirUnaryBlockOperation getUnaryBlockOperation();
+
+  @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
   @NotNull

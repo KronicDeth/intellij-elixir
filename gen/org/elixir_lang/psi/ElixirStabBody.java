@@ -27,6 +27,9 @@ public interface ElixirStabBody extends Quotable {
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
+  List<ElixirUnaryBlockOperation> getUnaryBlockOperationList();
+
+  @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
 
   @NotNull

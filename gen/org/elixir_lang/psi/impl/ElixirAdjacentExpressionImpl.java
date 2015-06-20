@@ -52,6 +52,12 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
+  public ElixirUnaryBlockOperation getUnaryBlockOperation() {
+    return findChildByClass(ElixirUnaryBlockOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }

@@ -1874,10 +1874,14 @@ atBlockOperation ::= atPrefixOperator blockExpression
 captureBlockOperation ::= capturePrefixOperator blockExpression
                           { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
+unaryBlockOperation ::= unaryPrefixOperator blockExpression
+                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
 private unmatchedExpression ::= blockExpression | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
                                 atBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L131
-                                captureBlockOperation // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L132
+                                captureBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L132
+                                unaryBlockOperation // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L130
 
 /*
  *

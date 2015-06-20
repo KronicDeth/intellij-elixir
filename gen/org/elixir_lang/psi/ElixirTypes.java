@@ -187,6 +187,7 @@ public interface ElixirTypes {
   IElementType TUPLE = new ElixirElementType("TUPLE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
+  IElementType UNARY_BLOCK_OPERATION = new ElixirElementType("UNARY_BLOCK_OPERATION");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
@@ -861,6 +862,9 @@ public interface ElixirTypes {
       }
       else if (type == TYPE_INFIX_OPERATOR) {
         return new ElixirTypeInfixOperatorImpl(node);
+      }
+      else if (type == UNARY_BLOCK_OPERATION) {
+        return new ElixirUnaryBlockOperationImpl(node);
       }
       else if (type == UNARY_NUMERIC_OPERATION) {
         return new ElixirUnaryNumericOperationImpl(node);

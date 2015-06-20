@@ -23,6 +23,9 @@ public interface ElixirAdjacentExpression extends Quotable {
   ElixirMatchedExpression getMatchedExpression();
 
   @Nullable
+  ElixirUnaryBlockOperation getUnaryBlockOperation();
+
+  @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
   @NotNull

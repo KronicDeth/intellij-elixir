@@ -783,6 +783,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitUnaryBlockOperation(@NotNull ElixirUnaryBlockOperation o) {
+    visitPrefixOperation(o);
+  }
+
   public void visitUnaryNumericOperation(@NotNull ElixirUnaryNumericOperation o) {
     visitPrefixOperation(o);
   }

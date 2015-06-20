@@ -58,6 +58,12 @@ public class ElixirCaptureExpressionOperationImpl extends ASTWrapperPsiElement i
 
   @Override
   @Nullable
+  public ElixirUnaryBlockOperation getUnaryBlockOperation() {
+    return findChildByClass(ElixirUnaryBlockOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }

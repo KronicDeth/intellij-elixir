@@ -30,6 +30,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
+  List<ElixirUnaryBlockOperation> getUnaryBlockOperationList();
+
+  @NotNull
   List<ElixirUnqualifiedNoParenthesesManyArgumentsCall> getUnqualifiedNoParenthesesManyArgumentsCallList();
 
   @NotNull
