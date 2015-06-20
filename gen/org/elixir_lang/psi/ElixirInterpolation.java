@@ -12,6 +12,9 @@ public interface ElixirInterpolation extends Quotable {
   List<ElixirAdjacentExpression> getAdjacentExpressionList();
 
   @NotNull
+  List<ElixirAtBlockOperation> getAtBlockOperationList();
+
+  @NotNull
   List<ElixirBlockExpression> getBlockExpressionList();
 
   @NotNull

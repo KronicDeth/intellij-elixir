@@ -30,6 +30,12 @@ public class ElixirInterpolationImpl extends ASTWrapperPsiElement implements Eli
 
   @Override
   @NotNull
+  public List<ElixirAtBlockOperation> getAtBlockOperationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtBlockOperation.class);
+  }
+
+  @Override
+  @NotNull
   public List<ElixirBlockExpression> getBlockExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBlockExpression.class);
   }

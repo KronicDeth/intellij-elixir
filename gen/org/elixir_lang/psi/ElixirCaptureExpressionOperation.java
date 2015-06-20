@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirCaptureExpressionOperation extends PrefixOperation {
 
   @Nullable
+  ElixirAtBlockOperation getAtBlockOperation();
+
+  @Nullable
   ElixirBlockExpression getBlockExpression();
 
   @Nullable

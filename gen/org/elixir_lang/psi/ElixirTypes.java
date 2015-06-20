@@ -19,6 +19,7 @@ public interface ElixirTypes {
   IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
+  IElementType AT_BLOCK_OPERATION = new ElixirElementType("AT_BLOCK_OPERATION");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
@@ -356,6 +357,9 @@ public interface ElixirTypes {
       }
       else if (type == ATOM_KEYWORD) {
         return new ElixirAtomKeywordImpl(node);
+      }
+      else if (type == AT_BLOCK_OPERATION) {
+        return new ElixirAtBlockOperationImpl(node);
       }
       else if (type == AT_NUMERIC_OPERATION) {
         return new ElixirAtNumericOperationImpl(node);

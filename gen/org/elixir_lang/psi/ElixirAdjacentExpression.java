@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirAdjacentExpression extends Quotable {
 
   @Nullable
+  ElixirAtBlockOperation getAtBlockOperation();
+
+  @Nullable
   ElixirBlockExpression getBlockExpression();
 
   @Nullable

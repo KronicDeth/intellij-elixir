@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirStabParenthesesSignature extends Quotable {
 
   @Nullable
+  ElixirAtBlockOperation getAtBlockOperation();
+
+  @Nullable
   ElixirBlockExpression getBlockExpression();
 
   @Nullable

@@ -50,6 +50,9 @@ public class ElixirParser implements PsiParser {
     else if (t == ASSOCIATIONS_BASE) {
       r = associationsBase(b, 0);
     }
+    else if (t == AT_BLOCK_OPERATION) {
+      r = atBlockOperation(b, 0);
+    }
     else if (t == AT_NUMERIC_OPERATION) {
       r = atNumericOperation(b, 0);
     }
@@ -882,6 +885,19 @@ public class ElixirParser implements PsiParser {
     r = containerAssociationOperation(b, l + 1);
     if (!r) r = mapExpression(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // atPrefixOperator blockExpression
+  public static boolean atBlockOperation(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atBlockOperation")) return false;
+    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && blockExpression(b, l + 1);
+    exit_section_(b, m, AT_BLOCK_OPERATION, r);
     return r;
   }
 
@@ -5456,12 +5472,14 @@ public class ElixirParser implements PsiParser {
 
   /* ********************************************************** */
   // blockExpression | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
+  //                                 atBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L131
   //                                 captureBlockOperation
   static boolean unmatchedExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedExpression")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = blockExpression(b, l + 1);
+    if (!r) r = atBlockOperation(b, l + 1);
     if (!r) r = captureBlockOperation(b, l + 1);
     exit_section_(b, m, null, r);
     return r;

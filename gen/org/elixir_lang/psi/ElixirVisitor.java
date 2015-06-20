@@ -44,6 +44,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitAtBlockOperation(@NotNull ElixirAtBlockOperation o) {
+    visitPrefixOperation(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }

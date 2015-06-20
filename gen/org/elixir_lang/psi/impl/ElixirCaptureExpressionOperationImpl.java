@@ -22,6 +22,12 @@ public class ElixirCaptureExpressionOperationImpl extends ASTWrapperPsiElement i
 
   @Override
   @Nullable
+  public ElixirAtBlockOperation getAtBlockOperation() {
+    return findChildByClass(ElixirAtBlockOperation.class);
+  }
+
+  @Override
+  @Nullable
   public ElixirBlockExpression getBlockExpression() {
     return findChildByClass(ElixirBlockExpression.class);
   }

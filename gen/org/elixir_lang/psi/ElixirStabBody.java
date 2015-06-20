@@ -9,6 +9,9 @@ import java.util.List;
 public interface ElixirStabBody extends Quotable {
 
   @NotNull
+  List<ElixirAtBlockOperation> getAtBlockOperationList();
+
+  @NotNull
   List<ElixirBlockExpression> getBlockExpressionList();
 
   @NotNull
