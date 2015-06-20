@@ -69,6 +69,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testExclamationPointQualifiedParenthesesCallBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testNotDotCallBlock() {
         assertParsedAndQuotedCorrectly();
     }
