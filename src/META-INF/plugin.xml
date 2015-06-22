@@ -27,6 +27,12 @@
             <li><code>do</code> blocks (<code>do end</code>)</li>
           </ul>
         </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Lex full atom instead of just identifier-like operator prefix (<code>:in<nospace>dex</code> before vs <code>:index</code> after)</li>
+          </ul>
+        </li>
       </ul>
       <h1>v0.3.4</h1>
       <ul>

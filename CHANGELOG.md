@@ -3,6 +3,8 @@
 ## Next Release
 * Enhancements
   * [#135](https://github.com/KronicDeth/intellij-elixir/pull/135) - `do` blocks (`do end) - [@KronicDeth](https://github.com/KronicDeth)
+* Bug Fixes
+  * [#137](https://github.com/KronicDeth/intellij-elixir/pull/137) - Lex full atom instead of just identifier-like operator prefix (`:in<nospace>dex` before vs `:index` after) - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.3.4
 * Enhancements
