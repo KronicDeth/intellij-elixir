@@ -34,7 +34,7 @@ public class FragmentTest extends TokenTest {
         // start to trigger ATOM_START state
         CharSequence fullCharSequence = ":" + charSequence;
         super.reset(fullCharSequence);
-        // consume '~'
+        // consume ':'
         flexLexer.advance();
     }
 
@@ -45,12 +45,49 @@ public class FragmentTest extends TokenTest {
         return Arrays.asList(new Object[][] {
                         { "'", ElixirTypes.CHAR_LIST_PROMOTER, ElixirFlexLexer.GROUP },
                         { ";", TokenType.BAD_CHARACTER, ElixirFlexLexer.ATOM_START },
-                        { "A", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
+                        { "A", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
                         { "\"", ElixirTypes.STRING_PROMOTER, ElixirFlexLexer.GROUP },
                         { "\n", ElixirTypes.EOL, INITIAL_STATE },
                         { "\r\n", ElixirTypes.EOL, INITIAL_STATE },
-                        { "_", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY },
-                        { "a", ElixirTypes.ATOM_FRAGMENT, ElixirFlexLexer.ATOM_BODY }
+                        { "_!", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_0", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_?", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_@", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_A", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "__", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "_a", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "a", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "after", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "afterwards", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "and", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "androids", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "catch", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "catchall", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "do", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "done", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "else", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "elsewhere", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "end", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "ending", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "false", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "falsehood", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "fn", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "fnctn", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "in", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "inner", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "nil", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "nils", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "not", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "notifiers", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "or", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "order", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "rescue", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "rescuer", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "true", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "truest", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "when", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE },
+                        { "whenever", ElixirTypes.ATOM_FRAGMENT, INITIAL_STATE }
                 }
         );
     }
