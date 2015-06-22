@@ -1,5 +1,9 @@
 # Changelog
 
+## Next Release
+* Enhancements
+  * [#135](https://github.com/KronicDeth/intellij-elixir/pull/135) - `do` blocks (`do end) - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v0.3.4
 * Enhancements
   * [#126](https://github.com/KronicDeth/intellij-elixir/pull/126) - Bracket at expression (`@foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
