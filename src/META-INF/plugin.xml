@@ -31,6 +31,7 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Lex full atom instead of just identifier-like operator prefix (<code>:in<nospace>dex</code> before vs <code>:index</code> after)</li>
+            <li><code>!</code> and <code>not</code> are properly wrapped in <code>__block__</code>s when in stab bodies</li>
           </ul>
         </li>
       </ul>
