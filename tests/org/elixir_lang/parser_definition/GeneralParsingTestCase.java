@@ -49,8 +49,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testPygment() {
-        // TODO change to assertParsedAndQuotedAroundError() prior to 1.0 once parser is complete
-        doTest(true);
+        assertParsedWithErrors();
     }
 
     public void testRealistic() {

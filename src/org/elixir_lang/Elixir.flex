@@ -261,6 +261,7 @@ OPERATOR = {FOUR_TOKEN_OPERATOR} |
 ATOM_END = [?!]
 ATOM_MIDDLE = [0-9a-zA-Z@_]
 ATOM_START = [a-zA-Z_]
+ATOM = {ATOM_START} {ATOM_MIDDLE}* {ATOM_END}?
 COLON = :
 
 /*
@@ -527,7 +528,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
  *  States - Ordered lexigraphically
  */
 
-%state ATOM_BODY
 %state ATOM_START
 %state BASE_WHOLE_NUMBER_BASE
 %state BINARY_WHOLE_NUMBER
@@ -711,19 +711,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
  *  maintained to ensure precedence.
  */
 
-<ATOM_BODY> {
-  {ATOM_END}     { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   yybegin(stackFrame.getLastLexicalState());
-                   return ElixirTypes.ATOM_FRAGMENT; }
-  {ATOM_MIDDLE}+ { return ElixirTypes.ATOM_FRAGMENT; }
-  // any other character ends the atom
-  {EOL}|.        { org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                   handleInState(stackFrame.getLastLexicalState()); }
-}
-
 /// Must be after {QUOTE_PROMOTER} for <ATOM_START> so that
 <ATOM_START> {
-  {ATOM_START}     { yybegin(ATOM_BODY);
+  {ATOM}           { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                     yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT; }
   {QUOTE_PROMOTER} { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
                         anything after the closing quote should be handle by the state prior to ATOM_START.  Without
@@ -735,7 +726,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {OPERATOR}       { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT; }
-  {EOL}            { return TokenType.BAD_CHARACTER; }
+  {EOL}|.          { return TokenType.BAD_CHARACTER; }
 }
 
 <BASE_WHOLE_NUMBER_BASE> {
