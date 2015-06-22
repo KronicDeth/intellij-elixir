@@ -125,6 +125,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnaryStabBody() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testUnqualifiedNoArgumentsAfterBlock() {
         assertParsedAndQuotedCorrectly();
     }

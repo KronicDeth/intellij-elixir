@@ -52,6 +52,12 @@ public class GeneralParsingTestCase extends ParsingTestCase {
         assertParsedWithErrors();
     }
 
+    /* The pygment example text contains intentional errors to ensure that pygment can handle errors, but to check
+       completeness of the parser, the text needs to be error free so the quoting can be checked */
+    public void testPygmentWithoutErrors() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testRealistic() {
         assertParsedAndQuotedCorrectly();
     }

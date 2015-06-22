@@ -118,9 +118,14 @@ public class ElixirPsiImplUtil {
         return UNKNOWN_BASE;
     }
 
+    /**
+     * Converts group of separated expressions into a block or returns the single expression.
+     *
+     * See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L724-L725
+     */
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject block(@NotNull final Deque<OtpErlangObject> quotedChildren) {
+    public static OtpErlangObject toBlock(@NotNull final Deque<OtpErlangObject> quotedChildren) {
         OtpErlangObject asBlock;
         final int size = quotedChildren.size();
 
@@ -129,17 +134,58 @@ public class ElixirPsiImplUtil {
         } else if (size == 1) {
             asBlock = quotedChildren.getFirst();
         } else {
-            OtpErlangObject[] quotedArray = new OtpErlangObject[size];
-            OtpErlangList blockMetadata = new OtpErlangList();
-
-            asBlock = quotedFunctionCall(
-                    BLOCK,
-                    blockMetadata,
-                    quotedChildren.toArray(quotedArray)
-            );
+            asBlock = blockFunctionCall(quotedChildren);
         }
 
         return asBlock;
+    }
+
+    /**
+     * Builds a block for stab bodies.  Unlike `toBlock`, handles rearranging unary operations `not` and `!`.
+     * @param quotedChildren
+     * @return
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject buildBlock(@NotNull final Deque<OtpErlangObject> quotedChildren) {
+        final int size = quotedChildren.size();
+        OtpErlangObject builtBlock;
+
+        if (size == 0) {
+            builtBlock = NIL;
+        } else if (size == 1) {
+            OtpErlangObject quotedChild = quotedChildren.getFirst();
+            builtBlock = quotedChild;
+
+            // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L588
+            if (Macro.isLocalCall(quotedChild)) {
+                OtpErlangTuple childTuple = (OtpErlangTuple) quotedChild;
+                OtpErlangObject quotedIdentifier = childTuple.elementAt(0);
+
+                // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
+                if (quotedIdentifier.equals(NOT) || quotedIdentifier.equals(EXCLAMATION_POINT)) {
+                    builtBlock = blockFunctionCall(quotedChildren);
+                }
+            }
+        } else {
+           builtBlock = blockFunctionCall(quotedChildren);
+        }
+
+        return builtBlock;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static OtpErlangTuple blockFunctionCall(@NotNull final Deque<OtpErlangObject> quotedChildren) {
+        OtpErlangObject[] quotedArray = new OtpErlangObject[quotedChildren.size()];
+        OtpErlangList blockMetadata = new OtpErlangList();
+        quotedArray = quotedChildren.toArray(quotedArray);
+
+        return quotedFunctionCall(
+                BLOCK,
+                blockMetadata,
+                quotedArray
+        );
     }
 
     // @return -1 if codePoint cannot be parsed.
@@ -1305,7 +1351,8 @@ public class ElixirPsiImplUtil {
                 }
         );
 
-        return block(quotedChildren);
+        // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L76-L79
+        return toBlock(quotedChildren);
     }
 
     @Contract(pure = true)
@@ -1511,58 +1558,20 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirStabBody stabBody) {
         PsiElement[] children = stabBody.getChildren();
-        OtpErlangObject quoted = null;
+        Deque<OtpErlangObject> quotedChildren = new ArrayDeque<OtpErlangObject>();
 
-        if (children.length == 1) {
-            PsiElement child = children[0];
-
-            // having only an unquoted child is the same as 0 effective children, so skip to the `if (quoted == null)`
-            if (!isUnquoted(child)) {
-
-                boolean unary = false;
-
-                if (child instanceof ElixirMatchedUnaryNonNumericOperation) {
-                    unary = true;
-                } else if (child instanceof ElixirAccessExpression) {
-                    PsiElement grandChild = child.getFirstChild();
-
-                    if (grandChild instanceof ElixirUnaryNumericOperation) {
-                        unary = true;
-                    }
-                }
-
-                if (unary) {
-                    OtpErlangList blockMetadata = new OtpErlangList();
-                    Quotable quotable = (Quotable) child;
-
-                    // Cannot use block as unary operation quoting is odd and is a single-element __block__
-                    quoted = quotedFunctionCall(
-                            BLOCK,
-                            blockMetadata,
-                            quotable.quote()
-                    );
-                }
-            }
-        }
-
-        if (quoted == null) {
-            Deque<OtpErlangObject> quotedChildren = new ArrayDeque<OtpErlangObject>();
-
-            for (PsiElement child : children) {
-                // skip endOfExpression
-                if (isUnquoted(child)) {
-                    continue;
-                }
-
-                Quotable quotableChild = (Quotable) child;
-                OtpErlangObject quotedChild = quotableChild.quote();
-                quotedChildren.add(quotedChild);
+        for (PsiElement child : children) {
+            // skip endOfExpression
+            if (isUnquoted(child)) {
+                continue;
             }
 
-            quoted = block(quotedChildren);
+            Quotable quotableChild = (Quotable) child;
+            OtpErlangObject quotedChild = quotableChild.quote();
+            quotedChildren.add(quotedChild);
         }
 
-        return quoted;
+        return buildBlock(quotedChildren);
     }
 
     @Contract(pure = true)
@@ -2539,7 +2548,8 @@ if (quoted == null) {
             quotedChildren.add(children[i].quote());
         }
 
-        return block(quotedChildren);
+        // Uses toBlock because this is for inside interpolation, which functions the same as an embedded file
+        return toBlock(quotedChildren);
     }
 
     @Contract(pure = true)
