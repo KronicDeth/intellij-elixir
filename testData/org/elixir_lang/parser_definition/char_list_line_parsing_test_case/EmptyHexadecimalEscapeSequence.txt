@@ -7,6 +7,4 @@ Elixir File(0,4)
           ElixirHexadecimalEscapePrefixImpl(HEXADECIMAL_ESCAPE_PREFIX)(1,3)
             PsiElement(ESCAPE)('\')(1,2)
             PsiElement(x)('x')(2,3)
-          PsiErrorElement:OPENING_CURLY or VALID_HEXADECIMAL_DIGITS expected, got '''(3,3)
-            <empty list>
       PsiElement(CHAR_LIST_TERMINATOR)(''')(3,4)

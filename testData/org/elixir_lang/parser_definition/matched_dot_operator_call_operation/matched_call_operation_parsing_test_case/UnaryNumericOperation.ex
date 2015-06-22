@@ -16,4 +16,6 @@
 !1.% Qualifier.qualified positional, key: value
 !1.<> Qualifier.qualified positional, key: value
 !1.^ Qualifier.qualified positional, key: value
+!1.after Qualifier.qualified positional, key: value
+!1.do Qualifier.qualified positional, key: value
 !1.when Qualifier.qualified positional, key: value

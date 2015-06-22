@@ -8,6 +8,10 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
      * matchedExpression
      */
 
+    public void testAfter() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testAndOperator() {
         assertParsedAndQuotedCorrectly();
     }
@@ -25,6 +29,10 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testComparisonOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testDo() {
         assertParsedAndQuotedCorrectly();
     }
 

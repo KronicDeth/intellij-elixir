@@ -16,4 +16,6 @@ variable.-> Qualifier.qualified positional, key: value
 variable.% Qualifier.qualified positional, key: value
 variable.<> Qualifier.qualified positional, key: value
 variable.^ Qualifier.qualified positional, key: value
+variable.after Qualifier.qualified positional, key: value
+variable.do Qualifier.qualified positional, key: value
 variable.when Qualifier.qualified positional, key: value

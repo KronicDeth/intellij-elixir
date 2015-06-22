@@ -1,0 +1,8 @@
+@Module.after[key: value]
+@Module.after [key: value]
+@Module.after[()]
+@Module.after [()]
+@Module.after[matched_expression]
+@Module.after [matched_expression]
+@Module.after[matched_expression,]
+@Module.after [matched_expression,]

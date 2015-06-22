@@ -16,4 +16,6 @@ Alias.->
 Alias.%
 Alias.<>
 Alias.^
+Alias.after
+Alias.do
 Alias.when

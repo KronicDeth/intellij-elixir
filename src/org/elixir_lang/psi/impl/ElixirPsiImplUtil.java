@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
@@ -32,6 +33,7 @@ public class ElixirPsiImplUtil {
     };
     public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
@@ -609,9 +611,100 @@ public class ElixirPsiImplUtil {
         }
 
         return quotedFunctionCall(
-                    "<<>>",
-                    metadata(openingBit),
-                    quotedChildren
+                "<<>>",
+                metadata(openingBit),
+                quotedChildren
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockExpression blockExpression) {
+        PsiElement[] children = blockExpression.getChildren();
+
+        assert children.length == 2;
+
+        Quotable call = (Quotable) children[0];
+        OtpErlangTuple quotedCall = (OtpErlangTuple) call.quote();
+
+        QuotableArguments blockArguments = (QuotableArguments) children[1];
+        OtpErlangObject[] quotedBlockArguments = blockArguments.quoteArguments();
+
+        OtpErlangList callMetadata = Macro.metadata(quotedCall);
+        OtpErlangObject[] quotedArguments;
+
+        if (Macro.isVariable(quotedCall)) {
+            quotedArguments = quotedBlockArguments;
+        } else {
+            OtpErlangList quotedCallArguments = Macro.callArguments(quotedCall);
+
+            OtpErlangObject[] quotedCallArgumentElements = quotedCallArguments.elements();
+
+            quotedArguments = (OtpErlangObject[]) ArrayUtils.addAll(
+                    quotedCallArgumentElements,
+                    quotedBlockArguments
+            );
+        }
+
+        return quotedFunctionCall(
+                quotedCall.elementAt(0),
+                callMetadata,
+                quotedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockIdentifier blockIdentifier) {
+        return new OtpErlangAtom(blockIdentifier.getNode().getText());
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockItem blockItem) {
+        Quotable blockIdentifier = blockItem.getBlockIdentifier();
+        Quotable stab = blockItem.getStab();
+        OtpErlangObject quotedValue = NIL;
+
+        if (stab != null) {
+            quotedValue = stab.quote();
+        }
+
+        return new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        blockIdentifier.quote(),
+                        quotedValue
+                }
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirBlockNoParenthesesCall blockNoParenthesesCall) {
+        PsiElement[] children = blockNoParenthesesCall.getChildren();
+
+        assert children.length == 2;
+
+        Quotable quotableCall = (Quotable) children[0];
+        OtpErlangTuple quotedCall = (OtpErlangTuple) quotableCall.quote();
+        OtpErlangList callMetadata = Macro.metadata(quotedCall);
+
+        QuotableArguments noParenthesesArguments = (QuotableArguments) children[1];
+        OtpErlangObject[] quotedNoParenthesesArguments = noParenthesesArguments.quoteArguments();
+
+        OtpErlangList quotedCallArguments = Macro.callArguments(quotedCall);
+
+        OtpErlangObject[] quotedCallArgumentElements = quotedCallArguments.elements();
+
+        OtpErlangObject[] quotedArguments = (OtpErlangObject[]) ArrayUtils.addAll(
+                quotedCallArgumentElements,
+                quotedNoParenthesesArguments
+        );
+
+        return quotedFunctionCall(
+                quotedCall.elementAt(0),
+                callMetadata,
+                quotedArguments
         );
     }
 
@@ -2498,8 +2591,61 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirBlockList blockList) {
+        List<ElixirBlockItem> blockItemList = blockList.getBlockItemList();
+        OtpErlangObject[] quotedBlockItems = new OtpErlangObject[blockItemList.size()];
+
+        int i = 0;
+        for (ElixirBlockItem blockItem : blockItemList) {
+            quotedBlockItems[i++] = blockItem.quote();
+        }
+
+        return quotedBlockItems;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject[] quoteArguments(Call call) {
         return call.getArguments().quoteArguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirDoBlock doBlock) {
+        ElixirStab stab = doBlock.getStab();
+        OtpErlangObject doValue = NIL;
+        OtpErlangObject[] quotedKeywordPairs;
+
+        if (stab != null) {
+            doValue = stab.quote();
+        }
+
+        OtpErlangTuple quotedDoKeywordPair = new OtpErlangTuple(
+                new OtpErlangObject[]{
+                        DO,
+                        doValue
+                }
+        );
+
+        ElixirBlockList blockList = doBlock.getBlockList();
+
+        if (blockList != null) {
+            OtpErlangObject[] blockListQuotedArguments = blockList.quoteArguments();
+
+            quotedKeywordPairs = new OtpErlangObject[1 + blockListQuotedArguments.length];
+
+            int i = 0;
+            quotedKeywordPairs[i++] = quotedDoKeywordPair;
+            System.arraycopy(blockListQuotedArguments, 0, quotedKeywordPairs, i, blockListQuotedArguments.length);
+        } else {
+            quotedKeywordPairs = new OtpErlangObject[]{
+                    quotedDoKeywordPair
+            };
+        }
+
+        return new OtpErlangObject[]{
+                new OtpErlangList(quotedKeywordPairs)
+        };
     }
 
     @Contract(pure = true)

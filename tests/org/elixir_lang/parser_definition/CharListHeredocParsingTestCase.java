@@ -9,7 +9,7 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testEmptyHexadecimalEscapeSequence() {
-        assertParsedWithLocalErrorAndRemoteExit();
+        assertParsedAndQuotedAroundExit();
     }
 
     public void testEscapeSequences() {

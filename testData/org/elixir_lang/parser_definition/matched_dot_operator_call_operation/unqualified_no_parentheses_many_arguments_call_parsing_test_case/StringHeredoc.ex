@@ -73,4 +73,12 @@ Heredoc
 """
 String
 Heredoc
+""".after unqualified positional, key: value
+"""
+String
+Heredoc
+""".do unqualified positional, key: value
+"""
+String
+Heredoc
 """.when unqualified positional, key: value

@@ -16,4 +16,6 @@ nil.-> key1: value1, key2: value2
 nil.% key1: value1, key2: value2
 nil.<> key1: value1, key2: value2
 nil.^ key1: value1, key2: value2
+nil.after key1: value1, key2: value2
+nil.do key1: value1, key2: value2
 nil.when key1: value1, key2: value2

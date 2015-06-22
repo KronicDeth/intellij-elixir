@@ -16,4 +16,6 @@
 :atom.%
 :atom.<>
 :atom.^
+:atom.after
+:atom.do
 :atom.when

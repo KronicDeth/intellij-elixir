@@ -16,12 +16,14 @@
   tokenTypeClass="org.elixir_lang.psi.ElixirTokenType"
 
   tokens = [
+    AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
     CALL = "<zero-width-call>"
     CAPTURE_OPERATOR = "&"
+    CATCH = "catch"
     CHAR_LIST_HEREDOC_PROMOTER = "'''"
     CHAR_LIST_PROMOTER = "'"
     CHAR_TOKENIZER = "?"
@@ -34,7 +36,9 @@
     COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
     DECIMAL_MARK = "."
     DECIMAL_SEPARATOR = "_"
+    DO = "do"
     DOT_OPERATOR = "."
+    ELSE = "else"
     END = "end"
     FALSE = "false"
     FN = "fn"
@@ -52,6 +56,7 @@
     OPENING_BRACKET = "["
     // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
     OPENING_PARENTHESIS = "("
+    RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
@@ -83,9 +88,21 @@ private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
 endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unquoted" }
+
+/*
+ *
+ * Expression
+ *
+ */
+
+captureExpressionOperation ::= capturePrefixOperator expression
+                               { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
 private expression ::= emptyParentheses |
+                       unmatchedExpression |
                        unqualifiedNoParenthesesManyArgumentsCall |
                        matchedExpression
+
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 
 /*
@@ -1312,14 +1329,18 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
 relativeIdentifier ::= IDENTIFIER |
+                       AFTER |
                        AND_OPERATOR |
                        ARROW_OPERATOR |
                        // NOT ASSOCIATION_OPERATOR
                        AT_OPERATOR |
                        // NOT BIT_STRING_OPERATOR because it is a special form
                        CAPTURE_OPERATOR |
+                       CATCH |
                        COMPARISON_OPERATOR |
+                       DO |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
+                       ELSE |
                        HAT_OPERATOR |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
@@ -1329,6 +1350,7 @@ relativeIdentifier ::= IDENTIFIER |
                        OR_OPERATOR |
                        PIPE_OPERATOR |
                        RELATIONAL_OPERATOR |
+                       RESCUE |
                        STAB_OPERATOR |
                        STRUCT_OPERATOR |
                        // NOT TUPLE_OPERATOR because it is a special form
@@ -1779,6 +1801,91 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
 /*
  *
  *
+ * Unmatched Expressions
+ *
+ *
+ */
+
+/*
+ *
+ * Block Expression
+ *
+ */
+
+/*
+ * Block Identifier
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L946
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L977-L981
+ */
+blockIdentifier ::= AFTER | CATCH | ELSE | RESCUE
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313-L314
+blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
+              (stab endOfExpression?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313
+              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L316-L317
+blockList ::= blockItem+
+              { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
+doBlock ::= DO endOfExpression*
+            stab? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+            blockList? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+            END
+            { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+left blockNoParenthesesCall ::= noParenthesesArguments
+                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
+blockExpression ::= (
+                     /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
+                        take a `.`. */
+                     matchedBracketOperation maxDotCall |
+                     matchedBracketOperation blockNoParenthesesCall |
+                     /* matchedQualifiedNoArgumentsCall because it is first rule after
+                        matchedQualifiedParenthesesCall */
+                     matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                     /* Can use matchedExpression rule directly because it's an ATOM and so won't match lower
+                        matchedExpression rules the way PREFIX or POSTFIX would. */
+                     matchedUnqualifiedNoParenthesesCall |
+                     /* matchedAtUnqualifiedBracketOperation and all rules through accessExpression are necessary
+                        because all those rules are ATOM or PREFIX so they won't also match lower rules */
+                     (
+                       matchedAtUnqualifiedBracketOperation |
+                       matchedAtNonNumericOperation |
+                       matchedUnqualifiedParenthesesCall |
+                       matchedUnqualifiedBracketOperation |
+                       variable |
+                       accessExpression
+                     ) maxQualifiedNoArgumentsCall+ |
+                     matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
+                     variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152 */
+                    )
+                    doBlock
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+atBlockOperation ::= atPrefixOperator blockExpression
+                     { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+captureBlockOperation ::= capturePrefixOperator blockExpression
+                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+unaryBlockOperation ::= unaryPrefixOperator blockExpression
+                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
+private unmatchedExpression ::= blockExpression | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
+                                atBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L131
+                                captureBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L132
+                                unaryBlockOperation // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L130
+
+/*
+ *
+ *
  * Whole Numbers
  *
  *
@@ -1940,7 +2047,7 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
  * Keywords
  */
 
- keywordKey ::= ALIAS_TOKEN |
+keywordKey ::= ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
@@ -1948,6 +2055,7 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
                BIT_STRING_OPERATOR |
                CAPTURE_OPERATOR |
                COMPARISON_OPERATOR |
+               DO |
                DUAL_OPERATOR |
                HAT_OPERATOR |
                IDENTIFIER |

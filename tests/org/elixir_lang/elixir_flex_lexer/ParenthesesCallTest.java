@@ -164,9 +164,44 @@ public class ParenthesesCallTest extends Test {
                                 )
                         },
                         {
+                                "after",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.AFTER, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
+                                "catch",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.CATCH, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
+                                "do",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.DO, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
+                                "else",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.ELSE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
                                 "end",
                                 Arrays.asList(
                                         new TokenTypeState(ElixirTypes.END, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
+                                )
+                        },
+                        {
+                                "rescue",
+                                Arrays.asList(
+                                        new TokenTypeState(ElixirTypes.RESCUE, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },

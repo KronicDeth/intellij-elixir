@@ -16,4 +16,6 @@
 'CharList'.% unqualified positional, key: value
 'CharList'.<> unqualified positional, key: value
 'CharList'.^ unqualified positional, key: value
+'CharList'.after unqualified positional, key: value
+'CharList'.do unqualified positional, key: value
 'CharList'.when unqualified positional, key: value

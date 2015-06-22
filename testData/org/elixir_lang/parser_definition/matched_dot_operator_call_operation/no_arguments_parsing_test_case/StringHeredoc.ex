@@ -73,4 +73,12 @@ Heredoc
 """
 String
 Heredoc
+""".after
+"""
+String
+Heredoc
+""".do
+"""
+String
+Heredoc
 """.when

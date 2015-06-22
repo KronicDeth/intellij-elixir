@@ -16,4 +16,6 @@
 "String".% positional
 "String".<> positional
 "String".^ positional
+"String".after positional
+"String".do positional
 "String".when positional

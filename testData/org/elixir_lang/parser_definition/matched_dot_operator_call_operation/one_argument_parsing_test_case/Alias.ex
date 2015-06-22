@@ -16,4 +16,6 @@ Alias.-> positional
 Alias.% positional
 Alias.<> positional
 Alias.^ positional
+Alias.after positional
+Alias.do positional
 Alias.when positional

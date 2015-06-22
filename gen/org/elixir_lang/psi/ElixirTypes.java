@@ -19,12 +19,20 @@ public interface ElixirTypes {
   IElementType ASSOCIATIONS_BASE = new ElixirElementType("ASSOCIATIONS_BASE");
   IElementType ATOM = new ElixirElementType("ATOM");
   IElementType ATOM_KEYWORD = new ElixirElementType("ATOM_KEYWORD");
+  IElementType AT_BLOCK_OPERATION = new ElixirElementType("AT_BLOCK_OPERATION");
   IElementType AT_NUMERIC_OPERATION = new ElixirElementType("AT_NUMERIC_OPERATION");
   IElementType AT_PREFIX_OPERATOR = new ElixirElementType("AT_PREFIX_OPERATOR");
   IElementType BINARY_DIGITS = new ElixirElementType("BINARY_DIGITS");
   IElementType BINARY_WHOLE_NUMBER = new ElixirElementType("BINARY_WHOLE_NUMBER");
   IElementType BIT_STRING = new ElixirElementType("BIT_STRING");
+  IElementType BLOCK_EXPRESSION = new ElixirElementType("BLOCK_EXPRESSION");
+  IElementType BLOCK_IDENTIFIER = new ElixirElementType("BLOCK_IDENTIFIER");
+  IElementType BLOCK_ITEM = new ElixirElementType("BLOCK_ITEM");
+  IElementType BLOCK_LIST = new ElixirElementType("BLOCK_LIST");
+  IElementType BLOCK_NO_PARENTHESES_CALL = new ElixirElementType("BLOCK_NO_PARENTHESES_CALL");
   IElementType BRACKET_ARGUMENTS = new ElixirElementType("BRACKET_ARGUMENTS");
+  IElementType CAPTURE_BLOCK_OPERATION = new ElixirElementType("CAPTURE_BLOCK_OPERATION");
+  IElementType CAPTURE_EXPRESSION_OPERATION = new ElixirElementType("CAPTURE_EXPRESSION_OPERATION");
   IElementType CAPTURE_NUMERIC_OPERATION = new ElixirElementType("CAPTURE_NUMERIC_OPERATION");
   IElementType CAPTURE_PREFIX_OPERATOR = new ElixirElementType("CAPTURE_PREFIX_OPERATOR");
   IElementType CHAR_LIST_HEREDOC = new ElixirElementType("CHAR_LIST_HEREDOC");
@@ -41,6 +49,7 @@ public interface ElixirTypes {
   IElementType DECIMAL_FLOAT_INTEGRAL = new ElixirElementType("DECIMAL_FLOAT_INTEGRAL");
   IElementType DECIMAL_WHOLE_NUMBER = new ElixirElementType("DECIMAL_WHOLE_NUMBER");
   IElementType DOT_INFIX_OPERATOR = new ElixirElementType("DOT_INFIX_OPERATOR");
+  IElementType DO_BLOCK = new ElixirElementType("DO_BLOCK");
   IElementType EMPTY_PARENTHESES = new ElixirElementType("EMPTY_PARENTHESES");
   IElementType ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE = new ElixirElementType("ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE");
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
@@ -178,6 +187,7 @@ public interface ElixirTypes {
   IElementType TUPLE = new ElixirElementType("TUPLE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
+  IElementType UNARY_BLOCK_OPERATION = new ElixirElementType("UNARY_BLOCK_OPERATION");
   IElementType UNARY_NUMERIC_OPERATION = new ElixirElementType("UNARY_NUMERIC_OPERATION");
   IElementType UNARY_PREFIX_OPERATOR = new ElixirElementType("UNARY_PREFIX_OPERATOR");
   IElementType UNKNOWN_BASE_DIGITS = new ElixirElementType("UNKNOWN_BASE_DIGITS");
@@ -186,6 +196,7 @@ public interface ElixirTypes {
   IElementType VARIABLE = new ElixirElementType("VARIABLE");
   IElementType WHEN_INFIX_OPERATOR = new ElixirElementType("WHEN_INFIX_OPERATOR");
 
+  IElementType AFTER = new ElixirTokenType("after");
   IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
   IElementType AND_OPERATOR = new ElixirTokenType("AND_OPERATOR");
   IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
@@ -197,6 +208,7 @@ public interface ElixirTypes {
   IElementType BIT_STRING_OPERATOR = new ElixirTokenType("BIT_STRING_OPERATOR");
   IElementType CALL = new ElixirTokenType("<zero-width-call>");
   IElementType CAPTURE_OPERATOR = new ElixirTokenType("&");
+  IElementType CATCH = new ElixirTokenType("catch");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("'''");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_HEREDOC_TERMINATOR");
@@ -217,8 +229,10 @@ public interface ElixirTypes {
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DECIMAL_MARK = new ElixirTokenType("DECIMAL_MARK");
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
+  IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
+  IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType ESCAPE = new ElixirTokenType("ESCAPE");
@@ -271,6 +285,7 @@ public interface ElixirTypes {
   IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
   IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");
+  IElementType RESCUE = new ElixirTokenType("rescue");
   IElementType SEMICOLON = new ElixirTokenType(";");
   IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("SIGIL_HEREDOC_PROMOTER");
@@ -344,6 +359,9 @@ public interface ElixirTypes {
       else if (type == ATOM_KEYWORD) {
         return new ElixirAtomKeywordImpl(node);
       }
+      else if (type == AT_BLOCK_OPERATION) {
+        return new ElixirAtBlockOperationImpl(node);
+      }
       else if (type == AT_NUMERIC_OPERATION) {
         return new ElixirAtNumericOperationImpl(node);
       }
@@ -359,8 +377,29 @@ public interface ElixirTypes {
       else if (type == BIT_STRING) {
         return new ElixirBitStringImpl(node);
       }
+      else if (type == BLOCK_EXPRESSION) {
+        return new ElixirBlockExpressionImpl(node);
+      }
+      else if (type == BLOCK_IDENTIFIER) {
+        return new ElixirBlockIdentifierImpl(node);
+      }
+      else if (type == BLOCK_ITEM) {
+        return new ElixirBlockItemImpl(node);
+      }
+      else if (type == BLOCK_LIST) {
+        return new ElixirBlockListImpl(node);
+      }
+      else if (type == BLOCK_NO_PARENTHESES_CALL) {
+        return new ElixirBlockNoParenthesesCallImpl(node);
+      }
       else if (type == BRACKET_ARGUMENTS) {
         return new ElixirBracketArgumentsImpl(node);
+      }
+      else if (type == CAPTURE_BLOCK_OPERATION) {
+        return new ElixirCaptureBlockOperationImpl(node);
+      }
+      else if (type == CAPTURE_EXPRESSION_OPERATION) {
+        return new ElixirCaptureExpressionOperationImpl(node);
       }
       else if (type == CAPTURE_NUMERIC_OPERATION) {
         return new ElixirCaptureNumericOperationImpl(node);
@@ -409,6 +448,9 @@ public interface ElixirTypes {
       }
       else if (type == DOT_INFIX_OPERATOR) {
         return new ElixirDotInfixOperatorImpl(node);
+      }
+      else if (type == DO_BLOCK) {
+        return new ElixirDoBlockImpl(node);
       }
       else if (type == EMPTY_PARENTHESES) {
         return new ElixirEmptyParenthesesImpl(node);
@@ -820,6 +862,9 @@ public interface ElixirTypes {
       }
       else if (type == TYPE_INFIX_OPERATOR) {
         return new ElixirTypeInfixOperatorImpl(node);
+      }
+      else if (type == UNARY_BLOCK_OPERATION) {
+        return new ElixirUnaryBlockOperationImpl(node);
       }
       else if (type == UNARY_NUMERIC_OPERATION) {
         return new ElixirUnaryNumericOperationImpl(node);

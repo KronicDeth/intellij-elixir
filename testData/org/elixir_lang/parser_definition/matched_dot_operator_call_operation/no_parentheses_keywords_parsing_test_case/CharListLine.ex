@@ -16,4 +16,6 @@
 'CharList'.% key1: value1, key2: value2
 'CharList'.<> key1: value1, key2: value2
 'CharList'.^ key1: value1, key2: value2
+'CharList'.after key1: value1, key2: value2
+'CharList'.do key1: value1, key2: value2
 'CharList'.when key1: value1, key2: value2

@@ -16,4 +16,6 @@ nil.->
 nil.%
 nil.<>
 nil.^
+nil.after
+nil.do
 nil.when

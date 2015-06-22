@@ -44,6 +44,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitAtBlockOperation(@NotNull ElixirAtBlockOperation o) {
+    visitPrefixOperation(o);
+  }
+
   public void visitAtNumericOperation(@NotNull ElixirAtNumericOperation o) {
     visitPrefixOperation(o);
   }
@@ -72,8 +76,36 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitBlockExpression(@NotNull ElixirBlockExpression o) {
+    visitQuotable(o);
+  }
+
+  public void visitBlockIdentifier(@NotNull ElixirBlockIdentifier o) {
+    visitQuotable(o);
+  }
+
+  public void visitBlockItem(@NotNull ElixirBlockItem o) {
+    visitQuotable(o);
+  }
+
+  public void visitBlockList(@NotNull ElixirBlockList o) {
+    visitQuotableArguments(o);
+  }
+
+  public void visitBlockNoParenthesesCall(@NotNull ElixirBlockNoParenthesesCall o) {
+    visitQuotable(o);
+  }
+
   public void visitBracketArguments(@NotNull ElixirBracketArguments o) {
     visitQuotable(o);
+  }
+
+  public void visitCaptureBlockOperation(@NotNull ElixirCaptureBlockOperation o) {
+    visitPrefixOperation(o);
+  }
+
+  public void visitCaptureExpressionOperation(@NotNull ElixirCaptureExpressionOperation o) {
+    visitPrefixOperation(o);
   }
 
   public void visitCaptureNumericOperation(@NotNull ElixirCaptureNumericOperation o) {
@@ -138,6 +170,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitDecimalWholeNumber(@NotNull ElixirDecimalWholeNumber o) {
     visitWholeNumber(o);
+  }
+
+  public void visitDoBlock(@NotNull ElixirDoBlock o) {
+    visitQuotableArguments(o);
   }
 
   public void visitDotInfixOperator(@NotNull ElixirDotInfixOperator o) {
@@ -745,6 +781,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitTypeInfixOperator(@NotNull ElixirTypeInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitUnaryBlockOperation(@NotNull ElixirUnaryBlockOperation o) {
+    visitPrefixOperation(o);
   }
 
   public void visitUnaryNumericOperation(@NotNull ElixirUnaryNumericOperation o) {

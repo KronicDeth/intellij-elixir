@@ -16,4 +16,6 @@
 'CharList'.%
 'CharList'.<>
 'CharList'.^
+'CharList'.after
+'CharList'.do
 'CharList'.when

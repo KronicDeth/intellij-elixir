@@ -54,8 +54,7 @@ public class GeneralParsingTestCase extends ParsingTestCase {
     }
 
     public void testRealistic() {
-        // TODO change to assertParsedAndQuotedCorrectly() prior to 1.0 once parser is complete
-        doTest(true);
+        assertParsedAndQuotedCorrectly();
     }
 
     @Override
