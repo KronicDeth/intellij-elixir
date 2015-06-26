@@ -22,6 +22,9 @@ public interface ElixirStructOperation extends Quotable {
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
 
+  @Nullable
+  ElixirVariable getVariable();
+
   @NotNull
   OtpErlangObject quote();
 

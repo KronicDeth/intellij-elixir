@@ -7,18 +7,25 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirMatchedDotCallOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedDotCallOperation {
+public class ElixirMatchedDotCallBlockOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedDotCallBlockOperation {
 
-  public ElixirMatchedDotCallOperationImpl(ASTNode node) {
+  public ElixirMatchedDotCallBlockOperationImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedDotCallOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedDotCallBlockOperation(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return findChildByClass(ElixirDoBlock.class);
   }
 
   @Override

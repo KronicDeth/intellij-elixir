@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
-  extends("matched.*Operation|matched(AtUnqualifiedNoParentheses|QualifiedNoArguments|(Q|Unq)ualified(No)?Parentheses)Call|variable|accessExpression")=matchedExpression
+  extends("matched.*Operation|matched(AtUnqualifiedNoParentheses|(Q|Unq)ualifiedNoArguments|(Q|Unq)ualified(No)?Parentheses)Call(Block)?|accessExpression")=matchedExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -969,21 +969,21 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedMultiplicationOperation |
                       matchedHatOperation |
                       matchedUnaryNonNumericOperation |
-                      matchedDotCallOperation |
+                      matchedDotCallBlockOperation |
                       // NoParentheses before matchedBracketOperation because brackets only make sense after parentheses.
-                      matchedQualifiedNoParenthesesCall |
-                      matchedAtUnqualifiedNoParenthesesCall |
-                      matchedUnqualifiedNoParenthesesCall |
+                      matchedQualifiedNoParenthesesCallBlock |
+                      matchedAtUnqualifiedNoParenthesesCallBlock |
+                      matchedUnqualifiedNoParenthesesCallBlock |
                       matchedBracketOperation |
                       matchedQualifiedAliasOperation |
                       matchedQualifiedBracketOperation |
-                      matchedQualifiedParenthesesCall |
+                      matchedQualifiedParenthesesCallBlock |
                       matchedQualifiedNoArgumentsCall |
                       matchedAtUnqualifiedBracketOperation |
                       matchedAtNonNumericOperation | // after matchedQualified because @ binds only before `.`
-                      matchedUnqualifiedParenthesesCall |
+                      matchedUnqualifiedParenthesesCallBlock |
                       matchedUnqualifiedBracketOperation |
-                      variable |
+                      matchedUnqualifiedNoArgumentsCallBlock |
                       accessExpression
 
 /*
@@ -1376,6 +1376,9 @@ parenthesesArguments ::= OPENING_PARENTHESIS EOL*
                          CLOSING_PARENTHESIS
                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
+left qualifiedNoParenthesesCall ::= dotInfixOperator relativeIdentifier noParenthesesOneArgument
+                                    { elementType = matchedQualifiedNoParenthesesCallBlock }
+
 // call_args_no_parens_one
 noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
                              unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
@@ -1385,6 +1388,16 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
 
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
                              noParenthesesManyArgumentsStrict |
+                             /* `do` block goes with the outer call, so use call rules that don't include a doBlock.  */
+                             (
+                               matchedBracketOperation maxDotCall  | // matchedDotCallOperation is POSTFIX, so replace to prevent subrule match
+                               matchedBracketOperation qualifiedNoParenthesesCall // matchedQualifiedNoParenthesesCall is POSTFIX, so replace to prevent subrule match
+                               matchedAtUnqualifiedNoParenthesesCall | // ATOM
+                               matchedUnqualifiedNoParenthesesCall | // ATOM
+                               matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // matchedQualifiedParenthesesCall is POSTFIX, so replace to prevent subrule match
+                               matchedUnqualifiedParenthesesCall | // ATOM
+                               matchedUnqualifiedNoArgumentsCall // ATOM
+                             ) |
                              /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
                              !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
@@ -1398,8 +1411,11 @@ matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? 
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
  */
 
+matchedDotCallBlockOperation ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
+                                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
-                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                            { elementType = matchedDotCallBlockOperation }
 
 /*
  * Qualified No Parentheses Call
@@ -1407,9 +1423,11 @@ matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArgume
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
+matchedQualifiedNoParenthesesCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlock?
+                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument
-                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                      { elementType = matchedQualifiedNoParenthesesCallBlock }
 
 /*
  * At Operation on Unqualified No Parentheses CALL
@@ -1419,17 +1437,23 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument
-                                          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+matchedAtUnqualifiedNoParenthesesCallBlock ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+                                               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+                                          { elementType = matchedAtUnqualifiedNoParenthesesCallBlock }
+
 /*
  * Unqualified No Parentheses Call
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
-                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+matchedUnqualifiedNoParenthesesCallBlock ::= IDENTIFIER noParenthesesOneArgument doBlock?
+                                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
+matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
+                                        { elementType = matchedUnqualifiedNoParenthesesCallBlock }
 /*
  * Bracket Operation
  *
@@ -1469,16 +1493,18 @@ matchedQualifiedBracketOperation ::= matchedExpression dotInfixOperator relative
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
+matchedQualifiedParenthesesCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
+                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments
-                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
+                                    { elementType = matchedQualifiedParenthesesCallBlock }
 /*
  * Qualified Call with No Arguments - neither parenthes nor no parentheses
  */
 
+matchedQualifiedNoArgumentsCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier !CALL doBlock?
+                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeIdentifier !CALL
-                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
+                                    { elementType = matchedQualifiedNoArgumentsCallBlock }
 
 /*
  * At Unqualified Bracket Operation
@@ -1495,9 +1521,10 @@ matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracke
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
+matchedUnqualifiedParenthesesCallBlock ::= IDENTIFIER matchedParenthesesArguments doBlock?
+                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
-                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
+                                      { elementType = matchedUnqualifiedParenthesesCallBlock }
 /*
  * At Non-Numeric Operation - non-associative
  *
@@ -1524,6 +1551,15 @@ matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
 
 matchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Unqualified No Arguments Call
+ */
+
+matchedUnqualifiedNoArgumentsCallBlock ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
+                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
+                                      { elementType = matchedUnqualifiedNoArgumentsCallBlock }
 
 /*
  * Access expression
@@ -1569,15 +1605,15 @@ containerAssociationOperation ::= containerExpression associationInfixOperator c
                                   { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
 left maxDotCall ::= dotInfixOperator parenthesesArguments parenthesesArguments?
-                    { elementType = matchedDotCallOperation }
+                    { elementType = matchedDotCallBlockOperation }
 left maxQualifiedAlias ::= dotInfixOperator alias
                            { elementType = matchedQualifiedAliasOperation }
 
 left maxQualifiedParenthesesCall ::= dotInfixOperator relativeIdentifier matchedParenthesesArguments
-                                     { elementType = matchedQualifiedParenthesesCall }
+                                     { elementType = matchedQualifiedParenthesesCallBlock }
 
 left maxQualifiedNoArgumentsCall ::= dotInfixOperator relativeIdentifier !CALL
-                                     { elementType = matchedQualifiedNoArgumentsCall }
+                                     { elementType = matchedQualifiedNoArgumentsCallBlock }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
 private maxExpression ::= /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will

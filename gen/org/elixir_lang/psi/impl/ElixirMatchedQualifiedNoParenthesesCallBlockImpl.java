@@ -6,16 +6,23 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedQualifiedNoParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedNoParenthesesCall {
+public class ElixirMatchedQualifiedNoParenthesesCallBlockImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedNoParenthesesCallBlock {
 
-  public ElixirMatchedQualifiedNoParenthesesCallImpl(ASTNode node) {
+  public ElixirMatchedQualifiedNoParenthesesCallBlockImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedQualifiedNoParenthesesCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedQualifiedNoParenthesesCallBlock(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return findChildByClass(ElixirDoBlock.class);
   }
 
   @Override

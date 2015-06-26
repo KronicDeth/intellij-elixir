@@ -50,6 +50,12 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
     return findChildByClass(ElixirMatchedExpression.class);
   }
 
+  @Override
+  @Nullable
+  public ElixirVariable getVariable() {
+    return findChildByClass(ElixirVariable.class);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);

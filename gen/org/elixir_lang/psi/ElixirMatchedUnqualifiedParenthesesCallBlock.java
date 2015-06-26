@@ -5,19 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirBlockExpression extends Quotable {
+public interface ElixirMatchedUnqualifiedParenthesesCallBlock extends ElixirMatchedExpression, Quotable {
 
   @Nullable
-  ElixirBlockNoParenthesesCall getBlockNoParenthesesCall();
-
-  @NotNull
   ElixirDoBlock getDoBlock();
 
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
-
-  @Nullable
-  ElixirVariable getVariable();
+  @NotNull
+  ElixirMatchedParenthesesArguments getMatchedParenthesesArguments();
 
   @NotNull
   OtpErlangObject quote();

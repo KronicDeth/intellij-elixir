@@ -483,7 +483,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
-  public void visitMatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCall o) {
+  public void visitMatchedAtUnqualifiedNoParenthesesCallBlock(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -503,7 +503,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
-  public void visitMatchedDotCallOperation(@NotNull ElixirMatchedDotCallOperation o) {
+  public void visitMatchedDotCallBlockOperation(@NotNull ElixirMatchedDotCallBlockOperation o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -561,17 +561,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
-  public void visitMatchedQualifiedNoArgumentsCall(@NotNull ElixirMatchedQualifiedNoArgumentsCall o) {
+  public void visitMatchedQualifiedNoArgumentsCallBlock(@NotNull ElixirMatchedQualifiedNoArgumentsCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
 
-  public void visitMatchedQualifiedNoParenthesesCall(@NotNull ElixirMatchedQualifiedNoParenthesesCall o) {
+  public void visitMatchedQualifiedNoParenthesesCallBlock(@NotNull ElixirMatchedQualifiedNoParenthesesCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
 
-  public void visitMatchedQualifiedParenthesesCall(@NotNull ElixirMatchedQualifiedParenthesesCall o) {
+  public void visitMatchedQualifiedParenthesesCallBlock(@NotNull ElixirMatchedQualifiedParenthesesCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -601,12 +601,17 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitQuotable(o);
   }
 
-  public void visitMatchedUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedUnqualifiedNoParenthesesCall o) {
+  public void visitMatchedUnqualifiedNoArgumentsCallBlock(@NotNull ElixirMatchedUnqualifiedNoArgumentsCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
 
-  public void visitMatchedUnqualifiedParenthesesCall(@NotNull ElixirMatchedUnqualifiedParenthesesCall o) {
+  public void visitMatchedUnqualifiedNoParenthesesCallBlock(@NotNull ElixirMatchedUnqualifiedNoParenthesesCallBlock o) {
+    visitMatchedExpression(o);
+    // visitQuotable(o);
+  }
+
+  public void visitMatchedUnqualifiedParenthesesCallBlock(@NotNull ElixirMatchedUnqualifiedParenthesesCallBlock o) {
     visitMatchedExpression(o);
     // visitQuotable(o);
   }
@@ -808,8 +813,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitVariable(@NotNull ElixirVariable o) {
-    visitMatchedExpression(o);
-    // visitQuotable(o);
+    visitQuotable(o);
   }
 
   public void visitWhenInfixOperator(@NotNull ElixirWhenInfixOperator o) {

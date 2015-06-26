@@ -4,20 +4,18 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirAtPrefixOperator;
-import org.elixir_lang.psi.ElixirMatchedAtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtUnqualifiedNoParenthesesCall {
+public class ElixirMatchedAtUnqualifiedNoParenthesesCallBlockImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtUnqualifiedNoParenthesesCallBlock {
 
-  public ElixirMatchedAtUnqualifiedNoParenthesesCallImpl(ASTNode node) {
+  public ElixirMatchedAtUnqualifiedNoParenthesesCallBlockImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedAtUnqualifiedNoParenthesesCall(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedAtUnqualifiedNoParenthesesCallBlock(this);
     else super.accept(visitor);
   }
 
@@ -25,6 +23,12 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
   @NotNull
   public ElixirAtPrefixOperator getAtPrefixOperator() {
     return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return findChildByClass(ElixirDoBlock.class);
   }
 
   @Override

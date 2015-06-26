@@ -3,14 +3,21 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, Quotable {
+public interface ElixirMatchedQualifiedNoParenthesesCallBlock extends ElixirMatchedExpression, Quotable {
+
+  @Nullable
+  ElixirDoBlock getDoBlock();
 
   @NotNull
   ElixirDotInfixOperator getDotInfixOperator();
 
   @NotNull
   ElixirMatchedExpression getMatchedExpression();
+
+  @NotNull
+  ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();

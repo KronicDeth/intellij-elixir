@@ -46,6 +46,12 @@ public class ElixirAssociationsBaseImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
+  @Override
+  @NotNull
+  public List<ElixirVariable> getVariableList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirVariable.class);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
