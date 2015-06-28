@@ -3,7 +3,9 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
-  extends("matched.*Operation|matched(AtUnqualifiedNoParentheses|(Q|Unq)ualifiedNoArguments|(Q|Unq)ualified(No)?Parentheses)Call(Block)?|accessExpression")=matchedExpression
+  extends("matched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call)")=matchedExpression
+  // direct children of unmatchedExpression
+  extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call)")=unmatchedExpression
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -95,13 +97,9 @@ endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unq
  *
  */
 
-captureExpressionOperation ::= capturePrefixOperator expression
-                               { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-
 private expression ::= emptyParentheses |
                        unmatchedExpression |
-                       unqualifiedNoParenthesesManyArgumentsCall |
-                       matchedExpression
+                       unqualifiedNoParenthesesManyArgumentsCall
 
 private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
 
@@ -969,28 +967,27 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedMultiplicationOperation |
                       matchedHatOperation |
                       matchedUnaryNonNumericOperation |
-                      matchedDotCallBlockOperation |
+                      matchedDotCall |
                       // NoParentheses before matchedBracketOperation because brackets only make sense after parentheses.
-                      matchedQualifiedNoParenthesesCallBlock |
-                      matchedAtUnqualifiedNoParenthesesCallBlock |
-                      matchedUnqualifiedNoParenthesesCallBlock |
+                      matchedQualifiedNoParenthesesCall |
+                      matchedAtUnqualifiedNoParenthesesCall |
+                      matchedUnqualifiedNoParenthesesCall |
                       matchedBracketOperation |
                       matchedQualifiedAliasOperation |
                       matchedQualifiedBracketOperation |
-                      matchedQualifiedParenthesesCallBlock |
+                      matchedQualifiedParenthesesCall |
                       matchedQualifiedNoArgumentsCall |
                       matchedAtUnqualifiedBracketOperation |
                       matchedAtNonNumericOperation | // after matchedQualified because @ binds only before `.`
-                      matchedUnqualifiedParenthesesCallBlock |
+                      matchedUnqualifiedParenthesesCall |
                       matchedUnqualifiedBracketOperation |
-                      matchedUnqualifiedNoArgumentsCallBlock |
-                      accessExpression
+                      matchedUnqualifiedNoArgumentsCall |
+                      matchedAccessExpression
 
 /*
  * Capture Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
- *
  */
 
 capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
@@ -1003,7 +1000,7 @@ capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                             name = "&"
                           }
 matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedExpression
-                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                      { elementType = unmatchedCaptureNonNumericOperation }
 
 /*
  * In Match Operation - left-associative
@@ -1021,7 +1018,7 @@ inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL*
                       name = "<-, \\\\"
                     }
 matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpression
-                            { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                            { elementType = unmatchedInMatchOperation }
 
 /*
  * When Operation - right-associative
@@ -1039,15 +1036,15 @@ whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
                         name = "when"
                       }
 /* noParenthesesKeywords needs to be in a separate operation so that only matchedWhenNoParenthesesKeywordsOperation is a
-   POSTFIX operation and matchedWhenOperation can remain a BINARY operaton.  With
+   POSTFIX operation and matchedWhenOperation can remain a BINARY operation.  With
    `(noParenthesesKeywords | matchedExpression)` as the right operand, matchdWhenExpression was a POSTFIX operator,
    which caused the precedence for matchedInMatchOperand and matchedWhenOperation to be wrong as demonstrated in
    49ffef5a33ca1102213821efb4e2140f97622ca1 by
    org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
 matchedWhenNoParenthesesKeywordsOperation ::= matchedExpression whenInfixOperator noParenthesesKeywords
-                                              { elementType = matchedWhenOperation rightAssociative = true }
+                                              { elementType = unmatchedWhenOperation rightAssociative = true }
 matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
-                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+                         { elementType = unmatchedWhenOperation rightAssociative = true }
 
 /*
  * Type Operation - right-associative
@@ -1065,7 +1062,7 @@ typeInfixOperator ::= EOL* TYPE_OPERATOR EOL*
                         name = "::"
                       }
 matchedTypeOperation ::= matchedExpression typeInfixOperator matchedExpression
-                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+                         { elementType = unmatchedTypeOperation rightAssociative = true }
 
 /*
  * Pipe Operation - right-associative
@@ -1083,7 +1080,7 @@ pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL*
                         name = "|"
                       }
 matchedPipeOperation ::= matchedExpression pipeInfixOperator matchedExpression
-                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+                         { elementType = unmatchedPipeOperation rightAssociative = true }
 
 /*
  * Match Operation - right-associative
@@ -1101,7 +1098,7 @@ matchInfixOperator ::= EOL* MATCH_OPERATOR EOL*
                          name = "="
                        }
 matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
-                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+                          { elementType = unmatchedMatchOperation rightAssociative = true }
 
 /*
  * Or Operation - left-associative
@@ -1119,7 +1116,7 @@ orInfixOperator ::= EOL* OR_OPERATOR EOL*
                       name = "||, |||, or"
                     }
 matchedOrOperation ::= matchedExpression orInfixOperator matchedExpression
-                       { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                       { elementType = unmatchedOrOperation }
 
 /*
  * And Operation - left-associative
@@ -1136,7 +1133,7 @@ andInfixOperator ::= EOL* AND_OPERATOR EOL*
                        name = "&&, &&&, and"
                      }
 matchedAndOperation ::= matchedExpression andInfixOperator matchedExpression
-                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                        { elementType = unmatchedAndOperation }
 
 /*
  * Comparison Operation - left-associative
@@ -1154,7 +1151,7 @@ comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
                               name = "!=, ==, =~, !==, ==="
                             }
 matchedComparisonOperation ::= matchedExpression comparisonInfixOperator matchedExpression
-                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                               { elementType = unmatchedComparisonOperation }
 
 /*
  * Relational Operation - left-associative
@@ -1172,7 +1169,7 @@ relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL*
                               name = "<, >, <=, >="
                             }
 matchedRelationalOperation ::= matchedExpression relationalInfixOperator matchedExpression
-                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                               { elementType = unmatchedRelationalOperation }
 
 /*
  * Arrow Operation - left-associative
@@ -1190,7 +1187,7 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                          name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
                        }
 matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
-                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                          { elementType = unmatchedArrowOperation }
 
 /*
  * In Operation - left-associative
@@ -1208,7 +1205,7 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
                       name = "in"
                     }
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
-                       { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                       { elementType = unmatchedInOperation }
 
 /*
  * Two Operation - right-associative
@@ -1226,7 +1223,7 @@ twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
                        name = "++, --, .., <>"
                      }
 matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
-                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+                        { elementType = unmatchedTwoOperation rightAssociative = true }
 
 /*
  * Addition Operation - left-associative
@@ -1247,7 +1244,7 @@ additionInfixOperator ::= DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? EOL*
                             name = "+, -"
                           }
 matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpression
-                             { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                             { elementType = unmatchedAdditionOperation }
 
 
 /*
@@ -1267,7 +1264,7 @@ multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                   name = "*, /"
                                 }
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
-                                   { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                                   { elementType = unmatchedMultiplicationOperation }
 
 /*
  * Hat Operation - left-associative
@@ -1286,7 +1283,7 @@ hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
                        name = "^^^"
                      }
 matchedHatOperation ::= matchedExpression hatInfixOperator matchedExpression
-                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+                        { elementType = unmatchedHatOperation }
 
 /*
  * Unary Non-Numeric Operation - non-associative
@@ -1305,7 +1302,7 @@ unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
                           name = "+, -, !, ^, not, ~~~"
                         }
 matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedExpression
-                                    { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                    { elementType = unmatchedUnaryNonNumericOperation }
 
 /*
  * Dot Operations
@@ -1362,10 +1359,8 @@ relativeIdentifier ::= IDENTIFIER |
                        stringLine
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-private parenthesesPositionalArgument ::= // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L477
-                                          matchedExpression
 // @see https://github.com/elixir-lang/elixir/blob/master/lib/elixir/src/elixir_parser.yrl#L481-L482
-private parenthesesPositionalArguments ::= parenthesesPositionalArgument (infixComma parenthesesPositionalArgument)*
+private parenthesesPositionalArguments ::= containerArgumentsBase
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L484-L488
 parenthesesArguments ::= OPENING_PARENTHESIS EOL*
@@ -1376,9 +1371,6 @@ parenthesesArguments ::= OPENING_PARENTHESIS EOL*
                          CLOSING_PARENTHESIS
                          { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-left qualifiedNoParenthesesCall ::= dotInfixOperator relativeIdentifier noParenthesesOneArgument
-                                    { elementType = matchedQualifiedNoParenthesesCallBlock }
-
 // call_args_no_parens_one
 noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
                              unqualifiedNoParenthesesManyArgumentsCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L419
@@ -1388,17 +1380,12 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
 
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125 */
                              noParenthesesManyArgumentsStrict |
-                             /* `do` block goes with the outer call, so use call rules that don't include a doBlock.  */
-                             (
-                               matchedBracketOperation maxDotCall  | // matchedDotCallOperation is POSTFIX, so replace to prevent subrule match
-                               matchedBracketOperation qualifiedNoParenthesesCall // matchedQualifiedNoParenthesesCall is POSTFIX, so replace to prevent subrule match
-                               matchedAtUnqualifiedNoParenthesesCall | // ATOM
-                               matchedUnqualifiedNoParenthesesCall | // ATOM
-                               matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // matchedQualifiedParenthesesCall is POSTFIX, so replace to prevent subrule match
-                               matchedUnqualifiedParenthesesCall | // ATOM
-                               matchedUnqualifiedNoArgumentsCall // ATOM
-                             ) |
                              /* MUST be after noParenthesesManyArgumentsStrict so that matchedExpression's inbuilt error handling doesn't match with error.
+
+                                NOTE this is used in both unmatchedExpression and matchedExpression.  Using
+                                matchedExpression here ensures the `do` block is only consumed by the left-most
+                                unmatchedExpression call and not any of the middle matchedExpression calls.
+
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
                              !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
                              { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
@@ -1411,11 +1398,8 @@ matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? 
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
  */
 
-matchedDotCallBlockOperation ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
-                                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
-                            { elementType = matchedDotCallBlockOperation }
+matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
+                   { elementType = unmatchedDotCall }
 
 /*
  * Qualified No Parentheses Call
@@ -1423,11 +1407,8 @@ matchedDotCallOperation ::= matchedExpression dotInfixOperator parenthesesArgume
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedQualifiedNoParenthesesCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlock?
-                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
 matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument
-                                      { elementType = matchedQualifiedNoParenthesesCallBlock }
+                                      { elementType = unmatchedQualifiedNoParenthesesCall }
 
 /*
  * At Operation on Unqualified No Parentheses CALL
@@ -1437,11 +1418,8 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCallBlock ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
-                                               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
 matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
-                                          { elementType = matchedAtUnqualifiedNoParenthesesCallBlock }
+                                          { elementType = unmatchedAtUnqualifiedNoParenthesesCall }
 
 /*
  * Unqualified No Parentheses Call
@@ -1449,11 +1427,9 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCallBlock ::= IDENTIFIER noParenthesesOneArgument doBlock?
-                                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
 matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
-                                        { elementType = matchedUnqualifiedNoParenthesesCallBlock }
+                                        { elementType = unmatchedUnqualifiedNoParenthesesCall }
+
 /*
  * Bracket Operation
  *
@@ -1469,7 +1445,7 @@ bracketArguments ::= OPENING_BRACKET EOL*
                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 matchedBracketOperation ::= matchedExpression bracketArguments
-                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                            { elementType = unmatchedBracketOperation }
 
 /*
  * Qualified Alias Operation
@@ -1478,14 +1454,14 @@ matchedBracketOperation ::= matchedExpression bracketArguments
  */
 
 matchedQualifiedAliasOperation ::= matchedExpression dotInfixOperator alias
-                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                   { elementType = unmatchedQualifiedAliasOperation }
 
 /*
  * Qualified Identifier Bracket Operation
  */
 
 matchedQualifiedBracketOperation ::= matchedExpression dotInfixOperator relativeIdentifier CALL bracketArguments
-                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                     { elementType = unmatchedQualifiedBracketOperation }
 
 /*
  * Qualified Parentheses Call
@@ -1493,18 +1469,14 @@ matchedQualifiedBracketOperation ::= matchedExpression dotInfixOperator relative
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-matchedQualifiedParenthesesCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
-                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments
-                                    { elementType = matchedQualifiedParenthesesCallBlock }
+                                    { elementType = unmatchedQualifiedParenthesesCall }
 /*
  * Qualified Call with No Arguments - neither parenthes nor no parentheses
  */
 
-matchedQualifiedNoArgumentsCallBlock ::= matchedExpression dotInfixOperator relativeIdentifier !CALL doBlock?
-                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeIdentifier !CALL
-                                    { elementType = matchedQualifiedNoArgumentsCallBlock }
+                                    { elementType = unmatchedQualifiedNoArgumentsCall }
 
 /*
  * At Unqualified Bracket Operation
@@ -1513,7 +1485,7 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
  */
 
 matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracketArguments
-                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                         { elementType = unmatchedAtUnqualifiedBracketOperation }
 
 /*
  * Unqualified Parentheses Call
@@ -1521,10 +1493,8 @@ matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracke
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-matchedUnqualifiedParenthesesCallBlock ::= IDENTIFIER matchedParenthesesArguments doBlock?
-                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
-                                      { elementType = matchedUnqualifiedParenthesesCallBlock }
+                                      { elementType = unmatchedUnqualifiedParenthesesCall }
 /*
  * At Non-Numeric Operation - non-associative
  *
@@ -1543,23 +1513,24 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        name = "@"
                      }
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
-                                 { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                 { elementType = unmatchedAtNonNumericOperation }
 
 /*
  * Unqualified Bracket Operation
  */
 
 matchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
-                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                                       { elementType = unmatchedUnqualifiedBracketOperation }
 
 /*
  * Unqualified No Arguments Call
  */
 
-matchedUnqualifiedNoArgumentsCallBlock ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
-                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
-                                      { elementType = matchedUnqualifiedNoArgumentsCallBlock }
+                                      { elementType = unmatchedUnqualifiedNoArgumentsCall }
+
+matchedAccessExpression ::= accessExpression
+                            { elementType = accessExpression }
 
 /*
  * Access expression
@@ -1605,15 +1576,15 @@ containerAssociationOperation ::= containerExpression associationInfixOperator c
                                   { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
 left maxDotCall ::= dotInfixOperator parenthesesArguments parenthesesArguments?
-                    { elementType = matchedDotCallBlockOperation }
+                    { elementType = unmatchedDotCall }
 left maxQualifiedAlias ::= dotInfixOperator alias
-                           { elementType = matchedQualifiedAliasOperation }
+                           { elementType = unmatchedQualifiedAliasOperation }
 
 left maxQualifiedParenthesesCall ::= dotInfixOperator relativeIdentifier matchedParenthesesArguments
-                                     { elementType = matchedQualifiedParenthesesCallBlock }
+                                     { elementType = unmatchedQualifiedParenthesesCall }
 
 left maxQualifiedNoArgumentsCall ::= dotInfixOperator relativeIdentifier !CALL
-                                     { elementType = matchedQualifiedNoArgumentsCallBlock }
+                                     { elementType = unmatchedQualifiedNoArgumentsCall }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L226-L231
 private maxExpression ::= /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
@@ -1651,7 +1622,7 @@ private maxExpression ::= /* matchedBracketOperation because it is first rule af
  */
 
 atMaxExpression ::= atPrefixOperator maxExpression
-                    { elementType = matchedAtNonNumericOperation }
+                    { elementType = unmatchedAtNonNumericOperation }
 
 /* Anything that can hold a map.
  *
@@ -1843,8 +1814,307 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
  */
 
 /*
+ * Capture Non-Numeric Operation - non-associative
  *
- * Block Expression
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L50
+ */
+
+unmatchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric unmatchedExpression
+                                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * In Match Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51
+ */
+
+unmatchedInMatchOperation ::= unmatchedExpression inMatchInfixOperator unmatchedExpression
+                              { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * When Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L52
+ */
+
+/* noParenthesesKeywords needs to be in a separate operation so that only unmatchedWhenNoParenthesesKeywordsOperation is a
+   POSTFIX operation and unmatchedWhenOperation can remain a BINARY operation.  With
+   `(noParenthesesKeywords | matchedExpression)` as the right operand, matchdWhenExpression was a POSTFIX operator,
+   which caused the precedence for matchedInMatchOperand and matchedWhenOperation to be wrong as demonstrated in
+   49ffef5a33ca1102213821efb4e2140f97622ca1 by
+   org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
+unmatchedWhenNoParenthesesKeywordsOperation ::= unmatchedExpression whenInfixOperator noParenthesesKeywords
+                                                { elementType = unmatchedWhenOperation rightAssociative = true }
+unmatchedWhenOperation ::= unmatchedExpression whenInfixOperator unmatchedExpression
+                           { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Type Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L53
+ */
+
+unmatchedTypeOperation ::= unmatchedExpression typeInfixOperator unmatchedExpression
+                           { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Pipe Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L54
+ */
+
+unmatchedPipeOperation ::= unmatchedExpression pipeInfixOperator unmatchedExpression
+                           { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Match Operation - right-associative
+ *
+ * @see see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L56
+ */
+
+
+unmatchedMatchOperation ::= unmatchedExpression matchInfixOperator unmatchedExpression
+                            { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Or Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
+ */
+
+unmatchedOrOperation ::= unmatchedExpression orInfixOperator unmatchedExpression
+                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * And Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
+ */
+
+unmatchedAndOperation ::= unmatchedExpression andInfixOperator unmatchedExpression
+                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Comparison Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59
+ */
+
+unmatchedComparisonOperation ::= unmatchedExpression comparisonInfixOperator unmatchedExpression
+                                 { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Relational Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L60
+ */
+
+unmatchedRelationalOperation ::= unmatchedExpression relationalInfixOperator unmatchedExpression
+                                 { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Arrow Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
+ */
+
+unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpression
+                            { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * In Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62
+ */
+
+unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
+                         { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Two Operation - right-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
+ */
+
+unmatchedTwoOperation ::= unmatchedExpression twoInfixOperator unmatchedExpression
+                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] rightAssociative = true }
+
+/*
+ * Addition Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L64
+ *
+ */
+
+unmatchedAdditionOperation ::= unmatchedExpression additionInfixOperator unmatchedExpression
+                               { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Multiplication Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L65
+ *
+ */
+
+unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOperator unmatchedExpression
+                                     { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Hat Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66
+ *
+ */
+
+unmatchedHatOperation ::= unmatchedExpression hatInfixOperator unmatchedExpression
+                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
+
+/*
+ * Unary Non-Numeric Operation - non-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
+ *
+ */
+
+unmatchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric unmatchedExpression
+                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Dot Operations
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L561-L565
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
+ */
+
+/*
+ * Dot (Anonymous function) Call Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
+ */
+
+unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
+                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Qualified No Parentheses Call
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
+ */
+
+unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlock?
+                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * At Operation on Unqualified No Parentheses CALL
+ *
+ * Needed because matchedAtNonNumericOperation must be after *matchedQualified* and *matchedBracketOperation, but
+ * *matchedUnqualifiedNoParenthesesCall needs to be an operand of At so that the entire call is an operand instead of
+ * just the variable.
+ */
+
+unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+                                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Unqualified No Parentheses Call
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
+ */
+
+unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument doBlock?
+                                          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Bracket Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L238
+ */
+
+unmatchedBracketOperation ::= unmatchedExpression bracketArguments
+                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Qualified Alias Operation
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L388
+ */
+
+unmatchedQualifiedAliasOperation ::= unmatchedExpression dotInfixOperator alias
+                                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Qualified Identifier Bracket Operation
+ */
+
+unmatchedQualifiedBracketOperation ::= unmatchedExpression dotInfixOperator relativeIdentifier CALL bracketArguments
+                                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Qualified Parentheses Call
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
+ */
+
+unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
+                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Qualified Call with No Arguments - neither parenthes nor no parentheses
+ */
+
+unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relativeIdentifier !CALL doBlock?
+                                      { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * At Unqualified Bracket Operation
+ *
+ * Needed so that At consumes Unqualified identifier, but brackets consume both of them.
+ */
+
+unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracketArguments
+                                           { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Unqualified Parentheses Call
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
+ */
+
+unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments doBlock?
+                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * At Non-Numeric Operation - non-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L70
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L567-L572
+ * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L574-L578
+ */
+
+unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
+                                   { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+
+/*
+ * Unqualified Bracket Operation
+ */
+
+unmatchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
+                                         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+/*
+ * Unqualified No Arguments Call
+ */
+
+unmatchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
+                                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
+unmatchedAccessExpression ::= accessExpression
+                              { elementType = accessExpression }
+
+/*
+ *
+ * Do Block
  *
  */
 
@@ -1873,51 +2143,43 @@ doBlock ::= DO endOfExpression*
             END
             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
-left blockNoParenthesesCall ::= noParenthesesArguments
-                                { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-// @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L150-L153
-blockExpression ::= (
-                     /* matchedBracketOperation because it is first rule after matchedDotCallOperation that will
-                        take a `.`. */
-                     matchedBracketOperation maxDotCall |
-                     matchedBracketOperation blockNoParenthesesCall |
-                     /* matchedQualifiedNoArgumentsCall because it is first rule after
-                        matchedQualifiedParenthesesCall */
-                     matchedQualifiedNoArgumentsCall maxQualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-                     /* Can use matchedExpression rule directly because it's an ATOM and so won't match lower
-                        matchedExpression rules the way PREFIX or POSTFIX would. */
-                     matchedUnqualifiedNoParenthesesCall |
-                     /* matchedAtUnqualifiedBracketOperation and all rules through accessExpression are necessary
-                        because all those rules are ATOM or PREFIX so they won't also match lower rules */
-                     (
-                       matchedAtUnqualifiedBracketOperation |
-                       matchedAtNonNumericOperation |
-                       matchedUnqualifiedParenthesesCall |
-                       matchedUnqualifiedBracketOperation |
-                       variable |
-                       accessExpression
-                     ) maxQualifiedNoArgumentsCall+ |
-                     matchedUnqualifiedParenthesesCall | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L231
-                     variable /* (partial @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L152 */
-                    )
-                    doBlock
-                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
-atBlockOperation ::= atPrefixOperator blockExpression
-                     { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-
-captureBlockOperation ::= capturePrefixOperator blockExpression
-                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-
-unaryBlockOperation ::= unaryPrefixOperator blockExpression
-                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
-
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L143-L148
-private unmatchedExpression ::= blockExpression | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L148
-                                atBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L131
-                                captureBlockOperation | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L132
-                                unaryBlockOperation // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L130
+unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
+                        unmatchedInMatchOperation |
+                        /* noParenthesesKeywords needs to be first as matchedExpression will match due to the error
+                         handling built into the Pratt parser. */
+                        unmatchedWhenNoParenthesesKeywordsOperation |
+                        unmatchedWhenOperation |
+                        unmatchedTypeOperation |
+                        unmatchedPipeOperation |
+                        unmatchedMatchOperation |
+                        unmatchedOrOperation |
+                        unmatchedAndOperation |
+                        unmatchedComparisonOperation |
+                        unmatchedRelationalOperation |
+                        unmatchedArrowOperation |
+                        unmatchedInOperation |
+                        unmatchedTwoOperation |
+                        unmatchedAdditionOperation |
+                        unmatchedMultiplicationOperation |
+                        unmatchedHatOperation |
+                        unmatchedUnaryNonNumericOperation |
+                        unmatchedDotCall |
+                        // NoParentheses before unmatchedBracketOperation because brackets only make sense after parentheses.
+                        unmatchedQualifiedNoParenthesesCall |
+                        unmatchedAtUnqualifiedNoParenthesesCall |
+                        unmatchedUnqualifiedNoParenthesesCall |
+                        unmatchedBracketOperation |
+                        unmatchedQualifiedAliasOperation |
+                        unmatchedQualifiedBracketOperation |
+                        unmatchedQualifiedParenthesesCall |
+                        unmatchedQualifiedNoArgumentsCall |
+                        unmatchedAtUnqualifiedBracketOperation |
+                        unmatchedAtNonNumericOperation | // after unmatchedQualified because @ binds only before `.`
+                        unmatchedUnqualifiedParenthesesCall |
+                        unmatchedUnqualifiedBracketOperation |
+                        unmatchedUnqualifiedNoArgumentsCall |
+                        unmatchedAccessExpression
 
 /*
  *
@@ -2034,7 +2296,7 @@ charToken ::= CHAR_TOKENIZER (CHAR_LIST_FRAGMENT | quoteEscapeSequence)
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 private containerExpression ::= emptyParentheses |
-                                matchedExpression // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L464
+                                unmatchedExpression
 
 decimalFloat ::= decimalFloatIntegral DECIMAL_MARK decimalFloatFractional (EXPONENT_MARK decimalFloatExponent)?
                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }

@@ -46,8 +46,8 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  public ElixirUnmatchedExpression getUnmatchedExpression() {
+    return findChildByClass(ElixirUnmatchedExpression.class);
   }
 
   @Override

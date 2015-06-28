@@ -20,7 +20,7 @@ public interface ElixirStructOperation extends Quotable {
   ElixirMapPrefixOperator getMapPrefixOperator();
 
   @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirUnmatchedExpression getUnmatchedExpression();
 
   @Nullable
   ElixirVariable getVariable();

@@ -1,5 +1,5 @@
 Elixir File(0,5)
-  ElixirMatchedQualifiedNoParenthesesCallImpl(MATCHED_QUALIFIED_NO_PARENTHESES_CALL)(0,5)
+  ElixirUnmatchedQualifiedNoParenthesesCallImpl(UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL)(0,5)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,2)
       ElixirUnaryNumericOperationImpl(UNARY_NUMERIC_OPERATION)(0,2)
         ElixirUnaryPrefixOperatorImpl(UNARY_PREFIX_OPERATOR)(0,1)

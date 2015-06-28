@@ -1,5 +1,5 @@
 Elixir File(0,18)
-  ElixirMatchedTypeOperationImpl(MATCHED_TYPE_OPERATION)(0,18)
+  ElixirUnmatchedTypeOperationImpl(UNMATCHED_TYPE_OPERATION)(0,18)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,8)
       ElixirInterpolatedCharListSigilLineImpl(INTERPOLATED_CHAR_LIST_SIGIL_LINE)(0,8)
         PsiElement(~)('~')(0,1)

@@ -14,7 +14,7 @@ public interface ElixirKeywordPair extends QuotableKeywordPair {
   ElixirKeywordKey getKeywordKey();
 
   @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  ElixirUnmatchedExpression getUnmatchedExpression();
 
   Quotable getKeywordValue();
 

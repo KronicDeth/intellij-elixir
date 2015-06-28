@@ -9,15 +9,9 @@ not one ^^^ not Two.three(four) do end
 not one ^^^ not Two.three(four)(five) do end
 not one ^^^ not two three.(four) do end
 not one ^^^ not two three.(four)(five) do end
-
-# TODO `Three.four` consumes `five do end` instead of just `five`
-#not one ^^^ not two Three.four five do end
-
-# TODO `Three.four` consumes `five, six: 6 do end` instead of just `five, six: 6`
-#not one ^^^ not two Three.four five, six: 6 do end
-
-# TODO `seven` consumes `do end` instead of no arguments
-#not one ^^^ not two Three.four five, six: seven do end
+not one ^^^ not two Three.four five do end
+not one ^^^ not two Three.four five, six: 6 do end
+not one ^^^ not two Three.four five, six: seven do end
 
 # TODO `four` consumes `do end` instead of no arguments
 #not one ^^^ not two @three four do end
@@ -28,30 +22,17 @@ not one ^^^ not two three.(four)(five) do end
 # TODO `six` consumes `do end` instead of no arguments
 #not one ^^^ not two @three four, five: six do end
 
-# TODO `Three.four` consumes `(five) do end` instead of just `(five)`
-#not one ^^^ not two Three.four(five) do end
-
-# TODO `Three.four(five)` consumes `(six) do end` instead of just `(six)`
-#not one ^^^ not two Three.four(five)(six) do end
-
+not one ^^^ not two Three.four(five) do end
+not one ^^^ not two Three.four(five)(six) do end
 not one ^^^ not two three(four) do end
 not one ^^^ not two three(four)(five) do end
 not one ^^^ not two three do end
 not one ^^^ not two three, four: 4 do end
-
-# TODO `five` consumes `do end` instead of no arguments
-#not one ^^^ not two three, four: five do end
-
-# TODO `four` consumes `do end` instead of no arguments
-#not one ^^^ not two three, four do end
-
+not one ^^^ not two three, four: five do end
+not one ^^^ not two three, four do end
 not one ^^^ not Two.three four, five: 5 do end
-
-# TODO `six` consumes `do end` instead of no arguments
-#not one ^^^ not Two.three four, five: six do end
-
-# TODO `five` consumes `do end` instead of no arguments
-#not one ^^^ not Two.three four, five do end
+not one ^^^ not Two.three four, five: six do end
+not one ^^^ not Two.three four, five do end
 
 #~~~one ^^^ ~~~two do end
 #~~~one ^^^ ~~~two.(three)(four) do end

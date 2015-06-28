@@ -1,6 +1,6 @@
 Elixir File(0,9)
-  ElixirMatchedAtNonNumericOperationImpl(MATCHED_AT_NON_NUMERIC_OPERATION)(0,9)
+  ElixirUnmatchedAtNonNumericOperationImpl(UNMATCHED_AT_NON_NUMERIC_OPERATION)(0,9)
     ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
       PsiElement(@)('@')(0,1)
-    ElixirVariableImpl(VARIABLE)(1,9)
+    ElixirUnmatchedUnqualifiedNoArgumentsCallImpl(UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL)(1,9)
       PsiElement(identifier)('variable')(1,9)

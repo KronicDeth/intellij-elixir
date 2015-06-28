@@ -56,7 +56,7 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                             if (parent instanceof ElixirNoParenthesesOneArgument) {
                                 PsiElement grandParent = parent.getParent();
 
-                                if (grandParent instanceof ElixirMatchedQualifiedNoParenthesesCallBlock || grandParent instanceof ElixirMatchedUnqualifiedNoParenthesesCallBlock) {
+                                if (grandParent instanceof ElixirUnmatchedQualifiedNoParenthesesCall || grandParent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
                                     PsiElement greatGrandParent = grandParent.getParent();
 
                                     if (greatGrandParent instanceof ElixirKeywordPair || greatGrandParent instanceof ElixirParenthesesArguments) {

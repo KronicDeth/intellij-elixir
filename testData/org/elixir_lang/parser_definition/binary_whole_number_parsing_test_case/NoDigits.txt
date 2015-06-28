@@ -6,27 +6,21 @@ Elixir File(0,78)
     ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(b)('b')(35,36)
-  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
-    PsiErrorElement:'"', '"""', '%', '%{}', '&', ''', ''''', '(', '0', ':', <!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <.>, <::>, <<, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>, <=>, <^^^>, <binary digits>, <decimal float>, <decimal whole number>, <end of expression>, <in>, <matched expression>, <max dot call>, <max qualified no arguments call>, <max qualified parentheses call>, <unary numeric operation>, <when>, <|>, <||, |||, or>, '?', '@', AND_OPERATOR, ARROW_OPERATOR, ASSOCIATION_OPERATOR, Alias, BIT_STRING_OPERATOR, COMPARISON_OPERATOR, DUAL_OPERATOR, EOL, HAT_OPERATOR, IN_MATCH_OPERATOR, MATCH_OPERATOR, MULTIPLICATION_OPERATOR, OPENING_CURLY and ... expected, got '
+      PsiErrorElement:<binary digits> expected, got '
 '(36,36)
-      <empty list>
+        <empty list>
+  ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,37)
     PsiElement(EOL)('\n')(36,37)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(37,38)
-    PsiErrorElement:<end of expression> or EOL expected, got '
-'(37,37)
-      <empty list>
     PsiElement(EOL)('\n')(37,38)
   PsiComment(COMMENT)('# No digits should recover at ;')(38,69)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(69,70)
-    PsiErrorElement:<end of expression> or EOL expected, got '
-'(69,69)
-      <empty list>
     PsiElement(EOL)('\n')(69,70)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(70,72)
     ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(70,72)
       PsiElement(0)('0')(70,71)
       PsiElement(b)('b')(71,72)
-      PsiErrorElement:<.>, <binary digits>, <max dot call>, <max qualified no arguments call>, <max qualified parentheses call>, <no parentheses arguments> or '[' expected, got ';'(72,72)
+      PsiErrorElement:<binary digits> expected, got ';'(72,72)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(;)(';')(72,73)

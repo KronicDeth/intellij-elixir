@@ -40,14 +40,14 @@ public class ElixirMapUpdateArgumentsImpl extends ASTWrapperPsiElement implement
 
   @Override
   @NotNull
-  public ElixirMatchedMatchOperation getMatchedMatchOperation() {
-    return findNotNullChildByClass(ElixirMatchedMatchOperation.class);
+  public ElixirPipeInfixOperator getPipeInfixOperator() {
+    return findNotNullChildByClass(ElixirPipeInfixOperator.class);
   }
 
   @Override
   @NotNull
-  public ElixirPipeInfixOperator getPipeInfixOperator() {
-    return findNotNullChildByClass(ElixirPipeInfixOperator.class);
+  public ElixirUnmatchedMatchOperation getUnmatchedMatchOperation() {
+    return findNotNullChildByClass(ElixirUnmatchedMatchOperation.class);
   }
 
   @NotNull

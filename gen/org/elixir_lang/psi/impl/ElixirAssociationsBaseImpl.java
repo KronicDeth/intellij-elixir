@@ -42,8 +42,8 @@ public class ElixirAssociationsBaseImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @Override

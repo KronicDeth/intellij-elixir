@@ -1,6 +1,6 @@
 Elixir File(0,14)
-  ElixirMatchedQualifiedAliasOperationImpl(MATCHED_QUALIFIED_ALIAS_OPERATION)(0,14)
-    ElixirVariableImpl(VARIABLE)(0,8)
+  ElixirUnmatchedQualifiedAliasOperationImpl(UNMATCHED_QUALIFIED_ALIAS_OPERATION)(0,14)
+    ElixirUnmatchedUnqualifiedNoArgumentsCallImpl(UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL)(0,8)
       PsiElement(identifier)('variable')(0,8)
     ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(8,9)
       PsiElement(.)('.')(8,9)

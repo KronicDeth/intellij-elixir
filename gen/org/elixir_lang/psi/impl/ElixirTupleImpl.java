@@ -37,8 +37,8 @@ public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @NotNull

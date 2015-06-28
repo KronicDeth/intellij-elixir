@@ -1,5 +1,5 @@
 Elixir File(0,3)
-  ElixirMatchedAtNonNumericOperationImpl(MATCHED_AT_NON_NUMERIC_OPERATION)(0,3)
+  ElixirUnmatchedAtNonNumericOperationImpl(UNMATCHED_AT_NON_NUMERIC_OPERATION)(0,3)
     ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
       PsiElement(@)('@')(0,1)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(1,3)
