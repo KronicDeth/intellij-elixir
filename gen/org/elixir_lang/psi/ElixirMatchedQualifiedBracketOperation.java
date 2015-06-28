@@ -4,16 +4,19 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirUnmatchedQualifiedAliasOperation extends ElixirUnmatchedExpression, Quotable {
+public interface ElixirMatchedQualifiedBracketOperation extends ElixirMatchedExpression, QualifiedBracketOperation {
 
   @NotNull
-  ElixirAlias getAlias();
+  ElixirBracketArguments getBracketArguments();
 
   @NotNull
   ElixirDotInfixOperator getDotInfixOperator();
 
   @NotNull
-  ElixirUnmatchedExpression getUnmatchedExpression();
+  ElixirMatchedExpression getMatchedExpression();
+
+  @NotNull
+  ElixirRelativeIdentifier getRelativeIdentifier();
 
   @NotNull
   OtpErlangObject quote();

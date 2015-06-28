@@ -1,5 +1,5 @@
 Elixir File(0,10)
-  ElixirUnmatchedQualifiedAliasOperationImpl(UNMATCHED_QUALIFIED_ALIAS_OPERATION)(0,10)
+  ElixirUnmatchedQualifiedAliasImpl(UNMATCHED_QUALIFIED_ALIAS)(0,10)
     ElixirUnmatchedAtNonNumericOperationImpl(UNMATCHED_AT_NON_NUMERIC_OPERATION)(0,4)
       ElixirAtPrefixOperatorImpl(AT_PREFIX_OPERATOR)(0,1)
         PsiElement(@)('@')(0,1)

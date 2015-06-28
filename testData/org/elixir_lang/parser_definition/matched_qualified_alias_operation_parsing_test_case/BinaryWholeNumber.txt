@@ -1,5 +1,5 @@
 Elixir File(0,10)
-  ElixirUnmatchedQualifiedAliasOperationImpl(UNMATCHED_QUALIFIED_ALIAS_OPERATION)(0,10)
+  ElixirUnmatchedQualifiedAliasImpl(UNMATCHED_QUALIFIED_ALIAS)(0,10)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
       ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(0,4)
         PsiElement(0)('0')(0,1)

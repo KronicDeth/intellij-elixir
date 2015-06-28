@@ -437,12 +437,174 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
+  public void visitMatchedAdditionOperation(@NotNull ElixirMatchedAdditionOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedAndOperation(@NotNull ElixirMatchedAndOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedArrowOperation(@NotNull ElixirMatchedArrowOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitPrefixOperation(o);
+  }
+
+  public void visitMatchedAtUnqualifiedBracketOperation(@NotNull ElixirMatchedAtUnqualifiedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitAtUnqualifiedBracketOperation(o);
+  }
+
+  public void visitMatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitAtUnqualifiedNoParenthesesCall(o);
+  }
+
+  public void visitMatchedBracketOperation(@NotNull ElixirMatchedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitBracketOperation(o);
+  }
+
+  public void visitMatchedCaptureNonNumericOperation(@NotNull ElixirMatchedCaptureNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitPrefixOperation(o);
+  }
+
+  public void visitMatchedComparisonOperation(@NotNull ElixirMatchedComparisonOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedDotCall(@NotNull ElixirMatchedDotCall o) {
+    visitMatchedExpression(o);
+    // visitDotCall(o);
+    // visitMatchedCall(o);
+  }
+
   public void visitMatchedExpression(@NotNull ElixirMatchedExpression o) {
     visitPsiElement(o);
   }
 
+  public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedInMatchOperation(@NotNull ElixirMatchedInMatchOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedInOperation(@NotNull ElixirMatchedInOperation o) {
+    visitMatchedExpression(o);
+    // visitInOperation(o);
+  }
+
+  public void visitMatchedMatchOperation(@NotNull ElixirMatchedMatchOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedMultiplicationOperation(@NotNull ElixirMatchedMultiplicationOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
   public void visitMatchedParenthesesArguments(@NotNull ElixirMatchedParenthesesArguments o) {
     visitPsiElement(o);
+  }
+
+  public void visitMatchedPipeOperation(@NotNull ElixirMatchedPipeOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedQualifiedAlias(@NotNull ElixirMatchedQualifiedAlias o) {
+    visitMatchedExpression(o);
+    // visitQualifiedAlias(o);
+  }
+
+  public void visitMatchedQualifiedBracketOperation(@NotNull ElixirMatchedQualifiedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitQualifiedBracketOperation(o);
+  }
+
+  public void visitMatchedQualifiedNoArgumentsCall(@NotNull ElixirMatchedQualifiedNoArgumentsCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitQualifiedNoArgumentsCall(o);
+  }
+
+  public void visitMatchedQualifiedNoParenthesesCall(@NotNull ElixirMatchedQualifiedNoParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitQualifiedNoParenthesesCall(o);
+  }
+
+  public void visitMatchedQualifiedParenthesesCall(@NotNull ElixirMatchedQualifiedParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitQualifiedParenthesesCall(o);
+  }
+
+  public void visitMatchedRelationalOperation(@NotNull ElixirMatchedRelationalOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedTwoOperation(@NotNull ElixirMatchedTwoOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedTypeOperation(@NotNull ElixirMatchedTypeOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
+  }
+
+  public void visitMatchedUnaryNonNumericOperation(@NotNull ElixirMatchedUnaryNonNumericOperation o) {
+    visitMatchedExpression(o);
+    // visitPrefixOperation(o);
+  }
+
+  public void visitMatchedUnqualifiedBracketOperation(@NotNull ElixirMatchedUnqualifiedBracketOperation o) {
+    visitMatchedExpression(o);
+    // visitUnqualifiedBracketOperation(o);
+  }
+
+  public void visitMatchedUnqualifiedNoArgumentsCall(@NotNull ElixirMatchedUnqualifiedNoArgumentsCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitUnqualifiedNoArgumentsCall(o);
+  }
+
+  public void visitMatchedUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedUnqualifiedNoParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitUnqualifiedNoParenthesesCall(o);
+  }
+
+  public void visitMatchedUnqualifiedParenthesesCall(@NotNull ElixirMatchedUnqualifiedParenthesesCall o) {
+    visitMatchedExpression(o);
+    // visitMatchedCall(o);
+    // visitUnqualifiedParenthesesCall(o);
+  }
+
+  public void visitMatchedWhenOperation(@NotNull ElixirMatchedWhenOperation o) {
+    visitMatchedExpression(o);
+    // visitInfixOperation(o);
   }
 
   public void visitMultiplicationInfixOperator(@NotNull ElixirMultiplicationInfixOperator o) {
@@ -650,17 +812,17 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedAtUnqualifiedBracketOperation(@NotNull ElixirUnmatchedAtUnqualifiedBracketOperation o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitAtUnqualifiedBracketOperation(o);
   }
 
   public void visitUnmatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirUnmatchedAtUnqualifiedNoParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitAtUnqualifiedNoParenthesesCall(o);
   }
 
   public void visitUnmatchedBracketOperation(@NotNull ElixirUnmatchedBracketOperation o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitBracketOperation(o);
   }
 
   public void visitUnmatchedCaptureNonNumericOperation(@NotNull ElixirUnmatchedCaptureNonNumericOperation o) {
@@ -675,7 +837,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedDotCall(@NotNull ElixirUnmatchedDotCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitDotCall(o);
   }
 
   public void visitUnmatchedExpression(@NotNull ElixirUnmatchedExpression o) {
@@ -694,7 +856,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedInOperation(@NotNull ElixirUnmatchedInOperation o) {
     visitUnmatchedExpression(o);
-    // visitInfixOperation(o);
+    // visitInOperation(o);
   }
 
   public void visitUnmatchedMatchOperation(@NotNull ElixirUnmatchedMatchOperation o) {
@@ -717,29 +879,29 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfixOperation(o);
   }
 
-  public void visitUnmatchedQualifiedAliasOperation(@NotNull ElixirUnmatchedQualifiedAliasOperation o) {
+  public void visitUnmatchedQualifiedAlias(@NotNull ElixirUnmatchedQualifiedAlias o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitQualifiedAlias(o);
   }
 
   public void visitUnmatchedQualifiedBracketOperation(@NotNull ElixirUnmatchedQualifiedBracketOperation o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitQualifiedBracketOperation(o);
   }
 
   public void visitUnmatchedQualifiedNoArgumentsCall(@NotNull ElixirUnmatchedQualifiedNoArgumentsCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitQualifiedNoArgumentsCall(o);
   }
 
   public void visitUnmatchedQualifiedNoParenthesesCall(@NotNull ElixirUnmatchedQualifiedNoParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitQualifiedNoParenthesesCall(o);
   }
 
   public void visitUnmatchedQualifiedParenthesesCall(@NotNull ElixirUnmatchedQualifiedParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitQualifiedParenthesesCall(o);
   }
 
   public void visitUnmatchedRelationalOperation(@NotNull ElixirUnmatchedRelationalOperation o) {
@@ -764,22 +926,22 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedUnqualifiedBracketOperation(@NotNull ElixirUnmatchedUnqualifiedBracketOperation o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitUnqualifiedBracketOperation(o);
   }
 
   public void visitUnmatchedUnqualifiedNoArgumentsCall(@NotNull ElixirUnmatchedUnqualifiedNoArgumentsCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitUnqualifiedNoArgumentsCall(o);
   }
 
   public void visitUnmatchedUnqualifiedNoParenthesesCall(@NotNull ElixirUnmatchedUnqualifiedNoParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitUnqualifiedNoParenthesesCall(o);
   }
 
   public void visitUnmatchedUnqualifiedParenthesesCall(@NotNull ElixirUnmatchedUnqualifiedParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitQuotable(o);
+    // visitUnqualifiedParenthesesCall(o);
   }
 
   public void visitUnmatchedWhenOperation(@NotNull ElixirUnmatchedWhenOperation o) {

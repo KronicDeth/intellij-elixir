@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, Quotable {
+public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCall {
 
   @Nullable
   ElixirDoBlock getDoBlock();

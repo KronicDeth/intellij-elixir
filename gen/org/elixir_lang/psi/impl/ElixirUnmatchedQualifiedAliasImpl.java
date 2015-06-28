@@ -7,14 +7,14 @@ import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirUnmatchedQualifiedAliasOperationImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedAliasOperation {
+public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedAlias {
 
-  public ElixirUnmatchedQualifiedAliasOperationImpl(ASTNode node) {
+  public ElixirUnmatchedQualifiedAliasImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnmatchedQualifiedAliasOperation(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnmatchedQualifiedAlias(this);
     else super.accept(visitor);
   }
 

@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatchedExpression, Quotable {
+public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatchedExpression, QualifiedNoParenthesesCall {
 
   @Nullable
   ElixirDoBlock getDoBlock();

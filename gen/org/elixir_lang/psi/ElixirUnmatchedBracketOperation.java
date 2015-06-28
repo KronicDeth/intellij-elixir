@@ -4,7 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 
-public interface ElixirUnmatchedBracketOperation extends ElixirUnmatchedExpression, Quotable {
+public interface ElixirUnmatchedBracketOperation extends ElixirUnmatchedExpression, BracketOperation {
 
   @NotNull
   ElixirBracketArguments getBracketArguments();

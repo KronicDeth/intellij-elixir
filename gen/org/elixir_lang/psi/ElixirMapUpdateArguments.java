@@ -17,10 +17,10 @@ public interface ElixirMapUpdateArguments extends Quotable {
   ElixirKeywords getKeywords();
 
   @NotNull
-  ElixirPipeInfixOperator getPipeInfixOperator();
+  ElixirMatchedMatchOperation getMatchedMatchOperation();
 
   @NotNull
-  ElixirUnmatchedMatchOperation getUnmatchedMatchOperation();
+  ElixirPipeInfixOperator getPipeInfixOperator();
 
   @NotNull
   OtpErlangObject quote();

@@ -18,7 +18,7 @@ public interface ElixirAssociationsBase extends Quotable {
   List<ElixirContainerAssociationOperation> getContainerAssociationOperationList();
 
   @NotNull
-  List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
   List<ElixirVariable> getVariableList();

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, InfixOperation {
+public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, InOperation {
 
   @NotNull
   ElixirInInfixOperator getInInfixOperator();
