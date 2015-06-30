@@ -1436,8 +1436,17 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
-                                          { implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall" methods = [quote] }
+matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument
+                                          {
+                                            implements = [
+                                              "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
+                                              "org.elixir_lang.psi.MatchedCall"
+                                            ]
+                                            methods = [
+                                              getDoBlock
+                                              quote
+                                            ]
+                                          }
 
 /*
  * Unqualified No Parentheses Call

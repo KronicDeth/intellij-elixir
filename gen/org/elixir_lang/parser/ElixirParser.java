@@ -5789,7 +5789,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+  // atPrefixOperator IDENTIFIER noParenthesesOneArgument
   public static boolean matchedAtUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtUnqualifiedNoParenthesesCall")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
@@ -5798,16 +5798,8 @@ public class ElixirParser implements PsiParser {
     r = atPrefixOperator(b, l + 1);
     r = r && consumeToken(b, IDENTIFIER);
     r = r && noParenthesesOneArgument(b, l + 1);
-    r = r && matchedAtUnqualifiedNoParenthesesCall_3(b, l + 1);
     exit_section_(b, m, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
-  }
-
-  // doBlock?
-  private static boolean matchedAtUnqualifiedNoParenthesesCall_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedAtUnqualifiedNoParenthesesCall_3")) return false;
-    doBlock(b, l + 1);
-    return true;
   }
 
   // IDENTIFIER noParenthesesOneArgument

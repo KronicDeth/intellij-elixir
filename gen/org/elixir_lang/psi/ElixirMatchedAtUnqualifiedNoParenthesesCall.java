@@ -5,16 +5,16 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatchedExpression, AtUnqualifiedNoParenthesesCall {
+public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatchedExpression, AtUnqualifiedNoParenthesesCall, MatchedCall {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
 
-  @Nullable
-  ElixirDoBlock getDoBlock();
-
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
+
+  @Nullable
+  ElixirDoBlock getDoBlock();
 
   @NotNull
   OtpErlangObject quote();

@@ -26,15 +26,14 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
   }
 
   @Override
-  @Nullable
-  public ElixirDoBlock getDoBlock() {
-    return findChildByClass(ElixirDoBlock.class);
-  }
-
-  @Override
   @NotNull
   public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
     return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
   }
 
   @NotNull

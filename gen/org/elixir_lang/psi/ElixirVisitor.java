@@ -465,6 +465,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedAtUnqualifiedNoParenthesesCall(@NotNull ElixirMatchedAtUnqualifiedNoParenthesesCall o) {
     visitMatchedExpression(o);
     // visitAtUnqualifiedNoParenthesesCall(o);
+    // visitMatchedCall(o);
   }
 
   public void visitMatchedBracketOperation(@NotNull ElixirMatchedBracketOperation o) {

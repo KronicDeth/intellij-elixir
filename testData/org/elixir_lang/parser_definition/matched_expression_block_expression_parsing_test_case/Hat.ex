@@ -12,16 +12,9 @@ not one ^^^ not two three.(four)(five) do end
 not one ^^^ not two Three.four five do end
 not one ^^^ not two Three.four five, six: 6 do end
 not one ^^^ not two Three.four five, six: seven do end
-
-# TODO `four` consumes `do end` instead of no arguments
-#not one ^^^ not two @three four do end
-
-# TODO `@three` consumes `four, five: 5 do end` instead of just `four, five: 5`
-#not one ^^^ not two @three four, five: 5 do end
-
-# TODO `six` consumes `do end` instead of no arguments
-#not one ^^^ not two @three four, five: six do end
-
+not one ^^^ not two @three four do end
+not one ^^^ not two @three four, five: 5 do end
+not one ^^^ not two @three four, five: six do end
 not one ^^^ not two Three.four(five) do end
 not one ^^^ not two Three.four(five)(six) do end
 not one ^^^ not two three(four) do end
