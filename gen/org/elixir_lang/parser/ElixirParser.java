@@ -1321,8 +1321,8 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // blockIdentifier endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
-  //               (stab endOfExpression?)?
+  // blockIdentifier endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
+  //               (stab endOfExpression*)?
   public static boolean blockItem(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem")) return false;
     boolean r;
@@ -1334,21 +1334,26 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // endOfExpression?
+  // endOfExpression*
   private static boolean blockItem_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem_1")) return false;
-    endOfExpression(b, l + 1);
+    int c = current_position_(b);
+    while (true) {
+      if (!endOfExpression(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "blockItem_1", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
-  // (stab endOfExpression?)?
+  // (stab endOfExpression*)?
   private static boolean blockItem_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem_2")) return false;
     blockItem_2_0(b, l + 1);
     return true;
   }
 
-  // stab endOfExpression?
+  // stab endOfExpression*
   private static boolean blockItem_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem_2_0")) return false;
     boolean r;
@@ -1359,10 +1364,15 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // endOfExpression?
+  // endOfExpression*
   private static boolean blockItem_2_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "blockItem_2_0_1")) return false;
-    endOfExpression(b, l + 1);
+    int c = current_position_(b);
+    while (true) {
+      if (!endOfExpression(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "blockItem_2_0_1", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
