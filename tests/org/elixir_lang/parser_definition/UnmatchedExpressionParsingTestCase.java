@@ -93,6 +93,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testInternalError() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testNotDotCallBlock() {
         assertParsedAndQuotedCorrectly();
     }
