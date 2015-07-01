@@ -94,7 +94,7 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testInternalError() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithErrors();
     }
 
     public void testNotDotCallBlock() {

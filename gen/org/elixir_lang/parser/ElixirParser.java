@@ -1857,17 +1857,18 @@ public class ElixirParser implements PsiParser {
   public static boolean doBlock(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doBlock")) return false;
     if (!nextTokenIs(b, DO)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, null);
     r = consumeToken(b, DO);
-    r = r && doBlock_1(b, l + 1);
-    r = r && doBlock_2(b, l + 1);
-    r = r && doBlock_3(b, l + 1);
-    r = r && doBlock_4(b, l + 1);
-    r = r && doBlock_5(b, l + 1);
-    r = r && consumeToken(b, END);
-    exit_section_(b, m, DO_BLOCK, r);
-    return r;
+    p = r; // pin = DO
+    r = r && report_error_(b, doBlock_1(b, l + 1));
+    r = p && report_error_(b, doBlock_2(b, l + 1)) && r;
+    r = p && report_error_(b, doBlock_3(b, l + 1)) && r;
+    r = p && report_error_(b, doBlock_4(b, l + 1)) && r;
+    r = p && report_error_(b, doBlock_5(b, l + 1)) && r;
+    r = p && consumeToken(b, END) && r;
+    exit_section_(b, l, m, DO_BLOCK, r, p, null);
+    return r || p;
   }
 
   // endOfExpression*
