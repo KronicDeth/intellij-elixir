@@ -4902,7 +4902,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // stabOperation (endOfExpression stabOperation)* |
+  // stabOperation (endOfExpression+ stabOperation)* |
   //          stabBody
   public static boolean stab(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stab")) return false;
@@ -4914,7 +4914,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // stabOperation (endOfExpression stabOperation)*
+  // stabOperation (endOfExpression+ stabOperation)*
   private static boolean stab_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stab_0")) return false;
     boolean r;
@@ -4925,7 +4925,7 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // (endOfExpression stabOperation)*
+  // (endOfExpression+ stabOperation)*
   private static boolean stab_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stab_0_1")) return false;
     int c = current_position_(b);
@@ -4937,13 +4937,29 @@ public class ElixirParser implements PsiParser {
     return true;
   }
 
-  // endOfExpression stabOperation
+  // endOfExpression+ stabOperation
   private static boolean stab_0_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stab_0_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = endOfExpression(b, l + 1);
+    r = stab_0_1_0_0(b, l + 1);
     r = r && stabOperation(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // endOfExpression+
+  private static boolean stab_0_1_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stab_0_1_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = endOfExpression(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!endOfExpression(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "stab_0_1_0_0", c)) break;
+      c = current_position_(b);
+    }
     exit_section_(b, m, null, r);
     return r;
   }

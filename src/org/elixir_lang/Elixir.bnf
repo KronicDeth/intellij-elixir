@@ -1804,7 +1804,7 @@ stabOperation ::= stabOperationPrefix stabBody?
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
-stab ::= stabOperation (endOfExpression stabOperation)* |
+stab ::= stabOperation (endOfExpression+ stabOperation)* |
          stabBody
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
