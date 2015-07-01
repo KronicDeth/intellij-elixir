@@ -2876,16 +2876,19 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // ALIAS_TOKEN |
+  // AFTER |
+  //                ALIAS_TOKEN |
   //                AND_OPERATOR |
   //                ARROW_OPERATOR |
   //                ASSOCIATION_OPERATOR |
   //                AT_OPERATOR |
   //                BIT_STRING_OPERATOR |
   //                CAPTURE_OPERATOR |
+  //                CATCH |
   //                COMPARISON_OPERATOR |
   //                DO |
   //                DUAL_OPERATOR |
+  //                ELSE |
   //                HAT_OPERATOR |
   //                IDENTIFIER |
   //                IN_MATCH_OPERATOR |
@@ -2895,6 +2898,7 @@ public class ElixirParser implements PsiParser {
   //                MULTIPLICATION_OPERATOR |
   //                OR_OPERATOR |
   //                PIPE_OPERATOR |
+  //                RESCUE |
   //                RELATIONAL_OPERATOR |
   //                STAB_OPERATOR |
   //                STRUCT_OPERATOR |
@@ -2907,16 +2911,19 @@ public class ElixirParser implements PsiParser {
     if (!recursion_guard_(b, l, "keywordKey")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<keyword key>");
-    r = consumeToken(b, ALIAS_TOKEN);
+    r = consumeToken(b, AFTER);
+    if (!r) r = consumeToken(b, ALIAS_TOKEN);
     if (!r) r = consumeToken(b, AND_OPERATOR);
     if (!r) r = consumeToken(b, ARROW_OPERATOR);
     if (!r) r = consumeToken(b, ASSOCIATION_OPERATOR);
     if (!r) r = consumeToken(b, AT_OPERATOR);
     if (!r) r = consumeToken(b, BIT_STRING_OPERATOR);
     if (!r) r = consumeToken(b, CAPTURE_OPERATOR);
+    if (!r) r = consumeToken(b, CATCH);
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
     if (!r) r = consumeToken(b, DO);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
+    if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IDENTIFIER);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
@@ -2926,6 +2933,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, MULTIPLICATION_OPERATOR);
     if (!r) r = consumeToken(b, OR_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
+    if (!r) r = consumeToken(b, RESCUE);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
     if (!r) r = consumeToken(b, STAB_OPERATOR);
     if (!r) r = consumeToken(b, STRUCT_OPERATOR);

@@ -2437,16 +2437,19 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
  * Keywords
  */
 
-keywordKey ::= ALIAS_TOKEN |
+keywordKey ::= AFTER |
+               ALIAS_TOKEN |
                AND_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
                AT_OPERATOR |
                BIT_STRING_OPERATOR |
                CAPTURE_OPERATOR |
+               CATCH |
                COMPARISON_OPERATOR |
                DO |
                DUAL_OPERATOR |
+               ELSE |
                HAT_OPERATOR |
                IDENTIFIER |
                IN_MATCH_OPERATOR |
@@ -2456,6 +2459,7 @@ keywordKey ::= ALIAS_TOKEN |
                MULTIPLICATION_OPERATOR |
                OR_OPERATOR |
                PIPE_OPERATOR |
+               RESCUE |
                RELATIONAL_OPERATOR |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
