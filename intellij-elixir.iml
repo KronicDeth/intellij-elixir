@@ -13,7 +13,7 @@
       <excludeFolder url="file://$MODULE_DIR$/dependencies" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-141.178.9" jdkType="IDEA JDK" />
+    <orderEntry type="jdk" jdkName="IntelliJ IDEA Community Edition IC-141.1010.3" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="junit" level="project" />
     <orderEntry type="module-library">
@@ -30,5 +30,6 @@
     <orderEntry type="library" name="JInterface" level="project" />
     <orderEntry type="library" scope="TEST" name="mockito-core-2.0.7-beta" level="project" />
     <orderEntry type="library" scope="TEST" name="objenesis-2.1" level="project" />
+    <orderEntry type="module" module-name="jps-shared" />
   </component>
 </module>

@@ -267,7 +267,6 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
-    <moduleConfigurationEditorProvider implementation="org.elixir_lang.ModuleConfigurationEditorProvider" order="first"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
     <internalFileTemplate name="Elixir Module"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
@@ -284,8 +283,19 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
-    <moduleType id="ELIXIR_MIX_PROJECT" implementationClass="org.elixir_lang.mix.ModuleType"/>
-    <sdkType implementation="org.elixir_lang.SdkType"/>
+  </extensions>
+
+  <!-- Elixir Module Structure -->
+  <extensions defaultExtensionNs="com.intellij">
+    <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
+    <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
+    <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
+  </extensions>
+
+  <!-- Mix related extensions -->
+  <extensions defaultExtensionNs="com.intellij">
+    <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
+    <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
   </extensions>
 
   <application-components>
@@ -297,7 +307,7 @@
   </project-components>
 
   <actions>
-    <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
+    <action id="Elixir.NewFile" class="org.elixir_lang.actions.CreateElixirFileAction"
             text="Elixir File" description="Create new Elixir Module">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
     </action>

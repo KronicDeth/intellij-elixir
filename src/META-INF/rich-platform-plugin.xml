@@ -4,6 +4,17 @@
      Thanks to Sergey Ignatov (@ignatov) for explaining this distinction. -->
 <idea-plugin version="2">
   <extensions defaultExtensionNs="com.intellij">
-      <projectStructureDetector implementation="org.elixir_lang.mix.ProjectStructureDetector"/>
+      <projectStructureDetector implementation="org.elixir_lang.module.ElixirProjectStructureDetector"/>
+
+      <projectImportProvider implementation="org.elixir_lang.mix.importWizard.MixProjectImportProvider" />
+      <projectImportBuilder implementation="org.elixir_lang.mix.importWizard.MixProjectImportBuilder" />
+
+      <!-- for doQuickImport when open directory which contains mix.exs file -->
+      <projectOpenProcessor implementation="org.elixir_lang.mix.importWizard.MixProjectOpenProcessor" />
+
+      <!-- project compiler configurable -->
+      <projectConfigurable instance="org.elixir_lang.configuration.ElixirCompilerOptionsConfigurable"
+                           parentId="project.propCompiler" id="Elixir Compiler" displayName="Elixir Compiler" />
+      <projectService serviceImplementation="org.elixir_lang.configuration.ElixirCompilerSettings" />
   </extensions>
 </idea-plugin>
