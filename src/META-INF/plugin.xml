@@ -266,9 +266,25 @@
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <!-- Elixir Module Structure -->
+    <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
+    <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
+    <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
+
+    <!-- Mix related extensions -->
+    <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
+    <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
+
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
+
+    <!-- for template -->
     <internalFileTemplate name="Elixir Module"/>
+    <internalFileTemplate name="Elixir Application"/>
+    <internalFileTemplate name="Elixir Supervisor"/>
+    <internalFileTemplate name="Elixir GenServer"/>
+    <internalFileTemplate name="Elixir GenEvent"/>
+
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
@@ -285,19 +301,6 @@
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
   </extensions>
 
-  <!-- Elixir Module Structure -->
-  <extensions defaultExtensionNs="com.intellij">
-    <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
-    <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
-    <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
-  </extensions>
-
-  <!-- Mix related extensions -->
-  <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
-    <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
-  </extensions>
-
   <application-components>
     <!-- Add your application components here -->
   </application-components>
@@ -307,7 +310,7 @@
   </project-components>
 
   <actions>
-    <action id="Elixir.NewFile" class="org.elixir_lang.actions.CreateElixirFileAction"
+    <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
             text="Elixir File" description="Create new Elixir Module">
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
     </action>

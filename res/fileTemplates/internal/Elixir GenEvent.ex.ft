@@ -1,4 +1,3 @@
-#parse("Elixir File Header.ex")
 defmodule ${NAME} do
 #parse("Elixir File Docs.ex")
   use GenEvent
@@ -19,5 +18,5 @@ defmodule ${NAME} do
 
   def handle_info(_msg, state) do
       {:ok, state}
-    end
+  end
 end

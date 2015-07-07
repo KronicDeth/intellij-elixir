@@ -1,7 +1,5 @@
-#parse("Elixir File Header.ex")
 defmodule ${NAME} do
 #parse("Elixir File Docs.ex")
-
   use GenServer
 
   def start_link(state, opts) do

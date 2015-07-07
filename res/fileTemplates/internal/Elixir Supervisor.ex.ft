@@ -1,4 +1,3 @@
-#parse("Elixir File Header.ex")
 defmodule ${NAME}.Supervisor do
 #parse("Elixir File Docs.ex")
   use Supervisor
