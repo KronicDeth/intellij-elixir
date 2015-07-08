@@ -9,9 +9,12 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 [WebStorm](http://www.jetbrains.com/webstorm/))
 
 **The parser is incomplete until [v1.0.0](https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0).  If you see
-an odd error from valid Elixir code, it is most likely due to the incomplete parser.  Please subscribe to notifications
-or comment on [Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the
-parser is complete.**
+an odd error from valid Elixir code, check if it's a
+[known bug](https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug)
+that is planned to be fixed for v1.0.0.  If you don't see your error, please
+[open a new issue](https://github.com/KronicDeth/intellij-elixir/issues/new). Please subscribe to notifications on
+[Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the parser is
+complete.**
 
 ## Features
 
