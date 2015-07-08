@@ -201,6 +201,9 @@ allows the grammar because they contain correctable errors:
     * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
     * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
 * Bracket expression (`variable[key]`)    
+* Block expressions (`function do end`)
+* [Unmatched expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L127-L133),
+  in other words combinations of block expressions and matched expressions.
 
 ### Inspections
 
