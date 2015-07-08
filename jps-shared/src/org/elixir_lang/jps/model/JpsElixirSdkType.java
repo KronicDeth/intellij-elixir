@@ -15,14 +15,14 @@ import java.io.File;
 public class JpsElixirSdkType extends JpsSdkType<JpsDummyElement> implements JpsElementTypeWithDefaultProperties<JpsDummyElement>{
   public static final JpsElixirSdkType INSTANCE = new JpsElixirSdkType();
 
-  public static final String BYTECODE_INTERPRETER = "elixir";
+  public static final String SCRIPT_INTERPRETER = "elixir";
   public static final String BYTECODE_COMPILER = "elixirc";
   public static final String ELIXIR_TOOL_MIX = "mix";
   public static final String ELIXIR_TOOL_IEX = "iex";
 
   @NotNull
-  public static File getByteCodeInterpreterExecutable(@NotNull String sdkHome){
-    return getSdkExecutable(sdkHome, BYTECODE_INTERPRETER);
+  public static File getScriptInterpreterExecutable(@NotNull String sdkHome){
+    return getSdkExecutable(sdkHome, SCRIPT_INTERPRETER);
   }
 
   @NotNull

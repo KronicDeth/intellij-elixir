@@ -82,8 +82,7 @@ public class ElixirSdkType extends SdkType {
 
   @Override
   public boolean isValidSdkHome(@NotNull String path) {
-    // todo  this methods move to JpsElixirSdkType.class
-    File elixir = JpsElixirSdkType.getByteCodeInterpreterExecutable(path);
+    File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(path);
     File elixirc = JpsElixirSdkType.getByteCodeCompilerExecutable(path);
     File iex = JpsElixirSdkType.getIExExecutable(path);
     File mix = JpsElixirSdkType.getMixExecutable(path);
@@ -166,7 +165,7 @@ public class ElixirSdkType extends SdkType {
 
     assert !ApplicationManager.getApplication().isUnitTestMode() : "Unit tests should have their SDK versions pre-cached!";
 
-    File elixir = JpsElixirSdkType.getByteCodeInterpreterExecutable(sdkHome);
+    File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome);
     if(!elixir.canExecute()){
       String reason = elixir.getPath() + (elixir.exists() ? " is not executable." : " is missing.");
       LOG.warn("Can't detect Elixir version: " + reason);

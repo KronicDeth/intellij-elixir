@@ -21,7 +21,9 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.projectImport.ProjectImportBuilder;
 import com.intellij.projectImport.ProjectImportWizardStep;
+import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.mix.settings.MixConfigurationForm;
+import org.elixir_lang.sdk.ElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -134,6 +136,10 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
 
   private static void fetchDependencies(@NotNull final VirtualFile projectRoot, @NotNull final String mixPath){
     final Project project = ProjectImportBuilder.getCurrentProject();
+    String sdkPath = project != null ? ElixirSdkType.getSdkPath(project) : null;
+    final String elixirPath = sdkPath != null ?
+        JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
+        JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
 
     ProgressManager.getInstance().run(new Task.Modal(project, "Fetching dependencies", true){
       @Override
@@ -142,7 +148,8 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
 
         GeneralCommandLine commandLine = new GeneralCommandLine();
         commandLine.withWorkDirectory(projectRoot.getCanonicalPath());
-        commandLine.setExePath(mixPath);
+        commandLine.setExePath(elixirPath);
+        commandLine.addParameter(mixPath);
         commandLine.addParameter("deps.get");
         try{
           OSProcessHandler handler = new OSProcessHandler(commandLine.createProcess(), commandLine.getPreparedCommandLine(Platform.current()));
