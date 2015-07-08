@@ -3,6 +3,7 @@
 ## Next Release
 * Enhancements
   * [#135](https://github.com/KronicDeth/intellij-elixir/pull/135) - `do` blocks (`do end) - [@KronicDeth](https://github.com/KronicDeth)
+  * [#152](https://github.com/KronicDeth/intellij-elixir/pull/152) - Unmatched expressions (operations involving `do` block calls and normal matched expressions) - [Kronicdeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#137](https://github.com/KronicDeth/intellij-elixir/pull/137) - Lex full atom instead of just identifier-like operator prefix (`:in<nospace>dex` before vs `:index` after) - [@KronicDeth](https://github.com/KronicDeth)
   * [#138](https://github.com/KronicDeth/intellij-elixir/pull/138) - `!` and `not` are properly wrapped in `__block__`s when in stab bodies - [@KronicDeth](https://github.com/KronicDeth)

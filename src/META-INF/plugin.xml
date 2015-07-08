@@ -25,6 +25,7 @@
           <p>Enhancements</p>
           <ul>
             <li><code>do</code> blocks (<code>do end</code>)</li>
+            <li>Unmatched expressions (operations involving <code>do</code> block calls and normal matched expressions)</li>
           </ul>
         </li>
         <li>
