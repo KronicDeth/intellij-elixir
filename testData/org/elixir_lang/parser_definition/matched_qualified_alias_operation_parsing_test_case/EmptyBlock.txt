@@ -1,5 +1,5 @@
 Elixir File(0,9)
-  ElixirMatchedQualifiedAliasOperationImpl(MATCHED_QUALIFIED_ALIAS_OPERATION)(0,9)
+  ElixirUnmatchedQualifiedAliasImpl(UNMATCHED_QUALIFIED_ALIAS)(0,9)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
       ElixirParentheticalStabImpl(PARENTHETICAL_STAB)(0,3)
         PsiElement(()('(')(0,1)

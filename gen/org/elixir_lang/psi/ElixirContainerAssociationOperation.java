@@ -12,7 +12,7 @@ public interface ElixirContainerAssociationOperation extends AssociationOperatio
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirMatchedExpression> getMatchedExpressionList();
+  List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
   @NotNull
   OtpErlangObject quote();

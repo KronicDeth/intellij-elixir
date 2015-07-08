@@ -22,38 +22,14 @@ public class ElixirAdjacentExpressionImpl extends ASTWrapperPsiElement implement
 
   @Override
   @Nullable
-  public ElixirAtBlockOperation getAtBlockOperation() {
-    return findChildByClass(ElixirAtBlockOperation.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirBlockExpression getBlockExpression() {
-    return findChildByClass(ElixirBlockExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirCaptureBlockOperation getCaptureBlockOperation() {
-    return findChildByClass(ElixirCaptureBlockOperation.class);
-  }
-
-  @Override
-  @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
     return findChildByClass(ElixirEmptyParentheses.class);
   }
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirUnaryBlockOperation getUnaryBlockOperation() {
-    return findChildByClass(ElixirUnaryBlockOperation.class);
+  public ElixirUnmatchedExpression getUnmatchedExpression() {
+    return findChildByClass(ElixirUnmatchedExpression.class);
   }
 
   @Override

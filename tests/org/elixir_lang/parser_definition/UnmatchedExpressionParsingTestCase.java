@@ -29,6 +29,14 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testBlockIdentifierKeywordKeys() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testBlockItemCommentStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testCaptureDotCallBlock() {
         assertParsedAndQuotedCorrectly();
     }
@@ -87,6 +95,10 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
 
     public void testExclamationPointUnqualifiedParenthesesCallBlock() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testInternalError() {
+        assertParsedWithErrors();
     }
 
     public void testNotDotCallBlock() {

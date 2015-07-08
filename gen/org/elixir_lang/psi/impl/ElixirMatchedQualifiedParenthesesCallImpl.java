@@ -6,6 +6,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedParenthesesCall {
 
@@ -40,6 +41,11 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
   @NotNull
   public ElixirRelativeIdentifier getRelativeIdentifier() {
     return findNotNullChildByClass(ElixirRelativeIdentifier.class);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
   }
 
   @NotNull

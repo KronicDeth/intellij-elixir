@@ -2,13 +2,14 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirVariable;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirVariableImpl extends ElixirMatchedExpressionImpl implements ElixirVariable {
+public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVariable {
 
   public ElixirVariableImpl(ASTNode node) {
     super(node);

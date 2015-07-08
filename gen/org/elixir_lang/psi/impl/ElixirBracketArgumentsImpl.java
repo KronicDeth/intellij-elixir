@@ -34,8 +34,8 @@ public class ElixirBracketArgumentsImpl extends ASTWrapperPsiElement implements 
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  public ElixirUnmatchedExpression getUnmatchedExpression() {
+    return findChildByClass(ElixirUnmatchedExpression.class);
   }
 
   @NotNull

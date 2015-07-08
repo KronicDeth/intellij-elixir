@@ -24,6 +24,12 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
   }
 
   @Override
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
+  }
+
+  @Override
   @Nullable
   public ElixirKeywords getKeywords() {
     return findChildByClass(ElixirKeywords.class);
@@ -31,8 +37,8 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @Override

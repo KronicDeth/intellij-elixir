@@ -21,6 +21,9 @@ public interface ElixirAssociationsBase extends Quotable {
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
+  List<ElixirVariable> getVariableList();
+
+  @NotNull
   OtpErlangObject quote();
 
 }

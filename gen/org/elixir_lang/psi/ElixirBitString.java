@@ -16,7 +16,7 @@ public interface ElixirBitString extends Quotable {
   ElixirKeywords getKeywords();
 
   @NotNull
-  List<ElixirMatchedExpression> getMatchedExpressionList();
+  List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
   @NotNull
   OtpErlangObject quote();
