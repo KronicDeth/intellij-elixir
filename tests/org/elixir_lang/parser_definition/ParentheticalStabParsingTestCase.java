@@ -73,6 +73,10 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testStabMultiEndOfExpressionStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testUnqualifiedNoParenthesesManyArgumentsCallStabExpression() {
         assertParsedAndQuotedCorrectly();
     }

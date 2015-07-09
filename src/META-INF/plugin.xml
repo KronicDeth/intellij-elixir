@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.3.5-prerelease</version>
+  <version>0.3.5</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -13,18 +13,24 @@
         The parser is incomplete until
         <a href="https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0">
           v1.0.0
-        </a>.  If you see an odd error from valid Elixir code, it is most likely due to the incomplete parser.  Please
-        subscribe to notifications or comment on
+        </a>.  If you see an odd error from valid Elixir code, check if it's a
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug">
+          known bug
+        </a> that is planned to be fixed for v1.0.0.  If you don't see your error, please
+        <a href="https://github.com/KronicDeth/intellij-elixir/issues/new">
+          open a new issue
+        </a>. Please subscribe to notifications on
         <a href="https://github.com/KronicDeth/intellij-elixir/issues/6">
           Issue #6
         </a> if you want to be notified when the parser is complete.
       </strong>
-      <h1>Next Release</h1>
+      <h1>0.3.5</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
             <li><code>do</code> blocks (<code>do end</code>)</li>
+            <li>Unmatched expressions (operations involving <code>do</code> block calls and normal matched expressions)</li>
           </ul>
         </li>
         <li>

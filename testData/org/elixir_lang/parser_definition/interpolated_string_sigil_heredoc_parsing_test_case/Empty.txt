@@ -4,6 +4,8 @@ Elixir File(0,8)
       PsiElement(~)('~')(0,1)
       PsiElement(INTERPOLATING_STRING_SIGIL_NAME)('s')(1,2)
       PsiElement(STRING_SIGIL_HEREDOC_PROMOTER)('"""')(2,5)
+      PsiErrorElement:EOL expected, got '"""'(5,5)
+        <empty list>
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
         <empty list>
       PsiElement(STRING_SIGIL_HEREDOC_TERMINATOR)('"""')(5,8)

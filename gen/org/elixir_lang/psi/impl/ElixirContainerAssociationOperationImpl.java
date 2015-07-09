@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirContainerAssociationOperation;
 import org.elixir_lang.psi.ElixirEmptyParentheses;
-import org.elixir_lang.psi.ElixirMatchedExpression;
+import org.elixir_lang.psi.ElixirUnmatchedExpression;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +33,8 @@ public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElemen
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @NotNull

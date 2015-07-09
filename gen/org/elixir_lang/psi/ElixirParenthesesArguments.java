@@ -9,11 +9,14 @@ import java.util.List;
 
 public interface ElixirParenthesesArguments extends QuotableArguments {
 
+  @NotNull
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
+
   @Nullable
   ElixirKeywords getKeywords();
 
   @NotNull
-  List<ElixirMatchedExpression> getMatchedExpressionList();
+  List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();

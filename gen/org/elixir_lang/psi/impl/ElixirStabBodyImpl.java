@@ -24,24 +24,6 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
 
   @Override
   @NotNull
-  public List<ElixirAtBlockOperation> getAtBlockOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirAtBlockOperation.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirBlockExpression> getBlockExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirBlockExpression.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirCaptureBlockOperation> getCaptureBlockOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirCaptureBlockOperation.class);
-  }
-
-  @Override
-  @NotNull
   public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
@@ -54,14 +36,8 @@ public class ElixirStabBodyImpl extends ASTWrapperPsiElement implements ElixirSt
 
   @Override
   @NotNull
-  public List<ElixirMatchedExpression> getMatchedExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
-  }
-
-  @Override
-  @NotNull
-  public List<ElixirUnaryBlockOperation> getUnaryBlockOperationList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnaryBlockOperation.class);
+  public List<ElixirUnmatchedExpression> getUnmatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnmatchedExpression.class);
   }
 
   @Override

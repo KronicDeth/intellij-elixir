@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAccessExpression extends ElixirMatchedExpression, Quotable {
+public interface ElixirAccessExpression extends Quotable {
 
   @Nullable
   ElixirAlias getAlias();

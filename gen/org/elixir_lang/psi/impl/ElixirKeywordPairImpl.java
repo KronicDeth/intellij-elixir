@@ -34,8 +34,8 @@ public class ElixirKeywordPairImpl extends ASTWrapperPsiElement implements Elixi
 
   @Override
   @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  public ElixirUnmatchedExpression getUnmatchedExpression() {
+    return findChildByClass(ElixirUnmatchedExpression.class);
   }
 
   public Quotable getKeywordValue() {

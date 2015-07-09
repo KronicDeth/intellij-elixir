@@ -9,9 +9,12 @@ This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) 
 [WebStorm](http://www.jetbrains.com/webstorm/))
 
 **The parser is incomplete until [v1.0.0](https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0).  If you see
-an odd error from valid Elixir code, it is most likely due to the incomplete parser.  Please subscribe to notifications
-or comment on [Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the
-parser is complete.**
+an odd error from valid Elixir code, check if it's a
+[known bug](https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug)
+that is planned to be fixed for v1.0.0.  If you don't see your error, please
+[open a new issue](https://github.com/KronicDeth/intellij-elixir/issues/new). Please subscribe to notifications on
+[Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the parser is
+complete.**
 
 ## Features
 
@@ -201,6 +204,9 @@ allows the grammar because they contain correctable errors:
     * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
     * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
 * Bracket expression (`variable[key]`)    
+* Block expressions (`function do end`)
+* [Unmatched expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L127-L133),
+  in other words combinations of block expressions and matched expressions.
 
 ### Inspections
 
@@ -488,3 +494,17 @@ with Alt+Enter. (Will vary based on keymap.)
 
 ![Color Settings](/screenshots/Color%20Settings.png?raw=true "Color Settings")
 ![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")
+
+## Donations
+
+If you would like to make a donation you can use Paypal:
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Kronic%2eDeth%40gmail%2ecom&lc=US&item_name=Elixir%20plugin%20for%20IntelliJ%20IDEA&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
+
+If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
+
+### Donors
+
+I'd like to thank those who have donated to help support this project.
+
+* Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
