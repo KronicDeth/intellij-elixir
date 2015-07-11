@@ -121,7 +121,7 @@ private expressionList ::= expression (endOfExpression+ expression | adjacentExp
  * Many Arguments
  */
 
-private noParenthesesCommaExpression ::= matchedExpression (infixComma noParenthesesExpression)+
+private noParenthesesCommaExpression ::= !additionTail matchedExpression (infixComma noParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
 noParenthesesExpression ::= emptyParentheses |
@@ -1233,8 +1233,12 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
  */
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
-   interpreted as unaryOperation */
-additionInfixOperator ::= DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? EOL*
+   interpreted as unaryOperation.
+
+   See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+   for rules for SIGNIFICANT_WHITE_SPACE */
+additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE |
+                           DUAL_OPERATOR) EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1292,7 +1296,7 @@ matchedHatOperation ::= matchedExpression hatInfixOperator matchedExpression
  *
  */
 
-unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR) EOL*
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -1386,9 +1390,23 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                 matchedExpression here ensures the `do` block is only consumed by the left-most
                                 unmatchedExpression call and not any of the middle matchedExpression calls.
 
-                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
-                             !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
+                             !additionTail matchedExpression
                              { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+/* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+  @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
+private additionTail ::= SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR (
+                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
+                           "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
+                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
+                           OPENING_BIT | OPENING_BRACKET | OPENING_CURLY | OPENING_PARENTHESIS |
+                           // white spaces
+                           EOL | SIGNIFICANT_WHITE_SPACE
+                         )
+                         |
+                         DUAL_OPERATOR
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 

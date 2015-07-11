@@ -11,6 +11,6 @@ Elixir File(0,8)
         <empty list>
   PsiElement(.)('.')(4,5)
   PsiElement(()('(')(5,6)
-  PsiErrorElement:'(', ')', <access expression>, <keyword key>, <unmatched expression>, EOL or identifier expected, got ';'(6,7)
+  PsiErrorElement:'(', ')', <keyword key>, <unmatched expression>, EOL or identifier expected, got ';'(6,7)
     PsiElement(;)(';')(6,7)
   PsiElement())(')')(7,8)
