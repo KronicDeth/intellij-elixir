@@ -326,6 +326,8 @@ HORIZONTAL_SPACE = [ \t]
 VERTICAL_SPACE = [\n\r]
 SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
+// see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
+SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>]
 
 /*
  *  Comments
@@ -600,7 +602,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {EOL}                                      { return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
-  {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
+  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
+  {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
@@ -870,6 +874,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    * Emulates strip_space in elixir_tokenizer.erl
    */
 
+  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE}  { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                      { return TokenType.WHITE_SPACE; }
   {EOL}                                             { return ElixirTypes.EOL; }
 
