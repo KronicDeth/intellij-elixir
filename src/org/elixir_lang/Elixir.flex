@@ -327,7 +327,7 @@ VERTICAL_SPACE = [\n\r]
 SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
 // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
-SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>]
+SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>:]
 
 /*
  *  Comments
