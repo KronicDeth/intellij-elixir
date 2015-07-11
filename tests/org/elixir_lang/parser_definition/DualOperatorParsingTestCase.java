@@ -13,6 +13,14 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
     }
 
     /**
+     * [one-two, three] can be confused for [one(-two, three)] because the no parentheses many arguments is part of
+     * matchedExpression even though it's not part of matched_expr.
+     */
+    public void testIdentifierOperatorIdentifierCommaIdentifierInContainer() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    /**
      * see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
      */
     public void testIdentifierSpaceOperatorContainer() {
