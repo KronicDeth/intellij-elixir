@@ -2539,7 +2539,9 @@ private containerArguments ::= containerArgumentsBase (infixComma keywords | inf
 private listArguments ::= keywords |
                           containerArguments
 
-list ::= OPENING_BRACKET EOL* listArguments? CLOSING_BRACKET
+list ::= OPENING_BRACKET EOL*
+         listArguments? EOL*
+         CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches

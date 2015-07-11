@@ -3103,7 +3103,9 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // OPENING_BRACKET EOL* listArguments? CLOSING_BRACKET
+  // OPENING_BRACKET EOL*
+  //          listArguments? EOL*
+  //          CLOSING_BRACKET
   public static boolean list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list")) return false;
     if (!nextTokenIs(b, OPENING_BRACKET)) return false;
@@ -3112,6 +3114,7 @@ public class ElixirParser implements PsiParser {
     r = consumeToken(b, OPENING_BRACKET);
     r = r && list_1(b, l + 1);
     r = r && list_2(b, l + 1);
+    r = r && list_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_BRACKET);
     exit_section_(b, m, LIST, r);
     return r;
@@ -3133,6 +3136,18 @@ public class ElixirParser implements PsiParser {
   private static boolean list_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "list_2")) return false;
     listArguments(b, l + 1);
+    return true;
+  }
+
+  // EOL*
+  private static boolean list_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "list_3")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!consumeToken(b, EOL)) break;
+      if (!empty_element_parsed_guard_(b, "list_3", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
