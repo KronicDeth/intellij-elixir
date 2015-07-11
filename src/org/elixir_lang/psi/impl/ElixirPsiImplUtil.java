@@ -2312,12 +2312,17 @@ if (quoted == null) {
                 OtpErlangObject receiver = expression.elementAt(0);
 
                 if (receiver.equals(MINUS) || receiver.equals(PLUS)) {
-                    blockCallMetadata = new OtpErlangList(
-                            new OtpErlangObject[]{
-                                    AMBIGUOUS_OP_KEYWORD_PAIR,
-                                    blockCallMetadata.elementAt(0)
-                            }
-                    );
+                    OtpErlangList dualCallArguments = Macro.callArguments(expression);
+
+                    // [Arg]
+                    if (dualCallArguments.arity() == 1) {
+                        blockCallMetadata = new OtpErlangList(
+                                new OtpErlangObject[]{
+                                        AMBIGUOUS_OP_KEYWORD_PAIR,
+                                        blockCallMetadata.elementAt(0)
+                                }
+                        );
+                    }
                 }
             }
         }
