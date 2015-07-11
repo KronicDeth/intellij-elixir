@@ -30,6 +30,7 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines</li>
+            <li>Allow EOL between list arguments and <code>]</code></li>
           </ul>
         </li>
       </ul>
