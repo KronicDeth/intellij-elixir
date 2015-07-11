@@ -1,5 +1,9 @@
 # Changelog
 
+## Next Release
+* Bug Fixes
+  * [#154](https://github.com/KronicDeth/intellij-elixir/pull/154) - Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines - [KronicDeth](https://github.com/KronicDeth)
+
 ## v0.3.5
 * Enhancements
   * [#135](https://github.com/KronicDeth/intellij-elixir/pull/135) - `do` blocks (`do end) - [@KronicDeth](https://github.com/KronicDeth)
