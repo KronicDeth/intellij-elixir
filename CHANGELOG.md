@@ -4,6 +4,10 @@
 * Bug Fixes
   * [#154](https://github.com/KronicDeth/intellij-elixir/pull/154) - Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines - [KronicDeth](https://github.com/KronicDeth)
   * [#155](https://github.com/KronicDeth/intellij-elixir/pull/155) - Allow EOL between list arguments and `]` - [KronicDeth](https://github.com/KronicDeth)
+  * [#156](https://github.com/KronicDeth/intellij-elixir/pull/156) - [KronicDeth](https://github.com/KronicDeth)
+   * Relative identifiers after `.` that start with `and`, `or`, and `not` will be lexed as a single identifier instead
+     of `and`, `or`, or `not` followed by another identifier.
+   * `end` is allowed as a relative identifier after `.`
 
 ## v0.3.5
 * Enhancements

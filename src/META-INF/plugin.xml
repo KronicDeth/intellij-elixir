@@ -31,6 +31,12 @@
           <ul>
             <li>Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines</li>
             <li>Allow EOL between list arguments and <code>]</code></li>
+            <li>
+              Relative identifiers after <code>.</code> that start with <code>and</code>, <code>or</code>, and
+              <code>not</code> will be lexed as a single identifier instead of <code>and</code>, <code>or</code>, or
+              <code>not</code> followed by another identifier.
+            </li>
+            <li><code>end</code> is allowed as a relative identifier after <code>.</code></li>
           </ul>
         </li>
       </ul>
