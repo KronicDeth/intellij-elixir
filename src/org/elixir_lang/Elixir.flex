@@ -838,6 +838,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.END; }
   {ELSE}                                            { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ELSE; }
+  {FALSE}                                           { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.FALSE; }
   {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.HAT_OPERATOR; }
   {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
@@ -848,6 +850,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {NIL}                                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.NIL; }
   {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.OR_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
@@ -860,6 +864,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }
+  {TRUE}                                            { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.TRUE; }
   {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TWO_OPERATOR; }
   {UNARY_OPERATOR}                                  { yybegin(CALL_MAYBE);
