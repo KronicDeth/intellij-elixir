@@ -872,6 +872,11 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {WHEN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR} { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.WHEN_OPERATOR; }
 
+  /* Must be after {AFTER}, {CATCH}, {DO}, {END}, {ELSE}, {IN_OPERATOR}, {OR_OPERATOR} (for 'or'), and {WHEN_OPERATOR}
+     as all those keywords would match {IDENTIFIER} */
+  {IDENTIFIER}                                      { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+                                                      return ElixirTypes.IDENTIFIER; }
+
   /*
    * Emulates strip_space in elixir_tokenizer.erl
    */
