@@ -4870,6 +4870,7 @@ public class ElixirParser implements PsiParser {
   //                        DO |
   //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
   //                        ELSE |
+  //                        END |
   //                        HAT_OPERATOR |
   //                        IN_MATCH_OPERATOR |
   //                        IN_OPERATOR |
@@ -4904,6 +4905,7 @@ public class ElixirParser implements PsiParser {
     if (!r) r = consumeToken(b, DO);
     if (!r) r = relativeIdentifier_9(b, l + 1);
     if (!r) r = consumeToken(b, ELSE);
+    if (!r) r = consumeToken(b, END);
     if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);

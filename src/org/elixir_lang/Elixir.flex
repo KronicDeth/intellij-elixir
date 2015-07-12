@@ -117,9 +117,6 @@ CLOSING_CURLY = "}"
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
  */
 
-// Separates operators that look like {IDENTIFIER} from the next token
-IDENTIFIER_OPERATOR_SEPARATOR = {EOL}|{OPENING_BRACKET}|{OPENING_PARENTHESIS}|{WHITE_SPACE}
-
 FOUR_TOKEN_BITSTRING_OPERATOR = "<<>>"
 FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
@@ -819,7 +816,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DOT_OPERATION> {
-  {AFTER} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+  {AFTER}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AFTER; }
   {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AND_OPERATOR; }
@@ -827,48 +824,59 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.ARROW_OPERATOR; }
   {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AT_OPERATOR; }
-  {CATCH} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+  {CATCH}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CATCH; }
   {CAPTURE_OPERATOR}                                { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CAPTURE_OPERATOR; }
   {COMPARISON_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.COMPARISON_OPERATOR; }
-  {DO} / {IDENTIFIER_OPERATOR_SEPARATOR}            { yybegin(CALL_MAYBE);
+  {DO}                                              { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DO; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
-  {ELSE} / {IDENTIFIER_OPERATOR_SEPARATOR}          { yybegin(CALL_MAYBE);
+  {END}                                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.END; }
+  {ELSE}                                            { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ELSE; }
+  {FALSE}                                           { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.FALSE; }
   {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.HAT_OPERATOR; }
   {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_MATCH_OPERATOR; }
-  // Ensure that it is just `in`
-  {IN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR}   { yybegin(CALL_MAYBE);
+  {IN_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_OPERATOR; }
   {MATCH_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {NIL}                                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.NIL; }
   {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.OR_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR; }
-  {RESCUE} / {IDENTIFIER_OPERATOR_SEPARATOR}        { yybegin(CALL_MAYBE);
+  {RESCUE}                                          { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RESCUE; }
   {STAB_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }
+  {TRUE}                                            { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.TRUE; }
   {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TWO_OPERATOR; }
   {UNARY_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.UNARY_OPERATOR; }
-  // Ensure that is just `when`
-  {WHEN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR} { yybegin(CALL_MAYBE);
+  {WHEN_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.WHEN_OPERATOR; }
+
+  /* Must be after {AFTER}, {CATCH}, {DO}, {END}, {ELSE}, {IN_OPERATOR}, {OR_OPERATOR} (for 'or'), and {WHEN_OPERATOR}
+     as all those keywords would match {IDENTIFIER} */
+  {IDENTIFIER}                                      { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+                                                      return ElixirTypes.IDENTIFIER; }
 
   /*
    * Emulates strip_space in elixir_tokenizer.erl
