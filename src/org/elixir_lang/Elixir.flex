@@ -837,6 +837,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.DO; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
+  {END} / {IDENTIFIER_OPERATOR_SEPARATOR}           { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.END; }
   {ELSE} / {IDENTIFIER_OPERATOR_SEPARATOR}          { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ELSE; }
   {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);

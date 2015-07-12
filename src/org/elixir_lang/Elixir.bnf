@@ -1342,6 +1342,7 @@ relativeIdentifier ::= IDENTIFIER |
                        DO |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
                        ELSE |
+                       END |
                        HAT_OPERATOR |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
