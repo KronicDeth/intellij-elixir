@@ -37,6 +37,7 @@
               <code>not</code> followed by another identifier.
             </li>
             <li><code>end</code> is allowed as a relative identifier after <code>.</code></li>
+            <li>Fix <code>(...)</code> as part of matched expression in no parentheses stab signature</li>
           </ul>
         </li>
       </ul>
@@ -168,7 +169,7 @@
           <p>Incompatible Changes</p>
           <ul>
             <li>
-              New Elixir File validates that the name is a valid Alias, so each `.` separated part must start with a
+              New Elixir File validates that the name is a valid Alias, so each <code>.</code> separated part must start with a
               capital letter.  Previous New Elixir File validated that the name was a valid path, and so forced the name
               to be lowercase.
             </li>
@@ -192,8 +193,8 @@
             <li>Inspection that marks errors for ambiguous commas</li>
             <li>Inspection that marks errors for ambiguous parentheses</li>
             <li>Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.</li>
-            <li>Inspection that marks errors for missing end-of-expressions (`;` and newlines) between expressions.</li>
-            <li>Quick Fix to insert `;` for missing end-of-expression.</li>
+            <li>Inspection that marks errors for missing end-of-expressions (<code>;</code> and newlines) between expressions.</li>
+            <li>Quick Fix to insert <code>;</code> for missing end-of-expression.</li>
             <li>Quick Fix to insert newline for missing end-of-expression.</li>
           </ul>
         </li>
