@@ -33,9 +33,15 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public ElixirStabSignature getStabSignature() {
-    return findNotNullChildByClass(ElixirStabSignature.class);
+  @Nullable
+  public ElixirStabNoParenthesesSignature getStabNoParenthesesSignature() {
+    return findChildByClass(ElixirStabNoParenthesesSignature.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStabParenthesesSignature getStabParenthesesSignature() {
+    return findChildByClass(ElixirStabParenthesesSignature.class);
   }
 
   @NotNull

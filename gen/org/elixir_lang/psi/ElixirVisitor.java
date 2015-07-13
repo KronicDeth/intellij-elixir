@@ -740,10 +740,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitStabSignature(@NotNull ElixirStabSignature o) {
-    visitQuotable(o);
-  }
-
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {
     visitHeredoc(o);
     // visitInterpolatedString(o);
