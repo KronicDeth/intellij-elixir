@@ -49,6 +49,10 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testParentheticalStabInNoParenthesesStabSignature() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testPositionalsAndKeywordsInParenthesesStab() {
         assertParsedAndQuotedCorrectly();
     }

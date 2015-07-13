@@ -1538,8 +1538,20 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
-        Quotable leftOperand = stabOperation.getStabSignature();
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
+
+        if (leftOperand == null) {
+            leftOperand = stabOperation.getStabNoParenthesesSignature();
+        }
+
+        OtpErlangObject quotedLeftOperand;
+
+        if (leftOperand != null) {
+            quotedLeftOperand = leftOperand.quote();
+        } else {
+            // when there is not signature before `->`.
+            quotedLeftOperand = new OtpErlangList();
+        }
 
         Operator operator = stabOperation.getStabInfixOperator();
         OtpErlangObject quotedOperator = operator.quote();
@@ -1601,24 +1613,6 @@ public class ElixirPsiImplUtil {
         }
 
         return new OtpErlangList(quotedListElements);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirStabSignature stabSignature) {
-        PsiElement[] children = stabSignature.getChildren();
-        OtpErlangObject quoted;
-
-        if (children.length > 0) {
-            assert children.length == 1;
-
-            Quotable child = (Quotable) children[0];
-            quoted = child.quote();
-        } else {
-            quoted = new OtpErlangList();
-        }
-
-        return quoted;
     }
 
     @Contract(pure = true)

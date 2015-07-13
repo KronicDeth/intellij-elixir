@@ -668,8 +668,6 @@ Elixir File(0,888)
               PsiWhiteSpace(' ')(695,696)
               ElixirStabImpl(STAB)(696,698)
                 ElixirStabOperationImpl(STAB_OPERATION)(696,698)
-                  ElixirStabSignatureImpl(STAB_SIGNATURE)(696,696)
-                    <empty list>
                   ElixirStabInfixOperatorImpl(STAB_INFIX_OPERATOR)(696,698)
                     PsiElement(STAB_OPERATOR)('->')(696,698)
               PsiWhiteSpace(' ')(698,699)

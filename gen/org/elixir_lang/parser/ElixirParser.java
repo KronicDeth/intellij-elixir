@@ -524,9 +524,6 @@ public class ElixirParser implements PsiParser {
     else if (t == STAB_PARENTHESES_SIGNATURE) {
       r = stabParenthesesSignature(b, 0);
     }
-    else if (t == STAB_SIGNATURE) {
-      r = stabSignature(b, 0);
-    }
     else if (t == STRING_HEREDOC) {
       r = stringHeredoc(b, 0);
     }
@@ -5209,12 +5206,37 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // stabSignature stabInfixOperator
+  // stabParenthesesSignature stabInfixOperator |
+  //                                 stabNoParenthesesSignature stabInfixOperator |
+  //                                 stabInfixOperator
   static boolean stabOperationPrefix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stabOperationPrefix")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = stabSignature(b, l + 1);
+    r = stabOperationPrefix_0(b, l + 1);
+    if (!r) r = stabOperationPrefix_1(b, l + 1);
+    if (!r) r = stabInfixOperator(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // stabParenthesesSignature stabInfixOperator
+  private static boolean stabOperationPrefix_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabOperationPrefix_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stabParenthesesSignature(b, l + 1);
+    r = r && stabInfixOperator(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // stabNoParenthesesSignature stabInfixOperator
+  private static boolean stabOperationPrefix_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stabOperationPrefix_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = stabNoParenthesesSignature(b, l + 1);
     r = r && stabInfixOperator(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -5247,29 +5269,6 @@ public class ElixirParser implements PsiParser {
     Marker m = enter_section_(b);
     r = whenInfixOperator(b, l + 1);
     r = r && expression(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // (stabParenthesesSignature |
-  //                    stabNoParenthesesSignature)?
-  public static boolean stabSignature(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabSignature")) return false;
-    Marker m = enter_section_(b, l, _NONE_, "<stab signature>");
-    stabSignature_0(b, l + 1);
-    exit_section_(b, l, m, STAB_SIGNATURE, true, false, null);
-    return true;
-  }
-
-  // stabParenthesesSignature |
-  //                    stabNoParenthesesSignature
-  private static boolean stabSignature_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "stabSignature_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = stabParenthesesSignature(b, l + 1);
-    if (!r) r = stabNoParenthesesSignature(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

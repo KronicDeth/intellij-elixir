@@ -13,8 +13,11 @@ public interface ElixirStabOperation extends Quotable {
   @NotNull
   ElixirStabInfixOperator getStabInfixOperator();
 
-  @NotNull
-  ElixirStabSignature getStabSignature();
+  @Nullable
+  ElixirStabNoParenthesesSignature getStabNoParenthesesSignature();
+
+  @Nullable
+  ElixirStabParenthesesSignature getStabParenthesesSignature();
 
   @NotNull
   OtpErlangObject quote();
