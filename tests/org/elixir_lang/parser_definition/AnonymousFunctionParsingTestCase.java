@@ -29,6 +29,14 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testFnMultiNewlineStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testFnMultiSemicolonStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testFnMultiStabEnd() {
         assertParsedAndQuotedCorrectly();
     }
@@ -69,7 +77,15 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testFnStabMultiNewlineStab() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testFnUnqualifiedNoParenthesesManyArgumentsCallStabExpressionEnd() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testKernelTypespecRegression() {
         assertParsedAndQuotedCorrectly();
     }
 
