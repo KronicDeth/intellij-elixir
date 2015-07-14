@@ -34,7 +34,7 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnMultiSemicolonStab() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedWithErrors();
     }
 
     public void testFnMultiStabEnd() {
