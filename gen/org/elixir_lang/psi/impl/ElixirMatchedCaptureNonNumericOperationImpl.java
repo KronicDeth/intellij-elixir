@@ -1,15 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirCapturePrefixOperator;
-import org.elixir_lang.psi.ElixirMatchedCaptureNonNumericOperation;
-import org.elixir_lang.psi.ElixirMatchedExpression;
-import org.elixir_lang.psi.ElixirVisitor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import org.elixir_lang.psi.*;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedCaptureNonNumericOperation {
 

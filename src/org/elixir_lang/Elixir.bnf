@@ -77,7 +77,7 @@
 
 // expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
 // lines
-private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
+private elixirFile ::= endOfExpression? (expressionList endOfExpression?)?
 
 /*
  *
@@ -89,7 +89,7 @@ private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
-endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unquoted" }
+endOfExpression ::= infixSemicolon | EOL+ { implements = "org.elixir_lang.psi.Unquoted" }
 
 /*
  *
@@ -101,7 +101,7 @@ private expression ::= emptyParentheses |
                        unmatchedExpression |
                        unqualifiedNoParenthesesManyArgumentsCall
 
-private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
+private expressionList ::= expression (endOfExpression expression | adjacentExpression)*
 
 /*
  *
@@ -1817,21 +1817,21 @@ private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabNoParenthesesSignature stabInfixOperator |
                                 stabInfixOperator
 private stabBodyExpression ::= !stabOperationPrefix expression
-stabBody ::= stabBodyExpression (endOfExpression+ stabBodyExpression)*
+stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 stabOperation ::= stabOperationPrefix stabBody?
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
-stab ::= stabOperation (endOfExpression+ stabOperation)* |
+stab ::= stabOperation (endOfExpression stabOperation)* |
          stabBody
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpression?
-                      stab
-                      endOfExpression* END
+                      stab endOfExpression?
+                      END
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
@@ -2236,8 +2236,8 @@ blockIdentifier ::= AFTER | CATCH | ELSE | RESCUE
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313-L314
-blockItem ::= blockIdentifier endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
-              (stab endOfExpression*)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313
+blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
+              (stab endOfExpression?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L316-L317
@@ -2245,9 +2245,9 @@ blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= DO endOfExpression*
-            stab? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-            blockList? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+doBlock ::= DO endOfExpression?
+            stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+            blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
             END
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
