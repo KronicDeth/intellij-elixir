@@ -199,18 +199,19 @@ ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
 ONE_TOKEN_STRUCT_OPERATOR = "%"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
-
-ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
-                     {ONE_TOKEN_CAPTURE_OPERATOR} |
-                     {ONE_TOKEN_DOT_OPERATOR} |
-                     {ONE_TOKEN_DUAL_OPERATOR} |
-                     {ONE_TOKEN_IN_OPERATOR} |
-                     {ONE_TOKEN_MATCH_OPERATOR} |
-                     {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
-                     {ONE_TOKEN_PIPE_OPERATOR} |
-                     {ONE_TOKEN_RELATIONAL_OPERATOR} |
-                     {ONE_TOKEN_STRUCT_OPERATOR} |
-                     {ONE_TOKEN_UNARY_OPERATOR}
+ONE_TOKEN_REFERENCABLE_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
+                                  {ONE_TOKEN_CAPTURE_OPERATOR} |
+                                  {ONE_TOKEN_DUAL_OPERATOR} |
+                                  {ONE_TOKEN_IN_OPERATOR} |
+                                  {ONE_TOKEN_MATCH_OPERATOR} |
+                                  {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                                  {ONE_TOKEN_PIPE_OPERATOR} |
+                                  {ONE_TOKEN_RELATIONAL_OPERATOR} |
+                                  {ONE_TOKEN_UNARY_OPERATOR}
+ONE_TOKEN_UNREFERENCABLE_OPERATOR = {ONE_TOKEN_DOT_OPERATOR} |
+                                    {ONE_TOKEN_STRUCT_OPERATOR}
+ONE_TOKEN_OPERATOR = {ONE_TOKEN_REFERENCABLE_OPERATOR} |
+                     {ONE_TOKEN_UNREFERENCABLE_OPERATOR}
 
 AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
@@ -245,6 +246,10 @@ UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
 WHEN_OPERATOR = {FOUR_TOKEN_WHEN_OPERATOR}
 
+REFERENCABLE_OPERATOR = {FOUR_TOKEN_OPERATOR} |
+                        {THREE_TOKEN_OPERATOR} |
+                        {TWO_TOKEN_OPERATOR} |
+                        {ONE_TOKEN_REFERENCABLE_OPERATOR}
 // OPERATOR is from longest to shortest so longest match wins
 OPERATOR = {FOUR_TOKEN_OPERATOR} |
            {THREE_TOKEN_OPERATOR} |
@@ -447,6 +452,13 @@ QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER
 QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
 
 /*
+ * Function References
+ */
+
+REFERENCE_OPERATOR = "/"
+REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{REFERENCE_OPERATOR}
+
+/*
  * Regular Keywords
  */
 
@@ -553,6 +565,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
+%state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
 %state UNKNOWN_BASE_WHOLE_NUMBER
@@ -565,6 +578,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <YYINITIAL, INTERPOLATION> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AFTER; }
+  // Must be before any single operator's match
+  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
+                                                         return ElixirTypes.IDENTIFIER; }
   {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -1089,6 +1105,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
   {EOL}|.                { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                            handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<REFERENCE_OPERATION> {
+  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {EOL}                        { return ElixirTypes.EOL; }
+  {REFERENCE_OPERATOR}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 yybegin(stackFrame.getLastLexicalState());
+                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
 }
 
 <SIGIL> {
