@@ -50,6 +50,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom PLUS = new OtpErlangAtom("+");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
     private static final OtpErlangAtom WHEN = new OtpErlangAtom("when");
+    public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
     public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
             FALSE,
             TRUE,
@@ -150,7 +151,9 @@ public class ElixirPsiImplUtil {
     }
 
     /**
-     * Builds a block for stab bodies.  Unlike `toBlock`, handles rearranging unary operations `not` and `!`.
+     * Builds a block for stab bodies.  Unlike `toBlock`, handles rearranging unary operations `not` and `!` and putting
+     * solitary `unquote_splicing` calls in blocks.
+     *
      * @param quotedChildren
      * @return
      */
@@ -172,7 +175,7 @@ public class ElixirPsiImplUtil {
                 OtpErlangObject quotedIdentifier = childTuple.elementAt(0);
 
                 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
-                if (quotedIdentifier.equals(NOT) || quotedIdentifier.equals(EXCLAMATION_POINT)) {
+                if (quotedIdentifier.equals(NOT) || quotedIdentifier.equals(EXCLAMATION_POINT) || quotedIdentifier.equals(UNQUOTE_SPLICING)) {
                     builtBlock = blockFunctionCall(quotedChildren);
                 }
             }
