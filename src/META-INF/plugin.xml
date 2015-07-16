@@ -43,6 +43,7 @@
               Allow operators in function references (<code>&lt;op&gt;/&lt;arity&gt;</code>) for function captures
               (<code>&amp;&lt;op&gt;/&lt;arity&gt;</code>)
             </li>
+            <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
           </ul>
         </li>
       </ul>
