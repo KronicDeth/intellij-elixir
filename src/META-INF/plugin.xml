@@ -39,6 +39,10 @@
             <li><code>end</code> is allowed as a relative identifier after <code>.</code></li>
             <li>Fix <code>(...)</code> as part of matched expression in no parentheses stab signature</li>
             <li>Allow multiple newlines to mark the end of an expression, but only one <code>;</code></li>
+            <li>
+              Allow operators in function references (<code>&lt;op&gt;/&lt;arity&gt;</code>) for function captures
+              (<code>&amp;&lt;op&gt;/&lt;arity&gt;</code>)
+            </li>
           </ul>
         </li>
       </ul>
