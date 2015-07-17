@@ -35,16 +35,16 @@ public class WordsTest extends TokenTest {
         return Arrays.asList(
                 new Object[][]{
                         {" '''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {" \"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {" \"\"\"", ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"'''", ElixirTypes.WORDS_HEREDOC_TERMINATOR, ElixirFlexLexer.SIGIL_MODIFIERS, true},
                         {";", ElixirTypes.WORDS_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true },
                         {"\"\"\"", ElixirTypes.WORDS_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"\f'''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {"\f\"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\f\"\"\"", ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true},
                         {"\r\n", ElixirTypes.EOL, ElixirFlexLexer.GROUP_HEREDOC_LINE_START, true },
                         {"\t'''", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
-                        {"\t\"\"\"", ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE, ElixirFlexLexer.GROUP_HEREDOC_END, false},
+                        {"\t\"\"\"", ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, false},
                         {"a", ElixirTypes.WORDS_FRAGMENT, ElixirFlexLexer.GROUP_HEREDOC_LINE_BODY, true}
                 }
         );
