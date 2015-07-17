@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.3.6-prerelease</version>
+  <version>0.4.0-prerelease</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -44,6 +44,13 @@
               (<code>&amp;&lt;op&gt;/&lt;arity&gt;</code>)
             </li>
             <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
+          </ul>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              New Elixir File has moved to the last item in the New File menu to preserve <code>CTRL+N ENTER</code>
+              keyboard shortcut for <code>New &gt; File</code>
+            </li>
           </ul>
         </li>
       </ul>
