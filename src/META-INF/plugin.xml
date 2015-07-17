@@ -328,7 +328,7 @@
   <actions>
     <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
             text="Elixir File" description="Create new Elixir Module">
-      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+      <add-to-group group-id="NewGroup" anchor="last" />
     </action>
   </actions>
 
