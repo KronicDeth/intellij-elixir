@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.3.5</version>
+  <version>0.4.0-prerelease</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -24,6 +24,37 @@
           Issue #6
         </a> if you want to be notified when the parser is complete.
       </strong>
+      <h1>Next Release</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines</li>
+            <li>Allow EOL between list arguments and <code>]</code></li>
+            <li>
+              Relative identifiers after <code>.</code> that start with <code>and</code>, <code>or</code>, and
+              <code>not</code> will be lexed as a single identifier instead of <code>and</code>, <code>or</code>, or
+              <code>not</code> followed by another identifier.
+            </li>
+            <li><code>end</code> is allowed as a relative identifier after <code>.</code></li>
+            <li>Fix <code>(...)</code> as part of matched expression in no parentheses stab signature</li>
+            <li>Allow multiple newlines to mark the end of an expression, but only one <code>;</code></li>
+            <li>
+              Allow operators in function references (<code>&lt;op&gt;/&lt;arity&gt;</code>) for function captures
+              (<code>&amp;&lt;op&gt;/&lt;arity&gt;</code>)
+            </li>
+            <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
+            <li>Check for matching terminator in heredocs when determining white space type at beginning of line</li>
+          </ul>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              New Elixir File has moved to the last item in the New File menu to preserve <code>CTRL+N ENTER</code>
+              keyboard shortcut for <code>New &gt; File</code>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>0.3.5</h1>
       <ul>
         <li>
@@ -152,7 +183,7 @@
           <p>Incompatible Changes</p>
           <ul>
             <li>
-              New Elixir File validates that the name is a valid Alias, so each `.` separated part must start with a
+              New Elixir File validates that the name is a valid Alias, so each <code>.</code> separated part must start with a
               capital letter.  Previous New Elixir File validated that the name was a valid path, and so forced the name
               to be lowercase.
             </li>
@@ -176,8 +207,8 @@
             <li>Inspection that marks errors for ambiguous commas</li>
             <li>Inspection that marks errors for ambiguous parentheses</li>
             <li>Quick Fix for the ambiguous parentheses to remove the space between the function name and the opening parentheses.</li>
-            <li>Inspection that marks errors for missing end-of-expressions (`;` and newlines) between expressions.</li>
-            <li>Quick Fix to insert `;` for missing end-of-expression.</li>
+            <li>Inspection that marks errors for missing end-of-expressions (<code>;</code> and newlines) between expressions.</li>
+            <li>Quick Fix to insert <code>;</code> for missing end-of-expression.</li>
             <li>Quick Fix to insert newline for missing end-of-expression.</li>
           </ul>
         </li>

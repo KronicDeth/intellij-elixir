@@ -56,6 +56,10 @@ public class ListParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEOLBeforeClosingBracket() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testIdentifierColon() {
         assertParsedAndQuotedCorrectly();
     }

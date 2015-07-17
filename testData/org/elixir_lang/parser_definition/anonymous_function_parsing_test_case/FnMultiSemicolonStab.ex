@@ -1,0 +1,5 @@
+fn
+  ;
+  ;
+  one -> one
+end

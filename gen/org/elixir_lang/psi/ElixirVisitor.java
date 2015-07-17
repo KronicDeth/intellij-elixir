@@ -1,9 +1,9 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
-import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiElement;
 
 public class ElixirVisitor extends PsiElementVisitor {
 
@@ -737,10 +737,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
-    visitQuotable(o);
-  }
-
-  public void visitStabSignature(@NotNull ElixirStabSignature o) {
     visitQuotable(o);
   }
 

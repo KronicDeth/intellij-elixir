@@ -77,7 +77,7 @@
 
 // expressionList is optional to handle code-less file that contains only EOL between blank lines and order comment
 // lines
-private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
+private elixirFile ::= endOfExpression? (expressionList endOfExpression?)?
 
 /*
  *
@@ -89,7 +89,7 @@ private elixirFile ::= endOfExpression* (expressionList endOfExpression*)?
 
 private infixSemicolon ::= EOL* SEMICOLON EOL*
 // Must have at least one EOL or SEMICOLON, but at most one SEMICOLON
-endOfExpression ::= infixSemicolon | EOL { implements = "org.elixir_lang.psi.Unquoted" }
+endOfExpression ::= infixSemicolon | EOL+ { implements = "org.elixir_lang.psi.Unquoted" }
 
 /*
  *
@@ -101,7 +101,7 @@ private expression ::= emptyParentheses |
                        unmatchedExpression |
                        unqualifiedNoParenthesesManyArgumentsCall
 
-private expressionList ::= expression (endOfExpression+ expression | adjacentExpression)*
+private expressionList ::= expression (endOfExpression expression | adjacentExpression)*
 
 /*
  *
@@ -121,7 +121,7 @@ private expressionList ::= expression (endOfExpression+ expression | adjacentExp
  * Many Arguments
  */
 
-private noParenthesesCommaExpression ::= matchedExpression (infixComma noParenthesesExpression)+
+private noParenthesesCommaExpression ::= !additionTail matchedExpression (infixComma noParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
 noParenthesesExpression ::= emptyParentheses |
@@ -1233,8 +1233,12 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
  */
 
 /* Unlike other binary operation, additionOperations cannot begin with EOLs: if there are EOLs, then the +/- is
-   interpreted as unaryOperation */
-additionInfixOperator ::= DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? EOL*
+   interpreted as unaryOperation.
+
+   See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+   for rules for SIGNIFICANT_WHITE_SPACE */
+additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE |
+                           DUAL_OPERATOR) EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
                             methods = [
@@ -1292,7 +1296,7 @@ matchedHatOperation ::= matchedExpression hatInfixOperator matchedExpression
  *
  */
 
-unaryPrefixOperator ::= (DUAL_OPERATOR | UNARY_OPERATOR) EOL*
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR) EOL*
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -1338,6 +1342,7 @@ relativeIdentifier ::= IDENTIFIER |
                        DO |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
                        ELSE |
+                       END |
                        HAT_OPERATOR |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
@@ -1386,9 +1391,23 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                 matchedExpression here ensures the `do` block is only consumed by the left-most
                                 unmatchedExpression call and not any of the middle matchedExpression calls.
 
-                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418 */
-                             !(DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE) matchedExpression
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+                                @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
+                             !additionTail matchedExpression
                              { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+
+/* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
+  @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
+private additionTail ::= SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR (
+                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
+                           "/" | ">" | DUAL_OPERATOR | STRUCT_OPERATOR |
+                           // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609
+                           OPENING_BIT | OPENING_BRACKET | OPENING_CURLY | OPENING_PARENTHESIS |
+                           // white spaces
+                           EOL | SIGNIFICANT_WHITE_SPACE
+                         )
+                         |
+                         DUAL_OPERATOR
 
 matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
 
@@ -1775,10 +1794,6 @@ stabNoParenthesesSignature ::= noParenthesesArguments
 stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)?
                              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
-stabSignature ::= (stabParenthesesSignature |
-                   stabNoParenthesesSignature)?
-                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-
 stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
                       {
                         implements = "org.elixir_lang.psi.Operator"
@@ -1790,28 +1805,33 @@ stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
                       }
 
 /*
+ * stabParenthesesSignature must be at same level as stabInfixOperator so that stabParenthesesSignature does not match
+ * beginning of stabNoParenthesesSignature that begins with a parentheticalStab, `(one) <op> two ->`.
+ *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L283-L284
  *    for optionalness
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L687-L702
  *    for grouping stab followed by expression into stab, so it is equivalent to expr_list (expressionList)
  */
-private stabOperationPrefix ::= stabSignature stabInfixOperator
+private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
+                                stabNoParenthesesSignature stabInfixOperator |
+                                stabInfixOperator
 private stabBodyExpression ::= !stabOperationPrefix expression
-stabBody ::= stabBodyExpression (endOfExpression+ stabBodyExpression)*
+stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 stabOperation ::= stabOperationPrefix stabBody?
                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
-stab ::= stabOperation (endOfExpression+ stabOperation)* |
+stab ::= stabOperation (endOfExpression stabOperation)* |
          stabBody
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L205
 anonymousFunction ::= FN endOfExpression?
-                      stab
-                      endOfExpression* END
+                      stab endOfExpression?
+                      END
                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L206-L210
@@ -2216,8 +2236,8 @@ blockIdentifier ::= AFTER | CATCH | ELSE | RESCUE
                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313-L314
-blockItem ::= blockIdentifier endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
-              (stab endOfExpression*)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313
+blockItem ::= blockIdentifier endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L290-L291
+              (stab endOfExpression?)? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L313
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L316-L317
@@ -2225,9 +2245,9 @@ blockList ::= blockItem+
               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
 
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L272-L275
-doBlock ::= DO endOfExpression*
-            stab? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
-            blockList? endOfExpression* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
+doBlock ::= DO endOfExpression?
+            stab? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L273
+            blockList? endOfExpression? // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L274
             END
             {
               implements = "org.elixir_lang.psi.QuotableArguments"
@@ -2521,7 +2541,9 @@ private containerArguments ::= containerArgumentsBase (infixComma keywords | inf
 private listArguments ::= keywords |
                           containerArguments
 
-list ::= OPENING_BRACKET EOL* listArguments? CLOSING_BRACKET
+list ::= OPENING_BRACKET EOL*
+         listArguments? EOL*
+         CLOSING_BRACKET
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /* elixir_tokenizer.erl converts CHAR_TOKEN_TOKENs to their number representation, so `number` in elixir_parser.yrl matches

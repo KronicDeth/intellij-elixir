@@ -1,5 +1,21 @@
 # Changelog
 
+## Next Release
+* Bug Fixes
+  * [#154](https://github.com/KronicDeth/intellij-elixir/pull/154) - Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines - [KronicDeth](https://github.com/KronicDeth)
+  * [#155](https://github.com/KronicDeth/intellij-elixir/pull/155) - Allow EOL between list arguments and `]` - [KronicDeth](https://github.com/KronicDeth)
+  * [#156](https://github.com/KronicDeth/intellij-elixir/pull/156) - [KronicDeth](https://github.com/KronicDeth)
+    * Relative identifiers after `.` that start with `and`, `or`, and `not` will be lexed as a single identifier instead
+      of `and`, `or`, or `not` followed by another identifier.
+    * `end` is allowed as a relative identifier after `.`
+  * [#157](https://github.com/KronicDeth/intellij-elixir/pull/157) - Fix `(...)` as part of matched expression in no parentheses stab signature - [KronicDeth](https://github.com/KronicDeth)
+  * [#158](https://github.com/KronicDeth/intellij-elixir/pull/158) - Allow multiple newlines to mark the end of an expression, but only one `;` - [KronicDeth](https://github.com/KronicDeth)
+  * [#159](https://github.com/KronicDeth/intellij-elixir/pull/159) - Allow operators in function references (`<op>/<arity>`) for function captures (`&<op>/<arity>`) - [KronicDeth](https://github.com/KronicDeth)
+  * [#160](https://github.com/KronicDeth/intellij-elixir/pull/160) - `unquote_splicing` is properly wrapped in `__block__` when in stab bodies - [KronicDeth](https://github.com/KronicDeth)
+  * [#163](https://github.com/KronicDeth/intellij-elixir/pull/160) - Check for matching terminator in heredocs when determining white space type at beginning of line - [KronicDeth](https://github.com/KronicDeth)
+* Incompatible Fixes
+  * [#162](https://github.com/KronicDeth/intellij-elixir/pull/162) - New Elixir File has moved to the last item in the New File menu to preserve `CTRL+N ENTER` keyboard shortcut for `New > File` - [KronicDeth](https://github.com/KronicDeth)
+
 ## v0.3.5
 * Enhancements
   * [#135](https://github.com/KronicDeth/intellij-elixir/pull/135) - `do` blocks (`do end) - [@KronicDeth](https://github.com/KronicDeth)

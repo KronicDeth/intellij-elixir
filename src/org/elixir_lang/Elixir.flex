@@ -117,9 +117,6 @@ CLOSING_CURLY = "}"
  * Note: before Atom because operator prefixed by {COLON} are valid Atoms
  */
 
-// Separates operators that look like {IDENTIFIER} from the next token
-IDENTIFIER_OPERATOR_SEPARATOR = {EOL}|{OPENING_BRACKET}|{OPENING_PARENTHESIS}|{WHITE_SPACE}
-
 FOUR_TOKEN_BITSTRING_OPERATOR = "<<>>"
 FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
@@ -202,18 +199,19 @@ ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
 ONE_TOKEN_STRUCT_OPERATOR = "%"
 ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
-
-ONE_TOKEN_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
-                     {ONE_TOKEN_CAPTURE_OPERATOR} |
-                     {ONE_TOKEN_DOT_OPERATOR} |
-                     {ONE_TOKEN_DUAL_OPERATOR} |
-                     {ONE_TOKEN_IN_OPERATOR} |
-                     {ONE_TOKEN_MATCH_OPERATOR} |
-                     {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
-                     {ONE_TOKEN_PIPE_OPERATOR} |
-                     {ONE_TOKEN_RELATIONAL_OPERATOR} |
-                     {ONE_TOKEN_STRUCT_OPERATOR} |
-                     {ONE_TOKEN_UNARY_OPERATOR}
+ONE_TOKEN_REFERENCABLE_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
+                                  {ONE_TOKEN_CAPTURE_OPERATOR} |
+                                  {ONE_TOKEN_DUAL_OPERATOR} |
+                                  {ONE_TOKEN_IN_OPERATOR} |
+                                  {ONE_TOKEN_MATCH_OPERATOR} |
+                                  {ONE_TOKEN_MULTIPLICATION_OPERATOR} |
+                                  {ONE_TOKEN_PIPE_OPERATOR} |
+                                  {ONE_TOKEN_RELATIONAL_OPERATOR} |
+                                  {ONE_TOKEN_UNARY_OPERATOR}
+ONE_TOKEN_UNREFERENCABLE_OPERATOR = {ONE_TOKEN_DOT_OPERATOR} |
+                                    {ONE_TOKEN_STRUCT_OPERATOR}
+ONE_TOKEN_OPERATOR = {ONE_TOKEN_REFERENCABLE_OPERATOR} |
+                     {ONE_TOKEN_UNREFERENCABLE_OPERATOR}
 
 AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                {TWO_TOKEN_AND_OPERATOR}
@@ -248,6 +246,10 @@ UNARY_OPERATOR = {THREE_TOKEN_UNARY_OPERATOR} |
                  {ONE_TOKEN_UNARY_OPERATOR}
 WHEN_OPERATOR = {FOUR_TOKEN_WHEN_OPERATOR}
 
+REFERENCABLE_OPERATOR = {FOUR_TOKEN_OPERATOR} |
+                        {THREE_TOKEN_OPERATOR} |
+                        {TWO_TOKEN_OPERATOR} |
+                        {ONE_TOKEN_REFERENCABLE_OPERATOR}
 // OPERATOR is from longest to shortest so longest match wins
 OPERATOR = {FOUR_TOKEN_OPERATOR} |
            {THREE_TOKEN_OPERATOR} |
@@ -326,6 +328,8 @@ HORIZONTAL_SPACE = [ \t]
 VERTICAL_SPACE = [\n\r]
 SPACE = {HORIZONTAL_SPACE} | {VERTICAL_SPACE}
 WHITE_SPACE=[\ \t\f]
+// see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610
+SPACE_SENSITIVE={DUAL_OPERATOR}[^(\[<{%+-/>:]
 
 /*
  *  Comments
@@ -448,6 +452,13 @@ QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER
 QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
 
 /*
+ * Function References
+ */
+
+REFERENCE_OPERATOR = "/"
+REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{REFERENCE_OPERATOR}
+
+/*
  * Regular Keywords
  */
 
@@ -554,6 +565,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state KEYWORD_PAIR_MAYBE
 %state NAMED_SIGIL
 %state OCTAL_WHOLE_NUMBER
+%state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
 %state UNKNOWN_BASE_WHOLE_NUMBER
@@ -566,6 +578,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <YYINITIAL, INTERPOLATION> {
   {AFTER}                                    { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AFTER; }
+  // Must be before any single operator's match
+  {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
+                                                         return ElixirTypes.IDENTIFIER; }
   {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -600,7 +615,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {EOL}                                      { return ElixirTypes.EOL; }
   {END}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END; }
-  {ESCAPED_EOL}|{WHITE_SPACE}+       { return TokenType.WHITE_SPACE; }
+  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE} { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
+  {ESCAPED_EOL}|{WHITE_SPACE}+                     { return TokenType.WHITE_SPACE; }
   {CHAR_TOKENIZER}                                      { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER; }
   /* So that that atom of comparison operator consumes all 3 ':' instead of {TYPE_OPERATOR} consuming '::'
@@ -815,7 +832,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <DOT_OPERATION> {
-  {AFTER} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+  {AFTER}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AFTER; }
   {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AND_OPERATOR; }
@@ -823,53 +840,66 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.ARROW_OPERATOR; }
   {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AT_OPERATOR; }
-  {CATCH} / {IDENTIFIER_OPERATOR_SEPARATOR}         { yybegin(CALL_MAYBE);
+  {CATCH}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CATCH; }
   {CAPTURE_OPERATOR}                                { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CAPTURE_OPERATOR; }
   {COMPARISON_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.COMPARISON_OPERATOR; }
-  {DO} / {IDENTIFIER_OPERATOR_SEPARATOR}            { yybegin(CALL_MAYBE);
+  {DO}                                              { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DO; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
-  {ELSE} / {IDENTIFIER_OPERATOR_SEPARATOR}          { yybegin(CALL_MAYBE);
+  {END}                                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.END; }
+  {ELSE}                                            { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ELSE; }
+  {FALSE}                                           { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.FALSE; }
   {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.HAT_OPERATOR; }
   {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_MATCH_OPERATOR; }
-  // Ensure that it is just `in`
-  {IN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR}   { yybegin(CALL_MAYBE);
+  {IN_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_OPERATOR; }
   {MATCH_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                         { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {NIL}                                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.NIL; }
   {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.OR_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR; }
-  {RESCUE} / {IDENTIFIER_OPERATOR_SEPARATOR}        { yybegin(CALL_MAYBE);
+  {RESCUE}                                          { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RESCUE; }
   {STAB_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }
+  {TRUE}                                            { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.TRUE; }
   {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TWO_OPERATOR; }
   {UNARY_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.UNARY_OPERATOR; }
-  // Ensure that is just `when`
-  {WHEN_OPERATOR} / {IDENTIFIER_OPERATOR_SEPARATOR} { yybegin(CALL_MAYBE);
+  {WHEN_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.WHEN_OPERATOR; }
+
+  /* Must be after {AFTER}, {CATCH}, {DO}, {END}, {ELSE}, {IN_OPERATOR}, {OR_OPERATOR} (for 'or'), and {WHEN_OPERATOR}
+     as all those keywords would match {IDENTIFIER} */
+  {IDENTIFIER}                                      { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+                                                      return ElixirTypes.IDENTIFIER; }
 
   /*
    * Emulates strip_space in elixir_tokenizer.erl
    */
 
+  // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
+  {ESCAPED_EOL}|{WHITE_SPACE}+ / {SPACE_SENSITIVE}  { return ElixirTypes.SIGNIFICANT_WHITE_SPACE; }
   {ESCAPED_EOL}|{WHITE_SPACE}+                      { return TokenType.WHITE_SPACE; }
   {EOL}                                             { return ElixirTypes.EOL; }
 
@@ -992,9 +1022,19 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <GROUP_HEREDOC_LINE_START> {
-  {WHITE_SPACE}+ / {GROUP_HEREDOC_TERMINATOR} {
+  {WHITE_SPACE}+{GROUP_HEREDOC_TERMINATOR}    {
+                                                String groupHeredocTerminator = yytext().toString().trim();
+
+                                                // manual lookahead pushes terminator back
+                                                yypushback(3);
+
+                                                if (isTerminator(groupHeredocTerminator)) {
                                                   yybegin(GROUP_HEREDOC_END);
                                                   return ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE;
+                                                } else {
+                                                  yybegin(GROUP_HEREDOC_LINE_BODY);
+                                                  return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
+                                                }
                                               }
   {WHITE_SPACE}+                              {
                                                 yybegin(GROUP_HEREDOC_LINE_BODY);
@@ -1075,6 +1115,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {VALID_OCTAL_DIGITS}   { return ElixirTypes.VALID_OCTAL_DIGITS; }
   {EOL}|.                { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                            handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<REFERENCE_OPERATION> {
+  {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+  {EOL}                        { return ElixirTypes.EOL; }
+  {REFERENCE_OPERATOR}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                 yybegin(stackFrame.getLastLexicalState());
+                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
 }
 
 <SIGIL> {

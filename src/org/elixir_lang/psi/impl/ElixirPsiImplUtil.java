@@ -31,15 +31,26 @@ public class ElixirPsiImplUtil {
             PsiWhiteSpace.class
     };
     public static final OtpErlangObject ALIASES = new OtpErlangAtom("__aliases__");
+    public static final OtpErlangAtom AMBIGUOUS_OP = new OtpErlangAtom("ambiguous_op");
+    // Must be before AMBIGUOUS_OP_KEYWORD_PAIR where NIL is used
+    public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
+    public static final OtpErlangTuple AMBIGUOUS_OP_KEYWORD_PAIR = new OtpErlangTuple(
+            new OtpErlangObject[]{
+                    AMBIGUOUS_OP,
+                    NIL
+            }
+    );
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
-    public static final OtpErlangAtom NIL = new OtpErlangAtom("nil");
+    public static final OtpErlangAtom MINUS = new OtpErlangAtom("-");
     public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
+    public static final OtpErlangAtom PLUS = new OtpErlangAtom("+");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
     private static final OtpErlangAtom WHEN = new OtpErlangAtom("when");
+    public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
     public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
             FALSE,
             TRUE,
@@ -140,7 +151,9 @@ public class ElixirPsiImplUtil {
     }
 
     /**
-     * Builds a block for stab bodies.  Unlike `toBlock`, handles rearranging unary operations `not` and `!`.
+     * Builds a block for stab bodies.  Unlike `toBlock`, handles rearranging unary operations `not` and `!` and putting
+     * solitary `unquote_splicing` calls in blocks.
+     *
      * @param quotedChildren
      * @return
      */
@@ -162,7 +175,7 @@ public class ElixirPsiImplUtil {
                 OtpErlangObject quotedIdentifier = childTuple.elementAt(0);
 
                 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L547
-                if (quotedIdentifier.equals(NOT) || quotedIdentifier.equals(EXCLAMATION_POINT)) {
+                if (quotedIdentifier.equals(NOT) || quotedIdentifier.equals(EXCLAMATION_POINT) || quotedIdentifier.equals(UNQUOTE_SPLICING)) {
                     builtBlock = blockFunctionCall(quotedChildren);
                 }
             }
@@ -1528,8 +1541,20 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
-        Quotable leftOperand = stabOperation.getStabSignature();
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
+        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
+
+        if (leftOperand == null) {
+            leftOperand = stabOperation.getStabNoParenthesesSignature();
+        }
+
+        OtpErlangObject quotedLeftOperand;
+
+        if (leftOperand != null) {
+            quotedLeftOperand = leftOperand.quote();
+        } else {
+            // when there is not signature before `->`.
+            quotedLeftOperand = new OtpErlangList();
+        }
 
         Operator operator = stabOperation.getStabInfixOperator();
         OtpErlangObject quotedOperator = operator.quote();
@@ -1591,24 +1616,6 @@ public class ElixirPsiImplUtil {
         }
 
         return new OtpErlangList(quotedListElements);
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirStabSignature stabSignature) {
-        PsiElement[] children = stabSignature.getChildren();
-        OtpErlangObject quoted;
-
-        if (children.length > 0) {
-            assert children.length == 1;
-
-            Quotable child = (Quotable) children[0];
-            quoted = child.quote();
-        } else {
-            quoted = new OtpErlangList();
-        }
-
-        return quoted;
     }
 
     @Contract(pure = true)
@@ -2289,11 +2296,39 @@ if (quoted == null) {
 
         ElixirNoParenthesesOneArgument noParenthesesOneArgument = unqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
         OtpErlangObject[] quotedArguments = noParenthesesOneArgument.quoteArguments();
+
+        OtpErlangList blockCallMetadata = metadata(unqualifiedNoParenthesesCall);
+
+        // see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L627-L628
+        if (quotedArguments.length == 1) {
+            OtpErlangObject quotedArgument = quotedArguments[0];
+
+            if (Macro.isExpression(quotedArgument)) {
+                OtpErlangTuple expression = (OtpErlangTuple) quotedArgument;
+
+                OtpErlangObject receiver = expression.elementAt(0);
+
+                if (receiver.equals(MINUS) || receiver.equals(PLUS)) {
+                    OtpErlangList dualCallArguments = Macro.callArguments(expression);
+
+                    // [Arg]
+                    if (dualCallArguments.arity() == 1) {
+                        blockCallMetadata = new OtpErlangList(
+                                new OtpErlangObject[]{
+                                        AMBIGUOUS_OP_KEYWORD_PAIR,
+                                        blockCallMetadata.elementAt(0)
+                                }
+                        );
+                    }
+                }
+            }
+        }
+
         ElixirDoBlock doBlock = unqualifiedNoParenthesesCall.getDoBlock();
 
         return quotedBlockCall(
                 quotedIdentifer,
-                metadata(unqualifiedNoParenthesesCall),
+                blockCallMetadata,
                 quotedArguments,
                 doBlock
         );

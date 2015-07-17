@@ -32,6 +32,10 @@ public class LiteralStringSigilHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEmbeddedStringHeredoc() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/literal_string_sigil_heredoc_parsing_test_case";

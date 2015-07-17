@@ -1,13 +1,16 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi.impl;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import java.util.List;
+import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static org.elixir_lang.psi.ElixirTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import org.elixir_lang.psi.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.ericsson.otp.erlang.OtpErlangObject;
 
 public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements ElixirStabOperation {
 
@@ -33,9 +36,15 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   }
 
   @Override
-  @NotNull
-  public ElixirStabSignature getStabSignature() {
-    return findNotNullChildByClass(ElixirStabSignature.class);
+  @Nullable
+  public ElixirStabNoParenthesesSignature getStabNoParenthesesSignature() {
+    return findChildByClass(ElixirStabNoParenthesesSignature.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirStabParenthesesSignature getStabParenthesesSignature() {
+    return findChildByClass(ElixirStabParenthesesSignature.class);
   }
 
   @NotNull
