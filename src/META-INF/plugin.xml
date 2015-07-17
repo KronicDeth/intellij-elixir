@@ -274,7 +274,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Elixir Module Structure -->
     <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
-    <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
+
     <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
 
     <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
@@ -314,13 +314,6 @@
   <application-components>
     <!-- Add your application components here -->
   </application-components>
-
-  <project-components>
-    <!-- Add your project components here -->
-    <component>
-      <implementation-class>org.elixir_lang.complication.ElixirDependenciesManager</implementation-class>
-    </component>
-  </project-components>
 
   <actions>
     <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"

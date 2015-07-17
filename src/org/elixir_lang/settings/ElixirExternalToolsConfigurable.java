@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.TitledSeparator;
 import org.elixir_lang.mix.settings.MixConfigurationForm;
 import org.elixir_lang.mix.settings.MixSettings;
+import org.elixir_lang.sdk.ElixirSdkForSmallIdes;
 import org.elixir_lang.sdk.ElixirSdkType;
 import org.elixir_lang.sdk.ElixirSystemUtil;
 import org.jetbrains.annotations.Nls;
@@ -98,7 +99,10 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
   @Override
   public void apply() throws ConfigurationException {
     myMixSettings.setMixPath(myMixConfigurationForm.getPath());
-    // todo small ides
+
+    if(ElixirSystemUtil.isSmallIde()){
+      ElixirSdkForSmallIdes.setUpOrUpdateSdk(myProject, mySdkPathSelector.getText());
+    }
   }
 
   @Override

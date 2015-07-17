@@ -8,6 +8,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.*;
+import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.roots.JavadocOrderRootType;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderRootType;
@@ -26,6 +27,7 @@ import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
 import java.io.File;
@@ -131,13 +133,20 @@ public class ElixirSdkType extends SdkType {
   @Nullable
   public static String getSdkPath(@NotNull final Project project){
     // todo small ide
+    if(ElixirSystemUtil.isSmallIde()){
+      return ElixirSdkForSmallIdes.getSdkHome(project);
+    }
+
     Sdk sdk = ProjectRootManager.getInstance(project).getProjectSdk();
     return sdk != null && sdk.getSdkType() == getInstance() ? sdk.getHomePath() : null;
   }
 
   @Nullable
   public static ElixirSdkRelease getRelease(@NotNull PsiElement element){
-    // todo small ide
+    if(ElixirSystemUtil.isSmallIde()){
+      return getReleaseForSmallIde(element.getProject());
+    }
+
     Module module = ModuleUtilCore.findModuleForPsiElement(element);
     ElixirSdkRelease byModuleSdk = getRelease(module != null ? ModuleRootManager.getInstance(module).getSdk() : null);
 
@@ -146,7 +155,9 @@ public class ElixirSdkType extends SdkType {
 
   @Nullable
   public static ElixirSdkRelease getRelease(@NotNull Project project){
-    // todo small ide
+    if(ElixirSystemUtil.isSmallIde()){
+      return getReleaseForSmallIde(project);
+    }
     return getRelease(ProjectRootManager.getInstance(project).getProjectSdk());
   }
 
@@ -294,6 +305,25 @@ public class ElixirSdkType extends SdkType {
     }
 
     return homePathByVersion;
+  }
+
+  @Nullable
+  private static ElixirSdkRelease getReleaseForSmallIde(@NotNull Project project){
+    String sdkPath = getSdkPath(project);
+    return StringUtil.isEmpty(sdkPath) ? null : getInstance().detectSdkVersion(sdkPath);
+  }
+
+  @TestOnly
+  @NotNull
+  public static Sdk createMockSdk(@NotNull String sdkHome, @NotNull ElixirSdkRelease version){
+    getInstance().mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), version);  // we'll not try to detect sdk version in tests environment
+    Sdk sdk = new ProjectJdkImpl(getDefaultSdkName(sdkHome, version), getInstance());
+    SdkModificator sdkModificator = sdk.getSdkModificator();
+    sdkModificator.setHomePath(sdkHome);
+    sdkModificator.setVersionString(getVersionString(version));// must be set after home path, otherwise setting home path clears the version string
+    sdkModificator.commitChanges();
+    configureSdkPaths(sdk);
+    return sdk;
   }
 
 

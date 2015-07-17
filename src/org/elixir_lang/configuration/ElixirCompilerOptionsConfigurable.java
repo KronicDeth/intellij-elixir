@@ -8,9 +8,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.ex.Settings;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.ui.AncestorListenerAdapter;
 import com.intellij.util.ObjectUtils;
-import io.netty.util.internal.ObjectUtil;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.settings.ElixirExternalToolsConfigurable;
 import org.elixir_lang.utils.AncestorAdapter;
@@ -18,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,8 +25,11 @@ import java.awt.event.ActionListener;
 public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
   private JPanel myRootPanel;
   private JCheckBox myUseMixCompilerCheckBox;
-  private JCheckBox myAddDebugInfoCheckBox;
+  private JCheckBox myAttachDebugInfoCheckBox;
   private JButton myConfigureMixButton;
+  private JCheckBox myIgnoreModuleConflictCheckBox;
+  private JCheckBox myAttachDocsCheckBox;
+  private JCheckBox myWarningsAsErrorsCheckBox;
 
   private final ElixirCompilerSettings mySettings;
   private final Project myProject;
@@ -39,6 +39,13 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
 
     myProject = project;
     mySettings = ElixirCompilerSettings.getInstance(project);
+
+    /*
+    * for now, --warnings-as-errors not like erlang's warn_as_error, it just return non-zero exit code
+    * @see https://github.com/elixir-lang/elixir/issues/3116#issuecomment-87316125
+    * */
+    myWarningsAsErrorsCheckBox.setVisible(false);
+
     setupUiListeners();
   }
 
@@ -87,18 +94,31 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
     myUseMixCompilerCheckBox.setEnabled(mixPathIsSet);
     myUseMixCompilerCheckBox.setSelected(mixPathIsSet && mySettings.isUseMixCompilerEnabled());
 
-    myAddDebugInfoCheckBox.setSelected(mySettings.isAddDebugInfoEnabled());
+    myAttachDocsCheckBox.setSelected(mySettings.isAttachDocsEnabled());
+    myAttachDebugInfoCheckBox.setSelected(mySettings.isAttachDebugInfoEnabled());
+    myWarningsAsErrorsCheckBox.setSelected(mySettings.isWarningsAsErrorsEnabled());
+    myIgnoreModuleConflictCheckBox.setSelected(mySettings.isIgnoreModuleConflictEnabled());
   }
 
   @Override
   public void apply() throws ConfigurationException {
     mySettings.setUseMixCompilerEnabled(myUseMixCompilerCheckBox.isSelected());
-    mySettings.setAddDebugInfoEnabled(myAddDebugInfoCheckBox.isSelected());
+    mySettings.setAttachDocsEnabled(myAttachDocsCheckBox.isSelected());
+    mySettings.setAttachDebugInfoEnabled(myAttachDebugInfoCheckBox.isSelected());
+    mySettings.setWarningsAsErrorsEnabled(myWarningsAsErrorsCheckBox.isSelected());
+    mySettings.setIgnoreModuleConflictEnabled(myIgnoreModuleConflictCheckBox.isSelected());
   }
 
   @Override
   public boolean isModified() {
     return myUseMixCompilerCheckBox.isSelected() != mySettings.isUseMixCompilerEnabled() ||
-        myAddDebugInfoCheckBox.isSelected() != mySettings.isAddDebugInfoEnabled();
+        myAttachDocsCheckBox.isSelected() != mySettings.isAttachDocsEnabled() ||
+        myAttachDebugInfoCheckBox.isSelected() != mySettings.isAttachDebugInfoEnabled() ||
+        myWarningsAsErrorsCheckBox.isSelected() != mySettings.isWarningsAsErrorsEnabled() ||
+        myIgnoreModuleConflictCheckBox.isSelected() != mySettings.isIgnoreModuleConflictEnabled();
+  }
+
+  private void createUIComponents() {
+    // TODO: place custom component creation code here
   }
 }

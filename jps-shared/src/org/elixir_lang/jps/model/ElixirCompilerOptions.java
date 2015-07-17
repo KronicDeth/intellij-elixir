@@ -9,14 +9,26 @@ public class ElixirCompilerOptions {
   @Tag("useMixCompiler")
   public boolean myUseMixCompiler = false;
 
+  @Tag("useDocs")
+  public boolean myAttachDocsEnabled = false;
+
   @Tag("useDebugInfo")
-  public boolean myAddDebugInfoEnabled = true;
+  public boolean myAttachDebugInfoEnabled = true;
+
+  @Tag("useWarningsAsErrors")
+  public boolean myWarningsAsErrorsEnabled = false;
+
+  @Tag("useIgnoreModuleConflict")
+  public boolean myIgnoreModuleConflictEnabled = false;
 
   public ElixirCompilerOptions() {
   }
 
   public ElixirCompilerOptions(ElixirCompilerOptions options){
     myUseMixCompiler = options.myUseMixCompiler;
-    myAddDebugInfoEnabled = options.myAddDebugInfoEnabled;
+    myAttachDocsEnabled = options.myAttachDocsEnabled;
+    myAttachDebugInfoEnabled = options.myAttachDebugInfoEnabled;
+    myWarningsAsErrorsEnabled = options.myWarningsAsErrorsEnabled;
+    myIgnoreModuleConflictEnabled = options.myIgnoreModuleConflictEnabled;
   }
 }

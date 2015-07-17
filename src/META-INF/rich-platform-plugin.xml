@@ -4,6 +4,8 @@
      Thanks to Sergey Ignatov (@ignatov) for explaining this distinction. -->
 <idea-plugin version="2">
   <extensions defaultExtensionNs="com.intellij">
+      <moduleType id="ELIXIR_MODULE" implementationClass="org.elixir_lang.module.ElixirModuleType"/>
+
       <projectStructureDetector implementation="org.elixir_lang.module.ElixirProjectStructureDetector"/>
 
       <projectImportProvider implementation="org.elixir_lang.mix.importWizard.MixProjectImportProvider" />
@@ -11,6 +13,11 @@
 
       <!-- for doQuickImport when open directory which contains mix.exs file -->
       <projectOpenProcessor implementation="org.elixir_lang.mix.importWizard.MixProjectOpenProcessor" />
+
+      <!-- Specifies semicolon-separated list of paths which should be added to the classpath of the compile server -->
+      <compileServer.plugin classpath="jps/jps-builder.jar;jps-shared.jar"/>
+      <!-- In the development mode the name of each file without extension -->
+      <!--<compileServer.plugin classpath="jps-builder;jps-shared"/>-->
 
       <!-- project compiler configurable -->
       <projectConfigurable instance="org.elixir_lang.configuration.ElixirCompilerOptionsConfigurable"

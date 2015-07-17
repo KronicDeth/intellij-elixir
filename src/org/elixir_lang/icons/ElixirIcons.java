@@ -23,4 +23,5 @@ public interface ElixirIcons {
   Icon ELIXIR_MODULE_NODE = new LayeredIcon(PlatformIcons.FOLDER_ICON, ELIXIR_MARK);
 
   Icon MIX = IconLoader.getIcon("/icons/mix-16.png");
+  Icon MIX_EX_UNIT = new LayeredIcon(MIX, AllIcons.Nodes.JunitTestMark);
 }

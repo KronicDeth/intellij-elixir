@@ -6,8 +6,6 @@ import com.intellij.openapi.extensions.Extensions;
 import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-
 /**
  * Created by zyuyou on 15/7/8.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationType.java

@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.mix.util.ElixirTermFileUtil;
+import org.elixir_lang.mix.util.ElixirScriptFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,10 +23,10 @@ public class ImportedOtpApp {
   private Module myModule;
 
   public ImportedOtpApp(@NotNull VirtualFile root, @NotNull final VirtualFile appMixFile){
-    // todo: here should use psi-pattern to get myName.
+    // todo: should use psi-pattern to get myName.
     String appName = "";
     try{
-      String firstLine = ElixirTermFileUtil.readLine(appMixFile.getInputStream());
+      String firstLine = ElixirScriptFileUtil.readLine(appMixFile.getInputStream());
       Pattern pattern = Pattern.compile("defmodule ([A-Z]{1}\\w*).Mixfile do");
       Matcher matcher = pattern.matcher(firstLine);
       appName = matcher.matches() ? matcher.group(1).toLowerCase() : "";
