@@ -316,10 +316,16 @@
   </application-components>
 
   <actions>
-    <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
-            text="Elixir File" description="Create new Elixir Module">
-      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
-    </action>
+    <group id="LangElixir.NewActions">
+      <separator/>
+      <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
+              text="Elixir File" description="Create new Elixir Module">
+      </action>
+      <separator/>
+
+      <!--<add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>-->
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
+    </group>
   </actions>
 
 </idea-plugin>
