@@ -1022,9 +1022,19 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <GROUP_HEREDOC_LINE_START> {
-  {WHITE_SPACE}+ / {GROUP_HEREDOC_TERMINATOR} {
+  {WHITE_SPACE}+{GROUP_HEREDOC_TERMINATOR}    {
+                                                String groupHeredocTerminator = yytext().toString().trim();
+
+                                                // manual lookahead pushes terminator back
+                                                yypushback(3);
+
+                                                if (isTerminator(groupHeredocTerminator)) {
                                                   yybegin(GROUP_HEREDOC_END);
                                                   return ElixirTypes.HEREDOC_PREFIX_WHITE_SPACE;
+                                                } else {
+                                                  yybegin(GROUP_HEREDOC_LINE_BODY);
+                                                  return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
+                                                }
                                               }
   {WHITE_SPACE}+                              {
                                                 yybegin(GROUP_HEREDOC_LINE_BODY);
