@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="get.idea" name="idea">
+    <dirname property="elixir.basedir" file="${ant.file.elixir}"/>
+
+    <property name="elixir.output.dir" value="${elixir.basedir}/dependencies/elixir"/>
+    <!-- This sha1 is the fix for https://groups.google.com/forum/#!topic/elixir-lang-core/W0sjGdeSva0 in native Elixir -->
+    <property name="elixir.sha1" value="3e52ed0fbbc09a156e6ea180baff3b89a8da183e"/>
+    <property name="elixir.zip" value="${elixir.sha1}.zip"/>
+    <property name="elixir.cache" value="${elixir.basedir}/cache/elixir"/>
+    <property name="elixir.zip.root.basename" value="elixir-${elixir.sha1}"/>
+
+    <property name="elixir.output.zip.root.dir" value="${elixir.output.dir}/${elixir.zip.root.basename}"/>
+    <available file="${elixir.output.zip.root.dir}" property="elixir.output.zip.root.available"/>
+
+    <available file="${elixir.output.dir}/${elixir.zip}" property="elixir.zip.available"/>
+
+    <target name="clean.elixir">
+        <delete quiet="true">
+            <fileset dir="${elixir.output.dir}"/>
+            <fileset dir="${elixir.cache}"/>
+        </delete>
+    </target>
+
+    <target name="get.elixir" depends="unpack.elixir.zip" description="Get Elixir ${elixir.sha1} from Github">
+        <copy todir="${elixir.cache}">
+            <fileset dir="${elixir.output.zip.root.dir}"/>
+        </copy>
+    </target>
+
+    <target name="get.elixir.zip" description="Get Elixir ${elixir.sha1} zip from Github" unless="elixir.zip.available">
+        <mkdir dir="${elixir.output.dir}"/>
+        <get dest="${elixir.output.dir}"
+             src="https://github.com/elixir-lang/elixir/archive/${elixir.zip}"
+             usetimestamp="true"
+             verbose="true"/>
+    </target>
+
+    <target name="unpack.elixir.zip" depends="get.elixir.zip" description="unzip ${elixir.zip}" unless="elixir.output.zip.root.available">
+        <unzip src="${elixir.output.dir}/${elixir.zip}" dest="${elixir.output.dir}"/>
+    </target>
+</project>
