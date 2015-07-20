@@ -58,6 +58,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
             if (treeFile.isDirectory()) {
                 File[] childFiles = treeFile.listFiles();
 
+                assert childFiles != null;
+
                 for (File childFile : childFiles) {
                     treeQueue.add(childFile);
                 }
