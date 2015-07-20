@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="get.idea" name="idea">
+<project default="get.elixir" name="elixir">
     <dirname property="elixir.basedir" file="${ant.file.elixir}"/>
 
     <property name="elixir.output.dir" value="${elixir.basedir}/dependencies/elixir"/>
