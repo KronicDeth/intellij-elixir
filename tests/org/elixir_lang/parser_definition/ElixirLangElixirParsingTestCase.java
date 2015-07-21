@@ -47,16 +47,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
      * Fields
      */
 
-    private File elixirFile;
-    private Parse parse;
-
-    /*
-     * Constructors
-     */
-    public ElixirLangElixirParsingTestCase(File elixirFile, Parse parse) {
-        this.elixirFile = elixirFile;
-        this.parse = parse;
-    }
+    @Parameterized.Parameter(value = 0)
+    public File elixirFile;
+    @Parameterized.Parameter(value = 1)
+    public Parse parse;
 
     @Parameterized.Parameters(
             name = "\"#{0}\" parses #{1}"
