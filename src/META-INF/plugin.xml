@@ -27,6 +27,12 @@
       <h1>Next Release</h1>
       <ul>
         <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>Update ant build on travis-ci.org to use IDEA 14.1.4 (from 14.0.2)</li>
+          </ul>
+        </li>
+        <li>
           <p>Bug Fixes</p>
           <ul>
             <li>Fix parsing of unary vs binary +/- with leading and trailing spaces and newlines</li>
