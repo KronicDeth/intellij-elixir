@@ -234,7 +234,6 @@
     <copy file="${idea.cache}/lib/junit-4.11.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit-4.11.jar"/>
     <copy file="${idea.cache}/lib/hamcrest-core-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-core-1.3.jar"/>
     <copy file="${idea.cache}/lib/hamcrest-library-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-library-1.3.jar"/>
-    <copy file="${idea.cache}/lib/junit.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit.jar"/>
     <zip destfile="${intellij-elixir.plugin.path.jar}">
       <fileset dir="${module.intellij-elixir.basedir}/../temp"/>
     </zip>

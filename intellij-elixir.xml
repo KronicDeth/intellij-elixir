@@ -133,7 +133,6 @@
       <include name="lib/jsr166e.jar"/>
       <include name="lib/jsr173_1.0_api.jar"/>
       <include name="lib/junit-4.11.jar"/>
-      <include name="lib/junit.jar"/>
       <include name="lib/jzlib-1.1.1.jar"/>
       <include name="lib/log4j.jar"/>
       <include name="lib/markdownj-core-0.4.2-SNAPSHOT.jar"/>
