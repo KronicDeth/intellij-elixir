@@ -104,8 +104,7 @@ public class MixConfigurationForm {
                 myMixPathSelector.setText(path);
                 validateMixPath();
               }
-            }catch (Exception e){
-              // Ignore
+            }catch (Exception e){ // Ignore
             }
           }
         }
@@ -113,9 +112,5 @@ public class MixConfigurationForm {
     });
 
     myLinkContainer.add(link, BorderLayout.NORTH);
-
   }
-
-
-
 }

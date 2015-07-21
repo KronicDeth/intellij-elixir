@@ -16,6 +16,8 @@ import java.util.regex.Pattern;
 public class ElixirCompilerError {
   private static final Pattern COMPILER_MESSAGE_PATTERN = Pattern.compile("^(.+):(\\d+):(\\s*warning:)?\\s*(.+)$");
 
+  private static final int UNKNOWN_LINE_NUMBER = -1;
+
   private final String errorMessage;
   private final String url;
   private final int line;
@@ -55,7 +57,7 @@ public class ElixirCompilerError {
     String details = matcher.group(4);
 
     String path = StringUtil.isEmpty(rootPath) ? relativeFilePath : new File(FileUtil.toSystemIndependentName(rootPath), relativeFilePath).getPath();
-    int lineNumber = StringUtil.parseInt(line, -1);
+    int lineNumber = StringUtil.parseInt(line, UNKNOWN_LINE_NUMBER);
     CompilerMessageCategory category = warning != null ? CompilerMessageCategory.WARNING : CompilerMessageCategory.ERROR;
     assert path != null;
     return new ElixirCompilerError(details, VfsUtilCore.pathToUrl(path), lineNumber, category);

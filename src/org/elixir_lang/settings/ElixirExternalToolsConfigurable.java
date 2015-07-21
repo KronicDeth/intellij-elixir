@@ -41,7 +41,7 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
     myProject = project;
     myMixSettings = MixSettings.getInstance(project);
     mySdkPathSelector.addBrowseFolderListener("Select Elixir SDK path", "", null,
-        FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor());
+        FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle("Elixir SDK root"));
     
     if(StringUtil.isEmpty(myMixSettings.getMixPath())){
       VirtualFile baseDir = project.getBaseDir();

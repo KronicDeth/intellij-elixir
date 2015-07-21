@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  * Created by zyuyou on 2015/5/27.
- * 
+ * https://github.com/ignatov/intellij-erlang/blob/master/jps-shared/src/org/intellij/erlang/jps/model/JpsErlangModelSerializerExtension.java
  */
 public class JpsElixirModelSerializerExtension extends JpsModelSerializerExtension{
   public static final String ELIXIR_SDK_TYPE_ID = "Elixir SDK";

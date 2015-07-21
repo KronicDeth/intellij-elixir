@@ -55,6 +55,8 @@ public class ElixirSystemUtil {
     return PlatformUtils.isRubyMine()
         || PlatformUtils.isPyCharm()
         || PlatformUtils.isPhpStorm()
-        || PlatformUtils.isWebStorm();
+        || PlatformUtils.isWebStorm()
+        || PlatformUtils.isAppCode()
+        || PlatformUtils.isCLion();
   }
 }

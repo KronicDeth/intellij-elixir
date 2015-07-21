@@ -16,8 +16,6 @@
 
       <!-- Specifies semicolon-separated list of paths which should be added to the classpath of the compile server -->
       <compileServer.plugin classpath="jps/jps-builder.jar;jps-shared.jar"/>
-      <!-- In the development mode the name of each file without extension -->
-      <!--<compileServer.plugin classpath="jps-builder;jps-shared"/>-->
 
       <!-- project compiler configurable -->
       <projectConfigurable instance="org.elixir_lang.configuration.ElixirCompilerOptionsConfigurable"

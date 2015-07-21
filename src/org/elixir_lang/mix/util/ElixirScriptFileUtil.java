@@ -47,6 +47,4 @@ public class ElixirScriptFileUtil {
       return null;
     }
   }
-
-
 }

@@ -27,6 +27,5 @@ public class JpsElixirCompilerOptionsSerializer extends JpsProjectExtensionSeria
 
   @Override
   public void saveExtension(@NotNull JpsProject project, @NotNull Element componentTag) {
-
   }
 }

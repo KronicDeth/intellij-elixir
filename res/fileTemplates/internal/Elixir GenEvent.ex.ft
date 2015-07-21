@@ -17,6 +17,6 @@ defmodule ${NAME} do
   end
 
   def handle_info(_msg, state) do
-      {:ok, state}
+    {:ok, state}
   end
 end

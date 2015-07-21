@@ -117,8 +117,4 @@ public class ElixirCompilerOptionsConfigurable extends CompilerConfigurable {
         myWarningsAsErrorsCheckBox.isSelected() != mySettings.isWarningsAsErrorsEnabled() ||
         myIgnoreModuleConflictCheckBox.isSelected() != mySettings.isIgnoreModuleConflictEnabled();
   }
-
-  private void createUIComponents() {
-    // TODO: place custom component creation code here
-  }
 }

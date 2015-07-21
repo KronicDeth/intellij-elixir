@@ -14,6 +14,11 @@ import org.jetbrains.jps.incremental.messages.CompilerMessage;
  * Created by zyuyou on 15/7/12.
  */
 public class ElixirCompilerProcessAdapter extends ProcessAdapter {
+  private static final long DEFAULT_PROBLEM_BEGIN_OFFSET = -1L;
+  private static final long DEFAULT_PROBLEM_END_OFFSET = -1L;
+  private static final long DEFAULT_PROBLEM_LOCATION_OFFSET = -1L;
+  private static final long DEFAULT_LOCATION_COLUMN = -1L;
+
   private final CompileContext myContext;
   private final String myBuilderName;
   private final String myCompileTargetRootPath;
@@ -33,7 +38,9 @@ public class ElixirCompilerProcessAdapter extends ProcessAdapter {
     if(error != null){
       boolean isError = error.getCategory() == CompilerMessageCategory.ERROR;
       BuildMessage.Kind kind = isError ? BuildMessage.Kind.ERROR : BuildMessage.Kind.WARNING;
-      CompilerMessage msg = new CompilerMessage(myBuilderName, kind, error.getErrorMessage(), VirtualFileManager.extractPath(error.getUrl()), -1, -1, -1, error.getLine(), -1);
+      CompilerMessage msg = new CompilerMessage(myBuilderName, kind, error.getErrorMessage(),
+          VirtualFileManager.extractPath(error.getUrl()), DEFAULT_PROBLEM_BEGIN_OFFSET, DEFAULT_PROBLEM_END_OFFSET,
+          DEFAULT_PROBLEM_LOCATION_OFFSET, error.getLine(), DEFAULT_LOCATION_COLUMN);
       myContext.processMessage(msg);
     }
   }

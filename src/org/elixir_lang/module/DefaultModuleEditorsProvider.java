@@ -40,6 +40,4 @@ public class DefaultModuleEditorsProvider implements ModuleConfigurationEditorPr
       return component;
     }
   }
-
-
 }

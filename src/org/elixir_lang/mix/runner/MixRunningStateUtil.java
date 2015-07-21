@@ -34,10 +34,6 @@ public class MixRunningStateUtil {
     MixSettings mixSettings = MixSettings.getInstance(project);
     String sdkPath = ElixirSdkType.getSdkPath(project);
 
-    // todo maybe use mixtool directly
-//    String mixToolPath = sdkPath != null? JpsElixirSdkType.getMixExecutable(sdkPath).getAbsolutePath():
-//        JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.ELIXIR_TOOL_MIX);
-
     String elixirPath = sdkPath != null? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath():
         JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
 

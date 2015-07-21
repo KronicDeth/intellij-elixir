@@ -48,44 +48,39 @@ import java.util.*;
 
 /**
  * Created by zyuyou on 15/7/10.
+ *
+ * https://github.com/ignatov/intellij-erlang/blob/master/jps-plugin/src/org/intellij/erlang/jps/builder/ErlangBuilder.java
+ * https://github.com/ignatov/intellij-erlang/tree/master/jps-plugin/src/org/intellij/erlang/jps/rebar
  */
 public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, ElixirTarget> {
   public static final String BUILDER_NAME = "Elixir Builder";
 
+  public static final String ELIXIR_SOURCE_EXTENSION = "ex";
+  public static final String ELIXIR_SCRIPT_EXTENSION = "exs";
+  public static final String ELIXIR_TEST_SOURCE_EXTENSION = ELIXIR_SCRIPT_EXTENSION;
+
   public static final String ElIXIRC_NAME = "elixirc";
   public static final String MIX_NAME = "mix";
 
-  private static final String MIX_CONFIG_FILE_NAME = "mix.exs";
+  private static final String MIX_CONFIG_FILE_NAME = "mix." + ELIXIR_SCRIPT_EXTENSION;
 
   private final static Logger LOG = Logger.getInstance(ElixirBuilder.class);
 
-  public static final FileFilter ELIXIR_SOURCE_FILTER = SystemInfo.isFileSystemCaseSensitive ?
-      new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-          return file.getPath().endsWith(".ex");
-        }
-      } :
-      new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-          return StringUtil.endsWithIgnoreCase(file.getPath(), ".ex");
-        }
-      };
+  public static final String ADD_PATH_TO_FRONT_OF_CODE_PATH = "-pa";
 
-  public static final FileFilter ELIXIR_TEST_SOURCE_FILTER = SystemInfo.isFileSystemCaseSensitive ?
-      new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-          return file.getPath().endsWith(".exs");
-        }
-      } :
-      new FileFilter() {
-        @Override
-        public boolean accept(File file) {
-          return StringUtil.endsWithIgnoreCase(file.getPath(), ".exs");
-        }
-      };
+  public static final FileFilter ELIXIR_SOURCE_FILTER = new FileFilter() {
+    @Override
+    public boolean accept(File file) {
+      return FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
+    }
+  };
+
+  public static final FileFilter ELIXIR_TEST_SOURCE_FILTER = new FileFilter() {
+    @Override
+    public boolean accept(File file) {
+      return FileUtilRt.extensionEquals(file.getName(), ELIXIR_TEST_SOURCE_EXTENSION);
+    }
+  };
 
   // use JavaBuilderExtension?
   public static final Set<? extends JpsModuleType<?>> ourCompilableModuleTypes = Collections.singleton(JpsElixirModuleType.INSTANCE);
@@ -133,7 +128,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     } else {
       // elixirc can not compile tests now.
       if(!target.isTests()){
-        doBuildWithElixic(target, context, module, compilerOptions, filesToCompile);
+        doBuildWithElixirc(target, context, module, compilerOptions, filesToCompile);
       }
     }
   }
@@ -149,11 +144,11 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
    * if "isMake": compile all files of the module and dependent module.
    * else: just for compile the target affected file.
    * */
-  private static void doBuildWithElixic(ElixirTarget target,
-                                        CompileContext context,
-                                        JpsModule module,
-                                        ElixirCompilerOptions compilerOptions,
-                                        Collection<File> filesToCompile) throws ProjectBuildException{
+  private static void doBuildWithElixirc(ElixirTarget target,
+                                         CompileContext context,
+                                         JpsModule module,
+                                         ElixirCompilerOptions compilerOptions,
+                                         Collection<File> filesToCompile) throws ProjectBuildException{
 
     // ensure compile output directory
     File outputDirectory = getBuildOutputDirectory(module, target.isTests(), context);
@@ -259,9 +254,8 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
                                                   @NotNull CompileContext context,
                                                   Collection<File> files){
     // make
-    if(JavaBuilderUtil.isCompileJavaIncrementally(context)){
+    if(context.getScope().isBuildIncrementally(target.getTargetType())){
       return getCompileFilePathsDefault(module, target);
-
     }
 
     // force build files
@@ -278,7 +272,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     CommonProcessors.CollectProcessor<File> exFilesCollector = new CommonProcessors.CollectProcessor<File>(){
       @Override
       protected boolean accept(File file) {
-        return !file.isDirectory() && FileUtilRt.extensionEquals(file.getName(), "ex");
+        return !file.isDirectory() && FileUtilRt.extensionEquals(file.getName(), ELIXIR_SOURCE_EXTENSION);
       }
     };
 
@@ -342,11 +336,11 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
                                           @NotNull CompileContext context) throws ProjectBuildException{
 
     File outputDirectory = getBuildOutputDirectory(module, forTests, context);
-    commandLine.addParameters("-pa", outputDirectory.getPath());
+    commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, outputDirectory.getPath());
     for(String rootUrl : module.getContentRootsList().getUrls()){
       try{
         String path = new URL(rootUrl).getPath();
-        commandLine.addParameters("-pa", path);
+        commandLine.addParameters(ADD_PATH_TO_FRONT_OF_CODE_PATH, path);
       }catch (MalformedURLException e){
         context.processMessage(new CompilerMessage(ElIXIRC_NAME, BuildMessage.Kind.ERROR, "Failed to find content root for module: " + module.getName()));
       }
@@ -369,10 +363,7 @@ public class ElixirBuilder extends TargetBuilder<ElixirSourceRootDescriptor, Eli
     if(compilerOptions.myIgnoreModuleConflictEnabled){
       commandLine.addParameter("--ignore-module-conflict");
     }
-
-    // commandLine.addParameter("--verbose");
   }
-
 
   /*** doBuildWithMix releated private methods */
 

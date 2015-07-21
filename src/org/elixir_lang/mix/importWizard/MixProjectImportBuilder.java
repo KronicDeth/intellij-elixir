@@ -43,6 +43,7 @@ import java.util.*;
 
 /**
  * Created by zyuyou on 15/7/1.
+ * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectImportBuilder.java
  */
 public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp> {
   private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
@@ -121,7 +122,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
             VirtualFile ideaModuleFile = importedOtpApp.getIdeaModuleFile();
             return ideaModuleFile != null ? "    " + ideaModuleFile.getPath() + "\n" : "";
           }
-        }, "") + "\nWould you licke to reuse them?", "Module files found", Messages.getQuestionIcon());
+        }, "") + "\nWould you like to reuse them?", "Module files found", Messages.getQuestionIcon());
 
     if(resultCode == Messages.YES){
       return true;
@@ -364,7 +365,6 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
   }
 
   private static void deleteIdeaModuleFiles(@NotNull final List<ImportedOtpApp> importedOtpApps) throws IOException{
-    // todo: why use array?
     final IOException[] ex = new IOException[1];
 
     ApplicationManager.getApplication().runWriteAction(new Runnable() {
@@ -420,7 +420,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
       if(allImportedAppNames.contains(depAppName)){
         rootModel.addInvalidModuleEntry(depAppName);
       }else if(projectSdk != null && isSdkOtpApp(depAppName, projectSdk)){
-        // Sdk is already a dependcy
+        // Sdk is already a dependency
         LOG.info("Sdk otp-app:[" + depAppName + "] is already a dependy.");
       }else{
         rootModel.addInvalidModuleEntry(depAppName);

@@ -11,7 +11,7 @@ import javax.swing.*;
  */
 public class ElixirFileType extends LanguageFileType {
     public static final ElixirFileType INSTANCE = new ElixirFileType();
-    public static final ElixirScripFileType SCRIPT = new ElixirScripFileType();
+    public static final ElixirScriptFileType SCRIPT = new ElixirScriptFileType();
 
     private ElixirFileType() {
         super(ElixirLanguage.INSTANCE);
@@ -41,7 +41,7 @@ public class ElixirFileType extends LanguageFileType {
         return ElixirIcon.FILE;
     }
 
-    public static class ElixirScripFileType extends ElixirFileType{
+    public static class ElixirScriptFileType extends ElixirFileType{
         @NotNull
         @Override
         public String getName() {

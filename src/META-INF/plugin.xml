@@ -354,7 +354,6 @@
       </action>
       <separator/>
 
-      <!--<add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>-->
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
     </group>
   </actions>

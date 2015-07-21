@@ -45,7 +45,8 @@ public class CreateElixirModuleActionTest extends LightCodeInsightFixtureTestCas
             }
         });
 
-        myFixture.checkResultByFile(path, path, true);
+        boolean ignoreTrailingWhitespaces = true;
+        myFixture.checkResultByFile(path, path, ignoreTrailingWhitespaces);
     }
 
     @Override

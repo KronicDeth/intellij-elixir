@@ -32,6 +32,7 @@ import java.io.File;
 
 /**
  * Created by zyuyou on 15/7/1.
+ * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
  */
 public class MixProjectRootStep extends ProjectImportWizardStep {
   private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
@@ -49,6 +50,7 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
     String projectFileDirectory = context.getProjectFileDirectory();
     myProjectRootComponent.addBrowseFolderListener("Select mix.exs of a mix project to import", "", null,
         FileChooserDescriptorFactory.createSingleFolderDescriptor());
+
     myProjectRootComponent.setText(projectFileDirectory); // provide project path
 
     myGetDepsCheckbox.setVisible(ourEnabled);
@@ -163,7 +165,7 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
           ProcessTerminatedListener.attach(handler);
           handler.startNotify();
           handler.waitFor();
-          indicator.setText2("Rfreshing");
+          indicator.setText2("Refreshing");
         }catch (ExecutionException e){
           LOG.warn(e);
         }

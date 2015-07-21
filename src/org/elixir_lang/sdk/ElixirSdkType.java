@@ -89,7 +89,7 @@ public class ElixirSdkType extends SdkType {
     File iex = JpsElixirSdkType.getIExExecutable(path);
     File mix = JpsElixirSdkType.getMixExecutable(path);
 
-    // 判断是否可执行
+    // Determine whether everything is executable
     return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
   }
 
@@ -250,7 +250,7 @@ public class ElixirSdkType extends SdkType {
 
   /**
    * set the sdk libs
-   * todo: need correct
+   * todo: differentiating `Elixir.*.beam` files and `*.ex` files.
    * */
   private static boolean tryToProcessAsStandardLibraryDir(@NotNull SdkModificator sdkModificator, @NotNull File stdLibDir) {
     if (!isStandardLibraryDir(stdLibDir)) return false;

@@ -23,6 +23,5 @@ public class ElixirBuilderService extends BuilderService {
   @Override
   public List<? extends TargetBuilder<?, ?>> createBuilders() {
     return Collections.singletonList(new ElixirBuilder());
-//    return Arrays.asList(new ElixirBuilder());
   }
 }

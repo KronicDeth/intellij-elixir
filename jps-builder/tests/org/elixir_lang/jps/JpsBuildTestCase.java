@@ -183,7 +183,7 @@ public abstract class JpsBuildTestCase extends UsefulTestCase {
     }
   }
 
-  protected void addPathVariables(Map<String, String> pathWariables){
+  protected void addPathVariables(Map<String, String> pathVariables){
   }
 
   @Nullable

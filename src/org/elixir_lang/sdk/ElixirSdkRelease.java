@@ -16,6 +16,7 @@ public final class ElixirSdkRelease {
   public static final ElixirSdkRelease V_1_0_2 = new ElixirSdkRelease("1", "0", "2");
   public static final ElixirSdkRelease V_1_0_3 = new ElixirSdkRelease("1", "0", "3");
   public static final ElixirSdkRelease V_1_0_4 = new ElixirSdkRelease("1", "0", "4");
+  public static final ElixirSdkRelease V_1_0_5 = new ElixirSdkRelease("1", "0", "5");
 
   private static final Pattern VERSION_PATTERN = Pattern.compile("Elixir (\\d+)\\.(\\d+)\\.(\\d+)");
 
@@ -40,7 +41,4 @@ public final class ElixirSdkRelease {
     Matcher m = versionString != null ? VERSION_PATTERN.matcher(versionString) : null;
     return m != null && m.matches() ? new ElixirSdkRelease(m.group(1), m.group(2), m.group(3)) : null;
   }
-
-
-
 }
