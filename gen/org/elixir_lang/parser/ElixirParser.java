@@ -9,9 +9,10 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.lang.PsiParser;
+import com.intellij.lang.LightPsiParser;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
-public class ElixirParser implements PsiParser {
+public class ElixirParser implements PsiParser, LightPsiParser {
 
   public ASTNode parse(IElementType t, PsiBuilder b) {
     parseLight(t, b);
@@ -816,7 +817,7 @@ public class ElixirParser implements PsiParser {
   }
 
   /* ********************************************************** */
-  // (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE |
+  // (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
   //                            DUAL_OPERATOR) EOL*
   public static boolean additionInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionInfixOperator")) return false;
@@ -829,15 +830,47 @@ public class ElixirParser implements PsiParser {
     return r;
   }
 
-  // SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE |
+  // SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
   //                            DUAL_OPERATOR
   private static boolean additionInfixOperator_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "additionInfixOperator_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = parseTokens(b, 0, SIGNIFICANT_WHITE_SPACE, DUAL_OPERATOR, SIGNIFICANT_WHITE_SPACE);
+    r = additionInfixOperator_0_0(b, l + 1);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL)
+  private static boolean additionInfixOperator_0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "additionInfixOperator_0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, SIGNIFICANT_WHITE_SPACE, DUAL_OPERATOR);
+    r = r && additionInfixOperator_0_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // SIGNIFICANT_WHITE_SPACE | &EOL
+  private static boolean additionInfixOperator_0_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "additionInfixOperator_0_0_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SIGNIFICANT_WHITE_SPACE);
+    if (!r) r = additionInfixOperator_0_0_2_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // &EOL
+  private static boolean additionInfixOperator_0_0_2_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "additionInfixOperator_0_0_2_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _AND_, null);
+    r = consumeToken(b, EOL);
+    exit_section_(b, l, m, null, r, false, null);
     return r;
   }
 

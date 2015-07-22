@@ -1237,7 +1237,7 @@ matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
 
    See https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L605-L613
    for rules for SIGNIFICANT_WHITE_SPACE */
-additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE |
+additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WHITE_SPACE | &EOL) |
                            DUAL_OPERATOR) EOL*
                           {
                             implements = "org.elixir_lang.psi.Operator"
