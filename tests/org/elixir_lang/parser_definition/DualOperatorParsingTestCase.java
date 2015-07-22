@@ -27,6 +27,10 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testIdentifierSpaceOperatorEOLIdentifier() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testIdentifierSpaceOperatorIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
@@ -35,6 +39,10 @@ public class DualOperatorParsingTestCase extends ParsingTestCase {
      * see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L610
      */
     public void testIdentifierSpaceOperatorOperatorOperand() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testIdentifierSpaceOperatorSpaceCommentEOLIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
 
