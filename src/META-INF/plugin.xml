@@ -51,6 +51,7 @@
             </li>
             <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
             <li>Check for matching terminator in heredocs when determining white space type at beginning of line</li>
+            <li>Allow &lt;space&gt;+&lt;EOL&gt; to count as addition</li>
           </ul>
           <p>Incompatible Changes</p>
           <ul>
