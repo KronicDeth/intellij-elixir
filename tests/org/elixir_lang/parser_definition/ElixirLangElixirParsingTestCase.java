@@ -693,9 +693,12 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
     }
 
+    // TODO re-enable once travis-ci run elixir with https://github.com/elixir-lang/elixir/commit/3e52ed0fbbc09a156e6ea180baff3b89a8da183e so intellij_elixir matches intellij-elixir behavior
+    /*
     public void testMixTasksDepsClean() {
         assertParsed("lib/mix/lib/mix/tasks/deps.clean.ex", Parse.CORRECT);
     }
+    */
 
     public void testMixTasksDepsCompile() {
         assertParsed("lib/mix/lib/mix/tasks/deps.compile.ex", Parse.CORRECT);
