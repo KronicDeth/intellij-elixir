@@ -16,6 +16,7 @@
   * [#160](https://github.com/KronicDeth/intellij-elixir/pull/160) - `unquote_splicing` is properly wrapped in `__block__` when in stab bodies - [KronicDeth](https://github.com/KronicDeth)
   * [#163](https://github.com/KronicDeth/intellij-elixir/pull/160) - Check for matching terminator in heredocs when determining white space type at beginning of line - [KronicDeth](https://github.com/KronicDeth)
   * [#170](https://github.com/KronicDeth/intellij-elixir/pull/170) - Allow <space>+<EOL> to count as addition - [KronicDeth](https://github.com/KronicDeth)
+  * [#171](https://github.com/KronicDeth/intellij-elixir/pull/171) - Unary expressions inside parentheses are no longer marked `ambiguous_op: nil` - [KronicDeth](https://github.com/KronicDeth)
 * Incompatible Fixes
   * [#162](https://github.com/KronicDeth/intellij-elixir/pull/162) - New Elixir File has moved to the last item in the New File menu to preserve `CTRL+N ENTER` keyboard shortcut for `New > File` - [KronicDeth](https://github.com/KronicDeth)
 
