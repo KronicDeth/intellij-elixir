@@ -2315,7 +2315,9 @@ if (quoted == null) {
 
                     // [Arg]
                     if (dualCallArguments.arity() == 1) {
-                        PsiElement argument = unqualifiedNoParenthesesCall.getLastChild().getFirstChild();
+                        /* @note getChildren[0] is NOT the same as getFirstChild().  getFirstChild() will get the
+                             leaf node for identifier instead of the first compound, rule node for the argument. */
+                        PsiElement argument = unqualifiedNoParenthesesCall.getChildren()[0].getFirstChild();
 
                         if (!(argument instanceof ElixirAccessExpression && argument.getFirstChild() instanceof ElixirParentheticalStab)) {
                             blockCallMetadata = new OtpErlangList(

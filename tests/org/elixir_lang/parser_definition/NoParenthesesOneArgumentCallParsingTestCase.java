@@ -8,6 +8,10 @@ public class NoParenthesesOneArgumentCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testUnqualifiedSpaceOpeningParenthesisDualVariableClosingParenthesesDoBlock() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/no_parentheses_one_argument_call_parsing_test_case";
