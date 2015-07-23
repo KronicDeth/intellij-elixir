@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 
@@ -2313,12 +2315,16 @@ if (quoted == null) {
 
                     // [Arg]
                     if (dualCallArguments.arity() == 1) {
-                        blockCallMetadata = new OtpErlangList(
-                                new OtpErlangObject[]{
-                                        AMBIGUOUS_OP_KEYWORD_PAIR,
-                                        blockCallMetadata.elementAt(0)
-                                }
-                        );
+                        PsiElement argument = unqualifiedNoParenthesesCall.getLastChild().getFirstChild();
+
+                        if (!(argument instanceof ElixirAccessExpression && argument.getFirstChild() instanceof ElixirParentheticalStab)) {
+                            blockCallMetadata = new OtpErlangList(
+                                    new OtpErlangObject[]{
+                                            AMBIGUOUS_OP_KEYWORD_PAIR,
+                                            blockCallMetadata.elementAt(0)
+                                    }
+                            );
+                        }
                     }
                 }
             }
