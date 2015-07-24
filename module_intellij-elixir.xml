@@ -10,7 +10,10 @@
   <property name="module.jdk.classpath.intellij-elixir" value="${project.jdk.classpath}"/>
 
   <property name="compiler.args.intellij-elixir" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
-  
+
+  <property name="intellij-elixir.bin.dir" value="${module.intellij-elixir.basedir}/bin" />
+  <property name="intellij-elixir.jps-shared.output.dir" value="${module.intellij-elixir.basedir}/out/production/jps-shared" />
+  <property name="intellij-elixir.jps-builder.output.dir" value="${module.intellij-elixir.basedir}/out/production/jps-builder" />
   <property name="intellij-elixir.output.dir" value="${module.intellij-elixir.basedir}/out/production/intellij-elixir"/>
   <property name="intellij-elixir.testoutput.dir" value="${module.intellij-elixir.basedir}/out/test/intellij-elixir"/>
   
@@ -62,7 +65,19 @@
   <patternset id="excluded.from.compilation.intellij-elixir">
     <patternset refid="excluded.from.module.intellij-elixir"/>
   </patternset>
-  
+
+  <path id="intellij-elixir.module.jps-shared.sourcepath">
+    <dirset dir="${module.intellij-elixir.basedir}/jps-shared">
+      <include name="src"/>
+    </dirset>
+  </path>
+
+  <path id="intellij-elixir.module.jps-builder.sourcepath">
+    <dirset dir="${module.intellij-elixir.basedir}/jps-builder">
+      <include name="src"/>
+    </dirset>
+  </path>
+
   <path id="intellij-elixir.module.sourcepath">
     <dirset dir="${module.intellij-elixir.basedir}">
       <include name="src"/>
@@ -81,16 +96,57 @@
   
   <target name="compile.module.intellij-elixir" depends="compile.module.intellij-elixir.production,compile.module.intellij-elixir.tests" description="Compile module intellij-elixir"/>
 
-  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers" description="Compile module intellij-elixir; production classes">
+  <target name="compile.module.jps-shared.production" depends="register.custom.compilers" description="Compile module jps-shared; production classes">
+    <mkdir dir="${intellij-elixir.jps-shared.output.dir}"/>
+    <javac2 destdir="${intellij-elixir.jps-shared.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
+      <compilerarg line="${compiler.args.intellij-elixir}"/>
+      <bootclasspath refid="intellij-elixir.module.bootclasspath"/>
+      <classpath refid="intellij-elixir.module.production.classpath"/>
+      <src refid="intellij-elixir.module.jps-shared.sourcepath"/>
+      <patternset refid="excluded.from.compilation.intellij-elixir"/>
+    </javac2>
+
+    <copy todir="${intellij-elixir.jps-shared.output.dir}">
+      <fileset dir="${module.intellij-elixir.basedir}/jps-shared/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="compile.module.jps-builder.production" depends="register.custom.compilers,compile.module.jps-shared.production" description="Compile module jps-builder; production classes">
+    <mkdir dir="${intellij-elixir.jps-builder.output.dir}"/>
+    <javac2 destdir="${intellij-elixir.jps-builder.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
+      <compilerarg line="${compiler.args.intellij-elixir}"/>
+      <bootclasspath refid="intellij-elixir.module.bootclasspath"/>
+      <classpath refid="intellij-elixir.module.production.classpath"/>
+      <classpath path="${intellij-elixir.jps-shared.output.dir}"/>
+      <src refid="intellij-elixir.module.jps-builder.sourcepath"/>
+      <patternset refid="excluded.from.compilation.intellij-elixir"/>
+    </javac2>
+
+    <copy todir="${intellij-elixir.jps-builder.output.dir}">
+      <fileset dir="${module.intellij-elixir.basedir}/jps-builder/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers,compile.module.jps-shared.production,compile.module.jps-builder.production" description="Compile module intellij-elixir; production classes">
     <mkdir dir="${intellij-elixir.output.dir}"/>
     <javac2 destdir="${intellij-elixir.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
       <bootclasspath refid="intellij-elixir.module.bootclasspath"/>
       <classpath refid="intellij-elixir.module.production.classpath"/>
+      <classpath path="${intellij-elixir.jps-shared.output.dir}"/>
+      <classpath path="${intellij-elixir.jps-builder.output.dir}"/>
       <src refid="intellij-elixir.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.intellij-elixir"/>
     </javac2>
-    
+
     <copy todir="${intellij-elixir.output.dir}">
       <fileset dir="${module.intellij-elixir.basedir}/src">
         <patternset refid="compiler.resources"/>
@@ -106,7 +162,7 @@
       </fileset>
     </copy>
   </target>
-  
+
   <target name="compile.module.intellij-elixir.tests" depends="register.custom.compilers,compile.module.intellij-elixir.production" description="compile module intellij-elixir; test classes" unless="skip.tests">
     <mkdir dir="${intellij-elixir.testoutput.dir}"/>
     <javac2 destdir="${intellij-elixir.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
@@ -130,6 +186,8 @@
   </target>
   
   <target name="clean.module.intellij-elixir" description="cleanup module">
+    <delete dir="${intellij-elixir.jps-shared.output.dir}"/>
+    <delete dir="${intellij-elixir.jps-builder.output.dir}"/>
     <delete dir="${intellij-elixir.output.dir}"/>
     <delete dir="${intellij-elixir.testoutput.dir}"/>
   </target>
@@ -180,6 +238,7 @@
           <exclude name="org/elixir_lang/inspection/*TestCase.java"/>
           <!-- Causes ERROR: Problems during index shutdown. TODO get fix from https://devnet.jetbrains.com/message/5539376#5539376 -->
           <exclude name="org/elixir_lang/action/*Test.java"/>
+          <exclude name="org/elixir_lang/mix/importWizard/*Test.java"/>
         </fileset>
       </batchtest>
     </junit>
@@ -221,18 +280,31 @@
     <property name="tmp.dir.intellij-elixir" value="${module.intellij-elixir.basedir}/../temp"/>
     <mkdir dir="${tmp.dir.intellij-elixir}"/>
     <mkdir dir="${tmp.dir.intellij-elixir}/lib"/>
-    <jar destfile="${tmp.dir.intellij-elixir}/lib/intellij-elixir.jar" duplicate="preserve">
-      <zipfileset dir="${module.intellij-elixir.basedir}/out/production/intellij-elixir"/>
-      <zipfileset file="/META-INF/plugin.xml" prefix="META-INF"/>
+    <mkdir dir="${tmp.dir.intellij-elixir}/lib/jps"/>
+
+    <jar destfile="${tmp.dir.intellij-elixir}/lib/jps-shared.jar" duplicate="preserve">
+      <zipfileset dir="${intellij-elixir.jps-shared.output.dir}"/>
       <manifest>
         <attribute name="Created-By" value="IntelliJ IDEA"/>
         <attribute name="Manifest-Version" value="1.0"/>
       </manifest>
     </jar>
-    <copy file="${idea.cache}/lib/junit-4.11.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit-4.11.jar"/>
-    <copy file="${idea.cache}/lib/hamcrest-core-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-core-1.3.jar"/>
-    <copy file="${idea.cache}/lib/hamcrest-library-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-library-1.3.jar"/>
-    <copy file="${idea.cache}/lib/junit.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit.jar"/>
+
+    <jar destfile="${tmp.dir.intellij-elixir}/lib/jps/jps-builder.jar" duplicate="preserve">
+      <zipfileset dir="${intellij-elixir.jps-builder.output.dir}"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
+
+    <jar destfile="${tmp.dir.intellij-elixir}/lib/intellij-elixir.jar" duplicate="preserve">
+      <zipfileset dir="${intellij-elixir.output.dir}"/>
+      <manifest>
+        <attribute name="Created-By" value="IntelliJ IDEA"/>
+        <attribute name="Manifest-Version" value="1.0"/>
+      </manifest>
+    </jar>
     <zip destfile="${intellij-elixir.plugin.path.jar}">
       <fileset dir="${module.intellij-elixir.basedir}/../temp"/>
     </zip>

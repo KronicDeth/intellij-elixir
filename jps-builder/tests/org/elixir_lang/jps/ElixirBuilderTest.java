@@ -2,7 +2,6 @@ package org.elixir_lang.jps;
 
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.util.PathUtil;
 import com.intellij.util.PathUtilRt;
 import org.elixir_lang.jps.model.JpsElixirModuleType;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -20,8 +19,10 @@ import org.jetbrains.jps.util.JpsPathUtil;
  * Created by zyuyou on 15/7/17.
  */
 public class ElixirBuilderTest extends JpsBuildTestCase {
-  public static final String ELIXIR_SDK_PATH = "/usr/local/Cellar/elixir";
+  public static final String MAC_ELIXIR_SDK_PATH = "/usr/local/Cellar/elixir";
+  public static final String LINUX_ELIXIR_SDK_PATH = "~/.kiex/elixirs";
   public static final String ELIXIR_SDK_VERSION = "1.0.5";
+  public static final String TRAVIS_CI_ELIXIR_SDK_VERSION = "1.0.2";
   public static final String TEST_MODULE_NAME = "m";
 
 
@@ -48,7 +49,8 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
 
   @NotNull
   private static String getElixirSdkPath(){
-    if(SystemInfo.isMac) return ELIXIR_SDK_PATH + "/" + ELIXIR_SDK_VERSION;
+    if(SystemInfo.isMac) return MAC_ELIXIR_SDK_PATH + "/" + ELIXIR_SDK_VERSION;
+    if(SystemInfo.isLinux) return LINUX_ELIXIR_SDK_PATH + "/elixir-" + TRAVIS_CI_ELIXIR_SDK_VERSION + "/lib/elixir";
     throw new RuntimeException("Only Mac supported");
   }
 
