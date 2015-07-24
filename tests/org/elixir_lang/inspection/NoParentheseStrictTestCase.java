@@ -30,6 +30,12 @@ public class NoParentheseStrictTestCase extends LightCodeInsightFixtureTestCase 
         myFixture.checkHighlighting();
     }
 
+    public void testQualifierDotQuoteParentheses() {
+        myFixture.configureByFile("QualifierDotQuoteParentheses.ex");
+        myFixture.enableInspections(NoParenthesesStrict.class);
+        myFixture.checkHighlighting();
+    }
+
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/inspection/no_parentheses_strict_test_case";
