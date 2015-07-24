@@ -30,6 +30,7 @@
           <p>Enhancements</p>
           <ul>
             <li>Update ant build on travis-ci.org to use IDEA 14.1.4 (from 14.0.2)</li>
+            <li>Parser is verified to quote the same as native Elixir</li>
           </ul>
         </li>
         <li>
