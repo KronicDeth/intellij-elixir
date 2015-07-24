@@ -143,9 +143,10 @@
 
   <property name="test" value="tests"/>
 
+  <import file="${module.intellij-elixir.basedir}/elixir.xml"/>
   <import file="${module.intellij-elixir.basedir}/intellij_elixir.xml"/>
 
-  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,release.intellij_elixir" description="test module">
+  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,release.intellij_elixir,unpack.elixir.zip" description="test module">
     <mkdir dir="tmp"/>
     <mkdir dir="tmp/results"/>
 
@@ -160,6 +161,7 @@
            haltonfailure="no"
            printsummary="on"
            showoutput="yes">
+      <env key="ELIXIR_LANG_ELIXIR_PATH" value="${elixir.output.zip.root.dir}"/>
       <env key="INTELLIJ_ELIXIR_PATH" value="${module.intellij-elixir.basedir}"/>
       <classpath>
         <path refid="classpath.test" />
@@ -232,7 +234,6 @@
     <copy file="${idea.cache}/lib/junit-4.11.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit-4.11.jar"/>
     <copy file="${idea.cache}/lib/hamcrest-core-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-core-1.3.jar"/>
     <copy file="${idea.cache}/lib/hamcrest-library-1.3.jar" tofile="${tmp.dir.intellij-elixir}/lib/hamcrest-library-1.3.jar"/>
-    <copy file="${idea.cache}/lib/junit.jar" tofile="${tmp.dir.intellij-elixir}/lib/junit.jar"/>
     <zip destfile="${intellij-elixir.plugin.path.jar}">
       <fileset dir="${module.intellij-elixir.basedir}/../temp"/>
     </zip>
