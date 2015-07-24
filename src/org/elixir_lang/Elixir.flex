@@ -910,6 +910,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    */
   {COMMENT}                                         { return ElixirTypes.COMMENT; }
 
+  {QUOTE_PROMOTER}                                  { /* return to CALL_MAYBE so that OPENING_BRACKET or
+                                                         OPENING_PARENTHESES after quote can be parsed
+                                                         with CALL so parser doesn't think call is no parentheses with
+                                                         parenthetical or list argument. */
+                                                      yybegin(CALL_MAYBE);
+                                                      startQuote(yytext());
+                                                      return promoterType(); }
+
   .                                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState()); }
 }
