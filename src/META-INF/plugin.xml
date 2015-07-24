@@ -53,6 +53,10 @@
             <li>Check for matching terminator in heredocs when determining white space type at beginning of line</li>
             <li>Allow &lt;space&gt;+&lt;EOL&gt; to count as addition</li>
             <li>Unary expressions inside parentheses are no longer marked <code>ambiguous_op: nil</code></li>
+            <li>
+              Differentiate between <code>Qualifier.'relative'()</code> vs <code>Qualifier.'relative' ()</code> and
+              <code>Qualifier."relative"()</code> vs <code>Qualifier."relative" ()</code>
+            </li>
           </ul>
           <p>Incompatible Changes</p>
           <ul>
