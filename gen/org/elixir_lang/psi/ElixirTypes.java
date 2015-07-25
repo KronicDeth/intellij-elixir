@@ -225,7 +225,7 @@ public interface ElixirTypes {
   IElementType AFTER = new ElixirTokenType("after");
   IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
   IElementType AND_OPERATOR = new ElixirTokenType("&&&, `and`, &&");
-  IElementType ARROW_OPERATOR = new ElixirTokenType("ARROW_OPERATOR");
+  IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("ASSOCIATION_OPERATOR");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
   IElementType AT_OPERATOR = new ElixirTokenType("@");
