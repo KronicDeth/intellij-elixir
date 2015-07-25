@@ -247,7 +247,7 @@ public interface ElixirTypes {
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
   IElementType CLOSING_BIT = new ElixirTokenType(">>");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
-  IElementType CLOSING_CURLY = new ElixirTokenType("CLOSING_CURLY");
+  IElementType CLOSING_CURLY = new ElixirTokenType("}");
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType(":");
   IElementType COMMA = new ElixirTokenType(",");

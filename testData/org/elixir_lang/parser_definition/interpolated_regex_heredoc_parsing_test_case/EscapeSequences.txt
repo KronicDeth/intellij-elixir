@@ -144,7 +144,7 @@ Elixir File(0,73)
             ElixirEnclosedHexadecimalEscapeSequenceImpl(ENCLOSED_HEXADECIMAL_ESCAPE_SEQUENCE)(61,69)
               PsiElement(OPENING_CURLY)('{')(61,62)
               PsiElement(VALID_HEXADECIMAL_DIGITS)('100000')(62,68)
-              PsiElement(CLOSING_CURLY)('}')(68,69)
+              PsiElement(})('}')(68,69)
         PsiElement(EOL)('\n')(69,70)
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(70,70)
         <empty list>
