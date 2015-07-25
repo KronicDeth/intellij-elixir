@@ -236,8 +236,8 @@ public interface ElixirTypes {
   IElementType CAPTURE_OPERATOR = new ElixirTokenType("&");
   IElementType CATCH = new ElixirTokenType("catch");
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
-  IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("'''");
-  IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_HEREDOC_TERMINATOR");
+  IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("Char List Heredoc Promoter (''')");
+  IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Heredoc Terminator (''')");
   IElementType CHAR_LIST_PROMOTER = new ElixirTokenType("'");
   IElementType CHAR_LIST_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_HEREDOC_PROMOTER");
   IElementType CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_HEREDOC_TERMINATOR");
