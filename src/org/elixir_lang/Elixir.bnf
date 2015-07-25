@@ -60,6 +60,8 @@
     FALSE = "false"
     FN = "fn"
     HAT_OPERATOR = "^^^"
+    HEREDOC_LINE_WHITE_SPACE_TOKEN = "Whitespace at beginning of line of heredoc"
+    HEREDOC_PREFIX_WHITE_SPACE = "Whitespace at beginning of last line of heredoc before terminator"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
     IDENTIFIER = "identifier"
     IN_OPERATOR = "in"
