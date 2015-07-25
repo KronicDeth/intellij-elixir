@@ -26,6 +26,7 @@
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
+    BIT_STRING_OPERATOR = "<<>>"
     CALL = "<zero-width-call>"
     CAPTURE_OPERATOR = "&"
     CATCH = "catch"
