@@ -1,5 +1,5 @@
 Elixir File(0,105)
-  PsiComment(COMMENT)('# mix of valid and invalid binary digits')(0,40)
+  PsiComment(#)('# mix of valid and invalid binary digits')(0,40)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(40,41)
     PsiElement(EOL)('\n')(40,41)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(41,105)

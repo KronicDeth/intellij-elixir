@@ -1,5 +1,5 @@
 Elixir File(0,95)
-  PsiComment(COMMENT)('# This comment will to displayed correctly')(0,42)
+  PsiComment(#)('# This comment will to displayed correctly')(0,42)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(42,43)
     PsiElement(EOL)('\n')(42,43)
   ElixirUnmatchedQualifiedNoParenthesesCallImpl(UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL)(43,95)

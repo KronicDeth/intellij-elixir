@@ -45,7 +45,7 @@
     CLOSING_PARENTHESIS = ")"
     COLON = ":"
     COMMA = ","
-    COMMENT = "regexp:#[^\r\n]*(\n|\r|\r\n)?"
+    COMMENT = "#"
     DECIMAL_MARK = "."
     DECIMAL_SEPARATOR = "_"
     DO = "do"

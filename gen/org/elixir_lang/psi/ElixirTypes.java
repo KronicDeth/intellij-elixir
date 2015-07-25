@@ -251,7 +251,7 @@ public interface ElixirTypes {
   IElementType CLOSING_PARENTHESIS = new ElixirTokenType(")");
   IElementType COLON = new ElixirTokenType(":");
   IElementType COMMA = new ElixirTokenType(",");
-  IElementType COMMENT = new ElixirTokenType("COMMENT");
+  IElementType COMMENT = new ElixirTokenType("#");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("COMPARISON_OPERATOR");
   IElementType DECIMAL_MARK = new ElixirTokenType("DECIMAL_MARK");
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");

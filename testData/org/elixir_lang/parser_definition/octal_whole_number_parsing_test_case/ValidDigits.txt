@@ -1,5 +1,5 @@
 Elixir File(0,35)
-  PsiComment(COMMENT)('# all valid octal digits')(0,24)
+  PsiComment(#)('# all valid octal digits')(0,24)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(24,25)
     PsiElement(EOL)('\n')(24,25)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(25,35)

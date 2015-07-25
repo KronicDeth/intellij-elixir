@@ -1,5 +1,5 @@
 Elixir File(0,127)
-  PsiComment(COMMENT)('# EOL between function and positional argument is invalid')(0,57)
+  PsiComment(#)('# EOL between function and positional argument is invalid')(0,57)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(57,58)
     PsiElement(EOL)('\n')(57,58)
   ElixirUnmatchedUnqualifiedNoArgumentsCallImpl(UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL)(58,68)

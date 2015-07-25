@@ -1,5 +1,5 @@
 Elixir File(0,37)
-  PsiComment(COMMENT)('# all valid decimal digits')(0,26)
+  PsiComment(#)('# all valid decimal digits')(0,26)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(26,27)
     PsiElement(EOL)('\n')(26,27)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(27,37)

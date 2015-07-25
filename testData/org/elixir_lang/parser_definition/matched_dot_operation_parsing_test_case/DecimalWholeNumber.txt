@@ -1,5 +1,5 @@
 Elixir File(0,49)
-  PsiComment(COMMENT)('# DecimalWholeNumber, not MatchedDotOperation')(0,45)
+  PsiComment(#)('# DecimalWholeNumber, not MatchedDotOperation')(0,45)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(45,46)
     PsiElement(EOL)('\n')(45,46)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(46,49)

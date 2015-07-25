@@ -1,5 +1,5 @@
 Elixir File(0,50)
-  PsiComment(COMMENT)('# <special atom identifiers / operators>:')(0,41)
+  PsiComment(#)('# <special atom identifiers / operators>:')(0,41)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(41,42)
     PsiElement(EOL)('\n')(41,42)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(42,50)

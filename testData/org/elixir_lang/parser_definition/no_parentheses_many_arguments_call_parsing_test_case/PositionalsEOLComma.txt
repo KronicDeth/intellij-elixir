@@ -1,5 +1,5 @@
 Elixir File(0,144)
-  PsiComment(COMMENT)('# invalid EOL before comma after last positional')(0,48)
+  PsiComment(#)('# invalid EOL before comma after last positional')(0,48)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(48,49)
     PsiElement(EOL)('\n')(48,49)
   ElixirUnmatchedUnqualifiedNoParenthesesCallImpl(UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL)(49,93)

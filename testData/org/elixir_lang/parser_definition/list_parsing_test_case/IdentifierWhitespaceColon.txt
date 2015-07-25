@@ -1,5 +1,5 @@
 Elixir File(0,53)
-  PsiComment(COMMENT)('# `IDENTIFIER <space> :` is invalid')(0,35)
+  PsiComment(#)('# `IDENTIFIER <space> :` is invalid')(0,35)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(35,36)
     PsiElement(EOL)('\n')(35,36)
   PsiElement([)('[')(36,37)

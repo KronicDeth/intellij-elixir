@@ -1,5 +1,5 @@
 Elixir File(0,75)
-  PsiComment(COMMENT)('# all invalid hexadecimal digits')(0,32)
+  PsiComment(#)('# all invalid hexadecimal digits')(0,32)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(32,33)
     PsiElement(EOL)('\n')(32,33)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(33,75)

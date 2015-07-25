@@ -1,5 +1,5 @@
 Elixir File(0,19)
-  PsiComment(COMMENT)('# "string"')(0,10)
+  PsiComment(#)('# "string"')(0,10)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(10,11)
     PsiElement(EOL)('\n')(10,11)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(11,19)

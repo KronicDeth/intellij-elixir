@@ -1,5 +1,5 @@
 Elixir File(0,167)
-  PsiComment(COMMENT)('# EOL between keywordValue and comma is invalid')(0,47)
+  PsiComment(#)('# EOL between keywordValue and comma is invalid')(0,47)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(47,48)
     PsiElement(EOL)('\n')(47,48)
   ElixirUnmatchedUnqualifiedNoParenthesesCallImpl(UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL)(48,113)
