@@ -261,7 +261,7 @@ public interface ElixirTypes {
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
-  IElementType ESCAPE = new ElixirTokenType("ESCAPE");
+  IElementType ESCAPE = new ElixirTokenType("\\\\");
   IElementType ESCAPED_CHARACTER_TOKEN = new ElixirTokenType("ESCAPED_CHARACTER_TOKEN");
   IElementType EXPONENT_MARK = new ElixirTokenType("EXPONENT_MARK");
   IElementType FALSE = new ElixirTokenType("false");

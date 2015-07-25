@@ -54,6 +54,7 @@
     DUAL_OPERATOR = "+, -"
     ELSE = "else"
     END = "end"
+    ESCAPE = "\\"
     FALSE = "false"
     FN = "fn"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
