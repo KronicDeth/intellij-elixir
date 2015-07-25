@@ -22,6 +22,7 @@
     ALIAS_TOKEN = "Alias"
     AND_OPERATOR = "&&&, `and`, &&"
     ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
+    ASSOCIATION_OPERATOR = "=>"
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"
