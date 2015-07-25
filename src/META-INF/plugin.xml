@@ -58,6 +58,7 @@
               Differentiate between <code>Qualifier.'relative'()</code> vs <code>Qualifier.'relative' ()</code> and
               <code>Qualifier."relative"()</code> vs <code>Qualifier."relative" ()</code>
             </li>
+            <li>Fix link to Elixir website in README</li>
           </ul>
           <p>Incompatible Changes</p>
           <ul>
