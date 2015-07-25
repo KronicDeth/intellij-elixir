@@ -271,7 +271,7 @@ public interface ElixirTypes {
   IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("Whitespace at beginning of last line of heredoc before terminator");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
   IElementType IDENTIFIER = new ElixirTokenType("identifier");
-  IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_CHAR_LIST_SIGIL_NAME");
+  IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("c");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_REGEX_SIGIL_NAME");
   IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_SIGIL_NAME");
   IElementType INTERPOLATING_STRING_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_STRING_SIGIL_NAME");
