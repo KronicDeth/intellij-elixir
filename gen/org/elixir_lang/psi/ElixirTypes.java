@@ -262,7 +262,7 @@ public interface ElixirTypes {
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");
   IElementType ESCAPE = new ElixirTokenType("\\\\");
-  IElementType ESCAPED_CHARACTER_TOKEN = new ElixirTokenType("ESCAPED_CHARACTER_TOKEN");
+  IElementType ESCAPED_CHARACTER_TOKEN = new ElixirTokenType("\\\\<character>, \\\\x{<hexadecimal-digit>}, \\\\x<hexadecimal-digit>, \\\\\\\\n, \\\\\\\\r\\\\n");
   IElementType EXPONENT_MARK = new ElixirTokenType("EXPONENT_MARK");
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
