@@ -3748,37 +3748,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // CALL parenthesesArguments parenthesesArguments? | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L254-255
-  // /*
-  //  * Dot (Anonymous function) Call Operation
-  //  *
-  //  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L403
-  //  */
+  // CALL parenthesesArguments parenthesesArguments?
   public static boolean matchedParenthesesArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedParenthesesArguments")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<matched parentheses arguments>");
-    r = matchedParenthesesArguments_0(b, l + 1);
-    if (!r) r = consumeToken(b, MATCHEDPARENTHESESARGUMENTS_1_0);
-    exit_section_(b, l, m, MATCHED_PARENTHESES_ARGUMENTS, r, false, null);
-    return r;
-  }
-
-  // CALL parenthesesArguments parenthesesArguments?
-  private static boolean matchedParenthesesArguments_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedParenthesesArguments_0")) return false;
+    if (!nextTokenIs(b, CALL)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, CALL);
     r = r && parenthesesArguments(b, l + 1);
-    r = r && matchedParenthesesArguments_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = r && matchedParenthesesArguments_2(b, l + 1);
+    exit_section_(b, m, MATCHED_PARENTHESES_ARGUMENTS, r);
     return r;
   }
 
   // parenthesesArguments?
-  private static boolean matchedParenthesesArguments_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "matchedParenthesesArguments_0_2")) return false;
+  private static boolean matchedParenthesesArguments_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "matchedParenthesesArguments_2")) return false;
     parenthesesArguments(b, l + 1);
     return true;
   }

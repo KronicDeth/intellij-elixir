@@ -292,7 +292,6 @@ public interface ElixirTypes {
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
-  IElementType MATCHEDPARENTHESESARGUMENTS_1_0 = new ElixirTokenType("matchedParenthesesArguments_1_0");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NIL = new ElixirTokenType("nil");
