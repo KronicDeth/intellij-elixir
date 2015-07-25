@@ -266,7 +266,7 @@ public interface ElixirTypes {
   IElementType EXPONENT_MARK = new ElixirTokenType("E, e");
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
-  IElementType HAT_OPERATOR = new ElixirTokenType("HAT_OPERATOR");
+  IElementType HAT_OPERATOR = new ElixirTokenType("^^^");
   IElementType HEREDOC_LINE_WHITE_SPACE_TOKEN = new ElixirTokenType("HEREDOC_LINE_WHITE_SPACE_TOKEN");
   IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("HEREDOC_PREFIX_WHITE_SPACE");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
@@ -290,7 +290,7 @@ public interface ElixirTypes {
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
-  IElementType LtITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
+  IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");

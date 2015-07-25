@@ -59,6 +59,7 @@
     EXPONENT_MARK = "E, e"
     FALSE = "false"
     FN = "fn"
+    HAT_OPERATOR = "^^^"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
     IDENTIFIER = "identifier"
     IN_OPERATOR = "in"
