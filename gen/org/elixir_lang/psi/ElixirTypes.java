@@ -257,7 +257,7 @@ public interface ElixirTypes {
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
-  IElementType DUAL_OPERATOR = new ElixirTokenType("DUAL_OPERATOR");
+  IElementType DUAL_OPERATOR = new ElixirTokenType("+, -");
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
   IElementType EOL = new ElixirTokenType("EOL");

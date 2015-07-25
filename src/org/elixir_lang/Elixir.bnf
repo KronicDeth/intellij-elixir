@@ -51,6 +51,7 @@
     DECIMAL_SEPARATOR = "_"
     DO = "do"
     DOT_OPERATOR = "."
+    DUAL_OPERATOR = "+, -"
     ELSE = "else"
     END = "end"
     FALSE = "false"
