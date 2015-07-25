@@ -56,6 +56,7 @@
     END = "end"
     ESCAPE = "\\"
     ESCAPED_CHARACTER_TOKEN = "\\<character>, \\x{<hexadecimal-digit>}, \\x<hexadecimal-digit>, \\\\n, \\\\r\\n"
+    EXPONENT_MARK = "E, e"
     FALSE = "false"
     FN = "fn"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
