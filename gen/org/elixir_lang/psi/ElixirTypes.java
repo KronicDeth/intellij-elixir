@@ -239,10 +239,10 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("Char List Heredoc Promoter (''')");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Heredoc Terminator (''')");
   IElementType CHAR_LIST_PROMOTER = new ElixirTokenType("'");
-  IElementType CHAR_LIST_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_HEREDOC_PROMOTER");
-  IElementType CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_HEREDOC_TERMINATOR");
-  IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("CHAR_LIST_SIGIL_PROMOTER");
-  IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("CHAR_LIST_SIGIL_TERMINATOR");
+  IElementType CHAR_LIST_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("Char List Sigil Heredoc Promoter (\"\"\", ''')");
+  IElementType CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Sigil Heredoc Terminator (\"\"\", ''')");
+  IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("Char List Sigil Heredoc Promoter ({, [, <, \", /, (, |, ')");
+  IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("Char List Sigil Heredoc Terminator ({, [, <, \", /, (, |, ')");
   IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
   IElementType CLOSING_BIT = new ElixirTokenType(">>");
