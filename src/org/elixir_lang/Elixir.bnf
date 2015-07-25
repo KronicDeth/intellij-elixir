@@ -46,6 +46,7 @@
     COLON = ":"
     COMMA = ","
     COMMENT = "#"
+    COMPARISON_OPERATOR = "!==, ===, !=, ==, =~"
     DECIMAL_MARK = "."
     DECIMAL_SEPARATOR = "_"
     DO = "do"
