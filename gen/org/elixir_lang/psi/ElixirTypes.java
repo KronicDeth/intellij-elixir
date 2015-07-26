@@ -303,7 +303,7 @@ public interface ElixirTypes {
   IElementType OPENING_CURLY = new ElixirTokenType("{");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("|||, `or`, ||");
-  IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");
+  IElementType PIPE_OPERATOR = new ElixirTokenType("|");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("REGEX_HEREDOC_PROMOTER");
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("REGEX_HEREDOC_TERMINATOR");

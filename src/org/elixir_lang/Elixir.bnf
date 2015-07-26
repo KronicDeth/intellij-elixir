@@ -98,6 +98,7 @@
     OPENING_CURLY = "{"
     OPENING_PARENTHESIS = "("
     OR_OPERATOR = "|||, `or`, ||"
+    PIPE_OPERATOR = "|"
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
