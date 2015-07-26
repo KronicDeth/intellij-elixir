@@ -290,7 +290,7 @@ public interface ElixirTypes {
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("R");
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("A-B, D-Q, T-V, X-Z");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("S");
-  IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
+  IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("W");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
   IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
