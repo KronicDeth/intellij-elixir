@@ -3,11 +3,11 @@ Elixir File(0,8)
     ElixirLiteralSigilHeredocImpl(LITERAL_SIGIL_HEREDOC)(0,8)
       PsiElement(~)('~')(0,1)
       PsiElement(A-B, D-Q, T-V, X-Z)('X')(1,2)
-      PsiElement(SIGIL_HEREDOC_PROMOTER)('"""')(2,5)
+      PsiElement(Sigil Heredoc Promoter (""", '''))('"""')(2,5)
       PsiErrorElement:EOL expected, got '"""'(5,5)
         <empty list>
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
         <empty list>
-      PsiElement(SIGIL_HEREDOC_TERMINATOR)('"""')(5,8)
+      PsiElement(Sigil Heredoc Terminator (""", '''))('"""')(5,8)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(8,8)
         <empty list>
