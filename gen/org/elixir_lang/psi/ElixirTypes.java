@@ -279,7 +279,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATION_END = new ElixirTokenType("Interpolation End (})");
   IElementType INTERPOLATION_START = new ElixirTokenType("Interpolation Start (#{)");
   IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("A-Z, a-z, 2-9");
-  IElementType INVALID_DECIMAL_DIGITS = new ElixirTokenType("INVALID_DECIMAL_DIGITS");
+  IElementType INVALID_DECIMAL_DIGITS = new ElixirTokenType("A-Z, a-z");
   IElementType INVALID_HEXADECIMAL_DIGITS = new ElixirTokenType("INVALID_HEXADECIMAL_DIGITS");
   IElementType INVALID_OCTAL_DIGITS = new ElixirTokenType("INVALID_OCTAL_DIGITS");
   IElementType INVALID_UNKNOWN_BASE_DIGITS = new ElixirTokenType("INVALID_UNKNOWN_BASE_DIGITS");

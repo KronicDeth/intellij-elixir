@@ -74,6 +74,7 @@
     // Human-readable "Interpolation Start" to match format of INTERPOLATION_END
     INTERPOLATION_START = "Interpolation Start (#{)"
     INVALID_BINARY_DIGITS = "A-Z, a-z, 2-9"
+    INVALID_DECIMAL_DIGITS = "A-Z, a-z"
     IN_OPERATOR = "in"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
     MAP_OPERATOR = "%{}"
