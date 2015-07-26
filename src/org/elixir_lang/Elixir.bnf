@@ -82,6 +82,7 @@
     IN_OPERATOR = "in"
     KEYWORD_PAIR_COLON = "Keyword Pair Colon (:)"
     LITERAL_CHAR_LIST_SIGIL_NAME = "C"
+    LITERAL_REGEX_SIGIL_NAME = "R"
     MAP_OPERATOR = "%{}"
     NIL = "nil"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
