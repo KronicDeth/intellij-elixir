@@ -2,7 +2,7 @@ Elixir File(0,4)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,3)
     ElixirDecimalWholeNumberImpl(DECIMAL_WHOLE_NUMBER)(0,3)
       ElixirDecimalDigitsImpl(DECIMAL_DIGITS)(0,3)
-        PsiElement(VALID_DECIMAL_DIGITS)('100')(0,3)
+        PsiElement(0-9)('100')(0,3)
   PsiElement(_)('_')(3,4)
   PsiErrorElement:<decimal digits> expected, unexpected end of file(4,4)
     <empty list>

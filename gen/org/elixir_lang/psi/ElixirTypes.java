@@ -338,7 +338,7 @@ public interface ElixirTypes {
   IElementType UNARY_OPERATOR = new ElixirTokenType("not, ~~~, !, ^");
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("A-Z, a, c-n, p-w, z");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("0-1");
-  IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("VALID_DECIMAL_DIGITS");
+  IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("0-9");
   IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("VALID_HEXADECIMAL_DIGITS");
   IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("VALID_OCTAL_DIGITS");
   IElementType WHEN_OPERATOR = new ElixirTokenType("WHEN_OPERATOR");
