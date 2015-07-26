@@ -131,7 +131,7 @@
     TWO_OPERATOR = "++, --, .., <>"
     TYPE_OPERATOR = "::"
     UNARY_OPERATOR = "not, ~~~, !, ^"
-    UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
+    UNKNOWN_WHOLE_NUMBER_BASE = "A-Z, a, c-n, p-w, z"
     VALID_BINARY_DIGITS = "regexp:[01]+"
     VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
   ]

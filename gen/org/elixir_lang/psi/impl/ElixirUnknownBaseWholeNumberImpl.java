@@ -4,7 +4,6 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.Digits;
@@ -14,8 +13,6 @@ import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-
-import static org.elixir_lang.psi.ElixirTypes.UNKNOWN_WHOLE_NUMBER_BASE;
 
 public class ElixirUnknownBaseWholeNumberImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseWholeNumber {
 
@@ -32,12 +29,6 @@ public class ElixirUnknownBaseWholeNumberImpl extends ASTWrapperPsiElement imple
   @NotNull
   public List<ElixirUnknownBaseDigits> getUnknownBaseDigitsList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirUnknownBaseDigits.class);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getUnknownWholeNumberBase() {
-    return findNotNullChildByType(UNKNOWN_WHOLE_NUMBER_BASE);
   }
 
   @NotNull
