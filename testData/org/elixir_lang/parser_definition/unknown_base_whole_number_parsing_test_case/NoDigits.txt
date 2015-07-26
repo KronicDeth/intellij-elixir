@@ -6,7 +6,7 @@ Elixir File(0,79)
     ElixirUnknownBaseWholeNumberImpl(UNKNOWN_BASE_WHOLE_NUMBER)(34,36)
       PsiElement(0)('0')(34,35)
       PsiElement(UNKNOWN_WHOLE_NUMBER_BASE)('z')(35,36)
-      PsiErrorElement:INVALID_UNKNOWN_BASE_DIGITS expected, got '
+      PsiErrorElement:A-Z, a-z, 0-9 expected, got '
 '(36,36)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(36,70)
@@ -18,7 +18,7 @@ Elixir File(0,79)
     ElixirUnknownBaseWholeNumberImpl(UNKNOWN_BASE_WHOLE_NUMBER)(70,72)
       PsiElement(0)('0')(70,71)
       PsiElement(UNKNOWN_WHOLE_NUMBER_BASE)('z')(71,72)
-      PsiErrorElement:INVALID_UNKNOWN_BASE_DIGITS expected, got ';'(72,72)
+      PsiErrorElement:A-Z, a-z, 0-9 expected, got ';'(72,72)
         <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(72,73)
     PsiElement(;)(';')(72,73)
@@ -28,4 +28,4 @@ Elixir File(0,79)
       PsiElement(0)('0')(74,75)
       PsiElement(UNKNOWN_WHOLE_NUMBER_BASE)('z')(75,76)
       ElixirUnknownBaseDigitsImpl(UNKNOWN_BASE_DIGITS)(76,79)
-        PsiElement(INVALID_UNKNOWN_BASE_DIGITS)('Aa0')(76,79)
+        PsiElement(A-Z, a-z, 0-9)('Aa0')(76,79)

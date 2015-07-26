@@ -4,15 +4,12 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirUnknownBaseDigits;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static org.elixir_lang.psi.ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS;
 
 public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements ElixirUnknownBaseDigits {
 
@@ -23,12 +20,6 @@ public class ElixirUnknownBaseDigitsImpl extends ASTWrapperPsiElement implements
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnknownBaseDigits(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getInvalidUnknownBaseDigits() {
-    return findNotNullChildByType(INVALID_UNKNOWN_BASE_DIGITS);
   }
 
   @NotNull
