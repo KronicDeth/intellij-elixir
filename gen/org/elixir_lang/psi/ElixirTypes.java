@@ -288,7 +288,7 @@ public interface ElixirTypes {
   IElementType KEYWORD_PAIR_COLON = new ElixirTokenType("Keyword Pair Colon (:)");
   IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("C");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("R");
-  IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
+  IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("A-B, D-Q, T-V, X-Z");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("LITERAL_WORDS_SIGIL_NAME");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
