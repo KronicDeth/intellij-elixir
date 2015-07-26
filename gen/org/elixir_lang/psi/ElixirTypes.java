@@ -276,7 +276,7 @@ public interface ElixirTypes {
   IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("a-b, d-q, t-v, x-z");
   IElementType INTERPOLATING_STRING_SIGIL_NAME = new ElixirTokenType("s");
   IElementType INTERPOLATING_WORDS_SIGIL_NAME = new ElixirTokenType("w");
-  IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
+  IElementType INTERPOLATION_END = new ElixirTokenType("Interpolation End (})");
   IElementType INTERPOLATION_START = new ElixirTokenType("INTERPOLATION_START");
   IElementType INVALID_BINARY_DIGITS = new ElixirTokenType("INVALID_BINARY_DIGITS");
   IElementType INVALID_DECIMAL_DIGITS = new ElixirTokenType("INVALID_DECIMAL_DIGITS");

@@ -69,6 +69,8 @@
     INTERPOLATING_SIGIL_NAME = "a-b, d-q, t-v, x-z"
     INTERPOLATING_STRING_SIGIL_NAME = "s"
     INTERPOLATING_WORDS_SIGIL_NAME = "w"
+    // Can't be just "}", because that's used for the more general CLOSING_CURLY
+    INTERPOLATION_END = "Interpolation End (})"
     IN_OPERATOR = "in"
     INVALID_BINARY_DIGITS = "regexp:[A-Za-z2-9]+"
     INVALID_UNKNOWN_BASE_DIGITS = "regexp:[A-Za-z0-9]+"
