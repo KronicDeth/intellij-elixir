@@ -323,12 +323,12 @@ public interface ElixirTypes {
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
   IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("String Heredoc Promoter (\"\"\")");
   IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("String Heredoc Terminator (\"\"\")");
-  IElementType STRING_PROMOTER = new ElixirTokenType("\"");
+  IElementType STRING_PROMOTER = new ElixirTokenType("String Promoter (\")");
   IElementType STRING_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("STRING_SIGIL_HEREDOC_PROMOTER");
   IElementType STRING_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_SIGIL_HEREDOC_TERMINATOR");
   IElementType STRING_SIGIL_PROMOTER = new ElixirTokenType("STRING_SIGIL_PROMOTER");
   IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("STRING_SIGIL_TERMINATOR");
-  IElementType STRING_TERMINATOR = new ElixirTokenType("STRING_TERMINATOR");
+  IElementType STRING_TERMINATOR = new ElixirTokenType("String Terminator (\")");
   IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");

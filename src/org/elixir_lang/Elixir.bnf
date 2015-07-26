@@ -116,7 +116,8 @@
     STAB_OPERATOR = "->"
     STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
     STRING_HEREDOC_TERMINATOR = "String Heredoc Terminator (\"\"\")"
-    STRING_PROMOTER = "\""
+    STRING_PROMOTER = "String Promoter (\")"
+    STRING_TERMINATOR = "String Terminator (\")"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
     TILDE = "~"
