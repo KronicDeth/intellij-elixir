@@ -4,15 +4,11 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirBinaryDigits;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import static org.elixir_lang.psi.ElixirTypes.VALID_BINARY_DIGITS;
 
 public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements ElixirBinaryDigits {
 
@@ -23,12 +19,6 @@ public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements Elix
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryDigits(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getValidBinaryDigits() {
-    return findChildByType(VALID_BINARY_DIGITS);
   }
 
   @NotNull
