@@ -305,8 +305,8 @@ public interface ElixirTypes {
   IElementType OR_OPERATOR = new ElixirTokenType("|||, `or`, ||");
   IElementType PIPE_OPERATOR = new ElixirTokenType("|");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
-  IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("REGEX_HEREDOC_PROMOTER");
-  IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("REGEX_HEREDOC_TERMINATOR");
+  IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("Regex Heredoc Promoter (\"\"\", ''')");
+  IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("Regex Heredoc Terminator (\"\"\", ''')");
   IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
   IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");

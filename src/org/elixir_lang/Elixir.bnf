@@ -99,6 +99,8 @@
     OPENING_PARENTHESIS = "("
     OR_OPERATOR = "|||, `or`, ||"
     PIPE_OPERATOR = "|"
+    REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
+    REGEX_HEREDOC_TERMINATOR = "Regex Heredoc Terminator (\"\"\", ''')"
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
