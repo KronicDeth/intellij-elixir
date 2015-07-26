@@ -118,6 +118,8 @@
     STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
     STRING_HEREDOC_TERMINATOR = "String Heredoc Terminator (\"\"\")"
     STRING_PROMOTER = "String Promoter (\")"
+    STRING_SIGIL_HEREDOC_PROMOTER = "String Sigil Heredoc Promoter (\"\"\", ''')"
+    STRING_SIGIL_HEREDOC_TERMINATOR = "String Sigil Heredoc Terminator (\"\"\", ''')"
     STRING_TERMINATOR = "String Terminator (\")"
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"
