@@ -10,9 +10,6 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirBinaryDigits extends Digits {
 
   @Nullable
-  PsiElement getInvalidBinaryDigits();
-
-  @Nullable
   PsiElement getValidBinaryDigits();
 
   @NotNull

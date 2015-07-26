@@ -12,7 +12,6 @@ import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.elixir_lang.psi.ElixirTypes.INVALID_BINARY_DIGITS;
 import static org.elixir_lang.psi.ElixirTypes.VALID_BINARY_DIGITS;
 
 public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements ElixirBinaryDigits {
@@ -24,12 +23,6 @@ public class ElixirBinaryDigitsImpl extends ASTWrapperPsiElement implements Elix
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitBinaryDigits(this);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getInvalidBinaryDigits() {
-    return findChildByType(INVALID_BINARY_DIGITS);
   }
 
   @Override
