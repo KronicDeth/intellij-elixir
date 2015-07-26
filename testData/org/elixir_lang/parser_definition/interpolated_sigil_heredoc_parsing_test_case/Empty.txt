@@ -2,7 +2,7 @@ Elixir File(0,8)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,8)
     ElixirInterpolatedSigilHeredocImpl(INTERPOLATED_SIGIL_HEREDOC)(0,8)
       PsiElement(~)('~')(0,1)
-      PsiElement(INTERPOLATING_SIGIL_NAME)('x')(1,2)
+      PsiElement(a-b, d-q, t-v, x-z)('x')(1,2)
       PsiElement(SIGIL_HEREDOC_PROMOTER)('"""')(2,5)
       PsiErrorElement:EOL expected, got '"""'(5,5)
         <empty list>

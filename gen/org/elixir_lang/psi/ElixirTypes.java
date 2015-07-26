@@ -273,7 +273,7 @@ public interface ElixirTypes {
   IElementType IDENTIFIER = new ElixirTokenType("identifier");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("c");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("r");
-  IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_SIGIL_NAME");
+  IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("a-b, d-q, t-v, x-z");
   IElementType INTERPOLATING_STRING_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_STRING_SIGIL_NAME");
   IElementType INTERPOLATING_WORDS_SIGIL_NAME = new ElixirTokenType("INTERPOLATING_WORDS_SIGIL_NAME");
   IElementType INTERPOLATION_END = new ElixirTokenType("INTERPOLATION_END");
