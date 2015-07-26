@@ -97,6 +97,7 @@
     OPENING_BRACKET = "["
     OPENING_CURLY = "{"
     OPENING_PARENTHESIS = "("
+    OR_OPERATOR = "|||, `or`, ||"
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
