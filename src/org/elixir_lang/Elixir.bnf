@@ -134,7 +134,7 @@
     UNKNOWN_WHOLE_NUMBER_BASE = "A-Z, a, c-n, p-w, z"
     VALID_BINARY_DIGITS = "0-1"
     VALID_DECIMAL_DIGITS = "0-9"
-    VALID_HEXADECIMAL_DIGITS = "regexp:[A-Fa-f0-9]+"
+    VALID_HEXADECIMAL_DIGITS = "A-F, a-f, 0-9"
   ]
 }
 
