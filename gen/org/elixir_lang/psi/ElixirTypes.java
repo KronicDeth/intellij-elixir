@@ -300,7 +300,7 @@ public interface ElixirTypes {
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
   IElementType OPENING_BIT = new ElixirTokenType("<<");
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
-  IElementType OPENING_CURLY = new ElixirTokenType("OPENING_CURLY");
+  IElementType OPENING_CURLY = new ElixirTokenType("{");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("OR_OPERATOR");
   IElementType PIPE_OPERATOR = new ElixirTokenType("PIPE_OPERATOR");

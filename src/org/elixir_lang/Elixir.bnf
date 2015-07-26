@@ -95,7 +95,7 @@
     OCTAL_WHOLE_NUMBER_BASE = "o"
     OPENING_BIT = "<<"
     OPENING_BRACKET = "["
-    // TODO remove once OPENING_PARENTHESIS is used in emptyParentheses rule
+    OPENING_CURLY = "{"
     OPENING_PARENTHESIS = "("
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
