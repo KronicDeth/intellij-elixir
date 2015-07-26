@@ -238,12 +238,12 @@ public interface ElixirTypes {
   IElementType CHAR_LIST_FRAGMENT = new ElixirTokenType("CHAR_LIST_FRAGMENT");
   IElementType CHAR_LIST_HEREDOC_PROMOTER = new ElixirTokenType("Char List Heredoc Promoter (''')");
   IElementType CHAR_LIST_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Heredoc Terminator (''')");
-  IElementType CHAR_LIST_PROMOTER = new ElixirTokenType("'");
+  IElementType CHAR_LIST_PROMOTER = new ElixirTokenType("Char List Promoter (')");
   IElementType CHAR_LIST_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("Char List Sigil Heredoc Promoter (\"\"\", ''')");
   IElementType CHAR_LIST_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("Char List Sigil Heredoc Terminator (\"\"\", ''')");
   IElementType CHAR_LIST_SIGIL_PROMOTER = new ElixirTokenType("Char List Sigil Promoter ({, [, <, \", /, (, |, ')");
   IElementType CHAR_LIST_SIGIL_TERMINATOR = new ElixirTokenType("Char List Sigil Terminator ({, [, <, \", /, (, |, ')");
-  IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("CHAR_LIST_TERMINATOR");
+  IElementType CHAR_LIST_TERMINATOR = new ElixirTokenType("Char List Terminator (')");
   IElementType CHAR_TOKENIZER = new ElixirTokenType("?");
   IElementType CLOSING_BIT = new ElixirTokenType(">>");
   IElementType CLOSING_BRACKET = new ElixirTokenType("]");
