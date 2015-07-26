@@ -80,6 +80,7 @@
     INVALID_UNKNOWN_BASE_DIGITS = "A-Z, a-z, 0-9"
     IN_MATCH_OPERATOR = "<-, \\\\"
     IN_OPERATOR = "in"
+    KEYWORD_PAIR_COLON = "Keyword Pair Colon (:)"
     MAP_OPERATOR = "%{}"
     NIL = "nil"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
