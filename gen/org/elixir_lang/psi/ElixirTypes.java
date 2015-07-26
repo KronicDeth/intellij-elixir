@@ -335,7 +335,7 @@ public interface ElixirTypes {
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
   IElementType TWO_OPERATOR = new ElixirTokenType("++, --, .., <>");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
-  IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
+  IElementType UNARY_OPERATOR = new ElixirTokenType("not, ~~~, !, ^");
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("UNKNOWN_WHOLE_NUMBER_BASE");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("VALID_BINARY_DIGITS");
   IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("VALID_DECIMAL_DIGITS");

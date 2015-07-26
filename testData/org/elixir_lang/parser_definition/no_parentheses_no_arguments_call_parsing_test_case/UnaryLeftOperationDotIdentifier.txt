@@ -1,7 +1,7 @@
 Elixir File(0,26)
   ElixirUnmatchedUnaryNonNumericOperationImpl(UNMATCHED_UNARY_NON_NUMERIC_OPERATION)(0,26)
     ElixirUnaryPrefixOperatorImpl(UNARY_PREFIX_OPERATOR)(0,3)
-      PsiElement(UNARY_OPERATOR)('not')(0,3)
+      PsiElement(not, ~~~, !, ^)('not')(0,3)
     PsiWhiteSpace(' ')(3,4)
     ElixirUnmatchedQualifiedNoArgumentsCallImpl(UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(4,26)
       ElixirUnmatchedUnqualifiedNoArgumentsCallImpl(UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL)(4,15)
