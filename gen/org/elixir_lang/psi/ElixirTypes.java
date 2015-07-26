@@ -319,7 +319,7 @@ public interface ElixirTypes {
   IElementType SIGIL_PROMOTER = new ElixirTokenType("Sigil Promoter ({, [, <, \", /, (, |, ')");
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType SIGNIFICANT_WHITE_SPACE = new ElixirTokenType("<significant-space>");
-  IElementType STAB_OPERATOR = new ElixirTokenType("STAB_OPERATOR");
+  IElementType STAB_OPERATOR = new ElixirTokenType("->");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
   IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("\"\"\"");
   IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_HEREDOC_TERMINATOR");
