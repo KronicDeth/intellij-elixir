@@ -2,7 +2,7 @@ Elixir File(0,8)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,8)
     ElixirLiteralCharListSigilHeredocImpl(LITERAL_CHAR_LIST_SIGIL_HEREDOC)(0,8)
       PsiElement(~)('~')(0,1)
-      PsiElement(LITERAL_CHAR_LIST_SIGIL_NAME)('C')(1,2)
+      PsiElement(C)('C')(1,2)
       PsiElement(Char List Sigil Heredoc Promoter (""", '''))(''''')(2,5)
       PsiErrorElement:EOL expected, got '''''(5,5)
         <empty list>

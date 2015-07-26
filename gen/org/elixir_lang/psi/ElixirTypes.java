@@ -286,7 +286,7 @@ public interface ElixirTypes {
   IElementType IN_MATCH_OPERATOR = new ElixirTokenType("<-, \\\\\\\\");
   IElementType IN_OPERATOR = new ElixirTokenType("in");
   IElementType KEYWORD_PAIR_COLON = new ElixirTokenType("Keyword Pair Colon (:)");
-  IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("LITERAL_CHAR_LIST_SIGIL_NAME");
+  IElementType LITERAL_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("C");
   IElementType LITERAL_REGEX_SIGIL_NAME = new ElixirTokenType("LITERAL_REGEX_SIGIL_NAME");
   IElementType LITERAL_SIGIL_NAME = new ElixirTokenType("LITERAL_SIGIL_NAME");
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("LITERAL_STRING_SIGIL_NAME");
