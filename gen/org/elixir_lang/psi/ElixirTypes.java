@@ -292,7 +292,7 @@ public interface ElixirTypes {
   IElementType LITERAL_STRING_SIGIL_NAME = new ElixirTokenType("S");
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("W");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
-  IElementType MATCH_OPERATOR = new ElixirTokenType("MATCH_OPERATOR");
+  IElementType MATCH_OPERATOR = new ElixirTokenType("=");
   IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("MULTIPLICATION_OPERATOR");
   IElementType NIL = new ElixirTokenType("nil");
   IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");

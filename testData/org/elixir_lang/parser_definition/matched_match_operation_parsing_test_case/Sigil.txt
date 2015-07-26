@@ -12,7 +12,7 @@ Elixir File(0,17)
         ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(8,8)
           <empty list>
     ElixirMatchInfixOperatorImpl(MATCH_INFIX_OPERATOR)(8,9)
-      PsiElement(MATCH_OPERATOR)('=')(8,9)
+      PsiElement(=)('=')(8,9)
     PsiWhiteSpace(' ')(9,10)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(10,17)
       ElixirInterpolatedStringSigilLineImpl(INTERPOLATED_STRING_SIGIL_LINE)(10,17)
