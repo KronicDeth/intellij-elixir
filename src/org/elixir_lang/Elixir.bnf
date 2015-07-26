@@ -114,7 +114,8 @@
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
     STAB_OPERATOR = "->"
-    STRING_HEREDOC_PROMOTER = "\"\"\""
+    STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
+    STRING_HEREDOC_TERMINATOR = "String Heredoc Terminator (\"\"\")"
     STRING_PROMOTER = "\""
     // TODO remove once containers are available for `{}` after alias for empty structs
     STRUCT_OPERATOR = "%"

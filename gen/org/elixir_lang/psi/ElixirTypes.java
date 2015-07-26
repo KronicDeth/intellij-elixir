@@ -321,8 +321,8 @@ public interface ElixirTypes {
   IElementType SIGNIFICANT_WHITE_SPACE = new ElixirTokenType("<significant-space>");
   IElementType STAB_OPERATOR = new ElixirTokenType("->");
   IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
-  IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("\"\"\"");
-  IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_HEREDOC_TERMINATOR");
+  IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("String Heredoc Promoter (\"\"\")");
+  IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("String Heredoc Terminator (\"\"\")");
   IElementType STRING_PROMOTER = new ElixirTokenType("\"");
   IElementType STRING_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("STRING_SIGIL_HEREDOC_PROMOTER");
   IElementType STRING_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("STRING_SIGIL_HEREDOC_TERMINATOR");
