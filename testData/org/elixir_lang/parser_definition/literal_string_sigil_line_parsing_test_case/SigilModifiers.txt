@@ -2,7 +2,7 @@ Elixir File(0,30)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,30)
     ElixirLiteralStringSigilLineImpl(LITERAL_STRING_SIGIL_LINE)(0,30)
       PsiElement(~)('~')(0,1)
-      PsiElement(LITERAL_STRING_SIGIL_NAME)('S')(1,2)
+      PsiElement(S)('S')(1,2)
       PsiElement(STRING_SIGIL_PROMOTER)('{')(2,3)
       ElixirLiteralStringBodyImpl(LITERAL_STRING_BODY)(3,3)
         <empty list>
