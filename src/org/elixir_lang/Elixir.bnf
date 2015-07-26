@@ -127,6 +127,7 @@
     STRUCT_OPERATOR = "%"
     TILDE = "~"
     TRUE = "true"
+    TUPLE_OPERATOR = "{}"
     TYPE_OPERATOR = "::"
     UNKNOWN_WHOLE_NUMBER_BASE = "regexp:A-Zac-z"
     VALID_BINARY_DIGITS = "regexp:[01]+"

@@ -332,7 +332,7 @@ public interface ElixirTypes {
   IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
-  IElementType TUPLE_OPERATOR = new ElixirTokenType("TUPLE_OPERATOR");
+  IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
   IElementType TWO_OPERATOR = new ElixirTokenType("TWO_OPERATOR");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
