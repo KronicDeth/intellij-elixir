@@ -101,6 +101,8 @@
     PIPE_OPERATOR = "|"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
     REGEX_HEREDOC_TERMINATOR = "Regex Heredoc Terminator (\"\"\", ''')"
+    REGEX_PROMOTER = "Regex Promoter ({, [, <, \", /, (, |, ')"
+    REGEX_TERMINATOR = "Regex Terminator ({, [, <, \", /, (, |, ')"
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"

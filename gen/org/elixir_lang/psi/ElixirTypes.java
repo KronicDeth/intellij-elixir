@@ -307,8 +307,8 @@ public interface ElixirTypes {
   IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("Regex Heredoc Promoter (\"\"\", ''')");
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("Regex Heredoc Terminator (\"\"\", ''')");
-  IElementType REGEX_PROMOTER = new ElixirTokenType("REGEX_PROMOTER");
-  IElementType REGEX_TERMINATOR = new ElixirTokenType("REGEX_TERMINATOR");
+  IElementType REGEX_PROMOTER = new ElixirTokenType("Regex Promoter ({, [, <, \", /, (, |, ')");
+  IElementType REGEX_TERMINATOR = new ElixirTokenType("Regex Terminator ({, [, <, \", /, (, |, ')");
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("RELATIONAL_OPERATOR");
   IElementType RESCUE = new ElixirTokenType("rescue");
   IElementType SEMICOLON = new ElixirTokenType(";");
