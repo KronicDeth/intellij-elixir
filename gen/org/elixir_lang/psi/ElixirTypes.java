@@ -326,8 +326,8 @@ public interface ElixirTypes {
   IElementType STRING_PROMOTER = new ElixirTokenType("String Promoter (\")");
   IElementType STRING_SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("String Sigil Heredoc Promoter (\"\"\", ''')");
   IElementType STRING_SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("String Sigil Heredoc Terminator (\"\"\", ''')");
-  IElementType STRING_SIGIL_PROMOTER = new ElixirTokenType("STRING_SIGIL_PROMOTER");
-  IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("STRING_SIGIL_TERMINATOR");
+  IElementType STRING_SIGIL_PROMOTER = new ElixirTokenType("String Sigil Promoter ({, [, <, \", /, (, |, ')");
+  IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("String Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType STRING_TERMINATOR = new ElixirTokenType("String Terminator (\")");
   IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
   IElementType TILDE = new ElixirTokenType("~");
