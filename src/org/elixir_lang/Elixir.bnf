@@ -78,6 +78,7 @@
     INVALID_HEXADECIMAL_DIGITS = "G-Z, g-z"
     INVALID_OCTAL_DIGITS = "A-Z, a-z, 8-9"
     INVALID_UNKNOWN_BASE_DIGITS = "A-Z, a-z, 0-9"
+    IN_MATCH_OPERATOR = "<-, \\\\"
     IN_OPERATOR = "in"
     MAP_OPERATOR = "%{}"
     NIL = "nil"
