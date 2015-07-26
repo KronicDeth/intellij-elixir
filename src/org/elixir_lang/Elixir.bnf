@@ -109,6 +109,7 @@
     SEMICOLON = ";"
     SIGIL_HEREDOC_PROMOTER = "Sigil Heredoc Promoter (\"\"\", ''')"
     SIGIL_HEREDOC_TERMINATOR = "Sigil Heredoc Terminator (\"\"\", ''')"
+    SIGIL_MODIFIER = "a-z"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
     STRING_HEREDOC_PROMOTER = "\"\"\""
     STRING_PROMOTER = "\""
