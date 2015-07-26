@@ -103,6 +103,7 @@
     REGEX_HEREDOC_TERMINATOR = "Regex Heredoc Terminator (\"\"\", ''')"
     REGEX_PROMOTER = "Regex Promoter ({, [, <, \", /, (, |, ')"
     REGEX_TERMINATOR = "Regex Terminator ({, [, <, \", /, (, |, ')"
+    RELATIONAL_OPERATOR = "<, <=, >=, >"
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
