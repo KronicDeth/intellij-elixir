@@ -333,7 +333,7 @@ public interface ElixirTypes {
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
-  IElementType TWO_OPERATOR = new ElixirTokenType("TWO_OPERATOR");
+  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, .., <>");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
   IElementType UNARY_OPERATOR = new ElixirTokenType("UNARY_OPERATOR");
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("UNKNOWN_WHOLE_NUMBER_BASE");
