@@ -1,7 +1,7 @@
 Elixir File(0,90)
   PsiComment(#)('# all invalid binary digits')(0,27)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(27,28)
-    PsiElement(EOL)('\n')(27,28)
+    PsiElement(\\n, \\r\\n)('\n')(27,28)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(28,90)
     ElixirBinaryWholeNumberImpl(BINARY_WHOLE_NUMBER)(28,90)
       PsiElement(0)('0')(28,29)

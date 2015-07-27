@@ -1,7 +1,7 @@
 Elixir File(0,111)
   PsiComment(#)('# mix of valid and invalid hexadecimal digits')(0,45)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(45,46)
-    PsiElement(EOL)('\n')(45,46)
+    PsiElement(\\n, \\r\\n)('\n')(45,46)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(46,111)
     ElixirHexadecimalWholeNumberImpl(HEXADECIMAL_WHOLE_NUMBER)(46,111)
       PsiElement(0)('0')(46,47)

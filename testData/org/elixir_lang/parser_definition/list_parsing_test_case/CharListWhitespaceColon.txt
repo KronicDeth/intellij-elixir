@@ -1,7 +1,7 @@
 Elixir File(0,52)
   PsiComment(#)('# `<char-list><space>:` is invalid')(0,34)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(34,35)
-    PsiElement(EOL)('\n')(34,35)
+    PsiElement(\\n, \\r\\n)('\n')(34,35)
   PsiElement([)('[')(35,36)
   PsiElement(Char List Promoter ('))(''')(36,37)
   PsiElement(Char List Fragment)('CharList')(37,45)

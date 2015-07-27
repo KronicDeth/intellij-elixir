@@ -80,7 +80,7 @@ Elixir File(0,67)
         PsiElement(SIGIL_FRAGMENT)('\n')(63,64)
         ElixirEscapedEOLImpl(ESCAPED_EOL)(64,66)
           PsiElement(\\)('\')(64,65)
-          PsiElement(EOL)('\n')(65,66)
+          PsiElement(\\n, \\r\\n)('\n')(65,66)
       PsiElement(Sigil Terminator ({, [, <, ", /, (, |, '))(''')(66,67)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(67,67)
         <empty list>

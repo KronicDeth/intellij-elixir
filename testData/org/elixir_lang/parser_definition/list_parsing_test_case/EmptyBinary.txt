@@ -1,7 +1,7 @@
 Elixir File(0,35)
   PsiComment(#)('# <four token operator>:')(0,24)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(24,25)
-    PsiElement(EOL)('\n')(24,25)
+    PsiElement(\\n, \\r\\n)('\n')(24,25)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(25,35)
     ElixirListImpl(LIST)(25,35)
       PsiElement([)('[')(25,26)

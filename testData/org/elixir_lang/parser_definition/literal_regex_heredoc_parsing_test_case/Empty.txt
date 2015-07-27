@@ -4,7 +4,7 @@ Elixir File(0,8)
       PsiElement(~)('~')(0,1)
       PsiElement(R)('R')(1,2)
       PsiElement(Regex Heredoc Promoter (""", '''))('"""')(2,5)
-      PsiErrorElement:EOL expected, got '"""'(5,5)
+      PsiErrorElement:'\\n, \\r\\n' expected, got '"""'(5,5)
         <empty list>
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(5,5)
         <empty list>

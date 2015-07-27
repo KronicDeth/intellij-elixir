@@ -1,7 +1,7 @@
 Elixir File(0,43)
   PsiComment(#)('# `alias <space> :` is invalid')(0,30)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(30,31)
-    PsiElement(EOL)('\n')(30,31)
+    PsiElement(\\n, \\r\\n)('\n')(30,31)
   PsiElement([)('[')(31,32)
   PsiElement(Alias)('Alias')(32,37)
   PsiWhiteSpace(' ')(37,38)

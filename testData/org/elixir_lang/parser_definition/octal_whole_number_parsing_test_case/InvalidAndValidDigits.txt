@@ -1,7 +1,7 @@
 Elixir File(0,105)
   PsiComment(#)('# mix of valid and invalid octal digits')(0,39)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(39,40)
-    PsiElement(EOL)('\n')(39,40)
+    PsiElement(\\n, \\r\\n)('\n')(39,40)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(40,105)
     ElixirOctalWholeNumberImpl(OCTAL_WHOLE_NUMBER)(40,105)
       PsiElement(0)('0')(40,41)

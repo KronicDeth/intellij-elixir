@@ -260,7 +260,7 @@ public interface ElixirTypes {
   IElementType DUAL_OPERATOR = new ElixirTokenType("+, -");
   IElementType ELSE = new ElixirTokenType("else");
   IElementType END = new ElixirTokenType("end");
-  IElementType EOL = new ElixirTokenType("EOL");
+  IElementType EOL = new ElixirTokenType("\\\\n, \\\\r\\\\n");
   IElementType ESCAPE = new ElixirTokenType("\\\\");
   IElementType ESCAPED_CHARACTER_TOKEN = new ElixirTokenType("\\\\<character>, \\\\x{<hexadecimal-digit>}, \\\\x<hexadecimal-digit>, \\\\\\\\n, \\\\\\\\r\\\\n");
   IElementType EXPONENT_MARK = new ElixirTokenType("E, e");

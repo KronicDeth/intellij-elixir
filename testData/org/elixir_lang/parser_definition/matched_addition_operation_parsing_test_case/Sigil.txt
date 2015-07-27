@@ -25,7 +25,7 @@ Elixir File(0,35)
         ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
           <empty list>
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(17,18)
-    PsiElement(EOL)('\n')(17,18)
+    PsiElement(\\n, \\r\\n)('\n')(17,18)
   ElixirUnmatchedAdditionOperationImpl(UNMATCHED_ADDITION_OPERATION)(18,35)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(18,25)
       ElixirInterpolatedStringSigilLineImpl(INTERPOLATED_STRING_SIGIL_LINE)(18,25)

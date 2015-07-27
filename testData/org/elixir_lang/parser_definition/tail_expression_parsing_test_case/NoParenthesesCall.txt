@@ -1,7 +1,7 @@
 Elixir File(0,70)
   PsiComment(#)('# no_parentheses(first, [key: value])')(0,37)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(37,38)
-    PsiElement(EOL)('\n')(37,38)
+    PsiElement(\\n, \\r\\n)('\n')(37,38)
   ElixirUnmatchedUnqualifiedNoParenthesesCallImpl(UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL)(38,70)
     PsiElement(identifier)('no_parentheses')(38,52)
     PsiWhiteSpace(' ')(52,53)
