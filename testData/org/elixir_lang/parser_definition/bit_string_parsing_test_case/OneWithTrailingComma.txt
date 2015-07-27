@@ -767,7 +767,7 @@ Elixir File(0,735)
           PsiElement(a-b, d-q, t-v, x-z)('x')(689,690)
           PsiElement(Sigil Promoter ({, [, <, ", /, (, |, '))('{')(690,691)
           ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(691,694)
-            PsiElement(SIGIL_FRAGMENT)('one')(691,694)
+            PsiElement(Sigil Fragment)('one')(691,694)
           PsiElement(Sigil Terminator ({, [, <, ", /, (, |, '))('}')(694,695)
           ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(695,695)
             <empty list>

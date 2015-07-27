@@ -5,7 +5,7 @@ Elixir File(0,17)
       PsiElement(A-B, D-Q, T-V, X-Z)('X')(1,2)
       PsiElement(Sigil Promoter ({, [, <, ", /, (, |, '))(''')(2,3)
       ElixirLiteralSigilBodyImpl(LITERAL_SIGIL_BODY)(3,16)
-        PsiElement(SIGIL_FRAGMENT)('{}[]<>"/()|\'')(3,16)
+        PsiElement(Sigil Fragment)('{}[]<>"/()|\'')(3,16)
       PsiElement(Sigil Terminator ({, [, <, ", /, (, |, '))(''')(16,17)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
         <empty list>

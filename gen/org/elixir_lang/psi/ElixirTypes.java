@@ -312,7 +312,7 @@ public interface ElixirTypes {
   IElementType RELATIONAL_OPERATOR = new ElixirTokenType("<, <=, >=, >");
   IElementType RESCUE = new ElixirTokenType("rescue");
   IElementType SEMICOLON = new ElixirTokenType(";");
-  IElementType SIGIL_FRAGMENT = new ElixirTokenType("SIGIL_FRAGMENT");
+  IElementType SIGIL_FRAGMENT = new ElixirTokenType("Sigil Fragment");
   IElementType SIGIL_HEREDOC_PROMOTER = new ElixirTokenType("Sigil Heredoc Promoter (\"\"\", ''')");
   IElementType SIGIL_HEREDOC_TERMINATOR = new ElixirTokenType("Sigil Heredoc Terminator (\"\"\", ''')");
   IElementType SIGIL_MODIFIER = new ElixirTokenType("a-z");

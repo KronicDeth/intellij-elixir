@@ -112,6 +112,7 @@
     RESCUE = "rescue"
     // TOO remove once SEMICOLON is used in endOfExpression rule
     SEMICOLON = ";"
+    SIGIL_FRAGMENT = "Sigil Fragment"
     SIGIL_HEREDOC_PROMOTER = "Sigil Heredoc Promoter (\"\"\", ''')"
     SIGIL_HEREDOC_TERMINATOR = "Sigil Heredoc Terminator (\"\"\", ''')"
     SIGIL_MODIFIER = "a-z"
