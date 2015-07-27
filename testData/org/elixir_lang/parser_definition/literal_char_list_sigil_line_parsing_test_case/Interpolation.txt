@@ -5,7 +5,7 @@ Elixir File(0,68)
       PsiElement(C)('C')(1,2)
       PsiElement(Char List Sigil Promoter ({, [, <, ", /, (, |, '))(''')(2,3)
       ElixirLiteralCharListBodyImpl(LITERAL_CHAR_LIST_BODY)(3,67)
-        PsiElement(CHAR_LIST_FRAGMENT)('\n  Outside Before #{\n            "Inside"\n  }\n  Outside After\n  ')(3,67)
+        PsiElement(Char List Fragment)('\n  Outside Before #{\n            "Inside"\n  }\n  Outside After\n  ')(3,67)
       PsiElement(Char List Sigil Terminator ({, [, <, ", /, (, |, '))(''')(67,68)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(68,68)
         <empty list>

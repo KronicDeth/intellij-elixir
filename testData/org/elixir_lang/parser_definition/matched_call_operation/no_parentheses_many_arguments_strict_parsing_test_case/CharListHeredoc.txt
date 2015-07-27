@@ -7,13 +7,13 @@ Elixir File(0,51)
         ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(4,4)
           <empty list>
         ElixirQuoteCharListBodyImpl(QUOTE_CHAR_LIST_BODY)(4,12)
-          PsiElement(CHAR_LIST_FRAGMENT)('CharList')(4,12)
+          PsiElement(Char List Fragment)('CharList')(4,12)
         PsiElement(EOL)('\n')(12,13)
       ElixirCharListHeredocLineImpl(CHAR_LIST_HEREDOC_LINE)(13,21)
         ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(13,13)
           <empty list>
         ElixirQuoteCharListBodyImpl(QUOTE_CHAR_LIST_BODY)(13,20)
-          PsiElement(CHAR_LIST_FRAGMENT)('Heredoc')(13,20)
+          PsiElement(Char List Fragment)('Heredoc')(13,20)
         PsiElement(EOL)('\n')(20,21)
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(21,21)
         <empty list>
