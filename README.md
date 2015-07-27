@@ -508,3 +508,4 @@ If you'd like to use a different donation mechanism (such as Patreon), please op
 I'd like to thank those who have donated to help support this project.
 
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
