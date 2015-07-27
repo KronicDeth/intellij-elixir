@@ -137,6 +137,8 @@
     VALID_HEXADECIMAL_DIGITS = "A-F, a-f, 0-9"
     VALID_OCTAL_DIGITS = "0-7"
     WHEN_OPERATOR = "when"
+    WORDS_HEREDOC_PROMOTER = "Words Heredoc Promoter (\"\"\", ''')"
+    WORDS_HEREDOC_TERMINATOR = "Words Heredoc Terminator (\"\"\", ''')"
   ]
 }
 

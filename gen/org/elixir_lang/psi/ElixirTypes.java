@@ -343,8 +343,8 @@ public interface ElixirTypes {
   IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("0-7");
   IElementType WHEN_OPERATOR = new ElixirTokenType("when");
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
-  IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("WORDS_HEREDOC_PROMOTER");
-  IElementType WORDS_HEREDOC_TERMINATOR = new ElixirTokenType("WORDS_HEREDOC_TERMINATOR");
+  IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("Words Heredoc Promoter (\"\"\", ''')");
+  IElementType WORDS_HEREDOC_TERMINATOR = new ElixirTokenType("Words Heredoc Terminator (\"\"\", ''')");
   IElementType WORDS_PROMOTER = new ElixirTokenType("WORDS_PROMOTER");
   IElementType WORDS_TERMINATOR = new ElixirTokenType("WORDS_TERMINATOR");
 
