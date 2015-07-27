@@ -50,7 +50,7 @@
     COMMA = ","
     COMMENT = "#"
     COMPARISON_OPERATOR = "!==, ===, !=, ==, =~"
-    DECIMAL_MARK = "."
+    DECIMAL_MARK = "Decimal Mark (.)"
     DECIMAL_SEPARATOR = "_"
     DO = "do"
     DOT_OPERATOR = "."

@@ -253,7 +253,7 @@ public interface ElixirTypes {
   IElementType COMMA = new ElixirTokenType(",");
   IElementType COMMENT = new ElixirTokenType("#");
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("!==, ===, !=, ==, =~");
-  IElementType DECIMAL_MARK = new ElixirTokenType("DECIMAL_MARK");
+  IElementType DECIMAL_MARK = new ElixirTokenType("Decimal Mark (.)");
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
