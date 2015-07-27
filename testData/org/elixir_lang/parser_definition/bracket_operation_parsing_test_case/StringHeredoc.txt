@@ -8,7 +8,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(4,4)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(4,7)
-            PsiElement(STRING_FRAGMENT)('One')(4,7)
+            PsiElement(String Fragment)('One')(4,7)
           PsiElement(\\n, \\r\\n)('\n')(7,8)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(8,8)
           <empty list>
@@ -35,7 +35,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(28,28)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(28,31)
-            PsiElement(STRING_FRAGMENT)('One')(28,31)
+            PsiElement(String Fragment)('One')(28,31)
           PsiElement(\\n, \\r\\n)('\n')(31,32)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(32,32)
           <empty list>
@@ -63,7 +63,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(53,53)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(53,56)
-            PsiElement(STRING_FRAGMENT)('One')(53,56)
+            PsiElement(String Fragment)('One')(53,56)
           PsiElement(\\n, \\r\\n)('\n')(56,57)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(57,57)
           <empty list>
@@ -85,7 +85,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(69,69)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(69,72)
-            PsiElement(STRING_FRAGMENT)('One')(69,72)
+            PsiElement(String Fragment)('One')(69,72)
           PsiElement(\\n, \\r\\n)('\n')(72,73)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(73,73)
           <empty list>
@@ -108,7 +108,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(86,86)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(86,89)
-            PsiElement(STRING_FRAGMENT)('One')(86,89)
+            PsiElement(String Fragment)('One')(86,89)
           PsiElement(\\n, \\r\\n)('\n')(89,90)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(90,90)
           <empty list>
@@ -129,7 +129,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(118,118)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(118,121)
-            PsiElement(STRING_FRAGMENT)('One')(118,121)
+            PsiElement(String Fragment)('One')(118,121)
           PsiElement(\\n, \\r\\n)('\n')(121,122)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(122,122)
           <empty list>
@@ -151,7 +151,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(151,151)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(151,154)
-            PsiElement(STRING_FRAGMENT)('One')(151,154)
+            PsiElement(String Fragment)('One')(151,154)
           PsiElement(\\n, \\r\\n)('\n')(154,155)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(155,155)
           <empty list>
@@ -173,7 +173,7 @@ Elixir File(0,213)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(184,184)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(184,187)
-            PsiElement(STRING_FRAGMENT)('One')(184,187)
+            PsiElement(String Fragment)('One')(184,187)
           PsiElement(\\n, \\r\\n)('\n')(187,188)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(188,188)
           <empty list>

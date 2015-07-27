@@ -8,13 +8,13 @@ Elixir File(0,28)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(4,4)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(4,10)
-            PsiElement(STRING_FRAGMENT)('String')(4,10)
+            PsiElement(String Fragment)('String')(4,10)
           PsiElement(\\n, \\r\\n)('\n')(10,11)
         ElixirStringHeredocLineImpl(STRING_HEREDOC_LINE)(11,19)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(11,11)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(11,18)
-            PsiElement(STRING_FRAGMENT)('Heredoc')(11,18)
+            PsiElement(String Fragment)('Heredoc')(11,18)
           PsiElement(\\n, \\r\\n)('\n')(18,19)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(19,19)
           <empty list>

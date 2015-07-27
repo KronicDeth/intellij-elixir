@@ -28,7 +28,7 @@ Elixir File(0,35)
           ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(22,22)
             <empty list>
           ElixirQuoteStringBodyImpl(QUOTE_STRING_BODY)(22,25)
-            PsiElement(STRING_FRAGMENT)('One')(22,25)
+            PsiElement(String Fragment)('One')(22,25)
           PsiElement(\\n, \\r\\n)('\n')(25,26)
         ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(26,26)
           <empty list>

@@ -20,7 +20,7 @@ Elixir File(0,17)
         PsiElement(s)('s')(11,12)
         PsiElement(String Sigil Promoter ({, [, <, ", /, (, |, '))('{')(12,13)
         ElixirInterpolatedStringBodyImpl(INTERPOLATED_STRING_BODY)(13,16)
-          PsiElement(STRING_FRAGMENT)('two')(13,16)
+          PsiElement(String Fragment)('two')(13,16)
         PsiElement(String Sigil Terminator ({, [, <, ", /, (, |, '))('}')(16,17)
         ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
           <empty list>

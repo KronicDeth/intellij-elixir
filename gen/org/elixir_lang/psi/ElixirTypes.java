@@ -320,7 +320,7 @@ public interface ElixirTypes {
   IElementType SIGIL_TERMINATOR = new ElixirTokenType("Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType SIGNIFICANT_WHITE_SPACE = new ElixirTokenType("<significant-space>");
   IElementType STAB_OPERATOR = new ElixirTokenType("->");
-  IElementType STRING_FRAGMENT = new ElixirTokenType("STRING_FRAGMENT");
+  IElementType STRING_FRAGMENT = new ElixirTokenType("String Fragment");
   IElementType STRING_HEREDOC_PROMOTER = new ElixirTokenType("String Heredoc Promoter (\"\"\")");
   IElementType STRING_HEREDOC_TERMINATOR = new ElixirTokenType("String Heredoc Terminator (\"\"\")");
   IElementType STRING_PROMOTER = new ElixirTokenType("String Promoter (\")");

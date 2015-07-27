@@ -120,6 +120,7 @@
     SIGIL_TERMINATOR = "Sigil Terminator ({, [, <, \", /, (, |, ')"
     SIGNIFICANT_WHITE_SPACE = "<significant-space>";
     STAB_OPERATOR = "->"
+    STRING_FRAGMENT = "String Fragment"
     STRING_HEREDOC_PROMOTER = "String Heredoc Promoter (\"\"\")"
     STRING_HEREDOC_TERMINATOR = "String Heredoc Terminator (\"\"\")"
     STRING_PROMOTER = "String Promoter (\")"

@@ -5,7 +5,7 @@ Elixir File(0,67)
       PsiElement(S)('S')(1,2)
       PsiElement(String Sigil Promoter ({, [, <, ", /, (, |, '))(''')(2,3)
       ElixirLiteralStringBodyImpl(LITERAL_STRING_BODY)(3,66)
-        PsiElement(STRING_FRAGMENT)('\n\'\n\#{}\n\"\n\0\n\1\n\a\n\b\n\d\n\e\n\f\n\b\n\r\n\s\n\v\n\x12\n\x{100000}\n\\n')(3,66)
+        PsiElement(String Fragment)('\n\'\n\#{}\n\"\n\0\n\1\n\a\n\b\n\d\n\e\n\f\n\b\n\r\n\s\n\v\n\x12\n\x{100000}\n\\n')(3,66)
       PsiElement(String Sigil Terminator ({, [, <, ", /, (, |, '))(''')(66,67)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(67,67)
         <empty list>
