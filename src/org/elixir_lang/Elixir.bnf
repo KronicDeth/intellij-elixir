@@ -139,6 +139,8 @@
     WHEN_OPERATOR = "when"
     WORDS_HEREDOC_PROMOTER = "Words Heredoc Promoter (\"\"\", ''')"
     WORDS_HEREDOC_TERMINATOR = "Words Heredoc Terminator (\"\"\", ''')"
+    WORDS_PROMOTER = "Words Promoter ({, [, <, \", /, (, |, ')"
+    WORDS_TERMINATOR = "Words Terminator ({, [, <, \", /, (, |, ')"
   ]
 }
 

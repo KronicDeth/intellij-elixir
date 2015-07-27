@@ -345,8 +345,8 @@ public interface ElixirTypes {
   IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("Words Heredoc Promoter (\"\"\", ''')");
   IElementType WORDS_HEREDOC_TERMINATOR = new ElixirTokenType("Words Heredoc Terminator (\"\"\", ''')");
-  IElementType WORDS_PROMOTER = new ElixirTokenType("WORDS_PROMOTER");
-  IElementType WORDS_TERMINATOR = new ElixirTokenType("WORDS_TERMINATOR");
+  IElementType WORDS_PROMOTER = new ElixirTokenType("Words Promoter ({, [, <, \", /, (, |, ')");
+  IElementType WORDS_TERMINATOR = new ElixirTokenType("Words Terminator ({, [, <, \", /, (, |, ')");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
