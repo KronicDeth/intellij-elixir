@@ -304,7 +304,7 @@ public interface ElixirTypes {
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
   IElementType OR_OPERATOR = new ElixirTokenType("|||, `or`, ||");
   IElementType PIPE_OPERATOR = new ElixirTokenType("|");
-  IElementType REGEX_FRAGMENT = new ElixirTokenType("REGEX_FRAGMENT");
+  IElementType REGEX_FRAGMENT = new ElixirTokenType("Regex Fragment");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("Regex Heredoc Promoter (\"\"\", ''')");
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("Regex Heredoc Terminator (\"\"\", ''')");
   IElementType REGEX_PROMOTER = new ElixirTokenType("Regex Promoter ({, [, <, \", /, (, |, ')");

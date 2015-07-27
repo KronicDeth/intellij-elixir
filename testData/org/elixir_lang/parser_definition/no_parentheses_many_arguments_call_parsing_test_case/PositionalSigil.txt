@@ -12,7 +12,7 @@ Elixir File(0,60)
                 PsiElement(r)('r')(12,13)
                 PsiElement(Regex Promoter ({, [, <, ", /, (, |, '))('{')(13,14)
                 ElixirInterpolatedRegexBodyImpl(INTERPOLATED_REGEX_BODY)(14,19)
-                  PsiElement(REGEX_FRAGMENT)('sigil')(14,19)
+                  PsiElement(Regex Fragment)('sigil')(14,19)
                 PsiElement(Regex Terminator ({, [, <, ", /, (, |, '))('}')(19,20)
                 ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(20,20)
                   <empty list>

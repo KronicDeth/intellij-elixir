@@ -5,7 +5,7 @@ Elixir File(0,17)
       PsiElement(R)('R')(1,2)
       PsiElement(Regex Promoter ({, [, <, ", /, (, |, '))('[')(2,3)
       ElixirLiteralRegexBodyImpl(LITERAL_REGEX_BODY)(3,16)
-        PsiElement(REGEX_FRAGMENT)('{}[\]<>"/()|'')(3,16)
+        PsiElement(Regex Fragment)('{}[\]<>"/()|'')(3,16)
       PsiElement(Regex Terminator ({, [, <, ", /, (, |, '))(']')(16,17)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
         <empty list>

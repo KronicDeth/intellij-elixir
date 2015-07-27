@@ -129,7 +129,7 @@ Elixir File(0,403)
             PsiElement(r)('r')(136,137)
             PsiElement(Regex Promoter ({, [, <, ", /, (, |, '))('(')(137,138)
             ElixirInterpolatedRegexBodyImpl(INTERPOLATED_REGEX_BODY)(138,140)
-              PsiElement(REGEX_FRAGMENT)('.*')(138,140)
+              PsiElement(Regex Fragment)('.*')(138,140)
             PsiElement(Regex Terminator ({, [, <, ", /, (, |, '))(')')(140,141)
             ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(141,141)
               <empty list>
