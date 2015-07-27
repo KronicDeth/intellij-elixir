@@ -136,6 +136,7 @@
     VALID_DECIMAL_DIGITS = "0-9"
     VALID_HEXADECIMAL_DIGITS = "A-F, a-f, 0-9"
     VALID_OCTAL_DIGITS = "0-7"
+    WHEN_OPERATOR = "when"
   ]
 }
 
