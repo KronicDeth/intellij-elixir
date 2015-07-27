@@ -9,21 +9,6 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <strong>
-        The parser is incomplete until
-        <a href="https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0">
-          v1.0.0
-        </a>.  If you see an odd error from valid Elixir code, check if it's a
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug">
-          known bug
-        </a> that is planned to be fixed for v1.0.0.  If you don't see your error, please
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/new">
-          open a new issue
-        </a>. Please subscribe to notifications on
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/6">
-          Issue #6
-        </a> if you want to be notified when the parser is complete.
-      </strong>
       <h1>Next Release</h1>
       <ul>
         <li>
