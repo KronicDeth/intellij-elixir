@@ -23,6 +23,7 @@
     AND_OPERATOR = "&&&, `and`, &&"
     ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
     ASSOCIATION_OPERATOR = "=>"
+    ATOM_FRAGMENT = "A-Z, a-z, _, @, 0-9. ?, !"
     AT_OPERATOR = "@"
     BASE_WHOLE_NUMBER_PREFIX = "0"
     BINARY_WHOLE_NUMBER_BASE = "b"

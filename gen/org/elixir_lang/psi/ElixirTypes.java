@@ -227,7 +227,7 @@ public interface ElixirTypes {
   IElementType AND_OPERATOR = new ElixirTokenType("&&&, `and`, &&");
   IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("=>");
-  IElementType ATOM_FRAGMENT = new ElixirTokenType("ATOM_FRAGMENT");
+  IElementType ATOM_FRAGMENT = new ElixirTokenType("A-Z, a-z, _, @, 0-9. ?, !");
   IElementType AT_OPERATOR = new ElixirTokenType("@");
   IElementType BASE_WHOLE_NUMBER_PREFIX = new ElixirTokenType("0");
   IElementType BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("b");
