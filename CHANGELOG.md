@@ -20,6 +20,7 @@
   * [#171](https://github.com/KronicDeth/intellij-elixir/pull/171) - Unary expressions inside parentheses are no longer marked `ambiguous_op: nil` - [KronicDeth](https://github.com/KronicDeth)
   * [#173](https://github.com/KronicDeth/intellij-elixir/pull/173) - Differentiate between `Qualifier.'relative'()` vs `Qualifier.'relative' ()` and `Qualifier."relative"()` vs `Qualifier."relative" ()` - [KronicDeth](https://github.com/KronicDeth)
   * [#176](https://github.com/KronicDeth/intellij-elixir/pull/176) - Fix link to Elixir website in README - [shalecraig](https://github.com/shalecraig)
+  * [#178](https://github.com/KronicDeth/intellij-elixir/pull/178) - All tokens have human-readable names and/or expected characters for better error messages - [KronicDeth](https://github.com/KronicDeth)
 * Incompatible Fixes
   * [#162](https://github.com/KronicDeth/intellij-elixir/pull/162) - New Elixir File has moved to the last item in the New File menu to preserve `CTRL+N ENTER` keyboard shortcut for `New > File` - [KronicDeth](https://github.com/KronicDeth)
 

@@ -59,6 +59,7 @@
               <code>Qualifier."relative"()</code> vs <code>Qualifier."relative" ()</code>
             </li>
             <li>Fix link to Elixir website in README</li>
+            <li>All tokens have human-readable names and/or expected characters for better error messages</li>
           </ul>
           <p>Incompatible Changes</p>
           <ul>
