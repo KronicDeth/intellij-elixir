@@ -501,3 +501,4 @@ I'd like to thank those who have donated to help support this project.
 
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
+* Gerard de Brieder ([@smeelvil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
