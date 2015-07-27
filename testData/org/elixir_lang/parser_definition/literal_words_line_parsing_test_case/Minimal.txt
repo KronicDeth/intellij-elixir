@@ -2,10 +2,10 @@ Elixir File(0,4)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
     ElixirLiteralWordsLineImpl(LITERAL_WORDS_LINE)(0,4)
       PsiElement(~)('~')(0,1)
-      PsiElement(LITERAL_WORDS_SIGIL_NAME)('W')(1,2)
-      PsiElement(WORDS_PROMOTER)('{')(2,3)
+      PsiElement(W)('W')(1,2)
+      PsiElement(Words Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
       ElixirLiteralWordsBodyImpl(LITERAL_WORDS_BODY)(3,3)
         <empty list>
-      PsiElement(WORDS_TERMINATOR)('}')(3,4)
+      PsiElement(Words Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>
