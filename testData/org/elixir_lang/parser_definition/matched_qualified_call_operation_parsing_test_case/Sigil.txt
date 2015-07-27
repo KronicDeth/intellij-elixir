@@ -148,7 +148,7 @@ Elixir File(0,403)
                 PsiElement(w)('w')(151,152)
                 PsiElement(Words Promoter ({, [, <, ", /, (, |, '))(''')(152,153)
                 ElixirInterpolatedWordsBodyImpl(INTERPOLATED_WORDS_BODY)(153,160)
-                  PsiElement(WORDS_FRAGMENT)('one two')(153,160)
+                  PsiElement(Words Fragment)('one two')(153,160)
                 PsiElement(Words Terminator ({, [, <, ", /, (, |, '))(''')(160,161)
                 ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(161,161)
                   <empty list>

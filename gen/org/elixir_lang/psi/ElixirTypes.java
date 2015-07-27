@@ -342,7 +342,7 @@ public interface ElixirTypes {
   IElementType VALID_HEXADECIMAL_DIGITS = new ElixirTokenType("A-F, a-f, 0-9");
   IElementType VALID_OCTAL_DIGITS = new ElixirTokenType("0-7");
   IElementType WHEN_OPERATOR = new ElixirTokenType("when");
-  IElementType WORDS_FRAGMENT = new ElixirTokenType("WORDS_FRAGMENT");
+  IElementType WORDS_FRAGMENT = new ElixirTokenType("Words Fragment");
   IElementType WORDS_HEREDOC_PROMOTER = new ElixirTokenType("Words Heredoc Promoter (\"\"\", ''')");
   IElementType WORDS_HEREDOC_TERMINATOR = new ElixirTokenType("Words Heredoc Terminator (\"\"\", ''')");
   IElementType WORDS_PROMOTER = new ElixirTokenType("Words Promoter ({, [, <, \", /, (, |, ')");

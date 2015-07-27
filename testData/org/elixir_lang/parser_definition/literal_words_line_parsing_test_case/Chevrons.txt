@@ -5,7 +5,7 @@ Elixir File(0,17)
       PsiElement(W)('W')(1,2)
       PsiElement(Words Promoter ({, [, <, ", /, (, |, '))('<')(2,3)
       ElixirLiteralWordsBodyImpl(LITERAL_WORDS_BODY)(3,16)
-        PsiElement(WORDS_FRAGMENT)('{}[]<\>"/()|'')(3,16)
+        PsiElement(Words Fragment)('{}[]<\>"/()|'')(3,16)
       PsiElement(Words Terminator ({, [, <, ", /, (, |, '))('>')(16,17)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(17,17)
         <empty list>
