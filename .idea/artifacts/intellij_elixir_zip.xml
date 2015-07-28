@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
-  <artifact build-on-make="true" name="elixir.zip">
+  <artifact build-on-make="true" name="intellij-elixir.zip">
     <output-path>$PROJECT_DIR$/bin</output-path>
     <root id="root">
-      <element id="archive" name="Elixir.zip">
-        <element id="directory" name="Elixir">
+      <element id="archive" name="intellij-elixir.zip">
+        <element id="directory" name="intellij-elixir">
           <element id="directory" name="lib">
             <element id="artifact" artifact-name="elixir.jar" />
             <element id="directory" name="jps">
