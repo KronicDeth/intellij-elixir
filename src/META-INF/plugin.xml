@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>0.4.0-prerelease</version>
+  <version>1.0.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,27 +9,13 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <strong>
-        The parser is incomplete until
-        <a href="https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0">
-          v1.0.0
-        </a>.  If you see an odd error from valid Elixir code, check if it's a
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug">
-          known bug
-        </a> that is planned to be fixed for v1.0.0.  If you don't see your error, please
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/new">
-          open a new issue
-        </a>. Please subscribe to notifications on
-        <a href="https://github.com/KronicDeth/intellij-elixir/issues/6">
-          Issue #6
-        </a> if you want to be notified when the parser is complete.
-      </strong>
-      <h1>Next Release</h1>
+      <h1>v1.0.0</h1>
       <ul>
         <li>
           <p>Enhancements</p>
           <ul>
             <li>Update ant build on travis-ci.org to use IDEA 14.1.4 (from 14.0.2)</li>
+            <li>Parser is verified to quote the same as native Elixir</li>
           </ul>
         </li>
         <li>
@@ -51,6 +37,14 @@
             </li>
             <li><code>unquote_splicing</code> is properly wrapped in <code>__block__</code> when in stab bodies</li>
             <li>Check for matching terminator in heredocs when determining white space type at beginning of line</li>
+            <li>Allow &lt;space&gt;+&lt;EOL&gt; to count as addition</li>
+            <li>Unary expressions inside parentheses are no longer marked <code>ambiguous_op: nil</code></li>
+            <li>
+              Differentiate between <code>Qualifier.'relative'()</code> vs <code>Qualifier.'relative' ()</code> and
+              <code>Qualifier."relative"()</code> vs <code>Qualifier."relative" ()</code>
+            </li>
+            <li>Fix link to Elixir website in README</li>
+            <li>All tokens have human-readable names and/or expected characters for better error messages</li>
           </ul>
           <p>Incompatible Changes</p>
           <ul>

@@ -910,6 +910,20 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
    */
   {COMMENT}                                         { return ElixirTypes.COMMENT; }
 
+  /* Must be before {QUOTE_PROMOTER} as {QUOTE_PROMOTER} is a prefix of {QUOTE_HEREDOC_PROMOTER} */
+  {QUOTE_HEREDOC_PROMOTER}                          { /* Does NOT return to CALL_MAYBE because heredocs aren't valid
+                                                         relative identifiers.  This clauses is only here to prevent a
+                                                         prefix match on {QUOTE_PROMOTER}. */
+                                                      org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                                      handleInState(stackFrame.getLastLexicalState()); }
+  {QUOTE_PROMOTER}                                  { /* return to CALL_MAYBE so that OPENING_BRACKET or
+                                                         OPENING_PARENTHESES after quote can be parsed
+                                                         with CALL so parser doesn't think call is no parentheses with
+                                                         parenthetical or list argument. */
+                                                      yybegin(CALL_MAYBE);
+                                                      startQuote(yytext());
+                                                      return promoterType(); }
+
   .                                                 { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState()); }
 }

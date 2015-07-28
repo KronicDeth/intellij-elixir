@@ -2,10 +2,10 @@ Elixir File(0,4)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
     ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(0,4)
       PsiElement(~)('~')(0,1)
-      PsiElement(INTERPOLATING_SIGIL_NAME)('x')(1,2)
-      PsiElement(SIGIL_PROMOTER)('{')(2,3)
+      PsiElement(a-b, d-q, t-v, x-z)('x')(1,2)
+      PsiElement(Sigil Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
       ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(3,3)
         <empty list>
-      PsiElement(SIGIL_TERMINATOR)('}')(3,4)
+      PsiElement(Sigil Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>

@@ -2,10 +2,10 @@ Elixir File(0,4)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
     ElixirInterpolatedRegexLineImpl(INTERPOLATED_REGEX_LINE)(0,4)
       PsiElement(~)('~')(0,1)
-      PsiElement(INTERPOLATING_REGEX_SIGIL_NAME)('r')(1,2)
-      PsiElement(REGEX_PROMOTER)('{')(2,3)
+      PsiElement(r)('r')(1,2)
+      PsiElement(Regex Promoter ({, [, <, ", /, (, |, '))('{')(2,3)
       ElixirInterpolatedRegexBodyImpl(INTERPOLATED_REGEX_BODY)(3,3)
         <empty list>
-      PsiElement(REGEX_TERMINATOR)('}')(3,4)
+      PsiElement(Regex Terminator ({, [, <, ", /, (, |, '))('}')(3,4)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(4,4)
         <empty list>

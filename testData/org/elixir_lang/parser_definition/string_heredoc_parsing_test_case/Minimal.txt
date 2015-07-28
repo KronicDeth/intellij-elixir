@@ -1,8 +1,8 @@
 Elixir File(0,7)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,7)
     ElixirStringHeredocImpl(STRING_HEREDOC)(0,7)
-      PsiElement(""")('"""')(0,3)
-      PsiElement(EOL)('\n')(3,4)
+      PsiElement(String Heredoc Promoter ("""))('"""')(0,3)
+      PsiElement(\\n, \\r\\n)('\n')(3,4)
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(4,4)
         <empty list>
-      PsiElement(STRING_HEREDOC_TERMINATOR)('"""')(4,7)
+      PsiElement(String Heredoc Terminator ("""))('"""')(4,7)

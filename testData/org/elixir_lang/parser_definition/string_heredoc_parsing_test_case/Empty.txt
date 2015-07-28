@@ -1,9 +1,9 @@
 Elixir File(0,6)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,6)
     ElixirStringHeredocImpl(STRING_HEREDOC)(0,6)
-      PsiElement(""")('"""')(0,3)
-      PsiErrorElement:EOL expected, got '"""'(3,3)
+      PsiElement(String Heredoc Promoter ("""))('"""')(0,3)
+      PsiErrorElement:'\\n, \\r\\n' expected, got '"""'(3,3)
         <empty list>
       ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(3,3)
         <empty list>
-      PsiElement(STRING_HEREDOC_TERMINATOR)('"""')(3,6)
+      PsiElement(String Heredoc Terminator ("""))('"""')(3,6)

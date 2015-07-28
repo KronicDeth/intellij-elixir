@@ -1,5 +1,11 @@
 # Upgrading
 
+## v1.0.0
+
+New Elixir File has moved to the last item in the New File menu to preserve `CTRL+N ENTER` keyboard shortcut for
+`New > File`, so if you got used to using `CTRL+N ENTER` for New Elixir File you'll have to learn the new position at
+the bottom of the menu.
+
 ## v0.3.1
 
 **NOTE: The Project Structure Detector is just bookkeeping and visual now.  No other features currently take advantage

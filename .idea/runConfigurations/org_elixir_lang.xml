@@ -16,7 +16,9 @@
     <option name="TEST_SEARCH_SCOPE">
       <value defaultName="moduleWithDependencies" />
     </option>
-    <envs />
+    <envs>
+      <env name="ELIXIR_LANG_ELIXIR_PATH" value="$PROJECT_DIR$/../../elixir-lang/elixir" />
+    </envs>
     <patterns />
     <RunnerSettings RunnerId="Debug">
       <option name="DEBUG_PORT" value="" />

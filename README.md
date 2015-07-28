@@ -2,19 +2,11 @@
 
 [![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
 
-This is a plugin that adds support for [Elixir](http://http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
+This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
 ([0xDBE](http://www.jetbrains.com/dbe/), [AppCode](http://www.jetbrains.com/objc/),
 [IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
 [PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
 [WebStorm](http://www.jetbrains.com/webstorm/))
-
-**The parser is incomplete until [v1.0.0](https://github.com/KronicDeth/intellij-elixir/milestones/v1.0.0).  If you see
-an odd error from valid Elixir code, check if it's a
-[known bug](https://github.com/KronicDeth/intellij-elixir/issues?q=is%3Aopen+is%3Aissue+milestone%3Av1.0.0+label%3Abug)
-that is planned to be fixed for v1.0.0.  If you don't see your error, please
-[open a new issue](https://github.com/KronicDeth/intellij-elixir/issues/new). Please subscribe to notifications on
-[Issue #6](https://github.com/KronicDeth/intellij-elixir/issues/6) if you want to be notified when the parser is
-complete.**
 
 ## Features
 
@@ -508,3 +500,5 @@ If you'd like to use a different donation mechanism (such as Patreon), please op
 I'd like to thank those who have donated to help support this project.
 
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
+* Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
