@@ -38,7 +38,7 @@ public class ElixirFileType extends LanguageFileType {
     @NotNull
     @Override
     public Icon getIcon() {
-        return ElixirIcon.FILE;
+        return ElixirIcons.FILE;
     }
 
     public static class ElixirScriptFileType extends ElixirFileType{
