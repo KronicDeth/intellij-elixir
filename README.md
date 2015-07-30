@@ -137,34 +137,135 @@ Module paths list the output directories when compiling code in the module.  The
 Module dependencies are currently just the SDK and the sources for the module.  Dependencies in `deps` are not
 automatically detected at this time.
 
-### New Elixir Module
-
-#### Unqualified
+### New Elixir File
 
 1. Right-click a directory (such as `lib` or `test` in the standard `mix new` layout)
 2. Select New > Elixir File.
-3. Enter an unqualified Module name, such as `MyModule`.
+   ![New > Elixir File](/screenshots/features/new/Elixir%20File.png?raw=true "New Elixir File")
+3. Enter an Alias for the Module name, such as `MyModule` or `MyNamespace.MyModule`.
+4. Select a Kind of Elixir File to use a different template.
+   ![New > Elixir File > Kind](/screenshots/features/new/elixir_file/Kind.png?raw=true "New Elixir File Kind")
 
-An underscored file (`lib/my_module.ex`) with the given module name will be created:
+#### Empty module
+
+An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
+name with be created:
 
 ```elixir
-defmodule MyModule do
-
+defmodule MyNamespace.MyModule do
+  @moduledoc false
+  
 end
 ```
 
-#### Qualified
+#### Elixir Application
 
-1. Right-click a directory (such as `lib` or `test` in the standard `mix new` layout).
-2. Select New > Elixir File.
-3. Enter a qualified Module name, such as `MyNamespace.MyModule`.
-
-An underscored file will be created in an underscored directory (`lib/my_namespace/my_module.ex`) with the given module
-name will be created:
+An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
+name with be created. It will have a `start/2` function that calls `MyNamespace.MyModule.Supervisor.start_link/0`.
 
 ```elixir
-defmodule MyNamspace.MyModule do
+defmodule MyNamespace.MyModule do
+  @moduledoc false
+  
+  use Application
 
+  def start(_type, _args) do
+    MyNamespace.MyModule.Supervisor.start_link()
+  end
+end
+```
+
+#### Elixir Supervisor
+
+An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
+name with be created. It will have a `start_link/1` function that calls `Supervisor.start_link/0` and `init/1` that sets
+up the child specs.  It assumes a `MyWorker` child that should be supervised `:one_for_one`.
+
+```elixir
+defmodule MyNamespace.MyModule.Supervisor do
+  @moduledoc false
+  
+  use Supervisor
+
+  def start_link(arg) do
+    Supervisor.start_link(__MODULE__, arg)
+  end
+
+  def init(arg) do
+    children = [
+      worker(MyWorker, [arg], restart: :temporary)
+    ]
+
+    supervise(children, strategy: :one_for_one)
+  end
+end
+```
+
+#### Elixir GenServer
+
+An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
+name with be created. It will have a `start_link/2` function that calls `GenServer.start_link/3` and the minimal
+callback implementations for `init/1`, `handle_call/3`, and `handle_cast/2`.
+
+The Elixir `use GenServer` supplies these callbacks, so this template is for when you want to change the callbacks, but
+would like the stubs to get started without having to look them up in the documentation.
+
+```elixir
+defmodule MyNamespace.MyModule do
+  @moduledoc false
+  
+  use GenServer
+
+  def start_link(state, opts) do
+    GenServer.start_link(__MODULE__, state, opts)
+  end
+
+  def init(_opts) do
+    {:ok, %{}}
+  end
+
+  def handle_call(_msg, _from, state) do
+    {:reply, :ok, state}
+  end
+
+  def handle_cast(_msg, state) do
+    {:noreply, state}
+  end
+end
+```
+
+### Elixir GenEvent
+
+An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
+name with be created.  The minimal callback implementations for `init/1`, `handle_event/2`, and `handle_call/2`,
+`handle_info/2`.
+
+The Elixir `use GenEvent` supplies these callbacks, so this template is for when you want to change the callbacks, but
+would like the stubs to get started without having to look them up in the documentation.
+
+```elixir
+defmodule MyNamespace.MyModule do
+  @moduledoc false
+  
+  use GenEvent
+
+  # Callbacks
+
+  def init(_opts) do
+    {:ok, %{}}
+  end
+
+  def handle_event(_msg, state) do
+    {:ok, state}
+  end
+
+  def handle_call(_msg, state) do
+    {:ok, :ok, state}
+  end
+
+  def handle_info(_msg, state) do
+    {:ok, state}
+  end
 end
 ```
 
