@@ -67,6 +67,31 @@ If you've already created a (non-`mix`) project, you can load it as an Elixir pr
 14. Click Finish on the framework page.  (*No framework detection is implemented yet for Elixir.*)
 15. Choose whether to open in a New Window or in This Window.
 
+##### Import project from external model
+If you've already created a `mix` project, you can load it as an Elixir project into the plugin.
+
+1. File > New > Project From Existing Sources...
+2. Select the root directory of your project.
+3. Select "Import project from external model"
+4. Select Mix
+   ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project"]
+5. Click Next
+6. The "Mix project root" will be filled in with the selected directory.
+7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
+8. Ensure the correct "Mix Path" is detected
+9. Ensure the "Mix Version" is as expected.  The number in parentheses should match the Elixir version.
+10. Click Next
+11. All directories with `mix.exs` files will be selected as "Mix projects to import".  To import just the main project and not its dependencies, click Unselect All.
+12. Check the box next to the project root to use only its `mix.exs`.  (It will likely be the first checkbox at the top.)
+13. Click Next
+14. Select a Project SDK directory by clicking Configure.
+15. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+    homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
+    about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+16. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+17. Click Finish after you select SDK name from the Project SDK list.
+
 ##### Project Structure
 
 ![Project View](/screenshots/Project%20View.png?raw=true "Project View")
