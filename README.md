@@ -12,6 +12,32 @@ This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetB
 
 ### Project
 
+#### New
+
+If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
+
+1. File > New > Project
+   ![File > New > Project](/screenshots/features/project/New.png?raw=true "New Project")
+2. Select Elixir from the project type menu on the left
+3. Click Next
+   ![File > New > Project > Elixir](/screenshots/features/project/new/Elixir.png?raw=true "New Elixir Project")
+4. Select a Project SDK directory by clicking Configure.
+   ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
+4. Select a Project SDK directory by clicking Configure.
+5. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
+   homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
+   about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
+    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+7. Click Next after you select SDK name from the Project SDK list.
+8. Change the `Project name` to the name your want for the project
+   ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
+9. (Optionally) change the `Project location` if the directory does not match what you want
+10. (Optionally) expand `More Settings` to change the `Module name`, `Content root`, `Module file location`, and/or `Project format`.  The defaults derived from the `Project name` and `Project location` should work for most projects.
+11. Click Finish
+12. Choose whether to open in a New Window or in This Window.
+    ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
+
 **NOTE: The Project Settings is just bookkeeping and visual now.  No other features currently take advantage
 of the SDK setting or the marked directories.  Theses Project Settings will be used for later features.**
 
