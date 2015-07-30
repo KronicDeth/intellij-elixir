@@ -92,7 +92,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
 17. Click Finish after you select SDK name from the Project SDK list.
 
-##### Project Structure
+### Project Structure
 
 ![Project View](/screenshots/Project%20View.png?raw=true "Project View")
 
@@ -104,23 +104,38 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 * Test Sources
   * `test`
 
-###### Project Settings
+### Project Settings
 
-![Project Settings](/screenshots/project_structure/project_settings/Project.png?raw=true "Project Settings")
+![Project Settings](/screenshots/project_settings/Project.png?raw=true "Project Settings")
 
 The Project Settings include
 * Project Name
 * Project SDK
 
-###### Module Settings
+### Module Settings
 
+#### Sources
 
-![Module Settings](/screenshots/project_structure/project_settings/Module.png?raw=true "Module Settings")
+![Module Settings > Sources](/screenshots/project_settings/Sources.png?raw=true "Module Sources")
 
 The Module Settings include Marking directories as
 * Excluded
 * Sources
 * Tests
+
+#### Paths
+
+![Module Settings > Paths](/screenshots/project_settings/module/Paths.png?raw=true "Module Paths")
+
+Module paths list the output directories when compiling code in the module.  There is a an "Output path" for `dev`
+`MIX_ENV` and "Test output path" for the `test` `MIX_ENV`.
+
+#### Dependencies
+
+![Module Settings > Dependencies](/screenshots/project_settings/module/Dependencies.png?raw=true "Module Dependencies")
+
+Module dependencies are currently just the SDK and the sources for the module.  Dependencies in `deps` are not
+automatically detected at this time.
 
 ### New Elixir Module
 
