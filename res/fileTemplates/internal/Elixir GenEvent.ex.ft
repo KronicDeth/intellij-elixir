@@ -1,0 +1,22 @@
+defmodule ${NAME} do
+#parse("Elixir File Docs.ex")
+  use GenEvent
+
+  # Callbacks
+
+  def init(_opts) do
+    {:ok, %{}}
+  end
+
+  def handle_event(_msg, state) do
+    {:ok, state}
+  end
+
+  def handle_call(_msg, state) do
+    {:ok, :ok, state}
+  end
+
+  def handle_info(_msg, state) do
+    {:ok, state}
+  end
+end

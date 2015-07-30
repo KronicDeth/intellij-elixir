@@ -42,17 +42,11 @@ public class CreateElixirModuleActionTest extends LightCodeInsightFixtureTestCas
             public void run() {
                 ElixirFile file = elixirNewFileAction.createFile(moduleName, TEMPLATE_NAME, directory);
                 assertNotNull("Expected CreateElixirModuleAction.createFile to create an ElixirFile", file);
-
             }
         });
 
         boolean ignoreTrailingWhitespaces = true;
-
-        myFixture.checkResultByFile(
-                path,
-                path,
-                ignoreTrailingWhitespaces
-        );
+        myFixture.checkResultByFile(path, path, ignoreTrailingWhitespaces);
     }
 
     @Override

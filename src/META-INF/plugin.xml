@@ -303,10 +303,29 @@
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <!-- Elixir Module Structure -->
+    <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
+
+    <moduleConfigurationEditorProvider implementation="org.elixir_lang.module.DefaultModuleEditorsProvider" order="first"/>
+
+    <editorNotificationProvider implementation="org.elixir_lang.inspection.SetupSDKNotificationProvider"/>
+
+    <!-- Mix related extensions -->
+    <projectConfigurable instance="org.elixir_lang.settings.ElixirExternalToolsConfigurable" />
+    <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
+    <programRunner implementation="org.elixir_lang.mix.runner.MixRunner" />
+    <configurationType implementation="org.elixir_lang.mix.runner.MixRunConfigurationType" />
+
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
-    <moduleConfigurationEditorProvider implementation="org.elixir_lang.ModuleConfigurationEditorProvider" order="first"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
+
+    <!-- for template -->
     <internalFileTemplate name="Elixir Module"/>
+    <internalFileTemplate name="Elixir Application"/>
+    <internalFileTemplate name="Elixir Supervisor"/>
+    <internalFileTemplate name="Elixir GenServer"/>
+    <internalFileTemplate name="Elixir GenEvent"/>
+
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
@@ -321,23 +340,22 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
-    <moduleType id="ELIXIR_MIX_PROJECT" implementationClass="org.elixir_lang.mix.ModuleType"/>
-    <sdkType implementation="org.elixir_lang.SdkType"/>
   </extensions>
 
   <application-components>
     <!-- Add your application components here -->
   </application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
-
   <actions>
-    <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
-            text="Elixir File" description="Create new Elixir Module">
-      <add-to-group group-id="NewGroup" anchor="last" />
-    </action>
+    <group id="LangElixir.NewActions">
+      <separator/>
+      <action id="Elixir.NewFile" class="org.elixir_lang.action.CreateElixirModuleAction"
+              text="Elixir File" description="Create new Elixir Module">
+      </action>
+      <separator/>
+
+      <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
+    </group>
   </actions>
 
 </idea-plugin>

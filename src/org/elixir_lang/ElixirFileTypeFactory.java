@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public class ElixirFileTypeFactory extends FileTypeFactory{
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(ElixirFileType.INSTANCE, "ex");
-        fileTypeConsumer.consume(ElixirFileType.INSTANCE, "exs");
+        fileTypeConsumer.consume(ElixirFileType.INSTANCE, ElixirFileType.INSTANCE.getDefaultExtension());
+        fileTypeConsumer.consume(ElixirFileType.SCRIPT, ElixirFileType.SCRIPT.getDefaultExtension());
     }
 }
