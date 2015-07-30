@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.1.0
+
+* Enhancements
+  * [#167](https://github.com/KronicDeth/intellij-elixir/pull/167) - [zyuyou](https://github.com/zyuyou)
+    * `Build`
+      * `Compile` an individual file
+      * `Make Project` to build the entire project
+    * `New`
+      * `Elixir File` has new templates
+        * `Empty module`
+        * `Elixir Application`
+        * `Elixir Supervisor`
+        * `Elixir GenServer`
+        * `Elixir GenEvent`
+      * `Project > Elixir` creates a new Elixir project with an empty `lib` directory marked as source directory.
+      * `Project from Existing Sources... `
+        * `Create project from existing sources` sets up the project with SDK using a pre-existing directory.
+        * `Import project from external model > Mix`
+          * Fetches the the dependencies with the local version of `mix`
+          * Marks `lib` directory as source
+          * Marks `test` directory as test sources
+    * `Run > Elixir Mix` to setup Run Configurations to run `mix` tasks. 
+
 ## v1.0.0
 * Enhancements
   * [#168](https://github.com/KronicDeth/intellij-elixir/pull/168) - Update ant build on travis-ci.org to use IDEA 14.1.4 (from 14.0.2) - [KronicDeth](https://github.com/KronicDeth)

@@ -9,6 +9,78 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v1.1.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>
+                <code>Build</code>
+              </p>
+              <ul>
+                <li><code>Compile</code> an individual file</li>
+                <li><code>Make Project</code> to build the entire project</li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                <code>New</code>
+              </p>
+              <ul>
+                <li>
+                  <p>
+                    <code>Elixir File</code> has new templates
+                  </p>
+                  <ul>
+                    <li>
+                      <code>Empty module</code>
+                    </li>
+                    <li>
+                      <code>Elixir Application</code>
+                    </li>
+                    <li>
+                      <code>Elixir Supervisor</code>
+                    </li>
+                    <li>
+                      <code>Elixir GenServer</code>
+                    </li>
+                    <li>
+                      <code>Elixir GenEvent</code>
+                    </li>
+                  <ul>
+                </li>
+                <li>
+                  <code>Project > Elixir</code> creates a new Elixir project with an empty <code>lib</code> directory
+                  marked as source directory.
+                </li>
+                <li>
+                  <p>
+                    <code>Project from Existing Sources... </code>
+                  </p>
+                  <ul>
+                    <li>
+                       <code>Create project from existing sources</code> sets up the project with SDK using a
+                       pre-existing directory.
+                    </li>
+                    <li>
+                      <p>
+                        <code>Import project from external model > Mix</code>
+                      </p>
+                      <ul>
+                        <li>Fetches the the dependencies with the local version of <code>mix</code></li>
+                        <li>Marks <code>lib</code> directory as source</li>
+                        <li>Marks <code>test</code> directory as test sources</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><code>Run > Elixir Mix</code> to setup Run Configurations to run <code>mix</code> tasks.</li>
+          </ul>
+        </li>
+      </ul>
       <h1>v1.0.0</h1>
       <ul>
         <li>
