@@ -13,6 +13,8 @@ This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetB
 ### Project
 
 #### New
+**NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
+  IDEs, like Rubymine.**
 
 If you want to create a basic (non-`mix`) Elixir project with a `lib` directory, perform the following steps.
 
@@ -37,9 +39,6 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 11. Click Finish
 12. Choose whether to open in a New Window or in This Window.
     ![File > New > Project > Window](/screenshots/features/project/new/Settings.png?raw=true "Open Project in New Window or This Window")
-
-**NOTE: The Project Settings is just bookkeeping and visual now.  No other features currently take advantage
-of the SDK setting or the marked directories.  Theses Project Settings will be used for later features.**
 
 #### From Existing Directory
 **NOTE: This feature only works in IntelliJ IDEA as it depends on an extension point unavailable in language-specific
