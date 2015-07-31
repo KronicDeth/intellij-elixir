@@ -619,6 +619,17 @@ with Alt+Enter. (Will vary based on keymap.)
   </figcaption>
 </figure>
 
+### Building/Compiling
+
+#### Settings
+
+![Build, Execution, Deployment > Compiler > Elixir Compiler](/screenshots/features/building/Settings.png?raw=true "Elixir Compiler Settings")
+
+* Compile project with mix (use `mix compile` instead of `elixirc` directly)
+* Attach docs (don't use `--no-docs` `elixirc` flag)
+* Attach debug info (don't use `--no-debug-info` `elixirc` flag)
+* Ignore module conflict (use `--ignore-module-conflict` `elixirc` flag)
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
