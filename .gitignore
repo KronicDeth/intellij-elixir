@@ -8,6 +8,7 @@
 # ignore travis.sh output
 /dependencies
 # build output
+/bin
 /intellij-elixir.zip
 /out
 # JFlex generator download
