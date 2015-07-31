@@ -630,6 +630,26 @@ with Alt+Enter. (Will vary based on keymap.)
 * Attach debug info (don't use `--no-debug-info` `elixirc` flag)
 * Ignore module conflict (use `--ignore-module-conflict` `elixirc` flag)
 
+#### Individual File
+
+1. Have a file selected in Project view with the Project view in focus OR have an Editor tab in focus
+2. Build > Compile 'FILE_NAME'
+3. Build results will be shown
+    * If compilation is successful, you'll see "Compilation completed successfully" in the Event Log
+    * If compilation had errors, you'll see "Compilation completed with N errors and M warnings" in the Event Log and
+      the Messages Compile tab will open showing a list of Errors
+      ![Messages Compile](/screenshots/features/building/file/Messages%20Compile.png?raw=true "Messages Compile Individual File Build Errors")
+
+#### Project
+
+1. Build > Make Project
+2. Build results will be shown
+    * If compilation is successful, you'll see "Compilation completed successfully" in the Event Log
+    * If compilation had errors, you'll see "Compilation completed with N errors and M warnings" in the Event Log and
+      the Messages Compile tab will open showing a list of Errors
+      ![Messages Compile](/screenshots/features/building/file/Messages%20Compile.png?raw=true "Messages Compile Individual File Build Errors")
+
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
