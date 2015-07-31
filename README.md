@@ -649,6 +649,26 @@ with Alt+Enter. (Will vary based on keymap.)
       the Messages Compile tab will open showing a list of Errors
       ![Messages Compile](/screenshots/features/building/file/Messages%20Compile.png?raw=true "Messages Compile Individual File Build Errors")
 
+### Run Configurations
+
+#### Mix Tasks
+
+Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
+ 
+1. Run > Edit Configurations...
+   ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "Elixir Mix"
+   ![Add New Elixir Mix](/screenshots/features/run_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
+4. Fill in the "Name" for the Run Configuration
+5. Fill in the command (`mix` task) to run
+   ![Edit Elixir Mix Run Configuration](/screenshots/features/run_configurations/mix_tasks/Edit.png?raw=true "Edit Elixir Mix Run Configuration")
+6. Click "OK" to save the Run Configuration and close the dialog
+7. Click the Run arrow in the Toolbar to run the `mix` task
+   ![Run](/screenshots/features/run_configurations/mix_tasks/Toolbar%20Run%20Button.png?raw=true "Run Elixir Mix Run Configuration")
+8. The Run pane will open, showing the results of the `mix` task.
+    * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
+      ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
 
 ## Installation
  
