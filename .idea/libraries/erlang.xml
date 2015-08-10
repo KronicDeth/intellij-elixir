@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="erlang">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/cache/intellij-erlang/lib/erlang.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
