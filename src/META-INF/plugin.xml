@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>1.1.0</version>
+  <version>1.2.0-pre</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,19 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v1.2.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              If (1) you have intellij-erlang installed and (2) you have an atom in Erlang that starts with
+              <code>Elixir.</code>, such as <code>'Elixir.Test'</code>, then intellij-elixir will annotate whether it
+              can resolve the name to a <code>defmodule</code> call in Elixir files.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v1.1.0</h1>
       <ul>
         <li>
