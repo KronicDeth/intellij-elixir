@@ -1,9 +1,11 @@
 <component name="libraryTable">
   <library name="JInterface">
     <CLASSES>
-      <root url="jar:///usr/local/Cellar/erlang/17.4/lib/erlang/lib/jinterface-1.5.12/priv/OtpErlang.jar!/" />
+      <root url="jar:///usr/local/Cellar/erlang/17.5/lib/erlang/lib/jinterface-1.5.12/priv/OtpErlang.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file:///usr/local/Cellar/erlang/17.5/lib/erlang/lib/jinterface-1.5.12/java_src" />
+    </SOURCES>
   </library>
 </component>

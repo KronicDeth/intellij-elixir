@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="get.intellij-erlang" name="intellij-erlang">
+    <dirname property="intellij-erlang.basedir" file="${ant.file.intellij-erlang}"/>
+
+    <property name="intellij-erlang.output.dir" value="${intellij-erlang.basedir}/dependencies/intellij-erlang"/>
+    <property name="intellij-erlang.release" value="778"/>
+    <property name="intellij-erlang.zip" value="Erlang.${intellij-erlang.release}.zip"/>
+    <property name="intellij-erlang.cache" value="${intellij-erlang.basedir}/cache/intellij-erlang"/>
+    <property name="intellij-erlang.zip.root.basename" value="Erlang"/>
+
+    <property name="intellij-erlang.output.zip.root.dir" value="${intellij-erlang.output.dir}/${intellij-erlang.zip.root.basename}"/>
+    <available file="${intellij-erlang.output.zip.root.dir}" property="intellij-erlang.output.zip.root.available"/>
+
+    <available file="${intellij-erlang.output.dir}/${intellij-erlang.zip}" property="intellij-erlang.zip.available"/>
+
+    <target name="clean.intellij-erlang">
+        <delete quiet="true">
+            <fileset dir="${intellij-erlang.output.dir}"/>
+            <fileset dir="${intellij-erlang.cache}"/>
+        </delete>
+    </target>
+
+    <target name="get.intellij-erlang" depends="unpack.intellij-erlang.zip" description="Get intellij-erlang ${intellij-erlang.release} from Github">
+        <copy todir="${intellij-erlang.cache}">
+            <fileset dir="${intellij-erlang.output.zip.root.dir}"/>
+        </copy>
+    </target>
+
+    <target name="get.intellij-erlang.zip" description="Get intellij-erlang ${intellij-erlang.release} zip from Github" unless="intellij-erlang.zip.available">
+        <mkdir dir="${intellij-erlang.output.dir}"/>
+        <get dest="${intellij-erlang.output.dir}"
+             src="https://github.com/ignatov/intellij-erlang/releases/download/%23${intellij-erlang.release}/Erlang.${intellij-erlang.release}.zip"
+             usetimestamp="true"
+             verbose="true"/>
+    </target>
+
+    <target name="unpack.intellij-erlang.zip" depends="get.intellij-erlang.zip" description="unzip ${intellij-erlang.zip}" unless="intellij-erlang.output.zip.root.available">
+        <unzip src="${intellij-erlang.output.dir}/${intellij-erlang.zip}" dest="${intellij-erlang.output.dir}"/>
+    </target>
+</project>
