@@ -1,7 +1,11 @@
 package org.elixir_lang;
 
 import com.ericsson.otp.erlang.*;
+import com.google.common.base.Joiner;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 public class Macro {
     public static OtpErlangList callArguments(OtpErlangTuple callExpression) {
@@ -145,5 +149,28 @@ public class Macro {
 
     public static OtpErlangList metadata(OtpErlangTuple expression) {
         return (OtpErlangList) expression.elementAt(1);
+    }
+
+    /**
+     *
+     * @param macro
+     * @return
+     * @see <a href="https://github.com/elixir-lang/elixir/blob/a1b06e1e9067ae08826f91274fefcb68c2bbdd02/lib/elixir/lib/macro.ex#L461-L464">Macro.to_string</a>
+     */
+    @NotNull
+    public static String toString(OtpErlangObject macro) {
+        assert Macro.isAliases(macro);
+
+        OtpErlangTuple quotedAlias = (OtpErlangTuple) macro;
+        OtpErlangList refs = (OtpErlangList) quotedAlias.elementAt(2);
+        java.util.List<String> refStringList = new ArrayList<String>();
+
+        for (OtpErlangObject ref : refs) {
+            OtpErlangAtom refAtom = (OtpErlangAtom) ref;
+
+            refStringList.add(refAtom.atomValue());
+        }
+
+        return Joiner.on(".").join(refStringList);
     }
 }
