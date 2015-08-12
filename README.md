@@ -74,7 +74,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 2. Select the root directory of your project.
 3. Select "Import project from external model"
 4. Select Mix
-   ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project"]
+   ![File > New Project > From Existing Sources > Import project from external model > Mix](/screenshots/features/project/from_existing_sources/import_project_from_external_model/Mix.png?raw=true "Import Mix Project")
 5. Click Next
 6. The "Mix project root" will be filled in with the selected directory.
 7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
@@ -116,7 +116,7 @@ The Project Settings include
 
 #### Sources
 
-![Module Settings > Sources](/screenshots/project_settings/Sources.png?raw=true "Module Sources")
+![Module Settings > Sources](/screenshots/project_settings/module/Sources.png?raw=true "Module Sources")
 
 The Module Settings include Marking directories as
 * Excluded
