@@ -21,6 +21,12 @@
             </li>
           </ul>
         </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fi links to screenshots in README</li>
+          </ul>
+        </li>
       </ul>
       <h1>v1.1.0</h1>
       <ul>
