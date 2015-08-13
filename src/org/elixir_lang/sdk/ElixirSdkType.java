@@ -302,8 +302,20 @@ public class ElixirSdkType extends SdkType {
           }
         }
       }
+    }else{
+      Version version = new Version(0,0,0);
+      String sdkPath = "";
+      if(SystemInfo.isWindows){
+        if(SystemInfo.is32Bit){
+          sdkPath = "C:\\Program Files\\Elixir";
+        }else{
+          sdkPath = "C:\\Program Files (x86)\\Elixir";
+        }
+      }else if(SystemInfo.isLinux){
+        sdkPath = "/usr/local/lib/elixir";
+      }
+      homePathByVersion.put(version, sdkPath);
     }
-
     return homePathByVersion;
   }
 
