@@ -19,6 +19,9 @@
               <code>Elixir.</code>, such as <code>'Elixir.Test'</code>, then intellij-elixir will annotate whether it
               can resolve the name to a <code>defmodule</code> call in Elixir files.
             </li>
+            <li>
+              Default SDK path for Linux and Windows.
+            </li>
           </ul>
         </li>
         <li>
