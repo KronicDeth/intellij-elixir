@@ -273,13 +273,13 @@ public class ElixirSdkType extends SdkType {
    */
   private Map<Version, String> homePathByVersion() {
     Map<Version, String> homePathByVersion = new TreeMap<Version, String>(
-        new Comparator<Version>() {
-          @Override
-          public int compare(Version version1, Version version2) {
-            // compare version2 to version1 to produce descending instead of ascending order.
-            return version2.compareTo(version1);
-          }
-        }
+            new Comparator<Version>() {
+              @Override
+              public int compare(Version version1, Version version2) {
+                // compare version2 to version1 to produce descending instead of ascending order.
+                return version2.compareTo(version1);
+              }
+            }
     );
 
     if (SystemInfo.isMac) {
@@ -302,6 +302,21 @@ public class ElixirSdkType extends SdkType {
           }
         }
       }
+    } else {
+      Version version = new Version(0,0,0);
+      String sdkPath = "";
+
+      if (SystemInfo.isWindows){
+        if (SystemInfo.is32Bit){
+          sdkPath = "C:\\Program Files\\Elixir";
+        } else {
+          sdkPath = "C:\\Program Files (x86)\\Elixir";
+        }
+      } else if (SystemInfo.isLinux){
+        sdkPath = "/usr/local/lib/elixir";
+      }
+
+      homePathByVersion.put(version, sdkPath);
     }
 
     return homePathByVersion;
