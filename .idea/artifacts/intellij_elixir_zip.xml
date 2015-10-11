@@ -14,9 +14,9 @@
             <element id="archive" name="jps-shared.jar">
               <element id="module-output" name="jps-shared" />
             </element>
-            <element id="file-copy" path="/usr/local/Cellar/erlang/17.4/lib/erlang/lib/jinterface-1.5.12/priv/OtpErlang.jar" />
             <element id="library" level="project" name="junit-4.11" />
             <element id="library" level="module" name="JUnit4" module-name="intellij-elixir" />
+            <element id="library" level="project" name="JInterface" />
           </element>
         </element>
       </element>
