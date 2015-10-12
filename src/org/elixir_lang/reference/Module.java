@@ -28,9 +28,21 @@ public class Module extends PsiReferenceBase<ElixirAlias> implements PsiPolyVari
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
 
-        ElixirAccessExpression parentAccessExpression = (ElixirAccessExpression) myElement.getParent();
+        PsiElement lastSibling = myElement;
 
-        for (PsiElement sibling = parentAccessExpression.getPrevSibling(); sibling != null; sibling = sibling.getPrevSibling()) {
+        while (results.isEmpty() && lastSibling != null) {
+            results.addAll(multiResolveSibling(lastSibling));
+
+            lastSibling = lastSibling.getParent();
+        }
+
+        return results.toArray(new ResolveResult[results.size()]);
+    }
+
+    private List<ResolveResult> multiResolveSibling(@NotNull final PsiElement lastSibling) {
+        List<ResolveResult> results = new ArrayList<ResolveResult>();
+
+        for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
             if (sibling instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
                 ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) sibling;
 
@@ -65,7 +77,7 @@ public class Module extends PsiReferenceBase<ElixirAlias> implements PsiPolyVari
             }
         }
 
-        return results.toArray(new ResolveResult[results.size()]);
+        return results;
     }
 
     @Nullable
