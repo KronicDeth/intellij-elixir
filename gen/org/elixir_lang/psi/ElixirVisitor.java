@@ -20,7 +20,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAlias(@NotNull ElixirAlias o) {
-    visitQuotable(o);
+    visitNamedElement(o);
+    // visitQuotable(o);
   }
 
   public void visitAndInfixOperator(@NotNull ElixirAndInfixOperator o) {
@@ -995,6 +996,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitNamedElement(@NotNull NamedElement o) {
     visitElement(o);
   }
 

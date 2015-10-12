@@ -17,8 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 
@@ -487,6 +485,13 @@ public class ElixirPsiImplUtil {
         return new OtpErlangList(keywordListElements);
     }
 
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // Always null because it's unqualified.
+        return null;
+    }
+
     @Contract(pure = true)
     @NotNull
     public static ASTNode operatorTokenNode(@NotNull Operator operator) {
@@ -928,6 +933,24 @@ public class ElixirPsiImplUtil {
         return excessWhitespaceASTNode;
     }
 
+    /**
+     * Adds `Elixir.` to alias text.
+     *
+     * @param alias
+     * @return
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
+        return "Elixir." + alias.getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String functionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        return unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+    }
+
     @Contract(pure = true)
     @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
@@ -1201,6 +1224,21 @@ public class ElixirPsiImplUtil {
 
     public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
         return noParenthesesKeywordPair.getNoParenthesesExpression();
+    }
+
+    @NotNull
+    public static String getName(@NotNull ElixirAlias alias) {
+        return alias.getText();
+    }
+
+    @NotNull
+    public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
+        return alias;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull ElixirAlias alias) {
+        return new org.elixir_lang.reference.Module(alias);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
@@ -2293,7 +2331,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        String identifier = unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+        String identifier = unqualifiedNoParenthesesCall.functionName();
         OtpErlangObject quotedIdentifer = new OtpErlangAtom(identifier);
 
         ElixirNoParenthesesOneArgument noParenthesesOneArgument = unqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
@@ -3063,6 +3101,35 @@ if (quoted == null) {
                         context
                 }
         );
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
+    public static String resolvedFunctionName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // TODO handle `import`s
+        return unmatchedUnqualifiedNoParenthesesCall.functionName();
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // TODO handle `import`s
+        return "Elixir.Kernel";
+    }
+
+    @NotNull
+    public static PsiElement setName(@NotNull PsiElement element, @NotNull String newName) {
+        return null;
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {

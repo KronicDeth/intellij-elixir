@@ -136,21 +136,33 @@ public class Util {
     }
 
     @Nullable
-    public static ModuleDefinition findModuleDefinition(Project project, String fullyQualifiedName) {
+    public static ModuleDefinition findModuleDefinition(Project project, String name) {
         ModuleDefinition found = null;
 
         for (Iterator<ModuleDefinition> moduleDefinitionIterator = moduleDefinitionIterator(project); moduleDefinitionIterator.hasNext();) {
             ModuleDefinition moduleDefinition = moduleDefinitionIterator.next();
-            String moduleFullyQualifiedName = moduleDefinition.fullyQualifiedName();
+            String moduleName = moduleDefinition.name();
 
-            if (moduleFullyQualifiedName.equals(fullyQualifiedName)) {
+            if (moduleName.equals(name)) {
                 found = moduleDefinition;
 
                 break;
+            } else {
+                String moduleFullyQualifiedName = moduleDefinition.fullyQualifiedName();
+
+                if (moduleFullyQualifiedName.equals(name)) {
+                    found = moduleDefinition;
+
+                    break;
+                }
             }
         }
 
         return found;
+    }
+
+    public static java.util.List<ModuleDefinition> findModuleDefinitions(Project project, String name) {
+        return java.util.Collections.singletonList(findModuleDefinition(project, name));
     }
 
     public static Iterator<ModuleDefinition> moduleDefinitionIterator(Project project) {

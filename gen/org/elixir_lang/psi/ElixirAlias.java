@@ -2,11 +2,29 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAlias extends Quotable {
+public interface ElixirAlias extends NamedElement, Quotable {
+
+  @NotNull
+  String fullyQualifiedName();
+
+  @NotNull
+  String getName();
+
+  @NotNull
+  PsiElement getNameIdentifier();
+
+  @Nullable
+  PsiReference getReference();
 
   @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

@@ -3,7 +3,6 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangList;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangTuple;
-import com.intellij.psi.PsiElement;
 import org.elixir_lang.Macro;
 
 /**
@@ -11,10 +10,10 @@ import org.elixir_lang.Macro;
  */
 public class ModuleDefinition {
     /*
-     * Private Fields
+     * Public Fields
      */
 
-    private final Quotable defmodule;
+    public final Quotable defmodule;
 
     /*
      * Constructors
@@ -24,7 +23,7 @@ public class ModuleDefinition {
         this.defmodule = defmodule;
     }
 
-    public String fullyQualifiedName(){
+    public String name() {
         OtpErlangTuple quotedDefmodule = (OtpErlangTuple) defmodule.quote();
         OtpErlangList callArguments = Macro.callArguments(quotedDefmodule);
 
@@ -36,6 +35,10 @@ public class ModuleDefinition {
         // TODO handle other forms for module names
         assert Macro.isAliases(quotedName);
 
-        return "Elixir." + Macro.toString(quotedName);
+        return Macro.toString(quotedName);
+    }
+
+    public String fullyQualifiedName(){
+        return "Elixir." + name();
     }
 }

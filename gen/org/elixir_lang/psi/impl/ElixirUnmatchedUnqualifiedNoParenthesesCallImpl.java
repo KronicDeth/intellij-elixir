@@ -35,8 +35,28 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   }
 
   @NotNull
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
+  @Nullable
+  public String moduleName() {
+    return ElixirPsiImplUtil.moduleName(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public String resolvedFunctionName() {
+    return ElixirPsiImplUtil.resolvedFunctionName(this);
+  }
+
+  @NotNull
+  public String resolvedModuleName() {
+    return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
 }

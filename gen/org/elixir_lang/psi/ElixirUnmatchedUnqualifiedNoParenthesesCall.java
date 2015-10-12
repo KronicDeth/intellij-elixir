@@ -14,6 +14,18 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @NotNull
+  String functionName();
+
+  @Nullable
+  String moduleName();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  String resolvedFunctionName();
+
+  @NotNull
+  String resolvedModuleName();
 
 }

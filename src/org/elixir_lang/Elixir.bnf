@@ -1556,6 +1556,7 @@ matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                             "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
                                           ]
                                           methods = [
+                                            functionName
                                             getDoBlock
                                             quote
                                           ]
@@ -1978,7 +1979,21 @@ atomKeyword ::= FALSE | NIL | TRUE
                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
 alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
-          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+          {
+            implements = [
+              "org.elixir_lang.psi.NamedElement"
+              "org.elixir_lang.psi.Quotable"
+            ]
+            methods = [
+              fullyQualifiedName
+              getName
+              getNameIdentifier
+              getReference
+              quote
+              setName
+            ]
+            mixin = "org.elixir_lang.psi.impl.NamedElementImpl"
+          }
 
 /*
  *
@@ -2200,7 +2215,13 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParent
 unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument doBlock?
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
-                                            methods = [quote]
+                                            methods = [
+                                              functionName
+                                              moduleName
+                                              quote
+                                              resolvedFunctionName
+                                              resolvedModuleName
+                                            ]
                                           }
 
 /*
