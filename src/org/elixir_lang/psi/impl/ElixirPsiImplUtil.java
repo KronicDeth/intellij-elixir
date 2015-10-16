@@ -1331,28 +1331,22 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull ElixirAlias alias) {
-        PsiElement parent = alias.getParent();
-        PsiReference reference;
+    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        PsiReference reference = null;
 
-        if (parent instanceof QualifiableAlias) {
-            // stops references being created for each Alias in qualified Alias chain
-            reference = null;
-        } else {
-            reference = new org.elixir_lang.reference.Module(alias);
+        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
+           reference from overall chain */
+        if (!(parent instanceof QualifiableAlias)) {
+            PsiElement grandParent = parent.getParent();
+
+            // prevents first Alias of a qualified chain from having a separate reference from overall chain
+            if (!(grandParent instanceof QualifiableAlias)) {
+                reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            }
         }
 
         return reference;
-    }
-
-    @Nullable
-    public static PsiReference getReference(@NotNull ElixirMatchedQualifiedAlias matchedQualifiedAlias) {
-        return new org.elixir_lang.reference.Module(matchedQualifiedAlias);
-    }
-
-    @Nullable
-    public static PsiReference getReference(@NotNull ElixirUnmatchedQualifiedAlias unmatchedQualifiedAlias) {
-        return new org.elixir_lang.reference.Module(unmatchedQualifiedAlias);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
