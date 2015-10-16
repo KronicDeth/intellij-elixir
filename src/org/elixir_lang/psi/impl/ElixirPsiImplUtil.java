@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
@@ -428,6 +429,15 @@ public class ElixirPsiImplUtil {
     }
 
     /*
+     * Whether this is a `defmodule <argument> do end` call.
+     */
+    public static boolean isDefmodule(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        return (unmatchedUnqualifiedNoParenthesesCall.resolvedModuleName().equals("Elixir.Kernel") &&
+                unmatchedUnqualifiedNoParenthesesCall.resolvedFunctionName().equals("defmodule") &&
+                unmatchedUnqualifiedNoParenthesesCall.getDoBlock() != null);
+    }
+
+    /*
      * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
      *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
      */
@@ -626,6 +636,84 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
         return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                accessExpression,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirAlias alias,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                alias,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                noParenthesesOneArgument,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                unmatchedUnqualifiedNoParenthesesCall,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,
+                                                         @NotNull PsiScopeProcessor processor,
+                                                         @NotNull ResolveState state,
+                                                         PsiElement lastParent,
+                                                         @NotNull PsiElement place) {
+        boolean keepProcessing = processor.execute(psiElement, state);
+
+        if (keepProcessing) {
+            PsiElement[] children = psiElement.getChildren();
+
+            for (PsiElement child : children) {
+                if (!child.processDeclarations(processor, state, lastParent, place)) {
+                    keepProcessing = false;
+
+                    break;
+                }
+            }
+        }
+
+        return keepProcessing;
     }
 
     @Contract(pure = true)

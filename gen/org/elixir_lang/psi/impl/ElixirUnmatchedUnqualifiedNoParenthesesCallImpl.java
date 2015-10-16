@@ -3,7 +3,10 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
@@ -42,6 +45,14 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   @Nullable
   public String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);
+  }
+
+  public boolean isDefmodule() {
+    return ElixirPsiImplUtil.isDefmodule(this);
+  }
+
+  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @NotNull

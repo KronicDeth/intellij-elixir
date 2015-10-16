@@ -1470,7 +1470,13 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
                              !additionTail matchedExpression
-                             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                             {
+                               implements = "org.elixir_lang.psi.QuotableArguments"
+                               methods = [
+                                 processDeclarations
+                                 quoteArguments
+                               ]
+                             }
 
 /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
@@ -1972,7 +1978,13 @@ accessExpression ::= atNumericOperation |
                      atomKeyword |
                      atom |
                      alias
-                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                     {
+                       implements = "org.elixir_lang.psi.Quotable"
+                       methods = [
+                         processDeclarations
+                         quote
+                       ]
+                     }
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE
@@ -1989,6 +2001,7 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
               getName
               getNameIdentifier
               getReference
+              processDeclarations
               quote
               setName
             ]
@@ -2218,6 +2231,8 @@ unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument do
                                             methods = [
                                               functionName
                                               moduleName
+                                              isDefmodule
+                                              processDeclarations
                                               quote
                                               resolvedFunctionName
                                               resolvedModuleName
