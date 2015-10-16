@@ -3,10 +3,7 @@ package org.elixir_lang.scope_processor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.BaseScopeProcessor;
-import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.ElixirAlias;
-import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
-import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,19 +12,19 @@ public class Module extends BaseScopeProcessor {
      * Fields
      */
 
-    private final ElixirAlias usage;
-    private ElixirAlias declaration = null;
+    private final QualifiableAlias usage;
+    private QualifiableAlias declaration = null;
 
     /*
      * Constructors
      */
 
-    public Module(ElixirAlias usage) {
+    public Module(QualifiableAlias usage) {
         this.usage = usage;
     }
 
     @Nullable
-    public ElixirAlias declaration() {
+    public QualifiableAlias declaration() {
         return declaration;
     }
 

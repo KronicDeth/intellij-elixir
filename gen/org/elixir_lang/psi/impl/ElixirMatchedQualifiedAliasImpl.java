@@ -4,8 +4,10 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedAlias {
 
@@ -34,6 +36,16 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   @NotNull
   public ElixirMatchedExpression getMatchedExpression() {
     return findNotNullChildByClass(ElixirMatchedExpression.class);
+  }
+
+  @Nullable
+  public String fullyQualifiedName() {
+    return ElixirPsiImplUtil.fullyQualifiedName(this);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
   }
 
   @NotNull

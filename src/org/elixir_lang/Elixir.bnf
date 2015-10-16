@@ -1592,7 +1592,14 @@ matchedBracketOperation ::= matchedExpression bracketArguments
  */
 
 matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
-                          { implements = "org.elixir_lang.psi.QualifiedAlias" methods = [quote] }
+                          {
+                            implements = "org.elixir_lang.psi.QualifiedAlias"
+                            methods = [
+                              fullyQualifiedName
+                              getReference
+                              quote
+                            ]
+                          }
 
 /*
  * Qualified Identifier Bracket Operation
@@ -1994,6 +2001,7 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
           {
             implements = [
               "org.elixir_lang.psi.NamedElement"
+              "org.elixir_lang.psi.QualifiableAlias"
               "org.elixir_lang.psi.Quotable"
             ]
             methods = [
@@ -2255,7 +2263,14 @@ unmatchedBracketOperation ::= unmatchedExpression bracketArguments
  */
 
 unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
-                            { implements = "org.elixir_lang.psi.QualifiedAlias" methods = [quote] }
+                            {
+                              implements = "org.elixir_lang.psi.QualifiedAlias"
+                              methods = [
+                                fullyQualifiedName
+                                getReference
+                                quote
+                              ]
+                            }
 
 /*
  * Qualified Identifier Bracket Operation

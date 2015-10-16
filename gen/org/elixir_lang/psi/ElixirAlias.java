@@ -9,7 +9,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAlias extends NamedElement, Quotable {
+public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable {
 
   @NotNull
   String fullyQualifiedName();

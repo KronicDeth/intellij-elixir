@@ -1030,7 +1030,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
-        return "Elixir." + alias.getText();
+        return "Elixir." + alias.getName();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
+        return null;
     }
 
     @Contract(pure = true)
@@ -1326,7 +1332,27 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull ElixirAlias alias) {
-        return new org.elixir_lang.reference.Module(alias);
+        PsiElement parent = alias.getParent();
+        PsiReference reference;
+
+        if (parent instanceof QualifiableAlias) {
+            // stops references being created for each Alias in qualified Alias chain
+            reference = null;
+        } else {
+            reference = new org.elixir_lang.reference.Module(alias);
+        }
+
+        return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull ElixirMatchedQualifiedAlias matchedQualifiedAlias) {
+        return new org.elixir_lang.reference.Module(matchedQualifiedAlias);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull ElixirUnmatchedQualifiedAlias unmatchedQualifiedAlias) {
+        return new org.elixir_lang.reference.Module(unmatchedQualifiedAlias);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {

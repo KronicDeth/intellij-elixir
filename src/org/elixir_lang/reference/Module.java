@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class Module extends PsiReferenceBase<ElixirAlias> implements PsiPolyVariantReference {
+public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPolyVariantReference {
     /*
      * Constructors
      */
 
-    public Module(@NotNull ElixirAlias alias) {
-        super(alias, TextRange.create(0, alias.getTextLength()));
+    public Module(@NotNull QualifiableAlias qualifiableAlias) {
+        super(qualifiableAlias, TextRange.create(0, qualifiableAlias.getTextLength()));
     }
 
     /*
@@ -64,7 +64,7 @@ public class Module extends PsiReferenceBase<ElixirAlias> implements PsiPolyVari
                         psiFile,
                         myElement
                 )) {
-                    ElixirAlias declaration = moduleScopeProcessor.declaration();
+                    QualifiableAlias declaration = moduleScopeProcessor.declaration();
 
                     assert declaration != null;
 

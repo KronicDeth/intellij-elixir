@@ -1,0 +1,2 @@
+defmodule Target do
+end

@@ -21,6 +21,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitAlias(@NotNull ElixirAlias o) {
     visitNamedElement(o);
+    // visitQualifiableAlias(o);
     // visitQuotable(o);
   }
 
