@@ -37,25 +37,29 @@ public class Module extends BaseScopeProcessor {
     public boolean execute(@NotNull final PsiElement element, @NotNull final ResolveState state) {
         boolean keepProcessing = true;
 
-        if (element instanceof ElixirAlias) {
-            ElixirAlias elementAsAlias = (ElixirAlias) element;
+        if (element instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) element;
+            String qualifiableAliasFullyQualifiedName = qualifiableAlias.fullyQualifiedName();
 
-            if (elementAsAlias.fullyQualifiedName().equals(usage.fullyQualifiedName())) {
+            if (qualifiableAliasFullyQualifiedName != null && qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
                 PsiElement parent = element.getParent();
+                PsiElement potentialNoParenthesesOneArgument;
 
                 if (parent instanceof ElixirAccessExpression) {
-                    PsiElement grandparent = parent.getParent();
+                    potentialNoParenthesesOneArgument = parent.getParent();
+                } else {
+                    potentialNoParenthesesOneArgument = parent;
+                }
 
-                    if (grandparent instanceof ElixirNoParenthesesOneArgument) {
-                        PsiElement greatGrandparent = grandparent.getParent();
+                if (potentialNoParenthesesOneArgument instanceof ElixirNoParenthesesOneArgument) {
+                    PsiElement potententialUnmatchedUnqualifiedNoParenthesesCall = potentialNoParenthesesOneArgument.getParent();
 
-                        if (greatGrandparent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
-                            ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) greatGrandparent;
+                    if (potententialUnmatchedUnqualifiedNoParenthesesCall instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
+                        ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) potententialUnmatchedUnqualifiedNoParenthesesCall;
 
-                            if (unmatchedUnqualifiedNoParenthesesCall.isDefmodule()) {
-                                declaration = elementAsAlias;
-                                keepProcessing = false;
-                            }
+                        if (unmatchedUnqualifiedNoParenthesesCall.isDefmodule()) {
+                            declaration = qualifiableAlias;
+                            keepProcessing = false;
                         }
                     }
                 }

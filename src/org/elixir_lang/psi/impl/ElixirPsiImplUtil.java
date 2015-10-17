@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
+import java.rmi.AccessException;
 import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -694,6 +695,14 @@ public class ElixirPsiImplUtil {
         );
     }
 
+    public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processor.execute(qualifiedAlias, state);
+    }
+
     public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,
                                                          @NotNull PsiScopeProcessor processor,
                                                          @NotNull ResolveState state,
@@ -1036,7 +1045,39 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
-        return null;
+        String fullyQualifiedName = null;
+        PsiElement[] children = qualifiableAlias.getChildren();
+
+        assert children.length == 3;
+
+        PsiElement qualifier = children[0];
+        String qualifierName = null;
+
+        if (qualifier instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableQualifier = (QualifiableAlias) qualifier;
+
+            qualifierName = qualifiableQualifier.fullyQualifiedName();
+        } else if (qualifier instanceof ElixirAccessExpression) {
+            PsiElement[] qualifierChildren = qualifier.getChildren();
+
+            if (qualifierChildren.length == 1) {
+                PsiElement qualifierChild = qualifierChildren[0];
+
+                if (qualifierChild instanceof ElixirAlias) {
+                    ElixirAlias childAlias = (ElixirAlias) qualifierChild;
+
+                    qualifierName = childAlias.getName();
+                }
+            }
+        }
+
+        if (qualifierName != null) {
+            ElixirAlias alias = (ElixirAlias) children[2];
+
+            fullyQualifiedName = qualifierName + "." + alias.getName();
+        }
+
+        return fullyQualifiedName;
     }
 
     @Contract(pure = true)
