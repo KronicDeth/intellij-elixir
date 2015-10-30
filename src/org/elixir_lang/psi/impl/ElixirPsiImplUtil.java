@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
-import java.rmi.AccessException;
 import java.util.*;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -1366,9 +1365,38 @@ public class ElixirPsiImplUtil {
         return alias.getText();
     }
 
-    @NotNull
+    @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
-        return alias;
+        PsiElement parent = alias.getParent();
+        PsiElement nameIdentifier = null;
+
+        if (parent instanceof ElixirAccessExpression) {
+            PsiElement grandParent = parent.getParent();
+
+            // alias is first alias in chain of qualifiers
+            if (grandParent instanceof QualifiableAlias) {
+                QualifiableAlias grandParentQualifiableAlias = (QualifiableAlias) grandParent;
+                nameIdentifier = grandParentQualifiableAlias.getNameIdentifier();
+            } else {
+                /* NamedStubbedPsiElementBase#getTextOffset assumes getNameIdentifier is null when the NameIdentifier is
+                   the element itself. */
+                // alias is single, unqualified alias
+                nameIdentifier = null;
+            }
+        } else if (parent instanceof QualifiableAlias) {
+            // alias is last in chain of qualifiers
+            QualifiableAlias parentQualifiableAlias = (QualifiableAlias) parent;
+            nameIdentifier = parentQualifiableAlias.getNameIdentifier();
+        }
+
+        return nameIdentifier;
+    }
+
+    @NotNull
+    public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+
+        return qualifiableAlias;
     }
 
     @Nullable

@@ -46,6 +46,11 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
+  @NotNull
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
@@ -58,6 +63,11 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

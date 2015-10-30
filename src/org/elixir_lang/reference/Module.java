@@ -3,13 +3,11 @@ package org.elixir_lang.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
-import org.elixir_lang.ElixirFileType;
+import com.intellij.psi.stubs.StubIndex;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,32 +44,19 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
 
     private Collection<ResolveResult> multiResolveProject(Project project, PsiFile exceptFile) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
-        Collection<VirtualFile> virtualFileCollection = FileBasedIndex.getInstance().getContainingFiles(
-                FileTypeIndex.NAME,
-                ElixirFileType.INSTANCE,
-                GlobalSearchScope.allScope(project)
-        );
-        PsiManager psiManager = PsiManager.getInstance(project);
-        org.elixir_lang.scope_processor.Module moduleScopeProcessor = new org.elixir_lang.scope_processor.Module(myElement);
+        final String fullyQualifiedName = myElement.fullyQualifiedName();
 
-        for (VirtualFile virtualFile : virtualFileCollection) {
-            PsiFile psiFile = psiManager.findFile(virtualFile);
+        if (fullyQualifiedName != null) {
+            Collection<NamedElement> namedElementCollection = StubIndex.getElements(
+                    AllName.KEY,
+                    fullyQualifiedName,
+                    project,
+                    GlobalSearchScope.allScope(project),
+                    NamedElement.class
+            );
 
-            if (psiFile != null) {
-                if (!psiFile.processDeclarations(
-                        moduleScopeProcessor,
-                        ResolveState.initial(),
-                        psiFile,
-                        myElement
-                )) {
-                    QualifiableAlias declaration = moduleScopeProcessor.declaration();
-
-                    assert declaration != null;
-
-                    results.add(new PsiElementResolveResult(declaration));
-
-                    break;
-                }
+            for (NamedElement namedElement : namedElementCollection) {
+                results.add(new PsiElementResolveResult(namedElement));
             }
         }
 

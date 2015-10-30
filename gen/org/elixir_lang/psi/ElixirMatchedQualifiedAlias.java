@@ -23,6 +23,9 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Qu
   @Nullable
   String fullyQualifiedName();
 
+  @NotNull
+  PsiElement getNameIdentifier();
+
   @Nullable
   PsiReference getReference();
 
@@ -30,5 +33,8 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Qu
 
   @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

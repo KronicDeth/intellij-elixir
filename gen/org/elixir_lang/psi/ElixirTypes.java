@@ -4,6 +4,7 @@ package org.elixir_lang.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.ElementTypeFactory;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -11,7 +12,7 @@ public interface ElixirTypes {
   IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
-  IElementType ALIAS = new ElixirElementType("ALIAS");
+  IElementType ALIAS = ElementTypeFactory.factory("ALIAS");
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
   IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");

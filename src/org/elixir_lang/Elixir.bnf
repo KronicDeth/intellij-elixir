@@ -1596,9 +1596,11 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                             implements = "org.elixir_lang.psi.QualifiedAlias"
                             methods = [
                               fullyQualifiedName
+                              getNameIdentifier
                               getReference
                               processDeclarations
                               quote
+                              setName
                             ]
                           }
 
@@ -2000,6 +2002,8 @@ atomKeyword ::= FALSE | NIL | TRUE
 
 alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
           {
+            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
+            extends = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<?>"
             implements = [
               "org.elixir_lang.psi.NamedElement"
               "org.elixir_lang.psi.QualifiableAlias"
@@ -2014,7 +2018,7 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
               quote
               setName
             ]
-            mixin = "org.elixir_lang.psi.impl.NamedElementImpl"
+            stubClass = "org.elixir_lang.psi.stub.Alias"
           }
 
 /*
@@ -2268,9 +2272,11 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
                               implements = "org.elixir_lang.psi.QualifiedAlias"
                               methods = [
                                 fullyQualifiedName
+                                getNameIdentifier
                                 getReference
                                 processDeclarations
                                 quote
+                                setName
                               ]
                             }
 

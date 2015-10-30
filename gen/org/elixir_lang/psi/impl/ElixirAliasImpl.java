@@ -8,15 +8,21 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.elixir_lang.psi.ElixirAlias;
 import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.stub.Alias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirAliasImpl extends NamedElementImpl implements ElixirAlias {
+public class ElixirAliasImpl extends NamedStubbedPsiElementBase<Alias> implements ElixirAlias {
 
   public ElixirAliasImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirAliasImpl(Alias stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -34,7 +40,7 @@ public class ElixirAliasImpl extends NamedElementImpl implements ElixirAlias {
     return ElixirPsiImplUtil.getName(this);
   }
 
-  @NotNull
+  @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
