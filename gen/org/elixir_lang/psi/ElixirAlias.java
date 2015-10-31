@@ -19,7 +19,7 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable, S
   @NotNull
   String getName();
 
-  @NotNull
+  @Nullable
   PsiElement getNameIdentifier();
 
   @Nullable

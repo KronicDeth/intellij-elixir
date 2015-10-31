@@ -1392,11 +1392,26 @@ public class ElixirPsiImplUtil {
         return nameIdentifier;
     }
 
-    @NotNull
+    /**
+     *
+     * @param qualifiableAlias
+     * @return null if qualifiableAlias is its own name identifier
+     * @return PsiElement if qualifiableAlias is a subalias of a bigger qualified alias
+     */
+    @Nullable
     public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
         PsiElement parent = qualifiableAlias.getParent();
+        PsiElement nameIdentifier;
 
-        return qualifiableAlias;
+        if (parent instanceof QualifiableAlias) {
+            QualifiableAlias parentQualifiedAlias = (QualifiableAlias) parent;
+
+            nameIdentifier = parentQualifiedAlias.getNameIdentifier();
+        } else {
+            nameIdentifier = null;
+        }
+
+        return nameIdentifier;
     }
 
     @Nullable

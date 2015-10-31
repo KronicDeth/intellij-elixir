@@ -536,6 +536,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedQualifiedAlias(@NotNull ElixirMatchedQualifiedAlias o) {
     visitMatchedExpression(o);
+    // visitNamedElement(o);
     // visitQualifiedAlias(o);
   }
 

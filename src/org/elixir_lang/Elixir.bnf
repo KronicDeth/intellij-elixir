@@ -1593,15 +1593,22 @@ matchedBracketOperation ::= matchedExpression bracketArguments
 
 matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                           {
-                            implements = "org.elixir_lang.psi.QualifiedAlias"
+                            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
+                            implements = [
+                              "org.elixir_lang.psi.NamedElement"
+                              "org.elixir_lang.psi.QualifiedAlias"
+                            ]
                             methods = [
                               fullyQualifiedName
+                              getName
                               getNameIdentifier
                               getReference
                               processDeclarations
                               quote
                               setName
                             ]
+                            mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedAlias>"
+                            stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedAlias"
                           }
 
 /*
