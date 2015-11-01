@@ -1607,6 +1607,7 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                               getName
                               getNameIdentifier
                               getReference
+                              isModuleName
                               processDeclarations
                               quote
                               setName
@@ -2029,6 +2030,7 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
               getName
               getNameIdentifier
               getReference
+              isModuleName
               processDeclarations
               quote
               setName
@@ -2289,6 +2291,7 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
                                 fullyQualifiedName
                                 getNameIdentifier
                                 getReference
+                                isModuleName
                                 processDeclarations
                                 quote
                                 setName

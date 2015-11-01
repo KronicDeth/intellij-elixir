@@ -453,6 +453,21 @@ public class ElixirPsiImplUtil {
         return isModuleName;
     }
 
+    public static boolean isModuleName(@NotNull final QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        int siblingCount = parent.getChildren().length - 1;
+        boolean isModuleName = false;
+
+        /* check that this qualifiableAlias is the only child so subsections of alias chains don't say they are module
+           names. */
+        if (siblingCount == 0 && parent instanceof MaybeModuleName) {
+            MaybeModuleName maybeModuleName = (MaybeModuleName) parent;
+
+            isModuleName = maybeModuleName.isModuleName();
+        }
+
+        return isModuleName;
+    }
 
     /*
      * Whether this is an argument in `defmodule <argument> do end` call.

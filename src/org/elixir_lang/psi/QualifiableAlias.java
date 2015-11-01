@@ -4,9 +4,9 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Alias that responds to `fullyQualifiedName`
+ * An alias that may or may not be qualified.
  */
-public interface QualifiableAlias extends PsiNameIdentifierOwner {
+public interface QualifiableAlias extends MaybeModuleName, PsiNameIdentifierOwner {
     @Nullable
     String fullyQualifiedName();
 }

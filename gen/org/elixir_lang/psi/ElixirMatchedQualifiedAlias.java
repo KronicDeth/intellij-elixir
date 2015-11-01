@@ -34,6 +34,8 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Na
   @Nullable
   PsiReference getReference();
 
+  boolean isModuleName();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull

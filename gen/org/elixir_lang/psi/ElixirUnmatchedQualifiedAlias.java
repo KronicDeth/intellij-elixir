@@ -29,6 +29,8 @@ public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression
   @Nullable
   PsiReference getReference();
 
+  boolean isModuleName();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull

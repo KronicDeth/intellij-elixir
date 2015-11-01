@@ -25,6 +25,8 @@ public interface ElixirAlias extends NamedElement, QualifiableAlias, Quotable, S
   @Nullable
   PsiReference getReference();
 
+  boolean isModuleName();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull

@@ -41,17 +41,11 @@ public class Module extends BaseScopeProcessor {
             QualifiableAlias qualifiableAlias = (QualifiableAlias) element;
             String qualifiableAliasFullyQualifiedName = qualifiableAlias.fullyQualifiedName();
 
-            if (qualifiableAliasFullyQualifiedName != null && qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
-                PsiElement parent = element.getParent();
-
-                if (parent instanceof MaybeModuleName) {
-                    MaybeModuleName maybeModuleName = (MaybeModuleName) parent;
-
-                    if (maybeModuleName.isModuleName()) {
-                        declaration = qualifiableAlias;
-                        keepProcessing = false;
-                    }
-                }
+            if (qualifiableAlias.isModuleName() &&
+                    qualifiableAliasFullyQualifiedName != null &&
+                    qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
+                declaration = qualifiableAlias;
+                keepProcessing = false;
             }
         }
 

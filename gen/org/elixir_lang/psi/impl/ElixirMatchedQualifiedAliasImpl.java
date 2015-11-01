@@ -67,6 +67,10 @@ public class ElixirMatchedQualifiedAliasImpl extends NamedStubbedPsiElementBase<
     return ElixirPsiImplUtil.getReference(this);
   }
 
+  public boolean isModuleName() {
+    return ElixirPsiImplUtil.isModuleName(this);
+  }
+
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
