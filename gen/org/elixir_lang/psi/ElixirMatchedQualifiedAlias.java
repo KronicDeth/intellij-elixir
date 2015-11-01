@@ -25,6 +25,9 @@ public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, Na
   @Nullable
   String fullyQualifiedName();
 
+  @NotNull
+  String getName();
+
   @Nullable
   PsiElement getNameIdentifier();
 

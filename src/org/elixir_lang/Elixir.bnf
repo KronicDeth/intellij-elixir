@@ -1473,6 +1473,7 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                              {
                                implements = "org.elixir_lang.psi.QuotableArguments"
                                methods = [
+                                 isModuleName
                                  processDeclarations
                                  quoteArguments
                                ]

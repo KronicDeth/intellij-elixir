@@ -52,15 +52,11 @@ public class Module extends BaseScopeProcessor {
                 }
 
                 if (potentialNoParenthesesOneArgument instanceof ElixirNoParenthesesOneArgument) {
-                    PsiElement potententialUnmatchedUnqualifiedNoParenthesesCall = potentialNoParenthesesOneArgument.getParent();
+                    ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) potentialNoParenthesesOneArgument;
 
-                    if (potententialUnmatchedUnqualifiedNoParenthesesCall instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
-                        ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) potententialUnmatchedUnqualifiedNoParenthesesCall;
-
-                        if (unmatchedUnqualifiedNoParenthesesCall.isDefmodule()) {
-                            declaration = qualifiableAlias;
-                            keepProcessing = false;
-                        }
+                    if (noParenthesesOneArgument.isModuleName()) {
+                        declaration = qualifiableAlias;
+                        keepProcessing = false;
                     }
                 }
             }

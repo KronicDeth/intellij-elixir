@@ -52,6 +52,11 @@ public class ElixirMatchedQualifiedAliasImpl extends NamedStubbedPsiElementBase<
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
+  @NotNull
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);

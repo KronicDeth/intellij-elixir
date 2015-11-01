@@ -438,6 +438,22 @@ public class ElixirPsiImplUtil {
     }
 
     /*
+     * Whether this an argument in `defmodule <argument> do end` call.
+     */
+    public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
+        PsiElement parent = noParenthesesOneArgument.getParent();
+        boolean isModuleName = false;
+
+        if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
+            ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
+
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isDefmodule();
+        }
+
+        return isModuleName;
+    }
+
+    /*
      * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
      *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
      */
@@ -1363,6 +1379,11 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static String getName(@NotNull ElixirAlias alias) {
         return alias.getText();
+    }
+
+    @NotNull
+    public static String getName(@NotNull ElixirMatchedQualifiedAlias matchedQualifiedAlias) {
+        return matchedQualifiedAlias.getText();
     }
 
     @Nullable

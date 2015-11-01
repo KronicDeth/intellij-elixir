@@ -53,6 +53,10 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
+  public boolean isModuleName() {
+    return ElixirPsiImplUtil.isModuleName(this);
+  }
+
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }

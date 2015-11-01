@@ -25,6 +25,8 @@ public interface ElixirNoParenthesesOneArgument extends QuotableArguments {
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
 
+  boolean isModuleName();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
