@@ -8,7 +8,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesOneArgument extends QuotableArguments {
+public interface ElixirNoParenthesesOneArgument extends MaybeModuleName, QuotableArguments {
 
   @Nullable
   ElixirMatchedExpression getMatchedExpression();

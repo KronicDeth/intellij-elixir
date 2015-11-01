@@ -8,7 +8,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAccessExpression extends Quotable {
+public interface ElixirAccessExpression extends MaybeModuleName, Quotable {
 
   @Nullable
   ElixirAlias getAlias();

@@ -1471,7 +1471,10 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
                              !additionTail matchedExpression
                              {
-                               implements = "org.elixir_lang.psi.QuotableArguments"
+                               implements = [
+                                 "org.elixir_lang.psi.MaybeModuleName"
+                                 "org.elixir_lang.psi.QuotableArguments"
+                               ]
                                methods = [
                                  isModuleName
                                  processDeclarations
@@ -1997,7 +2000,10 @@ accessExpression ::= atNumericOperation |
                      atom |
                      alias
                      {
-                       implements = "org.elixir_lang.psi.Quotable"
+                       implements = [
+                         "org.elixir_lang.psi.MaybeModuleName"
+                         "org.elixir_lang.psi.Quotable"
+                       ]
                        methods = [
                          isModuleName
                          processDeclarations

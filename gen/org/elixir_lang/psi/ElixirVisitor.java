@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitAccessExpression(@NotNull ElixirAccessExpression o) {
-    visitQuotable(o);
+    visitMaybeModuleName(o);
+    // visitQuotable(o);
   }
 
   public void visitAdditionInfixOperator(@NotNull ElixirAdditionInfixOperator o) {
@@ -652,7 +653,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {
-    visitQuotableArguments(o);
+    visitMaybeModuleName(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
@@ -998,6 +1000,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitHeredocLine(@NotNull HeredocLine o) {
+    visitElement(o);
+  }
+
+  public void visitMaybeModuleName(@NotNull MaybeModuleName o) {
     visitElement(o);
   }
 
