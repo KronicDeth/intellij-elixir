@@ -438,7 +438,24 @@ public class ElixirPsiImplUtil {
     }
 
     /*
-     * Whether this an argument in `defmodule <argument> do end` call.
+     * Whether this is an argument in `defmodule <argument> do end` call.
+     */
+    public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {
+        PsiElement parent = accessExpression.getParent();
+        boolean isModuleName = false;
+
+        if (parent instanceof ElixirNoParenthesesOneArgument) {
+            ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) parent;
+
+            isModuleName = noParenthesesOneArgument.isModuleName();
+        }
+
+        return isModuleName;
+    }
+
+
+    /*
+     * Whether this is an argument in `defmodule <argument> do end` call.
      */
     public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
         PsiElement parent = noParenthesesOneArgument.getParent();

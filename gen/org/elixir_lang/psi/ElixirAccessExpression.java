@@ -142,6 +142,8 @@ public interface ElixirAccessExpression extends Quotable {
   @Nullable
   ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber();
 
+  boolean isModuleName();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull

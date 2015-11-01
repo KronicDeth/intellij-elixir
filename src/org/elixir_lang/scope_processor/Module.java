@@ -43,16 +43,16 @@ public class Module extends BaseScopeProcessor {
 
             if (qualifiableAliasFullyQualifiedName != null && qualifiableAliasFullyQualifiedName.equals(usage.fullyQualifiedName())) {
                 PsiElement parent = element.getParent();
-                PsiElement potentialNoParenthesesOneArgument;
 
                 if (parent instanceof ElixirAccessExpression) {
-                    potentialNoParenthesesOneArgument = parent.getParent();
-                } else {
-                    potentialNoParenthesesOneArgument = parent;
-                }
+                    ElixirAccessExpression accessExpression = (ElixirAccessExpression) parent;
 
-                if (potentialNoParenthesesOneArgument instanceof ElixirNoParenthesesOneArgument) {
-                    ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) potentialNoParenthesesOneArgument;
+                    if (accessExpression.isModuleName()) {
+                        declaration = qualifiableAlias;
+                        keepProcessing = false;
+                    }
+                } else if (parent instanceof ElixirNoParenthesesOneArgument) {
+                    ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) parent;
 
                     if (noParenthesesOneArgument.isModuleName()) {
                         declaration = qualifiableAlias;

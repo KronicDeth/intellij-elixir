@@ -1999,6 +1999,7 @@ accessExpression ::= atNumericOperation |
                      {
                        implements = "org.elixir_lang.psi.Quotable"
                        methods = [
+                         isModuleName
                          processDeclarations
                          quote
                        ]
