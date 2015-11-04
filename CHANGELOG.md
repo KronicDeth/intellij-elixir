@@ -4,6 +4,10 @@
 * Enhancements
   * [#184](https://github.com/KronicDeth/intellij-elixir/pull/184) - If (1) you have intellij-erlang installed and (2) you have an atom in Erlang that starts with `Elixir.`, such as `'Elixir.Test'`, then intellij-elixir will annotate whether it can resolve the name to a `defmodule` call in Elixir files. - [KronicDeth](https://github.com/KronicDeth)
   * [#188](https://github.com/KronicDeth/intellij-elixir/pull/188) - Default SDK path for Linux and Windows - [zyuyou](https://github.com/zyuyou)
+  * [#198](https://github.com/KronicDeth/intellij-elixir/pull/198) - [KronicDeth](https://github.com/KronicDeth)
+    * Go To Declaration (`Cmd+Click`, `Cmd+B`, `Navigate > Declaration`) from Alias to `defmodule` where Alias is declared.
+    * Index `defmodule`s for fast Go To Declaration in [elixir-lang/elixir](https://github.com/elixir-lang/elixir) and other large projects.
+    * Find Usage for Alias in `defmodule`
 * Bug Fixes
   * [#187](https://github.com/KronicDeth/intellij-elixir/pull/187) - Fix links to screenshots in README - [zhyu](https://github.com/zhyu)
 

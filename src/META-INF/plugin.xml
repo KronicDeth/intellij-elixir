@@ -22,6 +22,20 @@
             <li>
               Default SDK path for Linux and Windows.
             </li>
+            <li>
+              Go To Declaration (<code>Cmd+Click</code>, <code>Cmd+B</code>, </code>Navigate > Declaration</code>) from
+              Alias to <code>defmodule</code> where Alias is declared.
+            </li>
+            <li>
+              Index <code>defmodule</code>s for fast Go To Declaration in
+              <a href="https://github.com/elixir-lang/elixir">
+                <code>elixir-lang/elixir</code>
+              </a>
+              and other large projects.
+            </li>
+            <li>
+              Find Usage for Alias in <code>defmodule</code>
+            </li>
           </ul>
         </li>
         <li>
