@@ -670,6 +670,23 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
     * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
       ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
 
+### Go To Declaration
+
+Go To Declaration is a feature of JetBrains IDEs that allows you to jump from the usage of a symbol, such as a Module
+Alias, to its declaration, such as the `defmodule` call.
+
+#### Module
+
+1. Place the cursor over an Alias
+2. Activate the Go To Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+
+If you hold `Cmd` and hover over the Alias before clicking, the target declaration will be shown.
+
+[![Go To Declaration Demonstration](http://img.youtube.com/vi/nN-DMEe-BQA/0.jpg)](https://www.youtube.com/watch?v=nN-DMEe-BQA)
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
