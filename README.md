@@ -27,8 +27,9 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
    ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
 4. Select a Project SDK directory by clicking Configure.
 5. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-   homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
-   about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+   Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+   with information about Elixir install locations on your operating system and package manager to have SDK detection
+   added for it.**)
 6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
 7. Click Next after you select SDK name from the Project SDK list.
@@ -59,8 +60,9 @@ If you've already created a (non-`mix`) project, you can load it as an Elixir pr
 10. Click Next.      
 10. Select a Project SDK directory by clicking Configure.
 11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-    homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
-    about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+    with information about Elixir install locations on your operating system and package manager to have SDK detection
+    added for it.**)
 12. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
 13. Click Next after you select SDK name from the Project SDK list.
@@ -86,8 +88,9 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 13. Click Next
 14. Select a Project SDK directory by clicking Configure.
 15. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-    homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
-    about Elixir install locations on your operating system and package manager to have SDK detection added for it.**)
+    Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
+    with information about Elixir install locations on your operating system and package manager to have SDK detection
+    added for it.**)
 16. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
 17. Click Finish after you select SDK name from the Project SDK list.
