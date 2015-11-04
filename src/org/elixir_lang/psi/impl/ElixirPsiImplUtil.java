@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
@@ -17,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 
@@ -430,6 +429,63 @@ public class ElixirPsiImplUtil {
     }
 
     /*
+     * Whether this is a `defmodule <argument> do end` call.
+     */
+    public static boolean isDefmodule(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        return (unmatchedUnqualifiedNoParenthesesCall.resolvedModuleName().equals("Elixir.Kernel") &&
+                unmatchedUnqualifiedNoParenthesesCall.resolvedFunctionName().equals("defmodule") &&
+                unmatchedUnqualifiedNoParenthesesCall.getDoBlock() != null);
+    }
+
+    /*
+     * Whether this is an argument in `defmodule <argument> do end` call.
+     */
+    public static boolean isModuleName(@NotNull final ElixirAccessExpression accessExpression) {
+        PsiElement parent = accessExpression.getParent();
+        boolean isModuleName = false;
+
+        if (parent instanceof ElixirNoParenthesesOneArgument) {
+            ElixirNoParenthesesOneArgument noParenthesesOneArgument = (ElixirNoParenthesesOneArgument) parent;
+
+            isModuleName = noParenthesesOneArgument.isModuleName();
+        }
+
+        return isModuleName;
+    }
+
+    public static boolean isModuleName(@NotNull final QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        int siblingCount = parent.getChildren().length - 1;
+        boolean isModuleName = false;
+
+        /* check that this qualifiableAlias is the only child so subsections of alias chains don't say they are module
+           names. */
+        if (siblingCount == 0 && parent instanceof MaybeModuleName) {
+            MaybeModuleName maybeModuleName = (MaybeModuleName) parent;
+
+            isModuleName = maybeModuleName.isModuleName();
+        }
+
+        return isModuleName;
+    }
+
+    /*
+     * Whether this is an argument in `defmodule <argument> do end` call.
+     */
+    public static boolean isModuleName(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
+        PsiElement parent = noParenthesesOneArgument.getParent();
+        boolean isModuleName = false;
+
+        if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
+            ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
+
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isDefmodule();
+        }
+
+        return isModuleName;
+    }
+
+    /*
      * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
      *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
      */
@@ -485,6 +541,13 @@ public class ElixirPsiImplUtil {
         };
 
         return new OtpErlangList(keywordListElements);
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // Always null because it's unqualified.
+        return null;
     }
 
     @Contract(pure = true)
@@ -621,6 +684,92 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
         return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                accessExpression,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirAlias alias,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                alias,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                noParenthesesOneArgument,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processDeclarationsRecursively(
+                unmatchedUnqualifiedNoParenthesesCall,
+                processor,
+                state,
+                lastParent,
+                place
+        );
+    }
+
+    public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement place) {
+        return processor.execute(qualifiedAlias, state);
+    }
+
+    public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,
+                                                         @NotNull PsiScopeProcessor processor,
+                                                         @NotNull ResolveState state,
+                                                         PsiElement lastParent,
+                                                         @NotNull PsiElement place) {
+        boolean keepProcessing = processor.execute(psiElement, state);
+
+        if (keepProcessing) {
+            PsiElement[] children = psiElement.getChildren();
+
+            for (PsiElement child : children) {
+                if (!child.processDeclarations(processor, state, lastParent, place)) {
+                    keepProcessing = false;
+
+                    break;
+                }
+            }
+        }
+
+        return keepProcessing;
     }
 
     @Contract(pure = true)
@@ -928,6 +1077,62 @@ public class ElixirPsiImplUtil {
         return excessWhitespaceASTNode;
     }
 
+    /**
+     * Adds `Elixir.` to alias text.
+     *
+     * @param alias
+     * @return
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
+        return "Elixir." + alias.getName();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
+        String fullyQualifiedName = null;
+        PsiElement[] children = qualifiableAlias.getChildren();
+
+        assert children.length == 3;
+
+        PsiElement qualifier = children[0];
+        String qualifierName = null;
+
+        if (qualifier instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableQualifier = (QualifiableAlias) qualifier;
+
+            qualifierName = qualifiableQualifier.fullyQualifiedName();
+        } else if (qualifier instanceof ElixirAccessExpression) {
+            PsiElement[] qualifierChildren = qualifier.getChildren();
+
+            if (qualifierChildren.length == 1) {
+                PsiElement qualifierChild = qualifierChildren[0];
+
+                if (qualifierChild instanceof ElixirAlias) {
+                    ElixirAlias childAlias = (ElixirAlias) qualifierChild;
+
+                    qualifierName = childAlias.getName();
+                }
+            }
+        }
+
+        if (qualifierName != null) {
+            ElixirAlias alias = (ElixirAlias) children[2];
+
+            fullyQualifiedName = qualifierName + "." + alias.getName();
+        }
+
+        return fullyQualifiedName;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String functionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        return unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+    }
+
     @Contract(pure = true)
     @NotNull
     public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
@@ -1201,6 +1406,84 @@ public class ElixirPsiImplUtil {
 
     public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
         return noParenthesesKeywordPair.getNoParenthesesExpression();
+    }
+
+    @NotNull
+    public static String getName(@NotNull ElixirAlias alias) {
+        return alias.getText();
+    }
+
+    @NotNull
+    public static String getName(@NotNull ElixirMatchedQualifiedAlias matchedQualifiedAlias) {
+        return matchedQualifiedAlias.getText();
+    }
+
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
+        PsiElement parent = alias.getParent();
+        PsiElement nameIdentifier = null;
+
+        if (parent instanceof ElixirAccessExpression) {
+            PsiElement grandParent = parent.getParent();
+
+            // alias is first alias in chain of qualifiers
+            if (grandParent instanceof QualifiableAlias) {
+                QualifiableAlias grandParentQualifiableAlias = (QualifiableAlias) grandParent;
+                nameIdentifier = grandParentQualifiableAlias.getNameIdentifier();
+            } else {
+                /* NamedStubbedPsiElementBase#getTextOffset assumes getNameIdentifier is null when the NameIdentifier is
+                   the element itself. */
+                // alias is single, unqualified alias
+                nameIdentifier = null;
+            }
+        } else if (parent instanceof QualifiableAlias) {
+            // alias is last in chain of qualifiers
+            QualifiableAlias parentQualifiableAlias = (QualifiableAlias) parent;
+            nameIdentifier = parentQualifiableAlias.getNameIdentifier();
+        }
+
+        return nameIdentifier;
+    }
+
+    /**
+     *
+     * @param qualifiableAlias
+     * @return null if qualifiableAlias is its own name identifier
+     * @return PsiElement if qualifiableAlias is a subalias of a bigger qualified alias
+     */
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        PsiElement nameIdentifier;
+
+        if (parent instanceof QualifiableAlias) {
+            QualifiableAlias parentQualifiedAlias = (QualifiableAlias) parent;
+
+            nameIdentifier = parentQualifiedAlias.getNameIdentifier();
+        } else {
+            nameIdentifier = null;
+        }
+
+        return nameIdentifier;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        PsiReference reference = null;
+
+        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
+           reference from overall chain */
+        if (!(parent instanceof QualifiableAlias)) {
+            PsiElement grandParent = parent.getParent();
+
+            // prevents first Alias of a qualified chain from having a separate reference from overall chain
+            if (!(grandParent instanceof QualifiableAlias)) {
+                reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            }
+        }
+
+        return reference;
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
@@ -2293,7 +2576,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        String identifier = unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+        String identifier = unqualifiedNoParenthesesCall.functionName();
         OtpErlangObject quotedIdentifer = new OtpErlangAtom(identifier);
 
         ElixirNoParenthesesOneArgument noParenthesesOneArgument = unqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
@@ -3063,6 +3346,35 @@ if (quoted == null) {
                         context
                 }
         );
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
+    public static String resolvedFunctionName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // TODO handle `import`s
+        return unmatchedUnqualifiedNoParenthesesCall.functionName();
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        // TODO handle `import`s
+        return "Elixir.Kernel";
+    }
+
+    @NotNull
+    public static PsiElement setName(@NotNull PsiElement element, @NotNull String newName) {
+        return null;
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {

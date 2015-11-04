@@ -31,8 +31,6 @@ public class ElixirParserDefinition implements ParserDefinition {
     );
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
 
-    public static final IFileElementType FILE = new IFileElementType(Language.<ElixirLanguage>findInstance(ElixirLanguage.class));
-
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
@@ -61,7 +59,7 @@ public class ElixirParserDefinition implements ParserDefinition {
 
     @Override
     public IFileElementType getFileNodeType() {
-        return FILE;
+        return org.elixir_lang.psi.stub.type.File.INSTANCE;
     }
 
     public PsiFile createFile(FileViewProvider viewProvider) {

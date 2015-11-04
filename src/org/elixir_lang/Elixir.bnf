@@ -1470,7 +1470,17 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
                                 @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
                              !additionTail matchedExpression
-                             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.MaybeModuleName"
+                                 "org.elixir_lang.psi.QuotableArguments"
+                               ]
+                               methods = [
+                                 isModuleName
+                                 processDeclarations
+                                 quoteArguments
+                               ]
+                             }
 
 /* @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L418
   @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L609-L610 */
@@ -1556,6 +1566,7 @@ matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                             "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
                                           ]
                                           methods = [
+                                            functionName
                                             getDoBlock
                                             quote
                                           ]
@@ -1585,7 +1596,25 @@ matchedBracketOperation ::= matchedExpression bracketArguments
  */
 
 matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
-                          { implements = "org.elixir_lang.psi.QualifiedAlias" methods = [quote] }
+                          {
+                            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
+                            implements = [
+                              "org.elixir_lang.psi.NamedElement"
+                              "org.elixir_lang.psi.QualifiedAlias"
+                            ]
+                            methods = [
+                              fullyQualifiedName
+                              getName
+                              getNameIdentifier
+                              getReference
+                              isModuleName
+                              processDeclarations
+                              quote
+                              setName
+                            ]
+                            mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedAlias>"
+                            stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedAlias"
+                          }
 
 /*
  * Qualified Identifier Bracket Operation
@@ -1971,14 +2000,43 @@ accessExpression ::= atNumericOperation |
                      atomKeyword |
                      atom |
                      alias
-                     { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                     {
+                       implements = [
+                         "org.elixir_lang.psi.MaybeModuleName"
+                         "org.elixir_lang.psi.Quotable"
+                       ]
+                       methods = [
+                         isModuleName
+                         processDeclarations
+                         quote
+                       ]
+                     }
 
 // keywords that map to atoms
 atomKeyword ::= FALSE | NIL | TRUE
                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] name = "false, nil, true" }
 
 alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
-          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+          {
+            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
+            extends = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<?>"
+            implements = [
+              "org.elixir_lang.psi.NamedElement"
+              "org.elixir_lang.psi.QualifiableAlias"
+              "org.elixir_lang.psi.Quotable"
+            ]
+            methods = [
+              fullyQualifiedName
+              getName
+              getNameIdentifier
+              getReference
+              isModuleName
+              processDeclarations
+              quote
+              setName
+            ]
+            stubClass = "org.elixir_lang.psi.stub.Alias"
+          }
 
 /*
  *
@@ -2200,7 +2258,15 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParent
 unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument doBlock?
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
-                                            methods = [quote]
+                                            methods = [
+                                              functionName
+                                              moduleName
+                                              isDefmodule
+                                              processDeclarations
+                                              quote
+                                              resolvedFunctionName
+                                              resolvedModuleName
+                                            ]
                                           }
 
 /*
@@ -2219,7 +2285,18 @@ unmatchedBracketOperation ::= unmatchedExpression bracketArguments
  */
 
 unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
-                            { implements = "org.elixir_lang.psi.QualifiedAlias" methods = [quote] }
+                            {
+                              implements = "org.elixir_lang.psi.QualifiedAlias"
+                              methods = [
+                                fullyQualifiedName
+                                getNameIdentifier
+                                getReference
+                                isModuleName
+                                processDeclarations
+                                quote
+                                setName
+                              ]
+                            }
 
 /*
  * Qualified Identifier Bracket Operation

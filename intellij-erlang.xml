@@ -3,7 +3,7 @@
     <dirname property="intellij-erlang.basedir" file="${ant.file.intellij-erlang}"/>
 
     <property name="intellij-erlang.output.dir" value="${intellij-erlang.basedir}/dependencies/intellij-erlang"/>
-    <property name="intellij-erlang.release" value="778"/>
+    <property name="intellij-erlang.release" value="802"/>
     <property name="intellij-erlang.zip" value="Erlang.${intellij-erlang.release}.zip"/>
     <property name="intellij-erlang.cache" value="${intellij-erlang.basedir}/cache/intellij-erlang"/>
     <property name="intellij-erlang.zip.root.basename" value="Erlang"/>

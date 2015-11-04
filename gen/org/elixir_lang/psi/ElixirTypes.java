@@ -4,6 +4,7 @@ package org.elixir_lang.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.ElementTypeFactory;
 import org.elixir_lang.psi.impl.*;
 
 public interface ElixirTypes {
@@ -11,7 +12,7 @@ public interface ElixirTypes {
   IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
   IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
-  IElementType ALIAS = new ElixirElementType("ALIAS");
+  IElementType ALIAS = ElementTypeFactory.factory("ALIAS");
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
   IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
   IElementType ARROW_INFIX_OPERATOR = new ElixirElementType("ARROW_INFIX_OPERATOR");
@@ -127,7 +128,7 @@ public interface ElixirTypes {
   IElementType MATCHED_OR_OPERATION = new ElixirElementType("MATCHED_OR_OPERATION");
   IElementType MATCHED_PARENTHESES_ARGUMENTS = new ElixirElementType("MATCHED_PARENTHESES_ARGUMENTS");
   IElementType MATCHED_PIPE_OPERATION = new ElixirElementType("MATCHED_PIPE_OPERATION");
-  IElementType MATCHED_QUALIFIED_ALIAS = new ElixirElementType("MATCHED_QUALIFIED_ALIAS");
+  IElementType MATCHED_QUALIFIED_ALIAS = ElementTypeFactory.factory("MATCHED_QUALIFIED_ALIAS");
   IElementType MATCHED_QUALIFIED_BRACKET_OPERATION = new ElixirElementType("MATCHED_QUALIFIED_BRACKET_OPERATION");
   IElementType MATCHED_QUALIFIED_NO_ARGUMENTS_CALL = new ElixirElementType("MATCHED_QUALIFIED_NO_ARGUMENTS_CALL");
   IElementType MATCHED_QUALIFIED_NO_PARENTHESES_CALL = new ElixirElementType("MATCHED_QUALIFIED_NO_PARENTHESES_CALL");

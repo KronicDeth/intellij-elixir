@@ -10,6 +10,9 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
+  @NotNull
+  String functionName();
+
   @Nullable
   ElixirDoBlock getDoBlock();
 

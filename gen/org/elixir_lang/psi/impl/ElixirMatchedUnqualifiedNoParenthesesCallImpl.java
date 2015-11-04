@@ -28,6 +28,11 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends ElixirMatched
     return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
   }
 
+  @NotNull
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
   @Nullable
   public ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);

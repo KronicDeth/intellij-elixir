@@ -421,6 +421,7 @@
     <internalFileTemplate name="Elixir GenServer"/>
     <internalFileTemplate name="Elixir GenEvent"/>
 
+    <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
@@ -435,6 +436,8 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
+
+    <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
   </extensions>
 
   <application-components>
