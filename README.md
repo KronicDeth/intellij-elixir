@@ -687,6 +687,23 @@ If you hold `Cmd` and hover over the Alias before clicking, the target declarati
 
 [![Go To Declaration Demonstration](http://img.youtube.com/vi/nN-DMEe-BQA/0.jpg)](https://www.youtube.com/watch?v=nN-DMEe-BQA)
 
+### Find Usage
+
+Find Usage is a feature of JetBrains IDEs that allows you to find all the places a declared symbol, such a Module Alias
+in a `defmodule`, is used, including in strings and comments.
+
+#### Module
+
+1. Place cursor over an `defmodule` Alias.
+2. Activate the Find Usage action with one of the following:
+  a.
+    i. Right-click the Alias
+    ii. Select "Find Usages" from the context menu
+  b. Select Edit &gt; Find &gt; Find Usages from the menu
+  c. `Alt+F7`
+  
+[![Find Module Usage Demonstration](http://img.youtube.com/vi/n_EEucKK0N0/0.jpg)](https://www.youtube.com/watch?v=n_EEucKK0N0)
+
 ## Installation
  
 ### Inside IDE using JetBrains repository
