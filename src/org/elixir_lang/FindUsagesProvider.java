@@ -5,7 +5,9 @@ import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirFile;
+import org.elixir_lang.psi.MaybeModuleName;
+import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -105,7 +107,11 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
         String descriptiveName = null;
 
-        if (element instanceof MaybeModuleName) {
+        if (element instanceof ElixirFile) {
+            ElixirFile file = (ElixirFile) element;
+
+            descriptiveName = file.getVirtualFile().getPresentableUrl();
+        } else if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
 
             if (maybeModuleName.isModuleName()) {
