@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>1.2.0</version>
+  <version>1.2.1-pre</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,18 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v1.2.1</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p
+          <ul>
+            <li>
+              Fix <code>IllegalStateException</code> for file delete and rename by giving <code>ElixirFile</code>s
+              descriptive names for safe-refactoring displaying file usage.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v1.2.0</h1>
       <ul>
         <li>
