@@ -6,7 +6,15 @@ This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetB
 ([0xDBE](http://www.jetbrains.com/dbe/), [AppCode](http://www.jetbrains.com/objc/),
 [IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
 [PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
-[WebStorm](http://www.jetbrains.com/webstorm/))
+[WebStorm](http://www.jetbrains.com/webstorm/)).
+
+It works with the free,
+[open source](https://github.com/JetBrains/intellij-community) Community edition of IntelliJ IDEA in edition to the
+paid JetBrains IDEs like Ultimate edition of IntelliJ.  No feature is locked to a the paid version of the IDEs, but
+the plugin works best in IntelliJ because only IntelliJ supports projects with different languages than the default
+(Java for IntelliJ, Ruby for Rubymine, etc).
+
+The plugin itself is free.  Once you have your IDE of choice installed, you can [install this plugin](#installation)
 
 ## Features
 
