@@ -18,6 +18,12 @@
               Fix <code>IllegalStateException</code> for file delete and rename by giving <code>ElixirFile</code>s
               descriptive names for safe-refactoring displaying file usage.
             </li>
+            <li>
+              README states explicitly that the plugin works with *both* IntelliJ Community and Ultimate.
+            </li>
+            <li>
+              README states that the plugin is free.
+            </li>
           </ul>
         </li>
       </ul>

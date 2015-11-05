@@ -3,6 +3,9 @@
 ## v1.2.1
 * Bug Fixes
   * [#200](https://github.com/KronicDeth/intellij-elixir/pull/200) - Fix `IllegalStateException` for file delete and rename by giving `ElixirFile`s descriptive names for safe-refactoring displaying file usage. - [KronicDeth](https://github.com/KronicDeth)
+  * [#201](https://github.com/KronicDeth/intellij-elixir/pull/201) - [KronicDeth](https://github.com/KronicDeth)
+    * README states explicitly that the plugin works with *both* IntelliJ Community and Ultimate.
+    * README states that the plugin is free.
 
 ## v1.2.0
 * Enhancements
