@@ -1122,6 +1122,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_PROMOTER}         { setPromoter(yytext());
                              yybegin(GROUP);
                              return promoterType(); }
+  {EOL}                    { return TokenType.BAD_CHARACTER; }
 }
 
 <OCTAL_WHOLE_NUMBER> {
