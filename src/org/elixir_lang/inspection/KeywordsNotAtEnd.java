@@ -6,7 +6,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import org.elixir_lang.psi.ElixirNoParenthesesKeywords;
+import org.elixir_lang.psi.ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments;
 import org.elixir_lang.psi.ElixirParenthesesArguments;
+import org.elixir_lang.psi.ElixirParentheticalStab;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +56,14 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                             PsiElement ancestor = element.getParent();
 
                             while (ancestor != null) {
-                                if (ancestor instanceof ElixirParenthesesArguments) {
+                                if (ancestor instanceof ElixirParentheticalStab) {
+                                    /* the keyword arguments are part of a call with parentheses around it, so they
+                                       are not ambiguous.
+
+                                       @see https://github.com/KronicDeth/intellij-elixir/issues/195 */
+                                    break;
+                                } else if (ancestor instanceof ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments ||
+                                        ancestor instanceof ElixirParenthesesArguments) {
                                     listElement = ancestor;
                                     PsiElement[] listChildren = listElement.getChildren();
 
