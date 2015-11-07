@@ -29,6 +29,7 @@ public class KeywordsNotAtEndTestCase extends LightCodeInsightFixtureTestCase {
         myFixture.enableInspections(KeywordsNotAtEnd.class);
         myFixture.checkHighlighting();
     }
+
     public void testParenthesesWithMatchedCallOperationInMiddle() {
         myFixture.configureByFiles("ParenthesesWithMatchedCallOperationInMiddle.ex");
         myFixture.enableInspections(KeywordsNotAtEnd.class);

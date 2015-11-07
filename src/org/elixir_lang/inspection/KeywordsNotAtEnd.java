@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import org.elixir_lang.psi.ElixirNoParenthesesKeywords;
+import org.elixir_lang.psi.ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments;
 import org.elixir_lang.psi.ElixirParenthesesArguments;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +55,8 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                             PsiElement ancestor = element.getParent();
 
                             while (ancestor != null) {
-                                if (ancestor instanceof ElixirParenthesesArguments) {
+                                if (ancestor instanceof ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments ||
+                                        ancestor instanceof ElixirParenthesesArguments) {
                                     listElement = ancestor;
                                     PsiElement[] listChildren = listElement.getChildren();
 
