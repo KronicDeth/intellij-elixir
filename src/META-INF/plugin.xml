@@ -12,6 +12,14 @@
       <h1>v1.2.1</h1>
       <ul>
         <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Keywords not at the end of no parentheses calls will be properly marked as errors.
+            </li>
+          </ul>
+        </li>
+        <li>
           <p>Bug Fixes</p
           <ul>
             <li>
@@ -28,6 +36,10 @@
               Prevent match error when typing <code>~</code> to start a sigil that is followed later by a
               <code>\n</code> by matching <code>EOL</code> in the <code>NAMED_SIGIL</code> state as a
               <code>BAD_CHARACTER</code>.
+            </li>
+            <li>
+               Keywords at the end of a no parentheses call that is surrounded by parentheses will not be marked as an
+               error when that parenthetical group appears in the middle of an outer call.
             </li>
           </ul>
         </li>

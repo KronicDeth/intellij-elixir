@@ -1,12 +1,15 @@
 # Changelog
 
 ## v1.2.1
+* Enhancements
+  * [#204](https://github.com/KronicDeth/intellij-elixir/pull/204) - Keywords not at the end of no parentheses calls will be properly marked as errors. - [KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#200](https://github.com/KronicDeth/intellij-elixir/pull/200) - Fix `IllegalStateException` for file delete and rename by giving `ElixirFile`s descriptive names for safe-refactoring displaying file usage. - [KronicDeth](https://github.com/KronicDeth)
   * [#201](https://github.com/KronicDeth/intellij-elixir/pull/201) - [KronicDeth](https://github.com/KronicDeth)
     * README states explicitly that the plugin works with *both* IntelliJ Community and Ultimate.
     * README states that the plugin is free.
   * [#202](https://github.com/KronicDeth/intellij-elixir/pull/202) - Prevent match error when typing `~` to start a sigil that is followed later by a `\n` by matching `EOL` in the `NAMED_SIGIL` state as a `BAD_CHARACTER` - [KronicDeth](https://github.com/KronicDeth)
+  * [#204](https://github.com/KronicDeth/intellij-elixir/pull/204) - Keywords at the end of a no parentheses call that is surrounded by parentheses will not be marked as an error when that parenthetical group appears in the middle of an outer call. - [KronicDeth](https://github.com/KronicDeth)
 
 ## v1.2.0
 * Enhancements
