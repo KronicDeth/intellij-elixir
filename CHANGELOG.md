@@ -6,6 +6,7 @@
   * [#201](https://github.com/KronicDeth/intellij-elixir/pull/201) - [KronicDeth](https://github.com/KronicDeth)
     * README states explicitly that the plugin works with *both* IntelliJ Community and Ultimate.
     * README states that the plugin is free.
+  * [#202](https://github.com/KronicDeth/intellij-elixir/pull/202) - Prevent match error when typing `~` to start a sigil that is followed later by a `\n` by matching `EOL` in the `NAMED_SIGIL` state as a `BAD_CHARACTER` - [KronicDeth](https://github.com/KronicDeth)
 
 ## v1.2.0
 * Enhancements

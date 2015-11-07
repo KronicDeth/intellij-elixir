@@ -24,6 +24,11 @@
             <li>
               README states that the plugin is free.
             </li>
+            <li>
+              Prevent match error when typing <code>~</code> to start a sigil that is followed later by a
+              <code>\n</code> by matching <code>EOL</code> in the <code>NAMED_SIGIL</code> state as a
+              <code>BAD_CHARACTER</code>.
+            </li>
           </ul>
         </li>
       </ul>
