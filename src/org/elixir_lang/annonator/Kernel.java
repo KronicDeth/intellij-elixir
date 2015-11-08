@@ -13,10 +13,66 @@ import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Annotates functions and macros from `Kernel` module.
  */
 public class Kernel implements Annotator, DumbAware {
+    /*
+     * CONSTANTS
+     */
+
+    private static final Set<String> RESOLVED_MACRO_NAME_SET = new HashSet<String>(
+            Arrays.asList(
+                    new String[] {
+                            "@",
+                            "alias!",
+                            "and",
+                            "binding",
+                            "def",
+                            "defdelegate",
+                            "defexception",
+                            "defimpl",
+                            "defmacro",
+                            "defmacrop",
+                            "defmodule",
+                            "defoverridable",
+                            "defp",
+                            "defprotocol",
+                            "defstruct",
+                            "destructure",
+                            "get_and_update_in",
+                            "if",
+                            "in",
+                            "is_nil",
+                            "match?",
+                            "or",
+                            "put_in",
+                            "raise",
+                            "raise",
+                            "reraise",
+                            "reraise",
+                            "sigil_C",
+                            "sigil_R",
+                            "sigil_S",
+                            "sigil_W",
+                            "sigil_c",
+                            "sigil_r",
+                            "sigil_s",
+                            "sigil_w",
+                            "to_char_list",
+                            "to_string",
+                            "unless",
+                            "update_in",
+                            "use",
+                            "var!"
+                    }
+            )
+    );
+
     /*
      * Public Instance Methods
      */
@@ -39,7 +95,7 @@ public class Kernel implements Annotator, DumbAware {
                if (unmatchedUnqualifiedNoParenthesesCall.resolvedModuleName().equals("Elixir.Kernel")) {
                    String resolvedFunctionName = unmatchedUnqualifiedNoParenthesesCall.resolvedFunctionName();
 
-                   if (resolvedFunctionName.equals("defmodule")) {
+                   if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
                        ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
                        ASTNode identifier = node.getFirstChildNode();
                        highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
