@@ -69,12 +69,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey KERNEL_FUNCTION = createTextAttributesKey(
             "ELIXIR_KERNEL_FUNCTION",
-            DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL
+            DefaultLanguageHighlighterColors.FUNCTION_CALL
     );
 
     public static final TextAttributesKey KERNEL_MACRO = createTextAttributesKey(
             "ELIXIR_KERNEL_MACRO",
-            DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL
+            DefaultLanguageHighlighterColors.FUNCTION_CALL
     );
 
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
