@@ -77,6 +77,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.FUNCTION_CALL
     );
 
+    public static final TextAttributesKey KERNEL_SPECIAL_FORMS_MACRO = createTextAttributesKey(
+            "ELIXIR_KERNEL_SPECIAL_FORMS_MACRO",
+            KERNEL_MACRO
+    );
+
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
             "ELIXIR_OBSOLETE_WHOLE_NUMBER_BASE",
             HighlighterColors.BAD_CHARACTER

@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Annotates functions and macros from `Kernel` module.
+ * Annotates functions and macros from `Kernel` and `Kernel.SpecialForms` modules.
  */
 public class Kernel implements Annotator, DumbAware {
     /*
@@ -136,6 +136,32 @@ public class Kernel implements Annotator, DumbAware {
             )
     );
 
+    private static final Set<String> RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET = new HashSet<String>(
+            Arrays.asList(
+                    new String[]{
+                            "__CALLER__",
+                            "__DIR__",
+                            "__ENV__",
+                            "__MODULE__",
+                            "__aliases__",
+                            "__block__",
+                            "alias",
+                            "case",
+                            "cond",
+                            "fn",
+                            "for",
+                            "import",
+                            "quote",
+                            "receive",
+                            "require",
+                            "super",
+                            "try",
+                            "unquote",
+                            "unquote_splicing"
+                    }
+            )
+    );
+
     /*
      * Public Instance Methods
      */
@@ -172,6 +198,12 @@ public class Kernel implements Annotator, DumbAware {
                                 ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
                                 ASTNode identifier = node.getFirstChildNode();
                                 highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
+                            }
+
+                            if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                                ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
+                                ASTNode identifier = node.getFirstChildNode();
+                                highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
                             }
                         }
                     }
