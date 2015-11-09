@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends QuotableCall {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Quotable, QuotableArguments {
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();

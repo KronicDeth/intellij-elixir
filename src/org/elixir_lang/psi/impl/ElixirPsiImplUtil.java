@@ -2834,10 +2834,10 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final QuotableCall quotableCall) {
-        OtpErlangObject quotedIdentifier = quotableCall.quoteIdentifier();
-        OtpErlangObject[] quotedArguments = quotableCall.quoteArguments();
-        return anchoredQuotedFunctionCall(quotableCall, quotedIdentifier, quotedArguments);
+    public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        OtpErlangObject quotedIdentifier = unqualifiedNoParenthesesManyArgumentsCall.quoteIdentifier();
+        OtpErlangObject[] quotedArguments = unqualifiedNoParenthesesManyArgumentsCall.quoteArguments();
+        return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, quotedArguments);
     }
 
     @NotNull
@@ -2847,7 +2847,7 @@ if (quoted == null) {
         if (Macro.isExpression(quotedIdentifier)) {
             OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
             /* Grab metadata from quotedIdentifier so line of quotedFunctionCall is line of identifier or `.` in
-               identifier, which can differ from the line of QuotableCall when there are newlines on either side of
+               identifier, which can differ from the line of quotable call when there are newlines on either side of
                `.`. */
             metadata = Macro.metadata(expression);
         } else {
