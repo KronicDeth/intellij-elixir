@@ -952,7 +952,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {
-    visitCall(o);
+    visitQuotableCall(o);
   }
 
   public void visitVariable(@NotNull ElixirVariable o) {
@@ -972,10 +972,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitBody(@NotNull Body o) {
-    visitElement(o);
-  }
-
-  public void visitCall(@NotNull Call o) {
     visitElement(o);
   }
 
@@ -1024,6 +1020,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitQuotableArguments(@NotNull QuotableArguments o) {
+    visitElement(o);
+  }
+
+  public void visitQuotableCall(@NotNull QuotableCall o) {
     visitElement(o);
   }
 

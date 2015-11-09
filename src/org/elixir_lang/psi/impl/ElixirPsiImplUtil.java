@@ -2895,8 +2895,8 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject[] quoteArguments(Call call) {
-        return call.getArguments().quoteArguments();
+    public static OtpErlangObject[] quoteArguments(ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return unqualifiedNoParenthesesManyArgumentsCall.getArguments().quoteArguments();
     }
 
     @Contract(pure = true)
@@ -3120,8 +3120,8 @@ if (quoted == null) {
         return elixirString("");
     }
 
-    public static OtpErlangObject quoteIdentifier(@NotNull Call call) {
-        Quotable identifier = call.getIdentifier();
+    public static OtpErlangObject quoteIdentifier(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        Quotable identifier = unqualifiedNoParenthesesManyArgumentsCall.getIdentifier();
         OtpErlangObject quotedIdentifier;
 
         if (identifier instanceof ElixirVariable) {

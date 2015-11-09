@@ -248,7 +248,9 @@ noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER !KEYWORD_PAIR_COL
 unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualifiedIdentifier
                                               noParenthesesManyArgumentsStrict
                                               {
-                                                implements = "org.elixir_lang.psi.Call"
+                                                implements = [
+                                                  "org.elixir_lang.psi.QuotableCall"
+                                                ]
                                                 methods = [
                                                   getArguments
                                                   getIdentifier
