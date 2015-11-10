@@ -54,14 +54,13 @@ public class Util {
 
                 Collection<Quotable> children = PsiTreeUtil.findChildrenOfAnyType(
                         elixirFile,
-                        AtUnqualifiedNoParenthesesCall.class,
+                        Call.class
                         DotCall.class,
                         ElixirUnqualifiedNoParenthesesManyArgumentsCall.class,
                         QualifiedNoArgumentsCall.class,
                         QualifiedNoParenthesesCall.class,
                         QualifiedParenthesesCall.class,
                         UnqualifiedNoArgumentsCall.class,
-                        UnqualifiedNoParenthesesCall.class,
                         UnqualifiedParenthesesCall.class
                 );
 
