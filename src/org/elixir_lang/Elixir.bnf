@@ -1742,8 +1742,13 @@ matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
                                           "org.elixir_lang.psi.UnqualifiedNoArgumentsCall"
                                         ]
                                         methods = [
+                                          functionName
+                                          functionNameNode
+                                          moduleName
                                           getDoBlock
                                           quote
+                                          resolvedFunctionName
+                                          resolvedModuleName
                                         ]
                                       }
 
@@ -2406,7 +2411,17 @@ unmatchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
  */
 
 unmatchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
-                                        { implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall" methods = [quote] }
+                                        {
+                                          implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall"
+                                          methods = [
+                                            functionName
+                                            functionNameNode
+                                            moduleName
+                                            quote
+                                            resolvedFunctionName
+                                            resolvedModuleName
+                                          ]
+                                        }
 
 unmatchedAccessExpression ::= accessExpression
                               { elementType = accessExpression }
