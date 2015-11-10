@@ -572,6 +572,13 @@ public class ElixirPsiImplUtil {
         return null;
     }
 
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
+        // Always null because it's unqualified.
+        return null;
+    }
+
     @Contract(pure = true)
     @NotNull
     public static ASTNode operatorTokenNode(@NotNull Operator operator) {
@@ -1195,6 +1202,12 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static ASTNode functionNameNode(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         return unqualifiedNoParenthesesCall.getNode().getFirstChildNode();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static ASTNode functionNameNode(@NotNull final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
+        return unqualifiedParenthesesCall.getNode().getFirstChildNode();
     }
 
     @Contract(pure = true)
@@ -3458,6 +3471,17 @@ if (quoted == null) {
     }
 
     /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
+    public static String resolvedFunctionName(@NotNull final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
+        // TODO handle `import`s
+        return unqualifiedParenthesesCall.functionName();
+    }
+
+    /**
      * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
      *
      * @param element
@@ -3506,7 +3530,20 @@ if (quoted == null) {
      * @return
      */
     @NotNull
-    public static String resolvedModuleName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        // TODO handle `import`s
+        return "Elixir.Kernel";
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
         // TODO handle `import`s
         return "Elixir.Kernel";
     }

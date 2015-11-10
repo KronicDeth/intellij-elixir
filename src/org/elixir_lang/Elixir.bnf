@@ -1696,8 +1696,13 @@ matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
                                           "org.elixir_lang.psi.UnqualifiedParenthesesCall"
                                         ]
                                         methods = [
+                                          functionName
+                                          functionNameNode
+                                          moduleName
                                           getDoBlock
                                           quote
+                                          resolvedFunctionName
+                                          resolvedModuleName
                                         ]
                                       }
 /*
@@ -2382,7 +2387,14 @@ unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL brac
 unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments doBlock?
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedParenthesesCall"
-                                          methods = [quote]
+                                          methods = [
+                                            functionName
+                                            functionNameNode
+                                            moduleName
+                                            quote
+                                            resolvedFunctionName
+                                            resolvedModuleName
+                                          ]
                                         }
 
 /*
