@@ -42,6 +42,11 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
     return ElixirPsiImplUtil.functionName(this);
   }
 
+  @NotNull
+  public ASTNode functionNameNode() {
+    return ElixirPsiImplUtil.functionNameNode(this);
+  }
+
   @Nullable
   public String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);

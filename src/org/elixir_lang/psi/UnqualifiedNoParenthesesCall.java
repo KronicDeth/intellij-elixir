@@ -5,11 +5,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * IDENTIFIER noParenthesesOneArgument
  */
-public interface UnqualifiedNoParenthesesCall extends Quotable {
+public interface UnqualifiedNoParenthesesCall extends Call, Quotable {
     @NotNull
     String functionName();
-
-    ElixirDoBlock getDoBlock();
 
     ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 }

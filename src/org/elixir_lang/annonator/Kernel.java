@@ -8,9 +8,9 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiRecursiveElementVisitor;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.Call;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -178,36 +178,33 @@ public class Kernel implements Annotator, DumbAware {
     @Override
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
-                new ElixirVisitor() {
-                    @Override
-                    public void visitUnmatchedUnqualifiedNoParenthesesCall(@NotNull ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
-                        // the Kernel annotator only cares about Elixir.Kernel
-                        if (unmatchedUnqualifiedNoParenthesesCall.resolvedModuleName().equals("Elixir.Kernel")) {
-                            String resolvedFunctionName = unmatchedUnqualifiedNoParenthesesCall.resolvedFunctionName();
+            new PsiRecursiveElementVisitor() {
+                public void visitCall(Call call) {
+                    String resolvedFunctionName = call.resolvedFunctionName();
 
-                            // a function can't take a do block
-                            if (unmatchedUnqualifiedNoParenthesesCall.getDoBlock() == null) {
-                                if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
-                                    ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
-                                    ASTNode identifier = node.getFirstChildNode();
-                                    highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_FUNCTION);
-                                }
-                            }
-
-                            if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                                ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
-                                ASTNode identifier = node.getFirstChildNode();
-                                highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
-                            }
-
-                            if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                                ASTNode node = unmatchedUnqualifiedNoParenthesesCall.getNode();
-                                ASTNode identifier = node.getFirstChildNode();
-                                highlight(identifier, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
-                            }
+                    // a function can't take a `do` block
+                    if (call.getDoBlock() == null) {
+                        if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
+                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_FUNCTION);
                         }
                     }
+
+                    if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                        highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
+                    }
+
+                    if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                        highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
+                    }
                 }
+
+                @Override
+                public void visitElement(PsiElement element) {
+                    if (element instanceof Call) {
+                        visitCall((Call) element);
+                    }
+                }
+            }
         );
     }
 
@@ -220,10 +217,25 @@ public class Kernel implements Annotator, DumbAware {
      *
      * @param node node to highlight
      * @param annotationHolder the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the `textRange`.
+     * @param textAttributesKey text attributes to apply to the `node`.
      */
-    private void highlight(@NotNull ASTNode node, @NotNull AnnotationHolder annotationHolder, @NotNull TextAttributesKey textAttributesKey) {
+    private void highlight(@NotNull final ASTNode node, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
         annotationHolder.createInfoAnnotation(node, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
         annotationHolder.createInfoAnnotation(node, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
+    }
+
+    /**
+     * Highlights function name of call.
+     *
+     * @param call
+     * @param annotationHolder  the container which receives annotations created by the plugin.
+     * @param textAttributesKey text attributes to apply to the `call`'s `Call#functionNameNode`.
+     */
+    private void highlight(@NotNull final Call call, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
+        ASTNode functionNameNode = call.functionNameNode();
+
+        assert functionNameNode != null;
+
+        highlight(functionNameNode, annotationHolder, textAttributesKey);
     }
 }

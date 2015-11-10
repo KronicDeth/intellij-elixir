@@ -545,7 +545,7 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // Always null because it's unqualified.
         return null;
     }
@@ -1130,7 +1130,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static String functionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+        return unqualifiedNoParenthesesCall.functionNameNode().getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static ASTNode functionNameNode(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        return unqualifiedNoParenthesesCall.getNode().getFirstChildNode();
     }
 
     @Contract(pure = true)
@@ -3354,9 +3360,9 @@ if (quoted == null) {
      * @return
      */
     @NotNull
-    public static String resolvedFunctionName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String resolvedFunctionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // TODO handle `import`s
-        return unmatchedUnqualifiedNoParenthesesCall.functionName();
+        return unqualifiedNoParenthesesCall.functionName();
     }
 
     /**
@@ -3367,7 +3373,7 @@ if (quoted == null) {
      * @return
      */
     @NotNull
-    public static String resolvedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String resolvedModuleName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // TODO handle `import`s
         return "Elixir.Kernel";
     }

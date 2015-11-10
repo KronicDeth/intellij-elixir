@@ -1570,8 +1570,12 @@ matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                           ]
                                           methods = [
                                             functionName
+                                            functionNameNode
+                                            moduleName
                                             getDoBlock
                                             quote
+                                            resolvedFunctionName
+                                            resolvedModuleName
                                           ]
                                         }
 
@@ -2263,6 +2267,7 @@ unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument do
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
                                             methods = [
                                               functionName
+                                              functionNameNode
                                               moduleName
                                               isDefmodule
                                               processDeclarations
