@@ -68,6 +68,7 @@ public class ElixirPsiImplUtil {
     public static final int OCTAL_BASE = 8;
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
     public static final int UNKNOWN_BASE = 36;
+    public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER);
 
     @Contract(pure = true)
     @NotNull
@@ -541,6 +542,13 @@ public class ElixirPsiImplUtil {
         };
 
         return new OtpErlangList(keywordListElements);
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        // Always null because it's unqualified.
+        return null;
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1128,9 +1136,28 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
+    @Nullable
+    public static String functionName(@NotNull final Call call) {
+        String functionName = null;
+        ASTNode node = call.functionNameNode();
+
+        if (node != null) {
+            functionName = node.getText();
+        }
+
+        return functionName;
+    }
+
+    /**
+     *
+     * @param atUnqualifiedNoParenthesesCall
+     * @return `null` because the `IDENTIFIER`, `foo` in `@foo 1` is not the local name of a function, but the name of a
+     *   Module attribute.
+     */
+    @Contract(pure = true, value = "_ -> null")
     @NotNull
-    public static String functionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return unqualifiedNoParenthesesCall.functionNameNode().getText();
+    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return null;
     }
 
     @Contract(pure = true)
@@ -2206,7 +2233,7 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedOperator = operator.quote();
 
         ASTNode node = atUnqualifiedBracketOperation.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -2236,7 +2263,7 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedOperator = operator.quote();
 
         ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -2637,7 +2664,7 @@ if (quoted == null) {
         ElixirDoBlock doBlock = unqualifiedNoArgumentsCall.getDoBlock();
         OtpErlangObject quoted;
         ASTNode node = unqualifiedNoArgumentsCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -3359,10 +3386,35 @@ if (quoted == null) {
      *
      * @return
      */
+    @Nullable
+    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        // TODO handle resolving function name from module attribute's declaration
+        return null;
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
     @NotNull
     public static String resolvedFunctionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // TODO handle `import`s
         return unqualifiedNoParenthesesCall.functionName();
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        // TODO handle resolving module name from module attribute's declaration
+        return null;
     }
 
     /**

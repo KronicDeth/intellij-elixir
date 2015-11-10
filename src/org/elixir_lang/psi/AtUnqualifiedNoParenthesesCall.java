@@ -3,10 +3,8 @@ package org.elixir_lang.psi;
 /**
  * atPrefixOperator IDENTIFIER CALL bracketArguments
  */
-public interface AtUnqualifiedNoParenthesesCall extends Quotable {
+public interface AtUnqualifiedNoParenthesesCall extends Call, Quotable {
     Quotable getAtPrefixOperator();
-
-    ElixirDoBlock getDoBlock();
 
     QuotableArguments getNoParenthesesOneArgument();
 }

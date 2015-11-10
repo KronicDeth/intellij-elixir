@@ -11,7 +11,7 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @NotNull
+  @Nullable
   String functionName();
 
   @NotNull
