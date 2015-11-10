@@ -46,9 +46,34 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
     return findNotNullChildByClass(ElixirUnmatchedExpression.class);
   }
 
+  @Nullable
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
+  @Nullable
+  public ASTNode functionNameNode() {
+    return ElixirPsiImplUtil.functionNameNode(this);
+  }
+
+  @Nullable
+  public String moduleName() {
+    return ElixirPsiImplUtil.moduleName(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @Nullable
+  public String resolvedFunctionName() {
+    return ElixirPsiImplUtil.resolvedFunctionName(this);
+  }
+
+  @Nullable
+  public String resolvedModuleName() {
+    return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
 }

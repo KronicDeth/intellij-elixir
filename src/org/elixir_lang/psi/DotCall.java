@@ -5,10 +5,8 @@ import java.util.List;
 /**
  * <expression> dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
  */
-public interface DotCall extends Quotable {
+public interface DotCall extends Call, Quotable {
     Quotable getDotInfixOperator();
 
     List<ElixirParenthesesArguments> getParenthesesArgumentsList();
-
-    ElixirDoBlock getDoBlock();
 }

@@ -42,7 +42,7 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
     return ElixirPsiImplUtil.functionName(this);
   }
 
-  @NotNull
+  @Nullable
   public ASTNode functionNameNode() {
     return ElixirPsiImplUtil.functionNameNode(this);
   }

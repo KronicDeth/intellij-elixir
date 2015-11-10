@@ -20,7 +20,7 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @Nullable
   String functionName();
 
-  @NotNull
+  @Nullable
   ASTNode functionNameNode();
 
   @Nullable

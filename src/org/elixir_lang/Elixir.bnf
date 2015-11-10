@@ -1513,8 +1513,13 @@ matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments paren
                        "org.elixir_lang.psi.MatchedCall"
                      ]
                      methods = [
+                       functionName
+                       functionNameNode
                        getDoBlock
+                       moduleName
                        quote
+                       resolvedFunctionName
+                       resolvedModuleName
                      ]
                    }
 
@@ -2239,7 +2244,17 @@ unmatchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric unmatchedExpr
  */
 
 unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
-                     { implements = "org.elixir_lang.psi.DotCall" methods = [quote] }
+                     {
+                       implements = "org.elixir_lang.psi.DotCall"
+                       methods = [
+                         functionName
+                         functionNameNode
+                         moduleName
+                         quote
+                         resolvedFunctionName
+                         resolvedModuleName
+                       ]
+                     }
 
 /*
  * Qualified No Parentheses Call

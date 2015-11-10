@@ -2,6 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,22 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
 
+  @Nullable
+  String functionName();
+
+  @Nullable
+  ASTNode functionNameNode();
+
+  @Nullable
+  String moduleName();
+
   @NotNull
   OtpErlangObject quote();
+
+  @Nullable
+  String resolvedFunctionName();
+
+  @Nullable
+  String resolvedModuleName();
 
 }

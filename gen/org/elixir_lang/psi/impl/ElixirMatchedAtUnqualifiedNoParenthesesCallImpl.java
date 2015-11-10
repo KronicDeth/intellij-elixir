@@ -36,7 +36,7 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
     return ElixirPsiImplUtil.functionName(this);
   }
 
-  @NotNull
+  @Nullable
   public ASTNode functionNameNode() {
     return ElixirPsiImplUtil.functionNameNode(this);
   }

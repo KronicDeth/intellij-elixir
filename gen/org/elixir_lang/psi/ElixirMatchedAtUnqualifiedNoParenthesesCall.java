@@ -17,7 +17,7 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @Nullable
   String functionName();
 
-  @NotNull
+  @Nullable
   ASTNode functionNameNode();
 
   @Nullable

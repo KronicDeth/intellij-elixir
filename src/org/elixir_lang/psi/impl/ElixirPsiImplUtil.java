@@ -553,6 +553,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // Always null because anonymous
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // Always null because it's unqualified.
         return null;
@@ -1155,8 +1162,19 @@ public class ElixirPsiImplUtil {
      *   Module attribute.
      */
     @Contract(pure = true, value = "_ -> null")
-    @NotNull
+    @Nullable
     public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return null;
+    }
+
+    /**
+     *
+     * @param dotCall
+     * @return `null` because the expression before the `.` is a variable name and not a function name.
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         return null;
     }
 
@@ -3397,6 +3415,19 @@ if (quoted == null) {
      *
      * @return
      */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // TODO handle resolving function name from potential capture when declaring variable
+        return null;
+    }
+
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
     @NotNull
     public static String resolvedFunctionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
         // TODO handle `import`s
@@ -3414,6 +3445,20 @@ if (quoted == null) {
     @Nullable
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         // TODO handle resolving module name from module attribute's declaration
+        return null;
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // TODO handle resolving module name from any capture from variable declaration
         return null;
     }
 
