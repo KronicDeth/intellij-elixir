@@ -2,10 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Quotable, QuotableArguments {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Call, Quotable, QuotableArguments {
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
@@ -15,6 +16,15 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Quotabl
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();
+
+  @Nullable
+  String functionName();
+
+  @NotNull
+  ASTNode functionNameNode();
+
+  @Nullable
+  String moduleName();
 
   @NotNull
   QuotableArguments getArguments();
@@ -29,5 +39,11 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Quotabl
   OtpErlangObject[] quoteArguments();
 
   OtpErlangObject quoteIdentifier();
+
+  @NotNull
+  String resolvedFunctionName();
+
+  @NotNull
+  String resolvedModuleName();
 
 }

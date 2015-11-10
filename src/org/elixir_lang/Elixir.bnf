@@ -249,15 +249,21 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                               noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
+                                                  "org.elixir_lang.psi.Call"
                                                   "org.elixir_lang.psi.Quotable"
                                                   "org.elixir_lang.psi.QuotableArguments"
                                                 ]
                                                 methods = [
+                                                  functionName
+                                                  functionNameNode
+                                                  moduleName
                                                   getArguments
                                                   getIdentifier
                                                   quote
                                                   quoteArguments
                                                   quoteIdentifier
+                                                  resolvedFunctionName
+                                                  resolvedModuleName
                                                 ]
                                               }
 

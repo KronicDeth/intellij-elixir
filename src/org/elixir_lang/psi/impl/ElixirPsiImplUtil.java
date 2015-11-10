@@ -560,6 +560,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        // Always null because it's unqualified.
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // Always null because it's unqualified.
         return null;
@@ -1190,6 +1197,12 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         return null;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static ASTNode functionNameNode(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier().getNode();
     }
 
     @Contract(pure = true)
@@ -3454,6 +3467,17 @@ if (quoted == null) {
      * @return
      */
     @NotNull
+    public static String resolvedFunctionName(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        // TODO handle `import`s
+        return unqualifiedNoParenthesesManyArgumentsCall.functionName();
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
     public static String resolvedFunctionName(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually local variable
         return unqualifiedNoArgumentsCall.functionName();
@@ -3507,6 +3531,19 @@ if (quoted == null) {
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         // TODO handle resolving module name from any capture from variable declaration
         return null;
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        // TODO handle `import`s
+        return "Elixir.Kernel";
     }
 
     /**
