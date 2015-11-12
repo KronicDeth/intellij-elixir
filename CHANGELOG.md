@@ -2,10 +2,11 @@
 
 ## v1.3.0
 * Enhancements
-  * Highlighters for
-    * Kernel Functions
-    * Kernel Macros
-    * Kernel.SpecialForms Macros
+  * [#207](https://github.com/KronicDeth/intellij-elixir/pull/207) - [KronicDeth](https://github.com/KronicDeth)
+    * Highlighters for
+      * Kernel Functions
+      * Kernel Macros
+      * Kernel.SpecialForms Macros
 * Bug Fixes 
   * [#206](https://github.com/KronicDeth/intellij-elixir/pull/206) - Change "edition" to "addition" in README. - [folz](https://github.com/folz)
 
