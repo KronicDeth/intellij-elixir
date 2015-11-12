@@ -3508,7 +3508,14 @@ if (quoted == null) {
     @NotNull
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final org.elixir_lang.psi.call.qualification.Qualified qualified) {
         // TODO handle `alias`es and `import`s
-        return qualified.moduleName();
+        String moduleName = qualified.moduleName();
+        String resolvedModuleName = moduleName;
+
+        if (!moduleName.startsWith("Elixir.")) {
+            resolvedModuleName = "Elixir." + moduleName;
+        }
+
+        return resolvedModuleName;
     }
 
     /**
