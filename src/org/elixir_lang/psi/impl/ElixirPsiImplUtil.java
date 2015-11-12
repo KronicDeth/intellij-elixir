@@ -12,6 +12,9 @@ import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.qualification.Qualified;
+import org.elixir_lang.psi.qualification.Unqualified;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,6 +71,7 @@ public class ElixirPsiImplUtil {
     public static final int OCTAL_BASE = 8;
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
     public static final int UNKNOWN_BASE = 36;
+    public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER);
 
     @Contract(pure = true)
     @NotNull
@@ -545,9 +549,30 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static String moduleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         // Always null because it's unqualified.
         return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // Always null because anonymous
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final Unqualified unqualified) {
+        // Always null because it's unqualified.
+        return null;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String moduleName(@NotNull final Qualified qualified) {
+        // TODO handle more complex qualifiers besides Aliases
+        return qualified.getFirstChild().getText();
     }
 
     @Contract(pure = true)
@@ -1128,9 +1153,55 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
+    @Nullable
+    public static String functionName(@NotNull final Call call) {
+        String functionName = null;
+        ASTNode node = call.functionNameNode();
+
+        if (node != null) {
+            functionName = node.getText();
+        }
+
+        return functionName;
+    }
+
+    /**
+     *
+     * @param atUnqualifiedNoParenthesesCall
+     * @return `null` because the `IDENTIFIER`, `foo` in `@foo 1` is not the local name of a function, but the name of a
+     *   Module attribute.
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return null;
+    }
+
+    /**
+     *
+     * @param dotCall
+     * @return `null` because the expression before the `.` is a variable name and not a function name.
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        return null;
+    }
+
+    public static ASTNode functionNameNode(@NotNull final Qualified qualified) {
+        return qualified.getRelativeIdentifier().getNode();
+    }
+
+    @Contract(pure = true)
     @NotNull
-    public static String functionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        return unqualifiedNoParenthesesCall.getNode().getFirstChildNode().getText();
+    public static ASTNode functionNameNode(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier().getNode();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static ASTNode functionNameNode(@NotNull final Unqualified unqualified) {
+        return unqualified.getNode().getFirstChildNode();
     }
 
     @Contract(pure = true)
@@ -1231,6 +1302,12 @@ public class ElixirPsiImplUtil {
 
     public static Body getBody(ElixirStringHeredocLine stringHeredocLine) {
         return stringHeredocLine.getQuoteStringBody();
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return null;
     }
 
     @Nullable
@@ -2200,7 +2277,7 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedOperator = operator.quote();
 
         ASTNode node = atUnqualifiedBracketOperation.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -2230,7 +2307,7 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedOperator = operator.quote();
 
         ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -2631,7 +2708,7 @@ if (quoted == null) {
         ElixirDoBlock doBlock = unqualifiedNoArgumentsCall.getDoBlock();
         OtpErlangObject quoted;
         ASTNode node = unqualifiedNoArgumentsCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(TokenSet.create(ElixirTypes.IDENTIFIER));
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
 
@@ -2834,10 +2911,10 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final QuotableCall quotableCall) {
-        OtpErlangObject quotedIdentifier = quotableCall.quoteIdentifier();
-        OtpErlangObject[] quotedArguments = quotableCall.quoteArguments();
-        return anchoredQuotedFunctionCall(quotableCall, quotedIdentifier, quotedArguments);
+    public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        OtpErlangObject quotedIdentifier = unqualifiedNoParenthesesManyArgumentsCall.quoteIdentifier();
+        OtpErlangObject[] quotedArguments = unqualifiedNoParenthesesManyArgumentsCall.quoteArguments();
+        return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, quotedArguments);
     }
 
     @NotNull
@@ -2847,7 +2924,7 @@ if (quoted == null) {
         if (Macro.isExpression(quotedIdentifier)) {
             OtpErlangTuple expression = (OtpErlangTuple) quotedIdentifier;
             /* Grab metadata from quotedIdentifier so line of quotedFunctionCall is line of identifier or `.` in
-               identifier, which can differ from the line of QuotableCall when there are newlines on either side of
+               identifier, which can differ from the line of quotable call when there are newlines on either side of
                `.`. */
             metadata = Macro.metadata(expression);
         } else {
@@ -2895,8 +2972,8 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject[] quoteArguments(Call call) {
-        return call.getArguments().quoteArguments();
+    public static OtpErlangObject[] quoteArguments(ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return unqualifiedNoParenthesesManyArgumentsCall.getArguments().quoteArguments();
     }
 
     @Contract(pure = true)
@@ -3120,8 +3197,8 @@ if (quoted == null) {
         return elixirString("");
     }
 
-    public static OtpErlangObject quoteIdentifier(@NotNull Call call) {
-        Quotable identifier = call.getIdentifier();
+    public static OtpErlangObject quoteIdentifier(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        Quotable identifier = unqualifiedNoParenthesesManyArgumentsCall.getIdentifier();
         OtpErlangObject quotedIdentifier;
 
         if (identifier instanceof ElixirVariable) {
@@ -3353,10 +3430,92 @@ if (quoted == null) {
      *
      * @return
      */
+    @Nullable
+    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        // TODO handle resolving function name from module attribute's declaration
+        return null;
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedFunctionName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // TODO handle resolving function name from potential capture when declaring variable
+        return null;
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @Contract(pure = true)
     @NotNull
-    public static String resolvedFunctionName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String resolvedFunctionName(@NotNull final Call call) {
         // TODO handle `import`s
-        return unmatchedUnqualifiedNoParenthesesCall.functionName();
+        return call.functionName();
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
+    public static String resolvedFunctionName(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        // TODO handle `import`s and determine whether actually local variable
+        return unqualifiedNoArgumentsCall.functionName();
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        // TODO handle resolving module name from module attribute's declaration
+        return null;
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+        // TODO handle resolving module name from any capture from variable declaration
+        return null;
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param qualifiedNoArgumentsCall
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final org.elixir_lang.psi.call.qualification.Qualified qualified) {
+        // TODO handle `alias`es and `import`s
+        String moduleName = qualified.moduleName();
+        String resolvedModuleName = moduleName;
+
+        if (!moduleName.startsWith("Elixir.")) {
+            resolvedModuleName = "Elixir." + moduleName;
+        }
+
+        return resolvedModuleName;
     }
 
     /**
@@ -3367,8 +3526,21 @@ if (quoted == null) {
      * @return
      */
     @NotNull
-    public static String resolvedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final Unqualified unqualified) {
         // TODO handle `import`s
+        return "Elixir.Kernel";
+    }
+
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param element
+     * @param newName
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        // TODO handle `import`s and determine whether actually a local variable
         return "Elixir.Kernel";
     }
 

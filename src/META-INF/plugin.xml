@@ -470,6 +470,7 @@
     <internalFileTemplate name="Elixir GenServer"/>
     <internalFileTemplate name="Elixir GenEvent"/>
 
+    <annotator implementationClass="org.elixir_lang.annonator.Kernel" language="Elixir"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>

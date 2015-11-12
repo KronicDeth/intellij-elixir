@@ -37,9 +37,14 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
     return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
   }
 
-  @NotNull
+  @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
+  }
+
+  @NotNull
+  public ASTNode functionNameNode() {
+    return ElixirPsiImplUtil.functionNameNode(this);
   }
 
   @Nullable

@@ -44,13 +44,37 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
   }
 
   @Nullable
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
+  public ASTNode functionNameNode() {
+    return ElixirPsiImplUtil.functionNameNode(this);
+  }
+
+  @Nullable
   public ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
   @NotNull
+  public String moduleName() {
+    return ElixirPsiImplUtil.moduleName(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public String resolvedFunctionName() {
+    return ElixirPsiImplUtil.resolvedFunctionName(this);
+  }
+
+  @NotNull
+  public String resolvedModuleName() {
+    return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
 }

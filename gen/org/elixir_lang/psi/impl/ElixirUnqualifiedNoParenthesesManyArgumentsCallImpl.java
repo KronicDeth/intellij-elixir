@@ -38,9 +38,29 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return findChildByClass(ElixirNoParenthesesStrict.class);
   }
 
+  @Nullable
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
+  @NotNull
+  public ASTNode functionNameNode() {
+    return ElixirPsiImplUtil.functionNameNode(this);
+  }
+
+  @Nullable
+  public String moduleName() {
+    return ElixirPsiImplUtil.moduleName(this);
+  }
+
   @NotNull
   public QuotableArguments getArguments() {
     return ElixirPsiImplUtil.getArguments(this);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
   }
 
   @NotNull
@@ -60,6 +80,16 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
 
   public OtpErlangObject quoteIdentifier() {
     return ElixirPsiImplUtil.quoteIdentifier(this);
+  }
+
+  @NotNull
+  public String resolvedFunctionName() {
+    return ElixirPsiImplUtil.resolvedFunctionName(this);
+  }
+
+  @NotNull
+  public String resolvedModuleName() {
+    return ElixirPsiImplUtil.resolvedModuleName(this);
   }
 
 }

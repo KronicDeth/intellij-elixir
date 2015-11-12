@@ -2,6 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
@@ -16,8 +17,11 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @NotNull
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
-  @NotNull
+  @Nullable
   String functionName();
+
+  @NotNull
+  ASTNode functionNameNode();
 
   @Nullable
   String moduleName();
