@@ -954,6 +954,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {
     visitPsiElement(o);
     // visitCall(o);
+    // visitUnqualified(o);
     // visitQuotable(o);
     // visitQuotableArguments(o);
   }

@@ -252,6 +252,7 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   // MUST be first so visitElement is used in ElixirVisitor
                                                   "com.intellij.psi.PsiElement"
                                                   "org.elixir_lang.psi.call.Call"
+                                                  "org.elixir_lang.psi.qualification.Unqualified"
                                                   "org.elixir_lang.psi.Quotable"
                                                   "org.elixir_lang.psi.QuotableArguments"
                                                 ]

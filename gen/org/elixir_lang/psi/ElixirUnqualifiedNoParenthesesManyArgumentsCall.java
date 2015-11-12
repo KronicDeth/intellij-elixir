@@ -5,10 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.qualification.Unqualified;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, Quotable, QuotableArguments {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, Unqualified, Quotable, QuotableArguments {
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
