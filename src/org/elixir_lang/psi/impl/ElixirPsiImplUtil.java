@@ -567,6 +567,13 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
+    public static String moduleName(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
+        // TODO handle more complex qualifiers besides
+        qualifiedNoArgumentsCall.getFirstChild().getText();
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // Always null because it's unqualified.
         return null;
@@ -1197,6 +1204,10 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         return null;
+    }
+
+    public static ASTNode functionNameNode(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
+        return qualifiedNoArgumentsCall.getRelativeIdentifier().getNode();
     }
 
     @Contract(pure = true)
@@ -3478,6 +3489,17 @@ if (quoted == null) {
      * @return
      */
     @NotNull
+    public static String resolvedFunctionName(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
+        // TODO handle `import`s
+        return qualifiedNoArgumentsCall.functionName();
+    }
+
+    /**
+     * Similar to {@link functionName}, but takes into account `import`s.
+     *
+     * @return
+     */
+    @NotNull
     public static String resolvedFunctionName(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually local variable
         return unqualifiedNoArgumentsCall.functionName();
@@ -3546,6 +3568,17 @@ if (quoted == null) {
         return "Elixir.Kernel";
     }
 
+    /**
+     * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
+     *
+     * @param qualifiedNoArgumentsCall
+     * @return
+     */
+    @NotNull
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
+        // TODO handle `alias`es and `import`s
+        return "Elixir.Kernel";
+    }
     /**
      * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
      *
