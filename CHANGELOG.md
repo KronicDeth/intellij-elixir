@@ -6,6 +6,8 @@
     * Kernel Functions
     * Kernel Macros
     * Kernel.SpecialForms Macros
+* Bug Fixes 
+  * [#206](https://github.com/KronicDeth/intellij-elixir/pull/206) - Change "edition" to "addition" in README. - [folz](https://github.com/folz)
 
 ## v1.2.1
 * Enhancements

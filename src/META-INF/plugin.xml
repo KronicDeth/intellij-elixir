@@ -24,6 +24,12 @@
             </li>
           </ul>
         </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Change "edition" to "addition" in README.</li>
+          </ul>
+        </li>
       </ul>
       <h1>v1.2.1</h1>
       <ul>
