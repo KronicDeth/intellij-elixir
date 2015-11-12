@@ -569,17 +569,10 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @Nullable
-    public static String moduleName(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
+    @NotNull
+    public static String moduleName(@NotNull final Qualified qualified) {
         // TODO handle more complex qualifiers besides Aliases
-        return qualifiedNoArgumentsCall.getFirstChild().getText();
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static String moduleName(@NotNull final QualifiedParenthesesCall qualifiedParenthesesCall) {
-        // TODO handle more complex qualifiers besides Aliases
-        return qualifiedParenthesesCall.getFirstChild().getText();
+        return qualified.getFirstChild().getText();
     }
 
     @Contract(pure = true)
@@ -3460,32 +3453,11 @@ if (quoted == null) {
      *
      * @return
      */
+    @Contract(pure = true)
     @NotNull
-    public static String resolvedFunctionName(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+    public static String resolvedFunctionName(@NotNull final Call call) {
         // TODO handle `import`s
-        return unqualifiedNoParenthesesManyArgumentsCall.functionName();
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
-        // TODO handle `import`s
-        return qualifiedNoArgumentsCall.functionName();
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final QualifiedParenthesesCall qualifiedParenthesesCall) {
-        // TODO handle `import`s
-        return qualifiedParenthesesCall.functionName();
+        return call.functionName();
     }
 
     /**
@@ -3497,28 +3469,6 @@ if (quoted == null) {
     public static String resolvedFunctionName(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually local variable
         return unqualifiedNoArgumentsCall.functionName();
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
-        // TODO handle `import`s
-        return unqualifiedNoParenthesesCall.functionName();
-    }
-
-    /**
-     * Similar to {@link functionName}, but takes into account `import`s.
-     *
-     * @return
-     */
-    @NotNull
-    public static String resolvedFunctionName(@NotNull final UnqualifiedParenthesesCall unqualifiedParenthesesCall) {
-        // TODO handle `import`s
-        return unqualifiedParenthesesCall.functionName();
     }
 
     /**
@@ -3556,9 +3506,9 @@ if (quoted == null) {
      * @return
      */
     @NotNull
-    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final Qualified qualified) {
+    public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final org.elixir_lang.psi.call.qualification.Qualified qualified) {
         // TODO handle `alias`es and `import`s
-        return "Elixir.Kernel";
+        return qualified.moduleName();
     }
 
     /**

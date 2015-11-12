@@ -22,7 +22,7 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
 
   ASTNode functionNameNode();
 
-  @Nullable
+  @NotNull
   String moduleName();
 
   @Nullable

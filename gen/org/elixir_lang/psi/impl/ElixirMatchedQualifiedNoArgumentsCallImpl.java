@@ -46,7 +46,7 @@ public class ElixirMatchedQualifiedNoArgumentsCallImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.functionNameNode(this);
   }
 
-  @Nullable
+  @NotNull
   public String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);
   }

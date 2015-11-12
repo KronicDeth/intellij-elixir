@@ -25,7 +25,7 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   ASTNode functionNameNode();
 
-  @Nullable
+  @NotNull
   String moduleName();
 
   @NotNull

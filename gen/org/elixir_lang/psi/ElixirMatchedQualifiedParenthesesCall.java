@@ -28,7 +28,7 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   @Nullable
   ElixirDoBlock getDoBlock();
 
-  @Nullable
+  @NotNull
   String moduleName();
 
   @NotNull

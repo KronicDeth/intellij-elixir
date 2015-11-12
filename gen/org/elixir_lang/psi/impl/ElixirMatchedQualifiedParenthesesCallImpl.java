@@ -57,7 +57,7 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  @Nullable
+  @NotNull
   public String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);
   }
