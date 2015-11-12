@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.3.0
+* Enhancements
+  * Highlighters for
+    * Kernel Functions
+    * Kernel Macros
+    * Kernel.SpecialForms Macros
+
 ## v1.2.1
 * Enhancements
   * [#204](https://github.com/KronicDeth/intellij-elixir/pull/204) - Keywords not at the end of no parentheses calls will be properly marked as errors. - [KronicDeth](https://github.com/KronicDeth)

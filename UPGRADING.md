@@ -1,5 +1,11 @@
 # Upgrading
 
+## v1.3.0
+
+The fallback key attribute is `DefaultLanguageHighlighterColors.FUNCTION_CALL`, which is uncolored in most themes, so
+users need to customize their themes to see the highlighting for "Kernel Functions", "Kernel Macros", and
+"Kernel.SpecialForms Macros".
+
 ## v1.0.0
 
 New Elixir File has moved to the last item in the New File menu to preserve `CTRL+N ENTER` keyboard shortcut for
