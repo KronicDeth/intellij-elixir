@@ -569,7 +569,7 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static String moduleName(@NotNull final QualifiedNoArgumentsCall qualifiedNoArgumentsCall) {
         // TODO handle more complex qualifiers besides
-        qualifiedNoArgumentsCall.getFirstChild().getText();
+        return qualifiedNoArgumentsCall.getFirstChild().getText();
     }
 
     @Contract(pure = true, value = "_ -> null")

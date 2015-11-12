@@ -249,6 +249,8 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                               noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
+                                                  // MUST be first so visitElement is used in ElixirVisitor
+                                                  "com.intellij.psi.PsiElement"
                                                   "org.elixir_lang.psi.Call"
                                                   "org.elixir_lang.psi.Quotable"
                                                   "org.elixir_lang.psi.QuotableArguments"
