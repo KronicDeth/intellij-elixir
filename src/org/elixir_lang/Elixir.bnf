@@ -1662,8 +1662,13 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
                                         "org.elixir_lang.psi.QualifiedParenthesesCall"
                                       ]
                                       methods = [
+                                        functionName
+                                        functionNameNode
                                         getDoBlock
+                                        moduleName
                                         quote
+                                        resolvedFunctionName
+                                        resolvedModuleName
                                       ]
                                     }
 
@@ -2374,7 +2379,17 @@ unmatchedQualifiedBracketOperation ::= unmatchedExpression dotInfixOperator rela
  */
 
 unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
-                                      { implements = "org.elixir_lang.psi.QualifiedParenthesesCall" methods = [quote] }
+                                      {
+                                        implements = "org.elixir_lang.psi.QualifiedParenthesesCall"
+                                        methods = [
+                                          functionName
+                                          functionNameNode
+                                          moduleName
+                                          quote
+                                          resolvedFunctionName
+                                          resolvedModuleName
+                                        ]
+                                      }
 
 /*
  * Qualified Call with No Arguments - neither parenthes nor no parentheses
