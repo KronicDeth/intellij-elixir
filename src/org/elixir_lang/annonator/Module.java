@@ -6,9 +6,14 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.Util;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.stubs.StubIndex;
+import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.stub.index.AllName;
 import org.intellij.erlang.psi.ErlangAtom;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public class Module implements Annotator {
 
@@ -23,7 +28,15 @@ public class Module implements Annotator {
             if (name.startsWith(ELIXIR_ALIAS_PREFIX)) {
                 Project project = psiElement.getProject();
 
-                if (Util.findModuleDefinition(project, name) != null) {
+                Collection<NamedElement> namedElementCollection = StubIndex.getElements(
+                        AllName.KEY,
+                        name,
+                        project,
+                        GlobalSearchScope.allScope(project),
+                        NamedElement.class
+                );
+
+                if (namedElementCollection.size() > 0) {
                     TextRange textRange = psiElement.getTextRange();
                     String unprefixedName = name.substring(ELIXIR_ALIAS_PREFIX.length(), name.length());
                     Annotation annotation = annotationHolder.createInfoAnnotation(textRange, "Resolves to Elixir Module " + unprefixedName);
