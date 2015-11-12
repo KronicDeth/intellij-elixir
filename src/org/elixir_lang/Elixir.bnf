@@ -258,6 +258,7 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   functionNameNode
                                                   moduleName
                                                   getArguments
+                                                  getDoBlock
                                                   getIdentifier
                                                   quote
                                                   quoteArguments

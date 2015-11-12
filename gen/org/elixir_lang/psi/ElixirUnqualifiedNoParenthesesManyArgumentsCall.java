@@ -29,6 +29,9 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends Call, Q
   @NotNull
   QuotableArguments getArguments();
 
+  @Nullable
+  ElixirDoBlock getDoBlock();
+
   @NotNull
   Quotable getIdentifier();
 

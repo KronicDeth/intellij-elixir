@@ -58,6 +58,11 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return ElixirPsiImplUtil.getArguments(this);
   }
 
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
   @NotNull
   public Quotable getIdentifier() {
     return ElixirPsiImplUtil.getIdentifier(this);

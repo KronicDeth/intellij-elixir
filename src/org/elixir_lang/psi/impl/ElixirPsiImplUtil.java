@@ -1334,6 +1334,12 @@ public class ElixirPsiImplUtil {
         return stringHeredocLine.getQuoteStringBody();
     }
 
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return null;
+    }
+
     @Nullable
     public static ElixirDoBlock getDoBlock(@SuppressWarnings("unused") MatchedCall matchedCall) {
         return null;
