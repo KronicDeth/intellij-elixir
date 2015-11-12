@@ -180,21 +180,25 @@ public class Kernel implements Annotator, DumbAware {
         element.accept(
             new PsiRecursiveElementVisitor() {
                 public void visitCall(Call call) {
-                    String resolvedFunctionName = call.resolvedFunctionName();
+                    String resolvedModuleName = call.resolvedModuleName();
 
-                    // a function can't take a `do` block
-                    if (call.getDoBlock() == null) {
-                        if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
-                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_FUNCTION);
+                    if (resolvedModuleName != null && resolvedModuleName.equals("Elixir.Kernel")) {
+                        String resolvedFunctionName = call.resolvedFunctionName();
+
+                        // a function can't take a `do` block
+                        if (call.getDoBlock() == null) {
+                            if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
+                                highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_FUNCTION);
+                            }
                         }
-                    }
 
-                    if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                        highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
-                    }
+                        if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
+                        }
 
-                    if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                        highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
+                        if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
+                        }
                     }
                 }
 
