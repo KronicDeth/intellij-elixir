@@ -10,7 +10,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.psi.Call;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

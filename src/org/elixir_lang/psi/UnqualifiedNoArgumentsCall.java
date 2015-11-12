@@ -1,5 +1,7 @@
 package org.elixir_lang.psi;
 
+import org.elixir_lang.psi.call.Call;
+
 /**
  * IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
  */

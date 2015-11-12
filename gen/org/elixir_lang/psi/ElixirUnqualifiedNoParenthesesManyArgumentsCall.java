@@ -4,6 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
