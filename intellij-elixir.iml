@@ -30,7 +30,7 @@
     <orderEntry type="library" name="JInterface" level="project" />
     <orderEntry type="library" scope="TEST" name="mockito-core-2.0.7-beta" level="project" />
     <orderEntry type="library" scope="TEST" name="objenesis-2.1" level="project" />
-    <orderEntry type="library" name="junit-4.11" level="project" />
+    <orderEntry type="library" name="junit-4.12" level="project" />
     <orderEntry type="module" module-name="jps-shared" />
     <orderEntry type="module" module-name="jps-builder" />
     <orderEntry type="library" scope="PROVIDED" name="erlang" level="project" />

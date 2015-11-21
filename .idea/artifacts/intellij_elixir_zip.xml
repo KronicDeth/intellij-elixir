@@ -14,7 +14,7 @@
             <element id="archive" name="jps-shared.jar">
               <element id="module-output" name="jps-shared" />
             </element>
-            <element id="library" level="project" name="junit-4.11" />
+            <element id="library" level="project" name="junit-4.12" />
             <element id="library" level="module" name="JUnit4" module-name="intellij-elixir" />
             <element id="library" level="project" name="JInterface" />
           </element>
