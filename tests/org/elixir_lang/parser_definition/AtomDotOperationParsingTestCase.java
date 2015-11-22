@@ -54,7 +54,7 @@ public class AtomDotOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testAlias() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     /*
