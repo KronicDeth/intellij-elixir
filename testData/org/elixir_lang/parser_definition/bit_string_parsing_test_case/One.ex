@@ -1,6 +1,5 @@
 << &one >>
 << one \\ two >>
-<< one when one: 1 >>
 << one :: two >>
 << one | two >>
 << one = two >>
@@ -16,7 +15,6 @@
 << one ^^^ two >>
 << !one >>
 << one.() >>
-<< @one two, three: 3 >>
 << One.Two[three] >>
 << One.Two >>
 << One.two[three] >>

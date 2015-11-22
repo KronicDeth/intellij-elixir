@@ -5,6 +5,10 @@ public class BitStringParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testNoParenthesesPositionalKeywords() {
+        assertParsedAndQuotedAroundError();
+    }
+
     public void testOne() {
         assertParsedAndQuotedCorrectly();
     }
@@ -23,6 +27,10 @@ public class BitStringParsingTestCase extends ParsingTestCase {
 
     public void testThree() {
         assertParsedAndQuotedCorrectly();
+    }
+
+    public void testWhenKeyword() {
+        assertParsedAndQuotedAroundError();
     }
 
     @Override
