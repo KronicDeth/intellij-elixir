@@ -48,6 +48,17 @@ its classes.  The ant files used to build on Travis CI can be used to download t
 
 ### Dependencies
 
+#### [`elixir-lang/elixir`](https://github.com/elixir-lang/elixir)
+
+[`package org.elixir_lang.parser_definition.ElixirLangElixirParsingTestCase`](https://github.com/KronicDeth/intellij-elixir/blob/master/tests/org/elixir_lang/parser_definition/ElixirLangElixirParsingTestCase.java)
+parses all the `*.ex` files in [`elixir-lang/elixir`](https://github.com/elixir-lang/elixir) to verify the parser works
+with a realistic set of realistic files.
+
+##### Installation
+
+1. `mkdir ~/git`
+2. `git clone git@github.com:elixir-lang/elixir.git elixir-lang/elixir`
+
 #### `intellij_elixir`
 [`org.elixir_lang.parsing_definition` tests](tests/org/elixir_lang.parsing_definition) uses
 [`intellij_elixir`](https://github.com/KronicDeth/intellij_elixir)'s `IntellijElixir.Quoter` process to verify that
