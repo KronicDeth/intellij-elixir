@@ -229,6 +229,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/elixir/lib/map.ex", Parse.CORRECT);
     }
 
+    public void testMapSet() {
+        assertParsed("lib/elixir/lib/map_set.ex", Parse.CORRECT);
+    }
+
     public void testModule() {
         assertParsed("lib/elixir/lib/module.ex", Parse.CORRECT);
     }
@@ -397,6 +401,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/ex_unit/lib/ex_unit/capture_io.ex", Parse.CORRECT);
     }
 
+    public void testExUnitCaptureLog() {
+        assertParsed("lib/ex_unit/lib/ex_unit/capture_log.ex", Parse.CORRECT);
+    }
+
     public void testExUnitCase() {
         assertParsed("lib/ex_unit/lib/ex_unit/case.ex", Parse.CORRECT);
     }
@@ -545,6 +553,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/config.ex", Parse.CORRECT);
     }
 
+    public void testMixConfigAgent() {
+        assertParsed("lib/mix/lib/mix/config/agent.ex", Parse.CORRECT);
+    }
+
     public void testMixDep() {
         assertParsed("lib/mix/lib/mix/dep.ex", Parse.CORRECT);
     }
@@ -577,6 +589,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/generator.ex", Parse.CORRECT);
     }
 
+    public void testMixHex() {
+        assertParsed("lib/mix/lib/mix/hex.ex", Parse.CORRECT);
+    }
+
     public void testMixLocal() {
         assertParsed("lib/mix/lib/mix/local.ex", Parse.CORRECT);
     }
@@ -591,6 +607,10 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
 
     public void testMixRebar() {
         assertParsed("lib/mix/lib/mix/rebar.ex", Parse.CORRECT);
+    }
+
+    public void testMixPublicKey() {
+        assertParsed("lib/mix/lib/mix/public_key.ex", Parse.CORRECT);
     }
 
     public void testMixRemoteConverger() {
@@ -756,12 +776,20 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/local.hex.ex", Parse.CORRECT);
     }
 
+    public void testMixTasksLocalPublicKeys() {
+        assertParsed("lib/mix/lib/mix/tasks/local.public_keys.ex", Parse.CORRECT);
+    }
+
     public void testMixTasksLocalRebar() {
         assertParsed("lib/mix/lib/mix/tasks/local.rebar.ex", Parse.CORRECT);
     }
 
     public void testMixTasksNew() {
         assertParsed("lib/mix/lib/mix/tasks/new.ex", Parse.CORRECT);
+    }
+
+    public void testMixTasksProfileFprof() {
+        assertParsed("lib/mix/lib/mix/tasks/profile.fprof.ex", Parse.CORRECT);
     }
 
     public void testMixTasksRun() {
