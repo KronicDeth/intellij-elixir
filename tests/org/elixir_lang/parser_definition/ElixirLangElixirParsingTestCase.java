@@ -792,10 +792,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/test/fixtures/escripttest/lib/escripttest.ex", Parse.CORRECT);
     }
 
-    public void testEscripttestProtocolsLibEscripttest() {
-        assertParsed("lib/mix/test/fixtures/escripttest_protocols/lib/escripttest.ex", Parse.CORRECT);
-    }
-
     public void testNoMixfileLibA() {
         assertParsed("lib/mix/test/fixtures/no_mixfile/lib/a.ex", Parse.CORRECT);
     }
