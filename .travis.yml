@@ -3,6 +3,10 @@ cache:
   - cache
   - dependencies
 language: elixir
+elixir:
+- 1.1.1
+otp_release:
+- 18.1
 before_install:
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"
