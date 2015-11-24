@@ -25,7 +25,7 @@ public class InterpolatedRegexHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     @Override

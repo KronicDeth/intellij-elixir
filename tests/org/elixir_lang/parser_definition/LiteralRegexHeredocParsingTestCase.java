@@ -25,7 +25,7 @@ public class LiteralRegexHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     @Override

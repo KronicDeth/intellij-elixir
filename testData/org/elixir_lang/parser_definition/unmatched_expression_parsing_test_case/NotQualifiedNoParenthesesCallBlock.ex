@@ -70,11 +70,11 @@ not ^1.two three, key: value do end
 not ^1.two three, four do end
 not ^1.two three + four do end
 
-not fn one end.two key: value do end
-not fn one end.two three four, key: value do end
-not fn one end.two three, key: value do end
-not fn one end.two three, four do end
-not fn one end.two three + four do end
+not fn -> one end.two key: value do end
+not fn -> one end.two three four, key: value do end
+not fn -> one end.two three, key: value do end
+not fn -> one end.two three, four do end
+not fn -> one end.two three + four do end
 
 not (->).one key: value do end
 not (->).one two three, key: value do end

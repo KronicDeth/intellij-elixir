@@ -70,11 +70,11 @@
 !^1.two three, four do end
 !^1.two three + four do end
 
-!fn one end.two key: value do end
-!fn one end.two three four, key: value do end
-!fn one end.two three, key: value do end
-!fn one end.two three, four do end
-!fn one end.two three + four do end
+!fn -> one end.two key: value do end
+!fn -> one end.two three four, key: value do end
+!fn -> one end.two three, key: value do end
+!fn -> one end.two three, four do end
+!fn -> one end.two three + four do end
 
 !(->).one key: value do end
 !(->).one two three, key: value do end

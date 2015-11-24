@@ -1,6 +1,5 @@
 %{ &one => &two }
 %{ one \\ two => three \\ four }
-%{ one when one: 1 => two when two: 2 }
 %{ one when one => two when two }
 %{ one :: two => three :: four }
 %{ one = two => three = four }

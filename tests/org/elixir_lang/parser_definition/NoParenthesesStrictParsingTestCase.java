@@ -2,7 +2,7 @@ package org.elixir_lang.parser_definition;
 
 public class NoParenthesesStrictParsingTestCase extends ParsingTestCase {
     public void testEmptyParentheses() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testKeywordsInParentheses() {

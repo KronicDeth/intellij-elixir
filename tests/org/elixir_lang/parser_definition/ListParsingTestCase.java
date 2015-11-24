@@ -81,7 +81,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordValue() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMatchedCallOperationKeywordValue() {

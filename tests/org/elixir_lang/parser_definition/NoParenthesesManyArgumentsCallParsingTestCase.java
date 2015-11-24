@@ -125,7 +125,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testNoParenthesesExpressionKeywordValue() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalAlias() {
