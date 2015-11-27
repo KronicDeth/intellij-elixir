@@ -56,10 +56,6 @@ public class MatchedPipeOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testMatchedHatOperation() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }

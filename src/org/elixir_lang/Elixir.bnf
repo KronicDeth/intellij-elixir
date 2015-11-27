@@ -21,7 +21,7 @@
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AND_OPERATOR = "&&&, `and`, &&"
-    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
+    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^"
     ASSOCIATION_OPERATOR = "=>"
     ATOM_FRAGMENT = "A-Z, a-z, _, @, 0-9. ?, !"
     AT_OPERATOR = "@"
@@ -63,7 +63,6 @@
     EXPONENT_MARK = "E, e"
     FALSE = "false"
     FN = "fn"
-    HAT_OPERATOR = "^^^"
     HEREDOC_LINE_WHITE_SPACE_TOKEN = "Whitespace at beginning of line of heredoc"
     HEREDOC_PREFIX_WHITE_SPACE = "Whitespace at beginning of last line of heredoc before terminator"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
@@ -1054,7 +1053,6 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
-                      matchedHatOperation |
                       matchedUnaryNonNumericOperation |
                       matchedDotCall |
                       // NoParentheses before matchedBracketOperation because brackets only make sense after parentheses.
@@ -1273,7 +1271,7 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                            operatorTokenSet
                            quote
                          ]
-                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
+                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^"
                        }
 matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
                           { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
@@ -1360,25 +1358,6 @@ matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator
                                    { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
 /*
- * Hat Operation - left-associative
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66
- *
- */
-
-hatInfixOperator ::= EOL* HAT_OPERATOR EOL*
-                     {
-                       implements = "org.elixir_lang.psi.Operator"
-                       methods = [
-                         operatorTokenSet
-                         quote
-                       ]
-                       name = "^^^"
-                     }
-matchedHatOperation ::= matchedExpression hatInfixOperator matchedExpression
-                        { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
-
-/*
  * Unary Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
@@ -1432,7 +1411,6 @@ relativeIdentifier ::= IDENTIFIER |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
                        ELSE |
                        END |
-                       HAT_OPERATOR |
                        IN_MATCH_OPERATOR |
                        IN_OPERATOR |
                        // NOT MAP_OPERATOR because it is a special form
@@ -2245,16 +2223,6 @@ unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOper
                                      { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
 
 /*
- * Hat Operation - left-associative
- *
- * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L66
- *
- */
-
-unmatchedHatOperation ::= unmatchedExpression hatInfixOperator unmatchedExpression
-                          { implements = "org.elixir_lang.psi.InfixOperation" methods = [quote] }
-
-/*
  * Unary Non-Numeric Operation - non-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L67
@@ -2547,7 +2515,6 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |
-                        unmatchedHatOperation |
                         unmatchedUnaryNonNumericOperation |
                         unmatchedDotCall |
                         // NoParentheses before unmatchedBracketOperation because brackets only make sense after parentheses.
@@ -2743,7 +2710,6 @@ keywordKey ::= AFTER |
                DO |
                DUAL_OPERATOR |
                ELSE |
-               HAT_OPERATOR |
                IDENTIFIER |
                IN_MATCH_OPERATOR |
                IN_OPERATOR |

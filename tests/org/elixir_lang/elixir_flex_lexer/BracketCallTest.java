@@ -359,7 +359,7 @@ public class BracketCallTest extends Test {
                         {
                                 "^^^",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.HAT_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, INITIAL_STATE)
                                 )
                         },

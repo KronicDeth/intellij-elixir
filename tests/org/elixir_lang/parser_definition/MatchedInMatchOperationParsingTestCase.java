@@ -68,10 +68,6 @@ public class MatchedInMatchOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testMatchedHatOperation() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }

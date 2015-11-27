@@ -635,12 +635,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirHatInfixOperator hatInfixOperator) {
-        return TokenSet.create(ElixirTypes.HAT_OPERATOR);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirInInfixOperator inInfixOperator) {
         return TokenSet.create(ElixirTypes.IN_OPERATOR);
     }
