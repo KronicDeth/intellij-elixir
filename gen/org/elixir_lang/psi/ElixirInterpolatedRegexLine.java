@@ -44,4 +44,6 @@ public interface ElixirInterpolatedRegexLine extends RegexFragmented, SigilLine 
 
   char sigilName();
 
+  char terminator();
+
 }

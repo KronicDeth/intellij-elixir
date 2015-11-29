@@ -839,6 +839,7 @@ interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_
                                       quoteEmpty
                                       quoteLiteral
                                       sigilName
+                                      terminator
                                     ]
                                   }
 
@@ -859,6 +860,7 @@ interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER in
                               quoteEmpty
                               quoteLiteral
                               sigilName
+                              terminator
                             ]
                           }
 
@@ -879,6 +881,7 @@ interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpol
                               quoteEmpty
                               quoteLiteral
                               sigilName
+                              terminator
                             ]
                           }
 
@@ -899,6 +902,7 @@ interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIG
                                     quoteEmpty
                                     quoteLiteral
                                     sigilName
+                                    terminator
                                   ]
                                 }
 
@@ -919,6 +923,7 @@ interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER in
                               quoteEmpty
                               quoteLiteral
                               sigilName
+                              terminator
                             ]
                           }
 /*
@@ -942,6 +947,7 @@ literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_
                                  quoteEmpty
                                  quoteLiteral
                                  sigilName
+                                 terminator
                                ]
                              }
 
@@ -962,6 +968,7 @@ literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexB
                          quoteEmpty
                          quoteLiteral
                          sigilName
+                         terminator
                        ]
                      }
 
@@ -982,6 +989,7 @@ literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SI
                          quoteEmpty
                          quoteLiteral
                          sigilName
+                         terminator
                        ]
                      }
 
@@ -1002,6 +1010,7 @@ literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER
                                quoteEmpty
                                quoteLiteral
                                sigilName
+                               terminator
                              ]
                            }
 
@@ -1022,6 +1031,7 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
                           quoteEmpty
                           quoteLiteral
                           sigilName
+                          terminator
                         ]
                       }
 

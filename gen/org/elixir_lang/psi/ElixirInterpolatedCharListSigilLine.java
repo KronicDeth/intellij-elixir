@@ -44,4 +44,6 @@ public interface ElixirInterpolatedCharListSigilLine extends CharListFragmented,
 
   char sigilName();
 
+  char terminator();
+
 }

@@ -82,4 +82,8 @@ public class ElixirLiteralCharListSigilLineImpl extends ASTWrapperPsiElement imp
     return ElixirPsiImplUtil.sigilName(this);
   }
 
+  public char terminator() {
+    return ElixirPsiImplUtil.terminator(this);
+  }
+
 }

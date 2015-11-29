@@ -3551,6 +3551,15 @@ if (quoted == null) {
         return chars.charAt(0);
     }
 
+    public static char terminator(@NotNull SigilLine sigilLine) {
+        ASTNode node = sigilLine.getNode();
+        ASTNode[] childNodes = node.getChildren(null);
+        ASTNode terminatorNode = childNodes[4];
+        CharSequence chars = terminatorNode.getChars();
+
+        return chars.charAt(0);
+    }
+
     @NotNull
     public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirBinaryDigits binaryDigits) {
         return ElixirTypes.VALID_BINARY_DIGITS;
@@ -3709,6 +3718,18 @@ if (quoted == null) {
         // Not sure, why, but \ gets stripped in front of # when quoting using Quoter.
         if (childText.equals("\\#")) {
             childText = "#";
+        } else if (parent instanceof SigilLine) {
+            SigilLine sigilLine = (SigilLine) parent;
+
+            char terminator = sigilLine.terminator();
+
+            if (childText.equals("\\" + terminator)) {
+                childText = new String(
+                        new char[] {
+                                terminator
+                        }
+                );
+            }
         }
 
         return addStringCodePoints(codePointList, childText);

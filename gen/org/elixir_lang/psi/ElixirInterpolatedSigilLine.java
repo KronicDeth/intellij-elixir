@@ -44,4 +44,6 @@ public interface ElixirInterpolatedSigilLine extends SigilFragmented, SigilLine 
 
   char sigilName();
 
+  char terminator();
+
 }
