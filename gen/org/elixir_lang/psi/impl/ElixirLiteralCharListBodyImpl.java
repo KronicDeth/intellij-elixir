@@ -4,9 +4,11 @@ package org.elixir_lang.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirLiteralCharListBody;
-import org.elixir_lang.psi.ElixirVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ElixirLiteralCharListBodyImpl extends ASTWrapperPsiElement implements ElixirLiteralCharListBody {
 
@@ -17,6 +19,30 @@ public class ElixirLiteralCharListBodyImpl extends ASTWrapperPsiElement implemen
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralCharListBody(this);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEscapedCharacter> getEscapedCharacterList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedCharacter.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirEscapedEOL> getEscapedEOLList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedEOL.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirHexadecimalEscapePrefix.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirSigilHexadecimalEscapeSequence> getSigilHexadecimalEscapeSequenceList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirSigilHexadecimalEscapeSequence.class);
   }
 
 }

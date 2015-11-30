@@ -3106,18 +3106,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // CHAR_LIST_FRAGMENT*
+  // (CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalCharListBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalCharListBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal char list body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, CHAR_LIST_FRAGMENT)) break;
+      if (!literalCharListBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalCharListBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_CHAR_LIST_BODY, true, false, null);
     return true;
+  }
+
+  // CHAR_LIST_FRAGMENT | sigilEscapeSequence
+  private static boolean literalCharListBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CHAR_LIST_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3180,18 +3191,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REGEX_FRAGMENT*
+  // (REGEX_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalRegexBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalRegexBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal regex body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, REGEX_FRAGMENT)) break;
+      if (!literalRegexBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalRegexBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_REGEX_BODY, true, false, null);
     return true;
+  }
+
+  // REGEX_FRAGMENT | sigilEscapeSequence
+  private static boolean literalRegexBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalRegexBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, REGEX_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3254,18 +3276,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // SIGIL_FRAGMENT*
+  // (SIGIL_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalSigilBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal sigil body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, SIGIL_FRAGMENT)) break;
+      if (!literalSigilBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalSigilBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_SIGIL_BODY, true, false, null);
     return true;
+  }
+
+  // SIGIL_FRAGMENT | sigilEscapeSequence
+  private static boolean literalSigilBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SIGIL_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3328,18 +3361,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // STRING_FRAGMENT*
+  // (STRING_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalStringBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalStringBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal string body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, STRING_FRAGMENT)) break;
+      if (!literalStringBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalStringBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_STRING_BODY, true, false, null);
     return true;
+  }
+
+  // STRING_FRAGMENT | sigilEscapeSequence
+  private static boolean literalStringBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalStringBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRING_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3402,18 +3446,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // WORDS_FRAGMENT*
+  // (WORDS_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalWordsBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal words body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, WORDS_FRAGMENT)) break;
+      if (!literalWordsBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalWordsBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_WORDS_BODY, true, false, null);
     return true;
+  }
+
+  // WORDS_FRAGMENT | sigilEscapeSequence
+  private static boolean literalWordsBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, WORDS_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

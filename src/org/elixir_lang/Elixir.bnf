@@ -610,7 +610,8 @@ literalCharListHeredocLine ::= heredocLinePrefix literalCharListBody EOL
                                    quote
                                  ]
                                }
-literalCharListBody ::= CHAR_LIST_FRAGMENT*
+// literals can have escape sequences for escaped terminator
+literalCharListBody ::= (CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
                         { implements = "org.elixir_lang.psi.Body" }
 
 literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EOL
@@ -645,7 +646,8 @@ literalRegexHeredocLine ::= heredocLinePrefix literalRegexBody EOL
                                 quote
                               ]
                             }
-literalRegexBody ::= REGEX_FRAGMENT*
+// literals can have escape sequences for escaped terminator
+literalRegexBody ::= (REGEX_FRAGMENT | sigilEscapeSequence)*
                      { implements = "org.elixir_lang.psi.Body" }
 
 literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
@@ -680,7 +682,8 @@ literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
                                 quote
                               ]
                             }
-literalSigilBody ::= SIGIL_FRAGMENT*
+// literals can have escape sequences for escaped terminator
+literalSigilBody ::= (SIGIL_FRAGMENT | sigilEscapeSequence)*
                      { implements = "org.elixir_lang.psi.Body" }
                      
 literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
@@ -715,7 +718,8 @@ literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
                                  quote
                                ]
                              }
-literalStringBody ::= STRING_FRAGMENT*
+// literals can have escape sequences for escaped terminator
+literalStringBody ::= (STRING_FRAGMENT | sigilEscapeSequence)*
                       { implements = "org.elixir_lang.psi.Body" }
                       
 literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
@@ -750,7 +754,8 @@ literalWordsHeredocLine ::= heredocLinePrefix literalWordsBody EOL
                                 quote
                               ]
                             }
-literalWordsBody ::= WORDS_FRAGMENT*
+// literals can have escape sequences for escaped terminator
+literalWordsBody ::= (WORDS_FRAGMENT | sigilEscapeSequence)*
                      { implements = "org.elixir_lang.psi.Body" }
 
 /*

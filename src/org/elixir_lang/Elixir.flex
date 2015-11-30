@@ -968,31 +968,48 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
 <GROUP> {
-  {ESCAPE}           {
-                       if (isInterpolating()) {
-                         pushAndBegin(ESCAPE_SEQUENCE);
-                         return ElixirTypes.ESCAPE;
-                       } else {
-                         yybegin(ESCAPE_IN_LITERAL_GROUP);
-                         return fragmentType();
-                       }
-                     }
-  {GROUP_TERMINATOR} {
-                       if (isTerminator(yytext())) {
-                         if (isSigil()) {
-                           yybegin(SIGIL_MODIFIERS);
-                           return terminatorType();
-                         } else {
-                           org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                           yybegin(stackFrame.getLastLexicalState());
-                           return stackFrame.terminatorType();
-                         }
-                       } else {
-                         return fragmentType();
-                       }
-                     }
-  {EOL}|.            { return fragmentType(); }
+  {ESCAPE}{GROUP_TERMINATOR} {
+                               CharSequence groupTerminator = yytext().subSequence(1, yytext().length());
 
+                               // manual lookahread pushes terminator back
+                               yypushback(groupTerminator.length());
+
+                               /* even literal groups have escape sequences because escaping the terminator is still
+                                  allowed */
+                               if (isTerminator(groupTerminator) || isInterpolating()) {
+                                 // matches interpolating behavior from `{ESCAPE}` rule below
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                                 return ElixirTypes.ESCAPE;
+                               } else {
+                                 // matches non-interpolating behavior from `{ESCAPE}` rule below
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 return fragmentType();
+                               }
+                             }
+  {ESCAPE}                   {
+                               if (isInterpolating()) {
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                                 return ElixirTypes.ESCAPE;
+                               } else {
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 return fragmentType();
+                               }
+                             }
+  {GROUP_TERMINATOR}         {
+                               if (isTerminator(yytext())) {
+                                 if (isSigil()) {
+                                   yybegin(SIGIL_MODIFIERS);
+                                   return terminatorType();
+                                 } else {
+                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                   yybegin(stackFrame.getLastLexicalState());
+                                   return stackFrame.terminatorType();
+                                 }
+                               } else {
+                                 return fragmentType();
+                               }
+                             }
+  {EOL}|.                    { return fragmentType(); }
 }
 
 <GROUP_HEREDOC_END> {
