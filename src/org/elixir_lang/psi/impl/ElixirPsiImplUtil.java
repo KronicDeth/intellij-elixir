@@ -3114,20 +3114,26 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesStrict noParenthesesStrict) {
-        OtpErlangObject[] quotedArguments;
+        OtpErlangObject[] quotedArguments = null;
 
-        if (noParenthesesStrict.getEmptyParentheses() != null) {
-            quotedArguments = new OtpErlangObject[0];
-        } else {
-            Quotable noParenthesesKeywords = noParenthesesStrict.getNoParenthesesKeywords();
+        PsiElement[] children = noParenthesesStrict.getChildren();
 
-            if (noParenthesesKeywords != null) {
-                quotedArguments = new OtpErlangObject[]{
-                        noParenthesesKeywords.quote()
-                };
-            } else {
-                QuotableArguments noParenthesesManyArguments = noParenthesesStrict.getNoParenthesesManyArguments();
-                quotedArguments = noParenthesesManyArguments.quoteArguments();
+        if (children.length == 1) {
+            PsiElement child = children[0];
+
+            if (child instanceof QuotableArguments) {
+                QuotableArguments quotableArguments = (QuotableArguments) child;
+
+                quotedArguments = quotableArguments.quoteArguments();
+            }
+        }
+
+        if (quotedArguments == null) {
+            quotedArguments = new OtpErlangObject[children.length];
+
+            for (int i = 0; i < children.length; i++) {
+                Quotable quotable = (Quotable) children[i];
+                quotedArguments[i] = quotable.quote();
             }
         }
 
