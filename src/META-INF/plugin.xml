@@ -22,6 +22,7 @@
                 </li>Kernel.SpecialForms Macros</li>
               </ul>
             </li>
+            <li>Test against Elixir v1.1.1</li>
           </ul>
         </li>
         <li>
