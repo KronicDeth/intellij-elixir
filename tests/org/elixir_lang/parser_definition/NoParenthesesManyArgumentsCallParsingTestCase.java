@@ -88,10 +88,6 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueMatchedHatOperation() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testKeywordValueMatchedMultiplicationOperation() {
         assertParsedAndQuotedCorrectly();
     }
@@ -125,7 +121,7 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
     }
 
     public void testNoParenthesesExpressionKeywordValue() {
-        assertParsedAndQuotedAroundError();
+        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalAlias() {
@@ -166,10 +162,6 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
 
     public void testPositionalEOLComma() {
         assertParsedWithErrors();
-    }
-
-    public void testPositionalHatOperation() {
-        assertParsedAndQuotedCorrectly();
     }
 
     public void testPositionalInMatchOperation() {

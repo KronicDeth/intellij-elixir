@@ -51,7 +51,6 @@ public interface ElixirTypes {
   IElementType END_OF_EXPRESSION = new ElixirElementType("END_OF_EXPRESSION");
   IElementType ESCAPED_CHARACTER = new ElixirElementType("ESCAPED_CHARACTER");
   IElementType ESCAPED_EOL = new ElixirElementType("ESCAPED_EOL");
-  IElementType HAT_INFIX_OPERATOR = new ElixirElementType("HAT_INFIX_OPERATOR");
   IElementType HEREDOC_LINE_PREFIX = new ElixirElementType("HEREDOC_LINE_PREFIX");
   IElementType HEREDOC_PREFIX = new ElixirElementType("HEREDOC_PREFIX");
   IElementType HEXADECIMAL_DIGITS = new ElixirElementType("HEXADECIMAL_DIGITS");
@@ -120,7 +119,6 @@ public interface ElixirTypes {
   IElementType MATCHED_COMPARISON_OPERATION = new ElixirElementType("MATCHED_COMPARISON_OPERATION");
   IElementType MATCHED_DOT_CALL = new ElixirElementType("MATCHED_DOT_CALL");
   IElementType MATCHED_EXPRESSION = new ElixirElementType("MATCHED_EXPRESSION");
-  IElementType MATCHED_HAT_OPERATION = new ElixirElementType("MATCHED_HAT_OPERATION");
   IElementType MATCHED_IN_MATCH_OPERATION = new ElixirElementType("MATCHED_IN_MATCH_OPERATION");
   IElementType MATCHED_IN_OPERATION = new ElixirElementType("MATCHED_IN_OPERATION");
   IElementType MATCHED_MATCH_OPERATION = new ElixirElementType("MATCHED_MATCH_OPERATION");
@@ -198,7 +196,6 @@ public interface ElixirTypes {
   IElementType UNMATCHED_COMPARISON_OPERATION = new ElixirElementType("UNMATCHED_COMPARISON_OPERATION");
   IElementType UNMATCHED_DOT_CALL = new ElixirElementType("UNMATCHED_DOT_CALL");
   IElementType UNMATCHED_EXPRESSION = new ElixirElementType("UNMATCHED_EXPRESSION");
-  IElementType UNMATCHED_HAT_OPERATION = new ElixirElementType("UNMATCHED_HAT_OPERATION");
   IElementType UNMATCHED_IN_MATCH_OPERATION = new ElixirElementType("UNMATCHED_IN_MATCH_OPERATION");
   IElementType UNMATCHED_IN_OPERATION = new ElixirElementType("UNMATCHED_IN_OPERATION");
   IElementType UNMATCHED_MATCH_OPERATION = new ElixirElementType("UNMATCHED_MATCH_OPERATION");
@@ -226,7 +223,7 @@ public interface ElixirTypes {
   IElementType AFTER = new ElixirTokenType("after");
   IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
   IElementType AND_OPERATOR = new ElixirTokenType("&&&, `and`, &&");
-  IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>");
+  IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("=>");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("A-Z, a-z, _, @, 0-9. ?, !");
   IElementType AT_OPERATOR = new ElixirTokenType("@");
@@ -267,7 +264,6 @@ public interface ElixirTypes {
   IElementType EXPONENT_MARK = new ElixirTokenType("E, e");
   IElementType FALSE = new ElixirTokenType("false");
   IElementType FN = new ElixirTokenType("fn");
-  IElementType HAT_OPERATOR = new ElixirTokenType("^^^");
   IElementType HEREDOC_LINE_WHITE_SPACE_TOKEN = new ElixirTokenType("Whitespace at beginning of line of heredoc");
   IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("Whitespace at beginning of last line of heredoc before terminator");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
@@ -478,9 +474,6 @@ public interface ElixirTypes {
       else if (type == ESCAPED_EOL) {
         return new ElixirEscapedEOLImpl(node);
       }
-      else if (type == HAT_INFIX_OPERATOR) {
-        return new ElixirHatInfixOperatorImpl(node);
-      }
       else if (type == HEREDOC_LINE_PREFIX) {
         return new ElixirHeredocLinePrefixImpl(node);
       }
@@ -684,9 +677,6 @@ public interface ElixirTypes {
       }
       else if (type == MATCHED_EXPRESSION) {
         return new ElixirMatchedExpressionImpl(node);
-      }
-      else if (type == MATCHED_HAT_OPERATION) {
-        return new ElixirMatchedHatOperationImpl(node);
       }
       else if (type == MATCHED_IN_MATCH_OPERATION) {
         return new ElixirMatchedInMatchOperationImpl(node);
@@ -918,9 +908,6 @@ public interface ElixirTypes {
       }
       else if (type == UNMATCHED_EXPRESSION) {
         return new ElixirUnmatchedExpressionImpl(node);
-      }
-      else if (type == UNMATCHED_HAT_OPERATION) {
-        return new ElixirUnmatchedHatOperationImpl(node);
       }
       else if (type == UNMATCHED_IN_MATCH_OPERATION) {
         return new ElixirUnmatchedInMatchOperationImpl(node);

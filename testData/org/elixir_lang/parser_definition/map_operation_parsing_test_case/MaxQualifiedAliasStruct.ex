@@ -29,5 +29,3 @@
  One
  '''.Two{}
 %~x{one}.Two{}
-%false.Two{}
-%:one.Two{}

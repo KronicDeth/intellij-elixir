@@ -3,8 +3,8 @@
     <dirname property="elixir.basedir" file="${ant.file.elixir}"/>
 
     <property name="elixir.output.dir" value="${elixir.basedir}/dependencies/elixir"/>
-    <!-- This sha1 is the fix for https://groups.google.com/forum/#!topic/elixir-lang-core/W0sjGdeSva0 in native Elixir -->
-    <property name="elixir.sha1" value="3e52ed0fbbc09a156e6ea180baff3b89a8da183e"/>
+    <!-- This sha1 for v1.1.1 -->
+    <property name="elixir.sha1" value="139d2eac5998259379862ff6ed2a5287f7de4ea6"/>
     <property name="elixir.zip" value="${elixir.sha1}.zip"/>
     <property name="elixir.cache" value="${elixir.basedir}/cache/elixir"/>
     <property name="elixir.zip.root.basename" value="elixir-${elixir.sha1}"/>

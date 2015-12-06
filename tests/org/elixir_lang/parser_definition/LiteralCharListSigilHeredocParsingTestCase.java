@@ -29,7 +29,7 @@ public class LiteralCharListSigilHeredocParsingTestCase extends ParsingTestCase 
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     @Override

@@ -21,8 +21,8 @@ import org.jetbrains.jps.util.JpsPathUtil;
 public class ElixirBuilderTest extends JpsBuildTestCase {
   public static final String MAC_ELIXIR_SDK_PATH = "/usr/local/Cellar/elixir";
   public static final String LINUX_ELIXIR_SDK_PATH = "~/.kiex/elixirs";
-  public static final String ELIXIR_SDK_VERSION = "1.0.5";
-  public static final String TRAVIS_CI_ELIXIR_SDK_VERSION = "1.0.2";
+  public static final String ELIXIR_SDK_VERSION = "1.1.1";
+  public static final String TRAVIS_CI_ELIXIR_SDK_VERSION = "1.1.1";
   public static final String TEST_MODULE_NAME = "m";
 
 

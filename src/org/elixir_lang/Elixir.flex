@@ -129,10 +129,10 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<|>" |
                              "<~>" |
                              ">>>" |
+                             "^^^" |
                              "~>>"
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
-THREE_TOKEN_HAT_OPERATOR = "^^^"
 THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
@@ -141,7 +141,6 @@ THREE_TOKEN_UNARY_OPERATOR = "not" |
 THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
-                       {THREE_TOKEN_HAT_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
                        {THREE_TOKEN_OR_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
@@ -226,7 +225,6 @@ DOT_OPERATOR = {ONE_TOKEN_DOT_OPERATOR}
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
 COMPARISON_OPERATOR = {THREE_TOKEN_COMPARISON_OPERATOR} |
                       {TWO_TOKEN_COMPARISON_OPERATOR}
-HAT_OPERATOR = {THREE_TOKEN_HAT_OPERATOR}
 IN_MATCH_OPERATOR = {TWO_TOKEN_IN_MATCH_OPERATOR}
 IN_OPERATOR = {ONE_TOKEN_IN_OPERATOR}
 MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
@@ -648,8 +646,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.FALSE; }
   {FN}                                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FN; }
-  {HAT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.HAT_OPERATOR; }
   {OPENING_BRACKET}                          { return ElixirTypes.OPENING_BRACKET; }
   /* Must be before {OPENING_CURLY} so entire "{}" is matched instead of just "{"
 
@@ -856,8 +852,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.ELSE; }
   {FALSE}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.FALSE; }
-  {HAT_OPERATOR}                                    { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.HAT_OPERATOR; }
   {IN_MATCH_OPERATOR}                               { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_MATCH_OPERATOR; }
   {IN_OPERATOR}                                     { yybegin(CALL_MAYBE);
@@ -974,31 +968,48 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP, but not GROUP_HEREDOC_LINE_BODY
 <GROUP> {
-  {ESCAPE}           {
-                       if (isInterpolating()) {
-                         pushAndBegin(ESCAPE_SEQUENCE);
-                         return ElixirTypes.ESCAPE;
-                       } else {
-                         yybegin(ESCAPE_IN_LITERAL_GROUP);
-                         return fragmentType();
-                       }
-                     }
-  {GROUP_TERMINATOR} {
-                       if (isTerminator(yytext())) {
-                         if (isSigil()) {
-                           yybegin(SIGIL_MODIFIERS);
-                           return terminatorType();
-                         } else {
-                           org.elixir_lang.lexer.StackFrame stackFrame = pop();
-                           yybegin(stackFrame.getLastLexicalState());
-                           return stackFrame.terminatorType();
-                         }
-                       } else {
-                         return fragmentType();
-                       }
-                     }
-  {EOL}|.            { return fragmentType(); }
+  {ESCAPE}{GROUP_TERMINATOR} {
+                               CharSequence groupTerminator = yytext().subSequence(1, yytext().length());
 
+                               // manual lookahread pushes terminator back
+                               yypushback(groupTerminator.length());
+
+                               /* even literal groups have escape sequences because escaping the terminator is still
+                                  allowed */
+                               if (isTerminator(groupTerminator) || isInterpolating()) {
+                                 // matches interpolating behavior from `{ESCAPE}` rule below
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                                 return ElixirTypes.ESCAPE;
+                               } else {
+                                 // matches non-interpolating behavior from `{ESCAPE}` rule below
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 return fragmentType();
+                               }
+                             }
+  {ESCAPE}                   {
+                               if (isInterpolating()) {
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                                 return ElixirTypes.ESCAPE;
+                               } else {
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                                 return fragmentType();
+                               }
+                             }
+  {GROUP_TERMINATOR}         {
+                               if (isTerminator(yytext())) {
+                                 if (isSigil()) {
+                                   yybegin(SIGIL_MODIFIERS);
+                                   return terminatorType();
+                                 } else {
+                                   org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                                   yybegin(stackFrame.getLastLexicalState());
+                                   return stackFrame.terminatorType();
+                                 }
+                               } else {
+                                 return fragmentType();
+                               }
+                             }
+  {EOL}|.                    { return fragmentType(); }
 }
 
 <GROUP_HEREDOC_END> {

@@ -1,4 +1,4 @@
 Alias.(
   one,
-  two when two: type
+  (two when two: type)
 )

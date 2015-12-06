@@ -28,16 +28,8 @@ public class ListParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testAliasWhitespaceColon() {
-        assertParsedWithErrors();
-    }
-
     public void testCharListColon() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testCharListWhitespaceColon() {
-        assertParsedWithErrors();
     }
 
     public void testEmpty() {
@@ -64,16 +56,8 @@ public class ListParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testIdentifierWhitespaceColon() {
-        assertParsedWithErrors();
-    }
-
     public void testKeywordKey() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testKeywordKeyEOLColon() {
-        assertParsedWithErrors();
     }
 
     public void testKeywordPair() {
@@ -81,7 +65,7 @@ public class ListParsingTestCase extends ParsingTestCase {
     }
 
     public void testKeywordValue() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testMatchedCallOperationKeywordValue() {
@@ -94,10 +78,6 @@ public class ListParsingTestCase extends ParsingTestCase {
 
     public void testStringColon() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testStringWhitespaceColon() {
-        assertParsedWithErrors();
     }
 
     @Override

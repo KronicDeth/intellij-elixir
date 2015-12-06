@@ -182,10 +182,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitEscapeSequence(o);
   }
 
-  public void visitHatInfixOperator(@NotNull ElixirHatInfixOperator o) {
-    visitOperator(o);
-  }
-
   public void visitHeredocLinePrefix(@NotNull ElixirHeredocLinePrefix o) {
     visitPsiElement(o);
   }
@@ -494,11 +490,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedExpression(@NotNull ElixirMatchedExpression o) {
     visitPsiElement(o);
-  }
-
-  public void visitMatchedHatOperation(@NotNull ElixirMatchedHatOperation o) {
-    visitMatchedExpression(o);
-    // visitInfixOperation(o);
   }
 
   public void visitMatchedInMatchOperation(@NotNull ElixirMatchedInMatchOperation o) {
@@ -844,11 +835,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedExpression(@NotNull ElixirUnmatchedExpression o) {
     visitPsiElement(o);
-  }
-
-  public void visitUnmatchedHatOperation(@NotNull ElixirUnmatchedHatOperation o) {
-    visitUnmatchedExpression(o);
-    // visitInfixOperation(o);
   }
 
   public void visitUnmatchedInMatchOperation(@NotNull ElixirUnmatchedInMatchOperation o) {

@@ -82,4 +82,8 @@ public class ElixirInterpolatedRegexLineImpl extends ASTWrapperPsiElement implem
     return ElixirPsiImplUtil.sigilName(this);
   }
 
+  public char terminator() {
+    return ElixirPsiImplUtil.terminator(this);
+  }
+
 }

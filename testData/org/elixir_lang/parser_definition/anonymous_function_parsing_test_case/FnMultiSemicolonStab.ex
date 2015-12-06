@@ -1,5 +1,0 @@
-fn
-  ;
-  ;
-  one -> one
-end

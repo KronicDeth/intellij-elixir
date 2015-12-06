@@ -635,12 +635,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirHatInfixOperator hatInfixOperator) {
-        return TokenSet.create(ElixirTypes.HAT_OPERATOR);
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirInInfixOperator inInfixOperator) {
         return TokenSet.create(ElixirTypes.IN_OPERATOR);
     }
@@ -3120,20 +3114,26 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesStrict noParenthesesStrict) {
-        OtpErlangObject[] quotedArguments;
+        OtpErlangObject[] quotedArguments = null;
 
-        if (noParenthesesStrict.getEmptyParentheses() != null) {
-            quotedArguments = new OtpErlangObject[0];
-        } else {
-            Quotable noParenthesesKeywords = noParenthesesStrict.getNoParenthesesKeywords();
+        PsiElement[] children = noParenthesesStrict.getChildren();
 
-            if (noParenthesesKeywords != null) {
-                quotedArguments = new OtpErlangObject[]{
-                        noParenthesesKeywords.quote()
-                };
-            } else {
-                QuotableArguments noParenthesesManyArguments = noParenthesesStrict.getNoParenthesesManyArguments();
-                quotedArguments = noParenthesesManyArguments.quoteArguments();
+        if (children.length == 1) {
+            PsiElement child = children[0];
+
+            if (child instanceof QuotableArguments) {
+                QuotableArguments quotableArguments = (QuotableArguments) child;
+
+                quotedArguments = quotableArguments.quoteArguments();
+            }
+        }
+
+        if (quotedArguments == null) {
+            quotedArguments = new OtpErlangObject[children.length];
+
+            for (int i = 0; i < children.length; i++) {
+                Quotable quotable = (Quotable) children[i];
+                quotedArguments[i] = quotable.quote();
             }
         }
 
@@ -3557,6 +3557,15 @@ if (quoted == null) {
         return chars.charAt(0);
     }
 
+    public static char terminator(@NotNull SigilLine sigilLine) {
+        ASTNode node = sigilLine.getNode();
+        ASTNode[] childNodes = node.getChildren(null);
+        ASTNode terminatorNode = childNodes[4];
+        CharSequence chars = terminatorNode.getChars();
+
+        return chars.charAt(0);
+    }
+
     @NotNull
     public static IElementType validElementType(@SuppressWarnings("unused") @NotNull ElixirBinaryDigits binaryDigits) {
         return ElixirTypes.VALID_BINARY_DIGITS;
@@ -3715,6 +3724,18 @@ if (quoted == null) {
         // Not sure, why, but \ gets stripped in front of # when quoting using Quoter.
         if (childText.equals("\\#")) {
             childText = "#";
+        } else if (parent instanceof SigilLine) {
+            SigilLine sigilLine = (SigilLine) parent;
+
+            char terminator = sigilLine.terminator();
+
+            if (childText.equals("\\" + terminator)) {
+                childText = new String(
+                        new char[] {
+                                terminator
+                        }
+                );
+            }
         }
 
         return addStringCodePoints(codePointList, childText);

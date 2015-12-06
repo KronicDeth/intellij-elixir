@@ -82,4 +82,8 @@ public class ElixirLiteralRegexLineImpl extends ASTWrapperPsiElement implements 
     return ElixirPsiImplUtil.sigilName(this);
   }
 
+  public char terminator() {
+    return ElixirPsiImplUtil.terminator(this);
+  }
+
 }

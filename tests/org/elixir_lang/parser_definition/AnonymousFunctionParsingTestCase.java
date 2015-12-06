@@ -2,7 +2,7 @@ package org.elixir_lang.parser_definition;
 
 public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     public void testBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testFnEmptyParenthesesStabEnd() {
@@ -14,7 +14,7 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
     }
 
     public void testFnExpressionEnd() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testFnKeywordsInParenthesesStabEnd() {
@@ -31,10 +31,6 @@ public class AnonymousFunctionParsingTestCase extends ParsingTestCase {
 
     public void testFnMultiNewlineStab() {
         assertParsedAndQuotedCorrectly();
-    }
-
-    public void testFnMultiSemicolonStab() {
-        assertParsedWithErrors();
     }
 
     public void testFnMultiStabEnd() {

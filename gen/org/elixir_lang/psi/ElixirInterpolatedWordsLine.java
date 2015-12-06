@@ -44,4 +44,6 @@ public interface ElixirInterpolatedWordsLine extends WordsFragmented, SigilLine 
 
   char sigilName();
 
+  char terminator();
+
 }

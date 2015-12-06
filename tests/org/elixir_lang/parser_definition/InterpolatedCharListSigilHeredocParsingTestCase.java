@@ -21,7 +21,7 @@ public class InterpolatedCharListSigilHeredocParsingTestCase extends ParsingTest
     }
 
     public void testWhitespaceEndPrefix() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     @Override

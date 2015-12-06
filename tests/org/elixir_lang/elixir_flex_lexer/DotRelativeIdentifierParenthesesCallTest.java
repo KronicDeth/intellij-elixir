@@ -377,7 +377,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "^^^",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.HAT_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )

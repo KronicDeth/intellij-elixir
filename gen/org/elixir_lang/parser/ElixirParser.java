@@ -150,9 +150,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == ESCAPED_EOL) {
       r = escapedEOL(b, 0);
     }
-    else if (t == HAT_INFIX_OPERATOR) {
-      r = hatInfixOperator(b, 0);
-    }
     else if (t == HEREDOC_LINE_PREFIX) {
       r = heredocLinePrefix(b, 0);
     }
@@ -346,7 +343,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = matchedAtUnqualifiedNoParenthesesCall(b, 0);
     }
     else if (t == MATCHED_BRACKET_OPERATION) {
-      r = matchedExpression(b, 0, 21);
+      r = matchedExpression(b, 0, 20);
     }
     else if (t == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
       r = matchedCaptureNonNumericOperation(b, 0);
@@ -355,13 +352,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = matchedExpression(b, 0, 8);
     }
     else if (t == MATCHED_DOT_CALL) {
-      r = matchedExpression(b, 0, 17);
+      r = matchedExpression(b, 0, 16);
     }
     else if (t == MATCHED_EXPRESSION) {
       r = matchedExpression(b, 0, -1);
-    }
-    else if (t == MATCHED_HAT_OPERATION) {
-      r = matchedExpression(b, 0, 15);
     }
     else if (t == MATCHED_IN_MATCH_OPERATION) {
       r = matchedExpression(b, 0, 0);
@@ -385,19 +379,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = matchedExpression(b, 0, 4);
     }
     else if (t == MATCHED_QUALIFIED_ALIAS) {
-      r = matchedExpression(b, 0, 22);
+      r = matchedExpression(b, 0, 21);
     }
     else if (t == MATCHED_QUALIFIED_BRACKET_OPERATION) {
-      r = matchedExpression(b, 0, 23);
+      r = matchedExpression(b, 0, 22);
     }
     else if (t == MATCHED_QUALIFIED_NO_ARGUMENTS_CALL) {
-      r = matchedExpression(b, 0, 25);
+      r = matchedExpression(b, 0, 24);
     }
     else if (t == MATCHED_QUALIFIED_NO_PARENTHESES_CALL) {
-      r = matchedExpression(b, 0, 18);
+      r = matchedExpression(b, 0, 17);
     }
     else if (t == MATCHED_QUALIFIED_PARENTHESES_CALL) {
-      r = matchedExpression(b, 0, 24);
+      r = matchedExpression(b, 0, 23);
     }
     else if (t == MATCHED_RELATIONAL_OPERATION) {
       r = matchedExpression(b, 0, 9);
@@ -577,7 +571,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = unmatchedAtUnqualifiedNoParenthesesCall(b, 0);
     }
     else if (t == UNMATCHED_BRACKET_OPERATION) {
-      r = unmatchedExpression(b, 0, 21);
+      r = unmatchedExpression(b, 0, 20);
     }
     else if (t == UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
       r = unmatchedCaptureNonNumericOperation(b, 0);
@@ -586,13 +580,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = unmatchedExpression(b, 0, 8);
     }
     else if (t == UNMATCHED_DOT_CALL) {
-      r = unmatchedExpression(b, 0, 17);
+      r = unmatchedExpression(b, 0, 16);
     }
     else if (t == UNMATCHED_EXPRESSION) {
       r = unmatchedExpression(b, 0, -1);
-    }
-    else if (t == UNMATCHED_HAT_OPERATION) {
-      r = unmatchedExpression(b, 0, 15);
     }
     else if (t == UNMATCHED_IN_MATCH_OPERATION) {
       r = unmatchedExpression(b, 0, 0);
@@ -613,19 +604,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       r = unmatchedExpression(b, 0, 4);
     }
     else if (t == UNMATCHED_QUALIFIED_ALIAS) {
-      r = unmatchedExpression(b, 0, 22);
+      r = unmatchedExpression(b, 0, 21);
     }
     else if (t == UNMATCHED_QUALIFIED_BRACKET_OPERATION) {
-      r = unmatchedExpression(b, 0, 23);
+      r = unmatchedExpression(b, 0, 22);
     }
     else if (t == UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL) {
-      r = unmatchedExpression(b, 0, 25);
+      r = unmatchedExpression(b, 0, 24);
     }
     else if (t == UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL) {
-      r = unmatchedExpression(b, 0, 18);
+      r = unmatchedExpression(b, 0, 17);
     }
     else if (t == UNMATCHED_QUALIFIED_PARENTHESES_CALL) {
-      r = unmatchedExpression(b, 0, 24);
+      r = unmatchedExpression(b, 0, 23);
     }
     else if (t == UNMATCHED_RELATIONAL_OPERATION) {
       r = unmatchedExpression(b, 0, 9);
@@ -676,20 +667,20 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION, MATCHED_AT_NON_NUMERIC_OPERATION,
       MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_BRACKET_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-      MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL, MATCHED_EXPRESSION, MATCHED_HAT_OPERATION,
-      MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION,
-      MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS, MATCHED_QUALIFIED_BRACKET_OPERATION,
-      MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL, MATCHED_RELATIONAL_OPERATION,
-      MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_BRACKET_OPERATION,
-      MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION),
+      MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL, MATCHED_EXPRESSION, MATCHED_IN_MATCH_OPERATION,
+      MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION,
+      MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS, MATCHED_QUALIFIED_BRACKET_OPERATION, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+      MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL, MATCHED_RELATIONAL_OPERATION, MATCHED_TWO_OPERATION,
+      MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_BRACKET_OPERATION, MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+      MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION),
     create_token_set_(UNMATCHED_ADDITION_OPERATION, UNMATCHED_AND_OPERATION, UNMATCHED_ARROW_OPERATION, UNMATCHED_AT_NON_NUMERIC_OPERATION,
       UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_BRACKET_OPERATION, UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-      UNMATCHED_COMPARISON_OPERATION, UNMATCHED_DOT_CALL, UNMATCHED_EXPRESSION, UNMATCHED_HAT_OPERATION,
-      UNMATCHED_IN_MATCH_OPERATION, UNMATCHED_IN_OPERATION, UNMATCHED_MATCH_OPERATION, UNMATCHED_MULTIPLICATION_OPERATION,
-      UNMATCHED_OR_OPERATION, UNMATCHED_PIPE_OPERATION, UNMATCHED_QUALIFIED_ALIAS, UNMATCHED_QUALIFIED_BRACKET_OPERATION,
-      UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_QUALIFIED_PARENTHESES_CALL, UNMATCHED_RELATIONAL_OPERATION,
-      UNMATCHED_TWO_OPERATION, UNMATCHED_TYPE_OPERATION, UNMATCHED_UNARY_NON_NUMERIC_OPERATION, UNMATCHED_UNQUALIFIED_BRACKET_OPERATION,
-      UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, UNMATCHED_WHEN_OPERATION),
+      UNMATCHED_COMPARISON_OPERATION, UNMATCHED_DOT_CALL, UNMATCHED_EXPRESSION, UNMATCHED_IN_MATCH_OPERATION,
+      UNMATCHED_IN_OPERATION, UNMATCHED_MATCH_OPERATION, UNMATCHED_MULTIPLICATION_OPERATION, UNMATCHED_OR_OPERATION,
+      UNMATCHED_PIPE_OPERATION, UNMATCHED_QUALIFIED_ALIAS, UNMATCHED_QUALIFIED_BRACKET_OPERATION, UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+      UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_QUALIFIED_PARENTHESES_CALL, UNMATCHED_RELATIONAL_OPERATION, UNMATCHED_TWO_OPERATION,
+      UNMATCHED_TYPE_OPERATION, UNMATCHED_UNARY_NON_NUMERIC_OPERATION, UNMATCHED_UNQUALIFIED_BRACKET_OPERATION, UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+      UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, UNMATCHED_WHEN_OPERATION),
   };
 
   /* ********************************************************** */
@@ -1066,9 +1057,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // EOL* ARROW_OPERATOR EOL*
   public static boolean arrowInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arrowInfixOperator")) return false;
-    if (!nextTokenIs(b, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>", ARROW_OPERATOR, EOL)) return false;
+    if (!nextTokenIs(b, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^>", ARROW_OPERATOR, EOL)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>>");
+    Marker m = enter_section_(b, l, _NONE_, "<<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^>");
     r = arrowInfixOperator_0(b, l + 1);
     r = r && consumeToken(b, ARROW_OPERATOR);
     r = r && arrowInfixOperator_2(b, l + 1);
@@ -2234,44 +2225,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* HAT_OPERATOR EOL*
-  public static boolean hatInfixOperator(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hatInfixOperator")) return false;
-    if (!nextTokenIs(b, "<^^^>", EOL, HAT_OPERATOR)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<^^^>");
-    r = hatInfixOperator_0(b, l + 1);
-    r = r && consumeToken(b, HAT_OPERATOR);
-    r = r && hatInfixOperator_2(b, l + 1);
-    exit_section_(b, l, m, HAT_INFIX_OPERATOR, r, false, null);
-    return r;
-  }
-
-  // EOL*
-  private static boolean hatInfixOperator_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hatInfixOperator_0")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "hatInfixOperator_0", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // EOL*
-  private static boolean hatInfixOperator_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "hatInfixOperator_2")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "hatInfixOperator_2", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  /* ********************************************************** */
   // HEREDOC_LINE_WHITE_SPACE_TOKEN?
   public static boolean heredocLinePrefix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "heredocLinePrefix")) return false;
@@ -2955,7 +2908,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                DO |
   //                DUAL_OPERATOR |
   //                ELSE |
-  //                HAT_OPERATOR |
   //                IDENTIFIER |
   //                IN_MATCH_OPERATOR |
   //                IN_OPERATOR |
@@ -2990,7 +2942,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DO);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, ELSE);
-    if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IDENTIFIER);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
@@ -3155,18 +3106,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // CHAR_LIST_FRAGMENT*
+  // (CHAR_LIST_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalCharListBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalCharListBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal char list body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, CHAR_LIST_FRAGMENT)) break;
+      if (!literalCharListBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalCharListBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_CHAR_LIST_BODY, true, false, null);
     return true;
+  }
+
+  // CHAR_LIST_FRAGMENT | sigilEscapeSequence
+  private static boolean literalCharListBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalCharListBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CHAR_LIST_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3229,18 +3191,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // REGEX_FRAGMENT*
+  // (REGEX_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalRegexBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalRegexBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal regex body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, REGEX_FRAGMENT)) break;
+      if (!literalRegexBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalRegexBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_REGEX_BODY, true, false, null);
     return true;
+  }
+
+  // REGEX_FRAGMENT | sigilEscapeSequence
+  private static boolean literalRegexBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalRegexBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, REGEX_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3303,18 +3276,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // SIGIL_FRAGMENT*
+  // (SIGIL_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalSigilBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal sigil body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, SIGIL_FRAGMENT)) break;
+      if (!literalSigilBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalSigilBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_SIGIL_BODY, true, false, null);
     return true;
+  }
+
+  // SIGIL_FRAGMENT | sigilEscapeSequence
+  private static boolean literalSigilBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalSigilBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SIGIL_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3377,18 +3361,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // STRING_FRAGMENT*
+  // (STRING_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalStringBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalStringBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal string body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, STRING_FRAGMENT)) break;
+      if (!literalStringBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalStringBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_STRING_BODY, true, false, null);
     return true;
+  }
+
+  // STRING_FRAGMENT | sigilEscapeSequence
+  private static boolean literalStringBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalStringBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRING_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3451,18 +3446,29 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // WORDS_FRAGMENT*
+  // (WORDS_FRAGMENT | sigilEscapeSequence)*
   public static boolean literalWordsBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsBody")) return false;
     Marker m = enter_section_(b, l, _NONE_, "<literal words body>");
     int c = current_position_(b);
     while (true) {
-      if (!consumeToken(b, WORDS_FRAGMENT)) break;
+      if (!literalWordsBody_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "literalWordsBody", c)) break;
       c = current_position_(b);
     }
     exit_section_(b, l, m, LITERAL_WORDS_BODY, true, false, null);
     return true;
+  }
+
+  // WORDS_FRAGMENT | sigilEscapeSequence
+  private static boolean literalWordsBody_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "literalWordsBody_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, WORDS_FRAGMENT);
+    if (!r) r = sigilEscapeSequence(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -3837,7 +3843,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "maxExpression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpression(b, l + 1, 21);
+    r = matchedExpression(b, l + 1, 20);
     r = r && maxDotCall(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3848,7 +3854,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "maxExpression_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpression(b, l + 1, 23);
+    r = matchedExpression(b, l + 1, 22);
     r = r && maxExpression_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -3875,7 +3881,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "maxExpression_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = matchedExpression(b, l + 1, 25);
+    r = matchedExpression(b, l + 1, 24);
     r = r && maxQualifiedParenthesesCall(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -4846,7 +4852,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
   //                        ELSE |
   //                        END |
-  //                        HAT_OPERATOR |
   //                        IN_MATCH_OPERATOR |
   //                        IN_OPERATOR |
   //                        // NOT MAP_OPERATOR because it is a special form
@@ -4881,7 +4886,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = relativeIdentifier_9(b, l + 1);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, END);
-    if (!r) r = consumeToken(b, HAT_OPERATOR);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
     if (!r) r = consumeToken(b, MATCH_OPERATOR);
@@ -5629,23 +5633,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // 13: BINARY(matchedTwoOperation)
   // 14: BINARY(matchedAdditionOperation)
   // 15: BINARY(matchedMultiplicationOperation)
-  // 16: BINARY(matchedHatOperation)
-  // 17: PREFIX(matchedUnaryNonNumericOperation)
-  // 18: POSTFIX(matchedDotCall)
-  // 19: POSTFIX(matchedQualifiedNoParenthesesCall)
-  // 20: ATOM(matchedAtUnqualifiedNoParenthesesCall)
-  // 21: ATOM(matchedUnqualifiedNoParenthesesCall)
-  // 22: POSTFIX(matchedBracketOperation)
-  // 23: POSTFIX(matchedQualifiedAlias)
-  // 24: POSTFIX(matchedQualifiedBracketOperation)
-  // 25: POSTFIX(matchedQualifiedParenthesesCall)
-  // 26: POSTFIX(matchedQualifiedNoArgumentsCall)
-  // 27: ATOM(matchedAtUnqualifiedBracketOperation)
-  // 28: PREFIX(matchedAtNonNumericOperation)
-  // 29: ATOM(matchedUnqualifiedParenthesesCall)
-  // 30: ATOM(matchedUnqualifiedBracketOperation)
-  // 31: ATOM(matchedUnqualifiedNoArgumentsCall)
-  // 32: ATOM(matchedAccessExpression)
+  // 16: PREFIX(matchedUnaryNonNumericOperation)
+  // 17: POSTFIX(matchedDotCall)
+  // 18: POSTFIX(matchedQualifiedNoParenthesesCall)
+  // 19: ATOM(matchedAtUnqualifiedNoParenthesesCall)
+  // 20: ATOM(matchedUnqualifiedNoParenthesesCall)
+  // 21: POSTFIX(matchedBracketOperation)
+  // 22: POSTFIX(matchedQualifiedAlias)
+  // 23: POSTFIX(matchedQualifiedBracketOperation)
+  // 24: POSTFIX(matchedQualifiedParenthesesCall)
+  // 25: POSTFIX(matchedQualifiedNoArgumentsCall)
+  // 26: ATOM(matchedAtUnqualifiedBracketOperation)
+  // 27: PREFIX(matchedAtNonNumericOperation)
+  // 28: ATOM(matchedUnqualifiedParenthesesCall)
+  // 29: ATOM(matchedUnqualifiedBracketOperation)
+  // 30: ATOM(matchedUnqualifiedNoArgumentsCall)
+  // 31: ATOM(matchedAccessExpression)
   public static boolean matchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "matchedExpression")) return false;
     addVariant(b, "<matched expression>");
@@ -5732,35 +5735,31 @@ public class ElixirParser implements PsiParser, LightPsiParser {
         r = matchedExpression(b, l, 15);
         exit_section_(b, l, m, MATCHED_MULTIPLICATION_OPERATION, r, true, null);
       }
-      else if (g < 16 && hatInfixOperator(b, l + 1)) {
-        r = matchedExpression(b, l, 16);
-        exit_section_(b, l, m, MATCHED_HAT_OPERATION, r, true, null);
-      }
-      else if (g < 18 && matchedDotCall_0(b, l + 1)) {
+      else if (g < 17 && matchedDotCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_DOT_CALL, r, true, null);
       }
-      else if (g < 19 && matchedQualifiedNoParenthesesCall_0(b, l + 1)) {
+      else if (g < 18 && matchedQualifiedNoParenthesesCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_QUALIFIED_NO_PARENTHESES_CALL, r, true, null);
       }
-      else if (g < 22 && bracketArguments(b, l + 1)) {
+      else if (g < 21 && bracketArguments(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_BRACKET_OPERATION, r, true, null);
       }
-      else if (g < 23 && matchedQualifiedAlias_0(b, l + 1)) {
+      else if (g < 22 && matchedQualifiedAlias_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_QUALIFIED_ALIAS, r, true, null);
       }
-      else if (g < 24 && matchedQualifiedBracketOperation_0(b, l + 1)) {
+      else if (g < 23 && matchedQualifiedBracketOperation_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_QUALIFIED_BRACKET_OPERATION, r, true, null);
       }
-      else if (g < 25 && matchedQualifiedParenthesesCall_0(b, l + 1)) {
+      else if (g < 24 && matchedQualifiedParenthesesCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_QUALIFIED_PARENTHESES_CALL, r, true, null);
       }
-      else if (g < 26 && matchedQualifiedNoArgumentsCall_0(b, l + 1)) {
+      else if (g < 25 && matchedQualifiedNoArgumentsCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, r, true, null);
       }
@@ -5822,7 +5821,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedUnaryNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 17);
+    r = p && matchedExpression(b, l, 16);
     exit_section_(b, l, m, MATCHED_UNARY_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }
@@ -5982,7 +5981,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = matchedAtNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && matchedExpression(b, l, 28);
+    r = p && matchedExpression(b, l, 27);
     exit_section_(b, l, m, MATCHED_AT_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }
@@ -6083,23 +6082,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   // 13: BINARY(unmatchedTwoOperation)
   // 14: BINARY(unmatchedAdditionOperation)
   // 15: BINARY(unmatchedMultiplicationOperation)
-  // 16: BINARY(unmatchedHatOperation)
-  // 17: PREFIX(unmatchedUnaryNonNumericOperation)
-  // 18: POSTFIX(unmatchedDotCall)
-  // 19: POSTFIX(unmatchedQualifiedNoParenthesesCall)
-  // 20: ATOM(unmatchedAtUnqualifiedNoParenthesesCall)
-  // 21: ATOM(unmatchedUnqualifiedNoParenthesesCall)
-  // 22: POSTFIX(unmatchedBracketOperation)
-  // 23: POSTFIX(unmatchedQualifiedAlias)
-  // 24: POSTFIX(unmatchedQualifiedBracketOperation)
-  // 25: POSTFIX(unmatchedQualifiedParenthesesCall)
-  // 26: POSTFIX(unmatchedQualifiedNoArgumentsCall)
-  // 27: ATOM(unmatchedAtUnqualifiedBracketOperation)
-  // 28: PREFIX(unmatchedAtNonNumericOperation)
-  // 29: ATOM(unmatchedUnqualifiedParenthesesCall)
-  // 30: ATOM(unmatchedUnqualifiedBracketOperation)
-  // 31: ATOM(unmatchedUnqualifiedNoArgumentsCall)
-  // 32: ATOM(unmatchedAccessExpression)
+  // 16: PREFIX(unmatchedUnaryNonNumericOperation)
+  // 17: POSTFIX(unmatchedDotCall)
+  // 18: POSTFIX(unmatchedQualifiedNoParenthesesCall)
+  // 19: ATOM(unmatchedAtUnqualifiedNoParenthesesCall)
+  // 20: ATOM(unmatchedUnqualifiedNoParenthesesCall)
+  // 21: POSTFIX(unmatchedBracketOperation)
+  // 22: POSTFIX(unmatchedQualifiedAlias)
+  // 23: POSTFIX(unmatchedQualifiedBracketOperation)
+  // 24: POSTFIX(unmatchedQualifiedParenthesesCall)
+  // 25: POSTFIX(unmatchedQualifiedNoArgumentsCall)
+  // 26: ATOM(unmatchedAtUnqualifiedBracketOperation)
+  // 27: PREFIX(unmatchedAtNonNumericOperation)
+  // 28: ATOM(unmatchedUnqualifiedParenthesesCall)
+  // 29: ATOM(unmatchedUnqualifiedBracketOperation)
+  // 30: ATOM(unmatchedUnqualifiedNoArgumentsCall)
+  // 31: ATOM(unmatchedAccessExpression)
   public static boolean unmatchedExpression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "unmatchedExpression")) return false;
     addVariant(b, "<unmatched expression>");
@@ -6186,35 +6184,31 @@ public class ElixirParser implements PsiParser, LightPsiParser {
         r = unmatchedExpression(b, l, 15);
         exit_section_(b, l, m, UNMATCHED_MULTIPLICATION_OPERATION, r, true, null);
       }
-      else if (g < 16 && hatInfixOperator(b, l + 1)) {
-        r = unmatchedExpression(b, l, 16);
-        exit_section_(b, l, m, UNMATCHED_HAT_OPERATION, r, true, null);
-      }
-      else if (g < 18 && unmatchedDotCall_0(b, l + 1)) {
+      else if (g < 17 && unmatchedDotCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_DOT_CALL, r, true, null);
       }
-      else if (g < 19 && unmatchedQualifiedNoParenthesesCall_0(b, l + 1)) {
+      else if (g < 18 && unmatchedQualifiedNoParenthesesCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, r, true, null);
       }
-      else if (g < 22 && bracketArguments(b, l + 1)) {
+      else if (g < 21 && bracketArguments(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_BRACKET_OPERATION, r, true, null);
       }
-      else if (g < 23 && unmatchedQualifiedAlias_0(b, l + 1)) {
+      else if (g < 22 && unmatchedQualifiedAlias_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_QUALIFIED_ALIAS, r, true, null);
       }
-      else if (g < 24 && unmatchedQualifiedBracketOperation_0(b, l + 1)) {
+      else if (g < 23 && unmatchedQualifiedBracketOperation_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_QUALIFIED_BRACKET_OPERATION, r, true, null);
       }
-      else if (g < 25 && unmatchedQualifiedParenthesesCall_0(b, l + 1)) {
+      else if (g < 24 && unmatchedQualifiedParenthesesCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_QUALIFIED_PARENTHESES_CALL, r, true, null);
       }
-      else if (g < 26 && unmatchedQualifiedNoArgumentsCall_0(b, l + 1)) {
+      else if (g < 25 && unmatchedQualifiedNoArgumentsCall_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, r, true, null);
       }
@@ -6276,7 +6270,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = unmatchedUnaryNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && unmatchedExpression(b, l, 17);
+    r = p && unmatchedExpression(b, l, 16);
     exit_section_(b, l, m, UNMATCHED_UNARY_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }
@@ -6484,7 +6478,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, null);
     r = unmatchedAtNonNumericOperation_0(b, l + 1);
     p = r;
-    r = p && unmatchedExpression(b, l, 28);
+    r = p && unmatchedExpression(b, l, 27);
     exit_section_(b, l, m, UNMATCHED_AT_NON_NUMERIC_OPERATION, r, p, null);
     return r || p;
   }

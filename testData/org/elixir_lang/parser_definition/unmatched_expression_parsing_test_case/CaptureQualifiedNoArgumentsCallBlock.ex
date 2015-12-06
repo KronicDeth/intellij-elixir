@@ -19,8 +19,8 @@
 &^1.two do end
 &^1.two.three do end
 
-&fn one end.two do end
-&fn one end.two.three do end
+&fn -> one end.two do end
+&fn -> one end.two.three do end
 
 &(->).one do end
 &(->).one.two do end

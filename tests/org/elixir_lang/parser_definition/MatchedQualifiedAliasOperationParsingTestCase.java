@@ -73,10 +73,6 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testMatchedHatOperation() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testMatchedUnaryNonNumericOperation() {
         assertParsedAndQuotedCorrectly();
     }
@@ -134,7 +130,7 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
     }
 
     public void testAtomKeyword() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedAroundError();
     }
 
     public void testAlias() {
