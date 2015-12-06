@@ -82,6 +82,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             KERNEL_MACRO
     );
 
+    public static final TextAttributesKey KEYWORD = createTextAttributesKey(
+            "ELIXIR_KEYWORD",
+            DefaultLanguageHighlighterColors.KEYWORD
+    );
+
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
             "ELIXIR_OBSOLETE_WHOLE_NUMBER_BASE",
             HighlighterColors.BAD_CHARACTER
@@ -129,6 +134,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
     private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
     private static final TextAttributesKey[] INVALID_DIGITS_KEYS = new TextAttributesKey[]{INVALID_DIGIT};
+    private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
     private static final TextAttributesKey[] OBSOLETE_WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{OBSOLETE_WHOLE_NUMBER_BASE};
     private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
@@ -169,6 +175,15 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.INVALID_HEXADECIMAL_DIGITS,
             ElixirTypes.INVALID_OCTAL_DIGITS,
             ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS
+    );
+    private static final TokenSet KEYWORD_TOKEN_SET = TokenSet.create(
+            ElixirTypes.AFTER,
+            ElixirTypes.CATCH,
+            ElixirTypes.DO,
+            ElixirTypes.ELSE,
+            ElixirTypes.END,
+            ElixirTypes.FN,
+            ElixirTypes.RESCUE
     );
     private static final TokenSet OBSOLETE_WHOLE_NUMBER_BASE_TOKEN_SET = TokenSet.create(
             ElixirTypes.OBSOLETE_BINARY_WHOLE_NUMBER_BASE,
@@ -276,6 +291,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return IDENTIFIER_KEYS;
         } else if (INVALID_DIGITS_TOKEN_SET.contains(tokenType)) {
             return INVALID_DIGITS_KEYS;
+        } else if (KEYWORD_TOKEN_SET.contains(tokenType)) {
+            return KEYWORD_KEYS;
         } else if (OBSOLETE_WHOLE_NUMBER_BASE_TOKEN_SET.contains(tokenType)) {
             return OBSOLETE_WHOLE_NUMBER_BASE_KEYS;
         } else if (OPERATION_SIGNS.contains(tokenType)) {
