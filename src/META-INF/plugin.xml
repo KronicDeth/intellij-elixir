@@ -23,6 +23,10 @@
               </ul>
             </li>
             <li>Test against Elixir v1.1.1</li>
+            <li>
+              Highlight <code>after</code>, <code>catch</code>, <code>do</code>, <code>else</code>, <code>end,
+              </code>fn<code>, and </code>rescue` as keywords.
+            </li>
           </ul>
         </li>
         <li>
