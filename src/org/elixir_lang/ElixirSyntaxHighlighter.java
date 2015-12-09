@@ -3,11 +3,13 @@ package org.elixir_lang;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.xmlb.annotations.Text;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,6 +87,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey KEYWORD = createTextAttributesKey(
             "ELIXIR_KEYWORD",
             DefaultLanguageHighlighterColors.KEYWORD
+    );
+
+    public static final TextAttributesKey MODULE_ATTRIBUTE = createTextAttributesKey(
+            "ELIXIR_MODULE_ATTRIBUTE",
+            // Color used for "ERL_ATTRIBUTE" in intellij-erlang
+            CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES
     );
 
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
