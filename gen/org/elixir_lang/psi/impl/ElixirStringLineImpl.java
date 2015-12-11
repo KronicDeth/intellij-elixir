@@ -7,6 +7,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.psi.Body;
 import org.elixir_lang.psi.ElixirQuoteStringBody;
 import org.elixir_lang.psi.ElixirStringLine;
 import org.elixir_lang.psi.ElixirVisitor;
@@ -44,6 +45,10 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   @NotNull
   public List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child) {
     return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, child);
+  }
+
+  public Body getBody() {
+    return ElixirPsiImplUtil.getBody(this);
   }
 
   public IElementType getFragmentType() {

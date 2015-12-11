@@ -685,7 +685,7 @@ literalSigilHeredocLine ::= heredocLinePrefix literalSigilBody EOL
 // literals can have escape sequences for escaped terminator
 literalSigilBody ::= (SIGIL_FRAGMENT | sigilEscapeSequence)*
                      { implements = "org.elixir_lang.psi.Body" }
-                     
+
 literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HEREDOC_PROMOTER EOL
                               literalStringHeredocLine*
                               heredocPrefix STRING_SIGIL_HEREDOC_TERMINATOR sigilModifiers
@@ -721,7 +721,7 @@ literalStringHeredocLine ::= heredocLinePrefix literalStringBody EOL
 // literals can have escape sequences for escaped terminator
 literalStringBody ::= (STRING_FRAGMENT | sigilEscapeSequence)*
                       { implements = "org.elixir_lang.psi.Body" }
-                      
+
 literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EOL
                         literalWordsHeredocLine*
                         heredocPrefix WORDS_HEREDOC_TERMINATOR sigilModifiers
@@ -780,12 +780,14 @@ charListLine ::= CHAR_LIST_PROMOTER quoteCharListBody CHAR_LIST_TERMINATOR
                    implements = [
                      "org.elixir_lang.psi.Atomable"
                      "org.elixir_lang.psi.InterpolatedCharList"
+                     "org.elixir_lang.psi.Line"
                      "org.elixir_lang.psi.Quotable"
                    ]
                    methods = [
                      addEscapedCharacterCodePoints
                      addFragmentCodePoints
                      addHexadecimalEscapeSequenceCodePoints
+                     getBody
                      getFragmentType
                      quote
                      quoteAsAtom
@@ -802,12 +804,14 @@ stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
                  implements = [
                    "org.elixir_lang.psi.Atomable"
                    "org.elixir_lang.psi.InterpolatedString"
+                   "org.elixir_lang.psi.Line"
                    "org.elixir_lang.psi.Quotable"
                  ]
                  methods = [
                    addEscapedCharacterCodePoints
                    addFragmentCodePoints
                    addHexadecimalEscapeSequenceCodePoints
+                   getBody
                    getFragmentType
                    quote
                    quoteAsAtom

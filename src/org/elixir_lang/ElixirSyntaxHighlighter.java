@@ -59,6 +59,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.DOC_COMMENT_TAG
     );
 
+    public static final TextAttributesKey DOCUMENTATION_TEXT = createTextAttributesKey(
+            "ELIXIR_DOCUMENTATION_TEXT",
+            DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE
+    );
+
     public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
             "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
             DefaultLanguageHighlighterColors.PARENTHESES

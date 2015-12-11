@@ -11,12 +11,13 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirSyntaxHighlighter;
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirUnmatchedAtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.Quotable;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Annotates module attributes.
@@ -60,6 +61,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 identifier.equals("moduledoc") ||
                                 identifier.equals("typedoc")) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
+
+                            highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
                         } else {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
                         }
@@ -73,6 +76,50 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     }
                 }
         );
+    }
+
+    private void highlightDocumentationText(
+            @NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+            @NotNull final AnnotationHolder holder
+    ) {
+        PsiElement noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
+
+        if (grandChildren.length == 1) {
+            PsiElement grandChild = grandChildren[0];
+
+            PsiElement[] greatGrandChildren = grandChild.getChildren();
+
+            if (greatGrandChildren.length == 1) {
+                PsiElement greatGrandChild = greatGrandChildren[0];
+
+                if (greatGrandChild instanceof Heredoc) {
+                    Heredoc heredoc = (Heredoc) greatGrandChild;
+                    List<HeredocLine> heredocLineList = heredoc.getHeredocLineList();
+
+                    for (Bodied bodied : heredocLineList) {
+                        Body body = bodied.getBody();
+
+                        highlightFragments(
+                                heredoc,
+                                body,
+                                holder,
+                                ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+                        );
+                    }
+                } else if (greatGrandChild instanceof Line) {
+                    Line line = (Line) greatGrandChild;
+                    Body body = line.getBody();
+
+                    highlightFragments(
+                            line,
+                            body,
+                            holder,
+                            ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+                    );
+                }
+            }
+        }
     }
 
     /*
@@ -89,5 +136,31 @@ public class ModuleAttribute implements Annotator, DumbAware {
     private void highlight(@NotNull final TextRange textRange, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
         annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
         annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
+    }
+
+    /**
+     * Highlights fragment ASTNodes under `body` that have fragment type from `fragmented.getFragmentType()`.
+     *
+     * @param fragmented supplies fragment type
+     * @param body contains fragments
+     * @param annotationHolder the container which receives annotations created by the plugin.
+     * @param textAttributesKey text attributes to apply to the fragments.
+     */
+    private void highlightFragments(@NotNull final Fragmented fragmented,
+                                    @NotNull final Body body,
+                                    @NotNull AnnotationHolder annotationHolder,
+                                    @NotNull final TextAttributesKey textAttributesKey) {
+        ASTNode bodyNode = body.getNode();
+        ASTNode[] fragmentNodes = bodyNode.getChildren(
+                TokenSet.create(fragmented.getFragmentType())
+        );
+
+        for (ASTNode fragmentNode : fragmentNodes) {
+            highlight(
+                    fragmentNode.getTextRange(),
+                    annotationHolder,
+                    textAttributesKey
+            );
+        }
     }
 }

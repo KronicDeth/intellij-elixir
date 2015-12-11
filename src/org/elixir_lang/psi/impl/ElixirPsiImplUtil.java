@@ -1214,6 +1214,11 @@ public class ElixirPsiImplUtil {
         return charListHeredocLine.getQuoteCharListBody();
     }
 
+    @NotNull
+    public static Body getBody(@NotNull final ElixirCharListLine charListLine) {
+        return charListLine.getQuoteCharListBody();
+    }
+
     public static Body getBody(ElixirInterpolatedCharListHeredocLine interpolatedCharListHeredocLine) {
         return interpolatedCharListHeredocLine.getInterpolatedCharListBody();
     }
@@ -1298,6 +1303,10 @@ public class ElixirPsiImplUtil {
         return stringHeredocLine.getQuoteStringBody();
     }
 
+    public static Body getBody(@NotNull final ElixirStringLine stringLine) {
+        return stringLine.getQuoteStringBody();
+    }
+
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
@@ -1372,7 +1381,7 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
-    
+
     public static List<HeredocLine> getHeredocLineList(ElixirInterpolatedSigilHeredoc interpolatedSigilHeredoc) {
         List<ElixirInterpolatedSigilHeredocLine> interpolatedSigilHeredocLines = interpolatedSigilHeredoc.getInterpolatedSigilHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedSigilHeredocLines.size());
@@ -1427,7 +1436,7 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
- 
+
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralStringSigilHeredoc literalStringSigilHeredoc) {
         List<ElixirLiteralStringHeredocLine> literalStringHeredocLines = literalStringSigilHeredoc.getLiteralStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalStringHeredocLines.size());
@@ -1437,8 +1446,8 @@ public class ElixirPsiImplUtil {
         }
 
         return heredocLineList;
-    }   
-   
+    }
+
     public static List<HeredocLine> getHeredocLineList(ElixirLiteralWordsHeredoc literalWordsSigilHeredoc) {
         List<ElixirLiteralWordsHeredocLine> literalWordsHeredocLines = literalWordsSigilHeredoc.getLiteralWordsHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(literalWordsHeredocLines.size());
@@ -1449,7 +1458,7 @@ public class ElixirPsiImplUtil {
 
         return heredocLineList;
     }
- 
+
     public static List<HeredocLine> getHeredocLineList(ElixirStringHeredoc stringHeredoc) {
         List<ElixirStringHeredocLine> stringHeredocLineList = stringHeredoc.getStringHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(stringHeredocLineList.size());
@@ -1727,7 +1736,7 @@ public class ElixirPsiImplUtil {
 
         return quotedAsAtom;
     }
-    
+
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteAsAtom(@NotNull final ElixirStringLine stringLine) {
@@ -1749,7 +1758,7 @@ public class ElixirPsiImplUtil {
                     UTF_8
             );
         }
-        
+
         return quotedAsAtom;
     }
 

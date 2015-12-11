@@ -111,6 +111,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitCharListLine(@NotNull ElixirCharListLine o) {
     visitAtomable(o);
     // visitInterpolatedCharList(o);
+    // visitLine(o);
     // visitQuotable(o);
   }
 
@@ -748,6 +749,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitStringLine(@NotNull ElixirStringLine o) {
     visitAtomable(o);
     // visitInterpolatedString(o);
+    // visitLine(o);
     // visitQuotable(o);
   }
 
