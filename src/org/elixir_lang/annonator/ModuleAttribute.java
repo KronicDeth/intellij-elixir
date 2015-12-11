@@ -93,7 +93,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
             if (greatGrandChildren.length == 1) {
                 PsiElement greatGrandChild = greatGrandChildren[0];
 
-                if (greatGrandChild instanceof Heredoc) {
+                if (greatGrandChild instanceof ElixirAtomKeyword) {
+                    ElixirAtomKeyword atomKeyword = (ElixirAtomKeyword) greatGrandChild;
+                    String text = atomKeyword.getText();
+
+                    if (text.equals("false")) {
+                        holder.createWeakWarningAnnotation(
+                                atomKeyword,
+                                "Will make documented invisible to the documentation extraction tools like ExDoc.");
+                    }
+                } else if (greatGrandChild instanceof Heredoc) {
                     Heredoc heredoc = (Heredoc) greatGrandChild;
                     List<HeredocLine> heredocLineList = heredoc.getHeredocLineList();
 
