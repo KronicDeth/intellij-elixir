@@ -53,7 +53,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 identifierNode.getTextRange().getEndOffset()
                         );
 
-                        highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+
+                        String identifier = identifierNode.getText();
+
+                        if (identifier.equals("doc") ||
+                                identifier.equals("moduledoc") ||
+                                identifier.equals("typedoc")) {
+                            highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
+                        } else {
+                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+                        }
                     }
 
                     @Override
