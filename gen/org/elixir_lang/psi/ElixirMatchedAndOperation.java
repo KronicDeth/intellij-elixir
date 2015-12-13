@@ -15,6 +15,15 @@ public interface ElixirMatchedAndOperation extends ElixirMatchedExpression, Infi
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

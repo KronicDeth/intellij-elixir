@@ -506,6 +506,16 @@ public class ElixirPsiImplUtil {
         return unquoted;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static Quotable leftOperand(InfixOperation infixOperation) {
+        PsiElement[] children = infixOperation.getChildren();
+
+        assert children.length == 3;
+
+        return (Quotable) children[0];
+    }
+
     /* Returns the 0-indexed line number for the element */
     public static int lineNumber(ASTNode node) {
         return document(node.getPsi()).getLineNumber(node.getStartOffset());
@@ -573,6 +583,16 @@ public class ElixirPsiImplUtil {
     public static String moduleName(@NotNull final Qualified qualified) {
         // TODO handle more complex qualifiers besides Aliases
         return qualified.getFirstChild().getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Operator operator(InfixOperation infixOperation) {
+        PsiElement[] children = infixOperation.getChildren();
+
+        assert children.length == 3;
+
+        return (Operator) children[1];
     }
 
     @Contract(pure = true)
@@ -814,9 +834,21 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final InfixOperation infixOperation) {
-        PsiElement[] children = infixOperation.getChildren();
+        Quotable leftOperand = infixOperation.leftOperand();
+        OtpErlangObject quotedLeftOperand = leftOperand.quote();
 
-        return quoteInfixOperationChildren(children);
+        Operator operator = infixOperation.operator();
+        OtpErlangObject quotedOperator = operator.quote();
+
+        Quotable rightOperand = infixOperation.rightOperand();
+        OtpErlangObject quotedRightOperand = rightOperand.quote();
+
+        return quotedFunctionCall(
+                quotedOperator,
+                metadata(operator),
+                quotedLeftOperand,
+                quotedRightOperand
+        );
     }
 
     @Contract(pure = true)
@@ -3372,30 +3404,6 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    private static OtpErlangObject quoteInfixOperationChildren(PsiElement... children) {
-        if (children.length != 3) {
-            throw new NotImplementedException("BinaryOperation expected to have 3 children (left operand, operator, right operand");
-        }
-
-        Quotable leftOperand = (Quotable) children[0];
-        OtpErlangObject quotedLeftOperand = leftOperand.quote();
-
-        Operator operator = (Operator) children[1];
-        OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable rightOperand = (Quotable) children[2];
-        OtpErlangObject quotedRightOperand = rightOperand.quote();
-
-        return quotedFunctionCall(
-                quotedOperator,
-                metadata(operator),
-                quotedLeftOperand,
-                quotedRightOperand
-        );
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quotedVariable(@NotNull final PsiElement variable) {
         return quotedVariable(
                 variable.getText(),
@@ -3551,6 +3559,16 @@ if (quoted == null) {
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually a local variable
         return "Elixir.Kernel";
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Quotable rightOperand(InfixOperation infixOperation) {
+        PsiElement[] children = infixOperation.getChildren();
+
+        assert children.length == 3;
+
+        return (Quotable) children[2];
     }
 
     @NotNull

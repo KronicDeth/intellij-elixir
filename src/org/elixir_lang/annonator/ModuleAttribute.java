@@ -5,7 +5,6 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
@@ -14,6 +13,7 @@ import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,10 +54,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 identifierNode.getTextRange().getEndOffset()
                         );
 
-
                         String identifier = identifierNode.getText();
 
-                        if (identifier.equals("doc") ||
+                        if (identifier.equals("callback") || identifier.equals("macrocallback")) {
+                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+
+                            highlightCallback(atUnqualifiedNoParenthesesCall, holder);
+                        } else if (identifier.equals("doc") ||
                                 identifier.equals("moduledoc") ||
                                 identifier.equals("typedoc")) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
@@ -76,6 +79,45 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     }
                 }
         );
+    }
+
+    /*
+     * Private Instance Methods
+     */
+
+    /**
+     * Highlights `textRange` with the given `textAttributesKey`.
+     *
+     * @param textRange textRange in the document to highlight
+     * @param annotationHolder the container which receives annotations created by the plugin.
+     * @param textAttributesKey text attributes to apply to the `node`.
+     */
+    private void highlight(@NotNull final TextRange textRange, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
+        annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
+        annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
+    }
+
+    private void highlightCallback(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall, AnnotationHolder annotationHolder) {
+        PsiElement noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
+
+        if (grandChildren.length == 1) {
+            PsiElement grandChild = grandChildren[0];
+
+            if (grandChild instanceof ElixirMatchedTypeOperation) {
+                InfixOperation infixOperation = (InfixOperation) grandChild;
+                PsiElement leftOperand = infixOperation.leftOperand();
+
+                if (leftOperand instanceof Call) {
+                    Call call = (Call) leftOperand;
+                    ASTNode functionNameNode = call.functionNameNode();
+
+                    if (functionNameNode != null) {
+                        highlight(functionNameNode.getTextRange(), annotationHolder, ElixirSyntaxHighlighter.CALLBACK);
+                    }
+                }
+            }
+        }
     }
 
     private void highlightDocumentationText(
@@ -129,22 +171,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 }
             }
         }
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    /**
-     * Highlights `textRange` with the given `textAttributesKey`.
-     *
-     * @param textRange textRange in the document to highlight
-     * @param annotationHolder the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the `node`.
-     */
-    private void highlight(@NotNull final TextRange textRange, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
-        annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
-        annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
     }
 
     /**

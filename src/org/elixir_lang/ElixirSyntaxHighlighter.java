@@ -34,6 +34,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             HighlighterColors.BAD_CHARACTER
     );
 
+    public static final TextAttributesKey CALLBACK = createTextAttributesKey(
+            "ELIXIR_CALLBACK",
+            // matches ERL_CALLBACK
+            CodeInsightColors.METHOD_CALL_ATTRIBUTES
+    );
+
     public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
             "ELIXIR_CHAR_LIST",
             DefaultLanguageHighlighterColors.STRING
