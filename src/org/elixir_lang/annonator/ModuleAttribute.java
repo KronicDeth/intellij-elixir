@@ -66,6 +66,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
 
                             highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
+                        } else if (identifier.equals("opaque") ||
+                                identifier.equals("type") ||
+                                identifier.equals("typep")) {
+                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+
+
+                            highlightType(atUnqualifiedNoParenthesesCall, holder);
                         } else {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
                         }
@@ -196,6 +203,30 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     textAttributesKey
             );
+        }
+    }
+
+    private void highlightType(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                               AnnotationHolder annotationHolder) {
+        PsiElement noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
+
+        if (grandChildren.length == 1) {
+            PsiElement grandChild = grandChildren[0];
+
+            if (grandChild instanceof ElixirMatchedTypeOperation) {
+                InfixOperation infixOperation = (InfixOperation) grandChild;
+                PsiElement leftOperand = infixOperation.leftOperand();
+
+                if (leftOperand instanceof Call) {
+                    Call call = (Call) leftOperand;
+                    ASTNode functionNameNode = call.functionNameNode();
+
+                    if (functionNameNode != null) {
+                        highlight(functionNameNode.getTextRange(), annotationHolder, ElixirSyntaxHighlighter.TYPE);
+                    }
+                }
+            }
         }
     }
 }

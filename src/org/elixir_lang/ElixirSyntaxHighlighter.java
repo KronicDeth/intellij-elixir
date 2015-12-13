@@ -10,6 +10,8 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.xmlb.annotations.Text;
+import com.thaiopensource.xml.dtd.om.Def;
+import org.apache.xmlbeans.impl.xb.ltgfmt.Code;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -130,6 +132,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey STRING = createTextAttributesKey(
             "ELIXIR_STRING",
             DefaultLanguageHighlighterColors.STRING
+    );
+
+    public static final TextAttributesKey TYPE = createTextAttributesKey(
+            "ELIXIR_TYPE",
+            // matches ERL_TYPE
+            CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES
     );
 
     public static final TextAttributesKey VALID_DIGIT = createTextAttributesKey(
