@@ -3,6 +3,7 @@ package org.elixir_lang.annonator;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
@@ -71,8 +72,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 identifier.equals("typep")) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
-
                             highlightType(atUnqualifiedNoParenthesesCall, holder);
+                        } else if (identifier.equals("spec")) {
+                            highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
+
+                            highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
                         } else {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
                         }
@@ -104,27 +108,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
         annotationHolder.createInfoAnnotation(textRange, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
     }
 
-    private void highlightCallback(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall, AnnotationHolder annotationHolder) {
-        PsiElement noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
-        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
-
-        if (grandChildren.length == 1) {
-            PsiElement grandChild = grandChildren[0];
-
-            if (grandChild instanceof ElixirMatchedTypeOperation) {
-                InfixOperation infixOperation = (InfixOperation) grandChild;
-                PsiElement leftOperand = infixOperation.leftOperand();
-
-                if (leftOperand instanceof Call) {
-                    Call call = (Call) leftOperand;
-                    ASTNode functionNameNode = call.functionNameNode();
-
-                    if (functionNameNode != null) {
-                        highlight(functionNameNode.getTextRange(), annotationHolder, ElixirSyntaxHighlighter.CALLBACK);
-                    }
-                }
-            }
-        }
+    private void highlightCallback(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                   @NotNull final AnnotationHolder annotationHolder) {
+        highlightSpecification(atUnqualifiedNoParenthesesCall, annotationHolder, ElixirSyntaxHighlighter.CALLBACK);
     }
 
     private void highlightDocumentationText(
@@ -205,6 +191,50 @@ public class ModuleAttribute implements Annotator, DumbAware {
             );
         }
     }
+
+    /**
+     * Highlights the function call name as a `ElixirSyntaxHighlighter.SPECIFICATION
+     *
+     * @param atUnqualifiedNoParenthesesCall
+     * @param annotationHolder
+     */
+    private void highlightSpecification(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                        @NotNull final AnnotationHolder annotationHolder) {
+        highlightSpecification(atUnqualifiedNoParenthesesCall, annotationHolder, ElixirSyntaxHighlighter.SPECIFICATION);
+    }
+
+    /**
+     * Highlight the function call name using the given `textAttributesKey`
+     *
+     * @param atUnqualifiedNoParenthesesCall
+     * @param annotationHolder
+     * @param textAttributesKey
+     */
+    private void highlightSpecification(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                        @NotNull final AnnotationHolder annotationHolder,
+                                        @NotNull final TextAttributesKey textAttributesKey) {
+        PsiElement noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
+
+        if (grandChildren.length == 1) {
+            PsiElement grandChild = grandChildren[0];
+
+            if (grandChild instanceof ElixirMatchedTypeOperation) {
+                InfixOperation infixOperation = (InfixOperation) grandChild;
+                PsiElement leftOperand = infixOperation.leftOperand();
+
+                if (leftOperand instanceof Call) {
+                    Call call = (Call) leftOperand;
+                    ASTNode functionNameNode = call.functionNameNode();
+
+                    if (functionNameNode != null) {
+                        highlight(functionNameNode.getTextRange(), annotationHolder, textAttributesKey);
+                    }
+                }
+            }
+        }
+    }
+
 
     private void highlightType(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                AnnotationHolder annotationHolder) {

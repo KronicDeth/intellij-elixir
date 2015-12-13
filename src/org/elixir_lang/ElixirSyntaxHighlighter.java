@@ -36,12 +36,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             HighlighterColors.BAD_CHARACTER
     );
 
-    public static final TextAttributesKey CALLBACK = createTextAttributesKey(
-            "ELIXIR_CALLBACK",
-            // matches ERL_CALLBACK
-            CodeInsightColors.METHOD_CALL_ATTRIBUTES
-    );
-
     public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
             "ELIXIR_CHAR_LIST",
             DefaultLanguageHighlighterColors.STRING
@@ -127,6 +121,16 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             "ELIXIR_SIGIL",
             // Based on color used for Regular expression's boundaries in Ruby
             DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR
+    );
+
+    public static final TextAttributesKey SPECIFICATION = createTextAttributesKey(
+            "ELIXIR_SPECIFICATION",
+            CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES
+    );
+
+    public static final TextAttributesKey CALLBACK = createTextAttributesKey(
+            "ELIXIR_CALLBACK",
+            SPECIFICATION
     );
 
     public static final TextAttributesKey STRING = createTextAttributesKey(
