@@ -144,6 +144,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES
     );
 
+    public static final TextAttributesKey TYPE_PARAMETER = createTextAttributesKey(
+            "ELIXIR_TYPE_PARAMETER",
+            CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES
+    );
+
     public static final TextAttributesKey VALID_DIGIT = createTextAttributesKey(
             "ELIXIR_VALID_DIGIT",
             DefaultLanguageHighlighterColors.NUMBER

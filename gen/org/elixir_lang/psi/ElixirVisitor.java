@@ -629,7 +629,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesManyArguments(@NotNull ElixirNoParenthesesManyArguments o) {
-    visitQuotableArguments(o);
+    visitArguments(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesManyArgumentsUnqualifiedIdentifier(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier o) {
@@ -637,7 +638,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesManyPositionalAndMaybeKeywordsArguments(@NotNull ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments o) {
-    visitQuotableArguments(o);
+    visitArguments(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
@@ -645,16 +647,19 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {
-    visitMaybeModuleName(o);
+    visitArguments(o);
+    // visitMaybeModuleName(o);
     // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
-    visitQuotableArguments(o);
+    visitArguments(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesStrict(@NotNull ElixirNoParenthesesStrict o) {
-    visitQuotableArguments(o);
+    visitArguments(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitOctalDigits(@NotNull ElixirOctalDigits o) {
@@ -674,7 +679,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitParenthesesArguments(@NotNull ElixirParenthesesArguments o) {
-    visitQuotableArguments(o);
+    visitArguments(o);
+    // visitQuotableArguments(o);
   }
 
   public void visitParentheticalStab(@NotNull ElixirParentheticalStab o) {
@@ -942,6 +948,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnqualifiedNoParenthesesManyArgumentsCall(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall o) {
     visitPsiElement(o);
     // visitCall(o);
+    // visitNoParentheses(o);
     // visitUnqualified(o);
     // visitQuotable(o);
     // visitQuotableArguments(o);
@@ -953,6 +960,10 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitWhenInfixOperator(@NotNull ElixirWhenInfixOperator o) {
     visitOperator(o);
+  }
+
+  public void visitArguments(@NotNull Arguments o) {
+    visitElement(o);
   }
 
   public void visitAssociationOperation(@NotNull AssociationOperation o) {

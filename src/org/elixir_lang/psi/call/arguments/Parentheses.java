@@ -1,20 +1,20 @@
-package org.elixir_lang.psi;
+package org.elixir_lang.psi.call.arguments;
 
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.ElixirMatchedParenthesesArguments;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.arguments.Parentheses;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 /**
- * <expression> dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
+ * A call with one or two sets of parentheses containing arguments inside a {@code matchedParenthesesArguments}
+ *
+ * {@code <...> matchedParenthesesArguments}
  */
-public interface DotCall extends Call, Quotable {
-    Quotable getDotInfixOperator();
-
-    List<ElixirParenthesesArguments> getParenthesesArgumentsList();
+public interface Parentheses extends Call {
+    @Contract(pure = true)
+    @NotNull
+    ElixirMatchedParenthesesArguments getMatchedParenthesesArguments();
 
     /**
      * Unlike with a base {@link Call}, {@link Parentheses#primaryArguments} are {@code @NotNull} because the first set

@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirNoParenthesesManyArguments;
 import org.elixir_lang.psi.ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments;
@@ -33,6 +34,11 @@ public class ElixirNoParenthesesManyArgumentsImpl extends ASTWrapperPsiElement i
   @Nullable
   public ElixirNoParenthesesOnePositionalAndKeywordsArguments getNoParenthesesOnePositionalAndKeywordsArguments() {
     return findChildByClass(ElixirNoParenthesesOnePositionalAndKeywordsArguments.class);
+  }
+
+  @NotNull
+  public PsiElement[] arguments() {
+    return ElixirPsiImplUtil.arguments(this);
   }
 
   @NotNull

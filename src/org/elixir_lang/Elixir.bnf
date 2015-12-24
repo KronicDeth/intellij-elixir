@@ -222,21 +222,57 @@ noParenthesesStrict ::= emptyParentheses |
                                              noParenthesesKeywords |
                                              noParenthesesManyArguments
                                             ) CLOSING_PARENTHESIS
-                        { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                        {
+                          implements = [
+                            "org.elixir_lang.psi.Arguments"
+                            "org.elixir_lang.psi.QuotableArguments"
+                          ]
+                          methods = [
+                            arguments
+                            quoteArguments
+                          ]
+                        }
 
 noParenthesesFirstPositional ::= matchedExpression
                                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 noParenthesesOnePositionalAndKeywordsArguments ::= noParenthesesFirstPositional infixComma noParenthesesKeywords
-                                                   { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                                                   {
+                                                     implements = [
+                                                       "org.elixir_lang.psi.Arguments"
+                                                       "org.elixir_lang.psi.QuotableArguments"
+                                                     ]
+                                                     methods = [
+                                                       arguments
+                                                       quoteArguments
+                                                     ]
+                                                   }
 noParenthesesManyPositionalAndMaybeKeywordsArguments ::= noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
-                                                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                                                         {
+                                                           implements = [
+                                                             "org.elixir_lang.psi.Arguments"
+                                                             "org.elixir_lang.psi.QuotableArguments"
+                                                           ]
+                                                           methods = [
+                                                             arguments
+                                                             quoteArguments
+                                                           ]
+                                                         }
 
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
 noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
                                noParenthesesManyPositionalAndMaybeKeywordsArguments
-                               { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                               {
+                                 implements = [
+                                   "org.elixir_lang.psi.Arguments"
+                                   "org.elixir_lang.psi.QuotableArguments"
+                                 ]
+                                 methods = [
+                                   arguments
+                                   quoteArguments
+                                 ]
+                               }
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
@@ -251,6 +287,7 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   // MUST be first so visitElement is used in ElixirVisitor
                                                   "com.intellij.psi.PsiElement"
                                                   "org.elixir_lang.psi.call.Call"
+                                                  "org.elixir_lang.psi.call.arguments.NoParentheses"
                                                   "org.elixir_lang.psi.qualification.Unqualified"
                                                   "org.elixir_lang.psi.Quotable"
                                                   "org.elixir_lang.psi.QuotableArguments"
@@ -262,11 +299,13 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                   getArguments
                                                   getDoBlock
                                                   getIdentifier
+                                                  primaryArguments
                                                   quote
                                                   quoteArguments
                                                   quoteIdentifier
                                                   resolvedFunctionName
                                                   resolvedModuleName
+                                                  secondaryArguments
                                                 ]
                                               }
 
@@ -1577,7 +1616,16 @@ parenthesesArguments ::= OPENING_PARENTHESIS EOL*
                           keywords | // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L486
                           parenthesesPositionalArguments (infixComma keywords)?)? EOL* // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L487-L488
                          CLOSING_PARENTHESIS
-                         { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                         {
+                           implements = [
+                             "org.elixir_lang.psi.Arguments"
+                             "org.elixir_lang.psi.QuotableArguments"
+                           ]
+                           methods = [
+                             arguments
+                             quoteArguments
+                           ]
+                         }
 
 // call_args_no_parens_one
 noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L417
@@ -1599,10 +1647,12 @@ noParenthesesOneArgument ::= noParenthesesKeywords | // @see https://github.com/
                              !additionTail matchedExpression
                              {
                                implements = [
+                                 "org.elixir_lang.psi.Arguments"
                                  "org.elixir_lang.psi.MaybeModuleName"
                                  "org.elixir_lang.psi.QuotableArguments"
                                ]
                                methods = [
+                                 arguments
                                  isModuleName
                                  processDeclarations
                                  quoteArguments
@@ -1641,9 +1691,11 @@ matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments paren
                        functionNameNode
                        getDoBlock
                        moduleName
+                       primaryArguments
                        quote
                        resolvedFunctionName
                        resolvedModuleName
+                       secondaryArguments
                      ]
                    }
 
@@ -1660,6 +1712,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
                                           "org.elixir_lang.psi.QualifiedNoParenthesesCall"
                                         ]
                                         methods = [
+                                          primaryArguments
                                           functionName
                                           functionNameNode
                                           getDoBlock
@@ -1667,6 +1720,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
                                           quote
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          secondaryArguments
                                         ]
                                       }
 
@@ -1689,9 +1743,11 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
                                               functionNameNode
                                               getDoBlock
                                               moduleName
+                                              primaryArguments
                                               quote
                                               resolvedFunctionName
                                               resolvedModuleName
+                                              secondaryArguments
                                             ]
                                           }
 
@@ -1712,9 +1768,11 @@ matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                             functionNameNode
                                             moduleName
                                             getDoBlock
+                                            primaryArguments
                                             quote
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            secondaryArguments
                                           ]
                                         }
 
@@ -1786,9 +1844,11 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
                                         functionNameNode
                                         getDoBlock
                                         moduleName
+                                        primaryArguments
                                         quote
                                         resolvedFunctionName
                                         resolvedModuleName
+                                        secondaryArguments
                                       ]
                                     }
 
@@ -1807,9 +1867,11 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
                                         functionNameNode
                                         moduleName
                                         getDoBlock
+                                        primaryArguments
                                         quote
                                         resolvedFunctionName
                                         resolvedModuleName
+                                        secondaryArguments
                                       ]
                                     }
 
@@ -1839,9 +1901,11 @@ matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
                                           functionNameNode
                                           moduleName
                                           getDoBlock
+                                          primaryArguments
                                           quote
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          secondaryArguments
                                         ]
                                       }
 /*
@@ -1890,9 +1954,11 @@ matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
                                           functionNameNode
                                           moduleName
                                           getDoBlock
+                                          primaryArguments
                                           quote
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          secondaryArguments
                                         ]
                                       }
 
@@ -2030,7 +2096,13 @@ mapUpdateArguments ::= matchedMatchOperation pipeInfixOperator mapTailArguments
                        { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 mapConstructionArguments ::= mapTailArguments
-                             { implements = "org.elixir_lang.psi.QuotableArguments" methods = [quoteArguments] }
+                             {
+                               implements = "org.elixir_lang.psi.QuotableArguments"
+                               methods = [
+                                 arguments
+                                 quoteArguments
+                               ]
+                             }
 
 mapArguments ::= OPENING_CURLY EOL*
                  (
@@ -2071,7 +2143,13 @@ stabNoParenthesesSignature ::= noParenthesesArguments
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L430-L432
  */
 stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)?
-                             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                             {
+                               implements = [
+                                 "org.elixir_lang.psi.Quotable"
+                                 "org.elixir_lang.psi.WhenOperation"
+                               ]
+                               methods = [quote]
+                             }
 
 stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
                       {
@@ -2514,9 +2592,11 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments p
                          functionName
                          functionNameNode
                          moduleName
+                         primaryArguments
                          quote
                          resolvedFunctionName
                          resolvedModuleName
+                         secondaryArguments
                        ]
                      }
 
@@ -2533,9 +2613,11 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
                                             functionName
                                             functionNameNode
                                             moduleName
+                                            primaryArguments
                                             quote
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            secondaryArguments
                                           ]
                                         }
 
@@ -2554,9 +2636,11 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParent
                                                 functionName
                                                 functionNameNode
                                                 moduleName
+                                                primaryArguments
                                                 quote
                                                 resolvedFunctionName
                                                 resolvedModuleName
+                                                secondaryArguments
                                               ]
                                             }
 
@@ -2574,10 +2658,12 @@ unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument do
                                               functionNameNode
                                               moduleName
                                               isDefmodule
+                                              primaryArguments
                                               processDeclarations
                                               quote
                                               resolvedFunctionName
                                               resolvedModuleName
+                                              secondaryArguments
                                             ]
                                           }
 
@@ -2630,9 +2716,11 @@ unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relat
                                           functionName
                                           functionNameNode
                                           moduleName
+                                          primaryArguments
                                           quote
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          secondaryArguments
                                         ]
                                       }
 
@@ -2647,9 +2735,11 @@ unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relat
                                           functionName
                                           functionNameNode
                                           moduleName
+                                          primaryArguments
                                           quote
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          secondaryArguments
                                         ]
                                       }
 
@@ -2675,9 +2765,11 @@ unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments d
                                             functionName
                                             functionNameNode
                                             moduleName
+                                            primaryArguments
                                             quote
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            secondaryArguments
                                           ]
                                         }
 
@@ -2713,9 +2805,11 @@ unmatchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
                                             functionName
                                             functionNameNode
                                             moduleName
+                                            primaryArguments
                                             quote
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            secondaryArguments
                                           ]
                                         }
 

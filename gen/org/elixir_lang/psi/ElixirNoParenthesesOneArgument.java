@@ -8,7 +8,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesOneArgument extends MaybeModuleName, QuotableArguments {
+public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleName, QuotableArguments {
 
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
@@ -24,6 +24,9 @@ public interface ElixirNoParenthesesOneArgument extends MaybeModuleName, Quotabl
 
   @Nullable
   ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall();
+
+  @NotNull
+  PsiElement[] arguments();
 
   boolean isModuleName();
 

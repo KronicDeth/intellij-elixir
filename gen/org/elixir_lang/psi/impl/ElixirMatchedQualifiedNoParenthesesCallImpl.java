@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,11 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends ElixirMatchedEx
     return findNotNullChildByClass(ElixirRelativeIdentifier.class);
   }
 
+  @NotNull
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
   @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
@@ -75,6 +81,11 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends ElixirMatchedEx
   @NotNull
   public String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @Nullable
+  public PsiElement[] secondaryArguments() {
+    return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
 }

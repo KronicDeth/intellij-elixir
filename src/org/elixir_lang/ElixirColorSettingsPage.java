@@ -45,7 +45,8 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
             new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING),
-            new AttributesDescriptor("Type", ElixirSyntaxHighlighter.TYPE)
+            new AttributesDescriptor("Type", ElixirSyntaxHighlighter.TYPE),
+            new AttributesDescriptor("Type Parameter", ElixirSyntaxHighlighter.TYPE_PARAMETER)
     };
 
     @Nullable

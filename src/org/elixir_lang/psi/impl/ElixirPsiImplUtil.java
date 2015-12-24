@@ -13,6 +13,10 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.arguments.NoParentheses;
+import org.elixir_lang.psi.call.arguments.NoParenthesesOneArgument;
+import org.elixir_lang.psi.call.arguments.None;
+import org.elixir_lang.psi.call.arguments.Parentheses;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.jetbrains.annotations.Contract;
@@ -72,6 +76,74 @@ public class ElixirPsiImplUtil {
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
     public static final int UNKNOWN_BASE = 36;
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER);
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(@NotNull final ElixirMapConstructionArguments mapConstructionArguments) {
+        return mapConstructionArguments.getChildren();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
+        Arguments arguments = noParenthesesManyArguments.getNoParenthesesOnePositionalAndKeywordsArguments();
+
+        if (arguments == null) {
+            arguments = noParenthesesManyArguments.getNoParenthesesManyPositionalAndMaybeKeywordsArguments();
+        }
+
+        return arguments.arguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
+        PsiElement[] children = noParenthesesOneArgument.getChildren();
+
+        assert children.length == 1;
+
+        PsiElement child = children[0];
+        PsiElement[] arguments;
+
+        if (child instanceof Arguments) {
+            Arguments childArguments = (Arguments) child;
+            arguments = childArguments.arguments();
+        } else {
+            arguments = children;
+        }
+
+        return arguments;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments noParenthesesManyPositionalAndMaybeKeywordsArguments) {
+        return noParenthesesManyPositionalAndMaybeKeywordsArguments.getChildren();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesOnePositionalAndKeywordsArguments noParenthesesOnePositionalAndKeywordsArguments) {
+        PsiElement noParenthesesFirstPositional = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesFirstPositional();
+        PsiElement noParenthesesKeywords = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesKeywords();
+
+        return new PsiElement[]{
+                noParenthesesFirstPositional,
+                noParenthesesKeywords
+        };
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesStrict noParenthesesStrict) {
+        return noParenthesesStrict.getChildren();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] arguments(@NotNull final ElixirParenthesesArguments parenthesesArguments) {
+        return parenthesesArguments.getChildren();
+    }
 
     @Contract(pure = true)
     @NotNull
@@ -723,6 +795,52 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
         return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final DotCall dotCall) {
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = dotCall.getParenthesesArgumentsList();
+
+        ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
+        return primaryParenthesesArguments.arguments();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] primaryArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        Arguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+
+        if (arguments == null) {
+            arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
+        }
+
+        assert arguments != null;
+
+        return arguments.arguments();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] primaryArguments(@NotNull @SuppressWarnings("unused") final None none) {
+        return null;
+    }
+
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final NoParenthesesOneArgument noParenthesesOneArgument) {
+        return noParenthesesOneArgument.getNoParenthesesOneArgument().arguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final Parentheses parentheses) {
+        ElixirMatchedParenthesesArguments matchedParenthesesArguments = parentheses.getMatchedParenthesesArguments();
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
+
+        ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
+        return primaryParenthesesArguments.arguments();
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
@@ -3053,21 +3171,21 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirMapConstructionArguments mapConstructionArguments) {
-        PsiElement[] children = mapConstructionArguments.getChildren();
-        List<OtpErlangObject> quotedChildList = new ArrayList<OtpErlangObject>();
+        PsiElement[] arguments = mapConstructionArguments.arguments();
+        List<OtpErlangObject> quotedArgumentList = new ArrayList<OtpErlangObject>();
 
-        for (PsiElement child : children) {
-            Quotable quotableChild = (Quotable) child;
-            OtpErlangList quotedChild = (OtpErlangList) quotableChild.quote();
+        for (PsiElement argument : arguments) {
+            Quotable quotableArgument = (Quotable) argument;
+            OtpErlangList quotedArgument = (OtpErlangList) quotableArgument.quote();
 
-            for (OtpErlangObject element : quotedChild.elements()) {
-                quotedChildList.add(element);
+            for (OtpErlangObject element : quotedArgument.elements()) {
+                quotedArgumentList.add(element);
             }
         }
 
-        OtpErlangObject[] quotedArguments = new OtpErlangObject[quotedChildList.size()];
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[quotedArgumentList.size()];
 
-        return quotedChildList.toArray(quotedArguments);
+        return quotedArgumentList.toArray(quotedArguments);
     }
 
     @Contract(pure = true)
@@ -3113,6 +3231,7 @@ if (quoted == null) {
 
         return quotedChildren;
     }
+
 
     @Contract(pure = true)
     @NotNull
@@ -3184,12 +3303,12 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
-        PsiElement[] children = parenthesesArguments.getChildren();
+        PsiElement[] arguments = parenthesesArguments.arguments();
 
-        OtpErlangObject[] quotedArguments = new OtpErlangObject[children.length];
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[arguments.length];
 
-        for (int i = 0; i < children.length; i++) {
-            Quotable quotableChild = (Quotable) children[i];
+        for (int i = 0; i < arguments.length; i++) {
+            Quotable quotableChild = (Quotable) arguments[i];
             OtpErlangObject quotedChild = quotableChild.quote();
             quotedArguments[i] = quotedChild;
         }
@@ -3569,6 +3688,51 @@ if (quoted == null) {
         assert children.length == 3;
 
         return (Quotable) children[2];
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull final DotCall dotCall) {
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = dotCall.getParenthesesArgumentsList();
+        PsiElement[] arguments;
+
+        if (parenthesesArgumentsList.size() < 2) {
+            arguments = null;
+        } else {
+            ElixirParenthesesArguments parenthesesArguments = parenthesesArgumentsList.get(1);
+            arguments = parenthesesArguments.arguments();
+        }
+
+        return arguments;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final None none) {
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final NoParentheses noParentheses) {
+        return null;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull final Parentheses parentheses) {
+        ElixirMatchedParenthesesArguments matchedParenthesesArguments = parentheses.getMatchedParenthesesArguments();
+        List<ElixirParenthesesArguments> parenthesesArgumentsList = matchedParenthesesArguments.getParenthesesArgumentsList();
+        PsiElement[] arguments;
+
+        if (parenthesesArgumentsList.size() < 2) {
+            arguments = null;
+        } else {
+            ElixirParenthesesArguments parenthesesArguments = parenthesesArgumentsList.get(1);
+            arguments = parenthesesArguments.arguments();
+        }
+
+        return arguments;
     }
 
     @NotNull

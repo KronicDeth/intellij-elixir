@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,9 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   @NotNull
   String moduleName();
 
+  @Nullable
+  PsiElement[] primaryArguments();
+
   @NotNull
   OtpErlangObject quote();
 
@@ -36,5 +40,8 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   @NotNull
   String resolvedModuleName();
+
+  @Nullable
+  PsiElement[] secondaryArguments();
 
 }

@@ -56,6 +56,11 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
     return ElixirPsiImplUtil.isDefmodule(this);
   }
 
+  @NotNull
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
     return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
@@ -73,6 +78,11 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   @NotNull
   public String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @Nullable
+  public PsiElement[] secondaryArguments() {
+    return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
 }

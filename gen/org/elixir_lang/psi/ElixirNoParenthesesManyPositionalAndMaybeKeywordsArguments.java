@@ -2,12 +2,13 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments extends QuotableArguments {
+public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments extends Arguments, QuotableArguments {
 
   @NotNull
   ElixirMatchedExpression getMatchedExpression();
@@ -17,6 +18,9 @@ public interface ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments exte
 
   @Nullable
   ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @NotNull
+  PsiElement[] arguments();
 
   @NotNull
   OtpErlangObject[] quoteArguments();
