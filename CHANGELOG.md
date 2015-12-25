@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Changelog](#changelog)
+  - [v1.3.0](#v130)
+  - [v1.2.1](#v121)
+  - [v1.2.0](#v120)
+  - [v1.1.0](#v110)
+  - [v1.0.0](#v100)
+  - [v0.3.5](#v035)
+  - [v0.3.4](#v034)
+  - [v0.3.3](#v033)
+  - [v0.3.2](#v032)
+  - [v0.3.1](#v031)
+  - [v0.3.0](#v030)
+  - [v0.2.1](#v021)
+  - [v0.2.0](#v020)
+  - [v0.1.4](#v014)
+  - [v0.1.3](#v013)
+  - [v0.1.2](#v012)
+  - [v0.1.1](#v011)
+  - [v0.1.0](#v010)
+  - [v0.0.3](#v003)
+  - [v0.0.2](#v002)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Changelog
 
 ## v1.3.0

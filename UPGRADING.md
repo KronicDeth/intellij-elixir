@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Upgrading](#upgrading)
+  - [v1.3.0](#v130)
+  - [v1.0.0](#v100)
+  - [v0.3.1](#v031)
+  - [v0.3.0](#v030)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Upgrading
 
 ## v1.3.0
