@@ -24,10 +24,13 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Alias", ElixirSyntaxHighlighter.ALIAS),
             new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
             new AttributesDescriptor("Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.VALID_DIGIT),
+            new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
             new AttributesDescriptor("Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN_TOKEN),
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
             new AttributesDescriptor("Decimal Exponent, Mark, and Separator", ElixirSyntaxHighlighter.DECIMAL),
+            new AttributesDescriptor("Documentation Module Attributes", ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE),
+            new AttributesDescriptor("Documentation Text", ElixirSyntaxHighlighter.DOCUMENTATION_TEXT),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Identifier", ElixirSyntaxHighlighter.IDENTIFIER),
@@ -35,11 +38,15 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Kernel Functions", ElixirSyntaxHighlighter.KERNEL_FUNCTION),
             new AttributesDescriptor("Kernel Macros", ElixirSyntaxHighlighter.KERNEL_MACRO),
             new AttributesDescriptor("Kernel.SpecialForms Macros", ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO),
+            new AttributesDescriptor("Module Attributes", ElixirSyntaxHighlighter.MODULE_ATTRIBUTE),
             new AttributesDescriptor("Non-Decimal Base Prefix", ElixirSyntaxHighlighter.WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Obsolete Non-Decimal Base Prefix", ElixirSyntaxHighlighter.OBSOLETE_WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
-            new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING)
+            new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
+            new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING),
+            new AttributesDescriptor("Type", ElixirSyntaxHighlighter.TYPE),
+            new AttributesDescriptor("Type Parameter", ElixirSyntaxHighlighter.TYPE_PARAMETER)
     };
 
     @Nullable

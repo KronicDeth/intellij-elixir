@@ -15,6 +15,15 @@ public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Inf
   ElixirWhenInfixOperator getWhenInfixOperator();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

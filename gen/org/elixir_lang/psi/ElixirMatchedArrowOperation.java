@@ -15,6 +15,15 @@ public interface ElixirMatchedArrowOperation extends ElixirMatchedExpression, In
   List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

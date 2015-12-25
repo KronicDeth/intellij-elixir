@@ -2,10 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirNoParenthesesStrict extends QuotableArguments {
+public interface ElixirNoParenthesesStrict extends Arguments, QuotableArguments {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
@@ -15,6 +16,9 @@ public interface ElixirNoParenthesesStrict extends QuotableArguments {
 
   @Nullable
   ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
+
+  @NotNull
+  PsiElement[] arguments();
 
   @NotNull
   OtpErlangObject[] quoteArguments();

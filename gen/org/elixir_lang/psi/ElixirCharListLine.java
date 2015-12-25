@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirCharListLine extends Atomable, InterpolatedCharList, Quotable {
+public interface ElixirCharListLine extends Atomable, InterpolatedCharList, Line, Quotable {
 
   @NotNull
   ElixirQuoteCharListBody getQuoteCharListBody();
@@ -22,6 +22,9 @@ public interface ElixirCharListLine extends Atomable, InterpolatedCharList, Quot
 
   @NotNull
   List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child);
+
+  @NotNull
+  Body getBody();
 
   IElementType getFragmentType();
 

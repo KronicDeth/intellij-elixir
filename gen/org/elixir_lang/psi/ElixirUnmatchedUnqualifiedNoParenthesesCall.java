@@ -28,6 +28,9 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   boolean isDefmodule();
 
+  @NotNull
+  PsiElement[] primaryArguments();
+
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
@@ -38,5 +41,8 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   @NotNull
   String resolvedModuleName();
+
+  @Nullable
+  PsiElement[] secondaryArguments();
 
 }

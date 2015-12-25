@@ -15,6 +15,15 @@ public interface ElixirUnmatchedComparisonOperation extends ElixirUnmatchedExpre
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

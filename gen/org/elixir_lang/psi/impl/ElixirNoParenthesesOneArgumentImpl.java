@@ -53,6 +53,11 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
     return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
+  @NotNull
+  public PsiElement[] arguments() {
+    return ElixirPsiImplUtil.arguments(this);
+  }
+
   public boolean isModuleName() {
     return ElixirPsiImplUtil.isModuleName(this);
   }

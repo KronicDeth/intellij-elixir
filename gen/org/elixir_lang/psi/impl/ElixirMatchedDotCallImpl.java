@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
@@ -61,6 +62,11 @@ public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implem
   }
 
   @NotNull
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -73,6 +79,11 @@ public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implem
   @Nullable
   public String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @Nullable
+  public PsiElement[] secondaryArguments() {
+    return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
 }

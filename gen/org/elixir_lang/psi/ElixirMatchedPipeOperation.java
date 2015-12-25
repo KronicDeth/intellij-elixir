@@ -15,6 +15,15 @@ public interface ElixirMatchedPipeOperation extends ElixirMatchedExpression, Inf
   ElixirPipeInfixOperator getPipeInfixOperator();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

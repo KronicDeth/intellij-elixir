@@ -3,11 +3,15 @@ package org.elixir_lang;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.xmlb.annotations.Text;
+import com.thaiopensource.xml.dtd.om.Def;
+import org.apache.xmlbeans.impl.xb.ltgfmt.Code;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,6 +56,16 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.NUMBER
     );
 
+    public static final TextAttributesKey DOCUMENTATION_MODULE_ATTRIBUTE = createTextAttributesKey(
+            "ELIXIR_DOCUMENTATION_MODULE_ATTRIBUTE",
+            DefaultLanguageHighlighterColors.DOC_COMMENT_TAG
+    );
+
+    public static final TextAttributesKey DOCUMENTATION_TEXT = createTextAttributesKey(
+            "ELIXIR_DOCUMENTATION_TEXT",
+            DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE
+    );
+
     public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
             "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
             DefaultLanguageHighlighterColors.PARENTHESES
@@ -87,6 +101,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.KEYWORD
     );
 
+    public static final TextAttributesKey MODULE_ATTRIBUTE = createTextAttributesKey(
+            "ELIXIR_MODULE_ATTRIBUTE",
+            // Color used for "ERL_ATTRIBUTE" in intellij-erlang
+            CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES
+    );
+
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
             "ELIXIR_OBSOLETE_WHOLE_NUMBER_BASE",
             HighlighterColors.BAD_CHARACTER
@@ -103,9 +123,30 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR
     );
 
+    public static final TextAttributesKey SPECIFICATION = createTextAttributesKey(
+            "ELIXIR_SPECIFICATION",
+            CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES
+    );
+
+    public static final TextAttributesKey CALLBACK = createTextAttributesKey(
+            "ELIXIR_CALLBACK",
+            SPECIFICATION
+    );
+
     public static final TextAttributesKey STRING = createTextAttributesKey(
             "ELIXIR_STRING",
             DefaultLanguageHighlighterColors.STRING
+    );
+
+    public static final TextAttributesKey TYPE = createTextAttributesKey(
+            "ELIXIR_TYPE",
+            // matches ERL_TYPE
+            CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES
+    );
+
+    public static final TextAttributesKey TYPE_PARAMETER = createTextAttributesKey(
+            "ELIXIR_TYPE_PARAMETER",
+            CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES
     );
 
     public static final TextAttributesKey VALID_DIGIT = createTextAttributesKey(

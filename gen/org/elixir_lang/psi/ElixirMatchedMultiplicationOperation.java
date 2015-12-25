@@ -15,6 +15,15 @@ public interface ElixirMatchedMultiplicationOperation extends ElixirMatchedExpre
   ElixirMultiplicationInfixOperator getMultiplicationInfixOperator();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

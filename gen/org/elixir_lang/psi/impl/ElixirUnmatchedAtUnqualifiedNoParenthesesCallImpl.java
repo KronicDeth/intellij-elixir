@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,11 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
   }
 
   @NotNull
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -65,6 +71,11 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
   @Nullable
   public String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @Nullable
+  public PsiElement[] secondaryArguments() {
+    return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
 }

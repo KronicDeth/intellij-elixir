@@ -15,6 +15,15 @@ public interface ElixirMatchedRelationalOperation extends ElixirMatchedExpressio
   ElixirRelationalInfixOperator getRelationalInfixOperator();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

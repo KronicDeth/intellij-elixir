@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +20,9 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
 
   @NotNull
   ElixirRelativeIdentifier getRelativeIdentifier();
+
+  @NotNull
+  PsiElement[] primaryArguments();
 
   @Nullable
   String functionName();
@@ -39,5 +43,8 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
 
   @NotNull
   String resolvedModuleName();
+
+  @Nullable
+  PsiElement[] secondaryArguments();
 
 }
