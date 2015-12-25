@@ -27,6 +27,41 @@
               Highlight <code>after</code>, <code>catch</code>, <code>do</code>, <code>else</code>, <code>end,
               </code>fn<code>, and </code>rescue` as keywords.
             </li>
+            <li>
+              <p>Annotate Module Attributes</p>
+              <ul>
+                <li>
+                  Documentation module attributes (<code>@doc</code>, <code>@moduledoc</code>, and
+                  <code>@typedoc</code>) are annotated as "Documentation Module Attributes" while all other module
+                  attributes are annotated as "Module Attributes".
+                </li>
+                <li>
+                  The string or heredoc argument to a documentation module attribute (<code>@doc</code>,
+                  <code>@moduledoc</code>, and <code>@typedoc</code> is annotated as "Documentation Text"
+                </li>
+                <li>
+                  Function names passed to <code>@callback</code>, <code>@macrocallback</code> or
+                  <code>@specification</code> are annotated as "Specification".
+                </li>
+                <li>
+                  Variables/calls in the parameters and return of <code>@callback</code>, <code>@macrocallback</code>,
+                  <code>@specification</code> are annotated as "Type".
+                </li>
+                <li>
+                  Parameters of <code>@opaque</code>, <code>@type</code>, <code>@typep</code> names are annotated as
+                  "Type Parameter"
+                </li>
+                <li>
+                  Keyword keys from the <code>when</code> clause of <code>@callback</code>, <code>@macrocallback</code>
+                  or <code>@spec</code> definitions and their usage are annotated as "Type Parameters"
+                </li>
+                <li>
+                  <code>@doc false</code>, <code>@moduledoc false</code>, and <code>@typedoc false</code> will annotate
+                  the <code>false</code> with a weak warning: "Will make documented invisible to the documentation
+                  extraction tools like ExDoc.".
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
