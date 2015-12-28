@@ -30,9 +30,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == ADDITION_INFIX_OPERATOR) {
       r = additionInfixOperator(b, 0);
     }
-    else if (t == ADJACENT_EXPRESSION) {
-      r = adjacentExpression(b, 0);
-    }
     else if (t == ALIAS) {
       r = alias(b, 0);
     }
@@ -946,17 +943,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, EOL);
     if (!r) r = consumeToken(b, SIGNIFICANT_WHITE_SPACE);
     exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // expression
-  public static boolean adjacentExpression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "adjacentExpression")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<adjacent expression>");
-    r = expression(b, l + 1);
-    exit_section_(b, l, m, ADJACENT_EXPRESSION, r, false, null);
     return r;
   }
 
@@ -2179,7 +2165,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // expression (endOfExpression expression | adjacentExpression)*
+  // expression (endOfExpression expression)*
   static boolean expressionList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList")) return false;
     boolean r;
@@ -2190,7 +2176,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (endOfExpression expression | adjacentExpression)*
+  // (endOfExpression expression)*
   private static boolean expressionList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList_1")) return false;
     int c = current_position_(b);
@@ -2202,20 +2188,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // endOfExpression expression | adjacentExpression
+  // endOfExpression expression
   private static boolean expressionList_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expressionList_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = expressionList_1_0_0(b, l + 1);
-    if (!r) r = adjacentExpression(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // endOfExpression expression
-  private static boolean expressionList_1_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expressionList_1_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = endOfExpression(b, l + 1);

@@ -5,7 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirStabParenthesesSignature extends Quotable {
+public interface ElixirStabParenthesesSignature extends Quotable, WhenOperation {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
@@ -23,6 +23,15 @@ public interface ElixirStabParenthesesSignature extends Quotable {
   ElixirWhenInfixOperator getWhenInfixOperator();
 
   @NotNull
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  Quotable rightOperand();
 
 }

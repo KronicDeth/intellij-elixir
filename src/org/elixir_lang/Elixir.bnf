@@ -176,7 +176,7 @@ private expression ::= emptyParentheses |
                        unmatchedExpression |
                        unqualifiedNoParenthesesManyArgumentsCall
 
-private expressionList ::= expression (endOfExpression expression | adjacentExpression)*
+private expressionList ::= expression (endOfExpression expression)*
 
 /*
  *
@@ -2148,7 +2148,12 @@ stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)
                                  "org.elixir_lang.psi.Quotable"
                                  "org.elixir_lang.psi.WhenOperation"
                                ]
-                               methods = [quote]
+                               methods = [
+                                 leftOperand
+                                 operator
+                                 quote
+                                 rightOperand
+                               ]
                              }
 
 stabInfixOperator ::= EOL* STAB_OPERATOR EOL*
@@ -2991,9 +2996,6 @@ unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE un
  *
  */
 
-// an expression in an expressionList that is NOT preceded by endOfExpression(s)
-adjacentExpression ::= expression
-                       { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 atom ::= COLON (ATOM_FRAGMENT | quote)
          { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 

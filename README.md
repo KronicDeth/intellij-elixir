@@ -659,20 +659,6 @@ End-of-expressions (`;` or new lines) missing between expressions.
 
 Quick Fixes are actions IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
 
-#### Add End-of-Expression
-
-If an end-of-expression is missing, it can be added as a `;` or a newline with Alt+Enter.  (Will vary based on keymap.)
-
-<figure>
-  <img alt="Add `;` or newline between expressions" src="/screenshots/local_quick_fix/Add%20End-of-Expression.gif?raw=true"/>
-  <br/>
-  <figcaption>
-    Hitting Alt+Enter on missing end-of-expression will bring up the Local Quick Fixes,
-    "Add `;` for missing end-of-expression" and "Add newline for the missing end-of-expression".  Select the
-    end-of-expression, hit enter to accept and add the missing end-of-expression.
-  </figcaption>
-</figure>
-
 #### Remove space in front of ambiguous parentheses
 
 If a set of parentheses is marked as ambiguous then the space before it can be removed to disambiguate the parentheses

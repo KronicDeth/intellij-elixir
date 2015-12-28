@@ -11,7 +11,6 @@ public interface ElixirTypes {
 
   IElementType ACCESS_EXPRESSION = new ElixirElementType("ACCESS_EXPRESSION");
   IElementType ADDITION_INFIX_OPERATOR = new ElixirElementType("ADDITION_INFIX_OPERATOR");
-  IElementType ADJACENT_EXPRESSION = new ElixirElementType("ADJACENT_EXPRESSION");
   IElementType ALIAS = ElementTypeFactory.factory("ALIAS");
   IElementType AND_INFIX_OPERATOR = new ElixirElementType("AND_INFIX_OPERATOR");
   IElementType ANONYMOUS_FUNCTION = new ElixirElementType("ANONYMOUS_FUNCTION");
@@ -353,9 +352,6 @@ public interface ElixirTypes {
       }
       else if (type == ADDITION_INFIX_OPERATOR) {
         return new ElixirAdditionInfixOperatorImpl(node);
-      }
-      else if (type == ADJACENT_EXPRESSION) {
-        return new ElixirAdjacentExpressionImpl(node);
       }
       else if (type == ALIAS) {
         return new ElixirAliasImpl(node);

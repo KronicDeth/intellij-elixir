@@ -18,39 +18,35 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testEmptyBlock() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testList() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testSigil() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testAtomKeyword() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testAtom() {
-        assertParsedAndQuotedAroundError();
-    }
-
-    public void testAlias() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     /*
@@ -58,27 +54,27 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      */
 
     public void testCharToken() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testHexadecimalWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testOctalWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testUnknownBaseWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testDecimalFloat() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testDecimalFloatDecimalFloat() {
@@ -86,23 +82,23 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testStringLine() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testStringHeredoc() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testCharListLine() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     public void testCharListHeredoc() {
-        assertParsedAndQuotedAroundError();
+        assertParsedWithErrors();
     }
 
     @Override

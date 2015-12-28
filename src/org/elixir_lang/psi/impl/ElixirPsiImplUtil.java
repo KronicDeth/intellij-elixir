@@ -1066,20 +1066,6 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirAdjacentExpression adjacentExpression) {
-        PsiElement[] children = adjacentExpression.getChildren();
-
-        if (children.length != 1) {
-            throw new NotImplementedException("Expecting only 1 child, an expression, in adjacentExpression");
-        }
-
-        Quotable child = (Quotable) children[0];
-
-        return child.quote();
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirAlias alias) {
         return quotedFunctionCall(
                 ALIASES,
