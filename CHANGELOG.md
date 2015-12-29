@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v1.3.0](#v130)
+  - [v2.0.0](#v220)
   - [v1.2.1](#v121)
   - [v1.2.0](#v120)
   - [v1.1.0](#v110)
@@ -28,7 +28,7 @@
 
 # Changelog
 
-## v1.3.0
+## v2.0.0
 * Enhancements
   * [#207](https://github.com/KronicDeth/intellij-elixir/pull/207) - [KronicDeth](https://github.com/KronicDeth)
     * Highlighters for
@@ -45,9 +45,13 @@
     * Parameters of `@opaque`, `@type`, `@typep` names are annotated as "Type Parameter"
     * Keyword keys from the `when` clause of `@callback`, `@macrocallback` or `@spec` definitions and their usage are annotated as "Type Parameters"
     * `@doc false`, `@moduledoc false`, and `@typedoc false` will annotate the `false` with a weak warning: "Will make documented invisible to the documentation extraction tools like ExDoc.".
-
 * Bug Fixes 
   * [#206](https://github.com/KronicDeth/intellij-elixir/pull/206) - Change "edition" to "addition" in README. - [folz](https://github.com/folz)
+  * [#225](https://github.com/KronicDeth/intellij-elixir/pull/225) - Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI. - [KronicDeth](https://github.com/KronicDeth)
+* Incompatible Changes
+  * [#225](https://github.com/KronicDeth/intellij-elixir/pull/225) - [KronicDeth](https://github.com/KronicDeth)
+    * Removed "Add Newline" Quick Fix as it depended on `adjacentExpression` elements, which have now been removed to speed up error handling when comments become code.
+    * Removed "Add Semicolon" Quick Fix as it depended on `adjacentExpression` elements, which have now been removed to speed up error handling when comments become code.
 
 ## v1.2.1
 * Enhancements

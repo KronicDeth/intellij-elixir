@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>1.3.0-pre</version>
+  <version>2.0.0-pre</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v1.3.0</h1>
+      <h1>v2.0.0</h1>
       <ul>
         <li>
           <p>Enhancements</p>
@@ -68,6 +68,23 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Change "edition" to "addition" in README.</li>
+            <li>
+              Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling
+              element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              Removed "Add Newline" Quick Fix as it depended on <code>adjacentExpression</code> elements, which have now
+              been removed to speed up error handling when comments become code.
+            </li>
+            <li>
+              Removed "Add Semicolon" Quick Fix as it depended on <code>adjacentExpression</code> elements, which have
+              now been removed to speed up error handling when comments become code.
+            </li>
           </ul>
         </li>
       </ul>
