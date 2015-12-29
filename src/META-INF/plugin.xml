@@ -72,6 +72,9 @@
               Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling
               element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI.
             </li>
+            <li>
+              Fix <code>mix</code> version detection on Windows.
+            </li>
           </ul>
         </li>
         <li>
