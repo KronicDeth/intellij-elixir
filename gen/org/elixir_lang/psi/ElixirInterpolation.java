@@ -9,9 +9,6 @@ import java.util.List;
 public interface ElixirInterpolation extends Quotable {
 
   @NotNull
-  List<ElixirAdjacentExpression> getAdjacentExpressionList();
-
-  @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull

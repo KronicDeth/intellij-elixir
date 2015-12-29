@@ -16,10 +16,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitOperator(o);
   }
 
-  public void visitAdjacentExpression(@NotNull ElixirAdjacentExpression o) {
-    visitQuotable(o);
-  }
-
   public void visitAlias(@NotNull ElixirAlias o) {
     visitNamedElement(o);
     // visitQualifiableAlias(o);
@@ -741,6 +737,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitStabParenthesesSignature(@NotNull ElixirStabParenthesesSignature o) {
     visitQuotable(o);
+    // visitWhenOperation(o);
   }
 
   public void visitStringHeredoc(@NotNull ElixirStringHeredoc o) {

@@ -51,8 +51,23 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
   }
 
   @NotNull
+  public Quotable leftOperand() {
+    return ElixirPsiImplUtil.leftOperand(this);
+  }
+
+  @NotNull
+  public Operator operator() {
+    return ElixirPsiImplUtil.operator(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public Quotable rightOperand() {
+    return ElixirPsiImplUtil.rightOperand(this);
   }
 
 }
