@@ -72,9 +72,23 @@ public class MixConfigurationForm {
     String mixPath = myMixPathSelector.getText();
     if(!new File(mixPath).exists()) return false;
 
-    ExtProcessUtil.ExtProcessOutput output = ExtProcessUtil.execAndGetFirstLine(3000, myMixPathSelector.getText(), "--version");
+    ExtProcessUtil.ExtProcessOutput output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--version");
     String version = output.getStdOut();
-    if(version.startsWith("Mix")){
+
+    // Elixir X.Y.Z for mix.bat before 1.2
+    // Mix X.Y.Z for all others
+    if (version.startsWith("Mix")) {
+      myMixVersionText.setText(version);
+      return true;
+    }
+
+    // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
+    output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--", "--version");
+    version = output.getStdOut();
+
+    // Elixir X.Y.Z for mix.bat before 1.2
+    // Mix X.Y.Z for all others
+    if (version.startsWith("Mix")) {
       myMixVersionText.setText(version);
       return true;
     }

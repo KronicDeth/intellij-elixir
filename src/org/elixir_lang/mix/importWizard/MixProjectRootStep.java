@@ -122,17 +122,25 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
       }
     }
 
-    boolean isPosix = SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix;
-    if(!isPosix) return "";
-
     String output = "";
-    try{
-      GeneralCommandLine which = new GeneralCommandLine("which");
-      which.addParameter("mix");
-      output = ScriptRunnerUtil.getProcessOutput(which);
-    }catch (Exception ignored){
-      LOG.warn(ignored);
+    GeneralCommandLine generalCommandLine = null;
+
+    if (SystemInfo.isWindows) {
+      generalCommandLine = new GeneralCommandLine("where");
+      generalCommandLine.addParameter("mix.bat");
+    } else if (SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix) {
+      generalCommandLine = new GeneralCommandLine("which");
+      generalCommandLine.addParameter("mix");
     }
+
+    if (generalCommandLine != null) {
+      try {
+        output = ScriptRunnerUtil.getProcessOutput(generalCommandLine);
+      } catch (Exception ignored) {
+        LOG.warn(ignored);
+      }
+    }
+
     return output.trim();
   }
 
