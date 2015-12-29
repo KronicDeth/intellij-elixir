@@ -40,8 +40,15 @@ public class MixRunningStateUtil {
     GeneralCommandLine commandLine = new GeneralCommandLine();
 
     commandLine.withWorkDirectory(getWorkingDirectory(configuration));
-    commandLine.setExePath(elixirPath);
-    commandLine.addParameter(mixSettings.getMixPath());
+
+    String mixPath = mixSettings.getMixPath();
+
+    if (mixPath.endsWith(".bat")) {
+      commandLine.setExePath(mixPath);
+    } else {
+      commandLine.setExePath(elixirPath);
+      commandLine.addParameter(mixPath);
+    }
 
     List<String> split = ContainerUtil.list(configuration.getCommand().split("\\s+"));
     if(configuration.isSkipDependencies() && !split.contains("--no-deps-check")){
