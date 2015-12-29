@@ -3,7 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Upgrading](#upgrading)
-  - [v2.2.0](#v220)
+  - [v2.0.0](#v200)
+    - [Preferences/Settings](#preferencessettings)
+    - [Quick Fix](#quick-fix)
   - [v1.0.0](#v100)
   - [v0.3.1](#v031)
   - [v0.3.0](#v030)

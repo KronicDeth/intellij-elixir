@@ -32,7 +32,6 @@
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
       - [Missing End-of-Expression](#missing-end-of-expression)
     - [Quick Fixes](#quick-fixes)
-      - [Add End-of-Expression](#add-end-of-expression)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)

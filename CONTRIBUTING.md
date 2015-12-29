@@ -4,6 +4,7 @@
 
 - [Contributing](#contributing)
   - [Building](#building)
+    - [Documentation](#documentation)
     - [Dependencies](#dependencies)
       - [IntelliJ IDEA](#intellij-idea)
       - [IntelliJ Erlang](#intellij-erlang)
