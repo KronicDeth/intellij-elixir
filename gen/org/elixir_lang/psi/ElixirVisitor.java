@@ -450,6 +450,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
     visitMatchedExpression(o);
+    // visitModuleAttributeNameable(o);
     // visitPrefixOperation(o);
   }
 

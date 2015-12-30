@@ -7,6 +7,7 @@ import org.elixir_lang.psi.call.arguments.NoParenthesesOneArgument;
 /**
  * atPrefixOperator IDENTIFIER CALL bracketArguments
  */
-public interface AtUnqualifiedNoParenthesesCall extends Call, NoParenthesesOneArgument, Quotable {
+public interface AtUnqualifiedNoParenthesesCall extends Call, ModuleAttributeNameable, NoParenthesesOneArgument,
+        Quotable {
     Quotable getAtPrefixOperator();
 }

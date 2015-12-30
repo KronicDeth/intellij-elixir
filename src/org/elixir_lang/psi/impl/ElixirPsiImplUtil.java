@@ -629,6 +629,23 @@ public class ElixirPsiImplUtil {
         return new OtpErlangList(keywordListElements);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static String moduleAttributeName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
+
+        assert identifierNodes.length == 1;
+
+        return "@" + identifierNodes[0].getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String moduleAttributeName(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
+        return matchedAtNonNumericOperation.getText();
+    }
+
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
@@ -1700,6 +1717,11 @@ public class ElixirPsiImplUtil {
         }
 
         return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
+        return new org.elixir_lang.reference.ModuleAttribute(matchedAtNonNumericOperation);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {

@@ -24,6 +24,9 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @Nullable
   ElixirDoBlock getDoBlock();
 
+  @NotNull
+  String moduleAttributeName();
+
   @Nullable
   String moduleName();
 

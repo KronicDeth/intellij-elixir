@@ -48,6 +48,11 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
     return ElixirPsiImplUtil.functionNameNode(this);
   }
 
+  @NotNull
+  public String moduleAttributeName() {
+    return ElixirPsiImplUtil.moduleAttributeName(this);
+  }
+
   @Nullable
   public String moduleName() {
     return ElixirPsiImplUtil.moduleName(this);

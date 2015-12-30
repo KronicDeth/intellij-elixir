@@ -24,6 +24,9 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @Nullable
   ASTNode functionNameNode();
 
+  @NotNull
+  String moduleAttributeName();
+
   @Nullable
   String moduleName();
 

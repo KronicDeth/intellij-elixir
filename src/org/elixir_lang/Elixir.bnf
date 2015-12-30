@@ -1742,6 +1742,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
                                               functionName
                                               functionNameNode
                                               getDoBlock
+                                              moduleAttributeName
                                               moduleName
                                               primaryArguments
                                               quote
@@ -1926,7 +1927,17 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        name = "@"
                      }
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
-                                 { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.ModuleAttributeNameable"
+                                     "org.elixir_lang.psi.PrefixOperation"
+                                   ]
+                                   methods = [
+                                     getReference
+                                     moduleAttributeName
+                                     quote
+                                   ]
+                                 }
 
 /*
  * Unqualified Bracket Operation
@@ -2632,6 +2643,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParent
                                               methods = [
                                                 functionName
                                                 functionNameNode
+                                                moduleAttributeName
                                                 moduleName
                                                 primaryArguments
                                                 quote
