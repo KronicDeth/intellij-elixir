@@ -18,7 +18,6 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.font.TextAttribute;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +44,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
                 new PsiRecursiveElementVisitor() {
-                    public void visitAtUnqualifiedNoParenthesesCall(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                    public void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
                         ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
                         ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
 
@@ -89,8 +88,18 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     @Override
                     public void visitElement(@NotNull final PsiElement element) {
                         if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                            visitAtUnqualifiedNoParenthesesCall((AtUnqualifiedNoParenthesesCall) element);
+                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                        } else if (element instanceof ElixirMatchedAtNonNumericOperation) {
+                            visitUsage((ElixirMatchedAtNonNumericOperation) element);
                         }
+                    }
+
+                    public void visitUsage(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
+                        highlight(
+                                matchedAtNonNumericOperation.getTextRange(),
+                                holder,
+                                ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
+                        );
                     }
                 }
         );
