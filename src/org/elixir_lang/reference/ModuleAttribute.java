@@ -1,8 +1,11 @@
 package org.elixir_lang.reference;
 
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import org.apache.commons.logging.impl.LogKitLogger;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElixirMatchedAtNonNumericOperation;
 import org.elixir_lang.psi.Quotable;
@@ -10,6 +13,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,7 +63,9 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<ElixirMatchedAt
     @NotNull
     @Override
     public Object[] getVariants() {
-        return new Object[0];
+        List<LookupElement> lookupElementList = getVariantsUpFromElement(myElement);
+
+        return lookupElementList.toArray(new Object[lookupElementList.size()]);
     }
 
     /*
@@ -99,4 +105,35 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<ElixirMatchedAt
         return resultList;
     }
 
+    private List<LookupElement> getVariantsSibling(PsiElement lastSibling) {
+        List<LookupElement> lookupElementList = new ArrayList<LookupElement>();
+
+        for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
+            if (sibling instanceof AtUnqualifiedNoParenthesesCall) {
+                AtUnqualifiedNoParenthesesCall  atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) sibling;
+
+                lookupElementList.add(
+                        LookupElementBuilder.createWithSmartPointer(
+                                atUnqualifiedNoParenthesesCall.moduleAttributeName(),
+                                atUnqualifiedNoParenthesesCall
+                        )
+                );
+            }
+        }
+
+        return lookupElementList;
+    }
+
+    private List<LookupElement> getVariantsUpFromElement(PsiElement element) {
+        List<LookupElement> lookupElementList = new ArrayList<LookupElement>();
+        PsiElement lastSibling = element;
+
+        while (lastSibling != null) {
+            lookupElementList.addAll(getVariantsSibling(lastSibling));
+
+            lastSibling = lastSibling.getParent();
+        }
+
+        return lookupElementList;
+    }
 }
