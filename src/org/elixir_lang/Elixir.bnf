@@ -2640,6 +2640,7 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
  */
 
 atIdentifier ::= atPrefixOperator IDENTIFIER
+                 { methods = [getReference] }
 unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"

@@ -1726,6 +1726,22 @@ public class ElixirPsiImplUtil {
         return reference;
     }
 
+    /**
+     * <blockquote>
+     *     The PSI element at the cursor (the direct tree parent of the token at the cursor position) must be either a
+     *     PsiNamedElement or <em>a PsiReference which resolves to a PsiNamedElement.</em>
+     * </blockquote>
+     * @param atIdentifier
+     * @return
+     * @see <a href="http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/find_usages.html?search=PsiNameIdentifierOwner">IntelliJ Platform SDK DevGuide | Find Usages</a>
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
+        // reference the parent AtUnqualifiedNoParenthesesCall
+        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
+    }
+
     @Nullable
     public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
         return new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);

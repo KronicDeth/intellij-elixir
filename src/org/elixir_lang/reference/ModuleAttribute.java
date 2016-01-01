@@ -4,7 +4,6 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import org.elixir_lang.psi.AtNonNumericOperation;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,13 +13,13 @@ import java.util.List;
 /**
  * Created by limhoff on 12/30/15.
  */
-public class ModuleAttribute extends PsiPolyVariantReferenceBase<AtNonNumericOperation> {
+public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
     /*
      * Constructors
      */
 
-    public ModuleAttribute(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-        super(atNonNumericOperation, TextRange.create(0, atNonNumericOperation.getTextLength()));
+    public ModuleAttribute(@NotNull final PsiElement psiElement) {
+        super(psiElement, TextRange.create(0, psiElement.getTextLength()));
     }
 
     /*
