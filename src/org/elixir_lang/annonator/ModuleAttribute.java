@@ -46,19 +46,15 @@ public class ModuleAttribute implements Annotator, DumbAware {
         element.accept(
                 new PsiRecursiveElementVisitor() {
                     public void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-                        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+                        ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+                        TextRange textRange = atIdentifier.getTextRange();
+
+                        ASTNode node = atIdentifier.getNode();
                         ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
 
                         assert identifierNodes.length == 1;
 
-                        Quotable atPrefixOperator = atUnqualifiedNoParenthesesCall.getAtPrefixOperator();
                         ASTNode identifierNode = identifierNodes[0];
-
-                        TextRange textRange = new TextRange(
-                                atPrefixOperator.getTextRange().getStartOffset(),
-                                identifierNode.getTextRange().getEndOffset()
-                        );
-
                         String identifier = identifierNode.getText();
 
                         if (identifier.equals("callback") || identifier.equals("macrocallback")) {

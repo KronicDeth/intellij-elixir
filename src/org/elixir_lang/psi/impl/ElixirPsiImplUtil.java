@@ -638,12 +638,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static String moduleAttributeName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
-
-        assert identifierNodes.length == 1;
-
-        return "@" + identifierNodes[0].getText();
+        return atUnqualifiedNoParenthesesCall.getAtIdentifier().getText();
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1651,6 +1646,18 @@ public class ElixirPsiImplUtil {
         return matchedQualifiedAlias.getText();
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static String getName(@NotNull NamedElement namedElement) {
+        return namedElement.getNameIdentifier().getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement getNameIdentifier(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+      return atUnqualifiedNoParenthesesCall.getAtIdentifier();
+    }
+
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
         PsiElement parent = alias.getParent();
@@ -2464,10 +2471,11 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        Quotable operator = atUnqualifiedNoParenthesesCall.getAtPrefixOperator();
+        ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+        Quotable operator = atIdentifier.getAtPrefixOperator();
         OtpErlangObject quotedOperator = operator.quote();
 
-        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+        ASTNode node = atIdentifier.getNode();
         ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;

@@ -22,8 +22,8 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
 
   @Override
   @NotNull
-  public ElixirAtPrefixOperator getAtPrefixOperator() {
-    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+  public ElixirAtIdentifier getAtIdentifier() {
+    return findNotNullChildByClass(ElixirAtIdentifier.class);
   }
 
   @Override
@@ -46,6 +46,16 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
   @Nullable
   public ASTNode functionNameNode() {
     return ElixirPsiImplUtil.functionNameNode(this);
+  }
+
+  @NotNull
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  @NotNull
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   @NotNull
@@ -81,6 +91,11 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
   @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

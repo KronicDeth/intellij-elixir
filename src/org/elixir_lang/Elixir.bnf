@@ -1732,7 +1732,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument
+matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
                                           {
                                             implements = [
                                               "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
@@ -1742,6 +1742,8 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
                                               functionName
                                               functionNameNode
                                               getDoBlock
+                                              getName
+                                              getNameIdentifier
                                               moduleAttributeName
                                               moduleName
                                               primaryArguments
@@ -1749,6 +1751,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
                                               resolvedFunctionName
                                               resolvedModuleName
                                               secondaryArguments
+                                              setName
                                             ]
                                           }
 
@@ -2636,12 +2639,15 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
  * just the variable.
  */
 
-unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+atIdentifier ::= atPrefixOperator IDENTIFIER
+unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
                                               methods = [
                                                 functionName
                                                 functionNameNode
+                                                getName
+                                                getNameIdentifier
                                                 moduleAttributeName
                                                 moduleName
                                                 primaryArguments
@@ -2649,6 +2655,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParent
                                                 resolvedFunctionName
                                                 resolvedModuleName
                                                 secondaryArguments
+                                                setName
                                               ]
                                             }
 

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, AtUnqualifiedNoParenthesesCall {
 
   @NotNull
-  ElixirAtPrefixOperator getAtPrefixOperator();
+  ElixirAtIdentifier getAtIdentifier();
 
   @Nullable
   ElixirDoBlock getDoBlock();
@@ -23,6 +23,12 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   @Nullable
   ASTNode functionNameNode();
+
+  @NotNull
+  String getName();
+
+  @NotNull
+  PsiElement getNameIdentifier();
 
   @NotNull
   String moduleAttributeName();
@@ -44,5 +50,8 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   @Nullable
   PsiElement[] secondaryArguments();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }
