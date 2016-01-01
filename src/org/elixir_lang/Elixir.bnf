@@ -2007,15 +2007,7 @@ private associationInfixOperator ::= EOL* ASSOCIATION_OPERATOR EOL*
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L505
 containerAssociationOperation ::= containerExpression associationInfixOperator containerExpression
-                                  {
-                                    implements = "org.elixir_lang.psi.AssociationOperation"
-                                    methods = [
-                                      leftOperand
-                                      operator
-                                      quote
-                                      rightOperand
-                                    ]
-                                  }
+                                  { implements = "org.elixir_lang.psi.AssociationOperation" methods = [quote] }
 
 left maxDotCall ::= dotInfixOperator parenthesesArguments parenthesesArguments?
                     { elementType = matchedDotCall }

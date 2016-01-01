@@ -15,15 +15,6 @@ public interface ElixirContainerAssociationOperation extends AssociationOperatio
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
   @NotNull
-  Quotable leftOperand();
-
-  @NotNull
-  Operator operator();
-
-  @NotNull
   OtpErlangObject quote();
-
-  @NotNull
-  Quotable rightOperand();
 
 }
