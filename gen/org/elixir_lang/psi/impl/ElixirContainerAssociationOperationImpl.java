@@ -6,7 +6,10 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.ElixirContainerAssociationOperation;
+import org.elixir_lang.psi.ElixirEmptyParentheses;
+import org.elixir_lang.psi.ElixirUnmatchedExpression;
+import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -35,23 +38,8 @@ public class ElixirContainerAssociationOperationImpl extends ASTWrapperPsiElemen
   }
 
   @NotNull
-  public Quotable leftOperand() {
-    return ElixirPsiImplUtil.leftOperand(this);
-  }
-
-  @NotNull
-  public Operator operator() {
-    return ElixirPsiImplUtil.operator(this);
-  }
-
-  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
-  }
-
-  @NotNull
-  public Quotable rightOperand() {
-    return ElixirPsiImplUtil.rightOperand(this);
   }
 
 }

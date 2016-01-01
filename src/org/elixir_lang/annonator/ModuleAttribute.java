@@ -756,6 +756,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else if (psiElement instanceof ElixirAccessExpression ||
+                psiElement instanceof ElixirAssociationsBase ||
+                psiElement instanceof ElixirAssociations ||
+                psiElement instanceof ElixirContainerAssociationOperation ||
                 psiElement instanceof ElixirKeywordPair ||
                 psiElement instanceof ElixirKeywords ||
                 psiElement instanceof ElixirList ||
@@ -783,7 +786,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 psiElement instanceof ElixirStringLine ||
                 psiElement instanceof ElixirUnaryNumericOperation) {
             // leave normal highlighting
-        } else if (psiElement instanceof ElixirMapOperation) {
+        }  else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
                     (ElixirMapOperation) psiElement,
                     typeParameterNameSet,
