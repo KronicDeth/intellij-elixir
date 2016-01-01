@@ -87,16 +87,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     @Override
                     public void visitElement(@NotNull final PsiElement element) {
-                        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                        if (element instanceof AtNonNumericOperation) {
+                            visitUsage((AtNonNumericOperation) element);
+                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
                             visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
-                        } else if (element instanceof ElixirMatchedAtNonNumericOperation) {
-                            visitUsage((ElixirMatchedAtNonNumericOperation) element);
                         }
                     }
 
-                    public void visitUsage(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
+                    public void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
                         highlight(
-                                matchedAtNonNumericOperation.getTextRange(),
+                                atNonNumericOperation.getTextRange(),
                                 holder,
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );

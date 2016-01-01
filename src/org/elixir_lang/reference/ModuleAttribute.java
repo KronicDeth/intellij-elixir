@@ -2,31 +2,25 @@ package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import org.apache.commons.logging.impl.LogKitLogger;
+import org.elixir_lang.psi.AtNonNumericOperation;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirMatchedAtNonNumericOperation;
-import org.elixir_lang.psi.Quotable;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by limhoff on 12/30/15.
  */
-public class ModuleAttribute extends PsiPolyVariantReferenceBase<ElixirMatchedAtNonNumericOperation> {
+public class ModuleAttribute extends PsiPolyVariantReferenceBase<AtNonNumericOperation> {
     /*
      * Constructors
      */
 
-    public ModuleAttribute(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
-        super(matchedAtNonNumericOperation, TextRange.create(0, matchedAtNonNumericOperation.getTextLength()));
-
+    public ModuleAttribute(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        super(atNonNumericOperation, TextRange.create(0, atNonNumericOperation.getTextLength()));
     }
 
     /*

@@ -1929,8 +1929,7 @@ atPrefixOperator ::= AT_OPERATOR EOL*
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
                                  {
                                    implements = [
-                                     "org.elixir_lang.psi.ModuleAttributeNameable"
-                                     "org.elixir_lang.psi.PrefixOperation"
+                                     "org.elixir_lang.psi.AtNonNumericOperation"
                                    ]
                                    methods = [
                                      getReference
@@ -2791,7 +2790,16 @@ unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments d
  */
 
 unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
-                                   { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                   {
+                                     implements = [
+                                       "org.elixir_lang.psi.AtNonNumericOperation"
+                                     ]
+                                     methods = [
+                                       getReference
+                                       moduleAttributeName
+                                       quote
+                                     ]
+                                   }
 
 /*
  * Unqualified Bracket Operation

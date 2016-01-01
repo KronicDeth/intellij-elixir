@@ -631,6 +631,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static String moduleAttributeName(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return atNonNumericOperation.getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static String moduleAttributeName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
         ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
@@ -638,12 +644,6 @@ public class ElixirPsiImplUtil {
         assert identifierNodes.length == 1;
 
         return "@" + identifierNodes[0].getText();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static String moduleAttributeName(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
-        return matchedAtNonNumericOperation.getText();
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -1720,8 +1720,8 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull final ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation) {
-        return new org.elixir_lang.reference.ModuleAttribute(matchedAtNonNumericOperation);
+    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {

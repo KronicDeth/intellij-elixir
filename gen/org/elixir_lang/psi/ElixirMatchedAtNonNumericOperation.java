@@ -6,7 +6,7 @@ import com.intellij.psi.PsiReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedAtNonNumericOperation extends ElixirMatchedExpression, ModuleAttributeNameable, PrefixOperation {
+public interface ElixirMatchedAtNonNumericOperation extends ElixirMatchedExpression, AtNonNumericOperation {
 
   @NotNull
   ElixirAtPrefixOperator getAtPrefixOperator();
