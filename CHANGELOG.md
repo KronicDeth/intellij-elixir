@@ -37,7 +37,7 @@
       * Kernel.SpecialForms Macros
   * [#219](https://github.com/KronicDeth/intellij-elixir/pull/219) - Test against Elixir v1.1.1 - [KronicDeth](https://github.com/KronicDeth)
   * [#221](https://github.com/KronicDeth/intellij-elixir/pull/221) - Highlight `after`, `catch`, `do`, `else`, `end, `fn`, and `rescue` as keywords - [KronicDeth](https://github.com/KronicDeth)
-  * [#223](https://github.com/KronicDeth/intellij-elixir/pull/223) - Annotate Module Attributes - [KronicDeth](https://github.com/KronicDeth)
+  * [#223](https://github.com/KronicDeth/intellij-elixir/pull/223), [#227](https://github.com/KronicDeth/intellij-elixir/pull/227) - Annotate Module Attributes - [KronicDeth](https://github.com/KronicDeth)
     * Documentation module attributes (`@doc`, `@moduledoc`, and `@typedoc`) are annotated as "Documentation Module Attributes" while all other module attributes are annotated as "Module Attributes".
     * The string or heredoc argument to a documentation module attribute (`@doc`, `@moduledoc`, and `@typedoc` is annotated as "Documentation Text"
     * Function names passed to `@callback`, `@macrocallback` or `@specification` are annotated as "Specification".
