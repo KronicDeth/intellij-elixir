@@ -557,6 +557,7 @@
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.namesValidator language="Elixir" implementationClass="org.elixir_lang.psi.module_attribute.NamesValidator"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
+    <lang.refactoringSupport language="Elixir" implementationClass="org.elixir_lang.refactoring.SupportProvider"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
