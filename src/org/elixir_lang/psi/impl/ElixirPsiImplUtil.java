@@ -3772,6 +3772,24 @@ if (quoted == null) {
         return null;
     }
 
+    @NotNull
+    public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                     @NotNull final String newName) {
+        AtUnqualifiedNoParenthesesCall newAtUnqualifiedNoParenthesesCall = ElementFactory.createModuleAttributeDeclaration(
+                atUnqualifiedNoParenthesesCall.getProject(),
+                newName,
+                "dummy_value"
+        );
+
+        ASTNode nameNode = atUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
+        ASTNode newNameNode = newAtUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
+
+        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+        node.replaceChild(nameNode, newNameNode);
+
+        return atUnqualifiedNoParenthesesCall;
+    }
+
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
         ASTNode sigilNode = sigil.getNode();
         ASTNode[] childNodes = sigilNode.getChildren(null);

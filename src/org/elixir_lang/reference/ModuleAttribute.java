@@ -4,7 +4,12 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.util.IncorrectOperationException;
+import org.apache.commons.lang.NotImplementedException;
+import org.elixir_lang.psi.AtNonNumericOperation;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.ElementFactory;
+import org.elixir_lang.psi.ElixirAtIdentifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,6 +32,46 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
      */
 
     /**
+     * Returns the array of String, {@link PsiElement} and/or {@link LookupElement}
+     * instances representing all identifiers that are visible at the location of the reference. The contents
+     * of the returned array is used to build the lookup list for basic code completion. (The list
+     * of visible identifiers may not be filtered by the completion prefix string - the
+     * filtering is performed later by IDEA core.)
+     *
+     * @return the array of available identifiers.
+     */
+    @NotNull
+    @Override
+    public Object[] getVariants() {
+        List<LookupElement> lookupElementList = getVariantsUpFromElement(myElement);
+
+        return lookupElementList.toArray(new Object[lookupElementList.size()]);
+    }
+
+    @Override
+    public PsiElement handleElementRename(String newModuleAttributeName) throws IncorrectOperationException {
+        PsiElement renamedElement = myElement;
+
+        if (myElement instanceof AtNonNumericOperation) {
+            PsiElement moduleAttributeUsage = ElementFactory.createModuleAttributeUsage(
+                    myElement.getProject(),
+                    newModuleAttributeName
+            );
+            renamedElement = myElement.replace(moduleAttributeUsage);
+        } else if (myElement instanceof ElixirAtIdentifier) {
+            // do nothing; handled by setName on ElixirAtUnqualifiedNoParenthesesCall
+        } else {
+            throw new NotImplementedException(
+                    "Renaming module attribute reference on " + myElement.getClass().getCanonicalName() +
+                            " PsiElements is not implemented yet.  Please open an issue " +
+                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name and the " +
+                            "sample text:\n" + myElement.getText());
+        }
+
+        return renamedElement;
+    }
+
+    /**
      * Returns the results of resolving the reference.
      *
      * @param incompleteCode if true, the code in the context of which the reference is
@@ -42,23 +87,6 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
 
         return resultList.toArray(new ResolveResult[resultList.size()]);
-    }
-
-    /**
-     * Returns the array of String, {@link PsiElement} and/or {@link LookupElement}
-     * instances representing all identifiers that are visible at the location of the reference. The contents
-     * of the returned array is used to build the lookup list for basic code completion. (The list
-     * of visible identifiers may not be filtered by the completion prefix string - the
-     * filtering is performed later by IDEA core.)
-     *
-     * @return the array of available identifiers.
-     */
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-        List<LookupElement> lookupElementList = getVariantsUpFromElement(myElement);
-
-        return lookupElementList.toArray(new Object[lookupElementList.size()]);
     }
 
     /*
