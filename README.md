@@ -20,7 +20,7 @@
       - [Elixir Application](#elixir-application)
       - [Elixir Supervisor](#elixir-supervisor)
       - [Elixir GenServer](#elixir-genserver)
-    - [Elixir GenEvent](#elixir-genevent)
+      - [Elixir GenEvent](#elixir-genevent)
     - [Syntax Highlighting](#syntax-highlighting)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
@@ -30,7 +30,6 @@
         - [Keywords in Parentheses](#keywords-in-parentheses)
         - [Positional arguments in Parentheses](#positional-arguments-in-parentheses)
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
-      - [Missing End-of-Expression](#missing-end-of-expression)
     - [Quick Fixes](#quick-fixes)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
     - [Building/Compiling](#buildingcompiling)
@@ -41,8 +40,13 @@
       - [Mix Tasks](#mix-tasks)
     - [Go To Declaration](#go-to-declaration)
       - [Module](#module)
+      - [Module Attribute](#module-attribute)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
+      - [Module Attribute](#module-attribute-1)
+    - [Refactor](#refactor)
+      - [Rename](#rename)
+        - [Module Attribute](#module-attribute-2)
   - [Installation](#installation)
     - [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
     - [Inside IDE using Github releases](#inside-ide-using-github-releases)
@@ -301,7 +305,7 @@ defmodule MyNamespace.MyModule do
 end
 ```
 
-### Elixir GenEvent
+#### Elixir GenEvent
 
 An underscored file will be created in an underscored directory `lib/my_namespace/my_module.ex`) with the given module
 name with be created.  The minimal callback implementations for `init/1`, `handle_event/2`, and `handle_call/2`,
@@ -347,10 +351,16 @@ Syntax highlighting for the following tokens:
 * Binaries/Bit Strings (`<<>>`)
 * [Character Tokens](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L166-L221) (`?<character>` or `?<escape_sequence>`)
 * [Comments](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`#`)
+* Documentation Module Attributes (`@doc`, `@moduledoc`, and `@typedoc`)
+* Documentation Text (the string or heredoc value to `@doc`, `@moduledoc`, and `@typedoc`)
 * [End of Lines](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L305-L332) (`;`, `\n`, `\r\n`)
 * [Escape Sequences](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_interpolation.erl#L71-L116) (`\\<character>`, `\\x<hexadecimal>`, or `\\x{<hexadecimal>}`)
 * [Heredocs](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L223-L229) (`"""` or `'''`)
 * [Identifiers](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L460-L470), in other words, variable, function and macro names.
+* Kernel Functions
+* Kernel Macros
+* Kernel.SpecialForms Macros
+* Keywords (`after`, `catch`, `do`, `else`, `end`, `fn`, and `rescue`)
 * Maps (`%{}` and `%{ current | <update> }`)
 * Numbers
   * Binary (`0b`) with invalid digit highlighting and missing digit recovery
@@ -390,12 +400,19 @@ Syntax highlighting for the following tokens:
   * String Sigils (`~s` and `~S`)
   * Word Sigils (`~w` and `~W`)
   * Custom Sigils (`~<lower_case_character>` and `~<UPPER_CASE_CHARACTER>`)
+* Specifications (function names passed to `@callback`, `@macrocallback` or `@spec`
 * Stabs (`->`)
 * Structs (`%MyStruct{}`)
 * [Strings and Char List](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L231-L236) (`"` or `'`)
 * [Tuples] (`{}`)
+* Type (Variables/calls in the parameters and return of `@callback`, `@macrocallback`, `@spec`)
+* Type Parameters
+  * Parameters of `@opaque`, `@type`, `@typep` name
+  * Keyword keys from the `when` clause of `@callback`, `@macrocallback` or `@spec` definitions and their usage
   
 The syntax highlighting colors can be customized in the Color Settings page for Elixir (Preferences > Editor > Color & Fonts > Elixir).
+
+![Module Attribute annotator](/screenshots/annotator/Module%20Attribute.png?raw=true "Module Attribute annotator")
 
 ### Grammar parsing
 
@@ -619,37 +636,6 @@ one.(
   <br/>
   <figcaption>
     Mousing over the keywords marked as an error in red (or over the red square in the right gutter) will
-    show the inspection describing the error.
-  </figcaption>
-</figure>
-
-
-#### Missing End-of-Expression
-
-End-of-expressions (`;` or new lines) missing between expressions.
-
-<figure>
-  <img alt="Missing End-of-Expression" src="/screenshots/inspection/elixir/missing_end_of_expression/preferences.png?raw=true"/>
-  <br/>
-  <figcaption>
-    Preferences &gt; Inspections &gt; Elixir &gt; Missing End-of-Expression
-  </figcaption>
-</figure>
-
-<figure>
-  <img alt="Missing End-of-Expression error" src="/screenshots/inspection/elixir/missing_end_of_expression/error.png?raw=true"/>
-  <br/>
-  <figcaption>
-    Missing end-of-expression inspection marks the error over the two expressions that should be separated by either a
-    `;` or new line. 
-  </figcaption>
-</figure>
-
-<figure>
-  <img alt="Missing End-of-Expression inspection" src="/screenshots/inspection/elixir/ambiguous_parentheses/inspection.png?raw=true"/>
-  <br/>
-  <figcaption>
-    Mousing over the expressions marked as an error in red (or over the red square in the right gutter) will
     show the inspection describing the error.
   </figcaption>
 </figure>

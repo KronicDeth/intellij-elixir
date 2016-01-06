@@ -37,15 +37,15 @@
                 </li>
                 <li>
                   The string or heredoc argument to a documentation module attribute (<code>@doc</code>,
-                  <code>@moduledoc</code>, and <code>@typedoc</code> is annotated as "Documentation Text"
+                  <code>@moduledoc</code>, and <code>@typedoc</code>) is annotated as "Documentation Text"
                 </li>
                 <li>
                   Function names passed to <code>@callback</code>, <code>@macrocallback</code> or
-                  <code>@specification</code> are annotated as "Specification".
+                  <code>@spec</code> are annotated as "Specification".
                 </li>
                 <li>
                   Variables/calls in the parameters and return of <code>@callback</code>, <code>@macrocallback</code>,
-                  <code>@specification</code> are annotated as "Type".
+                  <code>@spec</code> are annotated as "Type".
                 </li>
                 <li>
                   Parameters of <code>@opaque</code>, <code>@type</code>, <code>@typep</code> names are annotated as

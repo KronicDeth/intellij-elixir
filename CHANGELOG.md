@@ -39,9 +39,9 @@
   * [#221](https://github.com/KronicDeth/intellij-elixir/pull/221) - Highlight `after`, `catch`, `do`, `else`, `end`, `fn`, and `rescue` as keywords - [KronicDeth](https://github.com/KronicDeth)
   * [#223](https://github.com/KronicDeth/intellij-elixir/pull/223), [#227](https://github.com/KronicDeth/intellij-elixir/pull/227) - Annotate Module Attributes - [KronicDeth](https://github.com/KronicDeth)
     * Documentation module attributes (`@doc`, `@moduledoc`, and `@typedoc`) are annotated as "Documentation Module Attributes" while all other module attributes are annotated as "Module Attributes".
-    * The string or heredoc argument to a documentation module attribute (`@doc`, `@moduledoc`, and `@typedoc` is annotated as "Documentation Text"
-    * Function names passed to `@callback`, `@macrocallback` or `@specification` are annotated as "Specification".
-    * Variables/calls in the parameters and return of `@callback`, `@macrocallback`, `@specification` are annotated as "Type".
+    * The string or heredoc argument to a documentation module attribute (`@doc`, `@moduledoc`, and `@typedoc`) is annotated as "Documentation Text"
+    * Function names passed to `@callback`, `@macrocallback` or `@spec` are annotated as "Specification".
+    * Variables/calls in the parameters and return of `@callback`, `@macrocallback`, `@spec` are annotated as "Type".
     * Parameters of `@opaque`, `@type`, `@typep` names are annotated as "Type Parameter"
     * Keyword keys from the `when` clause of `@callback`, `@macrocallback` or `@spec` definitions and their usage are annotated as "Type Parameters"
     * `@doc false`, `@moduledoc false`, and `@typedoc false` will annotate the `false` with a weak warning: "Will make documented invisible to the documentation extraction tools like ExDoc.".
