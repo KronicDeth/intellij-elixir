@@ -5,11 +5,13 @@ import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.MaybeModuleName;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.java.generate.inspection.AbstractToStringInspection;
 
 public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsagesProvider {
     /**
@@ -36,7 +38,9 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
         boolean canFindUsages = false;
 
-        if (psiElement instanceof MaybeModuleName) {
+        if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
+            canFindUsages = true;
+        } else if (psiElement instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) psiElement;
 
             canFindUsages = maybeModuleName.isModuleName();
@@ -57,7 +61,9 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     public String getHelpId(@NotNull PsiElement psiElement) {
         String helpId = null;
 
-        if (psiElement instanceof MaybeModuleName) {
+        if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
+            helpId = com.intellij.lang.HelpID.FIND_OTHER_USAGES;
+        } if (psiElement instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) psiElement;
 
             if (maybeModuleName.isModuleName()) {
@@ -78,11 +84,13 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
      */
     @NotNull
     @Override
-    public String getType(PsiElement element) {
+    public String getType(@NotNull final PsiElement element) {
         // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
         String type = null;
 
-        if (element instanceof MaybeModuleName) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            type = "module attribute";
+        } if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
 
             if (maybeModuleName.isModuleName()) {
@@ -90,6 +98,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
             }
         }
 
+        //noinspection ConstantConditions
         return type;
     }
 
@@ -107,7 +116,11 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
         String descriptiveName = null;
 
-        if (element instanceof ElixirFile) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
+
+            descriptiveName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+        } else if (element instanceof ElixirFile) {
             ElixirFile file = (ElixirFile) element;
 
             descriptiveName = file.getVirtualFile().getPresentableUrl();
@@ -123,6 +136,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
             }
         }
 
+        //noinspection ConstantConditions
         return descriptiveName;
     }
 
@@ -139,7 +153,10 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
         String nodeText = null;
 
-        if (element instanceof MaybeModuleName) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
+            nodeText = atUnqualifiedNoParenthesesCall.getName();
+        } else if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
 
             if (maybeModuleName.isModuleName()) {
@@ -155,6 +172,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
             }
         }
 
+        //noinspection ConstantConditions
         return nodeText;
     }
 }

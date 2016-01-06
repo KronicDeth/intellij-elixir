@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirSyntaxHighlighter;
@@ -18,7 +19,6 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.font.TextAttribute;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -45,20 +45,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
                 new PsiRecursiveElementVisitor() {
-                    public void visitAtUnqualifiedNoParenthesesCall(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-                        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+                    public void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                        ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+                        TextRange textRange = atIdentifier.getTextRange();
+
+                        ASTNode node = atIdentifier.getNode();
                         ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
 
                         assert identifierNodes.length == 1;
 
-                        Quotable atPrefixOperator = atUnqualifiedNoParenthesesCall.getAtPrefixOperator();
                         ASTNode identifierNode = identifierNodes[0];
-
-                        TextRange textRange = new TextRange(
-                                atPrefixOperator.getTextRange().getStartOffset(),
-                                identifierNode.getTextRange().getEndOffset()
-                        );
-
                         String identifier = identifierNode.getText();
 
                         if (identifier.equals("callback") || identifier.equals("macrocallback")) {
@@ -88,8 +84,22 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     @Override
                     public void visitElement(@NotNull final PsiElement element) {
-                        if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                            visitAtUnqualifiedNoParenthesesCall((AtUnqualifiedNoParenthesesCall) element);
+                        if (element instanceof AtNonNumericOperation) {
+                            visitUsage((AtNonNumericOperation) element);
+                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                        }
+                    }
+
+                    public void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+                        highlight(
+                                atNonNumericOperation.getTextRange(),
+                                holder,
+                                ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
+                        );
+
+                        if (atNonNumericOperation.getReference().resolve() == null) {
+                            holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
                         }
                     }
                 }

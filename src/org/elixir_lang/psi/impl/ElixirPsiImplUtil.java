@@ -629,6 +629,18 @@ public class ElixirPsiImplUtil {
         return new OtpErlangList(keywordListElements);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static String moduleAttributeName(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return atNonNumericOperation.getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String moduleAttributeName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        return atUnqualifiedNoParenthesesCall.getAtIdentifier().getText();
+    }
+
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
@@ -1634,6 +1646,18 @@ public class ElixirPsiImplUtil {
         return matchedQualifiedAlias.getText();
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static String getName(@NotNull NamedElement namedElement) {
+        return namedElement.getNameIdentifier().getText();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement getNameIdentifier(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+      return atUnqualifiedNoParenthesesCall.getAtIdentifier();
+    }
+
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
         PsiElement parent = alias.getParent();
@@ -1700,6 +1724,27 @@ public class ElixirPsiImplUtil {
         }
 
         return reference;
+    }
+
+    /**
+     * <blockquote>
+     *     The PSI element at the cursor (the direct tree parent of the token at the cursor position) must be either a
+     *     PsiNamedElement or <em>a PsiReference which resolves to a PsiNamedElement.</em>
+     * </blockquote>
+     * @param atIdentifier
+     * @return
+     * @see <a href="http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/find_usages.html?search=PsiNameIdentifierOwner">IntelliJ Platform SDK DevGuide | Find Usages</a>
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
+        // reference the parent AtUnqualifiedNoParenthesesCall
+        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
@@ -2442,10 +2487,11 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-        Quotable operator = atUnqualifiedNoParenthesesCall.getAtPrefixOperator();
+        ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+        Quotable operator = atIdentifier.getAtPrefixOperator();
         OtpErlangObject quotedOperator = operator.quote();
 
-        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+        ASTNode node = atIdentifier.getNode();
         ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
 
         assert identifierNodes.length == 1;
@@ -3724,6 +3770,24 @@ if (quoted == null) {
     @NotNull
     public static PsiElement setName(@NotNull PsiElement element, @NotNull String newName) {
         return null;
+    }
+
+    @NotNull
+    public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
+                                     @NotNull final String newName) {
+        AtUnqualifiedNoParenthesesCall newAtUnqualifiedNoParenthesesCall = ElementFactory.createModuleAttributeDeclaration(
+                atUnqualifiedNoParenthesesCall.getProject(),
+                newName,
+                "dummy_value"
+        );
+
+        ASTNode nameNode = atUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
+        ASTNode newNameNode = newAtUnqualifiedNoParenthesesCall.getAtIdentifier().getNode();
+
+        ASTNode node = atUnqualifiedNoParenthesesCall.getNode();
+        node.replaceChild(nameNode, newNameNode);
+
+        return atUnqualifiedNoParenthesesCall;
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {

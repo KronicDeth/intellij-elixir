@@ -48,6 +48,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == ASSOCIATIONS_BASE) {
       r = associationsBase(b, 0);
     }
+    else if (t == AT_IDENTIFIER) {
+      r = atIdentifier(b, 0);
+    }
     else if (t == AT_NUMERIC_OPERATION) {
       r = atNumericOperation(b, 0);
     }
@@ -1179,6 +1182,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = containerAssociationOperation(b, l + 1);
     if (!r) r = mapExpression(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // atPrefixOperator IDENTIFIER
+  public static boolean atIdentifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "atIdentifier")) return false;
+    if (!nextTokenIs(b, AT_OPERATOR)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = atPrefixOperator(b, l + 1);
+    r = r && consumeToken(b, IDENTIFIER);
+    exit_section_(b, m, AT_IDENTIFIER, r);
     return r;
   }
 
@@ -5853,14 +5869,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // atPrefixOperator IDENTIFIER noParenthesesOneArgument
+  // atIdentifier noParenthesesOneArgument
   public static boolean matchedAtUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtUnqualifiedNoParenthesesCall")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = atPrefixOperator(b, l + 1);
-    r = r && consumeToken(b, IDENTIFIER);
+    r = atIdentifier(b, l + 1);
     r = r && noParenthesesOneArgument(b, l + 1);
     exit_section_(b, m, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
@@ -6318,23 +6333,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+  // atIdentifier noParenthesesOneArgument doBlock?
   public static boolean unmatchedAtUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtUnqualifiedNoParenthesesCall")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = atPrefixOperator(b, l + 1);
-    r = r && consumeToken(b, IDENTIFIER);
+    r = atIdentifier(b, l + 1);
     r = r && noParenthesesOneArgument(b, l + 1);
-    r = r && unmatchedAtUnqualifiedNoParenthesesCall_3(b, l + 1);
+    r = r && unmatchedAtUnqualifiedNoParenthesesCall_2(b, l + 1);
     exit_section_(b, m, UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
   }
 
   // doBlock?
-  private static boolean unmatchedAtUnqualifiedNoParenthesesCall_3(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unmatchedAtUnqualifiedNoParenthesesCall_3")) return false;
+  private static boolean unmatchedAtUnqualifiedNoParenthesesCall_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unmatchedAtUnqualifiedNoParenthesesCall_2")) return false;
     doBlock(b, l + 1);
     return true;
   }

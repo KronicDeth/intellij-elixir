@@ -1732,7 +1732,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
  * just the variable.
  */
 
-matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument
+matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
                                           {
                                             implements = [
                                               "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
@@ -1742,12 +1742,16 @@ matchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthe
                                               functionName
                                               functionNameNode
                                               getDoBlock
+                                              getName
+                                              getNameIdentifier
+                                              moduleAttributeName
                                               moduleName
                                               primaryArguments
                                               quote
                                               resolvedFunctionName
                                               resolvedModuleName
                                               secondaryArguments
+                                              setName
                                             ]
                                           }
 
@@ -1926,7 +1930,16 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        name = "@"
                      }
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
-                                 { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                 {
+                                   implements = [
+                                     "org.elixir_lang.psi.AtNonNumericOperation"
+                                   ]
+                                   methods = [
+                                     getReference
+                                     moduleAttributeName
+                                     quote
+                                   ]
+                                 }
 
 /*
  * Unqualified Bracket Operation
@@ -2626,18 +2639,24 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
  * just the variable.
  */
 
-unmatchedAtUnqualifiedNoParenthesesCall ::= atPrefixOperator IDENTIFIER noParenthesesOneArgument doBlock?
+atIdentifier ::= atPrefixOperator IDENTIFIER
+                 { methods = [getReference] }
+unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
                                               methods = [
                                                 functionName
                                                 functionNameNode
+                                                getName
+                                                getNameIdentifier
+                                                moduleAttributeName
                                                 moduleName
                                                 primaryArguments
                                                 quote
                                                 resolvedFunctionName
                                                 resolvedModuleName
                                                 secondaryArguments
+                                                setName
                                               ]
                                             }
 
@@ -2779,7 +2798,16 @@ unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments d
  */
 
 unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
-                                   { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
+                                   {
+                                     implements = [
+                                       "org.elixir_lang.psi.AtNonNumericOperation"
+                                     ]
+                                     methods = [
+                                       getReference
+                                       moduleAttributeName
+                                       quote
+                                     ]
+                                   }
 
 /*
  * Unqualified Bracket Operation

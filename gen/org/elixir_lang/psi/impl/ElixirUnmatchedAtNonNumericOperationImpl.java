@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import org.elixir_lang.psi.ElixirAtPrefixOperator;
 import org.elixir_lang.psi.ElixirUnmatchedAtNonNumericOperation;
 import org.elixir_lang.psi.ElixirUnmatchedExpression;
@@ -32,6 +33,16 @@ public class ElixirUnmatchedAtNonNumericOperationImpl extends ElixirUnmatchedExp
   @Nullable
   public ElixirUnmatchedExpression getUnmatchedExpression() {
     return findChildByClass(ElixirUnmatchedExpression.class);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
+  }
+
+  @NotNull
+  public String moduleAttributeName() {
+    return ElixirPsiImplUtil.moduleAttributeName(this);
   }
 
   @NotNull
