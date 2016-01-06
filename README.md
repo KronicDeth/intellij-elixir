@@ -740,6 +740,16 @@ If you hold `Cmd` and hover over the Alias before clicking, the target declarati
 
 [![Go To Declaration Demonstration](http://img.youtube.com/vi/nN-DMEe-BQA/0.jpg)](https://www.youtube.com/watch?v=nN-DMEe-BQA)
 
+#### Module Attribute
+
+1. Place the cursor over a `@module_attribute`
+2. Activate the Go To Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+
+If you hold `Cmd` and hover over the `@module_attribute` before clicking, the target declaration will be shown.
+
 ### Find Usage
 
 Find Usage is a feature of JetBrains IDEs that allows you to find all the places a declared symbol, such a Module Alias
@@ -756,6 +766,31 @@ in a `defmodule`, is used, including in strings and comments.
   c. `Alt+F7`
   
 [![Find Module Usage Demonstration](http://img.youtube.com/vi/n_EEucKK0N0/0.jpg)](https://www.youtube.com/watch?v=n_EEucKK0N0)
+
+#### Module Attribute
+
+1. Place cursor over the `@module_attribute` part of the declaration `@module_attribute value`.
+2. Activate the Find Usage action with one of the following:
+  a.
+    i. Right-click the module attribute
+    ii. Select "Find Usages" from the context menu
+  b. Select Edit &gt; Find &gt; Find Usages from the menu
+  c. `Alt+F7`
+
+### Refactor
+
+#### Rename
+
+##### Module Attribute
+
+1. Place the cursor over the `@module_attribute` usage or declaration.
+2. Active the Rename Refactoring action with one of the following:
+  a.
+    i. Right-click the module attribute
+    ii. Select Refactoring from the context menu
+    iii. Select "Rename..." from the Refactoring submenu
+  b. `Shift+F6`
+3. Edit the name inline and have the declaration and usages update.
 
 ## Installation
  
