@@ -62,6 +62,26 @@
                 </li>
               </ul>
             </li>
+            <li>
+              <p>Module Attribute resolution and refactoring</p>
+              <ul>
+                <li>Go To Definition for module attributes.</li>
+                <li>Module attribute completion</li>
+                <li>
+                  Module attributes that can't be resolved will have "Unresolved module attribute" error annotation
+                  (i.e. red squiggly underline).
+                </li>
+                <li>Find Usages of module attributes from their declarations.</li>
+                <li>
+                  Rename module attributes inline (editing the name in the declaration will change the name at the usage
+                  site at the same time without a dialog).
+                </li>
+                <li>
+                  The module attribute value (from the declaration site) will be folded into the usage site.  It can be
+                  reverted to the literal `@module_name` text by clicking the + to unfold.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>

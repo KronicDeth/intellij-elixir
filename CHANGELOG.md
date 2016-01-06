@@ -45,6 +45,13 @@
     * Parameters of `@opaque`, `@type`, `@typep` names are annotated as "Type Parameter"
     * Keyword keys from the `when` clause of `@callback`, `@macrocallback` or `@spec` definitions and their usage are annotated as "Type Parameters"
     * `@doc false`, `@moduledoc false`, and `@typedoc false` will annotate the `false` with a weak warning: "Will make documented invisible to the documentation extraction tools like ExDoc.".
+  * [#228](https://github.com/KronicDeth/intellij-elixir/pull/228) - Module attributes resolution and refactoring - [KronicDeth](https://github.com/KronicDeth)
+    * Go To Definition for module attributes.
+    * Module attribute completion (**NOTE: works after typing first character after `@`.  To see all module attributes, type a character after `@`, then delete the character to get the full list.**)
+    * Module attributes that can't be resolved will have "Unresolved module attribute" error annotation (i.e. red squiggly underline).
+    * Find Usages of module attributes from their declarations.
+    * Rename module attributes inline (editing the name in the declaration will change the name at the usage site at the same time without a dialog).
+    * The module attribute value (from the declaration site) will be folded into the usage site.  It can be reverted to the literal `@module_name` text by clicking the + to unfold.
 * Bug Fixes 
   * [#206](https://github.com/KronicDeth/intellij-elixir/pull/206) - Change "edition" to "addition" in README. - [folz](https://github.com/folz)
   * [#225](https://github.com/KronicDeth/intellij-elixir/pull/225) - Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI. - [KronicDeth](https://github.com/KronicDeth)
