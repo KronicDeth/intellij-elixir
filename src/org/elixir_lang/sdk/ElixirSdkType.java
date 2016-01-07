@@ -188,10 +188,12 @@ public class ElixirSdkType extends SdkType {
       List<String> lines = output.getExitCode() != 0 || output.isTimeout() || output.isCancelled() ?
           ContainerUtil.<String>emptyList() : output.getStdoutLines();
 
-      if(lines.size() == 1){
-        ElixirSdkRelease release = ElixirSdkRelease.fromString(lines.get(0));
-        mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
-        return release;
+      for (String line : lines) {
+        if (line.startsWith("Elixir")) {
+          ElixirSdkRelease release = ElixirSdkRelease.fromString(line);
+          mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
+          return release;
+        }
       }
     }catch (ExecutionException ignore){
       LOG.warn(ignore);
