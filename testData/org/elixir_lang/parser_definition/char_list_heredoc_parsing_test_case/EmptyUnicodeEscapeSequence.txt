@@ -1,0 +1,20 @@
+Elixir File(0,10)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,10)
+    ElixirCharListHeredocImpl(CHAR_LIST_HEREDOC)(0,10)
+      PsiElement(Char List Heredoc Promoter ('''))(''''')(0,3)
+      PsiElement(\\n, \\r\\n)('\n')(3,4)
+      ElixirCharListHeredocLineImpl(CHAR_LIST_HEREDOC_LINE)(4,7)
+        ElixirHeredocLinePrefixImpl(HEREDOC_LINE_PREFIX)(4,4)
+          <empty list>
+        ElixirQuoteCharListBodyImpl(QUOTE_CHAR_LIST_BODY)(4,6)
+          ElixirQuoteHexadecimalEscapeSequenceImpl(QUOTE_HEXADECIMAL_ESCAPE_SEQUENCE)(4,6)
+            ElixirHexadecimalEscapePrefixImpl(HEXADECIMAL_ESCAPE_PREFIX)(4,6)
+              PsiElement(\\)('\')(4,5)
+              PsiElement(u)('u')(5,6)
+            PsiErrorElement:A-F, a-f, 0-9 or '{' expected, got '
+'(6,6)
+              <empty list>
+        PsiElement(\\n, \\r\\n)('\n')(6,7)
+      ElixirHeredocPrefixImpl(HEREDOC_PREFIX)(7,7)
+        <empty list>
+      PsiElement(Char List Heredoc Terminator ('''))(''''')(7,10)

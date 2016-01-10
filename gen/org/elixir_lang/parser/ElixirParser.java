@@ -2249,14 +2249,26 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE
+  // ESCAPE (HEXADECIMAL_WHOLE_NUMBER_BASE | UNICODE_ESCAPE_CHARACTER)
   public static boolean hexadecimalEscapePrefix(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "hexadecimalEscapePrefix")) return false;
     if (!nextTokenIs(b, ESCAPE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, ESCAPE, HEXADECIMAL_WHOLE_NUMBER_BASE);
+    r = consumeToken(b, ESCAPE);
+    r = r && hexadecimalEscapePrefix_1(b, l + 1);
     exit_section_(b, m, HEXADECIMAL_ESCAPE_PREFIX, r);
+    return r;
+  }
+
+  // HEXADECIMAL_WHOLE_NUMBER_BASE | UNICODE_ESCAPE_CHARACTER
+  private static boolean hexadecimalEscapePrefix_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "hexadecimalEscapePrefix_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, HEXADECIMAL_WHOLE_NUMBER_BASE);
+    if (!r) r = consumeToken(b, UNICODE_ESCAPE_CHARACTER);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -4920,7 +4932,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                                 hexadecimalEscapePrefix |
   //                                 escapedEOL |
   //                                 /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-  //                                    ("\x") in hexadecimalEscapeSequence  */
+  //                                    ("\x") or ("\\u") in hexadecimalEscapeSequence  */
   //                                 escapedCharacter
   static boolean sigilEscapeSequence(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "sigilEscapeSequence")) return false;

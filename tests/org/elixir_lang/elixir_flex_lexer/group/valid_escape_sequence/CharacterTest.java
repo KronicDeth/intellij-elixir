@@ -24,7 +24,7 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
     public static final int MINIMUM_PRINTABLE_CHAR = 32;
     public static final int MAXIMUM_PRINTABLE_CHAR = 126;
     // -1 for x
-    public static final int PRINTABLE_CHAR_COUNT = MAXIMUM_PRINTABLE_CHAR - MINIMUM_PRINTABLE_CHAR + 1 - 1;
+    public static final int PRINTABLE_CHAR_COUNT = MAXIMUM_PRINTABLE_CHAR - MINIMUM_PRINTABLE_CHAR + 1 - 2;
 
     /*
      * Methods
@@ -36,7 +36,7 @@ public class CharacterTest extends org.elixir_lang.elixir_flex_lexer.Test {
 
         int i = 0;
         for (char c = MINIMUM_PRINTABLE_CHAR; c <= MAXIMUM_PRINTABLE_CHAR; c++) {
-            if (c != 'x') {
+            if (c != 'x' && c != 'u') {
                 charSequences[i++] = "\\" + c;
             }
         }

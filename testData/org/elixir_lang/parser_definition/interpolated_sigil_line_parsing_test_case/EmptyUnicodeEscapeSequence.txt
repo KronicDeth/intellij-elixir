@@ -1,0 +1,13 @@
+Elixir File(0,6)
+  ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,6)
+    ElixirInterpolatedSigilLineImpl(INTERPOLATED_SIGIL_LINE)(0,6)
+      PsiElement(~)('~')(0,1)
+      PsiElement(a-b, d-q, t-v, x-z)('x')(1,2)
+      PsiElement(Sigil Promoter ({, [, <, ", /, (, |, '))(''')(2,3)
+      ElixirInterpolatedSigilBodyImpl(INTERPOLATED_SIGIL_BODY)(3,5)
+        ElixirHexadecimalEscapePrefixImpl(HEXADECIMAL_ESCAPE_PREFIX)(3,5)
+          PsiElement(\\)('\')(3,4)
+          PsiElement(u)('u')(4,5)
+      PsiElement(Sigil Terminator ({, [, <, ", /, (, |, '))(''')(5,6)
+      ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(6,6)
+        <empty list>

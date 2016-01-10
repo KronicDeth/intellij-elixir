@@ -24,6 +24,10 @@ public class InterpolatedSigilLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEmptyUnicodeEscapeSequence() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
