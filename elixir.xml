@@ -3,11 +3,10 @@
     <dirname property="elixir.basedir" file="${ant.file.elixir}"/>
 
     <property name="elixir.output.dir" value="${elixir.basedir}/dependencies/elixir"/>
-    <!-- This sha1 for v1.1.1 -->
-    <property name="elixir.sha1" value="139d2eac5998259379862ff6ed2a5287f7de4ea6"/>
+    <property name="elixir.sha1" value="v${env.TRAVIS_ELIXIR_VERSION}"/>
     <property name="elixir.zip" value="${elixir.sha1}.zip"/>
     <property name="elixir.cache" value="${elixir.basedir}/cache/elixir"/>
-    <property name="elixir.zip.root.basename" value="elixir-${elixir.sha1}"/>
+    <property name="elixir.zip.root.basename" value="elixir-${env.TRAVIS_ELIXIR_VERSION}"/>
 
     <property name="elixir.output.zip.root.dir" value="${elixir.output.dir}/${elixir.zip.root.basename}"/>
     <available file="${elixir.output.zip.root.dir}" property="elixir.output.zip.root.available"/>
