@@ -303,14 +303,8 @@ EOL = \n|\r\n
 
 ESCAPE = "\\"
 
-ESCAPED_CHARACTER_TOKEN = {ESCAPE} .
-ESCAPED_CHARACTER_CODE = {ESCAPE} "x{" {HEXADECIMAL_DIGIT}{1,6} "}" |
-                         {ESCAPE} "x" {HEXADECIMAL_DIGIT}{1,2}
+UNICODE_ESCAPE_CHARACTER = "u"
 ESCAPED_EOL = {ESCAPE} {EOL}
-
-VALID_ESCAPE_SEQUENCE = {ESCAPED_CHARACTER_CODE} |
-                        {ESCAPED_CHARACTER_TOKEN} |
-                        {ESCAPED_EOL}
 
 /*
  * Char tokens
@@ -566,6 +560,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state REFERENCE_OPERATION
 %state SIGIL
 %state SIGIL_MODIFIERS
+%state UNICODE_ESCAPE_SEQUENCE
 %state UNKNOWN_BASE_WHOLE_NUMBER
 
 %%
@@ -942,6 +937,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                     return ElixirTypes.EOL; }
   {HEXADECIMAL_WHOLE_NUMBER_BASE} { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE; }
+  {UNICODE_ESCAPE_CHARACTER}      { yybegin(UNICODE_ESCAPE_SEQUENCE);
+                                    return ElixirTypes.UNICODE_ESCAPE_CHARACTER; }
   .                               { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                     yybegin(stackFrame.getLastLexicalState());
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN; }
@@ -952,6 +949,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.CLOSING_CURLY; }
   {HEXADECIMAL_DIGIT}{1,6} { return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+  .                        { return TokenType.BAD_CHARACTER; }
 }
 
 <GROUP,
@@ -1162,6 +1160,16 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {SIGIL_MODIFIER} { return ElixirTypes.SIGIL_MODIFIER; }
   {EOL}|.          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState()); }
+}
+
+<UNICODE_ESCAPE_SEQUENCE> {
+  {OPENING_CURLY}          { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
+                             return ElixirTypes.OPENING_CURLY; }
+  {HEXADECIMAL_DIGIT}{1,4} { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             yybegin(stackFrame.getLastLexicalState());
+                             return ElixirTypes.VALID_HEXADECIMAL_DIGITS; }
+  {EOL}|.                  { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+                             handleInState(stackFrame.getLastLexicalState()); }
 }
 
 <UNKNOWN_BASE_WHOLE_NUMBER> {

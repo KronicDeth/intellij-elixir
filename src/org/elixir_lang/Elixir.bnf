@@ -136,6 +136,7 @@
     TWO_OPERATOR = "++, --, .., <>"
     TYPE_OPERATOR = "::"
     UNARY_OPERATOR = "not, ~~~, !, ^"
+    UNICODE_ESCAPE_CHARACTER = "u"
     UNKNOWN_WHOLE_NUMBER_BASE = "A-Z, a, c-n, p-w, z"
     VALID_BINARY_DIGITS = "0-1"
     VALID_DECIMAL_DIGITS = "0-9"
@@ -3044,7 +3045,7 @@ decimalFloatIntegral ::= decimalWholeNumber
  * Shared subrules
  */
 
-hexadecimalEscapePrefix ::= ESCAPE HEXADECIMAL_WHOLE_NUMBER_BASE
+hexadecimalEscapePrefix ::= ESCAPE (HEXADECIMAL_WHOLE_NUMBER_BASE | UNICODE_ESCAPE_CHARACTER)
 enclosedHexadecimalEscapeSequence ::= OPENING_CURLY VALID_HEXADECIMAL_DIGITS CLOSING_CURLY
                                       { implements = "org.elixir_lang.psi.EscapedHexadecimalDigits" methods = [codePoint] pin = 1 }
 openHexadecimalEscapeSequence ::= VALID_HEXADECIMAL_DIGITS
@@ -3131,9 +3132,9 @@ private sigilEscapeSequence ::= sigilHexadecimalEscapeSequence |
                                 hexadecimalEscapePrefix |
                                 escapedEOL |
                                 /* Must be last so that ESCAPE ('\') can be pinned in escapedCharacter without excluding
-                                   ("\x") in hexadecimalEscapeSequence  */
+                                   ("\x") or ("\\u") in hexadecimalEscapeSequence  */
                                 escapedCharacter
-// Does not pin so that hexadecimalEscapePrefix can match separately as `\x` is valid for sigils
+// Does not pin so that escapePrefix can match separately as `\x` and `\u` is valid for sigils
 sigilHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscapeSequence | enclosedHexadecimalEscapeSequence)
                                    {
                                      implements = "org.elixir_lang.psi.EscapeSequence"

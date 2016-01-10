@@ -333,6 +333,7 @@ public interface ElixirTypes {
   IElementType TWO_OPERATOR = new ElixirTokenType("++, --, .., <>");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
   IElementType UNARY_OPERATOR = new ElixirTokenType("not, ~~~, !, ^");
+  IElementType UNICODE_ESCAPE_CHARACTER = new ElixirTokenType("u");
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("A-Z, a, c-n, p-w, z");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("0-1");
   IElementType VALID_DECIMAL_DIGITS = new ElixirTokenType("0-9");

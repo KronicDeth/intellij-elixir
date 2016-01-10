@@ -33,7 +33,7 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
     }
 
     /*
-     * hexadecimalEscapeSequence
+     * byte hexadecimalEscapeSequence
      */
 
     public void testOpenHexadecimalEscapeSequence() {

@@ -12,6 +12,10 @@ public class LiteralRegexHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testEmptyUnicodeEscapeSequence() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }

@@ -12,6 +12,10 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundExit();
     }
 
+    public void testEmptyUnicodeEscapeSequence() {
+        assertParsedAndQuotedAroundExit();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }
