@@ -32,6 +32,7 @@
 ## v2.1.0
 * Enhancement
   * [#236](https://github.com/KronicDeth/intellij-elixir/pull/236) - `\u` in strings and char lists for unicode mapping - [KronicDeth](https://github.com/KronicDeth)
+  * [#237](https://github.com/KronicDeth/intellij-elixir/pull/237) - Test against Elixir 1.1.1 and 1.2.0 - [KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#231](https://github.com/KronicDeth/intellij-elixir/pull/231) - Update IntelliJ to 14.1.6 to fix 403 errors in Travis-CI build - [sholden](https://github.com/sholden)
 
