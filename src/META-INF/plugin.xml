@@ -16,6 +16,9 @@
           <ul>
             <li><code>\u</code> in strings and char lists for unicode mapping</li>
             <li>Test against Elixir 1.1.1 and 1.2.0</li>
+            <li>
+              More flexible <code>elixir --version</code> parsing: works with <code>elixir</code> 1.2.0 and earlier
+            </li>
           </ul>
         </li>
         <li>
