@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>2.0.1</version>
+  <version>2.1.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,8 +9,14 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v2.0.1</h1>
+      <h1>v2.1.0</h1>
       <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li><code>\u</code> in strings and char lists for unicode mapping</li>
+          </ul>
+        </li>
         <li>
           <p>Bug Fixes</p>
           <ul>

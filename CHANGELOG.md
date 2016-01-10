@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.0.1](#v201)
+  - [v2.1.0](#v210)
   - [v2.0.0](#v200)
   - [v1.2.1](#v121)
   - [v1.2.0](#v120)
@@ -29,7 +29,9 @@
 
 # Changelog
 
-## v2.0.1
+## v2.1.0
+* Enhancement
+  * [#236](https://github.com/KronicDeth/intellij-elixir/pull/236) - `\u` in strings and char lists for unicode mapping - [KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#231](https://github.com/KronicDeth/intellij-elixir/pull/231) - Update IntelliJ to 14.1.6 to fix 403 errors in Travis-CI build - [sholden](https://github.com/sholden)
 
