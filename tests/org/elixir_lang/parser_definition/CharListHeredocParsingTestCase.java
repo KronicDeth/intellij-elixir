@@ -12,6 +12,10 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundExit();
     }
 
+    public void testEmptyUnicodeEscapeSequence() {
+        assertParsedAndQuotedAroundExit();
+    }
+
     public void testEscapeSequences() {
         assertParsedAndQuotedCorrectly();
     }

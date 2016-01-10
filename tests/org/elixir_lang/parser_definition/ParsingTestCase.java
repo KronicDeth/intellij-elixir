@@ -110,6 +110,17 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         return "testData/org/elixir_lang/parser_definition";
     }
 
+    /**
+     * Whether test is running on travis-ci.
+     *
+     * @return {@code true} if on Travis CI; {@code false} otherwise
+     */
+    protected boolean isTravis() {
+        String travis = System.getenv("TRAVIS");
+
+        return travis != null && travis.equals("true");
+    }
+
     @Override
     protected boolean skipSpaces() {
         return false;
