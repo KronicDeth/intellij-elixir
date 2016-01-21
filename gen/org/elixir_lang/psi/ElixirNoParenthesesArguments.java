@@ -5,10 +5,18 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public interface ElixirNoParenthesesArguments extends QuotableArguments {
 
   @Nullable
-  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
+  ElixirMatchedExpression getMatchedExpression();
+
+  @NotNull
+  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
+
+  @Nullable
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
 
   @Nullable
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();

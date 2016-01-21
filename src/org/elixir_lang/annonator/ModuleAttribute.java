@@ -248,11 +248,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
-                    ASTNode functionNameNode = call.functionNameNode();
+                    PsiElement functionNameElement = call.functionNameElement();
 
-                    if (functionNameNode != null) {
+                    if (functionNameElement != null) {
                         highlight(
-                                functionNameNode.getTextRange(),
+                                functionNameElement.getTextRange(),
                                 annotationHolder,
                                 ElixirSyntaxHighlighter.TYPE
                         );
@@ -434,11 +434,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
-                    ASTNode functionNameNode = call.functionNameNode();
+                    PsiElement functionNameElement = call.functionNameElement();
 
-                    if (functionNameNode != null) {
+                    if (functionNameElement != null) {
                         highlight(
-                                functionNameNode.getTextRange(),
+                                functionNameElement.getTextRange(),
                                 annotationHolder,
                                 leftMostFunctionNameTextAttributesKey
                         );
@@ -487,11 +487,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     if (matchedTypeOperationLeftOperand instanceof Call) {
                         Call call = (Call) matchedTypeOperationLeftOperand;
-                        ASTNode functionNameNode = call.functionNameNode();
+                        PsiElement functionNameElement = call.functionNameElement();
 
-                        if (functionNameNode != null) {
+                        if (functionNameElement != null) {
                             highlight(
-                                    functionNameNode.getTextRange(),
+                                    functionNameElement.getTextRange(),
                                     annotationHolder,
                                     leftMostFunctionNameTextAttributesKey
                             );
@@ -991,9 +991,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
-        ASTNode functionNameNode = unqualifiedNoParenthesesCall.functionNameNode();
-        assert functionNameNode != null;
-        highlight(functionNameNode.getTextRange(), annotationHolder, typeTextAttributesKey);
+        PsiElement functionNameElement = unqualifiedNoParenthesesCall.functionNameElement();
+        assert functionNameElement != null;
+        highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
         highlightTypesAndTypeParameterUsages(
                 unqualifiedNoParenthesesCall.primaryArguments(),
@@ -1008,9 +1008,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
-        ASTNode functionNameNode = unqualifiedParenthesesCall.functionNameNode();
-        assert functionNameNode != null;
-        highlight(functionNameNode.getTextRange(), annotationHolder, typeTextAttributesKey);
+        PsiElement functionNameElement = unqualifiedParenthesesCall.functionNameElement();
+
+        assert functionNameElement != null;
+
+        highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
         highlightTypesAndTypeParameterUsages(
                 unqualifiedParenthesesCall.primaryArguments(),

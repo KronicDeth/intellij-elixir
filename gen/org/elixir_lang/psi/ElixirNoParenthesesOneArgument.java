@@ -8,16 +8,18 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleName, QuotableArguments {
 
   @Nullable
   ElixirMatchedExpression getMatchedExpression();
 
-  @Nullable
-  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+  @NotNull
+  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
 
   @Nullable
-  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();

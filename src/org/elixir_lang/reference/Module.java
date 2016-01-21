@@ -83,7 +83,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
             if (sibling instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
                 ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) sibling;
 
-                if (unmatchedUnqualifiedNoParenthesesCall.isDefmodule()) {
+                if (unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
                     ElixirNoParenthesesOneArgument noParenthesesOneArgument = unmatchedUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
                     PsiElement[] children = noParenthesesOneArgument.getChildren();
 

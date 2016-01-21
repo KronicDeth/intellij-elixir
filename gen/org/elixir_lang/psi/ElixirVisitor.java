@@ -203,6 +203,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitWholeNumber(o);
   }
 
+  public void visitIdentifier(@NotNull ElixirIdentifier o) {
+    visitQuotable(o);
+  }
+
   public void visitInInfixOperator(@NotNull ElixirInInfixOperator o) {
     visitOperator(o);
   }
@@ -616,30 +620,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
-  public void visitNoParenthesesFirstPositional(@NotNull ElixirNoParenthesesFirstPositional o) {
-    visitQuotable(o);
-  }
-
   public void visitNoParenthesesKeywordPair(@NotNull ElixirNoParenthesesKeywordPair o) {
     visitQuotableKeywordPair(o);
   }
 
   public void visitNoParenthesesKeywords(@NotNull ElixirNoParenthesesKeywords o) {
     visitQuotableKeywordList(o);
-  }
-
-  public void visitNoParenthesesManyArguments(@NotNull ElixirNoParenthesesManyArguments o) {
-    visitArguments(o);
-    // visitQuotableArguments(o);
-  }
-
-  public void visitNoParenthesesManyArgumentsUnqualifiedIdentifier(@NotNull ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier o) {
-    visitQuotable(o);
-  }
-
-  public void visitNoParenthesesManyPositionalAndMaybeKeywordsArguments(@NotNull ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments o) {
-    visitArguments(o);
-    // visitQuotableArguments(o);
   }
 
   public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
@@ -649,11 +635,6 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {
     visitArguments(o);
     // visitMaybeModuleName(o);
-    // visitQuotableArguments(o);
-  }
-
-  public void visitNoParenthesesOnePositionalAndKeywordsArguments(@NotNull ElixirNoParenthesesOnePositionalAndKeywordsArguments o) {
-    visitArguments(o);
     // visitQuotableArguments(o);
   }
 
@@ -933,6 +914,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedUnqualifiedNoParenthesesCall(@NotNull ElixirUnmatchedUnqualifiedNoParenthesesCall o) {
     visitUnmatchedExpression(o);
+    // visitNamedElement(o);
     // visitUnqualifiedNoParenthesesCall(o);
   }
 

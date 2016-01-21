@@ -165,6 +165,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == HEXADECIMAL_WHOLE_NUMBER) {
       r = hexadecimalWholeNumber(b, 0);
     }
+    else if (t == IDENTIFIER) {
+      r = identifier(b, 0);
+    }
     else if (t == IN_INFIX_OPERATOR) {
       r = inInfixOperator(b, 0);
     }
@@ -429,32 +432,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesExpression(b, 0);
     }
-    else if (t == NO_PARENTHESES_FIRST_POSITIONAL) {
-      r = noParenthesesFirstPositional(b, 0);
-    }
     else if (t == NO_PARENTHESES_KEYWORD_PAIR) {
       r = noParenthesesKeywordPair(b, 0);
     }
     else if (t == NO_PARENTHESES_KEYWORDS) {
       r = noParenthesesKeywords(b, 0);
     }
-    else if (t == NO_PARENTHESES_MANY_ARGUMENTS) {
-      r = noParenthesesManyArguments(b, 0);
-    }
-    else if (t == NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER) {
-      r = noParenthesesManyArgumentsUnqualifiedIdentifier(b, 0);
-    }
-    else if (t == NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS) {
-      r = noParenthesesManyPositionalAndMaybeKeywordsArguments(b, 0);
-    }
     else if (t == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
       r = noParenthesesManyStrictNoParenthesesExpression(b, 0);
     }
     else if (t == NO_PARENTHESES_ONE_ARGUMENT) {
       r = noParenthesesOneArgument(b, 0);
-    }
-    else if (t == NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS) {
-      r = noParenthesesOnePositionalAndKeywordsArguments(b, 0);
     }
     else if (t == NO_PARENTHESES_STRICT) {
       r = noParenthesesStrict(b, 0);
@@ -1186,14 +1174,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // atPrefixOperator IDENTIFIER
+  // atPrefixOperator IDENTIFIER_TOKEN
   public static boolean atIdentifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "atIdentifier")) return false;
     if (!nextTokenIs(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && consumeToken(b, IDENTIFIER);
+    r = r && consumeToken(b, IDENTIFIER_TOKEN);
     exit_section_(b, m, AT_IDENTIFIER, r);
     return r;
   }
@@ -2315,6 +2303,18 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // IDENTIFIER_TOKEN
+  public static boolean identifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "identifier")) return false;
+    if (!nextTokenIs(b, IDENTIFIER_TOKEN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, IDENTIFIER_TOKEN);
+    exit_section_(b, m, IDENTIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // EOL* IN_OPERATOR EOL*
   public static boolean inInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "inInfixOperator")) return false;
@@ -2911,7 +2911,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                DO |
   //                DUAL_OPERATOR |
   //                ELSE |
-  //                IDENTIFIER |
+  //                IDENTIFIER_TOKEN |
   //                IN_MATCH_OPERATOR |
   //                IN_OPERATOR |
   //                MAP_OPERATOR |
@@ -2945,7 +2945,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DO);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, ELSE);
-    if (!r) r = consumeToken(b, IDENTIFIER);
+    if (!r) r = consumeToken(b, IDENTIFIER_TOKEN);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
     if (!r) r = consumeToken(b, IN_OPERATOR);
     if (!r) r = consumeToken(b, MAP_OPERATOR);
@@ -4031,56 +4031,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !additionTail matchedExpression (infixComma noParenthesesExpression)+
-  static boolean noParenthesesCommaExpression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesCommaExpression")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = noParenthesesCommaExpression_0(b, l + 1);
-    r = r && matchedExpression(b, l + 1, -1);
-    r = r && noParenthesesCommaExpression_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // !additionTail
-  private static boolean noParenthesesCommaExpression_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesCommaExpression_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_, null);
-    r = !additionTail(b, l + 1);
-    exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  // (infixComma noParenthesesExpression)+
-  private static boolean noParenthesesCommaExpression_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesCommaExpression_2")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = noParenthesesCommaExpression_2_0(b, l + 1);
-    int c = current_position_(b);
-    while (r) {
-      if (!noParenthesesCommaExpression_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "noParenthesesCommaExpression_2", c)) break;
-      c = current_position_(b);
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // infixComma noParenthesesExpression
-  private static boolean noParenthesesCommaExpression_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesCommaExpression_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = infixComma(b, l + 1);
-    r = r && noParenthesesExpression(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // emptyParentheses |
   //                             /* Must be before matchedExpression because noParenthesesExpression is
   //                                `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer
@@ -4097,17 +4047,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = noParenthesesManyStrictNoParenthesesExpression(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1, -1);
     exit_section_(b, l, m, NO_PARENTHESES_EXPRESSION, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // matchedExpression
-  public static boolean noParenthesesFirstPositional(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesFirstPositional")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<no parentheses first positional>");
-    r = matchedExpression(b, l + 1, -1);
-    exit_section_(b, l, m, NO_PARENTHESES_FIRST_POSITIONAL, r, false, null);
     return r;
   }
 
@@ -4159,15 +4098,95 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // noParenthesesOnePositionalAndKeywordsArguments |
-  //                                noParenthesesManyPositionalAndMaybeKeywordsArguments
-  public static boolean noParenthesesManyArguments(PsiBuilder b, int l) {
+  // matchedExpression infixComma noParenthesesKeywords |
+  //                                        !additionTail matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
+  static boolean noParenthesesManyArguments(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesManyArguments")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<no parentheses many arguments>");
-    r = noParenthesesOnePositionalAndKeywordsArguments(b, l + 1);
-    if (!r) r = noParenthesesManyPositionalAndMaybeKeywordsArguments(b, l + 1);
-    exit_section_(b, l, m, NO_PARENTHESES_MANY_ARGUMENTS, r, false, null);
+    Marker m = enter_section_(b);
+    r = noParenthesesManyArguments_0(b, l + 1);
+    if (!r) r = noParenthesesManyArguments_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // matchedExpression infixComma noParenthesesKeywords
+  private static boolean noParenthesesManyArguments_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = matchedExpression(b, l + 1, -1);
+    r = r && infixComma(b, l + 1);
+    r = r && noParenthesesKeywords(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !additionTail matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
+  private static boolean noParenthesesManyArguments_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesManyArguments_1_0(b, l + 1);
+    r = r && matchedExpression(b, l + 1, -1);
+    r = r && noParenthesesManyArguments_1_2(b, l + 1);
+    r = r && noParenthesesManyArguments_1_3(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // !additionTail
+  private static boolean noParenthesesManyArguments_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !additionTail(b, l + 1);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
+  // (infixComma noParenthesesExpression)+
+  private static boolean noParenthesesManyArguments_1_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = noParenthesesManyArguments_1_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (r) {
+      if (!noParenthesesManyArguments_1_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "noParenthesesManyArguments_1_2", c)) break;
+      c = current_position_(b);
+    }
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // infixComma noParenthesesExpression
+  private static boolean noParenthesesManyArguments_1_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = infixComma(b, l + 1);
+    r = r && noParenthesesExpression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (infixComma noParenthesesKeywords)?
+  private static boolean noParenthesesManyArguments_1_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1_3")) return false;
+    noParenthesesManyArguments_1_3_0(b, l + 1);
+    return true;
+  }
+
+  // infixComma noParenthesesKeywords
+  private static boolean noParenthesesManyArguments_1_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "noParenthesesManyArguments_1_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = infixComma(b, l + 1);
+    r = r && noParenthesesKeywords(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -4185,63 +4204,10 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER !KEYWORD_PAIR_COLON
-  public static boolean noParenthesesManyArgumentsUnqualifiedIdentifier(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesManyArgumentsUnqualifiedIdentifier")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
-    r = r && noParenthesesManyArgumentsUnqualifiedIdentifier_1(b, l + 1);
-    exit_section_(b, m, NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER, r);
-    return r;
-  }
-
-  // !KEYWORD_PAIR_COLON
-  private static boolean noParenthesesManyArgumentsUnqualifiedIdentifier_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesManyArgumentsUnqualifiedIdentifier_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NOT_, null);
-    r = !consumeToken(b, KEYWORD_PAIR_COLON);
-    exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
-  public static boolean noParenthesesManyPositionalAndMaybeKeywordsArguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesManyPositionalAndMaybeKeywordsArguments")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<no parentheses many positional and maybe keywords arguments>");
-    r = noParenthesesCommaExpression(b, l + 1);
-    r = r && noParenthesesManyPositionalAndMaybeKeywordsArguments_1(b, l + 1);
-    exit_section_(b, l, m, NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS, r, false, null);
-    return r;
-  }
-
-  // (infixComma noParenthesesKeywords)?
-  private static boolean noParenthesesManyPositionalAndMaybeKeywordsArguments_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesManyPositionalAndMaybeKeywordsArguments_1")) return false;
-    noParenthesesManyPositionalAndMaybeKeywordsArguments_1_0(b, l + 1);
-    return true;
-  }
-
-  // infixComma noParenthesesKeywords
-  private static boolean noParenthesesManyPositionalAndMaybeKeywordsArguments_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesManyPositionalAndMaybeKeywordsArguments_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = infixComma(b, l + 1);
-    r = r && noParenthesesKeywords(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // unqualifiedNoParenthesesManyArgumentsCall
   public static boolean noParenthesesManyStrictNoParenthesesExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesManyStrictNoParenthesesExpression")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
@@ -4294,19 +4260,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NOT_, null);
     r = !additionTail(b, l + 1);
     exit_section_(b, l, m, null, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // noParenthesesFirstPositional infixComma noParenthesesKeywords
-  public static boolean noParenthesesOnePositionalAndKeywordsArguments(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "noParenthesesOnePositionalAndKeywordsArguments")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<no parentheses one positional and keywords arguments>");
-    r = noParenthesesFirstPositional(b, l + 1);
-    r = r && infixComma(b, l + 1);
-    r = r && noParenthesesKeywords(b, l + 1);
-    exit_section_(b, l, m, NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS, r, false, null);
     return r;
   }
 
@@ -4841,7 +4794,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // IDENTIFIER |
+  // IDENTIFIER_TOKEN |
   //                        AFTER |
   //                        AND_OPERATOR |
   //                        ARROW_OPERATOR |
@@ -4877,7 +4830,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "relativeIdentifier")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, "<relative identifier>");
-    r = consumeToken(b, IDENTIFIER);
+    r = consumeToken(b, IDENTIFIER_TOKEN);
     if (!r) r = consumeToken(b, AFTER);
     if (!r) r = consumeToken(b, AND_OPERATOR);
     if (!r) r = consumeToken(b, ARROW_OPERATOR);
@@ -5543,27 +5496,38 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // noParenthesesManyArgumentsUnqualifiedIdentifier
+  // identifier !KEYWORD_PAIR_COLON
   //                                               noParenthesesManyArgumentsStrict
   public static boolean unqualifiedNoParenthesesManyArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unqualifiedNoParenthesesManyArgumentsCall")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = noParenthesesManyArgumentsUnqualifiedIdentifier(b, l + 1);
+    r = identifier(b, l + 1);
+    r = r && unqualifiedNoParenthesesManyArgumentsCall_1(b, l + 1);
     r = r && noParenthesesManyArgumentsStrict(b, l + 1);
     exit_section_(b, m, UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL, r);
     return r;
   }
 
+  // !KEYWORD_PAIR_COLON
+  private static boolean unqualifiedNoParenthesesManyArgumentsCall_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "unqualifiedNoParenthesesManyArgumentsCall_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_, null);
+    r = !consumeToken(b, KEYWORD_PAIR_COLON);
+    exit_section_(b, l, m, null, r, false, null);
+    return r;
+  }
+
   /* ********************************************************** */
-  // IDENTIFIER !KEYWORD_PAIR_COLON
+  // IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
   public static boolean variable(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "variable")) return false;
-    if (!nextTokenIs(b, IDENTIFIER)) return false;
+    if (!nextTokenIs(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, IDENTIFIER);
+    r = consumeToken(b, IDENTIFIER_TOKEN);
     r = r && variable_1(b, l + 1);
     exit_section_(b, m, VARIABLE, r);
     return r;
@@ -5893,13 +5857,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // IDENTIFIER noParenthesesOneArgument
+  // identifier noParenthesesOneArgument
   public static boolean matchedUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedNoParenthesesCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && noParenthesesOneArgument(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, r);
     return r;
@@ -5963,14 +5927,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // atPrefixOperator IDENTIFIER CALL bracketArguments
+  // atPrefixOperator IDENTIFIER_TOKEN CALL bracketArguments
   public static boolean matchedAtUnqualifiedBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedAtUnqualifiedBracketOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && consumeTokens(b, 0, IDENTIFIER, CALL);
+    r = r && consumeTokens(b, 0, IDENTIFIER_TOKEN, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;
@@ -6009,37 +5973,38 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // IDENTIFIER matchedParenthesesArguments
+  // identifier matchedParenthesesArguments
   public static boolean matchedUnqualifiedParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedParenthesesCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && matchedParenthesesArguments(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_PARENTHESES_CALL, r);
     return r;
   }
 
-  // IDENTIFIER CALL bracketArguments
+  // identifier CALL bracketArguments
   public static boolean matchedUnqualifiedBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedBracketOperation")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, IDENTIFIER, CALL);
+    r = identifier(b, l + 1);
+    r = r && consumeToken(b, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;
   }
 
-  // IDENTIFIER !KEYWORD_PAIR_COLON
+  // identifier !KEYWORD_PAIR_COLON
   public static boolean matchedUnqualifiedNoArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "matchedUnqualifiedNoArgumentsCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && matchedUnqualifiedNoArgumentsCall_1(b, l + 1);
     exit_section_(b, m, MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, r);
     return r;
@@ -6365,13 +6330,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // IDENTIFIER noParenthesesOneArgument doBlock?
+  // identifier noParenthesesOneArgument doBlock?
   public static boolean unmatchedUnqualifiedNoParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnqualifiedNoParenthesesCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && noParenthesesOneArgument(b, l + 1);
     r = r && unmatchedUnqualifiedNoParenthesesCall_2(b, l + 1);
     exit_section_(b, m, UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, r);
@@ -6459,14 +6424,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // atPrefixOperator IDENTIFIER CALL bracketArguments
+  // atPrefixOperator IDENTIFIER_TOKEN CALL bracketArguments
   public static boolean unmatchedAtUnqualifiedBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedAtUnqualifiedBracketOperation")) return false;
     if (!nextTokenIsFast(b, AT_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && consumeTokens(b, 0, IDENTIFIER, CALL);
+    r = r && consumeTokens(b, 0, IDENTIFIER_TOKEN, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;
@@ -6505,13 +6470,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // IDENTIFIER matchedParenthesesArguments doBlock?
+  // identifier matchedParenthesesArguments doBlock?
   public static boolean unmatchedUnqualifiedParenthesesCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnqualifiedParenthesesCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && matchedParenthesesArguments(b, l + 1);
     r = r && unmatchedUnqualifiedParenthesesCall_2(b, l + 1);
     exit_section_(b, m, UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, r);
@@ -6525,25 +6490,26 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // IDENTIFIER CALL bracketArguments
+  // identifier CALL bracketArguments
   public static boolean unmatchedUnqualifiedBracketOperation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnqualifiedBracketOperation")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, IDENTIFIER, CALL);
+    r = identifier(b, l + 1);
+    r = r && consumeToken(b, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, UNMATCHED_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;
   }
 
-  // IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
+  // identifier !KEYWORD_PAIR_COLON doBlock?
   public static boolean unmatchedUnqualifiedNoArgumentsCall(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unmatchedUnqualifiedNoArgumentsCall")) return false;
-    if (!nextTokenIsFast(b, IDENTIFIER)) return false;
+    if (!nextTokenIsFast(b, IDENTIFIER_TOKEN)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, IDENTIFIER);
+    r = identifier(b, l + 1);
     r = r && unmatchedUnqualifiedNoArgumentsCall_1(b, l + 1);
     r = r && unmatchedUnqualifiedNoArgumentsCall_2(b, l + 1);
     exit_section_(b, m, UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, r);

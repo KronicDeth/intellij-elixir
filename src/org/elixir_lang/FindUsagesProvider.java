@@ -5,10 +5,8 @@ import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirFile;
-import org.elixir_lang.psi.MaybeModuleName;
-import org.elixir_lang.psi.QualifiableAlias;
+import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.java.generate.inspection.AbstractToStringInspection;
@@ -156,6 +154,30 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         if (element instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
             nodeText = atUnqualifiedNoParenthesesCall.getName();
+        } else if (element instanceof Call) {
+            Call call = (Call) element;
+
+            if (call.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
+                NamedElement namedElement = (NamedElement) call;
+                nodeText = namedElement.getName();
+            } else if (call.isCallingMacro("Elixir.Kernel", "def", 2)) {
+                NamedElement namedElement = (NamedElement) call;
+                nodeText = namedElement.getName();
+            } else {
+                PsiElement parent = element.getParent();
+
+                if (parent instanceof ElixirNoParenthesesOneArgument) {
+                    PsiElement grandParent = parent.getParent();
+
+                    if (grandParent instanceof Call) {
+                        Call grandParentCall = (Call) grandParent;
+
+                        if (grandParentCall.isCallingMacro("Elixir.Kernel", "def", 2)) {
+                            nodeText = element.getText();
+                        }
+                    }
+                }
+            }
         } else if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
 

@@ -4,11 +4,15 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiElement implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
 
@@ -22,15 +26,27 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   }
 
   @Override
+  @NotNull
+  public ElixirIdentifier getIdentifier() {
+    return findNotNullChildByClass(ElixirIdentifier.class);
+  }
+
+  @Override
   @Nullable
-  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
-    return findChildByClass(ElixirNoParenthesesManyArguments.class);
+  public ElixirMatchedExpression getMatchedExpression() {
+    return findChildByClass(ElixirMatchedExpression.class);
   }
 
   @Override
   @NotNull
-  public ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier getNoParenthesesManyArgumentsUnqualifiedIdentifier() {
-    return findNotNullChildByClass(ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier.class);
+  public List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
+    return findChildByClass(ElixirNoParenthesesKeywords.class);
   }
 
   @Override
@@ -45,8 +61,34 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   }
 
   @NotNull
-  public ASTNode functionNameNode() {
-    return ElixirPsiImplUtil.functionNameNode(this);
+  public PsiElement functionNameElement() {
+    return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
   @Nullable
@@ -55,23 +97,13 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   }
 
   @NotNull
-  public QuotableArguments getArguments() {
-    return ElixirPsiImplUtil.getArguments(this);
-  }
-
-  @Nullable
-  public ElixirDoBlock getDoBlock() {
-    return ElixirPsiImplUtil.getDoBlock(this);
-  }
-
-  @NotNull
-  public Quotable getIdentifier() {
-    return ElixirPsiImplUtil.getIdentifier(this);
-  }
-
-  @Nullable
   public PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
+  @Nullable
+  public Integer primaryArity() {
+    return ElixirPsiImplUtil.primaryArity(this);
   }
 
   @NotNull
@@ -84,8 +116,9 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return ElixirPsiImplUtil.quoteArguments(this);
   }
 
-  public OtpErlangObject quoteIdentifier() {
-    return ElixirPsiImplUtil.quoteIdentifier(this);
+  @Nullable
+  public Integer resolvedFinalArity() {
+    return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @NotNull
@@ -99,8 +132,23 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   }
 
   @Nullable
+  public Integer resolvedPrimaryArity() {
+    return ElixirPsiImplUtil.resolvedPrimaryArity(this);
+  }
+
+  @Nullable
+  public Integer resolvedSecondaryArity() {
+    return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @Nullable
+  public Integer secondaryArity() {
+    return ElixirPsiImplUtil.secondaryArity(this);
   }
 
 }

@@ -2,7 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +27,18 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   @Nullable
   String functionName();
 
-  ASTNode functionNameNode();
+  PsiElement functionNameElement();
+
+  PsiElement getNameIdentifier();
+
+  @NotNull
+  ItemPresentation getPresentation();
+
+  boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
+
+  boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
   @NotNull
   String moduleName();
@@ -35,8 +46,14 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   @NotNull
   PsiElement[] primaryArguments();
 
+  @Nullable
+  Integer primaryArity();
+
   @NotNull
   OtpErlangObject quote();
+
+  @Nullable
+  Integer resolvedFinalArity();
 
   @NotNull
   String resolvedFunctionName();
@@ -45,6 +62,15 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   String resolvedModuleName();
 
   @Nullable
+  Integer resolvedPrimaryArity();
+
+  @Nullable
+  Integer resolvedSecondaryArity();
+
+  @Nullable
   PsiElement[] secondaryArguments();
+
+  @Nullable
+  Integer secondaryArity();
 
 }

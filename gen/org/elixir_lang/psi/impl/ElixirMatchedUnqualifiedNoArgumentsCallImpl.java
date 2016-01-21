@@ -3,9 +3,11 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirDoBlock;
+import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirMatchedUnqualifiedNoArgumentsCall;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -22,14 +24,46 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends ElixirMatchedEx
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public ElixirIdentifier getIdentifier() {
+    return findNotNullChildByClass(ElixirIdentifier.class);
+  }
+
   @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }
 
   @NotNull
-  public ASTNode functionNameNode() {
-    return ElixirPsiImplUtil.functionNameNode(this);
+  public PsiElement functionNameElement() {
+    return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
   @Nullable
@@ -38,18 +72,23 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends ElixirMatchedEx
   }
 
   @Nullable
-  public ElixirDoBlock getDoBlock() {
-    return ElixirPsiImplUtil.getDoBlock(this);
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
   }
 
   @Nullable
-  public PsiElement[] primaryArguments() {
-    return ElixirPsiImplUtil.primaryArguments(this);
+  public Integer primaryArity() {
+    return ElixirPsiImplUtil.primaryArity(this);
   }
 
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @Nullable
+  public Integer resolvedFinalArity() {
+    return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @NotNull
@@ -63,8 +102,23 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends ElixirMatchedEx
   }
 
   @Nullable
+  public Integer resolvedPrimaryArity() {
+    return ElixirPsiImplUtil.resolvedPrimaryArity(this);
+  }
+
+  @Nullable
+  public Integer resolvedSecondaryArity() {
+    return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @Nullable
+  public Integer secondaryArity() {
+    return ElixirPsiImplUtil.secondaryArity(this);
   }
 
 }

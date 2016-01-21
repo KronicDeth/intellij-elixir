@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirBracketArguments;
+import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedBracketOperation;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,12 @@ public class ElixirUnmatchedUnqualifiedBracketOperationImpl extends ElixirUnmatc
   @NotNull
   public ElixirBracketArguments getBracketArguments() {
     return findNotNullChildByClass(ElixirBracketArguments.class);
+  }
+
+  @Override
+  @NotNull
+  public ElixirIdentifier getIdentifier() {
+    return findNotNullChildByClass(ElixirIdentifier.class);
   }
 
   @NotNull

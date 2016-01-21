@@ -56,6 +56,7 @@ public interface ElixirTypes {
   IElementType HEXADECIMAL_DIGITS = new ElixirElementType("HEXADECIMAL_DIGITS");
   IElementType HEXADECIMAL_ESCAPE_PREFIX = new ElixirElementType("HEXADECIMAL_ESCAPE_PREFIX");
   IElementType HEXADECIMAL_WHOLE_NUMBER = new ElixirElementType("HEXADECIMAL_WHOLE_NUMBER");
+  IElementType IDENTIFIER = new ElixirElementType("IDENTIFIER");
   IElementType INTERPOLATED_CHAR_LIST_BODY = new ElixirElementType("INTERPOLATED_CHAR_LIST_BODY");
   IElementType INTERPOLATED_CHAR_LIST_HEREDOC_LINE = new ElixirElementType("INTERPOLATED_CHAR_LIST_HEREDOC_LINE");
   IElementType INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC = new ElixirElementType("INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC");
@@ -144,15 +145,10 @@ public interface ElixirTypes {
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ARGUMENTS");
   IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
-  IElementType NO_PARENTHESES_FIRST_POSITIONAL = new ElixirElementType("NO_PARENTHESES_FIRST_POSITIONAL");
   IElementType NO_PARENTHESES_KEYWORDS = new ElixirElementType("NO_PARENTHESES_KEYWORDS");
   IElementType NO_PARENTHESES_KEYWORD_PAIR = new ElixirElementType("NO_PARENTHESES_KEYWORD_PAIR");
-  IElementType NO_PARENTHESES_MANY_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS");
-  IElementType NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER = new ElixirElementType("NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER");
-  IElementType NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_ONE_ARGUMENT = new ElixirElementType("NO_PARENTHESES_ONE_ARGUMENT");
-  IElementType NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS");
   IElementType NO_PARENTHESES_STRICT = new ElixirElementType("NO_PARENTHESES_STRICT");
   IElementType OCTAL_DIGITS = new ElixirElementType("OCTAL_DIGITS");
   IElementType OCTAL_WHOLE_NUMBER = new ElixirElementType("OCTAL_WHOLE_NUMBER");
@@ -267,7 +263,7 @@ public interface ElixirTypes {
   IElementType HEREDOC_LINE_WHITE_SPACE_TOKEN = new ElixirTokenType("Whitespace at beginning of line of heredoc");
   IElementType HEREDOC_PREFIX_WHITE_SPACE = new ElixirTokenType("Whitespace at beginning of last line of heredoc before terminator");
   IElementType HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("x");
-  IElementType IDENTIFIER = new ElixirTokenType("identifier");
+  IElementType IDENTIFIER_TOKEN = new ElixirTokenType("identifier");
   IElementType INTERPOLATING_CHAR_LIST_SIGIL_NAME = new ElixirTokenType("c");
   IElementType INTERPOLATING_REGEX_SIGIL_NAME = new ElixirTokenType("r");
   IElementType INTERPOLATING_SIGIL_NAME = new ElixirTokenType("a-b, d-q, t-v, x-z");
@@ -489,6 +485,9 @@ public interface ElixirTypes {
       }
       else if (type == HEXADECIMAL_WHOLE_NUMBER) {
         return new ElixirHexadecimalWholeNumberImpl(node);
+      }
+      else if (type == IDENTIFIER) {
+        return new ElixirIdentifierImpl(node);
       }
       else if (type == INTERPOLATED_CHAR_LIST_BODY) {
         return new ElixirInterpolatedCharListBodyImpl(node);
@@ -754,32 +753,17 @@ public interface ElixirTypes {
       else if (type == NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesExpressionImpl(node);
       }
-      else if (type == NO_PARENTHESES_FIRST_POSITIONAL) {
-        return new ElixirNoParenthesesFirstPositionalImpl(node);
-      }
       else if (type == NO_PARENTHESES_KEYWORDS) {
         return new ElixirNoParenthesesKeywordsImpl(node);
       }
       else if (type == NO_PARENTHESES_KEYWORD_PAIR) {
         return new ElixirNoParenthesesKeywordPairImpl(node);
       }
-      else if (type == NO_PARENTHESES_MANY_ARGUMENTS) {
-        return new ElixirNoParenthesesManyArgumentsImpl(node);
-      }
-      else if (type == NO_PARENTHESES_MANY_ARGUMENTS_UNQUALIFIED_IDENTIFIER) {
-        return new ElixirNoParenthesesManyArgumentsUnqualifiedIdentifierImpl(node);
-      }
-      else if (type == NO_PARENTHESES_MANY_POSITIONAL_AND_MAYBE_KEYWORDS_ARGUMENTS) {
-        return new ElixirNoParenthesesManyPositionalAndMaybeKeywordsArgumentsImpl(node);
-      }
       else if (type == NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION) {
         return new ElixirNoParenthesesManyStrictNoParenthesesExpressionImpl(node);
       }
       else if (type == NO_PARENTHESES_ONE_ARGUMENT) {
         return new ElixirNoParenthesesOneArgumentImpl(node);
-      }
-      else if (type == NO_PARENTHESES_ONE_POSITIONAL_AND_KEYWORDS_ARGUMENTS) {
-        return new ElixirNoParenthesesOnePositionalAndKeywordsArgumentsImpl(node);
       }
       else if (type == NO_PARENTHESES_STRICT) {
         return new ElixirNoParenthesesStrictImpl(node);

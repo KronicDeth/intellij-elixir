@@ -5,18 +5,18 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
-import org.elixir_lang.psi.ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier;
+import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirNoParenthesesManyArgumentsUnqualifiedIdentifierImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier {
+public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements ElixirIdentifier {
 
-  public ElixirNoParenthesesManyArgumentsUnqualifiedIdentifierImpl(ASTNode node) {
+  public ElixirIdentifierImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesManyArgumentsUnqualifiedIdentifier(this);
+    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitIdentifier(this);
     else super.accept(visitor);
   }
 

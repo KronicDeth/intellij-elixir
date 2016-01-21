@@ -10,6 +10,9 @@ public interface ElixirMatchedUnqualifiedBracketOperation extends ElixirMatchedE
   ElixirBracketArguments getBracketArguments();
 
   @NotNull
+  ElixirIdentifier getIdentifier();
+
+  @NotNull
   OtpErlangObject quote();
 
 }

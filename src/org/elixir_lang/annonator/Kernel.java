@@ -217,15 +217,15 @@ public class Kernel implements Annotator, DumbAware {
      */
 
     /**
-     * Highlights `node` with the given `textAttributesKey`.
+     * Highlights `element` with the given `textAttributesKey`.
      *
-     * @param node node to highlight
+     * @param element element to highlight
      * @param annotationHolder the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the `node`.
+     * @param textAttributesKey text attributes to apply to the `element`.
      */
-    private void highlight(@NotNull final ASTNode node, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
-        annotationHolder.createInfoAnnotation(node, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
-        annotationHolder.createInfoAnnotation(node, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
+    private void highlight(@NotNull final PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
+        annotationHolder.createInfoAnnotation(element, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
+        annotationHolder.createInfoAnnotation(element, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
     }
 
     /**
@@ -236,10 +236,10 @@ public class Kernel implements Annotator, DumbAware {
      * @param textAttributesKey text attributes to apply to the `call`'s `Call#functionNameNode`.
      */
     private void highlight(@NotNull final Call call, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
-        ASTNode functionNameNode = call.functionNameNode();
+        PsiElement functionNameElement = call.functionNameElement();
 
-        assert functionNameNode != null;
+        assert functionNameElement != null;
 
-        highlight(functionNameNode, annotationHolder, textAttributesKey);
+        highlight(functionNameElement, annotationHolder, textAttributesKey);
     }
 }

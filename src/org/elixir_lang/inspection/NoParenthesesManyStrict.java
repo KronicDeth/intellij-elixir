@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.arguments.NoParentheses;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,24 +51,34 @@ public class NoParenthesesManyStrict extends LocalInspectionTool {
                     public void visitElement(PsiElement element) {
                         PsiElement elementWithAmbiguousComma = null;
 
-                        if (element instanceof ElixirNoParenthesesManyArguments) {
-                            PsiElement parent = element.getParent();
+                        if (element instanceof ElixirUnqualifiedNoParenthesesManyArgumentsCall) {
+                            PsiElement[] children = element.getChildren();
 
-                            if (parent instanceof ElixirNoParenthesesOneArgument) {
-                                PsiElement grandParent = parent.getParent();
+                            if (children.length > 1) {
+                                PsiElement parent = element.getParent();
 
-                                if (grandParent instanceof ElixirUnmatchedQualifiedNoParenthesesCall || grandParent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
-                                    PsiElement greatGrandParent = grandParent.getParent();
+                                if (parent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
+                                  elementWithAmbiguousComma = element;
+                                }
+                            }
+                        } else if (element instanceof ElixirNoParenthesesOneArgument) {
+                            PsiElement[] children = element.getChildren();
 
-                                    if (greatGrandParent instanceof ElixirKeywordPair || greatGrandParent instanceof ElixirParenthesesArguments) {
+                            if (children.length > 1) {
+                                PsiElement parent = element.getParent();
+
+                                if (parent instanceof NoParentheses) {
+                                    PsiElement grandParent = parent.getParent();
+
+                                    if (grandParent instanceof Arguments) {
+                                        PsiElement[] grandParentChildren = grandParent.getChildren();
+
+                                        if (grandParentChildren.length > 1) {
+                                            elementWithAmbiguousComma = element;
+                                        }
+                                    } else if (grandParent instanceof ElixirKeywordPair) {
                                         elementWithAmbiguousComma = element;
                                     }
-                                }
-                            } else if (parent instanceof ElixirUnqualifiedNoParenthesesManyArgumentsCall) {
-                                PsiElement grandParent = parent.getParent();
-
-                                if (grandParent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
-                                    elementWithAmbiguousComma = element;
                                 }
                             }
                         }

@@ -366,19 +366,19 @@ INVALID_UNKNOWN_BASE_DIGITS = [A-Za-z0-9]+
  * Identifiers
  */
 
-IDENTIFIER_END = [?!]
-IDENTIFIER_MIDDLE = [0-9a-zA-Z_]
-IDENTIFIER_START = [a-z_]
-IDENTIFIER_HEAD = {IDENTIFIER_START}
-IDENTIFIER_TAIL = {IDENTIFIER_MIDDLE}* {IDENTIFIER_END}?
-IDENTIFIER = ({IDENTIFIER_HEAD} {IDENTIFIER_TAIL}  | "...")
+IDENTIFIER_TOKEN_END = [?!]
+IDENTIFIER_TOKEN_MIDDLE = [0-9a-zA-Z_]
+IDENTIFIER_TOKEN_START = [a-z_]
+IDENTIFIER_TOKEN_HEAD = {IDENTIFIER_TOKEN_START}
+IDENTIFIER_TOKEN_TAIL = {IDENTIFIER_TOKEN_MIDDLE}* {IDENTIFIER_TOKEN_END}?
+IDENTIFIER_TOKEN = ({IDENTIFIER_TOKEN_HEAD} {IDENTIFIER_TOKEN_TAIL}  | "...")
 
 /*
  * Aliases
  */
 
 ALIAS_HEAD = [A-Z]
-ALIAS = {ALIAS_HEAD} {IDENTIFIER_TAIL}
+ALIAS = {ALIAS_HEAD} {IDENTIFIER_TOKEN_TAIL}
 
 /*
  * Bit Strings
@@ -573,7 +573,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.AFTER; }
   // Must be before any single operator's match
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
-                                                         return ElixirTypes.IDENTIFIER; }
+                                                         return ElixirTypes.IDENTIFIER_TOKEN; }
   {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AND_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -653,29 +653,29 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                pushAndBegin(YYINITIAL);
                                                return ElixirTypes.OPENING_CURLY; }
   {OPENING_PARENTHESIS}                      { return ElixirTypes.OPENING_PARENTHESIS; }
-  // Must be before {IDENTIFIER} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "in" would be parsed as an identifier since it's a lowercase alphanumeric.
   {IN_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_OPERATOR; }
-  // Must be before {IDENTIFIER} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
   {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NIL; }
-  // Must be before {IDENTIFIER} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_OPERATOR; }
-  // Must be before {IDENTIFIER} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
   {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RESCUE; }
-  // Must be before {IDENTIFIER} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
   {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TRUE; }
-  // Must be before {IDENTIFIER} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
-  // Must be before {IDENTIFIER} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
+  // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
-  {IDENTIFIER}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.IDENTIFIER; }
+  {IDENTIFIER_TOKEN}                               { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.IDENTIFIER_TOKEN; }
   {IN_MATCH_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR; }
   /* For map rule, STRUCT_OPERATOR EOL* OPENING_CURLY will be lexed.  This is just for when the operator needs to be one
@@ -879,9 +879,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.WHEN_OPERATOR; }
 
   /* Must be after {AFTER}, {CATCH}, {DO}, {END}, {ELSE}, {IN_OPERATOR}, {OR_OPERATOR} (for 'or'), and {WHEN_OPERATOR}
-     as all those keywords would match {IDENTIFIER} */
-  {IDENTIFIER}                                      { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
-                                                      return ElixirTypes.IDENTIFIER; }
+     as all those keywords would match {IDENTIFIER_TOKEN} */
+  {IDENTIFIER_TOKEN}                                { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
+                                                      return ElixirTypes.IDENTIFIER_TOKEN; }
 
   /*
    * Emulates strip_space in elixir_tokenizer.erl
@@ -892,8 +892,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {ESCAPED_EOL}|{WHITE_SPACE}+                      { return TokenType.WHITE_SPACE; }
   {EOL}                                             { return ElixirTypes.EOL; }
 
-  /* Be better than strip_space and handle_dot and ignore comments so that IDENTIFIER and operators are parsed the same
-     after dots.
+  /* Be better than strip_space and handle_dot and ignore comments so that IDENTIFIER_TOKEN and operators are parsed the
+     same after dots.
 
      @see https://groups.google.com/forum/#!topic/elixir-lang-core/nnI4oUB-63U
    */

@@ -6,16 +6,21 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public interface ElixirNoParenthesesStrict extends Arguments, QuotableArguments {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
 
   @Nullable
-  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+  ElixirMatchedExpression getMatchedExpression();
+
+  @NotNull
+  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
 
   @Nullable
-  ElixirNoParenthesesManyArguments getNoParenthesesManyArguments();
+  ElixirNoParenthesesKeywords getNoParenthesesKeywords();
 
   @NotNull
   PsiElement[] arguments();

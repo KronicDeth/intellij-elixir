@@ -66,7 +66,7 @@
     HEREDOC_LINE_WHITE_SPACE_TOKEN = "Whitespace at beginning of line of heredoc"
     HEREDOC_PREFIX_WHITE_SPACE = "Whitespace at beginning of last line of heredoc before terminator"
     HEXADECIMAL_WHOLE_NUMBER_BASE = "x"
-    IDENTIFIER = "identifier"
+    IDENTIFIER_TOKEN = "identifier"
     INTERPOLATING_CHAR_LIST_SIGIL_NAME = "c"
     INTERPOLATING_REGEX_SIGIL_NAME = "r"
     INTERPOLATING_SIGIL_NAME = "a-b, d-q, t-v, x-z"
@@ -197,7 +197,6 @@ private expressionList ::= expression (endOfExpression expression)*
  * Many Arguments
  */
 
-private noParenthesesCommaExpression ::= !additionTail matchedExpression (infixComma noParenthesesExpression)+
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
 noParenthesesExpression ::= emptyParentheses |
@@ -234,54 +233,20 @@ noParenthesesStrict ::= emptyParentheses |
                           ]
                         }
 
-noParenthesesFirstPositional ::= matchedExpression
-                                 { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
-noParenthesesOnePositionalAndKeywordsArguments ::= noParenthesesFirstPositional infixComma noParenthesesKeywords
-                                                   {
-                                                     implements = [
-                                                       "org.elixir_lang.psi.Arguments"
-                                                       "org.elixir_lang.psi.QuotableArguments"
-                                                     ]
-                                                     methods = [
-                                                       arguments
-                                                       quoteArguments
-                                                     ]
-                                                   }
-noParenthesesManyPositionalAndMaybeKeywordsArguments ::= noParenthesesCommaExpression (infixComma noParenthesesKeywords)?
-                                                         {
-                                                           implements = [
-                                                             "org.elixir_lang.psi.Arguments"
-                                                             "org.elixir_lang.psi.QuotableArguments"
-                                                           ]
-                                                           methods = [
-                                                             arguments
-                                                             quoteArguments
-                                                           ]
-                                                         }
-
 /* 1. (positional, keywords)
    2. (positional, positional)
    3. (positional, positional, keywords) */
-noParenthesesManyArguments ::= noParenthesesOnePositionalAndKeywordsArguments |
-                               noParenthesesManyPositionalAndMaybeKeywordsArguments
-                               {
-                                 implements = [
-                                   "org.elixir_lang.psi.Arguments"
-                                   "org.elixir_lang.psi.QuotableArguments"
-                                 ]
-                                 methods = [
-                                   arguments
-                                   quoteArguments
-                                 ]
-                               }
+private noParenthesesManyArguments ::= matchedExpression infixComma noParenthesesKeywords |
+                                       !additionTail matchedExpression (infixComma noParenthesesExpression)+ (infixComma noParenthesesKeywords)?
 private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
                                              noParenthesesStrict
 
-noParenthesesManyArgumentsUnqualifiedIdentifier ::= IDENTIFIER !KEYWORD_PAIR_COLON
-                                                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+// A rule instead of a token so that there is a PsiElement to return from getNameIdentifier
+identifier ::= IDENTIFIER_TOKEN
+               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
-unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualifiedIdentifier
+unqualifiedNoParenthesesManyArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                               noParenthesesManyArgumentsStrict
                                               {
                                                 implements = [
@@ -295,18 +260,24 @@ unqualifiedNoParenthesesManyArgumentsCall ::= noParenthesesManyArgumentsUnqualif
                                                 ]
                                                 methods = [
                                                   functionName
-                                                  functionNameNode
-                                                  moduleName
-                                                  getArguments
+                                                  functionNameElement
                                                   getDoBlock
-                                                  getIdentifier
+                                                  getNameIdentifier
+                                                  getPresentation
+                                                  isCalling
+                                                  isCallingMacro
+                                                  moduleName
                                                   primaryArguments
+                                                  primaryArity
                                                   quote
                                                   quoteArguments
-                                                  quoteIdentifier
+                                                  resolvedFinalArity
                                                   resolvedFunctionName
                                                   resolvedModuleName
+                                                  resolvedPrimaryArity
+                                                  resolvedSecondaryArity
                                                   secondaryArguments
+                                                  secondaryArity
                                                 ]
                                               }
 
@@ -336,7 +307,7 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  * 0 Arguments
  */
 
-variable ::= IDENTIFIER !KEYWORD_PAIR_COLON
+variable ::= IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
              { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
 /*
@@ -1573,7 +1544,7 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L71
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
-relativeIdentifier ::= IDENTIFIER |
+relativeIdentifier ::= IDENTIFIER_TOKEN |
                        AFTER |
                        AND_OPERATOR |
                        ARROW_OPERATOR |
@@ -1689,14 +1660,22 @@ matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments paren
                      ]
                      methods = [
                        functionName
-                       functionNameNode
+                       functionNameElement
                        getDoBlock
+                       getPresentation
+                       isCalling
+                       isCallingMacro
                        moduleName
                        primaryArguments
+                       primaryArity
                        quote
+                       resolvedFinalArity
                        resolvedFunctionName
                        resolvedModuleName
+                       resolvedPrimaryArity
+                       resolvedSecondaryArity
                        secondaryArguments
+                       secondaryArity
                      ]
                    }
 
@@ -1713,15 +1692,24 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
                                           "org.elixir_lang.psi.QualifiedNoParenthesesCall"
                                         ]
                                         methods = [
-                                          primaryArguments
                                           functionName
-                                          functionNameNode
+                                          functionNameElement
                                           getDoBlock
+                                          getNameIdentifier
+                                          getPresentation
+                                          isCalling
+                                          isCallingMacro
                                           moduleName
+                                          primaryArguments
+                                          primaryArity
                                           quote
+                                          resolvedFinalArity
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          resolvedPrimaryArity
+                                          resolvedSecondaryArity
                                           secondaryArguments
+                                          secondaryArity
                                         ]
                                       }
 
@@ -1741,17 +1729,25 @@ matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
                                             ]
                                             methods = [
                                               functionName
-                                              functionNameNode
+                                              functionNameElement
                                               getDoBlock
                                               getName
                                               getNameIdentifier
+                                              getPresentation
+                                              isCalling
+                                              isCallingMacro
                                               moduleAttributeName
                                               moduleName
                                               primaryArguments
+                                              primaryArity
                                               quote
+                                              resolvedFinalArity
                                               resolvedFunctionName
                                               resolvedModuleName
+                                              resolvedPrimaryArity
+                                              resolvedSecondaryArity
                                               secondaryArguments
+                                              secondaryArity
                                               setName
                                             ]
                                           }
@@ -1762,7 +1758,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
+matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.MatchedCall"
@@ -1770,14 +1766,23 @@ matchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument
                                           ]
                                           methods = [
                                             functionName
-                                            functionNameNode
-                                            moduleName
+                                            functionNameElement
                                             getDoBlock
+                                            getNameIdentifier
+                                            getPresentation
+                                            isCalling
+                                            isCallingMacro
+                                            moduleName
                                             primaryArguments
+                                            primaryArity
                                             quote
+                                            resolvedFinalArity
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            resolvedPrimaryArity
+                                            resolvedSecondaryArity
                                             secondaryArguments
+                                            secondaryArity
                                           ]
                                         }
 
@@ -1846,14 +1851,23 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
                                       ]
                                       methods = [
                                         functionName
-                                        functionNameNode
+                                        functionNameElement
                                         getDoBlock
+                                        isCalling
+                                        isCallingMacro
+                                        getNameIdentifier
+                                        getPresentation
                                         moduleName
                                         primaryArguments
+                                        primaryArity
                                         quote
+                                        resolvedFinalArity
                                         resolvedFunctionName
                                         resolvedModuleName
+                                        resolvedPrimaryArity
+                                        resolvedSecondaryArity
                                         secondaryArguments
+                                        secondaryArity
                                       ]
                                     }
 
@@ -1869,14 +1883,23 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
                                       ]
                                       methods = [
                                         functionName
-                                        functionNameNode
-                                        moduleName
+                                        functionNameElement
                                         getDoBlock
+                                        getNameIdentifier
+                                        getPresentation
+                                        isCalling
+                                        isCallingMacro
+                                        moduleName
                                         primaryArguments
+                                        primaryArity
                                         quote
+                                        resolvedFinalArity
                                         resolvedFunctionName
                                         resolvedModuleName
+                                        resolvedPrimaryArity
+                                        resolvedSecondaryArity
                                         secondaryArguments
+                                        secondaryArity
                                       ]
                                     }
 
@@ -1886,7 +1909,7 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
  * Needed so that At consumes Unqualified identifier, but brackets consume both of them.
  */
 
-matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracketArguments
+matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CALL bracketArguments
                                          { implements = "org.elixir_lang.psi.AtUnqualifiedBracketOperation" methods = [quote] }
 
 /*
@@ -1895,7 +1918,7 @@ matchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracke
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
+matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
@@ -1903,14 +1926,23 @@ matchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments
                                         ]
                                         methods = [
                                           functionName
-                                          functionNameNode
-                                          moduleName
+                                          functionNameElement
                                           getDoBlock
+                                          getNameIdentifier
+                                          getPresentation
+                                          isCalling
+                                          isCallingMacro
+                                          moduleName
                                           primaryArguments
+                                          primaryArity
                                           quote
+                                          resolvedFinalArity
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          resolvedPrimaryArity
+                                          resolvedSecondaryArity
                                           secondaryArguments
+                                          secondaryArity
                                         ]
                                       }
 /*
@@ -1946,7 +1978,7 @@ matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
  * Unqualified Bracket Operation
  */
 
-matchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
+matchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
                                        {
                                          implements = "org.elixir_lang.psi.UnqualifiedBracketOperation"
                                          methods = [quote]
@@ -1957,7 +1989,7 @@ matchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
  * Unqualified No Arguments Call
  */
 
-matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
+matchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
@@ -1965,14 +1997,23 @@ matchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON
                                         ]
                                         methods = [
                                           functionName
-                                          functionNameNode
-                                          moduleName
+                                          functionNameElement
                                           getDoBlock
+                                          getNameIdentifier
+                                          getPresentation
+                                          isCalling
+                                          isCallingMacro
+                                          moduleName
                                           primaryArguments
+                                          primaryArity
                                           quote
+                                          resolvedFinalArity
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          resolvedPrimaryArity
+                                          resolvedSecondaryArity
                                           secondaryArguments
+                                          secondaryArity
                                         ]
                                       }
 
@@ -2601,13 +2642,21 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments p
                        implements = "org.elixir_lang.psi.DotCall"
                        methods = [
                          functionName
-                         functionNameNode
+                         functionNameElement
+                         getPresentation
+                         isCalling
+                         isCallingMacro
                          moduleName
                          primaryArguments
+                         primaryArity
                          quote
+                         resolvedFinalArity
                          resolvedFunctionName
                          resolvedModuleName
+                         resolvedPrimaryArity
+                         resolvedSecondaryArity
                          secondaryArguments
+                         secondaryArity
                        ]
                      }
 
@@ -2622,13 +2671,22 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
                                           implements = "org.elixir_lang.psi.QualifiedNoParenthesesCall"
                                           methods = [
                                             functionName
-                                            functionNameNode
+                                            functionNameElement
+                                            getNameIdentifier
+                                            getPresentation
+                                            isCalling
+                                            isCallingMacro
                                             moduleName
                                             primaryArguments
+                                            primaryArity
                                             quote
+                                            resolvedFinalArity
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            resolvedPrimaryArity
+                                            resolvedSecondaryArity
                                             secondaryArguments
+                                            secondaryArity
                                           ]
                                         }
 
@@ -2640,23 +2698,31 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
  * just the variable.
  */
 
-atIdentifier ::= atPrefixOperator IDENTIFIER
+atIdentifier ::= atPrefixOperator IDENTIFIER_TOKEN
                  { methods = [getReference] }
 unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
                                             {
                                               implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
                                               methods = [
                                                 functionName
-                                                functionNameNode
+                                                functionNameElement
                                                 getName
                                                 getNameIdentifier
+                                                getPresentation
+                                                isCalling
+                                                isCallingMacro
                                                 moduleAttributeName
                                                 moduleName
                                                 primaryArguments
+                                                primaryArity
                                                 quote
+                                                resolvedFinalArity
                                                 resolvedFunctionName
                                                 resolvedModuleName
+                                                resolvedPrimaryArity
+                                                resolvedSecondaryArity
                                                 secondaryArguments
+                                                secondaryArity
                                                 setName
                                               ]
                                             }
@@ -2667,20 +2733,35 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L191-L194
  */
 
-unmatchedUnqualifiedNoParenthesesCall ::= IDENTIFIER noParenthesesOneArgument doBlock?
+unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlock?
                                           {
-                                            implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
+                                            implements = [
+                                              "org.elixir_lang.psi.NamedElement"
+                                              "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
+                                            ]
+                                            mixin = "org.elixir_lang.psi.impl.NamedElementImpl"
                                             methods = [
+                                              definedModuleName
                                               functionName
-                                              functionNameNode
+                                              functionNameElement
+                                              getName
+                                              getNameIdentifier
+                                              getPresentation
+                                              isCalling
+                                              isCallingMacro
                                               moduleName
-                                              isDefmodule
                                               primaryArguments
+                                              primaryArity
                                               processDeclarations
                                               quote
+                                              resolvedFinalArity
                                               resolvedFunctionName
                                               resolvedModuleName
+                                              resolvedPrimaryArity
+                                              resolvedSecondaryArity
                                               secondaryArguments
+                                              secondaryArity
+                                              setName
                                             ]
                                           }
 
@@ -2731,13 +2812,22 @@ unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relat
                                         implements = "org.elixir_lang.psi.QualifiedParenthesesCall"
                                         methods = [
                                           functionName
-                                          functionNameNode
+                                          functionNameElement
+                                          getNameIdentifier
+                                          getPresentation
+                                          isCalling
+                                          isCallingMacro
                                           moduleName
                                           primaryArguments
+                                          primaryArity
                                           quote
+                                          resolvedFinalArity
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          resolvedPrimaryArity
+                                          resolvedSecondaryArity
                                           secondaryArguments
+                                          secondaryArity
                                         ]
                                       }
 
@@ -2750,13 +2840,22 @@ unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relat
                                         implements = "org.elixir_lang.psi.QualifiedNoArgumentsCall"
                                         methods = [
                                           functionName
-                                          functionNameNode
+                                          functionNameElement
+                                          getNameIdentifier
+                                          getPresentation
+                                          isCalling
+                                          isCallingMacro
                                           moduleName
                                           primaryArguments
+                                          primaryArity
                                           quote
+                                          resolvedFinalArity
                                           resolvedFunctionName
                                           resolvedModuleName
+                                          resolvedPrimaryArity
+                                          resolvedSecondaryArity
                                           secondaryArguments
+                                          secondaryArity
                                         ]
                                       }
 
@@ -2766,7 +2865,7 @@ unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relat
  * Needed so that At consumes Unqualified identifier, but brackets consume both of them.
  */
 
-unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL bracketArguments
+unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CALL bracketArguments
                                            { implements = "org.elixir_lang.psi.AtUnqualifiedBracketOperation" methods = [quote] }
 
 /*
@@ -2775,18 +2874,27 @@ unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER CALL brac
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L229-L230
  */
 
-unmatchedUnqualifiedParenthesesCall ::= IDENTIFIER matchedParenthesesArguments doBlock?
+unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments doBlock?
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedParenthesesCall"
                                           methods = [
                                             functionName
-                                            functionNameNode
+                                            functionNameElement
+                                            getNameIdentifier
+                                            getPresentation
+                                            isCalling
+                                            isCallingMacro
                                             moduleName
                                             primaryArguments
+                                            primaryArity
                                             quote
+                                            resolvedFinalArity
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            resolvedPrimaryArity
+                                            resolvedSecondaryArity
                                             secondaryArguments
+                                            secondaryArity
                                           ]
                                         }
 
@@ -2814,7 +2922,7 @@ unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
  * Unqualified Bracket Operation
  */
 
-unmatchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
+unmatchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
                                          {
                                            implements = "org.elixir_lang.psi.UnqualifiedBracketOperation"
                                            methods = [quote]
@@ -2824,18 +2932,28 @@ unmatchedUnqualifiedBracketOperation ::= IDENTIFIER CALL bracketArguments
  * Unqualified No Arguments Call
  */
 
-unmatchedUnqualifiedNoArgumentsCall ::= IDENTIFIER !KEYWORD_PAIR_COLON doBlock?
+unmatchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON doBlock?
                                         {
                                           implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall"
                                           methods = [
                                             functionName
-                                            functionNameNode
+                                            functionNameElement
+                                            getNameIdentifier
+                                            getNameIdentifier
+                                            getPresentation
+                                            isCalling
+                                            isCallingMacro
                                             moduleName
                                             primaryArguments
+                                            primaryArity
                                             quote
+                                            resolvedFinalArity
                                             resolvedFunctionName
                                             resolvedModuleName
+                                            resolvedPrimaryArity
+                                            resolvedSecondaryArity
                                             secondaryArguments
+                                            secondaryArity
                                           ]
                                         }
 
@@ -3088,7 +3206,7 @@ keywordKey ::= AFTER |
                DO |
                DUAL_OPERATOR |
                ELSE |
-               IDENTIFIER |
+               IDENTIFIER_TOKEN |
                IN_MATCH_OPERATOR |
                IN_OPERATOR |
                MAP_OPERATOR |

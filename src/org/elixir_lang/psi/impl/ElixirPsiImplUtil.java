@@ -2,12 +2,14 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.usageView.UsageViewUtil;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
@@ -23,6 +25,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -75,7 +78,7 @@ public class ElixirPsiImplUtil {
     public static final int OCTAL_BASE = 8;
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
     public static final int UNKNOWN_BASE = 36;
-    public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER);
+    public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
 
     @Contract(pure = true)
     @NotNull
@@ -85,52 +88,20 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static PsiElement[] arguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
-        Arguments arguments = noParenthesesManyArguments.getNoParenthesesOnePositionalAndKeywordsArguments();
-
-        if (arguments == null) {
-            arguments = noParenthesesManyArguments.getNoParenthesesManyPositionalAndMaybeKeywordsArguments();
-        }
-
-        return arguments.arguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
         PsiElement[] children = noParenthesesOneArgument.getChildren();
+        PsiElement[] arguments = children;
 
-        assert children.length == 1;
+        if (children.length == 1) {
+            PsiElement child = children[0];
 
-        PsiElement child = children[0];
-        PsiElement[] arguments;
-
-        if (child instanceof Arguments) {
-            Arguments childArguments = (Arguments) child;
-            arguments = childArguments.arguments();
-        } else {
-            arguments = children;
+            if (child instanceof Arguments) {
+                Arguments childArguments = (Arguments) child;
+                arguments = childArguments.arguments();
+            }
         }
 
         return arguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static PsiElement[] arguments(ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments noParenthesesManyPositionalAndMaybeKeywordsArguments) {
-        return noParenthesesManyPositionalAndMaybeKeywordsArguments.getChildren();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static PsiElement[] arguments(@NotNull final ElixirNoParenthesesOnePositionalAndKeywordsArguments noParenthesesOnePositionalAndKeywordsArguments) {
-        PsiElement noParenthesesFirstPositional = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesFirstPositional();
-        PsiElement noParenthesesKeywords = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesKeywords();
-
-        return new PsiElement[]{
-                noParenthesesFirstPositional,
-                noParenthesesKeywords
-        };
     }
 
     @Contract(pure = true)
@@ -410,6 +381,20 @@ public class ElixirPsiImplUtil {
         };
     }
 
+    @Nullable
+    public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
+        PsiElement[] arguments = unmatchedUnqualifiedNoParenthesesCall.primaryArguments();
+        String definedModuleName = null;
+
+        if (arguments.length > 1) {
+            PsiElement argument = arguments[0];
+
+
+        }
+
+        return definedModuleName;
+    }
+
     @NotNull
     public static List<Digits> digitsList(@NotNull ElixirBinaryWholeNumber binaryWholeNumber) {
         List<Digits> digitsList = new LinkedList<Digits>();
@@ -504,13 +489,89 @@ public class ElixirPsiImplUtil {
         return valid;
     }
 
-    /*
-     * Whether this is a `defmodule <argument> do end` call.
+    /**
+     * Whether the {@code call} is calling the given `resolvedFunctionName` in the `resolvedModuleName` with any arity
+     * @param call the call element
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
+     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#resolvedFunctionName()} that equals
+     *   {@code resolvedFunctionName}; otherwise, {@code false}.
      */
-    public static boolean isDefmodule(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
-        return (unmatchedUnqualifiedNoParenthesesCall.resolvedModuleName().equals("Elixir.Kernel") &&
-                unmatchedUnqualifiedNoParenthesesCall.resolvedFunctionName().equals("defmodule") &&
-                unmatchedUnqualifiedNoParenthesesCall.getDoBlock() != null);
+    public static boolean isCalling(@NotNull final Call call,
+                                    @NotNull final String resolvedModuleName,
+                                    @NotNull final String resolvedFunctionName) {
+        String callResolvedModuleName = call.resolvedModuleName();
+        String callResolvedFunctionName = call.resolvedFunctionName();
+
+        return callResolvedModuleName != null && callResolvedModuleName.equals(resolvedModuleName) &&
+                callResolvedFunctionName != null && callResolvedFunctionName.equals(resolvedFunctionName);
+    }
+
+    /**
+     * Whether the {@code call} is calling the given `resolvedFunctionName` in the `resolvedModuleName` with the
+     * `resolvedFinalArity`
+     *
+     * @param call the call element
+     * @param resolvedModuleName  the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
+     * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
+     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#resolvedFunctionName()} that equals
+     *   {@code resolvedFunctionName} and the {@link Call#resolvedFinalArity()}; otherwise, {@code false}.
+     */
+    public static boolean isCalling(@NotNull final Call call,
+                                    @NotNull final String resolvedModuleName,
+                                    @NotNull final String resolvedFunctionName,
+                                    final int resolvedFinalArity) {
+        return isCalling(call, resolvedModuleName, resolvedFunctionName) &&
+                call.resolvedFinalArity() == resolvedFinalArity;
+    }
+
+    /**
+     * Whether {@code call} is of the named macro.
+     *
+     * Differs from {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} because this function ensures there
+     * is a {@code do} block.  If the macro can be called without a {@code do} block, then
+     * {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} should be called instead.
+     *
+     * @param call the call element
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
+     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
+     */
+    public static boolean isCallingMacro(@NotNull final Call call,
+                                         @NotNull final String resolvedModuleName,
+                                         @NotNull final  String resolvedFunctionName,
+                                         final int resolvedFinalArity) {
+        boolean isCallingMacro = false;
+
+        if (isCalling(call, resolvedModuleName, resolvedFunctionName, resolvedFinalArity)) {
+            if (call.getDoBlock() != null) {
+                isCallingMacro = true;
+            } else {
+                PsiElement[] finalArguments = finalArguments(call);
+
+                // shouldn't be null because resolvedFinalArity is not null
+                assert finalArguments != null;
+
+                PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
+
+                if (potentialKeywords instanceof QuotableKeywordList) {
+                    QuotableKeywordList quotableKeywordList = (QuotableKeywordList) potentialKeywords;
+                    List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
+                    QuotableKeywordPair firstQuotableKeywordPair = quotableKeywordPairList.get(0);
+                    Quotable keywordKey = firstQuotableKeywordPair.getKeywordKey();
+
+                    if (keywordKey.getText().equals("do")) {
+                        isCallingMacro = true;
+                    }
+                }
+            }
+        }
+
+        return isCallingMacro;
     }
 
     /*
@@ -555,7 +616,7 @@ public class ElixirPsiImplUtil {
         if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
             ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
 
-            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isDefmodule();
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2);
         }
 
         return isModuleName;
@@ -819,17 +880,25 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @Nullable
+    @NotNull
     public static PsiElement[] primaryArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        Arguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
+        Arguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
+        PsiElement[] primaryArguments;
 
-        if (arguments == null) {
-            arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
+        if (arguments != null) {
+            primaryArguments = arguments.arguments();
+        } else {
+            /* noParenthesesManyArguments is a private rule, so when noParenthesesStrict is not present, then the
+               noParenthesesManyArguments are direct children, but so is he identifier, so the identifier needs to be
+               ignored  */
+            PsiElement[] children = unqualifiedNoParenthesesManyArgumentsCall.getChildren();
+
+            assert children[0] instanceof ElixirIdentifier;
+
+            primaryArguments = Arrays.copyOfRange(children, 1, children.length);
         }
 
-        assert arguments != null;
-
-        return arguments.arguments();
+        return primaryArguments;
     }
 
     @Contract(pure = true)
@@ -853,6 +922,19 @@ public class ElixirPsiImplUtil {
 
         ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
         return primaryParenthesesArguments.arguments();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Integer primaryArity(@NotNull final Call call) {
+        PsiElement[] primaryArguments = call.primaryArguments();
+        Integer primaryArity = null;
+
+        if (primaryArguments != null) {
+            primaryArity = primaryArguments.length;
+        }
+
+        return primaryArity;
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
@@ -1245,6 +1327,22 @@ public class ElixirPsiImplUtil {
     }
 
     /**
+     * The outer most arguments
+     *
+     * @return {@link Call#primaryArguments}
+     */
+    @Nullable
+    public static PsiElement[] finalArguments(@NotNull final Call call) {
+        PsiElement[] finalArguments = call.secondaryArguments();
+
+        if (finalArguments == null) {
+            finalArguments = call.primaryArguments();
+        }
+
+        return finalArguments;
+    }
+
+    /**
      * Adds `Elixir.` to alias text.
      *
      * @param alias
@@ -1298,10 +1396,10 @@ public class ElixirPsiImplUtil {
     @Nullable
     public static String functionName(@NotNull final Call call) {
         String functionName = null;
-        ASTNode node = call.functionNameNode();
+        PsiElement element = call.functionNameElement();
 
-        if (node != null) {
-            functionName = node.getText();
+        if (element != null) {
+            functionName = element.getText();
         }
 
         return functionName;
@@ -1315,7 +1413,7 @@ public class ElixirPsiImplUtil {
      */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+    public static PsiElement functionNameElement(@NotNull @SuppressWarnings("unused") final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         return null;
     }
 
@@ -1326,36 +1424,18 @@ public class ElixirPsiImplUtil {
      */
     @Contract(pure = true, value = "_ -> null")
     @Nullable
-    public static ASTNode functionNameNode(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
+    public static PsiElement functionNameElement(@NotNull @SuppressWarnings("unused") final DotCall dotCall) {
         return null;
     }
 
-    public static ASTNode functionNameNode(@NotNull final Qualified qualified) {
-        return qualified.getRelativeIdentifier().getNode();
+    public static PsiElement functionNameElement(@NotNull final Qualified qualified) {
+        return qualified.getRelativeIdentifier();
     }
 
     @Contract(pure = true)
     @NotNull
-    public static ASTNode functionNameNode(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier().getNode();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static ASTNode functionNameNode(@NotNull final Unqualified unqualified) {
-        return unqualified.getNode().getFirstChildNode();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static QuotableArguments getArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        QuotableArguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArguments();
-
-        if (arguments == null) {
-            arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
-        }
-
-        return arguments;
+    public static PsiElement functionNameElement(@NotNull final Unqualified unqualified) {
+        return unqualified.getFirstChild();
     }
 
     public static Body getBody(ElixirCharListHeredocLine charListHeredocLine) {
@@ -1618,12 +1698,6 @@ public class ElixirPsiImplUtil {
         return heredocLineList;
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static Quotable getIdentifier(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        return unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesManyArgumentsUnqualifiedIdentifier();
-    }
-
     public static Quotable getKeywordValue(ElixirKeywordPair keywordPair) {
         PsiElement[] children = keywordPair.getChildren();
 
@@ -1685,6 +1759,48 @@ public class ElixirPsiImplUtil {
         return nameIdentifier;
     }
 
+    public static PsiElement getNameIdentifier(@NotNull final Call call) {
+        PsiElement nameIdentifier = null;
+
+        if (call.isCallingMacro("Elixir.Kernel", "def", 2)) {
+            PsiElement[] arguments = finalArguments(call);
+
+            assert arguments != null && arguments.length >= 1;
+
+            PsiElement argument = arguments[0];
+
+            if (argument instanceof Call) {
+                Call argumentCall = (Call) argument;
+
+                nameIdentifier = argumentCall.functionNameElement();
+            }
+        } else if (call.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
+            PsiElement[] arguments = finalArguments(call);
+
+            assert arguments != null && arguments.length >= 1;
+
+            PsiElement argument = arguments[0];
+
+            if (argument instanceof QualifiableAlias) {
+                nameIdentifier = argument;
+            } else if (argument instanceof ElixirAccessExpression) {
+                ElixirAccessExpression accessExpression = (ElixirAccessExpression) argument;
+
+                PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+
+                if (accessExpressionChildren.length == 1) {
+                    PsiElement accessExpressionChild = accessExpressionChildren[0];
+
+                    if (accessExpressionChild instanceof QualifiableAlias) {
+                        nameIdentifier = accessExpressionChild;
+                    }
+                }
+            }
+        }
+
+        return nameIdentifier;
+    }
+
     /**
      *
      * @param qualifiableAlias
@@ -1705,6 +1821,29 @@ public class ElixirPsiImplUtil {
         }
 
         return nameIdentifier;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static ItemPresentation getPresentation(@NotNull final Call call) {
+        final String text = UsageViewUtil.createNodeText(call);
+
+        return new ItemPresentation() {
+            @Nullable
+            public String getPresentableText() {
+                return text;
+            }
+
+            @Nullable
+            public String getLocationString() {
+                return call.getContainingFile().getName();
+            }
+
+            @Nullable
+            public Icon getIcon(boolean b) {
+                return call.getIcon(0);
+            }
+        };
     }
 
     @Nullable
@@ -1941,6 +2080,12 @@ public class ElixirPsiImplUtil {
         }
 
         return quotedAsAtom;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirIdentifier identifier) {
+        return new OtpErlangAtom(identifier.getText());
     }
 
     /* "#{a}" is transformed to "<<Kernel.to_string(a) :: binary>>" in
@@ -2892,21 +3037,17 @@ if (quoted == null) {
     public static OtpErlangObject quote(@NotNull final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         ElixirDoBlock doBlock = unqualifiedNoArgumentsCall.getDoBlock();
         OtpErlangObject quoted;
-        ASTNode node = unqualifiedNoArgumentsCall.getNode();
-        ASTNode[] identifierNodes = node.getChildren(IDENTIFIER_TOKEN_SET);
+        ElixirIdentifier identifier = unqualifiedNoArgumentsCall.getIdentifier();
 
-        assert identifierNodes.length == 1;
-
-        ASTNode identifierNode = identifierNodes[0];
-        String identifier = identifierNode.getText();
-        OtpErlangList callMetadata = metadata(identifierNode);
+        String identifierText = identifier.getText();
+        OtpErlangList callMetadata = metadata(identifier);
 
         // if a variable has a `do` block is no longer a variable because the do block acts as keyword arguments.
         if (doBlock != null) {
             OtpErlangObject[] quotedBlockArguments = doBlock.quoteArguments();
 
             quoted = quotedFunctionCall(
-                    identifier,
+                    identifierText,
                     callMetadata,
                     quotedBlockArguments
             );
@@ -2916,7 +3057,7 @@ if (quoted == null) {
               {name, metadata, context}.  Importantly, context is nil when there is no context while arguments are []
               when there are no arguments. */
             quoted = quotedVariable(
-                    identifier,
+                    identifierText,
                     callMetadata
             );
         }
@@ -2966,24 +3107,6 @@ if (quoted == null) {
         }
 
         return quotable.quote();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesFirstPositional noParenthesesFirstPositional) {
-        PsiElement[] children = noParenthesesFirstPositional.getChildren();
-
-        if (children.length != 1) {
-            throw new NotImplementedException("noParenthesesFirstPositional expected to only have one child");
-        }
-
-        return ((Quotable) children[0]).quote();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyArgumentsUnqualifiedIdentifier noParenthesesManyArgumentsUnqualifiedIdentifier) {
-        return new OtpErlangAtom(noParenthesesManyArgumentsUnqualifiedIdentifier.getText());
     }
 
     @Contract(pure = true)
@@ -3097,7 +3220,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        OtpErlangObject quotedIdentifier = unqualifiedNoParenthesesManyArgumentsCall.quoteIdentifier();
+        OtpErlangObject quotedIdentifier = unqualifiedNoParenthesesManyArgumentsCall.getIdentifier().quote();
         OtpErlangObject[] quotedArguments = unqualifiedNoParenthesesManyArgumentsCall.quoteArguments();
         return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, quotedArguments);
     }
@@ -3143,6 +3266,20 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject[] quoteArguments(@NotNull final Arguments arguments) {
+        PsiElement[] unquotedArguments = arguments.arguments();
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[unquotedArguments.length];
+
+        for (int i = 0; i < unquotedArguments.length; i++) {
+            Quotable quotableArgument = (Quotable) unquotedArguments[i];
+            quotedArguments[i] = quotableArgument.quote();
+        }
+
+        return quotedArguments;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject[] quoteArguments(@NotNull final ElixirBlockList blockList) {
         List<ElixirBlockItem> blockItemList = blockList.getBlockItemList();
         OtpErlangObject[] quotedBlockItems = new OtpErlangObject[blockItemList.size()];
@@ -3158,7 +3295,15 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        return unqualifiedNoParenthesesManyArgumentsCall.getArguments().quoteArguments();
+        PsiElement[] primaryArguments = unqualifiedNoParenthesesManyArgumentsCall.primaryArguments();
+        OtpErlangObject[] quotedArguments = new OtpErlangObject[primaryArguments.length];
+
+        for (int i = 0; i< primaryArguments.length; i++) {
+            Quotable quotablePrimaryArgument = (Quotable) primaryArguments[i];
+            quotedArguments[i] = quotablePrimaryArgument.quote();
+        }
+
+        return quotedArguments;
     }
 
     @Contract(pure = true)
@@ -3233,107 +3378,6 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyArguments noParenthesesManyArguments) {
-        QuotableArguments quotableArguments;
-
-        quotableArguments = noParenthesesManyArguments.getNoParenthesesOnePositionalAndKeywordsArguments();
-
-        if (quotableArguments == null) {
-            quotableArguments = noParenthesesManyArguments.getNoParenthesesManyPositionalAndMaybeKeywordsArguments();
-        }
-
-        return quotableArguments.quoteArguments();
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesManyPositionalAndMaybeKeywordsArguments noParenthesesManyPositionalAndMaybeKeywordsArguments) {
-        PsiElement[] children = noParenthesesManyPositionalAndMaybeKeywordsArguments.getChildren();
-        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
-
-        int i = 0;
-        for (PsiElement child : children) {
-            if (child instanceof Quotable) {
-                Quotable quotable = (Quotable) child;
-                quotedChildren[i++] = quotable.quote();
-            } else {
-                throw new NotImplementedException("Expected all children to be Quotable");
-            }
-        }
-
-        return quotedChildren;
-    }
-
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument) {
-        PsiElement[] noParenthesesOneArgumentChildren = noParenthesesOneArgument.getChildren();
-
-        assert noParenthesesOneArgumentChildren.length == 1;
-
-        PsiElement noParenthesesOneArgumentChild = noParenthesesOneArgumentChildren[0];
-        OtpErlangObject[] quotedArguments;
-
-        if (noParenthesesOneArgumentChild instanceof Quotable) {
-            Quotable quotable = (Quotable) noParenthesesOneArgumentChild;
-            quotedArguments = new OtpErlangObject[]{
-                    quotable.quote()
-            };
-        } else {
-            QuotableArguments quotableArguments = (QuotableArguments) noParenthesesOneArgumentChild;
-            quotedArguments = quotableArguments.quoteArguments();
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesOnePositionalAndKeywordsArguments noParenthesesOnePositionalAndKeywordsArguments) {
-        Quotable noParenthesesFirstPositional = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesFirstPositional();
-        OtpErlangObject quotedFirstArgument = noParenthesesFirstPositional.quote();
-
-        Quotable noParenthesesKeywords = noParenthesesOnePositionalAndKeywordsArguments.getNoParenthesesKeywords();
-        OtpErlangObject quotedKeywordArguments = noParenthesesKeywords.quote();
-
-        return new OtpErlangObject[]{
-                quotedFirstArgument,
-                quotedKeywordArguments
-        };
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject[] quoteArguments(ElixirNoParenthesesStrict noParenthesesStrict) {
-        OtpErlangObject[] quotedArguments = null;
-
-        PsiElement[] children = noParenthesesStrict.getChildren();
-
-        if (children.length == 1) {
-            PsiElement child = children[0];
-
-            if (child instanceof QuotableArguments) {
-                QuotableArguments quotableArguments = (QuotableArguments) child;
-
-                quotedArguments = quotableArguments.quoteArguments();
-            }
-        }
-
-        if (quotedArguments == null) {
-            quotedArguments = new OtpErlangObject[children.length];
-
-            for (int i = 0; i < children.length; i++) {
-                Quotable quotable = (Quotable) children[i];
-                quotedArguments[i] = quotable.quote();
-            }
-        }
-
-        return quotedArguments;
-    }
-
-    @Contract(pure = true)
-    @NotNull
     public static OtpErlangObject[] quoteArguments(ElixirParenthesesArguments parenthesesArguments) {
         PsiElement[] arguments = parenthesesArguments.arguments();
 
@@ -3387,18 +3431,6 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject quoteEmpty(@SuppressWarnings("unused") Sigil sigil) {
         return elixirString("");
-    }
-
-    public static OtpErlangObject quoteIdentifier(@NotNull ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
-        Quotable identifier = unqualifiedNoParenthesesManyArgumentsCall.getIdentifier();
-        OtpErlangObject quotedIdentifier;
-
-        if (identifier instanceof ElixirVariable) {
-            quotedIdentifier = new OtpErlangAtom(identifier.getText());
-        } else {
-            quotedIdentifier = identifier.quote();
-        }
-        return quotedIdentifier;
     }
 
     @Contract(pure = true)
@@ -3593,6 +3625,18 @@ if (quoted == null) {
         );
     }
 
+    @Contract(pure = true)
+    @Nullable
+    public static Integer resolvedFinalArity(@NotNull final Call call) {
+        Integer resolvedFinalArity = call.resolvedSecondaryArity();
+
+        if (resolvedFinalArity == null) {
+            resolvedFinalArity = call.resolvedPrimaryArity();
+        }
+
+        return resolvedFinalArity;
+    }
+
     /**
      * Similar to {@link functionName}, but takes into account `import`s.
      *
@@ -3713,6 +3757,46 @@ if (quoted == null) {
     }
 
     @Contract(pure = true)
+    @Nullable
+    public static Integer resolvedPrimaryArity(@NotNull final Call call) {
+        Integer primaryArity = call.primaryArity();
+        Integer resolvedPrimaryArity = primaryArity;
+
+        /* do block and piping attach to the outer most parentheses, only count do block and piping for primary if there
+           are no secondary. */
+        if (call.secondaryArity() == null) {
+            if (call.getDoBlock() != null) {
+                if (primaryArity == null) {
+                    resolvedPrimaryArity = 1;
+                } else {
+                    resolvedPrimaryArity += 1;
+                }
+            }
+
+            // TODO handle piping
+        }
+
+        return resolvedPrimaryArity;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Integer resolvedSecondaryArity(@NotNull final Call call) {
+        Integer secondaryArity = call.secondaryArity();
+        Integer resolvedSecondaryArity = secondaryArity;
+
+        if (secondaryArity != null) {
+            if (call.getDoBlock() != null) {
+                resolvedSecondaryArity += 1;
+            }
+
+            // TODO handle piping
+        }
+
+        return resolvedSecondaryArity;
+    }
+
+    @Contract(pure = true)
     @NotNull
     public static Quotable rightOperand(InfixOperation infixOperation) {
         PsiElement[] children = infixOperation.getChildren();
@@ -3765,6 +3849,19 @@ if (quoted == null) {
         }
 
         return arguments;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Integer secondaryArity(@NotNull final Call call) {
+        PsiElement[] secondaryArguments = call.secondaryArguments();
+        Integer secondaryArity = null;
+
+        if (secondaryArguments != null) {
+            secondaryArity = secondaryArguments.length;
+        }
+
+        return secondaryArity;
     }
 
     @NotNull

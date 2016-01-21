@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -53,8 +54,25 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
   }
 
   @Nullable
-  public ASTNode functionNameNode() {
-    return ElixirPsiImplUtil.functionNameNode(this);
+  public PsiElement functionNameElement() {
+    return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
   @Nullable
@@ -67,9 +85,19 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
+  @Nullable
+  public Integer primaryArity() {
+    return ElixirPsiImplUtil.primaryArity(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @Nullable
+  public Integer resolvedFinalArity() {
+    return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
   @Nullable
@@ -83,8 +111,23 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
   }
 
   @Nullable
+  public Integer resolvedPrimaryArity() {
+    return ElixirPsiImplUtil.resolvedPrimaryArity(this);
+  }
+
+  @Nullable
+  public Integer resolvedSecondaryArity() {
+    return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @Nullable
+  public Integer secondaryArity() {
+    return ElixirPsiImplUtil.secondaryArity(this);
   }
 
 }
