@@ -599,6 +599,7 @@
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.refactoringSupport language="Elixir" implementationClass="org.elixir_lang.refactoring.SupportProvider"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+    <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
                      level="ERROR" shortName="NoParenthesesManyStrict"/>
