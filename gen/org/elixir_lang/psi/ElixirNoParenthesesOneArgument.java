@@ -12,14 +12,17 @@ import java.util.List;
 
 public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleName, QuotableArguments {
 
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  @NotNull
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @Nullable
   ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @NotNull
+  List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();

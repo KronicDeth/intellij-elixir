@@ -1,6 +1,7 @@
 package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.psi.util.PsiTreeUtil;
 import kotlin.NotImplementedError;
@@ -10,12 +11,20 @@ import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirStab;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Module extends Element<Call> {
+    /*
+     * Fields
+     */
+
+    @Nullable
+    private final Module parent;
+
     /*
      * Public Instance Methods
      */
@@ -28,8 +37,18 @@ public class Module extends Element<Call> {
      * Constructors
      */
 
-    public Module(Call call) {
+    public Module(@NotNull Call call) {
+        this(null, call);
+    }
+
+    /**
+     *
+     * @param parent the parent {@link Module} that scopes {@code call}.
+     * @param call the {@code Kernel.defmodule/2} call nested in {@code parent}.
+     */
+    public Module(@Nullable Module parent, @NotNull Call call) {
         super(call);
+        this.parent = parent;
     }
 
     /*
@@ -49,8 +68,10 @@ public class Module extends Element<Call> {
             List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.size());
 
             for (Call childCall : childCalls) {
-                if (Module.is(childCall)) {
-                    treeElementList.add(new Module(childCall));
+                if (Function.is(childCall)) {
+                    treeElementList.add(new Function(this, childCall));
+                } else if (Module.is(childCall)) {
+                    treeElementList.add(new Module(this, childCall));
                 }
             }
 
@@ -64,5 +85,23 @@ public class Module extends Element<Call> {
 
         return children;
     }
+
+    /**
+     * Returns the presentation of the tree element.
+     *
+     * @return the element presentation.
+     */
+    @NotNull
+    @Override
+    public ItemPresentation getPresentation() {
+        org.elixir_lang.navigation.item_presentation.Module parentPresentation = null;
+
+        if (parent != null) {
+            parentPresentation = (org.elixir_lang.navigation.item_presentation.Module) parent.getPresentation();
+        }
+
+        return new org.elixir_lang.navigation.item_presentation.Module(parentPresentation, navigationItem);
+    }
+
 }
 

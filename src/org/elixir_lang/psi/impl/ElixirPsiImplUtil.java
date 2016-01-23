@@ -1707,7 +1707,11 @@ public class ElixirPsiImplUtil {
     }
 
     public static Quotable getKeywordValue(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
-        return noParenthesesKeywordPair.getNoParenthesesExpression();
+        PsiElement[] children = noParenthesesKeywordPair.getChildren();
+
+        assert children.length == 2;
+
+        return (Quotable) children[1];
     }
 
     @NotNull
@@ -3082,31 +3086,6 @@ if (quoted == null) {
                 parenthesesArgumentsList,
                 doBlock
         );
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesExpression noParenthesesExpression) {
-        PsiElement[] children = noParenthesesExpression.getChildren();
-        OtpErlangObject quoted;
-
-        if (children.length != 1) {
-            throw new NotImplementedException("noParenthesesExpression expected to only have one child");
-        }
-
-        PsiElement child = children[0];
-        Quotable quotable;
-
-        if (child instanceof Quotable) {
-            quotable = (Quotable) child;
-        } else if (child instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
-            ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression = (ElixirNoParenthesesManyStrictNoParenthesesExpression) child;
-            quotable = noParenthesesManyStrictNoParenthesesExpression.getUnqualifiedNoParenthesesManyArgumentsCall();
-        } else {
-            throw new NotImplementedException("Expected either Quotable or ");
-        }
-
-        return quotable.quote();
     }
 
     @Contract(pure = true)

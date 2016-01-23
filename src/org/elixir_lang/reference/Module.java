@@ -101,9 +101,12 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
                             }
                         }
                     }
-                    ElixirMatchedExpression matchedExpression = noParenthesesOneArgument.getMatchedExpression();
 
-                    if (matchedExpression != null) {
+                    List<ElixirMatchedExpression> matchedExpressionList = noParenthesesOneArgument.getMatchedExpressionList();
+
+                    if (matchedExpressionList.size() > 0) {
+                        ElixirMatchedExpression matchedExpression = matchedExpressionList.get(0);
+
                         if (matchedExpression.getText().equals(getValue())) {
                             results.add(new PsiElementResolveResult(matchedExpression));
                         }

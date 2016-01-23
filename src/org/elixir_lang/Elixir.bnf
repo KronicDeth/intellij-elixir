@@ -199,15 +199,14 @@ private expressionList ::= expression (endOfExpression expression)*
 
 /* Have to prevent matchedExpression that is actually a keywordKey from being parsed as just a matchedExpression or
    callArgumentsNoParenthesesCommaExpression COMMA EOL* callArgumentsNoParenthesesKeywords will never match. */
-noParenthesesExpression ::= emptyParentheses |
-                            /* Must be before matchedExpression because noParenthesesExpression is
-                               `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer
-                               than `matchedExpressionDotIdentifier` in matchedExpression. */
-                            /* This will be marked as an error by
-                               {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-                            noParenthesesManyStrictNoParenthesesExpression |
-                            matchedExpression
-                            { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+private noParenthesesExpression ::= emptyParentheses |
+                                    /* Must be before matchedExpression because noParenthesesExpression is
+                                       `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is
+                                       longer than `matchedExpressionDotIdentifier` in matchedExpression. */
+                                    /* This will be marked as an error by
+                                       {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+                                    noParenthesesManyStrictNoParenthesesExpression |
+                                    matchedExpression
 /* Special class for wrapping noParenthesesCall so that
    {@link: org.elixir_lang.inspection.NoParenthesesManyStrict} can just search for
    ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid

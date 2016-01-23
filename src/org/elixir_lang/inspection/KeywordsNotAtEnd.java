@@ -57,25 +57,21 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                                 if (ancestor instanceof ElixirMatchedWhenOperation) {
                                     PsiElement whenParent = ancestor.getParent();
 
-                                    if (whenParent instanceof ElixirNoParenthesesExpression) {
-                                        PsiElement whenGrandParent = whenParent.getParent();
+                                    if (whenParent instanceof ElixirNoParenthesesOneArgument) {
+                                        listElement = whenParent;
+                                        PsiElement[] listChildren = listElement.getChildren();
 
-                                        if (whenGrandParent instanceof ElixirNoParenthesesOneArgument) {
-                                            listElement = whenGrandParent;
-                                            PsiElement[] listChildren = listElement.getChildren();
+                                        // -1 because if keywords are the last argument, then they are valid
+                                        for (int i = 0; i < listChildren.length - 1; i++) {
+                                            PsiElement listChild = listChildren[i];
 
-                                            // -1 because if keywords are the last argument, then they are valid
-                                            for (int i = 0; i < listChildren.length - 1; i++) {
-                                                PsiElement listChild = listChildren[i];
-
-                                                if (listChild.equals(whenParent)) {
-                                                    keywordsElement = element;
-                                                    break;
-                                                }
+                                            if (listChild.equals(whenParent)) {
+                                                keywordsElement = element;
+                                                break;
                                             }
-
-                                            break;
                                         }
+
+                                        break;
                                     }
                                 } else if (ancestor instanceof ElixirNoParenthesesOneArgument) {
                                     PsiElement call = ancestor.getParent();
@@ -83,25 +79,21 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                                     if (call instanceof NoParentheses) {
                                         PsiElement callParent = call.getParent();
 
-                                        if (callParent instanceof ElixirNoParenthesesExpression) {
-                                            PsiElement callGrandParent = callParent.getParent();
+                                        if (callParent instanceof ElixirNoParenthesesOneArgument) {
+                                            listElement = callParent;
+                                            PsiElement[] listChildren = listElement.getChildren();
 
-                                            if (callGrandParent instanceof ElixirNoParenthesesOneArgument) {
-                                                listElement = callGrandParent;
-                                                PsiElement[] listChildren = listElement.getChildren();
+                                            // -1 because if keywords are the last argument, then they are valid
+                                            for (int i = 0; i < listChildren.length - 1; i++) {
+                                                PsiElement listChild = listChildren[i];
 
-                                                // -1 because if keywords are the last argument, then they are valid
-                                                for (int i = 0; i < listChildren.length - 1; i++) {
-                                                    PsiElement listChild = listChildren[i];
-
-                                                    if (listChild.equals(callParent)) {
-                                                        keywordsElement = element;
-                                                        break;
-                                                    }
+                                                if (listChild.equals(callParent)) {
+                                                    keywordsElement = element;
+                                                    break;
                                                 }
-
-                                                break;
                                             }
+
+                                            break;
                                         }
                                     }
                                 } else if (ancestor instanceof ElixirNoParenthesesStrict ||
@@ -134,25 +126,21 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                                     if (callParent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
                                         PsiElement callGrandParent = callParent.getParent();
 
-                                        if (callGrandParent instanceof ElixirNoParenthesesExpression) {
-                                            PsiElement callGreatGrandParent = callGrandParent.getParent();
+                                        if (callGrandParent instanceof ElixirNoParenthesesOneArgument) {
+                                            listElement = callGrandParent;
+                                            PsiElement[] listChildren = listElement.getChildren();
 
-                                            if (callGreatGrandParent instanceof ElixirNoParenthesesOneArgument) {
-                                                listElement = callGreatGrandParent;
-                                                PsiElement[] listChildren = listElement.getChildren();
+                                            // -1 because if keywords are the last argument, then they are valid
+                                            for (int i = 0; i < listChildren.length - 1; i++) {
+                                                PsiElement listChild = listChildren[i];
 
-                                                // -1 because if keywords are the last argument, then they are valid
-                                                for (int i = 0; i < listChildren.length - 1; i++) {
-                                                    PsiElement listChild = listChildren[i];
-
-                                                    if (listChild.equals(callGrandParent)) {
-                                                        keywordsElement = element;
-                                                        break;
-                                                    }
+                                                if (listChild.equals(callGrandParent)) {
+                                                    keywordsElement = element;
+                                                    break;
                                                 }
-
-                                                break;
                                             }
+
+                                            break;
                                         }
                                     }
                                 }

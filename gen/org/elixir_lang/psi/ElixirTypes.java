@@ -144,7 +144,6 @@ public interface ElixirTypes {
   IElementType MATCH_INFIX_OPERATOR = new ElixirElementType("MATCH_INFIX_OPERATOR");
   IElementType MULTIPLICATION_INFIX_OPERATOR = new ElixirElementType("MULTIPLICATION_INFIX_OPERATOR");
   IElementType NO_PARENTHESES_ARGUMENTS = new ElixirElementType("NO_PARENTHESES_ARGUMENTS");
-  IElementType NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_EXPRESSION");
   IElementType NO_PARENTHESES_KEYWORDS = new ElixirElementType("NO_PARENTHESES_KEYWORDS");
   IElementType NO_PARENTHESES_KEYWORD_PAIR = new ElixirElementType("NO_PARENTHESES_KEYWORD_PAIR");
   IElementType NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION = new ElixirElementType("NO_PARENTHESES_MANY_STRICT_NO_PARENTHESES_EXPRESSION");
@@ -749,9 +748,6 @@ public interface ElixirTypes {
       }
       else if (type == NO_PARENTHESES_ARGUMENTS) {
         return new ElixirNoParenthesesArgumentsImpl(node);
-      }
-      else if (type == NO_PARENTHESES_EXPRESSION) {
-        return new ElixirNoParenthesesExpressionImpl(node);
       }
       else if (type == NO_PARENTHESES_KEYWORDS) {
         return new ElixirNoParenthesesKeywordsImpl(node);

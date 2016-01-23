@@ -10,17 +10,17 @@ import java.util.List;
 
 public interface ElixirNoParenthesesStrict extends Arguments, QuotableArguments {
 
-  @Nullable
-  ElixirEmptyParentheses getEmptyParentheses();
-
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  @NotNull
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @Nullable
   ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @NotNull
+  List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
 
   @NotNull
   PsiElement[] arguments();

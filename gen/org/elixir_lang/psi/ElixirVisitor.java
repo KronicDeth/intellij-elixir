@@ -616,10 +616,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotableArguments(o);
   }
 
-  public void visitNoParenthesesExpression(@NotNull ElixirNoParenthesesExpression o) {
-    visitQuotable(o);
-  }
-
   public void visitNoParenthesesKeywordPair(@NotNull ElixirNoParenthesesKeywordPair o) {
     visitQuotableKeywordPair(o);
   }

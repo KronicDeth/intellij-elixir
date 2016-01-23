@@ -429,9 +429,6 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == NO_PARENTHESES_ARGUMENTS) {
       r = noParenthesesArguments(b, 0);
     }
-    else if (t == NO_PARENTHESES_EXPRESSION) {
-      r = noParenthesesExpression(b, 0);
-    }
     else if (t == NO_PARENTHESES_KEYWORD_PAIR) {
       r = noParenthesesKeywordPair(b, 0);
     }
@@ -4032,21 +4029,21 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // emptyParentheses |
-  //                             /* Must be before matchedExpression because noParenthesesExpression is
-  //                                `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is longer
-  //                                than `matchedExpressionDotIdentifier` in matchedExpression. */
-  //                             /* This will be marked as an error by
-  //                                {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
-  //                             noParenthesesManyStrictNoParenthesesExpression |
-  //                             matchedExpression
-  public static boolean noParenthesesExpression(PsiBuilder b, int l) {
+  //                                     /* Must be before matchedExpression because noParenthesesExpression is
+  //                                        `matchedExpressionDotIdentifier callArgumentsNoParenthesesManyStrict` which is
+  //                                        longer than `matchedExpressionDotIdentifier` in matchedExpression. */
+  //                                     /* This will be marked as an error by
+  //                                        {@link org.elixir_lang.inspection.NoParenthesesManyStrict} */
+  //                                     noParenthesesManyStrictNoParenthesesExpression |
+  //                                     matchedExpression
+  static boolean noParenthesesExpression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "noParenthesesExpression")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, "<no parentheses expression>");
+    Marker m = enter_section_(b);
     r = emptyParentheses(b, l + 1);
     if (!r) r = noParenthesesManyStrictNoParenthesesExpression(b, l + 1);
     if (!r) r = matchedExpression(b, l + 1, -1);
-    exit_section_(b, l, m, NO_PARENTHESES_EXPRESSION, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 

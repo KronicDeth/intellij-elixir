@@ -25,27 +25,27 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
-  }
-
-  @Override
-  @Nullable
-  public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
   }
 
   @Override
   @NotNull
-  public List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesExpression.class);
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @Override
   @Nullable
   public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
     return findChildByClass(ElixirNoParenthesesKeywords.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
   @NotNull

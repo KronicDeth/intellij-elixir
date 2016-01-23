@@ -15,16 +15,19 @@ import java.util.List;
 public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, NoParentheses, Unqualified, Quotable, QuotableArguments {
 
   @NotNull
-  ElixirIdentifier getIdentifier();
-
-  @Nullable
-  ElixirMatchedExpression getMatchedExpression();
+  List<ElixirEmptyParentheses> getEmptyParenthesesList();
 
   @NotNull
-  List<ElixirNoParenthesesExpression> getNoParenthesesExpressionList();
+  ElixirIdentifier getIdentifier();
+
+  @NotNull
+  List<ElixirMatchedExpression> getMatchedExpressionList();
 
   @Nullable
   ElixirNoParenthesesKeywords getNoParenthesesKeywords();
+
+  @NotNull
+  List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList();
 
   @Nullable
   ElixirNoParenthesesStrict getNoParenthesesStrict();

@@ -775,7 +775,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 psiElement instanceof ElixirMapArguments ||
                 psiElement instanceof ElixirMapConstructionArguments ||
                 psiElement instanceof ElixirNoParenthesesArguments ||
-                psiElement instanceof ElixirNoParenthesesExpression ||
                 psiElement instanceof ElixirParentheticalStab ||
                 psiElement instanceof ElixirStab ||
                 psiElement instanceof ElixirStabBody ||
