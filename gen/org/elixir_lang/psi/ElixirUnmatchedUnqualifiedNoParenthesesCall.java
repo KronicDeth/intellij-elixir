@@ -29,7 +29,7 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @NotNull
   PsiElement functionNameElement();
 
-  @NotNull
+  @Nullable
   String getName();
 
   PsiElement getNameIdentifier();

@@ -24,7 +24,7 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @Nullable
   PsiElement functionNameElement();
 
-  @NotNull
+  @Nullable
   String getName();
 
   @NotNull

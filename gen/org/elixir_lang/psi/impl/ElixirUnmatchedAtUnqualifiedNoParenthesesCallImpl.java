@@ -49,7 +49,7 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
     return ElixirPsiImplUtil.functionNameElement(this);
   }
 
-  @NotNull
+  @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

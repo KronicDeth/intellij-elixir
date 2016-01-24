@@ -56,7 +56,7 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedElemen
     return ElixirPsiImplUtil.functionNameElement(this);
   }
 
-  @NotNull
+  @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

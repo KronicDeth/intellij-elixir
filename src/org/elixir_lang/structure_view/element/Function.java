@@ -1,101 +1,113 @@
 package org.elixir_lang.structure_view.element;
 
+import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.psi.*;
+import com.intellij.openapi.util.Pair;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class Function extends Element<Call> {
+/**
+ * Function Structure view elements don't correspond to an actual element because they group together one or more
+ * {@link FunctionClause} elements.  In Erlang, functions would have corresponding elements, but since Elixir has
+ * separate `def` calls for each function clause there is no function element.
+ */
+public class Function implements StructureViewTreeElement {
     /*
      * Fields
      */
 
+    private final int arity;
+    @NotNull
+    private final List<FunctionClause> clauses = new ArrayList<FunctionClause>();
+    @NotNull
     private final Module module;
-
-    /*
-     * Public Static Methods
-     */
-
-    public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "def", 2);
-    }
+    @NotNull
+    private final String name;
 
     /*
      * Constructors
      */
 
-    public Function(Module module, Call call) {
-        super(call);
+    public Function(@NotNull Module module, @NotNull String name, int arity) {
+        this.arity = arity;
         this.module = module;
+        this.name = name;
     }
 
     /*
      * Public Instance Methods
      */
 
+    /**
+     * Adds clause to function
+     *
+     * @param clause the new clause for the function
+     */
+    public void clause(Call clause) {
+        Pair<String, Integer> nameArity = FunctionClause.nameArity(clause);
+
+        assert nameArity.first.equals(name);
+        assert nameArity.second == arity;
+
+        clauses.add(new FunctionClause(this, clause));
+    }
+
+    /**
+     * Returns the clauses of the function
+     *
+     * @return the list of {@link FunctionClause} elements.
+     */
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        ElixirDoBlock doBlock = navigationItem.getDoBlock();
-        TreeElement[] children = null;
+        return clauses.toArray(new TreeElement[clauses.size()]);
+    }
 
-        if (doBlock != null) {
-            ElixirStab stab = doBlock.getStab();
+    /**
+     * The scoping module
+     *
+     * @return The scoping module
+     */
+    @NotNull
+    public Module getModule() {
+        return module;
+    }
 
-            Collection<Call> childCalls = PsiTreeUtil.findChildrenOfType(stab, Call.class);
-            List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.size());
+    /**
+     * Returns the data object (usually a PSI element) corresponding to the
+     * structure view element.
+     *
+     * @return the data object instance.
+     */
+    @Override
+    public Object getValue() {
+        return this;
+    }
 
-            for (Call childCall : childCalls) {
-                // Kernel.def/2 can't be called in another Kernel.def/2, but one can call `Kernel.defmodule/2`
-                if (Module.is(childCall)) {
-                    treeElementList.add(new Module(module, childCall));
-                }
-            }
+    /**
+     * A function groups together one or more {@code FunctionClause} elements, it can not be navigated to, only its
+     * {@code FunctionClause} elements.
+     *
+     * @return <code>false</code>
+     */
+    @Override
+    public boolean canNavigate() {
+        return false;
+    }
 
-            children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
-        } else { // one liner version with `do:` keyword argument
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
-
-            assert  finalArguments.length > 0;
-
-            PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
-
-            if (potentialKeywords instanceof QuotableKeywordList) {
-                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) potentialKeywords;
-                List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
-                QuotableKeywordPair firstQuotableKeywordPair = quotableKeywordPairList.get(0);
-                Quotable keywordKey = firstQuotableKeywordPair.getKeywordKey();
-
-                if (keywordKey.getText().equals("do")) {
-                    Quotable keywordValue = firstQuotableKeywordPair.getKeywordValue();
-
-                    if (keywordValue instanceof Call) {
-                        Call childCall = (Call) keywordValue;
-
-                        if (Module.is(childCall)) {
-                            children = new TreeElement[] {
-                                    new Module(module, childCall)
-                            };
-                        }
-                    }
-                }
-            }
-        }
-
-        if (children == null) {
-            children = new TreeElement[0];
-        }
-
-        return children;
+    /**
+     * Cannot navigate to source because no element.
+     *
+     * @return <code>false</code>
+     */
+    @Override
+    public boolean canNavigateToSource() {
+        return false;
     }
 
     /**
@@ -108,9 +120,18 @@ public class Function extends Element<Call> {
     public ItemPresentation getPresentation() {
         return new org.elixir_lang.navigation.item_presentation.Function(
                 (org.elixir_lang.navigation.item_presentation.Module) module.getPresentation(),
-                navigationItem
+                name,
+                arity
         );
     }
 
+    /**
+     * Does nothing because Functions aren't elements, but groups of {@code FunctionClauses}.
+     *
+     * @param requestFocus <code>true</code> if focus requesting is necessary
+     */
+    @Override
+    public void navigate(@SuppressWarnings("unused") boolean requestFocus) {
+        // do nothing
+    }
 }
-

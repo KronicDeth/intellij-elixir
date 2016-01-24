@@ -48,7 +48,7 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  @NotNull
+  @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }

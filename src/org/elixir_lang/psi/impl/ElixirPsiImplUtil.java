@@ -1725,9 +1725,16 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static String getName(@NotNull NamedElement namedElement) {
-        return namedElement.getNameIdentifier().getText();
+        PsiElement nameIdentifier = namedElement.getNameIdentifier();
+        String name = null;
+
+        if (nameIdentifier != null) {
+            name = nameIdentifier.getText();
+        }
+
+        return name;
     }
 
     @Contract(pure = true)

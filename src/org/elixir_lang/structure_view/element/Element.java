@@ -6,7 +6,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class Element<T extends NavigatablePsiElement> implements StructureViewTreeElement, SortableTreeElement {
+public abstract class Element<T extends NavigatablePsiElement> implements StructureViewTreeElement {
     /*
      * Private Instance Fields
      */
@@ -40,13 +40,6 @@ public abstract class Element<T extends NavigatablePsiElement> implements Struct
     @Override
     public boolean canNavigateToSource() {
         return navigationItem.canNavigateToSource();
-    }
-
-    @NotNull
-    @Override
-    public String getAlphaSortKey() {
-        //noinspection ConstantConditions
-        return navigationItem.getName();
     }
 
     /**

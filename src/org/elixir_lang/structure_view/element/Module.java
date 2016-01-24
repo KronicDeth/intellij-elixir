@@ -3,6 +3,7 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.util.PsiTreeUtil;
 import kotlin.NotImplementedError;
 import org.apache.commons.lang.NotImplementedException;
@@ -13,9 +14,7 @@ import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class Module extends Element<Call> {
     /*
@@ -65,11 +64,24 @@ public class Module extends Element<Call> {
             ElixirStab stab = doBlock.getStab();
 
             Collection<Call> childCalls = PsiTreeUtil.findChildrenOfType(stab, Call.class);
-            List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.size());
+            int size = childCalls.size();
+            List<TreeElement> treeElementList = new ArrayList<TreeElement>(size);
+            Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(size);
 
             for (Call childCall : childCalls) {
-                if (Function.is(childCall)) {
-                    treeElementList.add(new Function(this, childCall));
+                if (FunctionClause.is(childCall)) {
+                    Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
+
+                    Function function = functionByNameArity.get(nameArity);
+
+                    if (function == null) {
+                        function = new Function(this, nameArity.first, nameArity.second);
+                        functionByNameArity.put(nameArity, function);
+
+                        treeElementList.add(function);
+                    }
+
+                    function.clause(childCall);
                 } else if (Module.is(childCall)) {
                     treeElementList.add(new Module(this, childCall));
                 }

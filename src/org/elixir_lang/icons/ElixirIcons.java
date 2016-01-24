@@ -13,6 +13,7 @@ import javax.swing.*;
 public interface ElixirIcons {
   Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
   Icon FUNCTION = PlatformIcons.FUNCTION_ICON;
+  Icon FUNCTION_CLAUSE = PlatformIcons.PACKAGE_LOCAL_ICON;
   Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
   Icon MODULE = PlatformIcons.PACKAGE_ICON;
 
