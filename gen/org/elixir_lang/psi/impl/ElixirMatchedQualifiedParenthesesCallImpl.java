@@ -100,8 +100,8 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.quote(this);
   }
 
-  @Nullable
-  public Integer resolvedFinalArity() {
+  @NotNull
+  public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 

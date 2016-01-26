@@ -69,7 +69,9 @@ public class Module extends Element<Call> {
             Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(size);
 
             for (Call childCall : childCalls) {
-                if (FunctionClause.is(childCall)) {
+                if (Delegation.is(childCall)) {
+                    treeElementList.add(new Delegation(this, childCall));
+                } else if (FunctionClause.is(childCall)) {
                     Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
 
                     Function function = functionByNameArity.get(nameArity);

@@ -1,7 +1,7 @@
 package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
-import com.intellij.navigation.NavigationItem;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.call.Call;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class File extends Element {
+public class File extends Element<ElixirFile> {
     /*
      * Constructors
      */
@@ -26,21 +26,39 @@ public class File extends Element {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        ElixirFile file = (ElixirFile) navigationItem;
-
         Call[] calls = PsiTreeUtil.getChildrenOfType(
-                file,
+                navigationItem,
                 Call.class
         );
-        List<TreeElement> treeElementList = new ArrayList<TreeElement>(calls.length);
+        TreeElement[] children;
 
-        for (Call call : calls) {
-            if (Module.is(call)) {
-                treeElementList.add(new Module(call));
+        if (calls != null) {
+            List<TreeElement> treeElementList = new ArrayList<TreeElement>(calls.length);
+
+            for (Call call : calls) {
+                if (Module.is(call)) {
+                    treeElementList.add(new Module(call));
+                }
             }
+
+            children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+        } else {
+            children = new TreeElement[0];
         }
 
-        return treeElementList.toArray(new TreeElement[treeElementList.size()]);
+        return children;
+    }
+
+    /**
+     * Returns the presentation of the tree element.
+     *
+     * @return the element presentation.
+     */
+    @NotNull
+    @Override
+    public ItemPresentation getPresentation() {
+        //noinspection ConstantConditions
+        return navigationItem.getPresentation();
     }
 }
 

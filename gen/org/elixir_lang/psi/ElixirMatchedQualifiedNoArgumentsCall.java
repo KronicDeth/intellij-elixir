@@ -49,8 +49,8 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @NotNull
   String resolvedFunctionName();

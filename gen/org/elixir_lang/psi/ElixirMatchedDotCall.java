@@ -50,8 +50,8 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall, 
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @Nullable
   String resolvedFunctionName();

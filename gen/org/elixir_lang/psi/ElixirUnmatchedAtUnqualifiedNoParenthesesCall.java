@@ -54,8 +54,8 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @Nullable
   String resolvedFunctionName();

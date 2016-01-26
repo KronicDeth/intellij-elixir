@@ -43,16 +43,6 @@ public abstract class Element<T extends NavigatablePsiElement> implements Struct
     }
 
     /**
-     * Returns the presentation of the tree element.
-     *
-     * @return the element presentation.
-     */
-    @Override
-    public ItemPresentation getPresentation() {
-        return navigationItem.getPresentation();
-    }
-
-    /**
      * Returns the data object (usually a PSI element) corresponding to the
      * structure view element.
      *

@@ -95,8 +95,8 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
     return ElixirPsiImplUtil.quote(this);
   }
 
-  @Nullable
-  public Integer resolvedFinalArity() {
+  @NotNull
+  public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 

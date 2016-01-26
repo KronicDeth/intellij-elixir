@@ -11,6 +11,7 @@ import javax.swing.*;
  * Created by zyuyou on 15/7/6.
  */
 public interface ElixirIcons {
+  Icon DELEGATION = PlatformIcons.PACKAGE_LOCAL_ICON;
   Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
   Icon FUNCTION = PlatformIcons.FUNCTION_ICON;
   Icon FUNCTION_CLAUSE = PlatformIcons.PACKAGE_LOCAL_ICON;

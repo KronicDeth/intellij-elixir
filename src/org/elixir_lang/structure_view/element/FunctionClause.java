@@ -29,7 +29,9 @@ public class FunctionClause extends Element<Call> {
      */
 
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "def", 2);
+        return call.isCallingMacro("Elixir.Kernel", "def", 2) ||
+                // function head
+                call.isCalling("Elixir.Kernel", "def", 1);
     }
 
     /**

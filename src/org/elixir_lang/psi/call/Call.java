@@ -147,10 +147,10 @@ public interface Call extends NavigatablePsiElement {
     /**
      * The final arity that is non-{@code null}.
      *
-     * @return {@link #resolvedSecondaryArity()} if it is not {@code null}; otherwise, {@link #resolvedPrimaryArity()}.
+     * @return {@link #resolvedSecondaryArity()} if it is not {@code null}; {@link #resolvedPrimaryArity()} if it is not
+     *   {@code null}; otherwise, {@code 0}.
      */
-    @Nullable
-    Integer resolvedFinalArity();
+    int resolvedFinalArity();
 
     /**
      * The total number of primary arguments for the final expanded function call.

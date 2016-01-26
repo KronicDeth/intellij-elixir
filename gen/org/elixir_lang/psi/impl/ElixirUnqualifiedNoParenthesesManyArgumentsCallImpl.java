@@ -122,8 +122,8 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return ElixirPsiImplUtil.quoteArguments(this);
   }
 
-  @Nullable
-  public Integer resolvedFinalArity() {
+  @NotNull
+  public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 

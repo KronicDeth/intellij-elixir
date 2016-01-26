@@ -54,8 +54,8 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @Nullable
   String resolvedFunctionName();

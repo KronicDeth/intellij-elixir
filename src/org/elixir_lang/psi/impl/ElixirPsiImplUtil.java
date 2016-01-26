@@ -446,6 +446,52 @@ public class ElixirPsiImplUtil {
         return fileViewProvider.getDocument();
     }
 
+    /**
+     * The keyword arguments for {@code call}.
+     * @param call call to search for keyword arguments.
+     * @return the final element of the {@link ElixirPsiImplUtil#finalArguments(Call)} of {@code} if they are a
+     *   {@link QuotableKeywordList}; otherwise, {@code null}.
+     */
+    @Nullable
+    public static QuotableKeywordList keywordArguments(@NotNull final Call call) {
+        PsiElement[] finalArguments = finalArguments(call);
+        QuotableKeywordList keywordArguments = null;
+
+        if (finalArguments != null) {
+            int finalArgumentCount = finalArguments.length;
+
+            if (finalArgumentCount > 0) {
+                PsiElement potentialKeywords = finalArguments[finalArgumentCount - 1];
+
+                if (potentialKeywords instanceof QuotableKeywordList) {
+                    keywordArguments = (QuotableKeywordList) potentialKeywords;
+                }
+            }
+        }
+
+        return keywordArguments;
+    }
+
+    /**
+     * The value of the keyword argument with the given keywordKeyText.
+     *
+     * @param call call to seach for the keyword argument.
+     * @param keywordKeyText the text of the key, such as {@code "do"}
+     * @return the keyword value {@code PsiElement} if {@code call} has {@link ElixirPsiImplUtil#keywordArguments(Call)}
+     *   and there is a {@link ElixirPsiImplUtil.keywordValue(QuotableKeywordList)} for {@code keywordKeyText}.
+     */
+    @Nullable
+    public static PsiElement keywordArgument(@NotNull final Call call, String keywordKeyText) {
+        QuotableKeywordList keywordArguments = keywordArguments(call);
+        PsiElement keywordValue = null;
+
+        if (keywordArguments != null) {
+            keywordValue = keywordValue(keywordArguments, keywordKeyText);
+        }
+
+        return keywordValue;
+    }
+
     public static OtpErlangTuple keywordTuple(String key, int value) {
         final OtpErlangAtom keyAtom = new OtpErlangAtom(key);
         final OtpErlangInt valueInt = new OtpErlangInt(value);
@@ -455,6 +501,37 @@ public class ElixirPsiImplUtil {
         };
 
         return new OtpErlangTuple(elements);
+    }
+
+    /**
+     * The value associated with the keyword value.
+     *
+     * @param keywordList The keyword list to search for {@code keywordKeyText}.
+     * @param keywordKeyText the text of the keyword value.
+     * @return the {@code PsiElement} associated with {@code keywordKeyText}.
+     */
+    public static PsiElement keywordValue(QuotableKeywordList keywordList, String keywordKeyText) {
+        PsiElement keywordValue = null;
+
+        for (QuotableKeywordPair quotableKeywordPair : keywordList.quotableKeywordPairList()) {
+            Quotable candidateKeywordValue = quotableKeywordPair.getKeywordKey();
+
+            if (candidateKeywordValue.getText().equals(keywordKeyText)) {
+                keywordValue = quotableKeywordPair.getKeywordValue();
+            } else {
+                OtpErlangObject quotedCandidateKeywordValue = candidateKeywordValue.quote();
+
+                if (quotedCandidateKeywordValue instanceof OtpErlangAtom) {
+                    OtpErlangAtom candidateKeywordValueAtom = (OtpErlangAtom) quotedCandidateKeywordValue;
+
+                    if (candidateKeywordValueAtom.atomValue().equals(keywordKeyText)) {
+                        keywordValue = quotableKeywordPair.getKeywordValue();
+                    }
+                }
+            }
+        }
+
+        return keywordValue;
     }
 
     public static boolean inBase(@NotNull final Digits digits) {
@@ -550,24 +627,8 @@ public class ElixirPsiImplUtil {
         if (isCalling(call, resolvedModuleName, resolvedFunctionName, resolvedFinalArity)) {
             if (call.getDoBlock() != null) {
                 isCallingMacro = true;
-            } else {
-                PsiElement[] finalArguments = finalArguments(call);
-
-                // shouldn't be null because resolvedFinalArity is not null
-                assert finalArguments != null;
-
-                PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
-
-                if (potentialKeywords instanceof QuotableKeywordList) {
-                    QuotableKeywordList quotableKeywordList = (QuotableKeywordList) potentialKeywords;
-                    List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
-                    QuotableKeywordPair firstQuotableKeywordPair = quotableKeywordPairList.get(0);
-                    Quotable keywordKey = firstQuotableKeywordPair.getKeywordKey();
-
-                    if (keywordKey.getText().equals("do")) {
-                        isCallingMacro = true;
-                    }
-                }
+            } else if (ElixirPsiImplUtil.keywordArgument(call, "do") != null) {
+                isCallingMacro = true;
             }
         }
 
@@ -3612,12 +3673,16 @@ if (quoted == null) {
     }
 
     @Contract(pure = true)
-    @Nullable
-    public static Integer resolvedFinalArity(@NotNull final Call call) {
+    @NotNull
+    public static int resolvedFinalArity(@NotNull final Call call) {
         Integer resolvedFinalArity = call.resolvedSecondaryArity();
 
         if (resolvedFinalArity == null) {
             resolvedFinalArity = call.resolvedPrimaryArity();
+        }
+
+        if (resolvedFinalArity == null) {
+            resolvedFinalArity = 0;
         }
 
         return resolvedFinalArity;

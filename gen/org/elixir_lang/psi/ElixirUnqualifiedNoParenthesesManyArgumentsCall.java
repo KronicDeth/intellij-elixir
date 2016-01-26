@@ -67,8 +67,8 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
   @NotNull
   OtpErlangObject[] quoteArguments();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @NotNull
   String resolvedFunctionName();

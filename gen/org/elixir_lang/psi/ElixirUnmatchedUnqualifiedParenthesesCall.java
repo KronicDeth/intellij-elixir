@@ -47,8 +47,8 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @NotNull
   String resolvedFunctionName();

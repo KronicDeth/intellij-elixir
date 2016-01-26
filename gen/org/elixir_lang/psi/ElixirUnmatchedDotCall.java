@@ -50,8 +50,8 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   @NotNull
   OtpErlangObject quote();
 
-  @Nullable
-  Integer resolvedFinalArity();
+  @NotNull
+  int resolvedFinalArity();
 
   @Nullable
   String resolvedFunctionName();

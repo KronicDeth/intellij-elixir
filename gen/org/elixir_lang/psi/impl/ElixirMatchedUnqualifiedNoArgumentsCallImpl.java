@@ -86,8 +86,8 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends ElixirMatchedEx
     return ElixirPsiImplUtil.quote(this);
   }
 
-  @Nullable
-  public Integer resolvedFinalArity() {
+  @NotNull
+  public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
   }
 
