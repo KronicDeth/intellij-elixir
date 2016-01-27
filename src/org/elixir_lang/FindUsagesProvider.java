@@ -9,7 +9,6 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.java.generate.inspection.AbstractToStringInspection;
 
 public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsagesProvider {
     /**

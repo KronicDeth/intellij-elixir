@@ -1,10 +1,8 @@
 package org.elixir_lang.psi.call.arguments;
 
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.ElixirMatchedParenthesesArguments;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**

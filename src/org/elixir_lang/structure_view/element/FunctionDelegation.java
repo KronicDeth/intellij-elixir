@@ -3,8 +3,6 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.*;
-import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.psi.UnqualifiedParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;

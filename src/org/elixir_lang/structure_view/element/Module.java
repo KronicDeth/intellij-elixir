@@ -2,13 +2,10 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.util.PsiTreeUtil;
-import kotlin.NotImplementedError;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirStab;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;

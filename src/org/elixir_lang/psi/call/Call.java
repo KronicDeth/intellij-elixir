@@ -1,7 +1,5 @@
 package org.elixir_lang.psi.call;
 
-import com.intellij.lang.ASTNode;
-import com.intellij.navigation.NavigationItem;
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.ElixirDoBlock;

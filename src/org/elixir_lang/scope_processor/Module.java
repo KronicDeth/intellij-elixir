@@ -3,7 +3,7 @@ package org.elixir_lang.scope_processor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.BaseScopeProcessor;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

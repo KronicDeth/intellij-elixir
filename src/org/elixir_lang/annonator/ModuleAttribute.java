@@ -10,7 +10,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.TokenSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirSyntaxHighlighter;

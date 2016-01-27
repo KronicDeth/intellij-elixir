@@ -1,10 +1,7 @@
 package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
-import com.intellij.ide.util.treeView.smartTree.SortableTreeElement;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.NavigatablePsiElement;
-import org.jetbrains.annotations.NotNull;
 
 public abstract class Element<T extends NavigatablePsiElement> implements StructureViewTreeElement {
     /*

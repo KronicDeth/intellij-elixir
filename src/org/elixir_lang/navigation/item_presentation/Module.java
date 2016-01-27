@@ -2,8 +2,6 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.ui.RowIcon;
-import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
