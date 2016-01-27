@@ -212,6 +212,7 @@ private noParenthesesExpression ::= emptyParentheses |
    ElixirNoParenthesesManyStrictNoParenthesesExpression isn't of having to differentiate between valid and invalid
    ElixirNoParenthesesCall. */
 noParenthesesManyStrictNoParenthesesExpression ::= unqualifiedNoParenthesesManyArgumentsCall
+                                                   { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 /* Special class for wrapping rules so that
    {@link: org.elixir_lang.inspection.NoParenthesesStrict} can just search for
    ElixirNoParenthesesStrict instead of having to differentiate between valid and invalid

@@ -625,7 +625,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNoParenthesesManyStrictNoParenthesesExpression(@NotNull ElixirNoParenthesesManyStrictNoParenthesesExpression o) {
-    visitPsiElement(o);
+    visitQuotable(o);
   }
 
   public void visitNoParenthesesOneArgument(@NotNull ElixirNoParenthesesOneArgument o) {

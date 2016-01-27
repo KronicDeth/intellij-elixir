@@ -7,8 +7,10 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.arguments.NoParentheses;
+import org.elixir_lang.psi.call.arguments.NoParenthesesOneArgument;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class KeywordsNotAtEnd extends LocalInspectionTool {
     @Nls
@@ -46,113 +48,84 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                 new PsiRecursiveElementWalkingVisitor() {
                     @Override
                     public void visitElement(PsiElement element) {
-                        PsiElement keywordsElement = null;
+                        PsiElement keywordsElementNotAtEnd = null;
                         PsiElement listElement = null;
 
                         if (element instanceof ElixirNoParenthesesKeywords) {
-                            PsiElement previousAncestor = null;
-                            PsiElement ancestor = element.getParent();
+                            ElixirNoParenthesesKeywords keywordsElement = (ElixirNoParenthesesKeywords) element;
 
-                            while (ancestor != null) {
-                                if (ancestor instanceof ElixirMatchedWhenOperation) {
-                                    PsiElement whenParent = ancestor.getParent();
+                            PsiElement parent = element.getParent();
 
-                                    if (whenParent instanceof ElixirNoParenthesesOneArgument) {
-                                        listElement = whenParent;
-                                        PsiElement[] listChildren = listElement.getChildren();
+                            if (parent instanceof ElixirMatchedWhenOperation) {
+                                PsiElement grandParent = parent.getParent();
 
-                                        // -1 because if keywords are the last argument, then they are valid
-                                        for (int i = 0; i < listChildren.length - 1; i++) {
-                                            PsiElement listChild = listChildren[i];
+                                if (grandParent instanceof ElixirNoParenthesesOneArgument) {
+                                    listElement = grandParent;
 
-                                            if (listChild.equals(whenParent)) {
-                                                keywordsElement = element;
-                                                break;
-                                            }
-                                        }
+                                    keywordsElementNotAtEnd = findKeywordsElementNotAtEnd(
+                                            listElement,
+                                            parent,
+                                            keywordsElement
+                                    );
+                                }
+                            } else if (parent instanceof ElixirNoParenthesesOneArgument) {
+                                PsiElement grandParent = parent.getParent();
 
-                                        break;
-                                    }
-                                } else if (ancestor instanceof ElixirNoParenthesesOneArgument) {
-                                    PsiElement call = ancestor.getParent();
+                                if (grandParent instanceof NoParentheses) {
+                                    PsiElement greatGrandParent = grandParent.getParent();
 
-                                    if (call instanceof NoParentheses) {
-                                        PsiElement callParent = call.getParent();
+                                    if (greatGrandParent instanceof ElixirNoParenthesesOneArgument) {
+                                        listElement = greatGrandParent;
 
-                                        if (callParent instanceof ElixirNoParenthesesOneArgument) {
-                                            listElement = callParent;
-                                            PsiElement[] listChildren = listElement.getChildren();
+                                        keywordsElementNotAtEnd = findKeywordsElementNotAtEnd(
+                                                listElement,
+                                                grandParent,
+                                                keywordsElement
+                                        );
+                                    } else if (greatGrandParent instanceof ElixirParenthesesArguments) {
+                                        listElement = greatGrandParent;
 
-                                            // -1 because if keywords are the last argument, then they are valid
-                                            for (int i = 0; i < listChildren.length - 1; i++) {
-                                                PsiElement listChild = listChildren[i];
-
-                                                if (listChild.equals(callParent)) {
-                                                    keywordsElement = element;
-                                                    break;
-                                                }
-                                            }
-
-                                            break;
-                                        }
-                                    }
-                                } else if (ancestor instanceof ElixirNoParenthesesStrict ||
-                                        ancestor instanceof ElixirParentheticalStab) {
-                                    /* the keyword arguments are part of a call with parentheses around it, so they
-                                       are not ambiguous.
-
-                                       @see https://github.com/KronicDeth/intellij-elixir/issues/195 */
-                                    break;
-                                } else if (ancestor instanceof ElixirParenthesesArguments) {
-                                    listElement = ancestor;
-                                    PsiElement[] listChildren = listElement.getChildren();
-
-                                    // -1 because if keywords are the last argument, then they are valid
-                                    for (int i = 0; i < listChildren.length - 1; i++) {
-                                        PsiElement listChild = listChildren[i];
-
-                                        if (listChild.equals(previousAncestor)) {
-                                            keywordsElement = element;
-                                            break;
-                                        }
-                                    }
-
-                                    break;
-                                } else if (ancestor instanceof ElixirUnqualifiedNoParenthesesManyArgumentsCall) {
-                                    PsiElement call = ancestor;
-
-                                    PsiElement callParent = call.getParent();
-
-                                    if (callParent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
-                                        PsiElement callGrandParent = callParent.getParent();
-
-                                        if (callGrandParent instanceof ElixirNoParenthesesOneArgument) {
-                                            listElement = callGrandParent;
-                                            PsiElement[] listChildren = listElement.getChildren();
-
-                                            // -1 because if keywords are the last argument, then they are valid
-                                            for (int i = 0; i < listChildren.length - 1; i++) {
-                                                PsiElement listChild = listChildren[i];
-
-                                                if (listChild.equals(callGrandParent)) {
-                                                    keywordsElement = element;
-                                                    break;
-                                                }
-                                            }
-
-                                            break;
-                                        }
+                                        keywordsElementNotAtEnd = findKeywordsElementNotAtEnd(
+                                                listElement,
+                                                grandParent,
+                                                keywordsElement
+                                        );
                                     }
                                 }
+                            } else if (parent instanceof ElixirUnmatchedWhenOperation) {
+                                PsiElement grandParent = parent.getParent();
 
-                                previousAncestor = ancestor;
-                                ancestor = ancestor.getParent();
+                                if (grandParent instanceof ElixirParenthesesArguments) {
+                                    listElement = grandParent;
+
+                                    keywordsElementNotAtEnd = findKeywordsElementNotAtEnd(
+                                            listElement,
+                                            parent,
+                                            keywordsElement
+                                    );
+                                }
+                            } else if (parent instanceof NoParentheses) {
+                                PsiElement grandParent = parent.getParent();
+
+                                if (grandParent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression) {
+                                    PsiElement greatGrandParent = grandParent.getParent();
+
+                                    if (greatGrandParent instanceof ElixirNoParenthesesOneArgument) {
+                                        listElement = greatGrandParent;
+
+                                        keywordsElementNotAtEnd = findKeywordsElementNotAtEnd(
+                                                listElement,
+                                                grandParent,
+                                                keywordsElement
+                                        );
+                                    }
+                                }
                             }
                         }
 
-                        if (keywordsElement != null) {
+                        if (keywordsElementNotAtEnd != null) {
                             TextRange listElementTextRange = listElement.getTextRange();
-                            TextRange keywordsTextRange = keywordsElement.getTextRange();
+                            TextRange keywordsTextRange = keywordsElementNotAtEnd.getTextRange();
                             int listElementStartOffset = listElementTextRange.getStartOffset();
                             TextRange relativeTextRange = new TextRange(
                                     keywordsTextRange.getStartOffset() - listElementStartOffset,
@@ -171,5 +144,16 @@ public class KeywordsNotAtEnd extends LocalInspectionTool {
                     }
                 }
         );
+    }
+
+    @Nullable
+    private static PsiElement findKeywordsElementNotAtEnd(PsiElement listElement, PsiElement listChildWithKeywords, ElixirNoParenthesesKeywords keywords) {
+        PsiElement keywordsElementNotAtEnd = null;
+
+        if (listElement.getLastChild() != listChildWithKeywords) {
+            keywordsElementNotAtEnd = keywords;
+        }
+
+        return keywordsElementNotAtEnd;
     }
 }

@@ -2673,6 +2673,18 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression) {
+        PsiElement[] children = noParenthesesManyStrictNoParenthesesExpression.getChildren();
+
+        assert children.length == 1;
+
+        Quotable child = (Quotable) children[0];
+
+        return child.quote();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final AtUnqualifiedBracketOperation atUnqualifiedBracketOperation) {
         Quotable operator = atUnqualifiedBracketOperation.getAtPrefixOperator();
         OtpErlangObject quotedOperator = operator.quote();
