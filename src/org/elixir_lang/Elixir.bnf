@@ -7,6 +7,10 @@
   // direct children of unmatchedExpression
   extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=unmatchedExpression
 
+  // infix operations
+  implements("(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")="org.elixir_lang.psi.InfixOperation"
+  methods("(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[leftOperand operator quote rightOperand]
+
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
@@ -1134,16 +1138,8 @@ inMatchInfixOperator ::= EOL* IN_MATCH_OPERATOR EOL*
                       ]
                       name = "<-, \\\\"
                     }
+// implements and methods defined by "infix operations" section above
 matchedInMatchOperation ::= matchedExpression inMatchInfixOperator matchedExpression
-                            {
-                              implements = "org.elixir_lang.psi.InfixOperation"
-                              methods = [
-                                leftOperand
-                                operator
-                                quote
-                                rightOperand
-                              ]
-                            }
 
 /*
  * When Operation - right-associative
@@ -1168,17 +1164,9 @@ whenInfixOperator ::= EOL* WHEN_OPERATOR EOL*
    org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
 matchedWhenNoParenthesesKeywordsOperation ::= matchedExpression whenInfixOperator noParenthesesKeywords
                                               { elementType = matchedWhenOperation rightAssociative = true }
+// implements and methods defined by "infix operations" section above
 matchedWhenOperation ::= matchedExpression whenInfixOperator matchedExpression
-                         {
-                           implements = "org.elixir_lang.psi.InfixOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                           rightAssociative = true
-                         }
+                         { rightAssociative = true }
 
 /*
  * Type Operation - right-associative
@@ -1195,17 +1183,9 @@ typeInfixOperator ::= EOL* TYPE_OPERATOR EOL*
                         ]
                         name = "::"
                       }
+// implements and methods defined by "infix operations" section above
 matchedTypeOperation ::= matchedExpression typeInfixOperator matchedExpression
-                         {
-                           implements = "org.elixir_lang.psi.InfixOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                           rightAssociative = true
-                         }
+                         { rightAssociative = true }
 
 /*
  * Pipe Operation - right-associative
@@ -1222,17 +1202,9 @@ pipeInfixOperator ::= EOL* PIPE_OPERATOR EOL*
                         ]
                         name = "|"
                       }
+// implements and methods defined by "infix operations" section above
 matchedPipeOperation ::= matchedExpression pipeInfixOperator matchedExpression
-                         {
-                           implements = "org.elixir_lang.psi.InfixOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                           rightAssociative = true
-                         }
+                         { rightAssociative = true }
 
 /*
  * Match Operation - right-associative
@@ -1249,17 +1221,9 @@ matchInfixOperator ::= EOL* MATCH_OPERATOR EOL*
                          ]
                          name = "="
                        }
+// implements and methods defined by "infix operations" section above
 matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
-                          {
-                           implements = "org.elixir_lang.psi.InfixOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                           rightAssociative = true
-                         }
+                          { rightAssociative = true }
 
 /*
  * Or Operation - left-associative
@@ -1276,16 +1240,8 @@ orInfixOperator ::= EOL* OR_OPERATOR EOL*
                       ]
                       name = "||, |||, or"
                     }
+// implements and methods defined by "infix operations" section above
 matchedOrOperation ::= matchedExpression orInfixOperator matchedExpression
-                       {
-                         implements = "org.elixir_lang.psi.InfixOperation"
-                         methods = [
-                           leftOperand
-                           operator
-                           quote
-                           rightOperand
-                         ]
-                       }
 
 /*
  * And Operation - left-associative
@@ -1301,16 +1257,8 @@ andInfixOperator ::= EOL* AND_OPERATOR EOL*
                        ]
                        name = "&&, &&&, and"
                      }
+// implements and methods defined by "infix operations" section above
 matchedAndOperation ::= matchedExpression andInfixOperator matchedExpression
-                        {
-                          implements = "org.elixir_lang.psi.InfixOperation"
-                          methods = [
-                            leftOperand
-                            operator
-                            quote
-                            rightOperand
-                          ]
-                        }
 
 /*
  * Comparison Operation - left-associative
@@ -1327,16 +1275,8 @@ comparisonInfixOperator ::= EOL* COMPARISON_OPERATOR EOL*
                               ]
                               name = "!=, ==, =~, !==, ==="
                             }
+// implements and methods defined by "infix operations" section above
 matchedComparisonOperation ::= matchedExpression comparisonInfixOperator matchedExpression
-                               {
-                                 implements = "org.elixir_lang.psi.InfixOperation"
-                                 methods = [
-                                   leftOperand
-                                   operator
-                                   quote
-                                   rightOperand
-                                 ]
-                               }
 
 /*
  * Relational Operation - left-associative
@@ -1353,16 +1293,8 @@ relationalInfixOperator ::= EOL* RELATIONAL_OPERATOR EOL*
                               ]
                               name = "<, >, <=, >="
                             }
+// implements and methods defined by "infix operations" section above
 matchedRelationalOperation ::= matchedExpression relationalInfixOperator matchedExpression
-                               {
-                                 implements = "org.elixir_lang.psi.InfixOperation"
-                                 methods = [
-                                   leftOperand
-                                   operator
-                                   quote
-                                   rightOperand
-                                 ]
-                               }
 
 /*
  * Arrow Operation - left-associative
@@ -1379,16 +1311,8 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                          ]
                          name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^"
                        }
+// implements and methods defined by "infix operations" section above
 matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
-                          {
-                            implements = "org.elixir_lang.psi.InfixOperation"
-                            methods = [
-                              leftOperand
-                              operator
-                              quote
-                              rightOperand
-                            ]
-                          }
 
 /*
  * In Operation - left-associative
@@ -1405,16 +1329,9 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
                       ]
                       name = "in"
                     }
+// methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
-                       {
-                         implements = "org.elixir_lang.psi.InOperation"
-                         methods = [
-                           leftOperand
-                           operator
-                           quote
-                           rightOperand
-                         ]
-                       }
+                       { implements = "org.elixir_lang.psi.InOperation" }
 
 /*
  * Two Operation - right-associative
@@ -1431,17 +1348,9 @@ twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
                        ]
                        name = "++, --, .., <>"
                      }
+// implements and methods defined by "infix operations" section above
 matchedTwoOperation ::= matchedExpression twoInfixOperator matchedExpression
-                        {
-                          implements = "org.elixir_lang.psi.InfixOperation"
-                          methods = [
-                            leftOperand
-                            operator
-                            quote
-                            rightOperand
-                          ]
-                          rightAssociative = true
-                        }
+                        { rightAssociative = true }
 
 /*
  * Addition Operation - left-associative
@@ -1465,17 +1374,8 @@ additionInfixOperator ::= (SIGNIFICANT_WHITE_SPACE DUAL_OPERATOR (SIGNIFICANT_WH
                             ]
                             name = "+, -"
                           }
+// implements and methods defined by "infix operations" section above
 matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpression
-                             {
-                               implements = "org.elixir_lang.psi.InfixOperation"
-                               methods = [
-                                 leftOperand
-                                 operator
-                                 quote
-                                 rightOperand
-                               ]
-                             }
-
 
 /*
  * Multiplication Operation - left-associative
@@ -1493,16 +1393,8 @@ multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
                                   ]
                                   name = "*, /"
                                 }
+// implements and methods defined by "infix operations" section above
 matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator matchedExpression
-                                   {
-                                     implements = "org.elixir_lang.psi.InfixOperation"
-                                     methods = [
-                                       leftOperand
-                                       operator
-                                       quote
-                                       rightOperand
-                                     ]
-                                   }
 
 /*
  * Unary Non-Numeric Operation - non-associative
@@ -2365,16 +2257,8 @@ unmatchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric unmatched
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L51
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedInMatchOperation ::= unmatchedExpression inMatchInfixOperator unmatchedExpression
-                              {
-                                implements = "org.elixir_lang.psi.InfixOperation"
-                                methods = [
-                                  leftOperand
-                                  operator
-                                  quote
-                                  rightOperand
-                                ]
-                              }
 
 /*
  * When Operation - right-associative
@@ -2390,17 +2274,9 @@ unmatchedInMatchOperation ::= unmatchedExpression inMatchInfixOperator unmatched
    org.elixir_lang.parser_definition.MatchedINMatchOperationParsingTestCase.testMatchedWhenOperation. */
 unmatchedWhenNoParenthesesKeywordsOperation ::= unmatchedExpression whenInfixOperator noParenthesesKeywords
                                                 { elementType = unmatchedWhenOperation rightAssociative = true }
+// implements and methods defined by "infix operations" section above
 unmatchedWhenOperation ::= unmatchedExpression whenInfixOperator unmatchedExpression
-                           {
-                             implements = "org.elixir_lang.psi.InfixOperation"
-                             methods = [
-                               leftOperand
-                               operator
-                               quote
-                               rightOperand
-                             ]
-                             rightAssociative = true
-                           }
+                           { rightAssociative = true }
 
 /*
  * Type Operation - right-associative
@@ -2408,17 +2284,9 @@ unmatchedWhenOperation ::= unmatchedExpression whenInfixOperator unmatchedExpres
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L53
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedTypeOperation ::= unmatchedExpression typeInfixOperator unmatchedExpression
-                           {
-                             implements = "org.elixir_lang.psi.InfixOperation"
-                             methods = [
-                               leftOperand
-                               operator
-                               quote
-                               rightOperand
-                             ]
-                             rightAssociative = true
-                           }
+                           { rightAssociative = true }
 
 /*
  * Pipe Operation - right-associative
@@ -2426,17 +2294,9 @@ unmatchedTypeOperation ::= unmatchedExpression typeInfixOperator unmatchedExpres
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L54
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedPipeOperation ::= unmatchedExpression pipeInfixOperator unmatchedExpression
-                           {
-                             implements = "org.elixir_lang.psi.InfixOperation"
-                             methods = [
-                               leftOperand
-                               operator
-                               quote
-                               rightOperand
-                             ]
-                             rightAssociative = true
-                           }
+                           { rightAssociative = true }
 
 /*
  * Match Operation - right-associative
@@ -2445,17 +2305,9 @@ unmatchedPipeOperation ::= unmatchedExpression pipeInfixOperator unmatchedExpres
  */
 
 
+// implements and methods defined by "infix operations" section above
 unmatchedMatchOperation ::= unmatchedExpression matchInfixOperator unmatchedExpression
-                            {
-                              implements = "org.elixir_lang.psi.InfixOperation"
-                              methods = [
-                                leftOperand
-                                operator
-                                quote
-                                rightOperand
-                              ]
-                              rightAssociative = true
-                            }
+                            { rightAssociative = true }
 
 /*
  * Or Operation - left-associative
@@ -2463,16 +2315,8 @@ unmatchedMatchOperation ::= unmatchedExpression matchInfixOperator unmatchedExpr
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedOrOperation ::= unmatchedExpression orInfixOperator unmatchedExpression
-                         {
-                           implements = "org.elixir_lang.psi.InfixOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                         }
 
 /*
  * And Operation - left-associative
@@ -2480,16 +2324,8 @@ unmatchedOrOperation ::= unmatchedExpression orInfixOperator unmatchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedAndOperation ::= unmatchedExpression andInfixOperator unmatchedExpression
-                          {
-                            implements = "org.elixir_lang.psi.InfixOperation"
-                            methods = [
-                              leftOperand
-                              operator
-                              quote
-                              rightOperand
-                            ]
-                          }
 
 /*
  * Comparison Operation - left-associative
@@ -2497,16 +2333,8 @@ unmatchedAndOperation ::= unmatchedExpression andInfixOperator unmatchedExpressi
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L59
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedComparisonOperation ::= unmatchedExpression comparisonInfixOperator unmatchedExpression
-                                 {
-                                   implements = "org.elixir_lang.psi.InfixOperation"
-                                   methods = [
-                                     leftOperand
-                                     operator
-                                     quote
-                                     rightOperand
-                                   ]
-                                 }
 
 /*
  * Relational Operation - left-associative
@@ -2514,16 +2342,8 @@ unmatchedComparisonOperation ::= unmatchedExpression comparisonInfixOperator unm
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L60
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedRelationalOperation ::= unmatchedExpression relationalInfixOperator unmatchedExpression
-                                 {
-                                   implements = "org.elixir_lang.psi.InfixOperation"
-                                   methods = [
-                                     leftOperand
-                                     operator
-                                     quote
-                                     rightOperand
-                                   ]
-                                 }
 
 /*
  * Arrow Operation - left-associative
@@ -2531,16 +2351,8 @@ unmatchedRelationalOperation ::= unmatchedExpression relationalInfixOperator unm
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L61
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpression
-                            {
-                              implements = "org.elixir_lang.psi.InfixOperation"
-                              methods = [
-                                leftOperand
-                                operator
-                                quote
-                                rightOperand
-                              ]
-                            }
 
 /*
  * In Operation - left-associative
@@ -2548,16 +2360,9 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62
  */
 
+// methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
-                         {
-                           implements = "org.elixir_lang.psi.InOperation"
-                           methods = [
-                             leftOperand
-                             operator
-                             quote
-                             rightOperand
-                           ]
-                         }
+                         { implements = "org.elixir_lang.psi.InOperation" }
 
 /*
  * Two Operation - right-associative
@@ -2565,17 +2370,9 @@ unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedTwoOperation ::= unmatchedExpression twoInfixOperator unmatchedExpression
-                          {
-                            implements = "org.elixir_lang.psi.InfixOperation"
-                            methods = [
-                              leftOperand
-                              operator
-                              quote
-                              rightOperand
-                            ]
-                            rightAssociative = true
-                          }
+                          { rightAssociative = true }
 
 /*
  * Addition Operation - left-associative
@@ -2584,16 +2381,8 @@ unmatchedTwoOperation ::= unmatchedExpression twoInfixOperator unmatchedExpressi
  *
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedAdditionOperation ::= unmatchedExpression additionInfixOperator unmatchedExpression
-                               {
-                                 implements = "org.elixir_lang.psi.InfixOperation"
-                                 methods = [
-                                   leftOperand
-                                   operator
-                                   quote
-                                   rightOperand
-                                 ]
-                               }
 
 /*
  * Multiplication Operation - left-associative
@@ -2602,16 +2391,8 @@ unmatchedAdditionOperation ::= unmatchedExpression additionInfixOperator unmatch
  *
  */
 
+// implements and methods defined by "infix operations" section above
 unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOperator unmatchedExpression
-                                     {
-                                       implements = "org.elixir_lang.psi.InfixOperation"
-                                       methods = [
-                                         leftOperand
-                                         operator
-                                         quote
-                                         rightOperand
-                                       ]
-                                     }
 
 /*
  * Unary Non-Numeric Operation - non-associative
