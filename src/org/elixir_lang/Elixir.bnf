@@ -7,9 +7,70 @@
   // direct children of unmatchedExpression
   extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=unmatchedExpression
 
-  // infix operations
-  implements("(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")="org.elixir_lang.psi.InfixOperation"
-  methods("(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[leftOperand operator quote rightOperand]
+  // infix operations that work as calls
+  implements("(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+    "org.elixir_lang.psi.call.Call"
+    "org.elixir_lang.psi.operation.Infix"
+  ]
+  methods("(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+    functionName
+    functionNameElement
+    getDoBlock
+    isCalling
+    isCallingMacro
+    leftOperand
+    moduleName
+    operator
+    primaryArguments
+    primaryArity
+    quote
+    resolvedFinalArity
+    resolvedFunctionName
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+    rightOperand
+    secondaryArguments
+    secondaryArity
+  ]
+
+  // prefix operations
+  implements("((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+    "org.elixir_lang.psi.call.Call"
+    "org.elixir_lang.psi.operation.Prefix"
+  ]
+  methods("((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+    functionName
+    functionNameElement
+    getDoBlock
+    isCalling
+    isCallingMacro
+    moduleName
+    operand
+    operator
+    primaryArguments
+    primaryArity
+    quote
+    secondaryArguments
+    secondaryArity
+    resolvedFinalArity
+    resolvedFunctionName
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+  ]
+
+  // atNonNumeric operations
+  implements("(un)?matchedAtNonNumericOperation")=[
+    "org.elixir_lang.psi.AtNonNumericOperation"
+  ]
+  methods("(un)?matchedAtNonNumericOperation")=[
+    getReference
+    moduleAttributeName
+    operand
+    operator
+    quote
+  ]
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -1121,7 +1182,6 @@ capturePrefixOperator ::= CAPTURE_OPERATOR EOL*
                             name = "&"
                           }
 matchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric matchedExpression
-                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
  * In Match Operation - left-associative
@@ -1331,7 +1391,7 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
                     }
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
-                       { implements = "org.elixir_lang.psi.InOperation" }
+                       { implements = "org.elixir_lang.psi.operation.In" }
 
 /*
  * Two Operation - right-associative
@@ -1413,7 +1473,6 @@ unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR
                           name = "+, -, !, ^, not, ~~~"
                         }
 matchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric matchedExpression
-                                    { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
  * Dot Operations
@@ -1855,16 +1914,6 @@ atPrefixOperator ::= AT_OPERATOR EOL*
                        name = "@"
                      }
 matchedAtNonNumericOperation ::= atPrefixOperator !numeric matchedExpression
-                                 {
-                                   implements = [
-                                     "org.elixir_lang.psi.AtNonNumericOperation"
-                                   ]
-                                   methods = [
-                                     getReference
-                                     moduleAttributeName
-                                     quote
-                                   ]
-                                 }
 
 /*
  * Unqualified Bracket Operation
@@ -1921,11 +1970,8 @@ matchedAccessExpression ::= accessExpression
  */
 
 atNumericOperation ::= atPrefixOperator numeric
-                       { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 captureNumericOperation ::= capturePrefixOperator numeric
-                            { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 unaryNumericOperation ::= unaryPrefixOperator numeric
-                          { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
  *
@@ -2085,7 +2131,7 @@ stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)
                              {
                                implements = [
                                  "org.elixir_lang.psi.Quotable"
-                                 "org.elixir_lang.psi.WhenOperation"
+                                 "org.elixir_lang.psi.operation.When"
                                ]
                                methods = [
                                  leftOperand
@@ -2249,7 +2295,6 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
  */
 
 unmatchedCaptureNonNumericOperation ::= capturePrefixOperator !numeric unmatchedExpression
-                                        { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
  * In Match Operation - left-associative
@@ -2362,7 +2407,7 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 
 // methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
-                         { implements = "org.elixir_lang.psi.InOperation" }
+                         { implements = "org.elixir_lang.psi.operation.In" }
 
 /*
  * Two Operation - right-associative
@@ -2402,7 +2447,6 @@ unmatchedMultiplicationOperation ::= unmatchedExpression multiplicationInfixOper
  */
 
 unmatchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric unmatchedExpression
-                                      { implements = "org.elixir_lang.psi.PrefixOperation" methods = [quote] }
 
 /*
  * Dot Operations
@@ -2688,16 +2732,6 @@ unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments d
  */
 
 unmatchedAtNonNumericOperation ::= atPrefixOperator !numeric unmatchedExpression
-                                   {
-                                     implements = [
-                                       "org.elixir_lang.psi.AtNonNumericOperation"
-                                     ]
-                                     methods = [
-                                       getReference
-                                       moduleAttributeName
-                                       quote
-                                     ]
-                                   }
 
 /*
  * Unqualified Bracket Operation

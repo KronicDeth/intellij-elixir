@@ -5,10 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
-import org.elixir_lang.psi.ElixirAtPrefixOperator;
-import org.elixir_lang.psi.ElixirMatchedAtNonNumericOperation;
-import org.elixir_lang.psi.ElixirMatchedExpression;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,6 +40,16 @@ public class ElixirMatchedAtNonNumericOperationImpl extends ElixirMatchedExpress
   @NotNull
   public String moduleAttributeName() {
     return ElixirPsiImplUtil.moduleAttributeName(this);
+  }
+
+  @NotNull
+  public Quotable operand() {
+    return ElixirPsiImplUtil.operand(this);
+  }
+
+  @NotNull
+  public Operator operator() {
+    return ElixirPsiImplUtil.operator(this);
   }
 
   @NotNull

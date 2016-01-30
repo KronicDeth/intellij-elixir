@@ -102,16 +102,19 @@ public class Delegation extends Element<Call>  {
                 if (accessExpressionChild instanceof ElixirList) {
                     ElixirList list = (ElixirList) accessExpressionChild;
 
-                    Collection<Call> listCalls = PsiTreeUtil.findChildrenOfType(list, Call.class);
-                    List<TreeElement> treeElementList = new ArrayList<TreeElement>(listCalls.size());
+                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
 
-                    for (Call listCall : listCalls) {
-                        if (FunctionDelegation.is(listCall)) {
-                            treeElementList.add(new FunctionDelegation(this, listCall));
+                    if (listCalls != null) {
+                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(listCalls.length);
+
+                        for (Call listCall : listCalls) {
+                            if (FunctionDelegation.is(listCall)) {
+                                treeElementList.add(new FunctionDelegation(this, listCall));
+                            }
                         }
-                    }
 
-                    children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+                    }
                 }
             }
         } else {

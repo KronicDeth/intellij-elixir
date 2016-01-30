@@ -3,10 +3,12 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirStab;
+import org.elixir_lang.psi.ElixirStabBody;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,43 +57,60 @@ public class Module extends Element<Call> {
     @Override
     public TreeElement[] getChildren() {
         ElixirDoBlock doBlock = navigationItem.getDoBlock();
-        TreeElement[] children;
+        TreeElement[] children = null;
 
         if (doBlock != null) {
             ElixirStab stab = doBlock.getStab();
 
-            Collection<Call> childCalls = PsiTreeUtil.findChildrenOfType(stab, Call.class);
-            int size = childCalls.size();
-            List<TreeElement> treeElementList = new ArrayList<TreeElement>(size);
-            Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(size);
+            PsiElement[] stabChildren = stab.getChildren();
 
-            for (Call childCall : childCalls) {
-                if (Delegation.is(childCall)) {
-                    treeElementList.add(new Delegation(this, childCall));
-                } else if (FunctionClause.is(childCall)) {
-                    Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
+            if (stabChildren.length == 1) {
+                PsiElement stabChild = stabChildren[0];
 
-                    Function function = functionByNameArity.get(nameArity);
+                if (stabChild instanceof ElixirStabBody) {
+                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
 
-                    if (function == null) {
-                        function = new Function(this, nameArity.first, nameArity.second);
-                        functionByNameArity.put(nameArity, function);
+                    Call[] childCalls = PsiTreeUtil.getChildrenOfType(stabBody, Call.class);
 
-                        treeElementList.add(function);
+                    if (childCalls != null) {
+                        int length = childCalls.length;
+                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
+                        Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(length);
+
+                        for (Call childCall : childCalls) {
+                            if (Delegation.is(childCall)) {
+                                treeElementList.add(new Delegation(this, childCall));
+                            } else if (FunctionClause.is(childCall)) {
+                                Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
+
+                                Function function = functionByNameArity.get(nameArity);
+
+                                if (function == null) {
+                                    function = new Function(this, nameArity.first, nameArity.second);
+                                    functionByNameArity.put(nameArity, function);
+
+                                    treeElementList.add(function);
+                                }
+
+                                function.clause(childCall);
+                            } else if (Module.is(childCall)) {
+                                treeElementList.add(new Module(this, childCall));
+                            }
+                        }
+
+                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
                     }
-
-                    function.clause(childCall);
-                } else if (Module.is(childCall)) {
-                    treeElementList.add(new Module(this, childCall));
                 }
             }
-
-            children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
-        } else { // one liner version with `do:` keyword argument
+        } else {
             throw new NotImplementedException(
                     "Walking one-liner defmodules not implemented yet. Please open an issue " +
                             "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the sample text:\n" +
                             navigationItem.getText());
+        }
+
+        if (children == null) {
+            children = new TreeElement[0];
         }
 
         return children;

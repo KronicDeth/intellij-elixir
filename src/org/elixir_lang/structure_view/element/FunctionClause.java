@@ -48,21 +48,114 @@ public class FunctionClause extends Element<Call> {
         assert primaryArguments.length > 0;
 
         PsiElement head = primaryArguments[0];
-        Call headCall;
+        Call headCall = null;
 
         if (head instanceof Call) {
             headCall = (Call) head;
+        } else if (head instanceof ElixirAccessExpression) {
+            PsiElement[] headChildren = head.getChildren();
+
+            if (headChildren.length == 1) {
+                PsiElement headChild = headChildren[0];
+
+                if (headChild instanceof ElixirParentheticalStab) {
+                    ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) headChild;
+
+                    PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
+
+                    if (parentheticalStabChildren.length == 1) {
+                        PsiElement parentheticalStabChild = parentheticalStabChildren[0];
+
+                        if (parentheticalStabChild instanceof ElixirStab) {
+                            ElixirStab stab = (ElixirStab) parentheticalStabChild;
+
+                            PsiElement[] stabChildren = stab.getChildren();
+
+                            if (stabChildren.length == 1) {
+                                PsiElement stabChild = stabChildren[0];
+
+                                if (stabChild instanceof ElixirStabBody) {
+                                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
+
+                                    PsiElement[] stabBodyChildren = stabBody.getChildren();
+
+                                    if (stabBodyChildren.length == 1) {
+                                        PsiElement stabBodyChild = stabBodyChildren[0];
+
+                                        if (stabBodyChild instanceof Call) {
+                                            headCall = (Call) stabBodyChild;
+                                        } else {
+                                            openIssueForNotImplemented(
+                                                    "Function clauses defined with `Elixir.Kernel.def/2` are assumed " +
+                                                            "to have a Call in ElixirStabBody, but got " +
+                                                            stabBodyChild.getClass().getCanonicalName() + ".",
+                                                    head
+                                            );
+                                        }
+                                    } else {
+                                        openIssueForNotImplemented(
+                                                "Function clauses defined with `Elixir.Kernel.def/` are assumed to " +
+                                                        "have a single child for ElixirStabBody, but got " +
+                                                        stabBodyChildren.length + ".",
+                                                head
+                                        );
+                                    }
+                                } else {
+                                    openIssueForNotImplemented(
+                                            "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have " +
+                                                    "an ElixirStabBody in ElixirStab, but got " +
+                                                    stabChild.getClass().getCanonicalName() + ".",
+                                            head
+                                    );
+                                }
+                            } else {
+                                openIssueForNotImplemented(
+                                        "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have an " +
+                                                "one child in the ElixirStab, but got " + stabChildren.length + ". ",
+                                        head
+                                );
+                            }
+                        } else {
+                            openIssueForNotImplemented(
+                                    "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have an " +
+                                            "ElixirStab under ElixirParentheticalStab, but got " +
+                                            parentheticalStabChild.getClass().getCanonicalName() + ".",
+                                    head
+                            );
+                        }
+                    } else {
+                        openIssueForNotImplemented(
+                                "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have one child " +
+                                        "for ElixirParentheticalStab, but got " + parentheticalStabChildren.length +
+                                        ".",
+                                head
+                        );
+                    }
+                } else {
+                    openIssueForNotImplemented(
+                            "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have " +
+                                    "ElixirParentheticalStab for ElixirAccessExpression, but got " +
+                                    headChild.getClass().getCanonicalName() + ".",
+                            head
+                    );
+                }
+            } else {
+                openIssueForNotImplemented(
+                        "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have one child for " +
+                                "ElixirAccessExpression, but got " + headChildren.length + " children.",
+                        head
+                );
+            }
         } else if (head instanceof ElixirMatchedWhenOperation) {
             ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
 
             headCall = (Call) whenOperation.leftOperand();
         } else {
-            throw new NotImplementedException(
+            openIssueForNotImplemented(
                     "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have either Calls or " +
                             "MatchedWhenOperation as the first primaryArgument, but got " +
-                            head.getClass().getCanonicalName() + ". Please open an issue " +
-                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the sample text:\n" +
-                            head.getText()
+                            head.getClass().getCanonicalName() + ".",
+                    head
             );
         }
 
@@ -70,6 +163,19 @@ public class FunctionClause extends Element<Call> {
         Integer arity = headCall.resolvedFinalArity();
 
         return pair(name, arity);
+    }
+
+    /**
+     * Throws {@code NotImplementedException} with the description and instructions to open an issue.
+     *
+     * @param description description of the unexpected condition that needs to be handled in the implementation.
+     * @param element Element whose text to include in the issue to open
+     */
+    public static void openIssueForNotImplemented(String description, PsiElement element) {
+        throw new NotImplementedException(
+                description + " Please open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) with " +
+                        "the sample text:\n" + element.getText()
+        );
     }
 
     /*
@@ -94,17 +200,29 @@ public class FunctionClause extends Element<Call> {
         if (doBlock != null) {
             ElixirStab stab = doBlock.getStab();
 
-            Collection<Call> childCalls = PsiTreeUtil.findChildrenOfType(stab, Call.class);
-            List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.size());
+            PsiElement[] stabChildren = stab.getChildren();
 
-            for (Call childCall : childCalls) {
-                // Kernel.def/2 can't be called in another Kernel.def/2, but one can call `Kernel.defmodule/2`
-                if (Module.is(childCall)) {
-                    treeElementList.add(new Module(function.getModule(), childCall));
+            if (stabChildren.length == 1) {
+                PsiElement stabChild = stabChildren[0];
+
+                if (stabChild instanceof ElixirStabBody) {
+                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
+                    Call[] childCalls = PsiTreeUtil.getChildrenOfType(stabBody, Call.class);
+
+                    if (childCalls != null) {
+                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.length);
+
+                        for (Call childCall : childCalls) {
+                            // Kernel.def/2 can't be called in another Kernel.def/2, but one can call `Kernel.defmodule/2`
+                            if (Module.is(childCall)) {
+                                treeElementList.add(new Module(function.getModule(), childCall));
+                            }
+                        }
+
+                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+                    }
                 }
             }
-
-            children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
         } else { // one liner version with `do:` keyword argument
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 

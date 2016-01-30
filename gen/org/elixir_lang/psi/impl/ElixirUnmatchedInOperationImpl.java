@@ -3,10 +3,12 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -34,8 +36,23 @@ public class ElixirUnmatchedInOperationImpl extends ElixirUnmatchedExpressionImp
   }
 
   @NotNull
+  public PsiElement functionNameElement() {
+    return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  @Nullable
+  public ElixirDoBlock getDoBlock() {
+    return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
+  @NotNull
   public Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
+  }
+
+  @Nullable
+  public String moduleName() {
+    return ElixirPsiImplUtil.moduleName(this);
   }
 
   @NotNull
@@ -44,13 +61,28 @@ public class ElixirUnmatchedInOperationImpl extends ElixirUnmatchedExpressionImp
   }
 
   @NotNull
+  public PsiElement[] primaryArguments() {
+    return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @NotNull
+  public String resolvedModuleName() {
+    return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @NotNull
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);
+  }
+
+  @Nullable
+  public PsiElement[] secondaryArguments() {
+    return ElixirPsiImplUtil.secondaryArguments(this);
   }
 
 }

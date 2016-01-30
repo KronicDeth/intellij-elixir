@@ -16,6 +16,8 @@ import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.When;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -241,8 +243,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
             if (grandChild instanceof ElixirMatchedMatchOperation) {
                 // TODO LocalInspectionTool with quick fix to "Use `::`, not `=`, to separate types declarations from their definitions"
             } else if (grandChild instanceof ElixirMatchedTypeOperation) {
-                InfixOperation infixOperation = (InfixOperation) grandChild;
-                PsiElement leftOperand = infixOperation.leftOperand();
+                Infix infix = (Infix) grandChild;
+                PsiElement leftOperand = infix.leftOperand();
                 Set<String> typeParameterNameSet = Collections.EMPTY_SET;
 
                 if (leftOperand instanceof Call) {
@@ -310,7 +312,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     );
                 }
 
-                PsiElement rightOperand = infixOperation.rightOperand();
+                PsiElement rightOperand = infix.rightOperand();
 
                 highlightTypesAndTypeParameterUsages(
                         rightOperand,
@@ -428,8 +430,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
             PsiElement grandChild = grandChildren[0];
 
             if (grandChild instanceof ElixirMatchedTypeOperation) {
-                InfixOperation infixOperation = (InfixOperation) grandChild;
-                PsiElement leftOperand = infixOperation.leftOperand();
+                Infix infix = (Infix) grandChild;
+                PsiElement leftOperand = infix.leftOperand();
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
@@ -466,7 +468,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     }
                 }
 
-                PsiElement rightOperand = infixOperation.rightOperand();
+                PsiElement rightOperand = infix.rightOperand();
 
                 highlightTypesAndTypeParameterUsages(
                         rightOperand,
@@ -706,7 +708,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
             );
         } else if (children.length == 3) {
             highlightTypesAndTypeParameterUsages(
-                    (WhenOperation) stabParenthesesSignature,
+                    (When) stabParenthesesSignature,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
@@ -735,18 +737,18 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private void highlightTypesAndTypeParameterUsages(
-            InfixOperation infixOperation,
+            Infix infix,
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
         highlightTypesAndTypeParameterUsages(
-                infixOperation.leftOperand(),
+                infix.leftOperand(),
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
         );
         highlightTypesAndTypeParameterUsages(
-                infixOperation.rightOperand(),
+                infix.rightOperand(),
                 typeParameterNameSet,
                 annotationHolder,
                 typeTextAttributesKey
@@ -835,18 +837,18 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof WhenOperation) {
-            /* NOTE: MUST be before `InfixOperation` as `WhenOperation` is a subinterface of
-              `InfixOperation` */
+        } else if (psiElement instanceof When) {
+            /* NOTE: MUST be before `Infix` as `When` is a subinterface of
+              `Infix` */
             highlightTypesAndTypeParameterUsages(
-                    (WhenOperation) psiElement,
+                    (When) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof InfixOperation) {
+        } else if (psiElement instanceof Infix) {
             highlightTypesAndTypeParameterUsages(
-                    (InfixOperation) psiElement,
+                    (Infix) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
@@ -1032,7 +1034,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private void highlightTypesAndTypeParameterUsages(
-            WhenOperation whenOperation,
+            When when,
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {

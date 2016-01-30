@@ -19,6 +19,10 @@ import org.elixir_lang.psi.call.arguments.NoParentheses;
 import org.elixir_lang.psi.call.arguments.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.Parentheses;
+import org.elixir_lang.psi.operation.In;
+import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Operation;
+import org.elixir_lang.psi.operation.Prefix;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.jetbrains.annotations.Contract;
@@ -702,8 +706,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static Quotable leftOperand(InfixOperation infixOperation) {
-        PsiElement[] children = infixOperation.getChildren();
+    public static Quotable leftOperand(Infix infix) {
+        PsiElement[] children = infix.getChildren();
 
         assert children.length == 3;
 
@@ -779,6 +783,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true, value = "_ -> null")
     @Nullable
+    public static String moduleName(@NotNull @SuppressWarnings("unused") final Operation operation) {
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
     public static String moduleName(@NotNull @SuppressWarnings("unused") final Unqualified unqualified) {
         // Always null because it's unqualified.
         return null;
@@ -793,12 +803,32 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static Operator operator(InfixOperation infixOperation) {
-        PsiElement[] children = infixOperation.getChildren();
+    public static Quotable operand(Prefix prefix) {
+        PsiElement[] children = prefix.getChildren();
+
+        assert children.length == 2;
+
+        return (Quotable) children[1];
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Operator operator(Infix infix) {
+        PsiElement[] children = infix.getChildren();
 
         assert children.length == 3;
 
         return (Operator) children[1];
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Operator operator(Prefix prefix) {
+        PsiElement[] children = prefix.getChildren();
+
+        assert children.length == 2;
+
+        return (Operator) children[0];
     }
 
     @Contract(pure = true)
@@ -942,6 +972,19 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
+        PsiElement[] children = infix.getChildren();
+
+        assert children.length == 3;
+
+        return new PsiElement[]{
+                children[0],
+                children[2]
+        };
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static PsiElement[] primaryArguments(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
         Arguments arguments = unqualifiedNoParenthesesManyArgumentsCall.getNoParenthesesStrict();
         PsiElement[] primaryArguments;
@@ -983,6 +1026,18 @@ public class ElixirPsiImplUtil {
 
         ElixirParenthesesArguments primaryParenthesesArguments = parenthesesArgumentsList.get(0);
         return primaryParenthesesArguments.arguments();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement[] primaryArguments(@NotNull final Prefix prefix) {
+        PsiElement[] children = prefix.getChildren();
+
+        assert children.length == 2;
+
+        return new PsiElement[]{
+                children[1]
+        };
     }
 
     @Contract(pure = true)
@@ -1106,14 +1161,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final InfixOperation infixOperation) {
-        Quotable leftOperand = infixOperation.leftOperand();
+    public static OtpErlangObject quote(@NotNull final Infix infix) {
+        Quotable leftOperand = infix.leftOperand();
         OtpErlangObject quotedLeftOperand = leftOperand.quote();
 
-        Operator operator = infixOperation.operator();
+        Operator operator = infix.operator();
         OtpErlangObject quotedOperator = operator.quote();
 
-        Quotable rightOperand = infixOperation.rightOperand();
+        Quotable rightOperand = infix.rightOperand();
         OtpErlangObject quotedRightOperand = rightOperand.quote();
 
         return quotedFunctionCall(
@@ -1489,6 +1544,12 @@ public class ElixirPsiImplUtil {
         return null;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement functionNameElement(@NotNull final Operation operation) {
+        return operation.operator();
+    }
+
     public static PsiElement functionNameElement(@NotNull final Qualified qualified) {
         return qualified.getRelativeIdentifier();
     }
@@ -1599,6 +1660,12 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true, value = "_ -> null")
     @Nullable
     public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
+        return null;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static ElixirDoBlock getDoBlock(@NotNull @SuppressWarnings("unused") final Operation operation) {
         return null;
     }
 
@@ -2796,8 +2863,8 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(@NotNull final InOperation inOperation) {
-        PsiElement[] children = inOperation.getChildren();
+    public static OtpErlangObject quote(@NotNull final In in) {
+        PsiElement[] children = in.getChildren();
 
         if (children.length != 3) {
             throw new NotImplementedException("BinaryOperation expected to have 3 children (left operand, operator, right operand");
@@ -3211,11 +3278,11 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static OtpErlangObject quote(PrefixOperation prefixOperation) {
-        PsiElement[] children = prefixOperation.getChildren();
+    public static OtpErlangObject quote(Prefix prefix) {
+        PsiElement[] children = prefix.getChildren();
 
         if (children.length != 2) {
-            throw new NotImplementedException("PrefixOperation expected to have 2 children (operator and operand");
+            throw new NotImplementedException("Prefix expected to have 2 children (operator and operand");
         }
 
         Quotable operator = (Quotable) children[0];
@@ -3226,7 +3293,7 @@ if (quoted == null) {
 
         return quotedFunctionCall(
                 quotedOperator,
-                metadata(prefixOperation),
+                metadata(prefix),
                 quotedOperand
         );
     }
@@ -3774,6 +3841,21 @@ if (quoted == null) {
         return null;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static String resolvedModuleName(@NotNull final Infix infix) {
+        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now, but some are actually from
+           Bitwise */
+        return "Elixir.Kernel";
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static String resolvedModuleName(@NotNull final Prefix prefix) {
+        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now. */
+        return "Elixir.Kernel";
+    }
+
     /**
      * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
      *
@@ -3861,8 +3943,8 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    public static Quotable rightOperand(InfixOperation infixOperation) {
-        PsiElement[] children = infixOperation.getChildren();
+    public static Quotable rightOperand(Infix infix) {
+        PsiElement[] children = infix.getChildren();
 
         assert children.length == 3;
 
@@ -3883,6 +3965,12 @@ if (quoted == null) {
         }
 
         return arguments;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final Infix infix) {
+        return null;
     }
 
     @Contract(pure = true, value = "_ -> null")
@@ -3912,6 +4000,12 @@ if (quoted == null) {
         }
 
         return arguments;
+    }
+
+    @Contract(pure = true, value = "_ -> null")
+    @Nullable
+    public static PsiElement[] secondaryArguments(@NotNull @SuppressWarnings("unused") final Prefix prefix) {
+        return null;
     }
 
     @Contract(pure = true)

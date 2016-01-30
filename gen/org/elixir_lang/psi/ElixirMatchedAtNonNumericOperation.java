@@ -21,6 +21,12 @@ public interface ElixirMatchedAtNonNumericOperation extends ElixirMatchedExpress
   String moduleAttributeName();
 
   @NotNull
+  Quotable operand();
+
+  @NotNull
+  Operator operator();
+
+  @NotNull
   OtpErlangObject quote();
 
 }

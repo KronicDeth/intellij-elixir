@@ -2,10 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import org.elixir_lang.psi.operation.When;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirStabParenthesesSignature extends Quotable, WhenOperation {
+public interface ElixirStabParenthesesSignature extends Quotable, When {
 
   @Nullable
   ElixirEmptyParentheses getEmptyParentheses();
