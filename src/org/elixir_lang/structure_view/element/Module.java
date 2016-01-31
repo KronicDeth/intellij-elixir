@@ -76,10 +76,14 @@ public class Module extends Element<Call> {
                         int length = childCalls.length;
                         List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
                         Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(length);
+                        org.elixir_lang.structure_view.element.Exception exception = null;
 
                         for (Call childCall : childCalls) {
                             if (Delegation.is(childCall)) {
                                 treeElementList.add(new Delegation(this, childCall));
+                            } else if (org.elixir_lang.structure_view.element.Exception.is(childCall)) {
+                                exception = new org.elixir_lang.structure_view.element.Exception(this, childCall);
+                                treeElementList.add(exception);
                             } else if (FunctionClause.is(childCall)) {
                                 Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
 
@@ -89,7 +93,12 @@ public class Module extends Element<Call> {
                                     function = new Function(this, nameArity.first, nameArity.second);
                                     functionByNameArity.put(nameArity, function);
 
-                                    treeElementList.add(function);
+                                    // callbacks are nested under the behavior they are for
+                                    if (exception != null && Exception.isCallback(nameArity)) {
+                                        exception.callback(function);
+                                    } else {
+                                        treeElementList.add(function);
+                                    }
                                 }
 
                                 function.clause(childCall);

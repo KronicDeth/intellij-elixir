@@ -42,6 +42,10 @@ public class Function implements StructureViewTreeElement {
      * Public Instance Methods
      */
 
+    public int arity() {
+        return arity;
+    }
+
     /**
      * Adds clause to function
      *
@@ -122,6 +126,11 @@ public class Function implements StructureViewTreeElement {
                 name,
                 arity
         );
+    }
+
+    @NotNull
+    public String name() {
+        return name;
     }
 
     /**
