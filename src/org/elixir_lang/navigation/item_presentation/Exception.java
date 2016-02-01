@@ -2,11 +2,16 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.PsiElement;
 import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.psi.ElixirAtom;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Exception implements ItemPresentation {
     /*
@@ -14,7 +19,7 @@ public class Exception implements ItemPresentation {
      */
 
     @NotNull
-    private final String[] fieldNames;
+    private final Map<PsiElement, PsiElement> defaultValueElementByKeyElement;
     @NotNull
     private final Module module;
 
@@ -22,8 +27,8 @@ public class Exception implements ItemPresentation {
      * Constructors
      */
 
-    public Exception(@NotNull Module module, @NotNull String[] fieldNames) {
-        this.fieldNames = fieldNames;
+    public Exception(@NotNull Module module, @NotNull Map<PsiElement, PsiElement> defaultValueElementByKeyElement) {
+        this.defaultValueElementByKeyElement = defaultValueElementByKeyElement;
         this.module = module;
     }
 
@@ -75,6 +80,50 @@ public class Exception implements ItemPresentation {
     @Nullable
     @Override
     public String getPresentableText() {
-        return "defexception [" + StringUtil.join(fieldNames, ", ") + "]";
+        SortedMap<String, String> defaultValueNameByKeyName = new TreeMap<String, String>();
+
+        for (Map.Entry<PsiElement, PsiElement> entry : defaultValueElementByKeyElement.entrySet()) {
+            PsiElement keyElement = entry.getKey();
+            String keyName;
+
+            if (keyElement instanceof ElixirAtom) {
+                ElixirAtom atom = (ElixirAtom) keyElement;
+                String atomText = atom.getText();
+                keyName = atomText.substring(1);
+            } else {
+                keyName = keyElement.getText();
+            }
+
+            PsiElement valueElement = entry.getValue();
+            String valueName;
+
+            if (valueElement != null) {
+                valueName = valueElement.getText();
+            } else {
+                valueName = "nil";
+            }
+
+            defaultValueNameByKeyName.put(keyName, valueName);
+        }
+
+        StringBuilder presentableTextBuilder = new StringBuilder("defexception [");
+
+        boolean first = true;
+
+        for (Map.Entry<String, String> entry : defaultValueNameByKeyName.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                presentableTextBuilder.append(", ");
+            }
+
+            presentableTextBuilder.append(entry.getKey());
+            presentableTextBuilder.append(": ");
+            presentableTextBuilder.append(entry.getValue());
+        }
+
+        presentableTextBuilder.append("]");
+
+        return presentableTextBuilder.toString();
     }
 }

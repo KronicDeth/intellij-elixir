@@ -4,8 +4,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.ElixirList;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.Contract;
@@ -13,7 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A `defexception` with its fields and the callbacks `exception/1` and `message/1` if overridden.
@@ -73,33 +74,60 @@ public class Exception extends Element<Call> {
     }
 
     /**
-     * The fields for the struct for the defined exception.
+     * The default value elements for the struct defined for the exception.
      *
-     * @return `{FIELD1, ...}` in `defexception [FIELD1, ...]`
+     * @return Maps the element for the key in the struct to the element in the default value.  When the list form of
+     *   fields without default values is used, the Map value element is {@code  null}.
      */
     @NotNull
-    public PsiElement[] fields() {
+    public Map<PsiElement, PsiElement> defaultValueElementByKeyElement() {
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 
+        assert finalArguments != null;
         assert finalArguments.length == 1;
 
         PsiElement finalArgument = finalArguments[0];
+        Map<PsiElement, PsiElement> defaultValueElementByKeyElement = new HashMap<PsiElement, PsiElement>(finalArguments.length);
 
-        assert finalArgument instanceof ElixirAccessExpression;
+        if (finalArgument instanceof ElixirAccessExpression) {
+            ElixirAccessExpression accessExpression = (ElixirAccessExpression) finalArgument;
+            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
 
-        ElixirAccessExpression accessExpression = (ElixirAccessExpression) finalArgument;
-        PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+            assert accessExpressionChildren.length == 1;
 
-        assert accessExpressionChildren.length == 1;
+            PsiElement accessExpressionChild = accessExpressionChildren[0];
 
-        PsiElement accessExpressionChild = accessExpressionChildren[0];
+            assert accessExpressionChild instanceof ElixirList;
 
-        assert accessExpressionChild instanceof ElixirList;
+            ElixirList list = (ElixirList) accessExpressionChild;
+            PsiElement[] listChildren = list.getChildren();
 
-        ElixirList list = (ElixirList) accessExpressionChild;
+            if (listChildren.length == 1) {
+                PsiElement listChild = listChildren[0];
 
-        return list.getChildren();
+                if (listChild instanceof QuotableKeywordList) {
+                    QuotableKeywordList quotableKeywordList = (QuotableKeywordList) listChild;
+
+                    putQuotableKeywordList(defaultValueElementByKeyElement, quotableKeywordList);
+                } else {
+                    defaultValueElementByKeyElement.put(listChild, null);
+                }
+            } else {
+                for (PsiElement key : list.getChildren()) {
+                    defaultValueElementByKeyElement.put(key, null);
+                }
+            }
+        } else if (finalArgument instanceof QuotableKeywordList) {
+            QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
+
+            putQuotableKeywordList(defaultValueElementByKeyElement, quotableKeywordList);
+        } else {
+            assert finalArgument != null;
+        }
+
+        return defaultValueElementByKeyElement;
     }
+
 
     /**
      * Returns the list of children of the tree element.
@@ -128,18 +156,19 @@ public class Exception extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        PsiElement[] fields = this.fields();
-        int length = fields.length;
-        String[] fieldNames = new String[length];
-
-        for (int i = 0; i < length; i++) {
-            fieldNames[i] = fields[i].getText();
-        }
-
         return new org.elixir_lang.navigation.item_presentation.Exception(
                 (org.elixir_lang.navigation.item_presentation.Module) module.getPresentation(),
-                fieldNames
+                defaultValueElementByKeyElement()
         );
     }
 
+    private void putQuotableKeywordList(Map<PsiElement, PsiElement> defaultValueElementByKeyElement,
+                                        QuotableKeywordList quotableKeywordList) {
+        for (QuotableKeywordPair quotableKeywordPair : quotableKeywordList.quotableKeywordPairList()) {
+            PsiElement keyElement = quotableKeywordPair.getKeywordKey();
+            PsiElement valueElement = quotableKeywordPair.getKeywordValue();
+
+            defaultValueElementByKeyElement.put(keyElement, valueElement);
+        }
+    }
 }
