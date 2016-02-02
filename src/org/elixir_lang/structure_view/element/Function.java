@@ -4,6 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
@@ -122,7 +123,7 @@ public class Function implements StructureViewTreeElement {
     @Override
     public ItemPresentation getPresentation() {
         return new org.elixir_lang.navigation.item_presentation.Function(
-                (org.elixir_lang.navigation.item_presentation.Module) module.getPresentation(),
+                (Parent) module.getPresentation(),
                 name,
                 arity
         );

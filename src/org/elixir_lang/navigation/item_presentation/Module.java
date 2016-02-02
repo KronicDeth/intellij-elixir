@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class Module implements ItemPresentation {
+public class Module implements ItemPresentation, Parent {
     /*
      * Fields
      */
@@ -61,6 +61,28 @@ public class Module implements ItemPresentation {
     }
 
     /**
+     * Combines {@link #getLocationString()} with {@link #getPresentableText()} for when this Module is the parent of
+     * another Module and needs to act as the location of the child Module.
+     *
+     * @return {@link #getLocationString()} + "." + {@link #getPresentableText()} if {@link #getLocationString()} is not
+     *   {@code null}; otherwise, {@link #getPresentableText()}.
+     */
+    @Override
+    @NotNull
+    public String getLocatedPresentableText() {
+        String locatedPresentableText;
+        String locationString = getLocationString();
+
+        if (locationString != null) {
+            locatedPresentableText = locationString + "." + getPresentableText();
+        } else {
+            locatedPresentableText = getPresentableText();
+        }
+
+        return locatedPresentableText;
+    }
+
+    /**
      * Returns the location of the object (for example, the package of a class). The location
      * string is used by some renderers and usually displayed as grayed text next to the item name.
      *
@@ -72,14 +94,7 @@ public class Module implements ItemPresentation {
         String locationString = null;
 
         if (parent != null) {
-            String parentLocationString = parent.getLocationString();
-            String parentPresentableText = parent.getPresentableText();
-
-            if (parentLocationString != null) {
-                locationString = parentLocationString + "." + parentPresentableText;
-            } else {
-                locationString = parentPresentableText;
-            }
+            locationString = parent.getLocatedPresentableText();
         }
 
         return locationString;

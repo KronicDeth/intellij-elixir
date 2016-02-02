@@ -56,20 +56,7 @@ public class Exception implements ItemPresentation {
     @Nullable
     @Override
     public String getLocationString() {
-        String locationString = null;
-
-        if (module != null) {
-            String moduleLocationString = module.getLocationString();
-            String modulePresentableText = module.getPresentableText();
-
-            if (moduleLocationString != null) {
-                locationString = moduleLocationString + "." + modulePresentableText;
-            } else {
-                locationString = modulePresentableText;
-            }
-        }
-
-        return locationString;
+        return module.getLocatedPresentableText();
     }
 
     /**

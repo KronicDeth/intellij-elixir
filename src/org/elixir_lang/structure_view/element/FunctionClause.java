@@ -213,8 +213,9 @@ public class FunctionClause extends Element<Call> {
                         List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.length);
 
                         for (Call childCall : childCalls) {
-                            // Kernel.def/2 can't be called in another Kernel.def/2, but one can call `Kernel.defmodule/2`
-                            if (Module.is(childCall)) {
+                            if (Implementation.is(childCall)) {
+                                treeElementList.add(new Implementation(function.getModule(), childCall));
+                            } else if (Module.is(childCall)) {
                                 treeElementList.add(new Module(function.getModule(), childCall));
                             }
                         }
@@ -242,7 +243,11 @@ public class FunctionClause extends Element<Call> {
                     if (keywordValue instanceof Call) {
                         Call childCall = (Call) keywordValue;
 
-                        if (Module.is(childCall)) {
+                        if (Implementation.is(childCall)) {
+                            children = new TreeElement[] {
+                                    new Implementation(function.getModule(), childCall)
+                            };
+                        } else if (Module.is(childCall)) {
                             children = new TreeElement[] {
                                     new Module(function.getModule(), childCall)
                             };

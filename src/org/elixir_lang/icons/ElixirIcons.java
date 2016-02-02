@@ -18,6 +18,7 @@ public interface ElixirIcons {
   Icon FUNCTION_CLAUSE = PlatformIcons.PACKAGE_LOCAL_ICON;
   Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
   Icon MODULE = PlatformIcons.PACKAGE_ICON;
+  Icon IMPLEMENTATION = PlatformIcons.ANONYMOUS_CLASS_ICON;
 
   Icon ELIXIR_APPLICATION = IconLoader.getIcon("/icons/elixir-Application-16.png");
   Icon ELIXIR_SUPERVISOR = IconLoader.getIcon("/icons/elixir-Supervisor-16.png");

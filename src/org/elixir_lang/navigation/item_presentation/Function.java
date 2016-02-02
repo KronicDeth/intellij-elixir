@@ -4,23 +4,26 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class Function implements ItemPresentation {
+public class Function<T extends Module> implements ItemPresentation {
     /*
      * Fields
      */
 
     private final int arity;
-    private final Module module;
+    @NotNull
     private final String name;
+    @NotNull
+    private final Parent parent;
 
-    public Function(Module module, String name, int arity) {
+    public Function(@NotNull Parent parent, @NotNull String name, int arity) {
         this.arity = arity;
-        this.module = module;
         this.name = name;
+        this.parent = parent;
     }
 
     /**
@@ -28,7 +31,7 @@ public class Function implements ItemPresentation {
      *
      * @return {@code name}/{@code arity}
      */
-    @Nullable
+    @NotNull
     @Override
     public String getPresentableText() {
         return name + "/" + arity;
@@ -40,23 +43,10 @@ public class Function implements ItemPresentation {
      *
      * @return the location description, or null if none is applicable.
      */
-    @Nullable
+    @NotNull
     @Override
     public String getLocationString() {
-        String locationString = null;
-
-        if (module != null) {
-            String moduleLocationString = module.getLocationString();
-            String modulePresentableText = module.getPresentableText();
-
-            if (moduleLocationString != null) {
-                locationString = moduleLocationString + "." + modulePresentableText;
-            } else {
-                locationString = modulePresentableText;
-            }
-        }
-
-        return locationString;
+        return parent.getLocatedPresentableText();
     }
 
     /**
@@ -64,7 +54,7 @@ public class Function implements ItemPresentation {
      *
      * @param unused Used to mean if open/close icons for tree renderer. No longer in use. The parameter is only there for API compatibility reason.
      */
-    @Nullable
+    @NotNull
     @Override
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);

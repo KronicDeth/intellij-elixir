@@ -36,7 +36,9 @@ public class File extends Element<ElixirFile> {
             List<TreeElement> treeElementList = new ArrayList<TreeElement>(calls.length);
 
             for (Call call : calls) {
-                if (Module.is(call)) {
+                if (Implementation.is(call)) {
+                    treeElementList.add(new Implementation(call));
+                } else if (Module.is(call)) {
                     treeElementList.add(new Module(call));
                 }
             }

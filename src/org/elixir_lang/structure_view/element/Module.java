@@ -21,10 +21,10 @@ public class Module extends Element<Call> {
      */
 
     @Nullable
-    private final Module parent;
+    protected final Module parent;
 
     /*
-     * Public Instance Methods
+     * Static Methods
      */
 
     public static boolean is(Call call) {
@@ -102,6 +102,8 @@ public class Module extends Element<Call> {
                                 }
 
                                 function.clause(childCall);
+                            } else if (Implementation.is(childCall)) {
+                                treeElementList.add(new Implementation(this, childCall));
                             } else if (Module.is(childCall)) {
                                 treeElementList.add(new Module(this, childCall));
                             }
