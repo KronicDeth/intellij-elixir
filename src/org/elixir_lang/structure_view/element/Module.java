@@ -76,6 +76,7 @@ public class Module extends Element<Call> {
                         int length = childCalls.length;
                         List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
                         Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(length);
+                        Map<Pair<String, Integer>, Macro> macroByNameArity = new HashMap<Pair<String, Integer>, Macro>(length);
                         org.elixir_lang.structure_view.element.Exception exception = null;
 
                         for (Call childCall : childCalls) {
@@ -104,6 +105,18 @@ public class Module extends Element<Call> {
                                 function.clause(childCall);
                             } else if (Implementation.is(childCall)) {
                                 treeElementList.add(new Implementation(this, childCall));
+                            } else if (MacroClause.is(childCall)) {
+                                Pair<String, Integer> nameArity = MacroClause.nameArity(childCall);
+
+                                Macro macro = macroByNameArity.get(nameArity);
+
+                                if (macro == null) {
+                                    macro = new Macro(this, nameArity.first, nameArity.second);
+                                    macroByNameArity.put(nameArity, macro);
+                                    treeElementList.add(macro);
+                                }
+
+                                macro.clause(childCall);
                             } else if (Module.is(childCall)) {
                                 treeElementList.add(new Module(this, childCall));
                             }

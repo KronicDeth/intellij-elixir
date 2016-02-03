@@ -2,6 +2,7 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.text.StringUtil;
+import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,7 +112,7 @@ public class FunctionDelegation implements ItemPresentation {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        return null;
+        return ElixirIcons.FUNCTION_DELEGATION;
     }
 
     public String name() {

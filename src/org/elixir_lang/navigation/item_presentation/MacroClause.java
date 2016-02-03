@@ -1,40 +1,56 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class Function implements ItemPresentation {
+public class MacroClause implements ItemPresentation {
     /*
      * Fields
      */
 
-    private final int arity;
-    @NotNull
-    private final String name;
-    @NotNull
-    private final Parent parent;
+    private final Call call;
+    private final Macro macro;
 
-    public Function(@NotNull Parent parent, @NotNull String name, int arity) {
-        this.arity = arity;
-        this.name = name;
-        this.parent = parent;
-    }
+    /*
+     * Constructors
+     */
 
     /**
-     * The name/arity of this function.
      *
-     * @return {@code name}/{@code arity}
+     * @param call a {@code Kernel.def/2} call nested in {@code parent}
+     * @param macro the parent {@link Function} of which {@code call} is a clause
+     */
+    public MacroClause(@NotNull Macro macro, @NotNull Call call) {
+        this.call = call;
+        this.macro = macro;
+    }
+
+    /*
+     * Public Instance Methods
+     */
+
+    /**
+     * Returns the name of the object to be presented in most renderers across the program.
+     *
+     * @return the function name.
      */
     @NotNull
     @Override
     public String getPresentableText() {
-        return name + "/" + arity;
+        PsiElement[] primaryArguments = call.primaryArguments();
+
+        assert primaryArguments != null;
+        assert primaryArguments.length > 0;
+
+        return primaryArguments[0].getText();
     }
 
     /**
@@ -43,10 +59,10 @@ public class Function implements ItemPresentation {
      *
      * @return the location description, or null if none is applicable.
      */
-    @NotNull
+    @Nullable
     @Override
     public String getLocationString() {
-        return parent.getLocatedPresentableText();
+        return macro.getLocationString();
     }
 
     /**
@@ -54,11 +70,11 @@ public class Function implements ItemPresentation {
      *
      * @param unused Used to mean if open/close icons for tree renderer. No longer in use. The parameter is only there for API compatibility reason.
      */
-    @NotNull
+    @Nullable
     @Override
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);
-        rowIcon.setIcon(ElixirIcons.FUNCTION, 0);
+        rowIcon.setIcon(ElixirIcons.MACRO_CLAUSE, 0);
         rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
 
         return rowIcon;

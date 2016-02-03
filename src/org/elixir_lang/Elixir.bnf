@@ -7,6 +7,13 @@
   // direct children of unmatchedExpression
   extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=unmatchedExpression
 
+  // in operations that works as calls
+  implements("(un)?matchedInOperation")=[
+    "org.elixir_lang.psi.call.Call"
+    "org.elixir_lang.psi.operation.In"
+  ]
+  // methods set by infix operations below
+
   // infix operations that work as calls
   implements("(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
     "org.elixir_lang.psi.call.Call"
@@ -1389,9 +1396,9 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
                       ]
                       name = "in"
                     }
+// implements defined by "in operations" section above
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
-                       { implements = "org.elixir_lang.psi.operation.In" }
 
 /*
  * Two Operation - right-associative
@@ -2405,9 +2412,9 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L62
  */
 
+// implements defined by "in operations" section above
 // methods defined by "infix operations" section above
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
-                         { implements = "org.elixir_lang.psi.operation.In" }
 
 /*
  * Two Operation - right-associative

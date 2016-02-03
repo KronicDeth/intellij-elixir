@@ -35,6 +35,11 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
     return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
+  @Nullable
+  public String functionName() {
+    return ElixirPsiImplUtil.functionName(this);
+  }
+
   @NotNull
   public PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
@@ -43,6 +48,18 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
   @Nullable
   public ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
   @NotNull
@@ -65,14 +82,39 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
     return ElixirPsiImplUtil.primaryArguments(this);
   }
 
+  @Nullable
+  public Integer primaryArity() {
+    return ElixirPsiImplUtil.primaryArity(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
 
   @NotNull
+  public int resolvedFinalArity() {
+    return ElixirPsiImplUtil.resolvedFinalArity(this);
+  }
+
+  @NotNull
+  public String resolvedFunctionName() {
+    return ElixirPsiImplUtil.resolvedFunctionName(this);
+  }
+
+  @NotNull
   public String resolvedModuleName() {
     return ElixirPsiImplUtil.resolvedModuleName(this);
+  }
+
+  @Nullable
+  public Integer resolvedPrimaryArity() {
+    return ElixirPsiImplUtil.resolvedPrimaryArity(this);
+  }
+
+  @Nullable
+  public Integer resolvedSecondaryArity() {
+    return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
 
   @NotNull
@@ -83,6 +125,11 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
   @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @Nullable
+  public Integer secondaryArity() {
+    return ElixirPsiImplUtil.secondaryArity(this);
   }
 
 }

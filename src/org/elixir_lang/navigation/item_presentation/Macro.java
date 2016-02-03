@@ -5,11 +5,10 @@ import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class Function implements ItemPresentation {
+public class Macro implements ItemPresentation {
     /*
      * Fields
      */
@@ -20,7 +19,7 @@ public class Function implements ItemPresentation {
     @NotNull
     private final Parent parent;
 
-    public Function(@NotNull Parent parent, @NotNull String name, int arity) {
+    public Macro(@NotNull Parent parent, @NotNull String name, int arity) {
         this.arity = arity;
         this.name = name;
         this.parent = parent;
@@ -58,7 +57,7 @@ public class Function implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);
-        rowIcon.setIcon(ElixirIcons.FUNCTION, 0);
+        rowIcon.setIcon(ElixirIcons.MACRO, 0);
         rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
 
         return rowIcon;

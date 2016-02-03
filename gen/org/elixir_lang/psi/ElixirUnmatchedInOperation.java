@@ -3,13 +3,14 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.In;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, In {
+public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, Call, In {
 
   @NotNull
   ElixirInInfixOperator getInInfixOperator();
@@ -17,11 +18,20 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, I
   @NotNull
   List<ElixirUnmatchedExpression> getUnmatchedExpressionList();
 
+  @Nullable
+  String functionName();
+
   @NotNull
   PsiElement functionNameElement();
 
   @Nullable
   ElixirDoBlock getDoBlock();
+
+  boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
+
+  boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
   @NotNull
   Quotable leftOperand();
@@ -35,16 +45,34 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, I
   @NotNull
   PsiElement[] primaryArguments();
 
+  @Nullable
+  Integer primaryArity();
+
   @NotNull
   OtpErlangObject quote();
 
   @NotNull
+  int resolvedFinalArity();
+
+  @NotNull
+  String resolvedFunctionName();
+
+  @NotNull
   String resolvedModuleName();
+
+  @Nullable
+  Integer resolvedPrimaryArity();
+
+  @Nullable
+  Integer resolvedSecondaryArity();
 
   @NotNull
   Quotable rightOperand();
 
   @Nullable
   PsiElement[] secondaryArguments();
+
+  @Nullable
+  Integer secondaryArity();
 
 }

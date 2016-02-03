@@ -9,36 +9,36 @@ import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.operation.Infix;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static com.intellij.openapi.util.Pair.pair;
 
-public class FunctionClause extends Element<Call> {
+public class MacroClause extends Element<Call> {
     /*
      * Fields
      */
 
-    private final Function function;
+    private final Macro macro;
 
     /*
      * Public Static Methods
      */
 
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "def", 2) ||
-                // function head
-                call.isCalling("Elixir.Kernel", "def", 1);
+        return call.isCallingMacro("Elixir.Kernel", "defmacro", 2) ||
+                // macro head
+                call.isCalling("Elixir.Kernel", "defmacro", 1);
     }
 
     /**
-     * The name and arity of the function this clause belongs to.
+     * The name and arity of the macro this clause belongs to.
      *
      * @param call
-     * @return The name and arity of the {@code Function} this function clause belongs
+     * @return The name and arity of the {@code Macro} this macro clause belongs
      */
     @NotNull
     public static Pair<String, Integer> nameArity(Call call) {
@@ -48,6 +48,8 @@ public class FunctionClause extends Element<Call> {
         assert primaryArguments.length > 0;
 
         PsiElement head = primaryArguments[0];
+        String name = null;
+        Integer arity = null;
         Call headCall = null;
 
         if (head instanceof ElixirMatchedWhenOperation) {
@@ -90,7 +92,7 @@ public class FunctionClause extends Element<Call> {
                                             headCall = (Call) stabBodyChild;
                                         } else {
                                             openIssueForNotImplemented(
-                                                    "Function clauses defined with `Elixir.Kernel.def/2` are assumed " +
+                                                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed " +
                                                             "to have a Call in ElixirStabBody, but got " +
                                                             stabBodyChild.getClass().getCanonicalName() + ".",
                                                     head
@@ -98,7 +100,7 @@ public class FunctionClause extends Element<Call> {
                                         }
                                     } else {
                                         openIssueForNotImplemented(
-                                                "Function clauses defined with `Elixir.Kernel.def/` are assumed to " +
+                                                "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to " +
                                                         "have a single child for ElixirStabBody, but got " +
                                                         stabBodyChildren.length + ".",
                                                 head
@@ -106,7 +108,7 @@ public class FunctionClause extends Element<Call> {
                                     }
                                 } else {
                                     openIssueForNotImplemented(
-                                            "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have " +
+                                            "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have " +
                                                     "an ElixirStabBody in ElixirStab, but got " +
                                                     stabChild.getClass().getCanonicalName() + ".",
                                             head
@@ -114,14 +116,14 @@ public class FunctionClause extends Element<Call> {
                                 }
                             } else {
                                 openIssueForNotImplemented(
-                                        "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have an " +
+                                        "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have an " +
                                                 "one child in the ElixirStab, but got " + stabChildren.length + ". ",
                                         head
                                 );
                             }
                         } else {
                             openIssueForNotImplemented(
-                                    "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have an " +
+                                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have an " +
                                             "ElixirStab under ElixirParentheticalStab, but got " +
                                             parentheticalStabChild.getClass().getCanonicalName() + ".",
                                     head
@@ -129,7 +131,7 @@ public class FunctionClause extends Element<Call> {
                         }
                     } else {
                         openIssueForNotImplemented(
-                                "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have one child " +
+                                "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have one child " +
                                         "for ElixirParentheticalStab, but got " + parentheticalStabChildren.length +
                                         ".",
                                 head
@@ -137,7 +139,7 @@ public class FunctionClause extends Element<Call> {
                     }
                 } else {
                     openIssueForNotImplemented(
-                            "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have " +
+                            "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have " +
                                     "ElixirParentheticalStab for ElixirAccessExpression, but got " +
                                     headChild.getClass().getCanonicalName() + ".",
                             head
@@ -145,22 +147,29 @@ public class FunctionClause extends Element<Call> {
                 }
             } else {
                 openIssueForNotImplemented(
-                        "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have one child for " +
+                        "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have one child for " +
                                 "ElixirAccessExpression, but got " + headChildren.length + " children.",
                         head
                 );
             }
+        } else if (head instanceof ElixirMatchedAtNonNumericOperation) {
+            ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
+
+            name = matchedAtNonNumericOperation.operator().getText().trim();
+            arity = 1;
         } else {
             openIssueForNotImplemented(
-                    "Function clauses defined with `Elixir.Kernel.def/2` are assumed to have either Calls or " +
+                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have either Calls or " +
                             "MatchedWhenOperation as the first primaryArgument, but got " +
                             head.getClass().getCanonicalName() + ".",
                     head
             );
         }
 
-        String name = headCall.functionName();
-        Integer arity = headCall.resolvedFinalArity();
+        if (headCall != null) {
+            name = headCall.functionName();
+            arity = headCall.resolvedFinalArity();
+        }
 
         return pair(name, arity);
     }
@@ -169,7 +178,7 @@ public class FunctionClause extends Element<Call> {
      * Throws {@code NotImplementedException} with the description and instructions to open an issue.
      *
      * @param description description of the unexpected condition that needs to be handled in the implementation.
-     * @param element Element whose text to include in the issue to open
+     * @param element     Element whose text to include in the issue to open
      */
     public static void openIssueForNotImplemented(String description, PsiElement element) {
         throw new NotImplementedException(
@@ -182,9 +191,9 @@ public class FunctionClause extends Element<Call> {
      * Constructors
      */
 
-    public FunctionClause(Function function, Call call) {
+    public MacroClause(Macro macro, Call call) {
         super(call);
-        this.function = function;
+        this.macro = macro;
     }
 
     /*
@@ -214,9 +223,9 @@ public class FunctionClause extends Element<Call> {
 
                         for (Call childCall : childCalls) {
                             if (Implementation.is(childCall)) {
-                                treeElementList.add(new Implementation(function.getModule(), childCall));
+                                treeElementList.add(new Implementation(macro.getModule(), childCall));
                             } else if (Module.is(childCall)) {
-                                treeElementList.add(new Module(function.getModule(), childCall));
+                                treeElementList.add(new Module(macro.getModule(), childCall));
                             }
                         }
 
@@ -227,7 +236,7 @@ public class FunctionClause extends Element<Call> {
         } else { // one liner version with `do:` keyword argument
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 
-            assert  finalArguments.length > 0;
+            assert finalArguments.length > 0;
 
             PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
 
@@ -244,12 +253,12 @@ public class FunctionClause extends Element<Call> {
                         Call childCall = (Call) keywordValue;
 
                         if (Implementation.is(childCall)) {
-                            children = new TreeElement[] {
-                                    new Implementation(function.getModule(), childCall)
+                            children = new TreeElement[]{
+                                    new Implementation(macro.getModule(), childCall)
                             };
                         } else if (Module.is(childCall)) {
-                            children = new TreeElement[] {
-                                    new Module(function.getModule(), childCall)
+                            children = new TreeElement[]{
+                                    new Module(macro.getModule(), childCall)
                             };
                         }
                     }
@@ -272,8 +281,8 @@ public class FunctionClause extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        return new org.elixir_lang.navigation.item_presentation.FunctionClause(
-                (org.elixir_lang.navigation.item_presentation.Function) function.getPresentation(),
+        return new org.elixir_lang.navigation.item_presentation.MacroClause(
+                (org.elixir_lang.navigation.item_presentation.Macro) macro.getPresentation(),
                 navigationItem
         );
     }
