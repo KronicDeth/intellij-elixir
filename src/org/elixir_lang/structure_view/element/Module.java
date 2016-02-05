@@ -75,8 +75,8 @@ public class Module extends Element<Call> {
                     if (childCalls != null) {
                         int length = childCalls.length;
                         List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
-                        Map<Pair<String, Integer>, Function> functionByNameArity = new HashMap<Pair<String, Integer>, Function>(length);
-                        Map<Pair<String, Integer>, Macro> macroByNameArity = new HashMap<Pair<String, Integer>, Macro>(length);
+                        Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
+                        Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
                         org.elixir_lang.structure_view.element.Exception exception = null;
 
                         for (Call childCall : childCalls) {
@@ -85,13 +85,18 @@ public class Module extends Element<Call> {
                             } else if (org.elixir_lang.structure_view.element.Exception.is(childCall)) {
                                 exception = new org.elixir_lang.structure_view.element.Exception(this, childCall);
                                 treeElementList.add(exception);
-                            } else if (FunctionClause.is(childCall)) {
-                                Pair<String, Integer> nameArity = FunctionClause.nameArity(childCall);
+                            } else if (CallDefinitionClause.isFunction(childCall)) {
+                                Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(childCall);
 
-                                Function function = functionByNameArity.get(nameArity);
+                                CallDefinition function = functionByNameArity.get(nameArity);
 
                                 if (function == null) {
-                                    function = new Function(this, nameArity.first, nameArity.second);
+                                    function = new CallDefinition(
+                                            this,
+                                            CallDefinition.Time.RUN,
+                                            nameArity.first,
+                                            nameArity.second
+                                    );
                                     functionByNameArity.put(nameArity, function);
 
                                     // callbacks are nested under the behavior they are for
@@ -105,13 +110,18 @@ public class Module extends Element<Call> {
                                 function.clause(childCall);
                             } else if (Implementation.is(childCall)) {
                                 treeElementList.add(new Implementation(this, childCall));
-                            } else if (MacroClause.is(childCall)) {
-                                Pair<String, Integer> nameArity = MacroClause.nameArity(childCall);
+                            } else if (CallDefinitionClause.isMacro(childCall)) {
+                                Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(childCall);
 
-                                Macro macro = macroByNameArity.get(nameArity);
+                                CallDefinition macro = macroByNameArity.get(nameArity);
 
                                 if (macro == null) {
-                                    macro = new Macro(this, nameArity.first, nameArity.second);
+                                    macro = new CallDefinition(
+                                            this,
+                                            CallDefinition.Time.COMPILE,
+                                            nameArity.first,
+                                            nameArity.second
+                                    );
                                     macroByNameArity.put(nameArity, macro);
                                     treeElementList.add(macro);
                                 }

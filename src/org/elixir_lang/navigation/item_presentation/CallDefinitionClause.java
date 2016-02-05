@@ -11,13 +11,13 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class MacroClause implements ItemPresentation {
+public class CallDefinitionClause implements ItemPresentation {
     /*
      * Fields
      */
 
     private final Call call;
-    private final Macro macro;
+    private final CallDefinition callDefinition;
 
     /*
      * Constructors
@@ -26,11 +26,11 @@ public class MacroClause implements ItemPresentation {
     /**
      *
      * @param call a {@code Kernel.def/2} call nested in {@code parent}
-     * @param macro the parent {@link Function} of which {@code call} is a clause
+     * @param callDefinition the parent {@link CallDefinition} of which {@code call} is a clause
      */
-    public MacroClause(@NotNull Macro macro, @NotNull Call call) {
+    public CallDefinitionClause(@NotNull CallDefinition callDefinition, @NotNull Call call) {
         this.call = call;
-        this.macro = macro;
+        this.callDefinition = callDefinition;
     }
 
     /*
@@ -62,7 +62,7 @@ public class MacroClause implements ItemPresentation {
     @Nullable
     @Override
     public String getLocationString() {
-        return macro.getLocationString();
+        return callDefinition.getLocationString();
     }
 
     /**
@@ -74,7 +74,20 @@ public class MacroClause implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);
-        rowIcon.setIcon(ElixirIcons.MACRO_CLAUSE, 0);
+        Icon timeIcon = null;
+
+        switch (callDefinition.time()) {
+            case COMPILE:
+                timeIcon = ElixirIcons.MACRO_CLAUSE;
+                break;
+            case RUN:
+                timeIcon = ElixirIcons.FUNCTION_CLAUSE;
+                break;
+        }
+
+        assert timeIcon != null;
+
+        rowIcon.setIcon(timeIcon, 0);
         rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
 
         return rowIcon;

@@ -12,31 +12,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Function Structure view elements don't correspond to an actual element because they group together one or more
- * {@link FunctionClause} elements.  In Erlang, functions would have corresponding elements, but since Elixir has
- * separate `def` calls for each function clause there is no function element.
+ * A definition for a call: either a function or a macro
  */
-public class Function implements StructureViewTreeElement {
+public class CallDefinition implements StructureViewTreeElement {
+    /*
+     * Enums
+     */
+
+    public enum Time {
+        COMPILE,
+        RUN
+    }
+
     /*
      * Fields
      */
 
     private final int arity;
     @NotNull
-    private final List<FunctionClause> clauses = new ArrayList<FunctionClause>();
+    private final List<CallDefinitionClause> clauses = new ArrayList<CallDefinitionClause>();
     @NotNull
     private final Module module;
     @NotNull
     private final String name;
+    @NotNull
+    private final Time time;
 
     /*
      * Constructors
      */
 
-    public Function(@NotNull Module module, @NotNull String name, int arity) {
+    public CallDefinition(@NotNull Module module, @NotNull Time time, @NotNull String name, int arity) {
         this.arity = arity;
         this.module = module;
         this.name = name;
+        this.time = time;
     }
 
     /*
@@ -48,23 +58,23 @@ public class Function implements StructureViewTreeElement {
     }
 
     /**
-     * Adds clause to function
+     * Adds clause to macro
      *
-     * @param clause the new clause for the function
+     * @param clause the new clause for the macro
      */
     public void clause(Call clause) {
-        Pair<String, Integer> nameArity = FunctionClause.nameArity(clause);
+        Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(clause);
 
         assert nameArity.first.equals(name);
         assert nameArity.second == arity;
 
-        clauses.add(new FunctionClause(this, clause));
+        clauses.add(new CallDefinitionClause(this, clause));
     }
 
     /**
-     * Returns the clauses of the function
+     * Returns the clauses of the macro
      *
-     * @return the list of {@link FunctionClause} elements.
+     * @return the list of {@link CallDefinitionClause} elements.
      */
     @NotNull
     @Override
@@ -90,28 +100,27 @@ public class Function implements StructureViewTreeElement {
      */
     @Override
     public Object getValue() {
-        return this;
+        return clauses.get(0);
     }
 
     /**
-     * A function groups together one or more {@code FunctionClause} elements, it can not be navigated to, only its
-     * {@code FunctionClause} elements.
+     * A macro groups together one or more {@link CallDefinitionClause} elements, so it can navigate if it has clauses.
      *
-     * @return <code>false</code>
+     * @return {@code true} if {@link #clauses} size is greater than 0; otherwise, {@code false}.
      */
     @Override
     public boolean canNavigate() {
-        return false;
+        return clauses.size() > 0;
     }
 
     /**
-     * Cannot navigate to source because no element.
+     * A macro groups together one or more {@link CallDefinitionClause} elements, so it can navigate if it has clauses.
      *
-     * @return <code>false</code>
+     * @return {@code true} if {@link #clauses} size is greater than 0; otherwise, {@code false}.
      */
     @Override
     public boolean canNavigateToSource() {
-        return false;
+        return clauses.size() > 0;
     }
 
     /**
@@ -122,12 +131,14 @@ public class Function implements StructureViewTreeElement {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        return new org.elixir_lang.navigation.item_presentation.Function(
+        return new org.elixir_lang.navigation.item_presentation.CallDefinition(
                 (Parent) module.getPresentation(),
+                time,
                 name,
                 arity
         );
     }
+
 
     @NotNull
     public String name() {
@@ -135,12 +146,26 @@ public class Function implements StructureViewTreeElement {
     }
 
     /**
-     * Does nothing because Functions aren't elements, but groups of {@code FunctionClauses}.
+     * Navigates to first clause in {@link #clauses}.
      *
      * @param requestFocus <code>true</code> if focus requesting is necessary
      */
     @Override
     public void navigate(@SuppressWarnings("unused") boolean requestFocus) {
-        // do nothing
+        if (canNavigate()) {
+            clauses.get(0).navigate(requestFocus);
+        }
     }
+
+    /**
+     * When the defined call is usable
+     *
+     * @return {@link CallDefinition.Time#COMPILE} for compile time ({@code defmacro}, {@code defmacrop});
+     *   {@link CallDefinition.Time#RUN} for run time {@code def}, {@code defp})
+     */
+    @NotNull
+    public Time time() {
+        return time;
+    }
+
 }

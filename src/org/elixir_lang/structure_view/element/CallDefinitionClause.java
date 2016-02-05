@@ -9,26 +9,36 @@ import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.psi.operation.Infix;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.intellij.openapi.util.Pair.pair;
 
-public class MacroClause extends Element<Call> {
+public class CallDefinitionClause extends Element<Call> {
+    /*
+     * Constants
+     */
+
     /*
      * Fields
      */
 
-    private final Macro macro;
+    private final CallDefinition callDefinition;
 
     /*
      * Public Static Methods
      */
 
-    public static boolean is(Call call) {
+    public static boolean isFunction(Call call) {
+        return call.isCallingMacro("Elixir.Kernel", "def", 2) ||
+                // function head
+                call.isCalling("Elixir.Kernel", "def", 1);
+    }
+
+    public static boolean isMacro(Call call) {
         return call.isCallingMacro("Elixir.Kernel", "defmacro", 2) ||
                 // macro head
                 call.isCalling("Elixir.Kernel", "defmacro", 1);
@@ -191,9 +201,9 @@ public class MacroClause extends Element<Call> {
      * Constructors
      */
 
-    public MacroClause(Macro macro, Call call) {
+    public CallDefinitionClause(CallDefinition callDefinition, Call call) {
         super(call);
-        this.macro = macro;
+        this.callDefinition = callDefinition;
     }
 
     /*
@@ -223,9 +233,9 @@ public class MacroClause extends Element<Call> {
 
                         for (Call childCall : childCalls) {
                             if (Implementation.is(childCall)) {
-                                treeElementList.add(new Implementation(macro.getModule(), childCall));
+                                treeElementList.add(new Implementation(callDefinition.getModule(), childCall));
                             } else if (Module.is(childCall)) {
-                                treeElementList.add(new Module(macro.getModule(), childCall));
+                                treeElementList.add(new Module(callDefinition.getModule(), childCall));
                             }
                         }
 
@@ -254,11 +264,11 @@ public class MacroClause extends Element<Call> {
 
                         if (Implementation.is(childCall)) {
                             children = new TreeElement[]{
-                                    new Implementation(macro.getModule(), childCall)
+                                    new Implementation(callDefinition.getModule(), childCall)
                             };
                         } else if (Module.is(childCall)) {
                             children = new TreeElement[]{
-                                    new Module(macro.getModule(), childCall)
+                                    new Module(callDefinition.getModule(), childCall)
                             };
                         }
                     }
@@ -281,8 +291,8 @@ public class MacroClause extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        return new org.elixir_lang.navigation.item_presentation.MacroClause(
-                (org.elixir_lang.navigation.item_presentation.Macro) macro.getPresentation(),
+        return new org.elixir_lang.navigation.item_presentation.CallDefinitionClause(
+                (org.elixir_lang.navigation.item_presentation.CallDefinition) callDefinition.getPresentation(),
                 navigationItem
         );
     }

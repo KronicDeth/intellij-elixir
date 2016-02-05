@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class Macro implements ItemPresentation {
+public class CallDefinition implements ItemPresentation {
     /*
      * Fields
      */
@@ -18,11 +18,17 @@ public class Macro implements ItemPresentation {
     private final String name;
     @NotNull
     private final Parent parent;
+    @NotNull
+    private final org.elixir_lang.structure_view.element.CallDefinition.Time time;
 
-    public Macro(@NotNull Parent parent, @NotNull String name, int arity) {
+    public CallDefinition(@NotNull Parent parent,
+                          @NotNull org.elixir_lang.structure_view.element.CallDefinition.Time time,
+                          @NotNull String name,
+                          int arity) {
         this.arity = arity;
         this.name = name;
         this.parent = parent;
+        this.time = time;
     }
 
     /**
@@ -57,9 +63,26 @@ public class Macro implements ItemPresentation {
     @Override
     public Icon getIcon(boolean unused) {
         RowIcon rowIcon = new RowIcon(2);
-        rowIcon.setIcon(ElixirIcons.MACRO, 0);
+        Icon timeIcon = null;
+
+        switch (time) {
+            case COMPILE:
+                timeIcon = ElixirIcons.MACRO;
+                break;
+            case RUN:
+                timeIcon = ElixirIcons.FUNCTION;
+                break;
+        }
+
+        assert timeIcon != null;
+
+        rowIcon.setIcon(timeIcon, 0);
         rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
 
         return rowIcon;
+    }
+
+    public org.elixir_lang.structure_view.element.CallDefinition.Time time() {
+        return time;
     }
 }

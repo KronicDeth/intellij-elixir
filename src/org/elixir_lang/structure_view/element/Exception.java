@@ -25,7 +25,7 @@ public class Exception extends Element<Call> {
      */
 
     @Nullable
-    private List<Function> callbacks = null;
+    private List<CallDefinition> callbacks = null;
     @NotNull
     private final Module module;
 
@@ -60,14 +60,15 @@ public class Exception extends Element<Call> {
      * @param callback the callback function: either exception/1 or message/1.
      */
     @Contract(pure = false)
-    public void callback(@NotNull final Function callback) {
+    public void callback(@NotNull final CallDefinition callback) {
         assert callback.arity() == 1;
+        assert callback.time() == CallDefinition.Time.RUN;
 
         String callbackName = callback.name();
         assert callbackName.equals("exception") || callbackName.equals("message");
 
         if (callbacks == null) {
-            callbacks = new ArrayList<Function>();
+            callbacks = new ArrayList<CallDefinition>();
         }
 
         callbacks.add(callback);
