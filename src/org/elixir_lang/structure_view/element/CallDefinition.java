@@ -14,15 +14,10 @@ import java.util.List;
 /**
  * A definition for a call: either a function or a macro
  */
-public class CallDefinition implements StructureViewTreeElement {
+public class CallDefinition implements StructureViewTreeElement, Timed {
     /*
      * Enums
      */
-
-    public enum Time {
-        COMPILE,
-        RUN
-    }
 
     /*
      * Fields
@@ -160,9 +155,10 @@ public class CallDefinition implements StructureViewTreeElement {
     /**
      * When the defined call is usable
      *
-     * @return {@link CallDefinition.Time#COMPILE} for compile time ({@code defmacro}, {@code defmacrop});
-     *   {@link CallDefinition.Time#RUN} for run time {@code def}, {@code defp})
+     * @return {@link Timed.Time#COMPILE} for compile time ({@code defmacro}, {@code defmacrop});
+     *   {@link Timed.Time#RUN} for run time {@code def}, {@code defp})
      */
+    @Override
     @NotNull
     public Time time() {
         return time;

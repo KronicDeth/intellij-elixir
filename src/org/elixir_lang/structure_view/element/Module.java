@@ -93,7 +93,7 @@ public class Module extends Element<Call> {
                                 if (function == null) {
                                     function = new CallDefinition(
                                             this,
-                                            CallDefinition.Time.RUN,
+                                            Timed.Time.RUN,
                                             nameArity.first,
                                             nameArity.second
                                     );
@@ -118,7 +118,7 @@ public class Module extends Element<Call> {
                                 if (macro == null) {
                                     macro = new CallDefinition(
                                             this,
-                                            CallDefinition.Time.COMPILE,
+                                            Timed.Time.COMPILE,
                                             nameArity.first,
                                             nameArity.second
                                     );

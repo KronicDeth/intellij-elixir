@@ -62,7 +62,7 @@ public class Exception extends Element<Call> {
     @Contract(pure = false)
     public void callback(@NotNull final CallDefinition callback) {
         assert callback.arity() == 1;
-        assert callback.time() == CallDefinition.Time.RUN;
+        assert callback.time() == Timed.Time.RUN;
 
         String callbackName = callback.name();
         assert callbackName.equals("exception") || callbackName.equals("message");

@@ -4,6 +4,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.structure_view.element.Timed;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -19,10 +20,10 @@ public class CallDefinition implements ItemPresentation {
     @NotNull
     private final Parent parent;
     @NotNull
-    private final org.elixir_lang.structure_view.element.CallDefinition.Time time;
+    private final Timed.Time time;
 
     public CallDefinition(@NotNull Parent parent,
-                          @NotNull org.elixir_lang.structure_view.element.CallDefinition.Time time,
+                          @NotNull Timed.Time time,
                           @NotNull String name,
                           int arity) {
         this.arity = arity;
@@ -82,7 +83,7 @@ public class CallDefinition implements ItemPresentation {
         return rowIcon;
     }
 
-    public org.elixir_lang.structure_view.element.CallDefinition.Time time() {
+    public Timed.Time time() {
         return time;
     }
 }

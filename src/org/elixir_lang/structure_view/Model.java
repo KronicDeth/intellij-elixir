@@ -6,6 +6,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.structure_view.element.File;
+import org.elixir_lang.structure_view.sorter.Time;
 import org.jetbrains.annotations.NotNull;
 
 public class Model extends StructureViewModelBase implements StructureViewModel.ElementInfoProvider {
@@ -24,9 +25,12 @@ public class Model extends StructureViewModelBase implements StructureViewModel.
     @NotNull
     @Override
     public Sorter[] getSorters() {
+        /* Time before instance as all macros should be together and all functions should be together before sorting
+           by name */
         return new Sorter[] {
+                Time.INSTANCE,
                 // TODO add visibility sorter for functions
-                Sorter.ALPHA_SORTER
+                Sorter.ALPHA_SORTER,
         };
     }
 
