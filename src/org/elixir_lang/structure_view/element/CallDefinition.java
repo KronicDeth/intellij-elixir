@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Pair;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * A definition for a call: either a function or a macro
  */
-public class CallDefinition implements StructureViewTreeElement, Timed {
+public class CallDefinition implements StructureViewTreeElement, Timed, Visible {
     /*
      * Enums
      */
@@ -129,6 +130,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed {
         return new org.elixir_lang.navigation.item_presentation.CallDefinition(
                 (Parent) module.getPresentation(),
                 time,
+                visibility(),
                 name,
                 arity
         );
@@ -164,4 +166,42 @@ public class CallDefinition implements StructureViewTreeElement, Timed {
         return time;
     }
 
+    /**
+     * The visibility of the element.
+     *
+     * @return {@link Visibility.PUBLIC} for public call definitions ({@code def} and {@code defmacro});
+     * {@link Visibility.PRIVATE} for private call definitions ({@code defp} and {@code defmacrop}); {@code null} for
+     * a mix of visibilities, such as when a call definition has a mix of call definition clause visibilities, which
+     * is invalid code, but can occur temporarily while code is being edited.
+     */
+    @Nullable
+    @Override
+    public Visibility visibility() {
+
+        int privateCount = 0;
+        int publicCount = 0;
+
+        for (CallDefinitionClause callDefinitionClause : clauses) {
+            switch (callDefinitionClause.visibility()) {
+                case PRIVATE:
+                    privateCount++;
+                    break;
+                case PUBLIC:
+                    publicCount++;
+                    break;
+            }
+        }
+
+        Visibility callDefinitionVisibility;
+
+        if (privateCount > 0 && publicCount == 0) {
+            callDefinitionVisibility = Visibility.PRIVATE;
+        } else if (privateCount == 0 && publicCount > 0) {
+            callDefinitionVisibility = Visibility.PUBLIC;
+        } else {
+            callDefinitionVisibility = null;
+        }
+
+        return callDefinitionVisibility;
+    }
 }

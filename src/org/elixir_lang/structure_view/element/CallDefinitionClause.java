@@ -17,7 +17,7 @@ import java.util.List;
 
 import static com.intellij.openapi.util.Pair.pair;
 
-public class CallDefinitionClause extends Element<Call> {
+public class CallDefinitionClause extends Element<Call> implements Visible {
     /*
      * Constants
      */
@@ -27,21 +27,35 @@ public class CallDefinitionClause extends Element<Call> {
      */
 
     private final CallDefinition callDefinition;
+    @NotNull
+    private final Visibility visibility;
 
     /*
      * Public Static Methods
      */
 
     public static boolean isFunction(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "def", 2) ||
-                // function head
-                call.isCalling("Elixir.Kernel", "def", 1);
+        return isPrivateFunction(call) || isPublicFunction(call);
     }
 
     public static boolean isMacro(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "defmacro", 2) ||
-                // macro head
-                call.isCalling("Elixir.Kernel", "defmacro", 1);
+        return isPrivateMacro(call) || isPublicMacro(call);
+    }
+
+    public static boolean isPrivateFunction(Call call) {
+        return isCallingKernelMacroOrHead(call, "defp");
+    }
+
+    public static boolean isPrivateMacro(Call call) {
+        return isCallingKernelMacroOrHead(call, "defmacrop");
+    }
+
+    public static boolean isPublicFunction(Call call) {
+        return isCallingKernelMacroOrHead(call, "def");
+    }
+
+    public static boolean isPublicMacro(Call call) {
+        return isCallingKernelMacroOrHead(call, "defmacro");
     }
 
     /**
@@ -185,6 +199,25 @@ public class CallDefinitionClause extends Element<Call> {
     }
 
     /**
+     *
+     * @param call
+     * @return {@code Visible.Visibility.PUBLIC} for {@code def} or {@code defmacro}; {@code Visible.Visibility.PRIVATE}
+     *   for {@code defp} and {@code defmacrop}; {@code null} only if {@code call} is unrecognized
+     */
+    @Nullable
+    public static Visible.Visibility visibility(Call call) {
+        Visible.Visibility callVisibility = null;
+
+        if (isPublicFunction(call) || isPublicMacro(call)) {
+            callVisibility = Visible.Visibility.PUBLIC;
+        } else if (isPrivateFunction(call) || isPrivateMacro(call)) {
+            callVisibility = Visible.Visibility.PRIVATE;
+        }
+
+        return callVisibility;
+    }
+
+    /**
      * Throws {@code NotImplementedException} with the description and instructions to open an issue.
      *
      * @param description description of the unexpected condition that needs to be handled in the implementation.
@@ -198,12 +231,23 @@ public class CallDefinitionClause extends Element<Call> {
     }
 
     /*
+     * Private Static Methods
+     */
+
+    private static boolean isCallingKernelMacroOrHead(@NotNull final Call call, @NotNull final String resolvedName) {
+        return call.isCallingMacro("Elixir.Kernel", resolvedName, 2) ||
+                call.isCalling("Elixir.Kernel", resolvedName, 1);
+    }
+
+    /*
      * Constructors
      */
 
     public CallDefinitionClause(CallDefinition callDefinition, Call call) {
         super(call);
         this.callDefinition = callDefinition;
+        //noinspection ConstantConditions
+        this.visibility = visibility(call);
     }
 
     /*
@@ -293,9 +337,21 @@ public class CallDefinitionClause extends Element<Call> {
     public ItemPresentation getPresentation() {
         return new org.elixir_lang.navigation.item_presentation.CallDefinitionClause(
                 (org.elixir_lang.navigation.item_presentation.CallDefinition) callDefinition.getPresentation(),
+                visibility(),
                 navigationItem
         );
     }
 
+    /**
+     * The visibility of the element.
+     *
+     * @return {@code Visible.Visibility.PUBLIC} for public call definitions ({@code def} and {@code defmacro});
+     * {@code Visible.Visibility.PRIVATE} for private call definitions ({@code defp} and {@code defmacrop}).
+     */
+    @NotNull
+    @Override
+    public Visibility visibility() {
+        return visibility;
+    }
 }
 

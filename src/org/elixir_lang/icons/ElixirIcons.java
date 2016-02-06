@@ -25,17 +25,28 @@ class RowIconFactory {
  * Created by zyuyou on 15/7/6.
  */
 public interface ElixirIcons {
+
+  interface Time {
+    Icon COMPILE = AllIcons.Actions.Compile;
+    Icon RUN = AllIcons.General.Run;
+  }
+
+  interface Visibility {
+    Icon PRIVATE = PlatformIcons.PRIVATE_ICON;
+    Icon PUBLIC = PlatformIcons.PUBLIC_ICON;
+  }
+
+  Icon CALL_DEFINITION = PlatformIcons.FUNCTION_ICON;
+  Icon CALL_DEFINITION_CLAUSE = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon DELEGATION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON;
   Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
-  Icon FUNCTION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.FUNCTION_ICON);
-  Icon FUNCTION_CLAUSE = RowIconFactory.create(FUNCTION, PlatformIcons.PACKAGE_LOCAL_ICON);
-  Icon FUNCTION_DELEGATION = FUNCTION_CLAUSE;
-  Icon MACRO = RowIconFactory.create(AllIcons.Actions.Compile, PlatformIcons.FUNCTION_ICON);
-  Icon MACRO_CLAUSE = RowIconFactory.create(MACRO, PlatformIcons.PACKAGE_LOCAL_ICON);
+  Icon IMPLEMENTATION = PlatformIcons.ANONYMOUS_CLASS_ICON;
   Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
   Icon MODULE = PlatformIcons.PACKAGE_ICON;
-  Icon IMPLEMENTATION = PlatformIcons.ANONYMOUS_CLASS_ICON;
+
+  // it is the unknown that is only a question mark
+  Icon UNKNOWN = AllIcons.RunConfigurations.Unknown;
 
   Icon ELIXIR_APPLICATION = IconLoader.getIcon("/icons/elixir-Application-16.png");
   Icon ELIXIR_SUPERVISOR = IconLoader.getIcon("/icons/elixir-Supervisor-16.png");

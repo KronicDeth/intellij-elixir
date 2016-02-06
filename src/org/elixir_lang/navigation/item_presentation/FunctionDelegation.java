@@ -2,6 +2,7 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.RowIcon;
 import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -112,7 +113,14 @@ public class FunctionDelegation implements ItemPresentation {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        return ElixirIcons.FUNCTION_DELEGATION;
+        RowIcon rowIcon = new RowIcon(3);
+
+        // same as {@code def}
+        rowIcon.setIcon(ElixirIcons.Time.RUN, 0);
+        rowIcon.setIcon(ElixirIcons.Visibility.PUBLIC, 1);
+        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION_CLAUSE, 2);
+
+        return rowIcon;
     }
 
     public String name() {

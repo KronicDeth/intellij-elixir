@@ -5,7 +5,9 @@ import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.structure_view.element.Timed;
+import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -21,15 +23,27 @@ public class CallDefinition implements ItemPresentation {
     private final Parent parent;
     @NotNull
     private final Timed.Time time;
+    @Nullable
+    private final Visible.Visibility visibility;
 
+    /**
+     *
+     * @param parent
+     * @param time
+     * @param visibility {@code null} if clauses are a mix of private and public
+     * @param name
+     * @param arity
+     */
     public CallDefinition(@NotNull Parent parent,
                           @NotNull Timed.Time time,
+                          @Nullable Visible.Visibility visibility,
                           @NotNull String name,
                           int arity) {
         this.arity = arity;
         this.name = name;
         this.parent = parent;
         this.time = time;
+        this.visibility = visibility;
     }
 
     /**
@@ -63,22 +77,36 @@ public class CallDefinition implements ItemPresentation {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        RowIcon rowIcon = new RowIcon(2);
+        RowIcon rowIcon = new RowIcon(3);
         Icon timeIcon = null;
 
         switch (time) {
             case COMPILE:
-                timeIcon = ElixirIcons.MACRO;
+                timeIcon = ElixirIcons.Time.COMPILE;
                 break;
             case RUN:
-                timeIcon = ElixirIcons.FUNCTION;
+                timeIcon = ElixirIcons.Time.RUN;
                 break;
         }
 
         assert timeIcon != null;
 
+        Icon visibilityIcon = null;
+
+        switch (visibility) {
+            case PRIVATE:
+                visibilityIcon = ElixirIcons.Visibility.PRIVATE;
+                break;
+            case PUBLIC:
+                visibilityIcon = ElixirIcons.Visibility.PUBLIC;
+                break;
+            default:
+                visibilityIcon = ElixirIcons.UNKNOWN;
+        }
+
         rowIcon.setIcon(timeIcon, 0);
-        rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
+        rowIcon.setIcon(visibilityIcon, 1);
+        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, 2);
 
         return rowIcon;
     }

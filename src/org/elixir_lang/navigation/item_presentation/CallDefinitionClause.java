@@ -6,6 +6,7 @@ import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +19,7 @@ public class CallDefinitionClause implements ItemPresentation {
 
     private final Call call;
     private final CallDefinition callDefinition;
+    private final Visible.Visibility visibility;
 
     /*
      * Constructors
@@ -28,9 +30,12 @@ public class CallDefinitionClause implements ItemPresentation {
      * @param call a {@code Kernel.def/2} call nested in {@code parent}
      * @param callDefinition the parent {@link CallDefinition} of which {@code call} is a clause
      */
-    public CallDefinitionClause(@NotNull CallDefinition callDefinition, @NotNull Call call) {
+    public CallDefinitionClause(@NotNull CallDefinition callDefinition,
+                                @NotNull Visible.Visibility visibility,
+                                @NotNull Call call) {
         this.call = call;
         this.callDefinition = callDefinition;
+        this.visibility = visibility;
     }
 
     /*
@@ -73,22 +78,36 @@ public class CallDefinitionClause implements ItemPresentation {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        RowIcon rowIcon = new RowIcon(2);
+        RowIcon rowIcon = new RowIcon(3);
         Icon timeIcon = null;
 
         switch (callDefinition.time()) {
             case COMPILE:
-                timeIcon = ElixirIcons.MACRO_CLAUSE;
+                timeIcon = ElixirIcons.Time.COMPILE;
                 break;
             case RUN:
-                timeIcon = ElixirIcons.FUNCTION_CLAUSE;
+                timeIcon = ElixirIcons.Time.RUN;
                 break;
         }
 
         assert timeIcon != null;
 
+        Icon visibilityIcon = null;
+
+        switch (visibility) {
+            case PRIVATE:
+                visibilityIcon = ElixirIcons.Visibility.PRIVATE;
+                break;
+            case PUBLIC:
+                visibilityIcon = ElixirIcons.Visibility.PUBLIC;
+                break;
+        }
+
+        assert visibilityIcon != null;
+
         rowIcon.setIcon(timeIcon, 0);
-        rowIcon.setIcon(PlatformIcons.PUBLIC_ICON, 1);
+        rowIcon.setIcon(visibilityIcon, 1);
+        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION_CLAUSE, 2);
 
         return rowIcon;
     }
