@@ -8,18 +8,31 @@ import com.intellij.util.PlatformIcons;
 
 import javax.swing.*;
 
+// RowIcon on travis-ci does not have RowIcon(Icon...) constructor, so fake it
+class RowIconFactory {
+  public static RowIcon create(Icon... icons) {
+    RowIcon rowIcon = new RowIcon(icons.length);
+
+    for (int i = 0; i < icons.length; i++) {
+      rowIcon.setIcon(icons[i], i);
+    }
+
+    return rowIcon;
+  }
+}
+
 /**
  * Created by zyuyou on 15/7/6.
  */
 public interface ElixirIcons {
-  Icon DELEGATION = new RowIcon(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);
+  Icon DELEGATION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON;
   Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
-  Icon FUNCTION = new RowIcon(AllIcons.General.Run, PlatformIcons.FUNCTION_ICON);
-  Icon FUNCTION_CLAUSE = new RowIcon(FUNCTION, PlatformIcons.PACKAGE_LOCAL_ICON);
+  Icon FUNCTION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.FUNCTION_ICON);
+  Icon FUNCTION_CLAUSE = RowIconFactory.create(FUNCTION, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon FUNCTION_DELEGATION = FUNCTION_CLAUSE;
-  Icon MACRO = new RowIcon(AllIcons.Actions.Compile, PlatformIcons.FUNCTION_ICON);
-  Icon MACRO_CLAUSE = new RowIcon(MACRO, PlatformIcons.PACKAGE_LOCAL_ICON);
+  Icon MACRO = RowIconFactory.create(AllIcons.Actions.Compile, PlatformIcons.FUNCTION_ICON);
+  Icon MACRO_CLAUSE = RowIconFactory.create(MACRO, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
   Icon MODULE = PlatformIcons.PACKAGE_ICON;
   Icon IMPLEMENTATION = PlatformIcons.ANONYMOUS_CLASS_ICON;
