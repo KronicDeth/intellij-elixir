@@ -17,10 +17,10 @@ public class CallDefinition implements ItemPresentation {
      */
 
     private final int arity;
+    @Nullable
+    private final String location;
     @NotNull
     private final String name;
-    @NotNull
-    private final Parent parent;
     @NotNull
     private final Timed.Time time;
     @Nullable
@@ -28,20 +28,20 @@ public class CallDefinition implements ItemPresentation {
 
     /**
      *
-     * @param parent
+     * @param location
      * @param time
      * @param visibility {@code null} if clauses are a mix of private and public
      * @param name
      * @param arity
      */
-    public CallDefinition(@NotNull Parent parent,
+    public CallDefinition(@Nullable String location,
                           @NotNull Timed.Time time,
                           @Nullable Visible.Visibility visibility,
                           @NotNull String name,
                           int arity) {
         this.arity = arity;
+        this.location = location;
         this.name = name;
-        this.parent = parent;
         this.time = time;
         this.visibility = visibility;
     }
@@ -58,15 +58,14 @@ public class CallDefinition implements ItemPresentation {
     }
 
     /**
-     * Returns the location of the object (for example, the package of a class). The location
-     * string is used by some renderers and usually displayed as grayed text next to the item name.
+     * Returns the module name where the function is defined
      *
-     * @return the location description, or null if none is applicable.
+     * @return the module name or {@code null} for {@code quote}.
      */
-    @NotNull
+    @Nullable
     @Override
     public String getLocationString() {
-        return parent.getLocatedPresentableText();
+        return location;
     }
 
     /**

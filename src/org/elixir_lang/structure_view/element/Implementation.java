@@ -3,11 +3,12 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.ElixirNoParenthesesKeywords;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +29,7 @@ public class Implementation extends Module {
         this(null, call);
     }
 
-    public Implementation(@Nullable Module parent, @NotNull Call call) {
+    public Implementation(@Nullable Modular parent, @NotNull Call call) {
         super(parent, call);
     }
 

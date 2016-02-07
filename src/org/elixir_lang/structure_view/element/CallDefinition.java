@@ -4,8 +4,11 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import org.apache.sanselan.common.ImageMetadata;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +31,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     @NotNull
     private final List<CallDefinitionClause> clauses = new ArrayList<CallDefinitionClause>();
     @NotNull
-    private final Module module;
+    private final Modular modular;
     @NotNull
     private final String name;
     @NotNull
@@ -38,9 +41,9 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      * Constructors
      */
 
-    public CallDefinition(@NotNull Module module, @NotNull Time time, @NotNull String name, int arity) {
+    public CallDefinition(@NotNull Modular modular, @NotNull Time time, @NotNull String name, int arity) {
         this.arity = arity;
-        this.module = module;
+        this.modular = modular;
         this.name = name;
         this.time = time;
     }
@@ -79,13 +82,13 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     }
 
     /**
-     * The scoping module
+     * The scoping module or quote
      *
-     * @return The scoping module
+     * @return The scoping module or quote
      */
     @NotNull
-    public Module getModule() {
-        return module;
+    public Modular getModular() {
+        return modular;
     }
 
     /**
@@ -127,8 +130,16 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
+        ItemPresentation itemPresentation = modular.getPresentation();
+        String location = null;
+
+        if (itemPresentation instanceof Parent) {
+            Parent parentPresentation = (Parent) itemPresentation;
+            location = parentPresentation.getLocatedPresentableText();
+        }
+
         return new org.elixir_lang.navigation.item_presentation.CallDefinition(
-                (Parent) module.getPresentation(),
+                location,
                 time,
                 visibility(),
                 name,

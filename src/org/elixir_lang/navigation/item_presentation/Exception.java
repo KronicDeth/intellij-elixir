@@ -21,15 +21,15 @@ public class Exception implements ItemPresentation {
     @NotNull
     private final Map<PsiElement, PsiElement> defaultValueElementByKeyElement;
     @NotNull
-    private final Module module;
+    private final String location;
 
     /*
      * Constructors
      */
 
-    public Exception(@NotNull Module module, @NotNull Map<PsiElement, PsiElement> defaultValueElementByKeyElement) {
+    public Exception(@NotNull String location, @NotNull Map<PsiElement, PsiElement> defaultValueElementByKeyElement) {
         this.defaultValueElementByKeyElement = defaultValueElementByKeyElement;
-        this.module = module;
+        this.location = location;
     }
 
     /*
@@ -56,7 +56,7 @@ public class Exception implements ItemPresentation {
     @Nullable
     @Override
     public String getLocationString() {
-        return module.getLocatedPresentableText();
+        return location;
     }
 
     /**

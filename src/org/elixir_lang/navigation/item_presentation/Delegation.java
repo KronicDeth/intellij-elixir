@@ -20,7 +20,7 @@ public class Delegation implements ItemPresentation {
     @Nullable
     private final String as;
     @NotNull
-    private final Module module;
+    private final String location;
     @Nullable
     private final String to;
 
@@ -28,10 +28,10 @@ public class Delegation implements ItemPresentation {
      * Constructors
      */
 
-    public Delegation(@NotNull Module module, @Nullable String to, @Nullable String as, boolean appendFirst) {
+    public Delegation(@NotNull String location, @Nullable String to, @Nullable String as, boolean appendFirst) {
         this.appendFirst = appendFirst;
         this.as = as;
-        this.module = module;
+        this.location = location;
         this.to = to;
     }
 
@@ -73,15 +73,15 @@ public class Delegation implements ItemPresentation {
     }
 
     /**
-     * Returns the location of the object (for example, the package of a class). The location
-     * string is used by some renderers and usually displayed as grayed text next to the item name.
+     * The module or anonymous module implied by {@code quote}.
      *
-     * @return the location description, or null if none is applicable.
+     *
+     * @return the modular name
      */
     @Nullable
     @Override
     public String getLocationString() {
-        return module.getLocatedPresentableText();
+        return location;
     }
 
     /**

@@ -1,8 +1,9 @@
-package org.elixir_lang.navigation.item_presentation;
+package org.elixir_lang.navigation.item_presentation.modular;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,7 @@ public class Module implements ItemPresentation, Parent {
     @NotNull
     private final Call call;
     @Nullable
-    private final Module parent;
+    private final String location;
 
     /*
      * Constructors
@@ -33,12 +34,12 @@ public class Module implements ItemPresentation, Parent {
 
     /**
      *
-     * @param parent the parent {@link Module} that scopes {@code call}.
+     * @param location the parent name of the Module that scopes {@code call}; {@code null} when scope is {@code quote}.
      * @param call a {@code Kernel.defmodule/2} call nested in {@code parent}.
      */
-    public Module(@Nullable final Module parent, @NotNull final Call call) {
+    public Module(@Nullable final String location, @NotNull final Call call) {
         this.call = call;
-        this.parent = parent;
+        this.location = location;
     }
 
     /*
@@ -91,13 +92,7 @@ public class Module implements ItemPresentation, Parent {
     @Nullable
     @Override
     public String getLocationString() {
-        String locationString = null;
-
-        if (parent != null) {
-            locationString = parent.getLocatedPresentableText();
-        }
-
-        return locationString;
+        return location;
     }
 
     /**

@@ -4,9 +4,14 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.navigation.item_presentation.Parent;
+import org.elixir_lang.psi.ElixirAccessExpression;
+import org.elixir_lang.psi.ElixirList;
+import org.elixir_lang.psi.QuotableKeywordList;
+import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +32,7 @@ public class Exception extends Element<Call> {
     @Nullable
     private List<CallDefinition> callbacks = null;
     @NotNull
-    private final Module module;
+    private final Modular modular;
 
     /*
      * Static Methods
@@ -45,9 +50,9 @@ public class Exception extends Element<Call> {
      * Constructors
      */
 
-    public Exception(@NotNull Module module, @NotNull Call call) {
+    public Exception(@NotNull Modular modular, @NotNull Call call) {
         super(call);
-        this.module = module;
+        this.modular = modular;
     }
 
     /*
@@ -157,8 +162,11 @@ public class Exception extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
+        Parent parent = (Parent) modular.getPresentation();
+        String location = parent.getLocatedPresentableText();
+
         return new org.elixir_lang.navigation.item_presentation.Exception(
-                (org.elixir_lang.navigation.item_presentation.Module) module.getPresentation(),
+                location,
                 defaultValueElementByKeyElement()
         );
     }

@@ -5,10 +5,13 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.ui.GroupedElementsRenderer;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Module;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +20,7 @@ import java.util.List;
 
 import static com.intellij.openapi.util.Pair.pair;
 
-public class CallDefinitionClause extends Element<Call> implements Visible {
+public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
     /*
      * Constants
      */
@@ -257,68 +260,8 @@ public class CallDefinitionClause extends Element<Call> implements Visible {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        ElixirDoBlock doBlock = navigationItem.getDoBlock();
-        TreeElement[] children = null;
-
-        if (doBlock != null) {
-            ElixirStab stab = doBlock.getStab();
-
-            PsiElement[] stabChildren = stab.getChildren();
-
-            if (stabChildren.length == 1) {
-                PsiElement stabChild = stabChildren[0];
-
-                if (stabChild instanceof ElixirStabBody) {
-                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
-                    Call[] childCalls = PsiTreeUtil.getChildrenOfType(stabBody, Call.class);
-
-                    if (childCalls != null) {
-                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.length);
-
-                        for (Call childCall : childCalls) {
-                            if (Implementation.is(childCall)) {
-                                treeElementList.add(new Implementation(callDefinition.getModule(), childCall));
-                            } else if (Module.is(childCall)) {
-                                treeElementList.add(new Module(callDefinition.getModule(), childCall));
-                            }
-                        }
-
-                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
-                    }
-                }
-            }
-        } else { // one liner version with `do:` keyword argument
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
-
-            assert finalArguments.length > 0;
-
-            PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
-
-            if (potentialKeywords instanceof QuotableKeywordList) {
-                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) potentialKeywords;
-                List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
-                QuotableKeywordPair firstQuotableKeywordPair = quotableKeywordPairList.get(0);
-                Quotable keywordKey = firstQuotableKeywordPair.getKeywordKey();
-
-                if (keywordKey.getText().equals("do")) {
-                    Quotable keywordValue = firstQuotableKeywordPair.getKeywordValue();
-
-                    if (keywordValue instanceof Call) {
-                        Call childCall = (Call) keywordValue;
-
-                        if (Implementation.is(childCall)) {
-                            children = new TreeElement[]{
-                                    new Implementation(callDefinition.getModule(), childCall)
-                            };
-                        } else if (Module.is(childCall)) {
-                            children = new TreeElement[]{
-                                    new Module(callDefinition.getModule(), childCall)
-                            };
-                        }
-                    }
-                }
-            }
-        }
+        Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(navigationItem);
+        TreeElement[] children = childCallTreeElements(childCalls);
 
         if (children == null) {
             children = new TreeElement[0];
@@ -352,6 +295,44 @@ public class CallDefinitionClause extends Element<Call> implements Visible {
     @Override
     public Visibility visibility() {
         return visibility;
+    }
+
+    /*
+     * Private Instance Methods
+     */
+
+    private void addChildCall(List<TreeElement> treeElementList, Call childCall) {
+        TreeElement childCallTreeElement = null;
+
+        if (Implementation.is(childCall)) {
+            childCallTreeElement = new Implementation(callDefinition.getModular(), childCall);
+        } else if (Module.is(childCall)) {
+            childCallTreeElement = new Module(callDefinition.getModular(), childCall);
+        } else if (Quote.is(childCall)) {
+            childCallTreeElement = new Quote(this, childCall);
+        }
+
+        if (childCallTreeElement != null) {
+            treeElementList.add(childCallTreeElement);
+        }
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private TreeElement[] childCallTreeElements(@Nullable Call[] childCalls) {
+        TreeElement[] treeElements = null;
+
+        if (childCalls != null) {
+            List<TreeElement> treeElementList = new ArrayList<TreeElement>(childCalls.length);
+
+            for (Call childCall : childCalls) {
+                addChildCall(treeElementList, childCall);
+            }
+
+            treeElements = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+        }
+
+        return treeElements;
     }
 }
 

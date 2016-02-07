@@ -9,6 +9,7 @@ import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewUtil;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirLanguage;
@@ -724,6 +725,57 @@ public class ElixirPsiImplUtil {
                 "line",
                 lineNumber(node) + 1
         );
+    }
+
+    @Nullable
+    public static Call[] macroChildCalls(Call macro) {
+        Call[] childCalls = null;
+        ElixirDoBlock doBlock = macro.getDoBlock();
+
+        if (doBlock != null) {
+            ElixirStab stab = doBlock.getStab();
+
+            if (stab != null) {
+                PsiElement[] stabChildren = stab.getChildren();
+
+                if (stabChildren.length == 1) {
+                    PsiElement stabChild = stabChildren[0];
+
+                    if (stabChild instanceof ElixirStabBody) {
+                        ElixirStabBody stabBody = (ElixirStabBody) stabChild;
+
+                        childCalls = PsiTreeUtil.getChildrenOfType(stabBody, Call.class);
+                    }
+                }
+            }
+        } else { // one liner version with `do:` keyword argument
+            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(macro);
+
+            assert finalArguments != null;
+            assert finalArguments.length > 0;
+
+            PsiElement potentialKeywords = finalArguments[finalArguments.length - 1];
+
+            if (potentialKeywords instanceof QuotableKeywordList) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) potentialKeywords;
+                List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
+                QuotableKeywordPair firstQuotableKeywordPair = quotableKeywordPairList.get(0);
+                Quotable keywordKey = firstQuotableKeywordPair.getKeywordKey();
+
+                if (keywordKey.getText().equals("do")) {
+                    Quotable keywordValue = firstQuotableKeywordPair.getKeywordValue();
+
+                    if (keywordValue instanceof Call) {
+                        Call childCall = (Call) keywordValue;
+                        childCalls = new Call[]{
+                                childCall
+                        };
+                    }
+                }
+            }
+        }
+
+        return childCalls;
     }
 
     public static OtpErlangList metadata(ASTNode node) {

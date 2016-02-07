@@ -4,15 +4,17 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class Delegation extends Element<Call>  {
@@ -21,7 +23,7 @@ public class Delegation extends Element<Call>  {
      */
 
     @NotNull
-    private final Module module;
+    private final Modular modular;
 
     /*
      * Static Methods
@@ -35,9 +37,9 @@ public class Delegation extends Element<Call>  {
      * Constructors
      */
 
-    public Delegation(@NotNull Module module, @NotNull Call call) {
+    public Delegation(@NotNull Modular modular, @NotNull Call call) {
         super(call);
-        this.module = module;
+        this.modular = modular;
     }
 
     /*
@@ -136,8 +138,11 @@ public class Delegation extends Element<Call>  {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
+        Parent parent = (Parent) modular.getPresentation();
+        String location = parent.getLocatedPresentableText();
+
         return new org.elixir_lang.navigation.item_presentation.Delegation(
-                (org.elixir_lang.navigation.item_presentation.Module) module.getPresentation(),
+                location,
                 to(),
                 as(),
                 appendFirst()
