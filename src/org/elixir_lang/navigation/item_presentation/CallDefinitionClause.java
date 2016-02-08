@@ -3,7 +3,6 @@ package org.elixir_lang.navigation.item_presentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
-import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.Visible;
@@ -18,7 +17,7 @@ public class CallDefinitionClause implements ItemPresentation {
      */
 
     private final Call call;
-    private final CallDefinition callDefinition;
+    private final NameArity callDefinition;
     private final Visible.Visibility visibility;
 
     /*
@@ -28,9 +27,9 @@ public class CallDefinitionClause implements ItemPresentation {
     /**
      *
      * @param call a {@code Kernel.def/2} call nested in {@code parent}
-     * @param callDefinition the parent {@link CallDefinition} of which {@code call} is a clause
+     * @param callDefinition the parent {@link NameArity} of which {@code call} is a clause
      */
-    public CallDefinitionClause(@NotNull CallDefinition callDefinition,
+    public CallDefinitionClause(@NotNull NameArity callDefinition,
                                 @NotNull Visible.Visibility visibility,
                                 @NotNull Call call) {
         this.call = call;

@@ -4,9 +4,8 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.ui.GroupedElementsRenderer;
 import org.apache.commons.lang.NotImplementedException;
+import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -279,7 +278,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @Override
     public ItemPresentation getPresentation() {
         return new org.elixir_lang.navigation.item_presentation.CallDefinitionClause(
-                (org.elixir_lang.navigation.item_presentation.CallDefinition) callDefinition.getPresentation(),
+                (NameArity) callDefinition.getPresentation(),
                 visibility(),
                 navigationItem
         );

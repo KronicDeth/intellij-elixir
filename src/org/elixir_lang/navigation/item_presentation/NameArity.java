@@ -11,12 +11,17 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class CallDefinition implements ItemPresentation {
+/**
+ * The name/arity of a {@link org.elixir_lang.structure_view.element.CallDefinition} or
+ * {@link org.elixir_lang.structure_view.element.CallReference}.
+ */
+public class NameArity implements ItemPresentation {
     /*
      * Fields
      */
 
-    private final int arity;
+    @Nullable
+    private final Integer arity;
     @Nullable
     private final String location;
     @NotNull
@@ -34,11 +39,11 @@ public class CallDefinition implements ItemPresentation {
      * @param name
      * @param arity
      */
-    public CallDefinition(@Nullable String location,
-                          @NotNull Timed.Time time,
-                          @Nullable Visible.Visibility visibility,
-                          @NotNull String name,
-                          int arity) {
+    public NameArity(@Nullable String location,
+                     @NotNull Timed.Time time,
+                     @Nullable Visible.Visibility visibility,
+                     @NotNull String name,
+                     @Nullable Integer arity) {
         this.arity = arity;
         this.location = location;
         this.name = name;
@@ -54,7 +59,15 @@ public class CallDefinition implements ItemPresentation {
     @NotNull
     @Override
     public String getPresentableText() {
-        return name + "/" + arity;
+        StringBuilder presentableTextBuilder = new StringBuilder(name).append('/');
+
+        if (arity != null) {
+            presentableTextBuilder.append(arity);
+        } else {
+            presentableTextBuilder.append('?');
+        }
+
+        return presentableTextBuilder.toString();
     }
 
     /**

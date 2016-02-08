@@ -4,11 +4,10 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
-import org.apache.sanselan.common.ImageMetadata;
+import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
-import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -138,7 +137,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
             location = parentPresentation.getLocatedPresentableText();
         }
 
-        return new org.elixir_lang.navigation.item_presentation.CallDefinition(
+        return new NameArity(
                 location,
                 time,
                 visibility(),

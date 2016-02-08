@@ -17,6 +17,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.Exception;
 import org.elixir_lang.structure_view.element.Implementation;
+import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -114,6 +115,8 @@ public class Module extends Element<Call> implements Modular {
                     macro.clause(childCall);
                 } else if (Module.is(childCall)) {
                     treeElementList.add(new Module(modular, childCall));
+                } else if (Overridable.is(childCall)) {
+                    treeElementList.add(new Overridable(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
                 }

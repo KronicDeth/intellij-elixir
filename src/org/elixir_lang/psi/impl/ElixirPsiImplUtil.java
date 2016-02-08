@@ -470,6 +470,26 @@ public class ElixirPsiImplUtil {
 
                 if (potentialKeywords instanceof QuotableKeywordList) {
                     keywordArguments = (QuotableKeywordList) potentialKeywords;
+                } else if (potentialKeywords instanceof ElixirAccessExpression) {
+                    ElixirAccessExpression accessExpression = (ElixirAccessExpression) potentialKeywords;
+                    PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+
+                    if (accessExpressionChildren.length == 1) {
+                        PsiElement accessExpressionChild = accessExpressionChildren[0];
+
+                        if (accessExpressionChild instanceof ElixirList) {
+                            ElixirList list = (ElixirList) accessExpressionChild;
+                            PsiElement[] listChildren = list.getChildren();
+
+                            if (listChildren.length == 1) {
+                                PsiElement listChild = listChildren[0];
+
+                                if (listChild instanceof QuotableKeywordList) {
+                                    keywordArguments = (QuotableKeywordList) listChild;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
