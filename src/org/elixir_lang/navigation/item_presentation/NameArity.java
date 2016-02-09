@@ -26,6 +26,7 @@ public class NameArity implements ItemPresentation {
     private final String location;
     @NotNull
     private final String name;
+    private final boolean overridable;
     @NotNull
     private final Timed.Time time;
     @Nullable
@@ -42,11 +43,13 @@ public class NameArity implements ItemPresentation {
     public NameArity(@Nullable String location,
                      @NotNull Timed.Time time,
                      @Nullable Visible.Visibility visibility,
+                     boolean overridable,
                      @NotNull String name,
                      @Nullable Integer arity) {
         this.arity = arity;
         this.location = location;
         this.name = name;
+        this.overridable = overridable;
         this.time = time;
         this.visibility = visibility;
     }
@@ -89,7 +92,13 @@ public class NameArity implements ItemPresentation {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        RowIcon rowIcon = new RowIcon(3);
+        int layers = 3;
+
+        if (overridable) {
+            layers += 1;
+        }
+
+        RowIcon rowIcon = new RowIcon(layers);
         Icon timeIcon = null;
 
         switch (time) {
@@ -119,6 +128,10 @@ public class NameArity implements ItemPresentation {
         rowIcon.setIcon(timeIcon, 0);
         rowIcon.setIcon(visibilityIcon, 1);
         rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, 2);
+
+        if (overridable) {
+            rowIcon.setIcon(ElixirIcons.OVERRIDABLE, 3);
+        }
 
         return rowIcon;
     }

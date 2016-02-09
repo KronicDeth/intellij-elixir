@@ -3,12 +3,7 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.util.PsiTreeUtil;
-import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.navigation.item_presentation.*;
 import org.elixir_lang.navigation.item_presentation.Parent;
-import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.*;
@@ -24,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static com.intellij.openapi.util.Pair.pair;
 
 public class Module extends Element<Call> implements Modular {
     /*
@@ -63,6 +60,7 @@ public class Module extends Element<Call> implements Modular {
             List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
             Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
             Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
+            Set<Overridable> overridableSet = new HashSet<Overridable>();
             Exception exception = null;
 
             for (Call childCall : childCalls) {
@@ -116,9 +114,25 @@ public class Module extends Element<Call> implements Modular {
                 } else if (Module.is(childCall)) {
                     treeElementList.add(new Module(modular, childCall));
                 } else if (Overridable.is(childCall)) {
-                    treeElementList.add(new Overridable(modular, childCall));
+                    Overridable overridable = new Overridable(modular, childCall);
+                    overridableSet.add(overridable);
+                    treeElementList.add(overridable);
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
+                }
+            }
+
+            for (Overridable overridable : overridableSet) {
+                for (TreeElement treeElement : overridable.getChildren()) {
+                    CallReference callReference = (CallReference) treeElement;
+                    Integer arity = callReference.arity();
+
+                    if (arity != null) {
+                        String name = callReference.name();
+
+                        CallDefinition function = functionByNameArity.get(pair(name, arity));
+                        function.setOverridable(true);
+                    }
                 }
             }
 

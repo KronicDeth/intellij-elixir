@@ -85,7 +85,11 @@ public class Overridable extends Element<Call> {
                     }
                 }
 
-                treeElementList.add(new CallReference(modular, quotableKeywordPair, Timed.Time.RUN, name, arity));
+                boolean overridable = true;
+                //noinspection ConstantConditions
+                treeElementList.add(
+                        new CallReference(modular, quotableKeywordPair, Timed.Time.RUN, overridable, name, arity)
+                );
             }
 
             children = treeElementList.toArray(new TreeElement[treeElementList.size()]);

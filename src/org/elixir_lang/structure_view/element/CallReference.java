@@ -29,23 +29,36 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
     @NotNull
     private final String name;
     @NotNull
+    private final boolean overridable;
+    @NotNull
     private final Timed.Time time;
 
     /*
      * Constructors
      */
 
-    public CallReference(@NotNull Modular modular, @NotNull NavigatablePsiElement psiElement, @NotNull Timed.Time time, @NotNull String name, @Nullable Integer arity) {
+    public CallReference(@NotNull Modular modular,
+                         @NotNull NavigatablePsiElement psiElement,
+                         @NotNull Timed.Time time,
+                         boolean overridable,
+                         @NotNull String name,
+                         @Nullable Integer arity) {
         super(psiElement);
         this.arity = arity;
         this.modular = modular;
         this.name = name;
+        this.overridable = overridable;
         this.time = time;
     }
 
     /*
      * Instance Methods
      */
+
+    @Nullable
+    public Integer arity() {
+        return arity;
+    }
 
     /**
      * Returns the presentation of the tree element.
@@ -67,6 +80,7 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
                 location,
                 time,
                 visibility(),
+                overridable,
                 name,
                 arity
         );
@@ -81,6 +95,11 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
     @Override
     public TreeElement[] getChildren() {
         return new TreeElement[0];
+    }
+
+    @NotNull
+    public String name() {
+        return name;
     }
 
     /**

@@ -33,6 +33,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     private final Modular modular;
     @NotNull
     private final String name;
+    private boolean overridable;
     @NotNull
     private final Time time;
 
@@ -141,11 +142,15 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
                 location,
                 time,
                 visibility(),
+                overridable,
                 name,
                 arity
         );
     }
 
+    public boolean isOverridable() {
+        return overridable;
+    }
 
     @NotNull
     public String name() {
@@ -174,6 +179,10 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     @NotNull
     public Time time() {
         return time;
+    }
+
+    public void setOverridable(boolean overridable) {
+        this.overridable = overridable;
     }
 
     /**
