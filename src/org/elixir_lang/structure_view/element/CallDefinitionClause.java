@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.intellij.openapi.util.Pair.pair;
@@ -61,13 +63,15 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     }
 
     /**
-     * The name and arity of the macro this clause belongs to.
+     * The name and arity range of the call definition this clause belongs to.
      *
      * @param call
-     * @return The name and arity of the {@code Macro} this macro clause belongs
+     * @return The name and arities of the {@link CallDefinition} this clause belongs.  Multiple arities occur when
+     *   default arguments are used, which produces an arity for each default argument that is turned on and off.
+     * @see Call#resolvedFinalArityRange()
      */
     @NotNull
-    public static Pair<String, Integer> nameArity(Call call) {
+    public static Pair<String, IntRange> nameArityRange(Call call) {
         PsiElement[] primaryArguments = call.primaryArguments();
 
         assert primaryArguments != null;
@@ -75,7 +79,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
 
         PsiElement head = primaryArguments[0];
         String name = null;
-        Integer arity = null;
+        IntRange arityRange = null;
         Call headCall = null;
 
         if (head instanceof ElixirMatchedWhenOperation) {
@@ -182,7 +186,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
             ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
 
             name = matchedAtNonNumericOperation.operator().getText().trim();
-            arity = 1;
+            arityRange = new IntRange(1);
         } else {
             openIssueForNotImplemented(
                     "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have either Calls or " +
@@ -194,10 +198,10 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
 
         if (headCall != null) {
             name = headCall.functionName();
-            arity = headCall.resolvedFinalArity();
+            arityRange = headCall.resolvedFinalArityRange();
         }
 
-        return pair(name, arity);
+        return pair(name, arityRange);
     }
 
     /**

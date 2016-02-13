@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Infix;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,9 @@ public interface ElixirUnmatchedRelationalOperation extends ElixirUnmatchedExpre
 
   @NotNull
   int resolvedFinalArity();
+
+  @NotNull
+  IntRange resolvedFinalArityRange();
 
   @NotNull
   String resolvedFunctionName();

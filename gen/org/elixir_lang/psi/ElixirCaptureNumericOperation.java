@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Prefix;
 import org.jetbrains.annotations.NotNull;
@@ -75,6 +76,9 @@ public interface ElixirCaptureNumericOperation extends Call, Prefix {
 
   @NotNull
   int resolvedFinalArity();
+
+  @NotNull
+  IntRange resolvedFinalArityRange();
 
   @NotNull
   String resolvedFunctionName();

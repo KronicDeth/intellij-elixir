@@ -4,6 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +53,9 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
 
   @NotNull
   int resolvedFinalArity();
+
+  @NotNull
+  IntRange resolvedFinalArityRange();
 
   @Nullable
   String resolvedFunctionName();

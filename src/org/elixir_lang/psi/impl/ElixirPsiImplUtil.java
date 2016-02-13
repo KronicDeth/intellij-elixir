@@ -12,6 +12,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewUtil;
 import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
 import org.elixir_lang.psi.*;
@@ -57,6 +58,7 @@ public class ElixirPsiImplUtil {
             }
     );
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
@@ -386,6 +388,23 @@ public class ElixirPsiImplUtil {
         };
     }
 
+    /**
+     * The number of arguments that have defaults.
+     * @param arguments arguments to a definition call
+     * @return
+     */
+    public static int defaultArgumentCount(@NotNull PsiElement[] arguments) {
+        int count = 0;
+
+        for (PsiElement argument : arguments) {
+            if (isDefaultArgument(argument)) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     @Nullable
     public static String definedModuleName(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall) {
         PsiElement[] arguments = unmatchedUnqualifiedNoParenthesesCall.primaryArguments();
@@ -658,6 +677,25 @@ public class ElixirPsiImplUtil {
         }
 
         return isCallingMacro;
+    }
+
+    /**
+     * Whether the given element presents a default argument (with {@code \\} in it.
+     * @param argument an argument to a {@link Call}
+     * @return {@code true} if in match operation with {@code \\} operator; otherwise, {@code false}.
+     */
+    private static boolean isDefaultArgument(PsiElement argument) {
+        boolean defaultArgument = false;
+
+        if (argument instanceof ElixirMatchedInMatchOperation || argument instanceof ElixirUnmatchedInMatchOperation) {
+            Operation matchedInMatchOperation = (Operation) argument;
+
+            if (matchedInMatchOperation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
+                defaultArgument = true;
+            }
+        }
+
+        return defaultArgument;
     }
 
     /*
@@ -3837,6 +3875,24 @@ if (quoted == null) {
         }
 
         return resolvedFinalArity;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static IntRange resolvedFinalArityRange(@NotNull final Call call) {
+        IntRange arityRange;
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+
+        if (finalArguments != null) {
+            int defaultCount = defaultArgumentCount(finalArguments);
+            int maximum = finalArguments.length;
+            int minimum = maximum - defaultCount;
+            arityRange = new IntRange(minimum, maximum);
+        } else {
+            arityRange = new IntRange(0);
+        }
+
+        return arityRange;
     }
 
     /**

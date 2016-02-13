@@ -4,6 +4,7 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
@@ -62,10 +63,10 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      * @param clause the new clause for the macro
      */
     public void clause(Call clause) {
-        Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(clause);
+        Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(clause);
 
-        assert nameArity.first.equals(name);
-        assert nameArity.second == arity;
+        assert nameArityRange.first.equals(name);
+        assert nameArityRange.second.getMinimumInteger() <= arity && nameArityRange.second.getMaximumInteger() >= arity;
 
         clauses.add(new CallDefinitionClause(this, clause));
     }

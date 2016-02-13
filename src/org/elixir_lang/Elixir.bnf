@@ -32,6 +32,7 @@
     primaryArity
     quote
     resolvedFinalArity
+    resolvedFinalArityRange
     resolvedFunctionName
     resolvedModuleName
     resolvedPrimaryArity
@@ -61,6 +62,7 @@
     secondaryArguments
     secondaryArity
     resolvedFinalArity
+    resolvedFinalArityRange
     resolvedFunctionName
     resolvedModuleName
     resolvedPrimaryArity
@@ -344,6 +346,7 @@ unqualifiedNoParenthesesManyArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                                   quote
                                                   quoteArguments
                                                   resolvedFinalArity
+                                                  resolvedFinalArityRange
                                                   resolvedFunctionName
                                                   resolvedModuleName
                                                   resolvedPrimaryArity
@@ -1628,6 +1631,7 @@ matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments paren
                        primaryArity
                        quote
                        resolvedFinalArity
+                       resolvedFinalArityRange
                        resolvedFunctionName
                        resolvedModuleName
                        resolvedPrimaryArity
@@ -1662,6 +1666,7 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
                                           primaryArity
                                           quote
                                           resolvedFinalArity
+                                          resolvedFinalArityRange
                                           resolvedFunctionName
                                           resolvedModuleName
                                           resolvedPrimaryArity
@@ -1700,6 +1705,7 @@ matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
                                               primaryArity
                                               quote
                                               resolvedFinalArity
+                                              resolvedFinalArityRange
                                               resolvedFunctionName
                                               resolvedModuleName
                                               resolvedPrimaryArity
@@ -1735,6 +1741,7 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                             primaryArity
                                             quote
                                             resolvedFinalArity
+                                            resolvedFinalArityRange
                                             resolvedFunctionName
                                             resolvedModuleName
                                             resolvedPrimaryArity
@@ -1820,6 +1827,7 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
                                         primaryArity
                                         quote
                                         resolvedFinalArity
+                                        resolvedFinalArityRange
                                         resolvedFunctionName
                                         resolvedModuleName
                                         resolvedPrimaryArity
@@ -1852,6 +1860,7 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
                                         primaryArity
                                         quote
                                         resolvedFinalArity
+                                        resolvedFinalArityRange
                                         resolvedFunctionName
                                         resolvedModuleName
                                         resolvedPrimaryArity
@@ -1895,6 +1904,7 @@ matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                           primaryArity
                                           quote
                                           resolvedFinalArity
+                                          resolvedFinalArityRange
                                           resolvedFunctionName
                                           resolvedModuleName
                                           resolvedPrimaryArity
@@ -1956,6 +1966,7 @@ matchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                           primaryArity
                                           quote
                                           resolvedFinalArity
+                                          resolvedFinalArityRange
                                           resolvedFunctionName
                                           resolvedModuleName
                                           resolvedPrimaryArity
@@ -2483,6 +2494,7 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments p
                          primaryArity
                          quote
                          resolvedFinalArity
+                         resolvedFinalArityRange
                          resolvedFunctionName
                          resolvedModuleName
                          resolvedPrimaryArity
@@ -2513,6 +2525,7 @@ unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator rel
                                             primaryArity
                                             quote
                                             resolvedFinalArity
+                                            resolvedFinalArityRange
                                             resolvedFunctionName
                                             resolvedModuleName
                                             resolvedPrimaryArity
@@ -2549,6 +2562,7 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
                                                 primaryArity
                                                 quote
                                                 resolvedFinalArity
+                                                resolvedFinalArityRange
                                                 resolvedFunctionName
                                                 resolvedModuleName
                                                 resolvedPrimaryArity
@@ -2587,6 +2601,7 @@ unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument do
                                               processDeclarations
                                               quote
                                               resolvedFinalArity
+                                              resolvedFinalArityRange
                                               resolvedFunctionName
                                               resolvedModuleName
                                               resolvedPrimaryArity
@@ -2654,6 +2669,7 @@ unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relat
                                           primaryArity
                                           quote
                                           resolvedFinalArity
+                                          resolvedFinalArityRange
                                           resolvedFunctionName
                                           resolvedModuleName
                                           resolvedPrimaryArity
@@ -2682,6 +2698,7 @@ unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relat
                                           primaryArity
                                           quote
                                           resolvedFinalArity
+                                          resolvedFinalArityRange
                                           resolvedFunctionName
                                           resolvedModuleName
                                           resolvedPrimaryArity
@@ -2721,6 +2738,7 @@ unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments d
                                             primaryArity
                                             quote
                                             resolvedFinalArity
+                                            resolvedFinalArityRange
                                             resolvedFunctionName
                                             resolvedModuleName
                                             resolvedPrimaryArity
@@ -2770,6 +2788,7 @@ unmatchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON doBlock?
                                             primaryArity
                                             quote
                                             resolvedFinalArity
+                                            resolvedFinalArityRange
                                             resolvedFunctionName
                                             resolvedModuleName
                                             resolvedPrimaryArity

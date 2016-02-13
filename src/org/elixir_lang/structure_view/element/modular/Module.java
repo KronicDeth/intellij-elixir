@@ -3,6 +3,8 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.util.Function;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -34,6 +36,38 @@ public class Module extends Element<Call> implements Modular {
      * Static Methods
      */
 
+    public static void addClausesToCallDefinition(
+            @NotNull Call call,
+            @NotNull Map<Pair<String, Integer>, CallDefinition> callDefinitionByNameArity,
+            @NotNull Modular modular,
+            @NotNull Timed.Time time,
+            @NotNull Inserter<CallDefinition> callDefinitionInserter
+    ) {
+        Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
+        String name = nameArityRange.first;
+        IntRange arityRange = nameArityRange.second;
+
+        for (int arity = arityRange.getMinimumInteger(); arity <= arityRange.getMaximumInteger(); arity++) {
+            Pair<String, Integer> nameArity = pair(name, arity);
+
+            CallDefinition callDefinition = callDefinitionByNameArity.get(nameArity);
+
+            if (callDefinition == null) {
+                callDefinition = new CallDefinition(
+                        modular,
+                        time,
+                        name,
+                        arity
+                );
+                callDefinitionByNameArity.put(nameArity, callDefinition);
+
+                callDefinitionInserter.insert(callDefinition);
+            }
+
+            callDefinition.clause(call);
+        }
+    }
+
     @NotNull
     public static TreeElement[] callChildren(@NotNull Modular modular, @NotNull Call call) {
         Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(call);
@@ -57,60 +91,53 @@ public class Module extends Element<Call> implements Modular {
 
         if (childCalls != null) {
             int length = childCalls.length;
-            List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
+            final List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
             Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
             Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
             Set<Overridable> overridableSet = new HashSet<Overridable>();
-            Exception exception = null;
+            // has to be in an array so it can be final to share with function inserter
+            final Exception[] exceptions = new Exception[]{ null };
 
             for (Call childCall : childCalls) {
                 if (Delegation.is(childCall)) {
                     treeElementList.add(new Delegation(modular, childCall));
                 } else if (Exception.is(childCall)) {
-                    exception = new Exception(modular, childCall);
-                    treeElementList.add(exception);
+                    exceptions[0] = new Exception(modular, childCall);
+                    treeElementList.add(exceptions[0]);
                 } else if (CallDefinitionClause.isFunction(childCall)) {
-                    Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(childCall);
-
-                    CallDefinition function = functionByNameArity.get(nameArity);
-
-                    if (function == null) {
-                        function = new CallDefinition(
-                                modular,
-                                Timed.Time.RUN,
-                                nameArity.first,
-                                nameArity.second
-                        );
-                        functionByNameArity.put(nameArity, function);
-
-                        // callbacks are nested under the behavior they are for
-                        if (exception != null && Exception.isCallback(nameArity)) {
-                            exception.callback(function);
-                        } else {
-                            treeElementList.add(function);
-                        }
-                    }
-
-                    function.clause(childCall);
+                    addClausesToCallDefinition(
+                            childCall,
+                            functionByNameArity,
+                            modular,
+                            Timed.Time.RUN,
+                            new Inserter<CallDefinition>() {
+                                @Override
+                                public void insert(CallDefinition function) {
+                                    // callbacks are nested under the behavior they are for
+                                    if (exceptions[0] != null &&
+                                            Exception.isCallback(pair(function.name(), function.arity()))) {
+                                        exceptions[0].callback(function);
+                                    } else {
+                                        treeElementList.add(function);
+                                    }
+                                }
+                            }
+                    );
                 } else if (Implementation.is(childCall)) {
                     treeElementList.add(new Implementation(modular, childCall));
                 } else if (CallDefinitionClause.isMacro(childCall)) {
-                    Pair<String, Integer> nameArity = CallDefinitionClause.nameArity(childCall);
-
-                    CallDefinition macro = macroByNameArity.get(nameArity);
-
-                    if (macro == null) {
-                        macro = new CallDefinition(
-                                modular,
-                                Timed.Time.COMPILE,
-                                nameArity.first,
-                                nameArity.second
-                        );
-                        macroByNameArity.put(nameArity, macro);
-                        treeElementList.add(macro);
-                    }
-
-                    macro.clause(childCall);
+                    addClausesToCallDefinition(
+                            childCall,
+                            macroByNameArity,
+                            modular,
+                            Timed.Time.COMPILE,
+                            new Inserter<CallDefinition>() {
+                                @Override
+                                public void insert(CallDefinition macro) {
+                                    treeElementList.add(macro);
+                                }
+                            }
+                    );
                 } else if (Module.is(childCall)) {
                     treeElementList.add(new Module(modular, childCall));
                 } else if (Overridable.is(childCall)) {

@@ -2,9 +2,12 @@ package org.elixir_lang.psi.call;
 
 import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.TreeSet;
 
 /**
  * A general function or macro call.
@@ -149,6 +152,14 @@ public interface Call extends NavigatablePsiElement {
      *   {@code null}; otherwise, {@code 0}.
      */
     int resolvedFinalArity();
+
+    /**
+     * The final arities produced by turning default arguments on and off.
+     *
+     * @return the minimum arity with all defaults active to the maximum arity with all defaults overridden
+     */
+    @NotNull
+    IntRange resolvedFinalArityRange();
 
     /**
      * The total number of primary arguments for the final expanded function call.

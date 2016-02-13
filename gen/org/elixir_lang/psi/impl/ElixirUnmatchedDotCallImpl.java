@@ -7,6 +7,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,6 +99,11 @@ public class ElixirUnmatchedDotCallImpl extends ElixirUnmatchedExpressionImpl im
   @NotNull
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
+  }
+
+  @NotNull
+  public IntRange resolvedFinalArityRange() {
+    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
   }
 
   @Nullable

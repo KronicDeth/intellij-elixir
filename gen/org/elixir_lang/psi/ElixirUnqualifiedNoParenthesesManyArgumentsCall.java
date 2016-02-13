@@ -4,6 +4,7 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.arguments.NoParentheses;
 import org.elixir_lang.psi.qualification.Unqualified;
@@ -69,6 +70,9 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   @NotNull
   int resolvedFinalArity();
+
+  @NotNull
+  IntRange resolvedFinalArityRange();
 
   @NotNull
   String resolvedFunctionName();

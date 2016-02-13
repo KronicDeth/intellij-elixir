@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -102,6 +103,11 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ElixirMatchedExpr
   @NotNull
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
+  }
+
+  @NotNull
+  public IntRange resolvedFinalArityRange() {
+    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
   }
 
   @NotNull

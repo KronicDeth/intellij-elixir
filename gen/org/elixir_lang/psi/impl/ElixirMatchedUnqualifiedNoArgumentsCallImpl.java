@@ -6,6 +6,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirMatchedUnqualifiedNoArgumentsCall;
@@ -89,6 +90,11 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends ElixirMatchedEx
   @NotNull
   public int resolvedFinalArity() {
     return ElixirPsiImplUtil.resolvedFinalArity(this);
+  }
+
+  @NotNull
+  public IntRange resolvedFinalArityRange() {
+    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
   }
 
   @NotNull
