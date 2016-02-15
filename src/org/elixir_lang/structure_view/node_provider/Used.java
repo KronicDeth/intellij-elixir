@@ -102,7 +102,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
         return nodes;
     }
 
-    private Collection<TreeElement> provideNodesFromChild(TreeElement child) {
+    private Collection<TreeElement> provideNodesFromChild(@NotNull TreeElement child) {
         Collection<TreeElement> nodes = null;
 
         if (child instanceof Use) {
@@ -201,7 +201,8 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
 
                                                             if (lastCallDefinitionClauseChild instanceof Quote) {
                                                                 Quote quote = (Quote) lastCallDefinitionClauseChild;
-                                                                TreeElement[] quoteChildren = quote.getChildren();
+                                                                Quote injectedQuote = quote.used(use);
+                                                                TreeElement[] quoteChildren = injectedQuote.getChildren();
                                                                 nodes = Arrays.asList(quoteChildren);
                                                                 break;
                                                             }

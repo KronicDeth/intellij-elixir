@@ -168,7 +168,7 @@ public class Module extends Element<Call> implements Modular {
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Use.is(childCall)) {
-                    treeElementList.add(new Use(modular, childCall));
+                    treeElementList.add(new org.elixir_lang.structure_view.element.Use(modular, childCall));
                 }
             }
 
