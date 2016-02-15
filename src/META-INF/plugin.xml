@@ -591,6 +591,11 @@
     <internalFileTemplate name="Elixir GenServer"/>
     <internalFileTemplate name="Elixir GenEvent"/>
 
+    <!-- for liveTemplates -->
+    <defaultLiveTemplatesProvider implementation="org.elixir_lang.templates.ElixirLiveTemplateProvider"/>
+    <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
+    <!-- end liveTemplates -->
+
     <annotator implementationClass="org.elixir_lang.annonator.Kernel" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
