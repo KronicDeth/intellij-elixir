@@ -47,6 +47,26 @@ public class Module extends Element<Call> implements Modular {
         String name = nameArityRange.first;
         IntRange arityRange = nameArityRange.second;
 
+        addClausesToCallDefinition(
+                call,
+                name,
+                arityRange,
+                callDefinitionByNameArity,
+                modular,
+                time,
+                callDefinitionInserter
+        );
+    }
+
+    public static void addClausesToCallDefinition(
+            @NotNull Call call,
+            @NotNull String name,
+            @NotNull IntRange arityRange,
+            @NotNull Map<Pair<String, Integer>, CallDefinition> callDefinitionByNameArity,
+            @NotNull Modular modular,
+            @NotNull Timed.Time time,
+            @NotNull Inserter<CallDefinition> callDefinitionInserter
+    ) {
         for (int arity = arityRange.getMinimumInteger(); arity <= arityRange.getMaximumInteger(); arity++) {
             Pair<String, Integer> nameArity = pair(name, arity);
 
@@ -67,6 +87,7 @@ public class Module extends Element<Call> implements Modular {
             callDefinition.clause(call);
         }
     }
+
 
     @NotNull
     public static TreeElement[] callChildren(@NotNull Modular modular, @NotNull Call call) {

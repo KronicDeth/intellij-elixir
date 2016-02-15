@@ -337,5 +337,16 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
 
         return treeElements;
     }
+
+    /**
+     * Whether this clause would match the given arguments and be called.
+     *
+     * @param arguments argument being passed to this clauses' function.
+     * @return {@code true} if arguments matches up-to the available information about the arguments; otherwise,
+     *   {@code false}
+     */
+    public boolean isMatch(PsiElement[] arguments) {
+        return false;
+    }
 }
 

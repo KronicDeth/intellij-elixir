@@ -38,6 +38,11 @@ public class Use extends Element<Call> {
      * Instance Methods
      */
 
+    @NotNull
+    public Call call() {
+        return navigationItem;
+    }
+
     /**
      * Returns the list of children of the tree element.
      *

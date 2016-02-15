@@ -5,6 +5,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import org.apache.commons.lang.math.IntRange;
+import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
@@ -29,7 +30,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
     private final int arity;
     @NotNull
-    private final List<CallDefinitionClause> clauses = new ArrayList<CallDefinitionClause>();
+    private final List<CallDefinitionClause> clauseList = new ArrayList<CallDefinitionClause>();
     @NotNull
     private final Modular modular;
     @NotNull
@@ -68,7 +69,11 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         assert nameArityRange.first.equals(name);
         assert nameArityRange.second.getMinimumInteger() <= arity && nameArityRange.second.getMaximumInteger() >= arity;
 
-        clauses.add(new CallDefinitionClause(this, clause));
+        clauseList.add(new CallDefinitionClause(this, clause));
+    }
+
+    public List<CallDefinitionClause> clauseList() {
+        return clauseList;
     }
 
     /**
@@ -79,7 +84,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        return clauses.toArray(new TreeElement[clauses.size()]);
+        return clauseList.toArray(new TreeElement[clauseList.size()]);
     }
 
     /**
@@ -100,27 +105,27 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      */
     @Override
     public Object getValue() {
-        return clauses.get(0);
+        return clauseList.get(0);
     }
 
     /**
      * A macro groups together one or more {@link CallDefinitionClause} elements, so it can navigate if it has clauses.
      *
-     * @return {@code true} if {@link #clauses} size is greater than 0; otherwise, {@code false}.
+     * @return {@code true} if {@link #clauseList} size is greater than 0; otherwise, {@code false}.
      */
     @Override
     public boolean canNavigate() {
-        return clauses.size() > 0;
+        return clauseList.size() > 0;
     }
 
     /**
      * A macro groups together one or more {@link CallDefinitionClause} elements, so it can navigate if it has clauses.
      *
-     * @return {@code true} if {@link #clauses} size is greater than 0; otherwise, {@code false}.
+     * @return {@code true} if {@link #clauseList} size is greater than 0; otherwise, {@code false}.
      */
     @Override
     public boolean canNavigateToSource() {
-        return clauses.size() > 0;
+        return clauseList.size() > 0;
     }
 
     /**
@@ -153,20 +158,62 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         return overridable;
     }
 
+    /**
+     * The clause that matches the {@code arguments}.
+     *
+     * @param arguments the arguments the clause's arguments must match
+     * @return {@code null} if no clauses match or if more than one clause match
+     */
+    @Nullable
+    public CallDefinitionClause matchingClause(PsiElement[] arguments) {
+        CallDefinitionClause clause = null;
+        List<CallDefinitionClause> clauseList = matchingClauseList(arguments);
+
+        if (clauseList != null && clauseList.size() == 1) {
+            clause = clauseList.get(0);
+        }
+
+        return clause;
+    }
+
+    /**
+     * All clauses that match the {@code arguments}.
+     *
+     * @param arguments the arguments the clauses' arguments must match
+     * @return {@code null} if no clauses match; multiple clauses if the types of arguments cannot be inferred and
+     *   simpler, relaxed matching has to be used.
+     */
+    @Nullable
+    public List<CallDefinitionClause> matchingClauseList(PsiElement[] arguments) {
+        List<CallDefinitionClause> clauseList = null;
+
+        for (CallDefinitionClause clause : this.clauseList) {
+           if (clause.isMatch(arguments)) {
+               if (clauseList == null) {
+                   clauseList = new ArrayList<CallDefinitionClause>(1);
+               }
+
+               clauseList.add(clause);
+           }
+        }
+
+        return clauseList;
+    }
+
     @NotNull
     public String name() {
         return name;
     }
 
     /**
-     * Navigates to first clause in {@link #clauses}.
+     * Navigates to first clause in {@link #clauseList}.
      *
      * @param requestFocus <code>true</code> if focus requesting is necessary
      */
     @Override
     public void navigate(@SuppressWarnings("unused") boolean requestFocus) {
         if (canNavigate()) {
-            clauses.get(0).navigate(requestFocus);
+            clauseList.get(0).navigate(requestFocus);
         }
     }
 
@@ -201,7 +248,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         int privateCount = 0;
         int publicCount = 0;
 
-        for (CallDefinitionClause callDefinitionClause : clauses) {
+        for (CallDefinitionClause callDefinitionClause : clauseList) {
             switch (callDefinitionClause.visibility()) {
                 case PRIVATE:
                     privateCount++;
