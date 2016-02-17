@@ -81,6 +81,7 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
                 time,
                 visibility(),
                 overridable,
+                false,
                 name,
                 arity
         );

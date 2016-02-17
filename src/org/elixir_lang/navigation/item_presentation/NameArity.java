@@ -26,7 +26,10 @@ public class NameArity implements ItemPresentation {
     private final String location;
     @NotNull
     private final String name;
+    // is allowed to be overridden by an override function
     private final boolean overridable;
+    // overrides an overridable function
+    private boolean override;
     @NotNull
     private final Timed.Time time;
     @Nullable
@@ -44,12 +47,14 @@ public class NameArity implements ItemPresentation {
                      @NotNull Timed.Time time,
                      @Nullable Visible.Visibility visibility,
                      boolean overridable,
+                     boolean override,
                      @NotNull String name,
                      @Nullable Integer arity) {
         this.arity = arity;
         this.location = location;
         this.name = name;
         this.overridable = overridable;
+        this.override = override;
         this.time = time;
         this.visibility = visibility;
     }
@@ -98,6 +103,10 @@ public class NameArity implements ItemPresentation {
             layers += 1;
         }
 
+        if (override) {
+            layers += 1;
+        }
+
         RowIcon rowIcon = new RowIcon(layers);
         Icon timeIcon = null;
 
@@ -125,12 +134,17 @@ public class NameArity implements ItemPresentation {
                 visibilityIcon = ElixirIcons.UNKNOWN;
         }
 
-        rowIcon.setIcon(timeIcon, 0);
-        rowIcon.setIcon(visibilityIcon, 1);
-        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, 2);
+        int layer = 0;
+        rowIcon.setIcon(timeIcon, layer++);
+        rowIcon.setIcon(visibilityIcon, layer++);
+        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, layer++);
 
         if (overridable) {
-            rowIcon.setIcon(ElixirIcons.OVERRIDABLE, 3);
+            rowIcon.setIcon(ElixirIcons.OVERRIDABLE, layer++);
+        }
+
+        if (override) {
+            rowIcon.setIcon(ElixirIcons.OVERRIDE, layer);
         }
 
         return rowIcon;

@@ -35,7 +35,10 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     private final Modular modular;
     @NotNull
     private final String name;
+    // is allowed to be overridden by an override function
     private boolean overridable;
+    // overrides an overridable function
+    private boolean override;
     @NotNull
     private final Time time;
 
@@ -149,11 +152,15 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
                 time,
                 visibility(),
                 overridable,
+                override,
                 name,
                 arity
         );
     }
 
+    /**
+     * @return {@code true} if this function can be overridden when the outer quote is {@code use}d
+     */
     public boolean isOverridable() {
         return overridable;
     }
@@ -229,6 +236,21 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         return time;
     }
 
+    /**
+     * Set that this function overrides an overridable function
+     *
+     * @param override {@code true} to mark as an override of another function; {@code false} to mark as an independent
+     *   function
+     */
+    public void setOverride(boolean override) {
+        this.override = override;
+    }
+
+    /**
+     * Set that this function can be overridden by another function of the same name and arity.
+     * @param overridable {@code true} to mark as overridable by another function of the same name and arity;
+     *   {@code false} to make as non-overridable.
+     */
     public void setOverridable(boolean overridable) {
         this.overridable = overridable;
     }
@@ -271,4 +293,5 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
         return callDefinitionVisibility;
     }
+
 }

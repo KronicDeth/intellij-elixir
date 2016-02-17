@@ -3,7 +3,6 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
-import com.intellij.util.Function;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
@@ -16,6 +15,7 @@ import org.elixir_lang.structure_view.element.Exception;
 import org.elixir_lang.structure_view.element.Implementation;
 import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
+import org.elixir_lang.structure_view.node_provider.Used;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -116,6 +116,7 @@ public class Module extends Element<Call> implements Modular {
             Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
             Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
             Set<Overridable> overridableSet = new HashSet<Overridable>();
+            Set<org.elixir_lang.structure_view.element.Use> useSet = new HashSet<org.elixir_lang.structure_view.element.Use>();
             // has to be in an array so it can be final to share with function inserter
             final Exception[] exceptions = new Exception[]{ null };
 
@@ -168,7 +169,9 @@ public class Module extends Element<Call> implements Modular {
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Use.is(childCall)) {
-                    treeElementList.add(new org.elixir_lang.structure_view.element.Use(modular, childCall));
+                    org.elixir_lang.structure_view.element.Use use = new org.elixir_lang.structure_view.element.Use(modular, childCall);
+                    useSet.add(use);
+                    treeElementList.add(use);
                 }
             }
 
@@ -182,6 +185,25 @@ public class Module extends Element<Call> implements Modular {
 
                         CallDefinition function = functionByNameArity.get(pair(name, arity));
                         function.setOverridable(true);
+                    }
+                }
+            }
+
+            Collection<TreeElement> useCollection = new HashSet<TreeElement>(useSet.size());
+            useCollection.addAll(useSet);
+            Collection<TreeElement> nodesFromUses = Used.provideNodesFromChildren(useCollection);
+            Map<Pair<String, Integer>, CallDefinition> useFunctionByNameArity = Used.functionByNameArity(nodesFromUses);
+
+            for (Map.Entry<Pair<String, Integer>, CallDefinition> useNameArityFunction : useFunctionByNameArity.entrySet()) {
+                CallDefinition useFunction = useNameArityFunction.getValue();
+
+                if (useFunction.isOverridable()) {
+                    Pair<String, Integer> useNameArity = useNameArityFunction.getKey();
+
+                    CallDefinition function = functionByNameArity.get(useNameArity);
+
+                    if (function != null) {
+                        function.setOverride(true);
                     }
                 }
             }

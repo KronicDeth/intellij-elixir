@@ -45,6 +45,7 @@ public interface ElixirIcons {
   Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
   Icon MODULE = PlatformIcons.PACKAGE_ICON;
   Icon OVERRIDABLE = AllIcons.General.OverridenMethod;
+  Icon OVERRIDE = AllIcons.General.OverridingMethod;
 
   // it is the unknown that is only a question mark
   Icon UNKNOWN = AllIcons.RunConfigurations.Unknown;

@@ -40,69 +40,52 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
     public static final String USING = "__using__";
 
     /*
-     * Instance Methods
+     * Static Methods
      */
 
-    @NotNull
-    @Override
-    public String getActionIdForShortcut() {
-        return "FileStructurePopup";
+    public static Collection<TreeElement> filterOverridden(@NotNull Collection<TreeElement> nodesFromChildren,
+                                                           @NotNull Collection<TreeElement> children) {
+        Map<Pair<String, Integer>, CallDefinition> childFunctionByNameArity = functionByNameArity(children);
+        Collection<TreeElement> filtered = new ArrayList<TreeElement>(nodesFromChildren.size());
+
+        for (TreeElement nodeFromChildren : nodesFromChildren) {
+            if (nodeFromChildren instanceof CallDefinition) {
+                CallDefinition callDefinition = (CallDefinition) nodeFromChildren;
+
+                // only functions work with defoverridable
+                if (callDefinition.time() == Timed.Time.RUN) {
+                    Pair<String, Integer> nameArity = pair(callDefinition.name(), callDefinition.arity());
+
+                    if (childFunctionByNameArity.containsKey(nameArity)) {
+                        continue;
+                    }
+                }
+            }
+
+            filtered.add(nodeFromChildren);
+        }
+
+        return filtered;
     }
 
-    @NotNull
-    @Override
-    public String getCheckBoxText() {
-        return "Show Used";
-    }
+    public static Map<Pair<String, Integer>, CallDefinition> functionByNameArity(@NotNull Collection<TreeElement> children) {
+        Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(children.size());
 
-    /**
-     * Returns a unique identifier for the action.
-     *
-     * @return the action identifier.
-     */
-    @NotNull
-    @Override
-    public String getName() {
-        return ID;
-    }
+        for (TreeElement child : children) {
+            if (child instanceof CallDefinition) {
+                CallDefinition callDefinition = (CallDefinition) child;
 
-    /**
-     * Returns the presentation for the action.
-     *
-     * @return the action presentation.
-     * @see ActionPresentationData#ActionPresentationData(String, String, Icon)
-     */
-    @NotNull
-    @Override
-    public ActionPresentation getPresentation() {
-        return new ActionPresentationData("Show Used", null, AllIcons.Hierarchy.Supertypes);
-    }
-
-    @NotNull
-    @Override
-    public Shortcut[] getShortcut() {
-        throw new IncorrectOperationException("see getActionIdForShortcut()");
-    }
-
-    @NotNull
-    @Override
-    public Collection<TreeElement> provideNodes(@NotNull TreeElement node) {
-        Collection<TreeElement> nodes = new ArrayList<TreeElement>();
-
-        if (node instanceof Module) {
-            Module module = (Module) node;
-            TreeElement[] children = module.getChildren();
-
-            for (TreeElement child : children) {
-                Collection<TreeElement>  nodesFromChild = provideNodesFromChild(child);
-                nodes.addAll(nodesFromChild);
+                if (callDefinition.time() == Timed.Time.RUN) {
+                    Pair<String, Integer> nameArity = pair(callDefinition.name(), callDefinition.arity());
+                    functionByNameArity.put(nameArity, callDefinition);
+                }
             }
         }
 
-        return nodes;
+        return functionByNameArity;
     }
 
-    private Collection<TreeElement> provideNodesFromChild(@NotNull TreeElement child) {
+    public static Collection<TreeElement> provideNodesFromChild(@NotNull TreeElement child) {
         Collection<TreeElement> nodes = null;
 
         if (child instanceof Use) {
@@ -202,8 +185,15 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
                                                             if (lastCallDefinitionClauseChild instanceof Quote) {
                                                                 Quote quote = (Quote) lastCallDefinitionClauseChild;
                                                                 Quote injectedQuote = quote.used(use);
-                                                                TreeElement[] quoteChildren = injectedQuote.getChildren();
-                                                                nodes = Arrays.asList(quoteChildren);
+                                                                TreeElement[] injectedQuoteChildren = injectedQuote.getChildren();
+                                                                nodes = new ArrayList<TreeElement>(injectedQuoteChildren.length);
+
+                                                                for (TreeElement injectedQuoteChild : injectedQuoteChildren) {
+                                                                    if (!(injectedQuoteChild instanceof Overridable)) {
+                                                                        nodes.add(injectedQuoteChild);
+                                                                    }
+                                                                }
+
                                                                 break;
                                                             }
                                                         }
@@ -230,4 +220,78 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
 
         return nodes;
     }
+
+    public static Collection<TreeElement> provideNodesFromChildren(@NotNull Collection<TreeElement> children) {
+        Collection<TreeElement> nodes = new ArrayList<TreeElement>();
+
+        for (TreeElement child : children) {
+            Collection<TreeElement>  nodesFromChild = provideNodesFromChild(child);
+            nodes.addAll(nodesFromChild);
+        }
+
+        return nodes;
+    }
+
+    /*
+     * Instance Methods
+     */
+
+    @NotNull
+    @Override
+    public String getActionIdForShortcut() {
+        return "FileStructurePopup";
+    }
+
+    @NotNull
+    @Override
+    public String getCheckBoxText() {
+        return "Show Used";
+    }
+
+    /**
+     * Returns a unique identifier for the action.
+     *
+     * @return the action identifier.
+     */
+    @NotNull
+    @Override
+    public String getName() {
+        return ID;
+    }
+
+    /**
+     * Returns the presentation for the action.
+     *
+     * @return the action presentation.
+     * @see ActionPresentationData#ActionPresentationData(String, String, Icon)
+     */
+    @NotNull
+    @Override
+    public ActionPresentation getPresentation() {
+        return new ActionPresentationData("Show Used", null, AllIcons.Hierarchy.Supertypes);
+    }
+
+    @NotNull
+    @Override
+    public Shortcut[] getShortcut() {
+        throw new IncorrectOperationException("see getActionIdForShortcut()");
+    }
+
+    @NotNull
+    @Override
+    public Collection<TreeElement> provideNodes(@NotNull TreeElement node) {
+        Collection<TreeElement> nodes = new ArrayList<TreeElement>();
+
+        if (node instanceof Module) {
+            Module module = (Module) node;
+            TreeElement[] children = module.getChildren();
+            Collection<TreeElement> childCollection = Arrays.asList(children);
+
+            nodes = provideNodesFromChildren(childCollection);
+            nodes = filterOverridden(nodes, childCollection);
+        }
+
+        return nodes;
+    }
+
 }
