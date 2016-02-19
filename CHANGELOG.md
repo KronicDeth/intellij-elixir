@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v2.2.0](#v220)
   - [v2.1.0](#v210)
   - [v2.0.0](#v200)
   - [v1.2.1](#v121)
@@ -28,6 +29,10 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v2.2.0
+* Enhancement
+  * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
 
 ## v2.1.0
 * Enhancement
