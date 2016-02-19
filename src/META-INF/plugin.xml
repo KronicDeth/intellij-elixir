@@ -593,13 +593,13 @@
 
     <annotator implementationClass="org.elixir_lang.annonator.Kernel" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
+    <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.psi.FoldingBuilder"/>
     <lang.namesValidator language="Elixir" implementationClass="org.elixir_lang.psi.module_attribute.NamesValidator"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.refactoringSupport language="Elixir" implementationClass="org.elixir_lang.refactoring.SupportProvider"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
-    <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
                      level="ERROR" shortName="NoParenthesesManyStrict"/>
