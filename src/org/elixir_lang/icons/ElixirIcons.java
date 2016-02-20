@@ -36,6 +36,7 @@ public interface ElixirIcons {
     Icon PUBLIC = PlatformIcons.PUBLIC_ICON;
   }
 
+  Icon CALLBACK = AllIcons.Gutter.ImplementedMethod;
   Icon CALL_DEFINITION = PlatformIcons.FUNCTION_ICON;
   Icon CALL_DEFINITION_CLAUSE = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON);
   Icon DELEGATION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);

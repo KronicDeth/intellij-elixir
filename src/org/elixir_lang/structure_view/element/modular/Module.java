@@ -121,7 +121,9 @@ public class Module extends Element<Call> implements Modular {
             final Exception[] exceptions = new Exception[]{ null };
 
             for (Call childCall : childCalls) {
-                if (Delegation.is(childCall)) {
+                if (Callback.is(childCall)) {
+                    treeElementList.add(new Callback(modular, childCall));
+                } else if (Delegation.is(childCall)) {
                     treeElementList.add(new Delegation(modular, childCall));
                 } else if (Exception.is(childCall)) {
                     exceptions[0] = new Exception(modular, childCall);
