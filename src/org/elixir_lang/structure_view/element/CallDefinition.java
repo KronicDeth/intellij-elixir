@@ -4,10 +4,12 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.math.IntRange;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +31,9 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      */
 
     private final int arity;
+    // keeps track of total order of all children (clauses and specifications)
+    @NotNull
+    private final List<TreeElement> childList = new ArrayList<TreeElement>();
     @NotNull
     private final List<CallDefinitionClause> clauseList = new ArrayList<CallDefinitionClause>();
     @NotNull
@@ -39,6 +44,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     private boolean overridable;
     // overrides an overridable function
     private boolean override;
+    private List<CallDefinitionSpecification> specificationList = new ArrayList<CallDefinitionSpecification>();
     @NotNull
     private final Time time;
 
@@ -72,7 +78,9 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         assert nameArityRange.first.equals(name);
         assert nameArityRange.second.getMinimumInteger() <= arity && nameArityRange.second.getMaximumInteger() >= arity;
 
-        clauseList.add(new CallDefinitionClause(this, clause));
+        CallDefinitionClause callDefinitionClause = new CallDefinitionClause(this, clause);
+        childList.add(callDefinitionClause);
+        clauseList.add(callDefinitionClause);
     }
 
     public List<CallDefinitionClause> clauseList() {
@@ -87,7 +95,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        return clauseList.toArray(new TreeElement[clauseList.size()]);
+        return childList.toArray(new TreeElement[childList.size()]);
     }
 
     /**
@@ -255,6 +263,26 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         this.overridable = overridable;
     }
 
+    /**
+     *
+     * @param moduleAttributeDefinition
+     */
+    public void specification(AtUnqualifiedNoParenthesesCall moduleAttributeDefinition) {
+        Pair<String, Integer> nameArity = CallDefinitionSpecification.moduleAttributeNameArity(
+                moduleAttributeDefinition
+        );
+
+        assert nameArity != null;
+        assert nameArity.first.equals(name);
+        assert nameArity.second == arity;
+
+        CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
+                modular,
+                moduleAttributeDefinition
+        );
+        childList.add(callDefinitionSpecification);
+        specificationList.add(callDefinitionSpecification);
+    }
     /**
      * The visibility of the element.
      *

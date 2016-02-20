@@ -15,6 +15,8 @@ import org.elixir_lang.structure_view.element.Exception;
 import org.elixir_lang.structure_view.element.Implementation;
 import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
+import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity;
+import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity;
 import org.elixir_lang.structure_view.node_provider.Used;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -113,12 +115,10 @@ public class Module extends Element<Call> implements Modular {
         if (childCalls != null) {
             int length = childCalls.length;
             final List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
-            Map<Pair<String, Integer>, CallDefinition> functionByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
-            Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(length);
+            FunctionByNameArity functionByNameArity = new FunctionByNameArity(length, treeElementList, modular);
+            MacroByNameArity macroByNameArity = new MacroByNameArity(length, treeElementList, modular);
             Set<Overridable> overridableSet = new HashSet<Overridable>();
             Set<org.elixir_lang.structure_view.element.Use> useSet = new HashSet<org.elixir_lang.structure_view.element.Use>();
-            // has to be in an array so it can be final to share with function inserter
-            final Exception[] exceptions = new Exception[]{ null };
 
             for (Call childCall : childCalls) {
                 if (Callback.is(childCall)) {
@@ -126,42 +126,15 @@ public class Module extends Element<Call> implements Modular {
                 } else if (Delegation.is(childCall)) {
                     treeElementList.add(new Delegation(modular, childCall));
                 } else if (Exception.is(childCall)) {
-                    exceptions[0] = new Exception(modular, childCall);
-                    treeElementList.add(exceptions[0]);
+                    functionByNameArity.setException(new Exception(modular, childCall));
                 } else if (CallDefinitionClause.isFunction(childCall)) {
-                    addClausesToCallDefinition(
-                            childCall,
-                            functionByNameArity,
-                            modular,
-                            Timed.Time.RUN,
-                            new Inserter<CallDefinition>() {
-                                @Override
-                                public void insert(CallDefinition function) {
-                                    // callbacks are nested under the behavior they are for
-                                    if (exceptions[0] != null &&
-                                            Exception.isCallback(pair(function.name(), function.arity()))) {
-                                        exceptions[0].callback(function);
-                                    } else {
-                                        treeElementList.add(function);
-                                    }
-                                }
-                            }
-                    );
+                    functionByNameArity.addClausesToCallDefinition(childCall);
+                } else if (CallDefinitionSpecification.is(childCall)) {
+                    functionByNameArity.addSpecificationToCallDefinition(childCall);
                 } else if (Implementation.is(childCall)) {
                     treeElementList.add(new Implementation(modular, childCall));
                 } else if (CallDefinitionClause.isMacro(childCall)) {
-                    addClausesToCallDefinition(
-                            childCall,
-                            macroByNameArity,
-                            modular,
-                            Timed.Time.COMPILE,
-                            new Inserter<CallDefinition>() {
-                                @Override
-                                public void insert(CallDefinition macro) {
-                                    treeElementList.add(macro);
-                                }
-                            }
-                    );
+                    macroByNameArity.addClausesToCallDefinition(childCall);
                 } else if (Module.is(childCall)) {
                     treeElementList.add(new Module(modular, childCall));
                 } else if (Overridable.is(childCall)) {

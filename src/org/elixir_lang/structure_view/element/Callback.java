@@ -31,17 +31,9 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> {
 
         if (call instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) call;
-            ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
+            String moduleAttributeName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
 
-            ASTNode node = atIdentifier.getNode();
-            ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
-
-            assert identifierNodes.length == 1;
-
-            ASTNode identifierNode = identifierNodes[0];
-            String identifier = identifierNode.getText();
-
-            if (identifier.equals("callback")) {
+            if (moduleAttributeName.equals("@callback")) {
                 is = true;
             }
         }

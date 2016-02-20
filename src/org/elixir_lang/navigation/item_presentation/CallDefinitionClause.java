@@ -77,36 +77,17 @@ public class CallDefinitionClause implements ItemPresentation {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        RowIcon rowIcon = new RowIcon(3);
-        Icon timeIcon = null;
+        Icon[] icons = new Icon[]{
+                ElixirIcons.Time.from(callDefinition.time()),
+                ElixirIcons.Visibility.from(visibility),
+                ElixirIcons.CALL_DEFINITION_CLAUSE
+        };
 
-        switch (callDefinition.time()) {
-            case COMPILE:
-                timeIcon = ElixirIcons.Time.COMPILE;
-                break;
-            case RUN:
-                timeIcon = ElixirIcons.Time.RUN;
-                break;
+        RowIcon rowIcon = new RowIcon(icons.length);
+
+        for (int layer = 0; layer < icons.length; layer++) {
+            rowIcon.setIcon(icons[layer], layer);
         }
-
-        assert timeIcon != null;
-
-        Icon visibilityIcon = null;
-
-        switch (visibility) {
-            case PRIVATE:
-                visibilityIcon = ElixirIcons.Visibility.PRIVATE;
-                break;
-            case PUBLIC:
-                visibilityIcon = ElixirIcons.Visibility.PUBLIC;
-                break;
-        }
-
-        assert visibilityIcon != null;
-
-        rowIcon.setIcon(timeIcon, 0);
-        rowIcon.setIcon(visibilityIcon, 1);
-        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION_CLAUSE, 2);
 
         return rowIcon;
     }
