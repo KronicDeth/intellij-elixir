@@ -61,14 +61,27 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
      */
 
     /**
-     * Returns the list of children of the tree element.
+     * A callback's {@link #getPresentation()} is a {@link NameArity} like a {@link CallDefinition}, so like a call
+     * definition, it's children are the specifications and clauses, since the callback has no clauses, the only child
+     * is the specification.
      *
      * @return the list of children.
      */
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        return new TreeElement[0];
+        // pseudo-named-arguments
+        boolean callback = true;
+
+        //noinspection ConstantConditions
+        return new TreeElement[]{
+                new CallDefinitionSpecification(
+                        modular,
+                        navigationItem,
+                        callback,
+                        time()
+                )
+        };
     }
 
     /**
@@ -92,9 +105,14 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         boolean overridable = false;
         boolean override = false;
 
+        String name = "?";
+        int arity = -1;
         Call headCall = headCall();
-        String name = headCall.functionName();
-        int arity = headCall.resolvedFinalArity();
+
+        if (headCall != null) {
+            name = headCall.functionName();
+            arity = headCall.resolvedFinalArity();
+        }
 
         //noinspection ConstantConditions
         return new NameArity(

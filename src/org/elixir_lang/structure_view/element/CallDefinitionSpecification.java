@@ -3,9 +3,11 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.navigation.item_presentation.Parent;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.ElixirMatchedTypeOperation;
+import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.Contract;
@@ -22,8 +24,11 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
      * Fields
      */
 
+    private final boolean callback;
     @NotNull
     private final Modular modular;
+    @NotNull
+    private final Timed.Time time;
 
     /*
      * Static Methods
@@ -135,9 +140,13 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
      */
 
     public CallDefinitionSpecification(@NotNull Modular modular,
-                                       @NotNull AtUnqualifiedNoParenthesesCall moduleAttributeDefinition) {
+                                       @NotNull AtUnqualifiedNoParenthesesCall moduleAttributeDefinition,
+                                       boolean callback,
+                                       @NotNull Timed.Time time) {
         super(moduleAttributeDefinition);
+        this.callback = callback;
         this.modular = modular;
+        this.time = time;
     }
 
     /*
@@ -163,9 +172,14 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
+        Parent parentPresentation = (Parent) modular.getPresentation();
+        String location = parentPresentation.getLocatedPresentableText();
+
         return new org.elixir_lang.navigation.item_presentation.CallDefinitionSpecification(
+                location,
                 specification(navigationItem),
-                Timed.Time.RUN
+                callback,
+                time
         );
     }
 

@@ -281,9 +281,15 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         assert nameArity.first.equals(name);
         assert nameArity.second == arity;
 
+        // pseudo-named-arguments
+        boolean callback = false;
+        Timed.Time time = Time.RUN;
+
         CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
                 modular,
-                moduleAttributeDefinition
+                moduleAttributeDefinition,
+                callback,
+                time
         );
         childList.add(callDefinitionSpecification);
         specificationList.add(callDefinitionSpecification);

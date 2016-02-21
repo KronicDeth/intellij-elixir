@@ -15,6 +15,9 @@ public class CallDefinitionSpecification implements ItemPresentation {
      * Fields
      */
 
+    private final boolean callback;
+    @Nullable
+    private final String location;
     @Nullable
     private final Call specification;
     @NotNull
@@ -27,7 +30,12 @@ public class CallDefinitionSpecification implements ItemPresentation {
     /**
      * @param specification should only be {@code null} when format is unrecognized because it is invalid or mid-editing
      */
-    public CallDefinitionSpecification(@Nullable Call specification, Timed.Time time) {
+    public CallDefinitionSpecification(@Nullable String location,
+                                       @Nullable Call specification,
+                                       boolean callback,
+                                       @NotNull Timed.Time time) {
+        this.callback = callback;
+        this.location = location;
         this.specification = specification;
         this.time = time;
     }
@@ -40,17 +48,25 @@ public class CallDefinitionSpecification implements ItemPresentation {
     @Nullable
     @Override
     public Icon getIcon(boolean unused) {
-        Icon[] icons = new Icon[]{
-                ElixirIcons.Time.from(time),
-                ElixirIcons.Visibility.PUBLIC,
-                ElixirIcons.SPECIFICATION
-        };
+        int layers = 3;
 
-        RowIcon rowIcon = new RowIcon(icons.length);
-
-        for (int layer = 0; layer < icons.length; layer++) {
-            rowIcon.setIcon(icons[layer], layer);
+        if (callback) {
+            layers++;
         }
+
+        RowIcon rowIcon = new RowIcon(layers);
+
+        int layer = 0;
+
+        if (callback) {
+            rowIcon.setIcon(ElixirIcons.CALLBACK, layer++);
+        }
+
+        Icon timeIcon = ElixirIcons.Time.from(time);
+        rowIcon.setIcon(timeIcon, layer++);
+
+        rowIcon.setIcon(ElixirIcons.Visibility.PUBLIC, layer++);
+        rowIcon.setIcon(ElixirIcons.SPECIFICATION, layer);
 
         return rowIcon;
     }
@@ -64,7 +80,7 @@ public class CallDefinitionSpecification implements ItemPresentation {
     @Nullable
     @Override
     public String getLocationString() {
-        return null;
+        return location;
     }
 
     /**
