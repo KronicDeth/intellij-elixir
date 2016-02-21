@@ -155,8 +155,13 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
             location = parentPresentation.getLocatedPresentableText();
         }
 
+        // pseudo-named-arguments
+        boolean callback = false;
+
+        //noinspection ConstantConditions
         return new NameArity(
                 location,
+                callback,
                 time,
                 visibility(),
                 overridable,

@@ -76,8 +76,13 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
             location = parentPresentation.getLocatedPresentableText();
         }
 
+        // pseudo-named-arguments
+        boolean callback = false;
+
+        //noinspection ConstantConditions
         return new org.elixir_lang.navigation.item_presentation.NameArity(
                 location,
+                callback,
                 time,
                 visibility(),
                 overridable,

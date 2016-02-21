@@ -2,7 +2,6 @@ package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
-import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.structure_view.element.Timed;
 import org.elixir_lang.structure_view.element.Visible;
@@ -22,6 +21,7 @@ public class NameArity implements ItemPresentation {
 
     @Nullable
     private final Integer arity;
+    private final boolean callback;
     @Nullable
     private final String location;
     @NotNull
@@ -44,6 +44,7 @@ public class NameArity implements ItemPresentation {
      * @param arity
      */
     public NameArity(@Nullable String location,
+                     boolean callback,
                      @NotNull Timed.Time time,
                      @Nullable Visible.Visibility visibility,
                      boolean overridable,
@@ -51,6 +52,7 @@ public class NameArity implements ItemPresentation {
                      @NotNull String name,
                      @Nullable Integer arity) {
         this.arity = arity;
+        this.callback = callback;
         this.location = location;
         this.name = name;
         this.overridable = overridable;
@@ -99,44 +101,32 @@ public class NameArity implements ItemPresentation {
     public Icon getIcon(boolean unused) {
         int layers = 3;
 
+        if (callback) {
+            layers++;
+        }
+
         if (overridable) {
-            layers += 1;
+            layers++;
         }
 
         if (override) {
-            layers += 1;
+            layers++;
         }
 
         RowIcon rowIcon = new RowIcon(layers);
-        Icon timeIcon = null;
-
-        switch (time) {
-            case COMPILE:
-                timeIcon = ElixirIcons.Time.COMPILE;
-                break;
-            case RUN:
-                timeIcon = ElixirIcons.Time.RUN;
-                break;
-        }
-
-        assert timeIcon != null;
-
-        Icon visibilityIcon = null;
-
-        switch (visibility) {
-            case PRIVATE:
-                visibilityIcon = ElixirIcons.Visibility.PRIVATE;
-                break;
-            case PUBLIC:
-                visibilityIcon = ElixirIcons.Visibility.PUBLIC;
-                break;
-            default:
-                visibilityIcon = ElixirIcons.UNKNOWN;
-        }
 
         int layer = 0;
+
+        if (callback) {
+            rowIcon.setIcon(ElixirIcons.CALLBACK, layer++);
+        }
+
+        Icon timeIcon = ElixirIcons.Time.from(time);
         rowIcon.setIcon(timeIcon, layer++);
+
+        Icon visibilityIcon = ElixirIcons.Visibility.from(visibility);
         rowIcon.setIcon(visibilityIcon, layer++);
+
         rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, layer++);
 
         if (overridable) {
