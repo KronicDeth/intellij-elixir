@@ -141,6 +141,8 @@ public class Module extends Element<Call> implements Modular {
                     Overridable overridable = new Overridable(modular, childCall);
                     overridableSet.add(overridable);
                     treeElementList.add(overridable);
+                } else if (Protocol.is(childCall)) {
+                    treeElementList.add(new Protocol(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
                 } else if (Type.is(childCall)) {
@@ -228,6 +230,15 @@ public class Module extends Element<Call> implements Modular {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
+        return new org.elixir_lang.navigation.item_presentation.modular.Module(location(), navigationItem);
+    }
+
+    /*
+     * Protected Instanc Methods
+     */
+
+    @Nullable
+    protected String location() {
         String location = null;
 
         if (parent != null) {
@@ -239,8 +250,7 @@ public class Module extends Element<Call> implements Modular {
             }
         }
 
-        return new org.elixir_lang.navigation.item_presentation.modular.Module(location, navigationItem);
+        return location;
     }
-
 }
 

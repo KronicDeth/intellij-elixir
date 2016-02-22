@@ -26,14 +26,6 @@ public class Module implements ItemPresentation, Parent {
 
     /**
      *
-     * @param call a top-level `Kernel.defmodule/2` call
-     */
-    public Module(@NotNull final Call call) {
-        this(null, call);
-    }
-
-    /**
-     *
      * @param location the parent name of the Module that scopes {@code call}; {@code null} when scope is {@code quote}.
      * @param call a {@code Kernel.defmodule/2} call nested in {@code parent}.
      */

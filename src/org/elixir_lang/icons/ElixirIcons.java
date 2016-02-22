@@ -86,11 +86,12 @@ public interface ElixirIcons {
     Icon DELEGATION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);
     Icon EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON;
     Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
-    Icon IMPLEMENTATION = PlatformIcons.ANONYMOUS_CLASS_ICON;
+    Icon IMPLEMENTATION = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod);
     Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
     Icon MODULE = PlatformIcons.PACKAGE_ICON;
     Icon OVERRIDABLE = AllIcons.General.OverridenMethod;
     Icon OVERRIDE = AllIcons.General.OverridingMethod;
+    Icon PROTOCOL = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod);
     // same icon as intellij-erlang to match their look and feel
     Icon TYPE = IconLoader.getIcon("/icons/type.png");
     // MUST be after TYPE
