@@ -136,24 +136,4 @@
       <option name="ELIXIR_CODE" value="true" />
     </context>
   </template>
-  <template name="%" value="&lt;% $END$ %&gt;" description="&lt;% inline %&gt;" toReformat="true" toShortenFQNames="true">
-    <context>
-      <option name="ELIXIR_CODE" value="true" />
-    </context>
-  </template>
-  <template name="%=" value="&lt;%= $END$ %&gt;" description="&lt;%= replace %&gt;" toReformat="true" toShortenFQNames="true">
-    <context>
-      <option name="ELIXIR_CODE" value="true" />
-    </context>
-  </template>
-  <template name="%%" value="&lt;%% $END$ %&gt;" description="&lt;%% quotation %&gt;" toReformat="true" toShortenFQNames="true">
-    <context>
-      <option name="ELIXIR_CODE" value="true" />
-    </context>
-  </template>
-  <template name="%#" value="&lt;%# $END$ %&gt;" description="&lt;%# comment %&gt;" toReformat="true" toShortenFQNames="true">
-    <context>
-      <option name="ELIXIR_CODE" value="true" />
-    </context>
-  </template>
 </templateSet>
