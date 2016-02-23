@@ -48,12 +48,12 @@
       <option name="ELIXIR_CODE" value="true" />
     </context>
   </template>
-  <template name="doc" value="@doc &quot;&quot;&quot; $END$ &quot;&quot;&quot;" description="@doc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
+  <template name="doc" value="@doc &quot;&quot;&quot;&#10;$1$&#10;&quot;&quot;&quot;&#10;$END$" description="@doc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
     <context>
       <option name="ELIXIR_CODE" value="true" />
     </context>
   </template>
-  <template name="mdoc" value="@moduledoc &quot;&quot;&quot; $END$ &quot;&quot;&quot;" description="@moduledoc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
+  <template name="mdoc" value="@moduledoc &quot;&quot;&quot;&#10;$1$&#10;&quot;&quot;&quot;&#10;$END$" description="@moduledoc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
     <context>
       <option name="ELIXIR_CODE" value="true" />
     </context>
