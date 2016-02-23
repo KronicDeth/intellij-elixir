@@ -17,6 +17,7 @@ import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity;
+import org.elixir_lang.structure_view.element.structure.Structure;
 import org.elixir_lang.structure_view.node_provider.Used;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -145,6 +146,8 @@ public class Module extends Element<Call> implements Modular {
                     treeElementList.add(new Protocol(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Quote.is(childCall)) {
                     treeElementList.add(new Quote(modular, childCall));
+                } else if (Structure.is(childCall)) {
+                    treeElementList.add(new Structure(modular, childCall));
                 } else if (Type.is(childCall)) {
                     treeElementList.add(Type.fromCall(modular, childCall));
                 } else if (org.elixir_lang.structure_view.element.Use.is(childCall)) {

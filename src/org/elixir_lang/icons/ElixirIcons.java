@@ -29,6 +29,7 @@ class RowIconFactory {
  * Created by zyuyou on 15/7/6.
  */
 public interface ElixirIcons {
+
     class Time {
         public static final Icon COMPILE = AllIcons.Actions.Compile;
         public static final Icon RUN = AllIcons.General.Run;
@@ -85,6 +86,7 @@ public interface ElixirIcons {
     Icon CALL_DEFINITION_CLAUSE = RowIconFactory.create(CALL_DEFINITION, PlatformIcons.PACKAGE_LOCAL_ICON);
     Icon DELEGATION = RowIconFactory.create(AllIcons.General.Run, PlatformIcons.PACKAGE_LOCAL_ICON);
     Icon EXCEPTION = PlatformIcons.EXCEPTION_CLASS_ICON;
+    Icon FIELD = AllIcons.Nodes.Field;
     Icon FILE = IconLoader.getIcon("/icons/elixir-16.png");
     Icon IMPLEMENTATION = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridingMethod);
     Icon MIX_MODULE_CONFLICT = AllIcons.Actions.Cancel;
@@ -92,6 +94,7 @@ public interface ElixirIcons {
     Icon OVERRIDABLE = AllIcons.General.OverridenMethod;
     Icon OVERRIDE = AllIcons.General.OverridingMethod;
     Icon PROTOCOL = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod);
+    Icon STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure;
     // same icon as intellij-erlang to match their look and feel
     Icon TYPE = IconLoader.getIcon("/icons/type.png");
     // MUST be after TYPE
