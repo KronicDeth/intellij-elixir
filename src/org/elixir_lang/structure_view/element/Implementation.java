@@ -106,20 +106,28 @@ public class Implementation extends Module {
                 PsiElement accessExpressionChild = accessExpressionChildren[0];
 
                 if (accessExpressionChild instanceof QualifiableAlias) {
-                    QualifiableAlias qualifiableAlias = (QualifiableAlias) accessExpressionChild;
-
-                    String fullyQualifiedName = qualifiableAlias.fullyQualifiedName();
-
-                    if (fullyQualifiedName != null) {
-                        // strip the `Elixir.` because no other presentation shows it
-                        protocolName = fullyQualifiedName.replace("Elixir.", "");
-                    }
+                    protocolName = protocolName((QualifiableAlias) accessExpressionChild);
                 }
             }
+        } else if (firstFinalArgument instanceof QualifiableAlias) {
+            protocolName = protocolName((QualifiableAlias) firstFinalArgument);
         }
 
         if (protocolName == null) {
             protocolName = "?";
+        }
+
+        return protocolName;
+    }
+
+    @Nullable
+    private String protocolName(QualifiableAlias qualifiableAlias) {
+        String fullyQualifiedName = qualifiableAlias.fullyQualifiedName();
+        String protocolName = null;
+
+        if (fullyQualifiedName != null) {
+            // strip the `Elixir.` because no other presentation shows it
+            protocolName = fullyQualifiedName.replace("Elixir.", "");
         }
 
         return protocolName;
