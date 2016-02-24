@@ -18,18 +18,18 @@ public class Exception implements ItemPresentation {
      * Fields
      */
 
-    @NotNull
-    private final Map<PsiElement, PsiElement> defaultValueElementByKeyElement;
-    @NotNull
+    @Nullable
     private final String location;
+    @Nullable
+    private final String name;
 
     /*
      * Constructors
      */
 
-    public Exception(@NotNull String location, @NotNull Map<PsiElement, PsiElement> defaultValueElementByKeyElement) {
-        this.defaultValueElementByKeyElement = defaultValueElementByKeyElement;
+    public Exception(@Nullable String location, @NotNull String name) {
         this.location = location;
+        this.name = name;
     }
 
     /*
@@ -67,50 +67,6 @@ public class Exception implements ItemPresentation {
     @Nullable
     @Override
     public String getPresentableText() {
-        SortedMap<String, String> defaultValueNameByKeyName = new TreeMap<String, String>();
-
-        for (Map.Entry<PsiElement, PsiElement> entry : defaultValueElementByKeyElement.entrySet()) {
-            PsiElement keyElement = entry.getKey();
-            String keyName;
-
-            if (keyElement instanceof ElixirAtom) {
-                ElixirAtom atom = (ElixirAtom) keyElement;
-                String atomText = atom.getText();
-                keyName = atomText.substring(1);
-            } else {
-                keyName = keyElement.getText();
-            }
-
-            PsiElement valueElement = entry.getValue();
-            String valueName;
-
-            if (valueElement != null) {
-                valueName = valueElement.getText();
-            } else {
-                valueName = "nil";
-            }
-
-            defaultValueNameByKeyName.put(keyName, valueName);
-        }
-
-        StringBuilder presentableTextBuilder = new StringBuilder("defexception [");
-
-        boolean first = true;
-
-        for (Map.Entry<String, String> entry : defaultValueNameByKeyName.entrySet()) {
-            if (first) {
-                first = false;
-            } else {
-                presentableTextBuilder.append(", ");
-            }
-
-            presentableTextBuilder.append(entry.getKey());
-            presentableTextBuilder.append(": ");
-            presentableTextBuilder.append(entry.getValue());
-        }
-
-        presentableTextBuilder.append("]");
-
-        return presentableTextBuilder.toString();
+        return name;
     }
 }

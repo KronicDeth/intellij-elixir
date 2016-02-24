@@ -12,6 +12,7 @@ import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -143,15 +144,17 @@ public class Exception extends Element<Call> {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        TreeElement[] children;
+        List<TreeElement> childList = new ArrayList<TreeElement>();
+
+        childList.add(
+                new Structure(modular, navigationItem)
+        );
 
         if (callbacks != null) {
-            children = callbacks.toArray(new TreeElement[callbacks.size()]);
-        } else {
-            children = new TreeElement[0];
+            childList.addAll(callbacks);
         }
 
-        return children;
+        return childList.toArray(new TreeElement[childList.size()]);
     }
 
     /**
@@ -162,12 +165,23 @@ public class Exception extends Element<Call> {
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        Parent parent = (Parent) modular.getPresentation();
-        String location = parent.getLocatedPresentableText();
+        Parent parentPresentation = (Parent) modular.getPresentation();
+        String location = parentPresentation.getLocatedPresentableText();
+        int lastIndex = location.lastIndexOf('.');
+        String parentLocation;
+        String name;
+
+        if (lastIndex != -1) {
+            parentLocation = location.substring(0, lastIndex);
+            name = location.substring(lastIndex + 1, location.length());
+        } else {
+            parentLocation = null;
+            name = location;
+        }
 
         return new org.elixir_lang.navigation.item_presentation.Exception(
-                location,
-                defaultValueElementByKeyElement()
+                parentLocation,
+                name
         );
     }
 
