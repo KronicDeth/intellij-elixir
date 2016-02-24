@@ -4,7 +4,12 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
+import org.elixir_lang.psi.ElixirNoParenthesesKeywords;
+import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
+import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.QuotableKeywordPair;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.arguments.NoParenthesesOneArgument;
 import org.elixir_lang.structure_view.element.Element;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,6 +23,31 @@ public class FieldWithDefaultValue extends Element<QuotableKeywordPair> {
 
     @NotNull
     private final Structure structure;
+
+    /*
+     * Static Methods
+     */
+
+    public static boolean is(QuotableKeywordPair quotableKeywordPair) {
+        boolean fieldWithDefaultValue = false;
+
+        PsiElement parent = quotableKeywordPair.getParent();
+
+        if (parent instanceof QuotableKeywordList) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof ElixirNoParenthesesOneArgument) {
+                PsiElement greatGrandParent = grandParent.getParent();
+
+                if (greatGrandParent instanceof Call) {
+                    Call greatGrandParentCall = (Call) greatGrandParent;
+                    fieldWithDefaultValue = Structure.is(greatGrandParentCall);
+                }
+            }
+        }
+
+        return fieldWithDefaultValue;
+    }
 
     /*
      * Constructors
