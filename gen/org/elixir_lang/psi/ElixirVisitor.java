@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package org.elixir_lang.psi;
 
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.call.Call;
@@ -57,7 +58,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAtom(@NotNull ElixirAtom o) {
-    visitQuotable(o);
+    visitNavigatablePsiElement(o);
+    // visitQuotable(o);
   }
 
   public void visitAtomKeyword(@NotNull ElixirAtomKeyword o) {
@@ -1026,6 +1028,10 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitNamedElement(@NotNull NamedElement o) {
+    visitElement(o);
+  }
+
+  public void visitNavigatablePsiElement(@NotNull NavigatablePsiElement o) {
     visitElement(o);
   }
 

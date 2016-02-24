@@ -2977,7 +2977,13 @@ unknownBaseWholeNumber ::= BASE_WHOLE_NUMBER_PREFIX UNKNOWN_WHOLE_NUMBER_BASE un
  */
 
 atom ::= COLON (ATOM_FRAGMENT | quote)
-         { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+         {
+           implements = [
+             "com.intellij.psi.NavigatablePsiElement"
+             "org.elixir_lang.psi.Quotable"
+           ]
+           methods = [quote]
+         }
 
 private infixComma ::= COMMA EOL*
 

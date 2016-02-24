@@ -2,10 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.NavigatablePsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirAtom extends Quotable {
+public interface ElixirAtom extends NavigatablePsiElement, Quotable {
 
   @Nullable
   ElixirCharListLine getCharListLine();

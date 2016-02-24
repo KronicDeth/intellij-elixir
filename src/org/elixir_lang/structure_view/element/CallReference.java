@@ -2,8 +2,8 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.NavigatablePsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
+import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  * 1) A call reference exists as an element in the PSI.
  * 2) The arity or name may not be fully resolved due to syntactically valid, but semantically invalid code.
  */
-public class CallReference extends Element<NavigatablePsiElement> implements Timed, Visible {
+public class CallReference extends Element<QuotableKeywordPair> implements Timed, Visible {
     /*
      * Fields
      */
@@ -38,12 +38,12 @@ public class CallReference extends Element<NavigatablePsiElement> implements Tim
      */
 
     public CallReference(@NotNull Modular modular,
-                         @NotNull NavigatablePsiElement psiElement,
+                         @NotNull QuotableKeywordPair quotableKeywordPair,
                          @NotNull Timed.Time time,
                          boolean overridable,
                          @NotNull String name,
                          @Nullable Integer arity) {
-        super(psiElement);
+        super(quotableKeywordPair);
         this.arity = arity;
         this.modular = modular;
         this.name = name;

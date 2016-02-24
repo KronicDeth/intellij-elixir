@@ -2,7 +2,6 @@ package org.elixir_lang.structure_view.element.structure;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
@@ -85,7 +84,7 @@ public class Structure extends Element<Call> {
 
                                 if (listChildAccessExpressionChild instanceof ElixirAtom) {
                                     childList.add(
-                                            new Field(this, (NavigatablePsiElement) listChildAccessExpressionChild)
+                                            new Field(this, (ElixirAtom) listChildAccessExpressionChild)
                                     );
                                 }
                             }

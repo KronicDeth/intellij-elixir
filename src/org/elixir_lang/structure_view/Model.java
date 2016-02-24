@@ -1,13 +1,15 @@
 package org.elixir_lang.structure_view;
 
 import com.intellij.ide.structureView.StructureViewModel;
-import com.intellij.ide.structureView.StructureViewModelBase;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.structureView.TextEditorBasedStructureViewModel;
 import com.intellij.ide.util.treeView.smartTree.NodeProvider;
 import com.intellij.ide.util.treeView.smartTree.Sorter;
 import com.intellij.openapi.editor.Editor;
+import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.psi.ElixirFile;
+import org.elixir_lang.psi.QuotableKeywordPair;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.File;
 import org.elixir_lang.structure_view.node_provider.Used;
 import org.elixir_lang.structure_view.sorter.Time;
@@ -55,6 +57,23 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 Time.INSTANCE,
                 Visibility.INSTANCE,
                 Sorter.ALPHA_SORTER,
+        };
+    }
+
+    /**
+     * Returns the list of PSI element classes which are shown as structure view elements.
+     * When determining the current editor element, the PSI tree is walked up until an element
+     * matching one of these classes is found.
+     *
+     * @return the list of classes
+     */
+    @NotNull
+    @Override
+    protected Class[] getSuitableClasses() {
+        return new Class[]{
+                Call.class,
+                ElixirAtom.class,
+                QuotableKeywordPair.class
         };
     }
 

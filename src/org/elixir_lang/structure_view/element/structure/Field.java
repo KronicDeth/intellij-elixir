@@ -2,7 +2,6 @@ package org.elixir_lang.structure_view.element.structure;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.NavigatablePsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAtom;
 import org.elixir_lang.structure_view.element.Element;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A {@code defstruct} field only given by its name
  */
-public class Field extends Element<NavigatablePsiElement> {
+public class Field extends Element<ElixirAtom> {
     /*
      * Fields
      */
@@ -23,7 +22,7 @@ public class Field extends Element<NavigatablePsiElement> {
      * Constructors
      */
 
-    public Field(@NotNull Structure structure, @NotNull NavigatablePsiElement name) {
+    public Field(@NotNull Structure structure, @NotNull ElixirAtom name) {
         super(name);
         this.structure = structure;
     }
@@ -55,13 +54,8 @@ public class Field extends Element<NavigatablePsiElement> {
         String location = parentPresentation.getLocatedPresentableText();
         String name;
 
-        if (navigationItem instanceof ElixirAtom) {
-            ElixirAtom atom = (ElixirAtom) navigationItem;
-            String atomText = atom.getText();
-            name = atomText.substring(1);
-        } else {
-            name = navigationItem.getText();
-        }
+        String atomText = navigationItem.getText();
+        name = atomText.substring(1);
 
         return new org.elixir_lang.navigation.item_presentation.structure.Field(location, name);
     }
