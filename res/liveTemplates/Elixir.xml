@@ -1,0 +1,139 @@
+<templateSet group="Elixir">
+  <template name="def" value="def $NAME$ do&#10;  $END$&#10;end" description="def name do end" toReformat="true" toShortenFQNames="true" >
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="def," value="def $NAME$, do: $END$" description="def name, do" toReformat="true" toShortenFQNames="true" >
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="do" value="do&#10;  $END$&#10;end" description="do ... end" toReformat="true" toShortenFQNames="true" >
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="if" value="if $TRUE$ do&#10;  $END$&#10;end" description="if .. do .. end" toReformat="true" toShortenFQNames="true" >
+    <variable name="TRUE" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="ife" value="if $TRUE$ do&#10;  $OK$&#10;else&#10;  $END$&#10;end" description="if .. do .. else .. end" toReformat="true" toShortenFQNames="true" >
+    <variable name="TRUE" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="OK" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="case" value="case $1$ do&#10;  $2$ -&gt; $END$&#10;end" description="case ... end" toReformat="true" toShortenFQNames="true" >
+    <variable name="1" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="2" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defm" value="defmodule $MODULNAME$ do&#10;  $END$&#10;end" description="def module" toReformat="true" toShortenFQNames="true" >
+    <variable name="MODULNAME" expression="capitalize(fileNameWithoutExtension())" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defp" value="defp $NAME$ do&#10;  $END$&#10;end" description="defp ... end" toReformat="true" toShortenFQNames="true" >
+    <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="doc" value="@doc &quot;&quot;&quot;&#10;$1$&#10;&quot;&quot;&quot;&#10;$END$" description="@doc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="mdoc" value="@moduledoc &quot;&quot;&quot;&#10;$1$&#10;&quot;&quot;&quot;&#10;$END$" description="@moduledoc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="fn" value="fn $ARGS$ -&gt; $END$ end" description="fn(..) -&gt; .. end" toReformat="true" toShortenFQNames="true" >
+    <variable name="ARGS" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="rec" value="receive do&#10;  $1$ -&gt; $END$&#10;end" description="receive ... do .. end" toReformat="true" toShortenFQNames="true" >
+    <variable name="1" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="test" value="test &quot;$TESTDESC$&quot; do&#10;  $END$&#10;end" description="test ... do ... end" toReformat="true" toShortenFQNames="true" >
+    <variable name="TESTDESC" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="try" value="try do&#10;  $1$&#10;rescue&#10;  $2$ -&gt; $END$&#10;" description="try ... rescue .. end" toReformat="true" toShortenFQNames="true" >
+    <variable name="1" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="2" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defs" value="defstruct [$END$]" description="defstruct [..]" toReformat="true" toShortenFQNames="true" >
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="cond" value="cond do&#10;  $END$&#10;end" description="cond do ... end" toReformat="true" toShortenFQNames="true">
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defmac" value="defmacro $MACRO_NAME$ do&#10;  $END$&#10;end" description="defmacro do ... end" toReformat="true" toShortenFQNames="true">
+    <variable name="MACRO_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defmacp" value="defmacrop $MACRO_NAME$ do&#10;  $END$&#10;end" description="defmarcop do ... end" toReformat="true" toShortenFQNames="true">
+    <variable name="MACRO_NAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="for" value="for $A$ &lt;- $B$ do&#10;  $END$&#10;end" description="for a &lt;- b  do .. end" toReformat="true" toShortenFQNames="true">
+    <variable name="A" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="B" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defpro" value="defprotocol $PROTOCOLNAME$ do&#10;  $END$&#10;end" description="defprotocol do ... end" toReformat="true" toShortenFQNames="true">
+    <variable name="PROTOCOLNAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defi" value="defimpl $PROTOCOL$, for: $TYPE$ do&#10;  $END$&#10;end" description="defimpl proto for do .. end" toReformat="true" toShortenFQNames="true">
+    <variable name="PROTOCOL" expression="" defaultValue="" alwaysStopAt="true" />
+    <variable name="TYPE" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="defover" value="defoverridable [$FUNCTIONNAME$: $END$]" description="defoverridable [function_name: arity]" toReformat="true" toShortenFQNames="true">
+    <variable name="FUNCTIONNAME" expression="" defaultValue="" alwaysStopAt="true" />
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+  <template name="ii" value="IO.inspect($END$)" description="IO.inspect(fn)" toReformat="true" toShortenFQNames="true">
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
+</templateSet>
