@@ -80,6 +80,19 @@
               Added clarification to "Import Project from External Model" that <code>mix.bat</code> should be used
               instead of <code>mix</code>
             </li>
+            <li>
+              Get the Elixir version directly from <code>System.build_info[:version]</code> instead of processing the
+              formatted output of <code>elixir --version</code> as the build info version is more stable
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Elixir version parsing handles both pre and build numbers if present by using the same regular expression
+              as Elixir itself uses for the <code>Version</code> module
+            </li>
           </ul>
         </li>
       </ul>

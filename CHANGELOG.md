@@ -33,7 +33,7 @@
 ## v2.2.0
 * Enhancement
   * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
-  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/243) - Structure View - [KroncDeth](https://github.com/KronicDeth)
+  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/243) - Structure View - [KronicDeth](https://github.com/KronicDeth)
     * Controls
       * Scroll to Source and Scroll From Source
       * Sorting
@@ -52,8 +52,11 @@
       * Overridable `defoverridable` tracks overridable functions and is used to mark CallDefinitions are overrides.
       * Quote `quote do end` models quote blocks so they can be injected `use Alias` sites.
       * Use `use Alias` show `use` calls.    
-  * [#241](https://github.com/KronicDeth/intellij-elixir/pull/241) - Live Templates - [KroncDeth](https://github.com/pfitz)
+  * [#241](https://github.com/KronicDeth/intellij-elixir/pull/241) - Live Templates - [pfitz](https://github.com/pfitz)
   * [#220](https://github.com/KronicDeth/intellij-elixir/pull/220) - Added clarification to "Import Project from External Model" that `mix.bat` should be used instead of `mix` - [f-lombardo](https://github.com/f-lombardo)
+  * [#244](https://github.com/KronicDeth/intellij-elixir/pull/244) - Get the Elixir version directly from `System.build_info[:version]` instead of processing the formatted output of `elixir --version` as the build info version is more stable - [KronicDeth](https://github.com/KronicDeth)
+* Bug Fixes
+  * [#244](https://github.com/KronicDeth/intellij-elixir/pull/244) - Elixir version parsing handles both pre and build numbers if present by using the same regular expression as Elixir itself uses for the `Version` module - [KronicDeth](https://github.com/KronicDeth)
 
 ## v2.1.0
 * Enhancement
