@@ -1,17 +1,17 @@
 package org.elixir_lang.psi.stub.type;
 
-        import com.intellij.psi.PsiFile;
-        import com.intellij.psi.StubBuilder;
-        import com.intellij.psi.stubs.DefaultStubBuilder;
-        import com.intellij.psi.stubs.StubElement;
-        import com.intellij.psi.stubs.StubInputStream;
-        import com.intellij.psi.stubs.StubOutputStream;
-        import com.intellij.psi.tree.IStubFileElementType;
-        import org.elixir_lang.ElixirLanguage;
-        import org.elixir_lang.psi.ElixirFile;
-        import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.StubBuilder;
+import com.intellij.psi.stubs.DefaultStubBuilder;
+import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.psi.tree.IStubFileElementType;
+import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.psi.ElixirFile;
+import org.jetbrains.annotations.NotNull;
 
-        import java.io.IOException;
+import java.io.IOException;
 
 public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
     public static final int VERSION = 1;

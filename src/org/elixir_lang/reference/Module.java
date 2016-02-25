@@ -83,7 +83,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
             if (sibling instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
                 ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) sibling;
 
-                if (unmatchedUnqualifiedNoParenthesesCall.isDefmodule()) {
+                if (unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
                     ElixirNoParenthesesOneArgument noParenthesesOneArgument = unmatchedUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
                     PsiElement[] children = noParenthesesOneArgument.getChildren();
 
@@ -101,9 +101,12 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
                             }
                         }
                     }
-                    ElixirMatchedExpression matchedExpression = noParenthesesOneArgument.getMatchedExpression();
 
-                    if (matchedExpression != null) {
+                    List<ElixirMatchedExpression> matchedExpressionList = noParenthesesOneArgument.getMatchedExpressionList();
+
+                    if (matchedExpressionList.size() > 0) {
+                        ElixirMatchedExpression matchedExpression = matchedExpressionList.get(0);
+
                         if (matchedExpression.getText().equals(getValue())) {
                             results.add(new PsiElementResolveResult(matchedExpression));
                         }

@@ -5,13 +5,9 @@ import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.jetbrains.annotations.NotNull;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.util.*;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     private enum Parse {

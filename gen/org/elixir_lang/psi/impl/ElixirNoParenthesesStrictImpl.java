@@ -6,9 +6,12 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implements ElixirNoParenthesesStrict {
 
@@ -22,9 +25,15 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
+  @NotNull
+  public List<ElixirEmptyParentheses> getEmptyParenthesesList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEmptyParentheses.class);
+  }
+
+  @Override
+  @NotNull
+  public List<ElixirMatchedExpression> getMatchedExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirMatchedExpression.class);
   }
 
   @Override
@@ -34,9 +43,9 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
   }
 
   @Override
-  @Nullable
-  public ElixirNoParenthesesManyArguments getNoParenthesesManyArguments() {
-    return findChildByClass(ElixirNoParenthesesManyArguments.class);
+  @NotNull
+  public List<ElixirNoParenthesesManyStrictNoParenthesesExpression> getNoParenthesesManyStrictNoParenthesesExpressionList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
   @NotNull

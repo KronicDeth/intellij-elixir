@@ -9,9 +9,6 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.xmlb.annotations.Text;
-import com.thaiopensource.xml.dtd.om.Def;
-import org.apache.xmlbeans.impl.xb.ltgfmt.Code;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 

@@ -5,7 +5,7 @@ import com.google.common.base.Joiner;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class Macro {
     public static OtpErlangList callArguments(OtpErlangTuple callExpression) {

@@ -3,18 +3,17 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import org.elixir_lang.psi.ElixirDoBlock;
-import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
-import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirVisitor;
+import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedUnqualifiedNoParenthesesCall {
+public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedElementImpl implements ElixirUnmatchedUnqualifiedNoParenthesesCall {
 
   public ElixirUnmatchedUnqualifiedNoParenthesesCallImpl(ASTNode node) {
     super(node);
@@ -33,8 +32,19 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
 
   @Override
   @NotNull
+  public ElixirIdentifier getIdentifier() {
+    return findNotNullChildByClass(ElixirIdentifier.class);
+  }
+
+  @Override
+  @NotNull
   public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
     return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
+  }
+
+  @Nullable
+  public String definedModuleName() {
+    return ElixirPsiImplUtil.definedModuleName(this);
   }
 
   @Nullable
@@ -43,8 +53,34 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   }
 
   @NotNull
-  public ASTNode functionNameNode() {
-    return ElixirPsiImplUtil.functionNameNode(this);
+  public PsiElement functionNameElement() {
+    return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  }
+
+  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
   @Nullable
@@ -52,13 +88,14 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
     return ElixirPsiImplUtil.moduleName(this);
   }
 
-  public boolean isDefmodule() {
-    return ElixirPsiImplUtil.isDefmodule(this);
-  }
-
   @NotNull
   public PsiElement[] primaryArguments() {
     return ElixirPsiImplUtil.primaryArguments(this);
+  }
+
+  @Nullable
+  public Integer primaryArity() {
+    return ElixirPsiImplUtil.primaryArity(this);
   }
 
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
@@ -68,6 +105,16 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public int resolvedFinalArity() {
+    return ElixirPsiImplUtil.resolvedFinalArity(this);
+  }
+
+  @NotNull
+  public IntRange resolvedFinalArityRange() {
+    return ElixirPsiImplUtil.resolvedFinalArityRange(this);
   }
 
   @NotNull
@@ -81,8 +128,28 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends ElixirUnmat
   }
 
   @Nullable
+  public Integer resolvedPrimaryArity() {
+    return ElixirPsiImplUtil.resolvedPrimaryArity(this);
+  }
+
+  @Nullable
+  public Integer resolvedSecondaryArity() {
+    return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @Nullable
   public PsiElement[] secondaryArguments() {
     return ElixirPsiImplUtil.secondaryArguments(this);
+  }
+
+  @Nullable
+  public Integer secondaryArity() {
+    return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }
