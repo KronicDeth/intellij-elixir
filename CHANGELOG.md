@@ -53,6 +53,7 @@
       * Quote `quote do end` models quote blocks so they can be injected `use Alias` sites.
       * Use `use Alias` show `use` calls.    
   * [#241](https://github.com/KronicDeth/intellij-elixir/pull/241) - Live Templates - [KroncDeth](https://github.com/pfitz)
+  * [#220](https://github.com/KronicDeth/intellij-elixir/pull/220) - Added clarification to "Import Project from External Model" that `mix.bat` should be used instead of `mix` - [f-lombardo](https://github.com/f-lombardo)
 
 ## v2.1.0
 * Enhancement

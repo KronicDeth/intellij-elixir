@@ -76,6 +76,10 @@
               </ul>
             </li>
             <li>Live Templates</li>
+            <li>
+              Added clarification to "Import Project from External Model" that <code>mix.bat</code> should be used
+              instead of <code>mix</code>
+            </li>
           </ul>
         </li>
       </ul>
