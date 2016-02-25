@@ -33,7 +33,7 @@
 ## v2.2.0
 * Enhancement
   * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
-  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/240) - Structure View - [KroncDeth](https://github.com/KronicDeth)
+  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/243) - Structure View - [KroncDeth](https://github.com/KronicDeth)
     * Controls
       * Scroll to Source and Scroll From Source
       * Sorting
@@ -52,6 +52,7 @@
       * Overridable `defoverridable` tracks overridable functions and is used to mark CallDefinitions are overrides.
       * Quote `quote do end` models quote blocks so they can be injected `use Alias` sites.
       * Use `use Alias` show `use` calls.    
+  * [#241](https://github.com/KronicDeth/intellij-elixir/pull/241) - Live Templates - [KroncDeth](https://github.com/pfitz)
 
 ## v2.1.0
 * Enhancement
