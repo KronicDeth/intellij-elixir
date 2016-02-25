@@ -33,6 +33,25 @@
 ## v2.2.0
 * Enhancement
   * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
+  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/240) - Structure View - [KroncDeth](https://github.com/KronicDeth)
+    * Controls
+      * Scroll to Source and Scroll From Source
+      * Sorting
+        * Runtime (functions) vs Compile (macros)
+        * Visibility (public [`def`, `macro`, etc] vs private [`defp`, `macrop` and `@typep`])
+        * Alphabetical
+      * Show Used - injects structure from `use Alias` call's `__using__`'s `quote` into the call site Structure
+    * Elements
+      * Callbacks (`@callback`) show their name/arity and then a nest spec
+      * CallDefinition groups together CallDefinitionClause of the same name/arity
+      * CallDefinitionClause (`def`, `defp`, `macro`, and `macrop`) shows the head of each definition under the CallDefinition.
+      * CallDefinitionSpecification (`@spec`) show the type specification for a CallDefinition
+      * CallReference `name: arity` shows the name/arity for a `defoverridable`.
+      * Delegation shows all the `:append_first` and `:to` options with the implied Function Delegation nested underneath
+      * Exception (`defexception`) show the implicit struct and nest any callback functions, such as `exception/1` or `message/1`.
+      * Overridable `defoverridable` tracks overridable functions and is used to mark CallDefinitions are overrides.
+      * Quote `quote do end` models quote blocks so they can be injected `use Alias` sites.
+      * Use `use Alias` show `use` calls.    
 
 ## v2.1.0
 * Enhancement

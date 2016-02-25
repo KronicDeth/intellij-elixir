@@ -15,6 +15,66 @@
           <p>Enhancements</p>
           <ul>
             <li>Code Commenter</li>
+            <li>
+              <p>Structure View</p>
+              <ul>
+                <li>
+                  <p>Controls</p>
+                  <ul>
+                    <li>Scroll to Source and Scroll From Source</li>
+                    <li>
+                      <p>Sorting</p>
+                      <ul>
+                        <li>Runtime (functions) vs Compile (macros)</li>
+                        <li>
+                          Visibility (public [<code>def</code>, <code>macro</code>, etc] vs private
+                          [<code>defp</code>, <code>macrop</code> and <code>@typep</code>]
+                        </li>
+                        <li>Alphabetical</li>
+                      </ul>
+                    </li>
+                    <li>
+                      Show Used - injects structure from <code>use Alias</code> call's <code>__using__</code>'s
+                      <code>quote<code> into the call site Structure
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Elements</p>
+                  <ul>
+                    <li>Callbacks (<code>@callback</code>) show their name/arity and then a nest spec</li>
+                    <li>CallDefinition groups together CallDefinitionClause of the same name/arity</li>
+                    <li>
+                      CallDefinitionClause (<code>def</code>, <code>defp</code>, <code>macro</code>, and
+                      <code>macrop</code>) shows the head of each definition under the CallDefinition.
+                    </li>
+                    <li>
+                      CallDefinitionSpecification (<code>@spec</code>) show the type specification for a CallDefinition
+                    </li>
+                    <li>
+                      CallReference <code>name: arity</code> shows the name/arity for a <code>defoverridable</code>.
+                    </li>
+                    <li>
+                      Delegation shows all the <code>:append_first</code> and <code>:to</code> options with the implied
+                      Function Delegation nested underneath
+                    </li>
+                    <li>
+                      Exception (<code>defexception</code>) show the implicit struct and nest any callback functions,
+                      such as <code>exception/1</code> or <code>message/1</code>.
+                    </li>
+                    <li>
+                      Overridable <code>defoverridable</code> tracks overridable functions and is used to mark
+                      CallDefinitions are overrides.
+                    </li>
+                    <li>
+                      Quote <code>quote do end</code> models quote blocks so they can be injected <code>use Alias</code>
+                      sites.
+                    </li>
+                    <li>Use <code>use Alias</code> show <code>use</code> calls.</li>
+                  <ul>
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
