@@ -158,7 +158,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 15. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
     Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
     with information about Elixir install locations on your operating system and package manager to have SDK detection
-    added for it.**)
+    added for it.**) On Windows point to `C:\Program Files (x86)\Elixir\bin\mix.bat`
 16. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
     the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
 17. Click Finish after you select SDK name from the Project SDK list.
