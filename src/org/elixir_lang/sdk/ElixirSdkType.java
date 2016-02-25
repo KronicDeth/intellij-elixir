@@ -163,8 +163,8 @@ public class ElixirSdkType extends SdkType {
 
 
   @NotNull
-  private static String getDefaultSdkName(@NotNull String sdkHome, @Nullable ElixirSdkRelease version){
-    return version != null ? "Elixir " + version.getRelease() : "Unknown Elixir version at " + sdkHome ;
+  private static String getDefaultSdkName(@NotNull String sdkHome, @Nullable ElixirSdkRelease release){
+    return release != null ? release.toString() : "Unknown Elixir version at " + sdkHome ;
   }
 
   @Nullable
@@ -184,13 +184,14 @@ public class ElixirSdkType extends SdkType {
     }
 
     try{
-      ProcessOutput output = ElixirSystemUtil.getProcessOutput(sdkHome, elixir.getAbsolutePath(), "-v");
+      ProcessOutput output = ElixirSystemUtil.getProcessOutput(sdkHome, elixir.getAbsolutePath(), "-e", "IO.puts System.build_info[:version]");
       List<String> lines = output.getExitCode() != 0 || output.isTimeout() || output.isCancelled() ?
           ContainerUtil.<String>emptyList() : output.getStdoutLines();
 
       for (String line : lines) {
-        if (line.startsWith("Elixir")) {
-          ElixirSdkRelease release = ElixirSdkRelease.fromString(line);
+        ElixirSdkRelease release = ElixirSdkRelease.fromString(line);
+
+        if (release != null) {
           mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
           return release;
         }
