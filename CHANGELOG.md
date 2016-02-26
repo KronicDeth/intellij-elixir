@@ -57,6 +57,7 @@
   * [#244](https://github.com/KronicDeth/intellij-elixir/pull/244) - Get the Elixir version directly from `System.build_info[:version]` instead of processing the formatted output of `elixir --version` as the build info version is more stable - [KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#244](https://github.com/KronicDeth/intellij-elixir/pull/244) - Elixir version parsing handles both pre and build numbers if present by using the same regular expression as Elixir itself uses for the `Version` module - [KronicDeth](https://github.com/KronicDeth)
+  * [#245](https://github.com/KronicDeth/intellij-elixir/pull/245) - Better error handling in Structure View - [KronicDeth](https://github.com/KronicDeth)
 
 ## v2.1.0
 * Enhancement

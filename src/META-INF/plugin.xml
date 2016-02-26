@@ -93,6 +93,7 @@
               Elixir version parsing handles both pre and build numbers if present by using the same regular expression
               as Elixir itself uses for the <code>Version</code> module
             </li>
+            <li>Better error handing in Structure View</li>
           </ul>
         </li>
       </ul>
