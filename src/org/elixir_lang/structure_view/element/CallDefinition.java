@@ -75,6 +75,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     public void clause(Call clause) {
         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(clause);
 
+        assert nameArityRange != null;
         assert nameArityRange.first.equals(name);
         assert nameArityRange.second.getMinimumInteger() <= arity && nameArityRange.second.getMaximumInteger() >= arity;
 

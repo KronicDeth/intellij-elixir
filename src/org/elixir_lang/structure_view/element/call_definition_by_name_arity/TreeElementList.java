@@ -53,10 +53,13 @@ public class TreeElementList
 
     public void addClausesToCallDefinition(@NotNull Call call) {
         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
-        String name = nameArityRange.first;
-        IntRange arityRange = nameArityRange.second;
 
-        addClausesToCallDefinition(call, name, arityRange);
+        if (nameArityRange != null) {
+            String name = nameArityRange.first;
+            IntRange arityRange = nameArityRange.second;
+
+            addClausesToCallDefinition(call, name, arityRange);
+        }
     }
 
     public void addClausesToCallDefinition(@NotNull Call call, @NotNull String name, @NotNull IntRange arityRange) {
