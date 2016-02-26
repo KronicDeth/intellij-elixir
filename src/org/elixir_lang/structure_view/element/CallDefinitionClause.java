@@ -69,138 +69,79 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      *   default arguments are used, which produces an arity for each default argument that is turned on and off.
      * @see Call#resolvedFinalArityRange()
      */
-    @NotNull
+    @Nullable
     public static Pair<String, IntRange> nameArityRange(Call call) {
         PsiElement[] primaryArguments = call.primaryArguments();
+        Pair<String, IntRange> pair = null;
 
-        assert primaryArguments != null;
-        assert primaryArguments.length > 0;
+        if (primaryArguments != null && primaryArguments.length > 0) {
+            PsiElement head = primaryArguments[0];
+            String name;
+            IntRange arityRange;
+            Call headCall = null;
 
-        PsiElement head = primaryArguments[0];
-        String name = null;
-        IntRange arityRange = null;
-        Call headCall = null;
+            if (head instanceof ElixirMatchedWhenOperation) {
+                ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
 
-        if (head instanceof ElixirMatchedWhenOperation) {
-            ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
+                headCall = (Call) whenOperation.leftOperand();
+            } else if (head instanceof Call) {
+                headCall = (Call) head;
+            } else if (head instanceof ElixirAccessExpression) {
+                PsiElement[] headChildren = head.getChildren();
 
-            headCall = (Call) whenOperation.leftOperand();
-        } else if (head instanceof Call) {
-            headCall = (Call) head;
-        } else if (head instanceof ElixirAccessExpression) {
-            PsiElement[] headChildren = head.getChildren();
+                if (headChildren.length == 1) {
+                    PsiElement headChild = headChildren[0];
 
-            if (headChildren.length == 1) {
-                PsiElement headChild = headChildren[0];
+                    if (headChild instanceof ElixirParentheticalStab) {
+                        ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) headChild;
 
-                if (headChild instanceof ElixirParentheticalStab) {
-                    ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) headChild;
+                        PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
 
-                    PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
+                        if (parentheticalStabChildren.length == 1) {
+                            PsiElement parentheticalStabChild = parentheticalStabChildren[0];
 
-                    if (parentheticalStabChildren.length == 1) {
-                        PsiElement parentheticalStabChild = parentheticalStabChildren[0];
+                            if (parentheticalStabChild instanceof ElixirStab) {
+                                ElixirStab stab = (ElixirStab) parentheticalStabChild;
 
-                        if (parentheticalStabChild instanceof ElixirStab) {
-                            ElixirStab stab = (ElixirStab) parentheticalStabChild;
+                                PsiElement[] stabChildren = stab.getChildren();
 
-                            PsiElement[] stabChildren = stab.getChildren();
+                                if (stabChildren.length == 1) {
+                                    PsiElement stabChild = stabChildren[0];
 
-                            if (stabChildren.length == 1) {
-                                PsiElement stabChild = stabChildren[0];
+                                    if (stabChild instanceof ElixirStabBody) {
+                                        ElixirStabBody stabBody = (ElixirStabBody) stabChild;
 
-                                if (stabChild instanceof ElixirStabBody) {
-                                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
+                                        PsiElement[] stabBodyChildren = stabBody.getChildren();
 
-                                    PsiElement[] stabBodyChildren = stabBody.getChildren();
+                                        if (stabBodyChildren.length == 1) {
+                                            PsiElement stabBodyChild = stabBodyChildren[0];
 
-                                    if (stabBodyChildren.length == 1) {
-                                        PsiElement stabBodyChild = stabBodyChildren[0];
-
-                                        if (stabBodyChild instanceof Call) {
-                                            headCall = (Call) stabBodyChild;
-                                        } else {
-                                            openIssueForNotImplemented(
-                                                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed " +
-                                                            "to have a Call in ElixirStabBody, but got " +
-                                                            stabBodyChild.getClass().getCanonicalName() + ".",
-                                                    head
-                                            );
+                                            if (stabBodyChild instanceof Call) {
+                                                headCall = (Call) stabBodyChild;
+                                            }
                                         }
-                                    } else {
-                                        openIssueForNotImplemented(
-                                                "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to " +
-                                                        "have a single child for ElixirStabBody, but got " +
-                                                        stabBodyChildren.length + ".",
-                                                head
-                                        );
                                     }
-                                } else {
-                                    openIssueForNotImplemented(
-                                            "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have " +
-                                                    "an ElixirStabBody in ElixirStab, but got " +
-                                                    stabChild.getClass().getCanonicalName() + ".",
-                                            head
-                                    );
                                 }
-                            } else {
-                                openIssueForNotImplemented(
-                                        "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have an " +
-                                                "one child in the ElixirStab, but got " + stabChildren.length + ". ",
-                                        head
-                                );
                             }
-                        } else {
-                            openIssueForNotImplemented(
-                                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have an " +
-                                            "ElixirStab under ElixirParentheticalStab, but got " +
-                                            parentheticalStabChild.getClass().getCanonicalName() + ".",
-                                    head
-                            );
                         }
-                    } else {
-                        openIssueForNotImplemented(
-                                "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have one child " +
-                                        "for ElixirParentheticalStab, but got " + parentheticalStabChildren.length +
-                                        ".",
-                                head
-                        );
                     }
-                } else {
-                    openIssueForNotImplemented(
-                            "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have " +
-                                    "ElixirParentheticalStab for ElixirAccessExpression, but got " +
-                                    headChild.getClass().getCanonicalName() + ".",
-                            head
-                    );
                 }
-            } else {
-                openIssueForNotImplemented(
-                        "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have one child for " +
-                                "ElixirAccessExpression, but got " + headChildren.length + " children.",
-                        head
-                );
+            } else if (head instanceof ElixirMatchedAtNonNumericOperation) {
+                ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
+
+                name = matchedAtNonNumericOperation.operator().getText().trim();
+                arityRange = new IntRange(1);
+                pair = pair(name, arityRange);
             }
-        } else if (head instanceof ElixirMatchedAtNonNumericOperation) {
-            ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
 
-            name = matchedAtNonNumericOperation.operator().getText().trim();
-            arityRange = new IntRange(1);
-        } else {
-            openIssueForNotImplemented(
-                    "Macro clauses defined with `Elixir.Kernel.defmacro/2` are assumed to have either Calls or " +
-                            "MatchedWhenOperation as the first primaryArgument, but got " +
-                            head.getClass().getCanonicalName() + ".",
-                    head
-            );
+            if (headCall != null) {
+                name = headCall.functionName();
+                arityRange = headCall.resolvedFinalArityRange();
+                pair = pair(name, arityRange);
+            }
         }
 
-        if (headCall != null) {
-            name = headCall.functionName();
-            arityRange = headCall.resolvedFinalArityRange();
-        }
-
-        return pair(name, arityRange);
+        return pair;
     }
 
     /**

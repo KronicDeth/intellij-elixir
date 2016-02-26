@@ -47,18 +47,21 @@ public class Module extends Element<Call> implements Modular {
             @NotNull Inserter<CallDefinition> callDefinitionInserter
     ) {
         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
-        String name = nameArityRange.first;
-        IntRange arityRange = nameArityRange.second;
 
-        addClausesToCallDefinition(
-                call,
-                name,
-                arityRange,
-                callDefinitionByNameArity,
-                modular,
-                time,
-                callDefinitionInserter
-        );
+        if (nameArityRange != null) {
+            String name = nameArityRange.first;
+            IntRange arityRange = nameArityRange.second;
+
+            addClausesToCallDefinition(
+                    call,
+                    name,
+                    arityRange,
+                    callDefinitionByNameArity,
+                    modular,
+                    time,
+                    callDefinitionInserter
+            );
+        }
     }
 
     public static void addClausesToCallDefinition(
@@ -166,7 +169,10 @@ public class Module extends Element<Call> implements Modular {
                         String name = callReference.name();
 
                         CallDefinition function = functionByNameArity.get(pair(name, arity));
-                        function.setOverridable(true);
+
+                        if (function != null) {
+                            function.setOverridable(true);
+                        }
                     }
                 }
             }

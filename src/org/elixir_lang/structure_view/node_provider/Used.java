@@ -11,7 +11,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.util.PsiUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirAccessExpression;
@@ -28,7 +27,6 @@ import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.structure_view.element.modular.Module.addClausesToCallDefinition;
-import static org.elixir_lang.structure_view.element.modular.Module.is;
 
 public class Used implements FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
     /*
@@ -127,23 +125,26 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
                                                        dealing with macros, restricted to __using__/1 */
                                                     if (CallDefinitionClause.isMacro(childCall)) {
                                                         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);
-                                                        String name = nameArityRange.first;
-                                                        IntRange arityRange = nameArityRange.second;
 
-                                                        if (name.equals(USING) && arityRange.containsInteger(1)) {
-                                                            addClausesToCallDefinition(
-                                                                    childCall,
-                                                                    name,
-                                                                    arityRange,
-                                                                    macroByNameArity,
-                                                                    module,
-                                                                    Timed.Time.COMPILE,
-                                                                    new Inserter<CallDefinition>() {
-                                                                        @Override
-                                                                        public void insert(CallDefinition element) {
+                                                        if (nameArityRange != null) {
+                                                            String name = nameArityRange.first;
+                                                            IntRange arityRange = nameArityRange.second;
+
+                                                            if (name.equals(USING) && arityRange.containsInteger(1)) {
+                                                                addClausesToCallDefinition(
+                                                                        childCall,
+                                                                        name,
+                                                                        arityRange,
+                                                                        macroByNameArity,
+                                                                        module,
+                                                                        Timed.Time.COMPILE,
+                                                                        new Inserter<CallDefinition>() {
+                                                                            @Override
+                                                                            public void insert(CallDefinition element) {
+                                                                            }
                                                                         }
-                                                                    }
-                                                            );
+                                                                );
+                                                            }
                                                         }
                                                     }
                                                 }
