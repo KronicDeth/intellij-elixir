@@ -32,6 +32,7 @@
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
     - [Quick Fixes](#quick-fixes)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
+    - [Commenter](#commenter)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
       - [Individual File](#individual-file)
@@ -659,6 +660,19 @@ with Alt+Enter. (Will vary based on keymap.)
     "Remove spaces between function name and parentheses".  Hit Enter to accept and remove the space.
   </figcaption>
 </figure>
+
+### Commenter
+
+You can comment or uncomment the current line or selected block of source. By selecting a block of source first you can
+quickly comment out and entire function if you're trying to track down a compiling or testing error that's not giving a
+helpful line number.
+
+Using the menus
+
+1. Highlight one or more lines
+2. Comment (or Uncomment) with one of the following:
+  a. Code > Comment with Line Comment 
+  b. On OSX the key binding is normally `Cmd+/`.  
 
 ### Building/Compiling
 
