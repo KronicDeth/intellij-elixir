@@ -48,6 +48,18 @@
     - [Refactor](#refactor)
       - [Rename](#rename)
         - [Module Attribute](#module-attribute-2)
+    - [Structure](#structure)
+      - [Viewing Structure](#viewing-structure)
+      - [Buttons](#buttons)
+        - [Sorters](#sorters)
+        - [Providers](#providers)
+        - [Expanders](#expanders)
+        - [Autoscrollers](#autoscrollers)
+      - [Elements](#elements)
+        - [Icons](#icons)
+          - [Time](#time)
+          - [Visibility](#visibility)
+        - [Call to Element](#call-to-element)
   - [Installation](#installation)
     - [Inside IDE using JetBrains repository](#inside-ide-using-jetbrains-repository)
     - [Inside IDE using Github releases](#inside-ide-using-github-releases)
@@ -793,6 +805,962 @@ in a `defmodule`, is used, including in strings and comments.
     iii. Select "Rename..." from the Refactoring submenu
   b. `Shift+F6`
 3. Edit the name inline and have the declaration and usages update.
+
+### Structure
+
+You can view the structure of the currently open editor tab using the Structure tool window.
+
+#### Viewing Structure
+
+* View > Tool Windows > Structure
+* Click the Structure Button (normally in the left tool buttons)
+  1. If you can't see the Tool Buttons, they can be enabled with View > Tool Buttons
+* `Cmd+7`
+
+#### Buttons
+
+![Structure Buttons](/screenshots/structure/Buttons.png?raw=true "Sort By Time, Sort By Visibility, Sort Alphabetically, Show Used, Expand All, Collapse All, Autoscroll to Source, Autoscroll from Source")
+
+The buttons in the Structure tool are broken into 4 categories:
+* [Sorters](#sorters)
+* [Providers](#providers)
+* [Expanders](#expanders)
+* [Autoscrollers](#autoscrollers)
+
+##### Sorters
+
+![Structure Sorter Buttons](/screenshots/structure/button/Sorters.png?raw=true "Sort By Time, Sort By Visibility, Sort Alphabetically")
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Sort by Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/objectBrowser/sortByType.png?raw=true" />
+      </td>
+      <td>Sort by Time</td>
+      <td>
+        When the defined callable is usable:
+        <ol>
+          <li>Compile time</li>
+          <li>Both or None</li>
+          <li>Runtime</li>
+        </ol>
+        Macros are compile time while functions are runtime.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Sort by Visibility" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/objectBrowser/visibilitySort.png?raw=true" />
+      </td>
+      <td>Sort by Visibility</td>
+      <td>
+        Whether the element visible outside its defining module:
+        <ol>
+          <li>Public</li>
+          <li><None</li>
+          <li>Private</li>
+        </ol>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Sort Alphabetically" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/objectBrowser/sorted.png?raw=true" />
+      </td>
+      <td>
+        Sort Alphabetically
+      </td>
+      <td>
+        Sort by name
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+**NOTE: When any combination of sorters is turned on, they are sorted from left to right (as shown in the button bar),
+so with all 3 sorters on, the elements are first grouped by Time, then inside each Time group, they are sorted by
+Visibility, then in each Visibility group, they are sorted by name.**
+
+##### Providers
+
+![Structure Provider Buttons](/screenshots/structure/button/Providers.png?raw=true "Providers")
+
+The providers add nodes not in the text of the file, but that will appear in the compiled Module.
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Show Used" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/hierarchy/supertypes.png?raw=true" />
+      </td>
+      <td>
+        Show Used
+      </td>
+      <td>
+        In Modules that `use <Alias>` or `use <Alias>, arg`, the elements from the last `quote` block in the
+        `__using__/1` for `<Alias>` are injected.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+##### Expanders
+
+![Structure Expander Buttons](/screenshots/structure/button/Expanders.png?raw=true "Expanders")
+
+The expanders expand or collapse all the elements in the Structure tool window.
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Expand All" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/expandall.png?raw=true" />
+      </td>
+      <td>
+        Expand All
+      </td>
+      <td>
+        Expand All Elements in the Structure tool window
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Expand All" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/collapseall.png?raw=true" />
+      </td>
+      <td>
+        Collapse All
+      </td>
+      <td>
+        Collapse All Elements in the Structure tool window
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+##### Autoscrollers
+
+![Structure Autoscroller Buttons](/screenshots/structure/button/Autoscrollers.png?raw=true "Autoscrollers")
+
+The autoscrollers link together the editor tab's location and the Structure tool windows selected element.
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Autoscroll to Source" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/autoscrollToSource.png?raw=true" />
+      </td>
+      <td>
+        Autoscroll to Source
+      </td>
+      <td>
+        Clicking an element in the Structure tool window will scroll the editor window to the location of the
+        corresponding source.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Autoscroll from Source" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/autoscrollFromSource.png" />
+      </td>
+      <td>
+        Autoscroll from Source
+      </td>
+      <td>
+        When moving the cursor in the editor window, the selected element in the Structure tool window will change to
+        the corresponding element.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+#### Elements
+
+##### Icons
+
+###### Time
+
+The Time icons indicate whether the element is usable at compile time or runtime.
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        Compile Time
+      </td>
+      <td>
+        The element is used or checked at compile time and (may) not even be accessible at run time, such as macros.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        Runtime
+      </td>
+      <td>
+        The element is usable at runtime, such as a function.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+###### Visibility
+
+The Visibility icons indicated whether the element is usable outside its defining Module.
+
+<table>
+  <thead>
+    <tr>
+      <th>Icon</th>
+      <th>Tooltip</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        Public
+      </td>
+      <td>
+        Public elements are accessible outside their defining Module.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img alt="Private" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_private.png?raw=true" />
+      </td>
+      <td>
+        Private
+      </td>
+      <td>
+        Private elements are only accessible in their defining Module.  The macros that define private elements usually
+        end in <code>p</code>.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+##### Call to Element
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">
+        Call
+      </th>
+      <th colspan="7">
+        Icons
+      </th>
+      <th rowspan="2">
+        Text
+      </th>
+      <th rowspan="2">
+        Description
+      </th>
+    </tr>
+    <tr>
+      <th>
+        Macro Type
+      </th>
+      <th>
+        Time
+      </th>
+      <th>
+        Visibility
+      </th>
+      <th>
+        Function
+      </th>
+      <th>
+        Module Local
+      </th>
+      <th>
+        Overridable
+      </th>
+      <th>
+        Override
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">
+        <code>def</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>def</code> with the same name and arity.
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>[<code>(</code>][<code>ARGUMENTS</code>][<code>)</code>][when <code>...</code>]
+      </td>
+      <td>
+        The function head for function clause, including the name, arguments, and <code>when</code> if present
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defdelegate</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        defdelegate append_first: false<code>|</code>true, to: <code>ALIAS|ATOM</code>
+      </td>
+      <td>
+        Groups together all the delegated functions for a single <code>defdelegate</code> call.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code><i>defdelegate</i> func(arg)<i>, to: ALIAS</i></code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together implied <code>def</code> and any explicit <code>@spec</code> for the given function head
+        (<code>func(arg)</code>)
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code><i>defdelegate</i> func(arg)<i>, to: ALIAS</i></code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>func(arg)</code>
+      </td>
+      <td>
+        The function head implied by the <code>defdelegate</code> list of function heads.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defexception</code>
+      </td>
+      <td>
+        <img alt="Exception" src="https://github.com/JetBrains/intellij-community/blob/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/exceptionClass.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>RELATIVE_ALIAS</code>
+      </td>
+      <td>
+        The exception has the same name as the parent Module, but will display with only the relative name (the last
+        Alias without a <code>.</code>) with its location as the qualifying Alias.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defexception</code>
+      </td>
+      <td>
+        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/toolwindows/toolWindowStructure.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        %<code>RELATIVE_ALIAS</code>{}
+      </td>
+      <td>
+        Exceptions are defined as structs, so any <code>defexception<code> also defines a struct with the same name.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code><i>defexception</i> list_or_keywords</code>
+      </td>
+      <td>
+        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/field.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>: <code>DEFAULT_VALUE</code>
+      </td>
+      <td>
+        The fields and default values (or <code>nil</code> if a list is used instead of a keyword list) for the struct
+        as passed in the first argument to <code>defexception</code>.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defimpl PROTOCOL, for: MODULE</code>
+      </td>
+      <td>
+        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/anonymousClass.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Override" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridingMethod.png?raw=true" />
+      </td>
+      <td>
+        <code>MODULE</code> (<code>PROTOCOL</code>)
+      </td>
+      <td>
+        <code>defimpl</code> defines a protocol implementation that defines a Module that concatenates the
+        <code>PROTOCOL</code> name and the <code>MODULE</code> name.  If no <code>:for</code> is given, then the outer
+        Module is used.
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">
+        <code>defmacro</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>defmacro</code> with the same name and arity.
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>[<code>(</code>][<code>ARGUMENTS</code>][<code>)</code>][when <code>...</code>]
+      </td>
+      <td>
+        The macro head for macro clause, including the name, arguments, and <code>when</code> if present
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">
+        <code>defmacrop</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Private" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_private.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>defmacrop</code> with the same name and arity.
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Private" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_private.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>[<code>(</code>][<code>ARGUMENTS</code>][<code>)</code>][when <code>...</code>]
+      </td>
+      <td>
+        The macro head for macro clause, including the name, arguments, and <code>when</code> if present
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defmacro</code> AND <code>defmacrop</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Compile Time" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/actions/compile.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Unknown" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/runConfigurations/unknown.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>defmacro</code> AND <code>defmacrop</code> with the same name and arity.  This will be a
+        compile error, but is represented with
+        <img alt="Unknown" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/runConfigurations/unknown.png?raw=true" />
+        Unknown for the Visibility until corrected.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defmodule ALIAS</code>
+      </td>
+      <td>
+        <img alt="Module" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/package.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>RELATIVE_ALIAS</code> (<code>QUALIFIER</code>)
+      </td>
+      <td>
+        Top-level Modules show only the <code>ALIAS</code> with no location, while qualified Aliases or nested Modules
+        show the <code>RELATIVE_ALIAS</code> and the <code>QUALIFIER</code> as the location.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defoverridable</code>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        Mark previously declared functions as overridable.  Overridable functions are listed as children of this
+        element.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code><i>defoverridable</i> NAME: ARITY<i>, ...</i></code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Public" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_public.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        The <code>NAME</code> and <code>ARITY</code> of the function that is overridable.  Matches the icon and text
+        for <code>def</code>, but with the addition of  
+        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
+        Overridable
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2">
+        <code>defp</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Private" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_private.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>def</code> with the same name and arity.
+      </td>
+    </tr>
+    <tr>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Private" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_private.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Module Local" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/c_plocal.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>[<code>(</code>][<code>ARGUMENTS</code>][<code>)</code>][when <code>...</code>]
+      </td>
+      <td>
+        The function head for function clause, including the name, arguments, and <code>when</code> if present
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>def</code> AND <code>defp</code>
+      </td>
+      <td>
+      </td>
+      <td>
+        <img alt="Runtime" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/general/run.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Unknown" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/runConfigurations/unknown.png?raw=true" />
+      </td>
+      <td>
+        <img alt="Function" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/nodes/function.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>/<code>ARITY</code>
+      </td>
+      <td>
+        Groups together <code>def</code> AND <code>defp</code> with the same name and arity.  This will be a
+        compile error, but is represented with
+        <img alt="Unknown" src="https://raw.githubusercontent.com/JetBrains/intellij-community/a034d3874d3f126b3de3d665ee18bc7e8abe5fb4/platform/icons/src/runConfigurations/unknown.png?raw=true" />
+        Unknown for the Visibility until corrected.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defprotocol PROTOCOL</code>
+      </td>
+      <td>
+        <img alt="Protocol" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/anonymousClass.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+        <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>PROTOCOL</code>
+      </td>
+      <td>
+        The <code>protocol</code> name.  Functions required by the protocol are children of this element.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defstruct</code>
+      </td>
+      <td>
+        <img alt="Struct" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/toolwindows/toolWindowStructure.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        %<code>RELATIVE_ALIAS</code>{}
+      </td>
+      <td>
+        Structs have the same <code>RELATIVE_ALIAS<code> as their parent Module.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code><i>defstruct</i> NAME<i>:</i> DEFAULT_VALUE<i>, ...</i></code>
+      </td>
+      <td>
+        <img alt="Field" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/nodes/field.png?raw=true" />
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td> 
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+      </td>
+      <td>
+        <code>NAME</code>: <code>DEFAULT_VALUE</code>
+      </td>
+      <td>
+        The fields and default values (or <code>nil</code> if a list is used instead of a keyword list) for the struct.
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ## Installation
  
