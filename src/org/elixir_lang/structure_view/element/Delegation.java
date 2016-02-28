@@ -43,7 +43,13 @@ public class Delegation extends Element<Call>  {
     }
 
     /*
+     *
      * Instance Methods
+     *
+     */
+
+    /*
+     * Public Instance Methods
      */
 
     /**
@@ -105,22 +111,13 @@ public class Delegation extends Element<Call>  {
                     ElixirList list = (ElixirList) accessExpressionChild;
 
                     Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-
-                    if (listCalls != null) {
-                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(listCalls.length);
-
-                        for (Call listCall : listCalls) {
-                            if (FunctionDelegation.is(listCall)) {
-                                treeElementList.add(new FunctionDelegation(this, listCall));
-                            }
-                        }
-
-                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
-                    }
+                    children = childrenFromCalls(listCalls);
                 }
             }
-        } else {
-            assert firstFinalArgument != null;
+        } else if (firstFinalArgument instanceof Call){
+            Call call = (Call) firstFinalArgument;
+
+            children = childrenFromCalls(call);
         }
 
         if (children == null) {
@@ -162,6 +159,25 @@ public class Delegation extends Element<Call>  {
     /*
      * Private Instance Methods
      */
+
+    @Nullable
+    private TreeElement[] childrenFromCalls(Call... calls) {
+        TreeElement[] children = null;
+
+        if (calls != null) {
+            List<TreeElement> treeElementList = new ArrayList<TreeElement>(calls.length);
+
+            for (Call call : calls) {
+                if (FunctionDelegation.is(call)) {
+                    treeElementList.add(new FunctionDelegation(this, call));
+                }
+            }
+
+            children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
+        }
+
+        return children;
+    }
 
     /**
      * The text of the {@code keywordValueText} keyword argument.

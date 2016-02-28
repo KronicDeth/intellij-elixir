@@ -115,9 +115,16 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      *
      * @return the data object instance.
      */
+    @Nullable
     @Override
     public Object getValue() {
-        return clauseList.get(0);
+        Object value = null;
+
+        if (clauseList.size() > 0) {
+            value = clauseList.get(0);
+        }
+
+        return value;
     }
 
     /**
