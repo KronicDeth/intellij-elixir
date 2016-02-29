@@ -27,7 +27,7 @@ public class TreeElementList
      */
 
     @NotNull
-    private Modular modular;
+    protected Modular modular;
     @NotNull
     private Timed.Time time;
     @NotNull

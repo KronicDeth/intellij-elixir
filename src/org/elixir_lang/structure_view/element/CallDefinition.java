@@ -4,7 +4,6 @@ import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
-import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.math.IntRange;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.NameArity;
@@ -31,11 +30,13 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      */
 
     private final int arity;
-    // keeps track of total order of all children (clauses and specifications)
+    // keeps track of total order of all children (clauses, heads, and specifications)
     @NotNull
     private final List<TreeElement> childList = new ArrayList<TreeElement>();
     @NotNull
     private final List<CallDefinitionClause> clauseList = new ArrayList<CallDefinitionClause>();
+    @NotNull
+    private final List<CallDefinitionHead> headList = new ArrayList<CallDefinitionHead>();
     @NotNull
     private final Modular modular;
     @NotNull
@@ -77,7 +78,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
         assert nameArityRange != null;
         assert nameArityRange.first.equals(name);
-        assert nameArityRange.second.getMinimumInteger() <= arity && nameArityRange.second.getMaximumInteger() >= arity;
+        assert nameArityRange.second.getMinimumInteger() <= arity && arity <= nameArityRange.second.getMaximumInteger();
 
         CallDefinitionClause callDefinitionClause = new CallDefinitionClause(this, clause);
         childList.add(callDefinitionClause);
@@ -120,7 +121,9 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     public Object getValue() {
         Object value = null;
 
-        if (clauseList.size() > 0) {
+        if (headList.size() > 0) {
+            value = headList.get(0);
+        } else if (clauseList.size() > 0) {
             value = clauseList.get(0);
         }
 
@@ -177,6 +180,24 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
                 name,
                 arity
         );
+    }
+
+    /**
+     * Unlike a clause, a head is just the name and arguments, without the outer macro calls.  Heads occur in
+     * {@code Kernel.defdelegate/2}.
+     *
+     * @param call
+     */
+    public void head(Call head) {
+        Pair<String, IntRange> nameArityRange = CallDefinitionHead.nameArityRange(head);
+
+        assert nameArityRange != null;
+        assert nameArityRange.first.equals(name);
+        assert nameArityRange.second.getMinimumInteger() <= arity &&  arity <= nameArityRange.second.getMaximumInteger();
+
+        CallDefinitionHead callDefinitionHead = new CallDefinitionHead(this, Visibility.PUBLIC, head);
+        childList.add(callDefinitionHead);
+        headList.add(callDefinitionHead);
     }
 
     /**
@@ -305,8 +326,8 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
     /**
      * The visibility of the element.
      *
-     * @return {@link Visibility.PUBLIC} for public call definitions ({@code def} and {@code defmacro});
-     * {@link Visibility.PRIVATE} for private call definitions ({@code defp} and {@code defmacrop}); {@code null} for
+     * @return {@link Visibility#PUBLIC} for public call definitions ({@code def} and {@code defmacro});
+     * {@link Visibility#PRIVATE} for private call definitions ({@code defp} and {@code defmacrop}); {@code null} for
      * a mix of visibilities, such as when a call definition has a mix of call definition clause visibilities, which
      * is invalid code, but can occur temporarily while code is being edited.
      */
@@ -316,6 +337,17 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
         int privateCount = 0;
         int publicCount = 0;
+
+        for (CallDefinitionHead callDefinitionHead : headList) {
+            switch (callDefinitionHead.visibility()) {
+                case PRIVATE:
+                    privateCount++;
+                    break;
+                case PUBLIC:
+                    publicCount++;
+                    break;
+            }
+        }
 
         for (CallDefinitionClause callDefinitionClause : clauseList) {
             switch (callDefinitionClause.visibility()) {

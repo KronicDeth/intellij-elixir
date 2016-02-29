@@ -4,10 +4,8 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
-import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -17,8 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.intellij.openapi.util.Pair.pair;
 
 public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
     /*
@@ -76,69 +72,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
 
         if (primaryArguments != null && primaryArguments.length > 0) {
             PsiElement head = primaryArguments[0];
-            String name;
-            IntRange arityRange;
-            Call headCall = null;
-
-            if (head instanceof ElixirMatchedWhenOperation) {
-                ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
-
-                headCall = (Call) whenOperation.leftOperand();
-            } else if (head instanceof Call) {
-                headCall = (Call) head;
-            } else if (head instanceof ElixirAccessExpression) {
-                PsiElement[] headChildren = head.getChildren();
-
-                if (headChildren.length == 1) {
-                    PsiElement headChild = headChildren[0];
-
-                    if (headChild instanceof ElixirParentheticalStab) {
-                        ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) headChild;
-
-                        PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
-
-                        if (parentheticalStabChildren.length == 1) {
-                            PsiElement parentheticalStabChild = parentheticalStabChildren[0];
-
-                            if (parentheticalStabChild instanceof ElixirStab) {
-                                ElixirStab stab = (ElixirStab) parentheticalStabChild;
-
-                                PsiElement[] stabChildren = stab.getChildren();
-
-                                if (stabChildren.length == 1) {
-                                    PsiElement stabChild = stabChildren[0];
-
-                                    if (stabChild instanceof ElixirStabBody) {
-                                        ElixirStabBody stabBody = (ElixirStabBody) stabChild;
-
-                                        PsiElement[] stabBodyChildren = stabBody.getChildren();
-
-                                        if (stabBodyChildren.length == 1) {
-                                            PsiElement stabBodyChild = stabBodyChildren[0];
-
-                                            if (stabBodyChild instanceof Call) {
-                                                headCall = (Call) stabBodyChild;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else if (head instanceof ElixirMatchedAtNonNumericOperation) {
-                ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
-
-                name = matchedAtNonNumericOperation.operator().getText().trim();
-                arityRange = new IntRange(1);
-                pair = pair(name, arityRange);
-            }
-
-            if (headCall != null) {
-                name = headCall.functionName();
-                arityRange = headCall.resolvedFinalArityRange();
-                pair = pair(name, arityRange);
-            }
+            pair = CallDefinitionHead.nameArityRange(head);
         }
 
         return pair;
@@ -161,19 +95,6 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
         }
 
         return callVisibility;
-    }
-
-    /**
-     * Throws {@code NotImplementedException} with the description and instructions to open an issue.
-     *
-     * @param description description of the unexpected condition that needs to be handled in the implementation.
-     * @param element     Element whose text to include in the issue to open
-     */
-    public static void openIssueForNotImplemented(String description, PsiElement element) {
-        throw new NotImplementedException(
-                description + " Please open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) with " +
-                        "the sample text:\n" + element.getText()
-        );
     }
 
     /*
@@ -221,10 +142,17 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        return new org.elixir_lang.navigation.item_presentation.CallDefinitionClause(
+        PsiElement[] primaryArguments = navigationItem.primaryArguments();
+
+        assert primaryArguments != null;
+        assert primaryArguments.length > 0;
+
+        PsiElement head = primaryArguments[0];
+
+        return new org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
                 (NameArity) callDefinition.getPresentation(),
                 visibility(),
-                navigationItem
+                head
         );
     }
 

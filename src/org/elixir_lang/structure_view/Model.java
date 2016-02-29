@@ -106,6 +106,7 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 // everything in {@link Module#childCallTreeElements}
                 suitable = CallDefinitionClause.isFunction(call) ||
                         CallDefinitionClause.isMacro(call) ||
+                        CallDefinitionHead.is(call) ||
                         CallDefinitionSpecification.is(call) ||
                         Callback.is(call) ||
                         Delegation.is(call) ||

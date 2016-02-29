@@ -128,7 +128,7 @@ public class Module extends Element<Call> implements Modular {
                 if (Callback.is(childCall)) {
                     treeElementList.add(new Callback(modular, childCall));
                 } else if (Delegation.is(childCall)) {
-                    treeElementList.add(new Delegation(modular, childCall));
+                    functionByNameArity.addDelegationToTreeElementList(childCall);
                 } else if (Exception.is(childCall)) {
                     functionByNameArity.setException(new Exception(modular, childCall));
                 } else if (CallDefinitionClause.isFunction(childCall)) {
