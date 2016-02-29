@@ -10,11 +10,11 @@ import org.elixir_lang.psi.ElixirList;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
-import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Delegation extends Element<Call>  {
@@ -23,11 +23,30 @@ public class Delegation extends Element<Call>  {
      */
 
     @NotNull
+    private final List<TreeElement> childList = new ArrayList<TreeElement>();
+    @NotNull
     private final Modular modular;
 
     /*
      * Static Methods
      */
+
+    @NotNull
+    public static List<Call> callDefinitionHeadCallList(Call... calls) {
+        List<Call> callList = Collections.emptyList();
+
+        if (calls != null) {
+            callList = new ArrayList<Call>(calls.length);
+
+            for (Call call : calls) {
+                if (CallDefinitionHead.is(call)) {
+                    callList.add(call);
+                }
+            }
+        }
+
+        return callList;
+    }
 
     public static boolean is(Call call) {
         return call.isCalling("Elixir.Kernel", "defdelegate", 2);
@@ -43,7 +62,13 @@ public class Delegation extends Element<Call>  {
     }
 
     /*
+     *
      * Instance Methods
+     *
+     */
+
+    /*
+     * Public Instance Methods
      */
 
     /**
@@ -77,20 +102,15 @@ public class Delegation extends Element<Call>  {
         return keywordArgumentText("as");
     }
 
-    /**
-     * Returns the list of children of the tree element.
-     *
-     * @return the list of children.
-     */
     @NotNull
-    @Override
-    public TreeElement[] getChildren() {
+    public List<Call> callDefinitionHeadCallList() {
+        List<Call> callDefinitionHeadCallList = null;
+
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 
         assert finalArguments != null;
         assert finalArguments.length > 0;
 
-        TreeElement[] children = null;
         PsiElement firstFinalArgument = finalArguments[0];
 
         if (firstFinalArgument instanceof ElixirAccessExpression) {
@@ -105,29 +125,35 @@ public class Delegation extends Element<Call>  {
                     ElixirList list = (ElixirList) accessExpressionChild;
 
                     Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-
-                    if (listCalls != null) {
-                        List<TreeElement> treeElementList = new ArrayList<TreeElement>(listCalls.length);
-
-                        for (Call listCall : listCalls) {
-                            if (FunctionDelegation.is(listCall)) {
-                                treeElementList.add(new FunctionDelegation(this, listCall));
-                            }
-                        }
-
-                        children = treeElementList.toArray(new TreeElement[treeElementList.size()]);
-                    }
+                    callDefinitionHeadCallList = callDefinitionHeadCallList(listCalls);
                 }
             }
-        } else {
-            assert firstFinalArgument != null;
+        } else if (firstFinalArgument instanceof Call) {
+            Call call = (Call) firstFinalArgument;
+
+            callDefinitionHeadCallList = callDefinitionHeadCallList(call);
         }
 
-        if (children == null) {
-            children = new TreeElement[0];
+        if (callDefinitionHeadCallList == null) {
+            callDefinitionHeadCallList = Collections.emptyList();
         }
 
-        return children;
+        return callDefinitionHeadCallList;
+    }
+
+    public void definition(CallDefinition callDefinition) {
+      childList.add(callDefinition);
+    }
+
+    /**
+     * The calls defined by this delegation
+     *
+     * @return the list of {@link CallDefinition} elements;
+     */
+    @NotNull
+    @Override
+    public TreeElement[] getChildren() {
+        return childList.toArray(new TreeElement[childList.size()]);
     }
 
     /**
@@ -181,4 +207,5 @@ public class Delegation extends Element<Call>  {
 
         return text;
     }
+
 }

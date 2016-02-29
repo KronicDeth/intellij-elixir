@@ -4,11 +4,13 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.ui.RowIcon;
 import com.intellij.util.PlatformIcons;
 import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.navigation.item_presentation.Parent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class Quote implements ItemPresentation {
+public class Quote implements ItemPresentation, Parent {
     /**
      * Returns the icon representing the object.
      *
@@ -23,6 +25,20 @@ public class Quote implements ItemPresentation {
         rowIcon.setIcon(PlatformIcons.ANONYMOUS_CLASS_ICON, 1);
 
         return rowIcon;
+    }
+
+    /**
+     * Combines {@link #getLocationString()} with {@link #getPresentableText()} for when this is the parent of
+     * an {@link ItemPresentation} and needs to act as the
+     * {@link ItemPresentation#getLocationString()}.
+     *
+     * @return {@link #getLocationString()} + "." + {@link #getPresentableText()} if {@link #getLocationString()} is not
+     * {@code null}; otherwise, {@link #getPresentableText()}.
+     */
+    @NotNull
+    @Override
+    public String getLocatedPresentableText() {
+        return "?";
     }
 
     /**
