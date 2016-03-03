@@ -37,6 +37,7 @@
       - [Settings](#settings)
       - [Individual File](#individual-file)
       - [Project](#project-1)
+    - [Live Templates](#live-templates)
     - [Run Configurations](#run-configurations)
       - [Mix Tasks](#mix-tasks)
     - [Go To Declaration](#go-to-declaration)
@@ -715,6 +716,304 @@ Using the menus
     * If compilation had errors, you'll see "Compilation completed with N errors and M warnings" in the Event Log and
       the Messages Compile tab will open showing a list of Errors
       ![Messages Compile](/screenshots/features/building/file/Messages%20Compile.png?raw=true "Messages Compile Individual File Build Errors")
+
+### Live Templates
+
+Live Templates are snippets of code that can be inserted quickly and have placeholder locations that the cursor will
+automatically jump to when using the template.  Whenever you start typing, Live Templates will start matching against
+the shortcuts.  A template can be selected with Tab.
+
+Live Templates can be customized in Preferences > Editor > Live Templates > Elixir.
+
+<table>
+  <caption>
+    Metasyntactic variables are locations where the cursor will jump to.  <code>END</code> is the final location of the
+    cursor.
+  </caption>
+  <thead>
+    <tr>
+      <th>
+        Shortcut
+      </th>
+      <th>
+        Code
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>case</code>
+      </td>
+      <td>
+<pre><code>
+case ONE do
+  TWO -> END
+end
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>cond</code>
+      </td>
+      <td>
+<pre><code>
+cond do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>def</code>
+      </td>
+      <td>
+<pre><code>
+def NAME do
+  END
+end        
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>def,</code>
+      </td>
+      <td>
+<pre><code>
+def NAME, do: END        
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defi</code>
+      </td>
+      <td>
+<pre><code>
+defimpl PROTOCOL, for: TYPE do
+  END
+end  
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defm</code>
+      </td>
+      <td>
+<pre><code>
+defmodule ALIAS do
+  END
+end
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defmac</code>
+      </td>
+      <td>
+<pre><code>
+defmacro MACRO_NAME do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defmacp</code>
+      </td>
+      <td>
+<pre><code>
+defmacrop MACRO_NAME do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defover</code>
+      </td>
+      <td>
+<pre><code>
+defoverridable [NAME: END]
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defp</code>
+      </td>
+      <td>
+<pre><code>
+defp NAME do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defpro</code>
+      </td>
+      <td>
+<pre><code>
+defprotocol PROTOCOL do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>defs</code>
+      </td>
+      <td>
+<pre><code>
+defstruct [END]
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>do</code>
+      </td>
+      <td>
+<pre><code> 
+do
+  END
+end
+</code></pre>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>doc</code>
+      </td>
+      <td>
+<pre><code>
+@doc """
+ONE
+"""
+END
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>fn</code>
+      </td>
+      <td>
+<pre><code>
+fn ARGS -> END end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>for</code>
+      </td>
+      <td>
+<pre><code>
+for A <- B do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>if</code>
+      </td>
+      <td>
+<pre><code>
+if TRUE do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>ife</code>
+      </td>
+      <td>
+<pre><code>
+if TRUE do
+  OK
+else
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>ii</code>
+      </td>
+      <td>
+<pre><code>
+IO.inspect(END)
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>mdoc</code>
+      </td>
+      <td>
+<pre><code>
+@moduledoc """
+ONE
+"""
+END
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>rec</code>
+      </td>
+      <td>
+<pre><code>
+receive do
+  ONE -> END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>test</code>
+      </td>
+      <td>
+<pre><code>
+test "TESTDESC" do
+  END
+end
+</code></pre>      
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>try</code>
+      </td>
+      <td>
+<pre><code>
+try do
+  ONE 
+rescue
+  TWO -> END
+</code></pre>      
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Run Configurations
 
