@@ -33,7 +33,7 @@
 ## v2.2.0
 * Enhancement
   * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
-  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/243) - Structure View - [KronicDeth](https://github.com/KronicDeth)
+  * [#243](https://github.com/KronicDeth/intellij-elixir/pull/243), [#248](https://github.com/KronicDeth/intellij-elixir/pull/248) - Structure View - [KronicDeth](https://github.com/KronicDeth)
     * Controls
       * Scroll to Source and Scroll From Source
       * Sorting
