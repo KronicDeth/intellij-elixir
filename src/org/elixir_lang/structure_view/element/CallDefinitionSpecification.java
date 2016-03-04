@@ -9,6 +9,7 @@ import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElixirMatchedTypeOperation;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
 
         if (call instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) call;
-            String  moduleAttributeName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+            String  moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
 
             if (moduleAttributeName.equals("@spec")) {
                 is = true;

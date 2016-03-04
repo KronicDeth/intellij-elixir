@@ -4,7 +4,6 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -77,15 +76,6 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
-  }
-
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
   }
@@ -116,11 +106,6 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
-  }
-
-  @NotNull
-  public OtpErlangObject[] quoteArguments() {
-    return ElixirPsiImplUtil.quoteArguments(this);
   }
 
   @NotNull

@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * atPrefixOperator IDENTIFIER CALL bracketArguments
  */
-public interface AtUnqualifiedNoParenthesesCall extends Call, ModuleAttributeNameable, NamedElement,
-        NoParenthesesOneArgument, Quotable {
+public interface AtUnqualifiedNoParenthesesCall extends Call, NoParenthesesOneArgument, Quotable {
     @Contract(pure = true)
     @NotNull
     ElixirAtIdentifier getAtIdentifier();

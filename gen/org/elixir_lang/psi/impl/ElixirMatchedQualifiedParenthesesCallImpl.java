@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.apache.commons.lang.math.IntRange;
@@ -70,15 +69,6 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
 
   public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
-  }
-
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @NotNull

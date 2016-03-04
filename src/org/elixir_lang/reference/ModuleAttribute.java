@@ -13,6 +13,7 @@ import org.elixir_lang.psi.AtNonNumericOperation;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.ElementFactory;
 import org.elixir_lang.psi.ElixirAtIdentifier;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
             if (sibling instanceof AtUnqualifiedNoParenthesesCall) {
                 AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) sibling;
-                String moduleAttributeName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+                String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
                 String value = getValue();
 
                 if (moduleAttributeName.equals(value)) {
@@ -138,7 +139,7 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
 
                 lookupElementList.add(
                         LookupElementBuilder.createWithSmartPointer(
-                                atUnqualifiedNoParenthesesCall.moduleAttributeName(),
+                                ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall),
                                 atUnqualifiedNoParenthesesCall
                         )
                 );

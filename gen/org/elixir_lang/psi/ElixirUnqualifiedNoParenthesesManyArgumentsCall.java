@@ -2,7 +2,6 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
@@ -13,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, NoParentheses, Unqualified, Quotable, QuotableArguments {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, NoParentheses, Unqualified, Quotable {
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
@@ -42,11 +41,6 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
   @Nullable
   ElixirDoBlock getDoBlock();
 
-  PsiElement getNameIdentifier();
-
-  @NotNull
-  ItemPresentation getPresentation();
-
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
@@ -64,9 +58,6 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   @NotNull
   OtpErlangObject quote();
-
-  @NotNull
-  OtpErlangObject[] quoteArguments();
 
   @NotNull
   int resolvedFinalArity();

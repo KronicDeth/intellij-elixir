@@ -2,15 +2,12 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.ResolveState;
-import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, NamedElement, UnqualifiedNoParenthesesCall {
+public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, UnqualifiedNoParenthesesCall {
 
   @Nullable
   ElixirDoBlock getDoBlock();
@@ -22,21 +19,10 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @Nullable
-  String definedModuleName();
-
-  @Nullable
   String functionName();
 
   @NotNull
   PsiElement functionNameElement();
-
-  @Nullable
-  String getName();
-
-  PsiElement getNameIdentifier();
-
-  @NotNull
-  ItemPresentation getPresentation();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -52,8 +38,6 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   @Nullable
   Integer primaryArity();
-
-  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();
@@ -81,8 +65,5 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   @Nullable
   Integer secondaryArity();
-
-  @NotNull
-  PsiElement setName(String newName);
 
 }

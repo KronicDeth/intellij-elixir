@@ -2,7 +2,6 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.jetbrains.annotations.NotNull;
@@ -25,23 +24,11 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @Nullable
   ElixirDoBlock getDoBlock();
 
-  @Nullable
-  String getName();
-
-  @NotNull
-  PsiElement getNameIdentifier();
-
-  @NotNull
-  ItemPresentation getPresentation();
-
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
-
-  @NotNull
-  String moduleAttributeName();
 
   @Nullable
   String moduleName();
@@ -78,8 +65,5 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
 
   @Nullable
   Integer secondaryArity();
-
-  @NotNull
-  PsiElement setName(String newName);
 
 }

@@ -31,7 +31,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
 
         if (call instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) call;
-            String moduleAttributeName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+            String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
 
             if (moduleAttributeName.equals("@callback") || moduleAttributeName.equals("@macrocallback")) {
                 is = true;
@@ -136,7 +136,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
     @NotNull
     @Override
     public Time time() {
-        String moduleAttributeName = navigationItem.moduleAttributeName();
+        String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(navigationItem);
         Time time = null;
 
         if (moduleAttributeName.equals("@callback")) {

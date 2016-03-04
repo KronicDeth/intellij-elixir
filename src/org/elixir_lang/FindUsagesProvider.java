@@ -7,6 +7,7 @@ import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,7 +117,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         if (element instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
 
-            descriptiveName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+            descriptiveName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
         } else if (element instanceof ElixirFile) {
             ElixirFile file = (ElixirFile) element;
 

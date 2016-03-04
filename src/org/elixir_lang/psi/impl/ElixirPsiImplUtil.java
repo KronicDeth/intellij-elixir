@@ -3457,7 +3457,7 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirUnqualifiedNoParenthesesManyArgumentsCall unqualifiedNoParenthesesManyArgumentsCall) {
         OtpErlangObject quotedIdentifier = unqualifiedNoParenthesesManyArgumentsCall.getIdentifier().quote();
-        OtpErlangObject[] quotedArguments = unqualifiedNoParenthesesManyArgumentsCall.quoteArguments();
+        OtpErlangObject[] quotedArguments = ElixirPsiImplUtil.quoteArguments(unqualifiedNoParenthesesManyArgumentsCall);
         return anchoredQuotedFunctionCall(unqualifiedNoParenthesesManyArgumentsCall, quotedIdentifier, quotedArguments);
     }
 

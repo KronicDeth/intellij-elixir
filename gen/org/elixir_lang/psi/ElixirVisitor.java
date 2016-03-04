@@ -947,7 +947,6 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedUnqualifiedNoParenthesesCall(@NotNull ElixirUnmatchedUnqualifiedNoParenthesesCall o) {
     visitUnmatchedExpression(o);
-    // visitNamedElement(o);
     // visitUnqualifiedNoParenthesesCall(o);
   }
 
@@ -968,7 +967,6 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitNoParentheses(o);
     // visitUnqualified(o);
     // visitQuotable(o);
-    // visitQuotableArguments(o);
   }
 
   public void visitVariable(@NotNull ElixirVariable o) {

@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.apache.commons.lang.math.IntRange;
@@ -53,15 +52,6 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends ElixirUnmatched
 
   public PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
-  }
-
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {

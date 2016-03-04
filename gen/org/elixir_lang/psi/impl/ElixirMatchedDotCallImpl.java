@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -56,11 +55,6 @@ public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implem
   @Nullable
   public ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {

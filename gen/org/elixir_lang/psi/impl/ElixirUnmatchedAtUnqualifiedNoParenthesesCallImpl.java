@@ -3,7 +3,6 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.apache.commons.lang.math.IntRange;
@@ -50,21 +49,6 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
     return ElixirPsiImplUtil.functionNameElement(this);
   }
 
-  @Nullable
-  public String getName() {
-    return ElixirPsiImplUtil.getName(this);
-  }
-
-  @NotNull
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
-  }
-
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
   }
@@ -75,11 +59,6 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
 
   public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
-  }
-
-  @NotNull
-  public String moduleAttributeName() {
-    return ElixirPsiImplUtil.moduleAttributeName(this);
   }
 
   @Nullable
@@ -140,11 +119,6 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirUnm
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
-  }
-
-  @NotNull
-  public PsiElement setName(String newName) {
-    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }
