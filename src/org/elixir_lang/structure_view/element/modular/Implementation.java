@@ -1,4 +1,4 @@
-package org.elixir_lang.structure_view.element;
+package org.elixir_lang.structure_view.element.modular;
 
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;

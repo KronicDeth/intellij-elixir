@@ -4,12 +4,12 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.Prefix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirCaptureNumericOperation extends Call, Prefix {
+public interface ElixirCaptureNumericOperation extends Named, Prefix {
 
   @Nullable
   ElixirBinaryWholeNumber getBinaryWholeNumber();
@@ -43,6 +43,13 @@ public interface ElixirCaptureNumericOperation extends Call, Prefix {
 
   @Nullable
   ElixirDoBlock getDoBlock();
+
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
+
+  boolean hasDoBlockOrKeyword();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -91,5 +98,8 @@ public interface ElixirCaptureNumericOperation extends Call, Prefix {
 
   @Nullable
   Integer resolvedSecondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

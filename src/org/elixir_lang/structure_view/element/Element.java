@@ -1,9 +1,12 @@
 package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.structureView.StructureViewTreeElement;
+import com.intellij.navigation.NavigationItem;
 import com.intellij.psi.NavigatablePsiElement;
+import org.elixir_lang.psi.NamedElement;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class Element<T extends NavigatablePsiElement> implements StructureViewTreeElement {
+public abstract class Element<T extends NavigatablePsiElement> implements StructureViewTreeElement, NavigationItem {
     /*
      * Private Instance Fields
      */
@@ -37,6 +40,25 @@ public abstract class Element<T extends NavigatablePsiElement> implements Struct
     @Override
     public boolean canNavigateToSource() {
         return navigationItem.canNavigateToSource();
+    }
+
+    /**
+     * The name of the {@link #navigationItem}.
+     *
+     * @return the {@link NamedElement#getName()} if {@link #navigationItem} is a {@link NamedElement}; otherwise,
+     *   {@code null}.
+     */
+    @Nullable
+    @Override
+    public String getName() {
+        String name = null;
+
+        if (navigationItem instanceof NamedElement) {
+            NamedElement namedElement = (NamedElement) navigationItem;
+            name = namedElement.getName();
+        }
+
+        return name;
     }
 
     /**

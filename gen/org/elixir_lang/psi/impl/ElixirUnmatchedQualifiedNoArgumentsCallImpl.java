@@ -5,15 +5,21 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends ElixirUnmatchedExpressionImpl implements ElixirUnmatchedQualifiedNoArgumentsCall {
+public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<UnmatchedQualifiedNoArgumentsCall> implements ElixirUnmatchedQualifiedNoArgumentsCall {
 
   public ElixirUnmatchedQualifiedNoArgumentsCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirUnmatchedQualifiedNoArgumentsCallImpl(UnmatchedQualifiedNoArgumentsCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -52,6 +58,19 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends ElixirUnmatched
 
   public PsiElement functionNameElement() {
     return ElixirPsiImplUtil.functionNameElement(this);
+  }
+
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -124,6 +143,11 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends ElixirUnmatched
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

@@ -1,6 +1,6 @@
 Elixir File(0,10)
   ElixirUnmatchedMultiplicationOperationImpl(UNMATCHED_MULTIPLICATION_OPERATION)(0,10)
-    ElixirUnmatchedQualifiedNoArgumentsCallImpl(UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,8)
+    UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL(0,8)
       ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,4)
         ElixirAtomImpl(ATOM)(0,4)
           PsiElement(:)(':')(0,1)

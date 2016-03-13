@@ -7,11 +7,16 @@
   // direct children of unmatchedExpression
   extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=unmatchedExpression
 
-  // calls
-  methods("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
+  // name identifier owner calls - no argument calls are included because in a pipeline they can have effective arguments
+  elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
+  methods(           "((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
     functionName
     functionNameElement
     getDoBlock
+    hasDoBlockOrKeyword
+    getName
+    getNameIdentifier
+    getStub
     isCalling
     isCallingMacro
     moduleName
@@ -26,6 +31,7 @@
     resolvedSecondaryArity
     secondaryArguments
     secondaryArity
+    setName
   ]
 
   // in operations that works as calls
@@ -35,15 +41,20 @@
   ]
   // methods set by infix operations below
 
-  // infix operations that work as calls
-  implements("(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
-    "org.elixir_lang.psi.call.Call"
+  /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
+     return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
+     the free arrow operators */
+  implements(        "(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+    "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
-  methods("(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
     functionName
     functionNameElement
     getDoBlock
+    getName
+    getNameIdentifier
+    hasDoBlockOrKeyword
     isCalling
     isCallingMacro
     leftOperand
@@ -61,17 +72,25 @@
     rightOperand
     secondaryArguments
     secondaryArity
+    setName
   ]
 
-  // prefix operations
-  implements("((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
-    "org.elixir_lang.psi.call.Call"
+  /*
+   * Prefix operations
+   *
+   * Have names (their operators), but aren't stubbed because they don't define structures.
+   */
+  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+    "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Prefix"
   ]
-  methods("((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+  methods(           "((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
     functionName
     functionNameElement
     getDoBlock
+    getName
+    getNameIdentifier
+    hasDoBlockOrKeyword
     isCalling
     isCallingMacro
     moduleName
@@ -88,6 +107,7 @@
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
+    setName
   ]
 
   // atNonNumeric operations
@@ -347,11 +367,13 @@ unqualifiedNoParenthesesManyArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                                 implements = [
                                                   // MUST be first so visitElement is used in ElixirVisitor
                                                   "com.intellij.psi.PsiElement"
-                                                  "org.elixir_lang.psi.call.Call"
-                                                  "org.elixir_lang.psi.call.arguments.NoParentheses"
+                                                  "org.elixir_lang.psi.call.StubBased<org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall>"
+                                                  "org.elixir_lang.psi.call.arguments.star.NoParentheses"
                                                   "org.elixir_lang.psi.qualification.Unqualified"
                                                   "org.elixir_lang.psi.Quotable"
                                                 ]
+                                                mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall>"
+                                                stubClass = "org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall"
                                               }
 
 /*
@@ -1614,9 +1636,11 @@ matchedParenthesesArguments ::= CALL parenthesesArguments parenthesesArguments? 
 matchedDotCall ::= matchedExpression dotInfixOperator parenthesesArguments parenthesesArguments?
                    {
                      implements = [
-                       "org.elixir_lang.psi.DotCall"
+                       "org.elixir_lang.psi.DotCall<org.elixir_lang.psi.stub.MatchedDotCall>"
                        "org.elixir_lang.psi.MatchedCall"
                      ]
+                     mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedDotCall>"
+                     stubClass = "org.elixir_lang.psi.stub.MatchedDotCall"
                    }
 
 /*
@@ -1629,8 +1653,10 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
-                                          "org.elixir_lang.psi.QualifiedNoParenthesesCall"
+                                          "org.elixir_lang.psi.QualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedQualifiedNoParenthesesCall>"
                                         ]
+                                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedNoParenthesesCall>"
+                                        stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedNoParenthesesCall"
                                       }
 
 /*
@@ -1644,9 +1670,11 @@ matchedQualifiedNoParenthesesCall ::= matchedExpression dotInfixOperator relativ
 matchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument
                                           {
                                             implements = [
-                                              "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
+                                              "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall>"
                                               "org.elixir_lang.psi.MatchedCall"
                                             ]
+                                            mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall>"
+                                            stubClass = "org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall"
                                           }
 
 /*
@@ -1659,8 +1687,10 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                         {
                                           implements = [
                                             "org.elixir_lang.psi.MatchedCall"
-                                            "org.elixir_lang.psi.UnqualifiedNoParenthesesCall"
+                                            "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall>"
                                           ]
+                                          mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall>"
+                                          stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall"
                                         }
 
 /*
@@ -1688,7 +1718,6 @@ matchedBracketOperation ::= matchedExpression bracketArguments
 
 matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                           {
-                            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
                             implements = [
                               "org.elixir_lang.psi.NamedElement"
                               "org.elixir_lang.psi.QualifiedAlias"
@@ -1703,8 +1732,6 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                               quote
                               setName
                             ]
-                            mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedAlias>"
-                            stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedAlias"
                           }
 
 /*
@@ -1724,8 +1751,10 @@ matchedQualifiedParenthesesCall ::= matchedExpression dotInfixOperator relativeI
                                     {
                                       implements = [
                                         "org.elixir_lang.psi.MatchedCall"
-                                        "org.elixir_lang.psi.QualifiedParenthesesCall"
+                                        "org.elixir_lang.psi.QualifiedParenthesesCall<org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall>"
                                       ]
+                                      mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall>"
+                                      stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall"
                                     }
 
 /*
@@ -1736,8 +1765,10 @@ matchedQualifiedNoArgumentsCall ::= matchedExpression dotInfixOperator relativeI
                                     {
                                       implements = [
                                         "org.elixir_lang.psi.MatchedCall"
-                                        "org.elixir_lang.psi.QualifiedNoArgumentsCall"
+                                        "org.elixir_lang.psi.QualifiedNoArgumentsCall<org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall>"
                                       ]
+                                      mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall>"
+                                      stubClass = "org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall"
                                     }
 
 /*
@@ -1759,9 +1790,12 @@ matchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
-                                          "org.elixir_lang.psi.UnqualifiedParenthesesCall"
+                                          "org.elixir_lang.psi.UnqualifiedParenthesesCall<org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall>"
                                         ]
+                                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall>"
+                                        stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall"
                                       }
+
 /*
  * At Non-Numeric Operation - non-associative
  *
@@ -1800,8 +1834,10 @@ matchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON
                                       {
                                         implements = [
                                           "org.elixir_lang.psi.MatchedCall"
-                                          "org.elixir_lang.psi.UnqualifiedNoArgumentsCall"
+                                          "org.elixir_lang.psi.UnqualifiedNoArgumentsCall<org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall>"
                                         ]
+                                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall>"
+                                        stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedNoArgumentsCall"
                                       }
 
 
@@ -1980,6 +2016,7 @@ stabParenthesesSignature ::= parenthesesArguments (whenInfixOperator expression)
                                  "org.elixir_lang.psi.operation.When"
                                ]
                                methods = [
+                                 getNameIdentifier
                                  leftOperand
                                  operator
                                  quote
@@ -2106,8 +2143,6 @@ atomKeyword ::= FALSE | NIL | TRUE
 
 alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
           {
-            elementTypeFactory = "org.elixir_lang.ElementTypeFactory.factory"
-            extends = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<?>"
             implements = [
               "org.elixir_lang.psi.NamedElement"
               "org.elixir_lang.psi.QualifiableAlias"
@@ -2123,7 +2158,6 @@ alias ::= ALIAS_TOKEN !KEYWORD_PAIR_COLON
               quote
               setName
             ]
-            stubClass = "org.elixir_lang.psi.stub.Alias"
           }
 
 /*
@@ -2310,7 +2344,9 @@ unmatchedUnaryNonNumericOperation ::= unaryPrefixOperator !numeric unmatchedExpr
 
 unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments parenthesesArguments? doBlock?
                      {
-                       implements = "org.elixir_lang.psi.DotCall"
+                       implements = "org.elixir_lang.psi.DotCall<org.elixir_lang.psi.stub.UnmatchedDotCall>"
+                       mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedDotCall>"
+                       stubClass = "org.elixir_lang.psi.stub.UnmatchedDotCall"
                      }
 
 /*
@@ -2321,7 +2357,11 @@ unmatchedDotCall ::= unmatchedExpression dotInfixOperator parenthesesArguments p
 
 unmatchedQualifiedNoParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier noParenthesesOneArgument doBlock?
                                         {
-                                          implements = "org.elixir_lang.psi.QualifiedNoParenthesesCall"
+                                          implements = [
+                                            "org.elixir_lang.psi.QualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall>"
+                                          ]
+                                          mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall>"
+                                          stubClass = "org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall"
                                         }
 
 /*
@@ -2336,7 +2376,9 @@ atIdentifier ::= atPrefixOperator IDENTIFIER_TOKEN
                  { methods = [getReference] }
 unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgument doBlock?
                                             {
-                                              implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall"
+                                              implements = "org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
+                                              mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall>"
+                                              stubClass = "org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall"
                                             }
 
 /*
@@ -2346,7 +2388,11 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
  */
 
 unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlock?
-                                          { implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall" }
+                                          {
+                                            implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
+                                            mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
+                                            stubClass="org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall"
+                                          }
 
 /*
  * Bracket Operation
@@ -2391,14 +2437,24 @@ unmatchedQualifiedBracketOperation ::= unmatchedExpression dotInfixOperator rela
  */
 
 unmatchedQualifiedParenthesesCall ::= unmatchedExpression dotInfixOperator relativeIdentifier matchedParenthesesArguments doBlock?
-                                      { implements = "org.elixir_lang.psi.QualifiedParenthesesCall" }
+                                      {
+                                        implements = "org.elixir_lang.psi.QualifiedParenthesesCall<org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall>"
+                                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall>"
+                                        stubClass = "org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall"
+                                      }
 
 /*
  * Qualified Call with No Arguments - neither parenthes nor no parentheses
  */
 
 unmatchedQualifiedNoArgumentsCall ::= unmatchedExpression dotInfixOperator relativeIdentifier !CALL doBlock?
-                                      { implements = "org.elixir_lang.psi.QualifiedNoArgumentsCall" }
+                                      {
+                                        implements = [
+                                          "org.elixir_lang.psi.QualifiedNoArgumentsCall<org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall>"
+                                        ]
+                                        mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall>"
+                                        stubClass = "org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall"
+                                      }
 
 /*
  * At Unqualified Bracket Operation
@@ -2416,7 +2472,11 @@ unmatchedAtUnqualifiedBracketOperation ::= atPrefixOperator IDENTIFIER_TOKEN CAL
  */
 
 unmatchedUnqualifiedParenthesesCall ::= identifier matchedParenthesesArguments doBlock?
-                                        { implements = "org.elixir_lang.psi.UnqualifiedParenthesesCall" }
+                                        {
+                                          implements = "org.elixir_lang.psi.UnqualifiedParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall>"
+                                          mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall>"
+                                          stubClass = "org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall"
+                                        }
 
 /*
  * At Non-Numeric Operation - non-associative
@@ -2443,7 +2503,11 @@ unmatchedUnqualifiedBracketOperation ::= identifier CALL bracketArguments
  */
 
 unmatchedUnqualifiedNoArgumentsCall ::= identifier !KEYWORD_PAIR_COLON doBlock?
-                                        { implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall" }
+                                        {
+                                          implements = "org.elixir_lang.psi.UnqualifiedNoArgumentsCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
+                                          mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall>"
+                                          stubClass = "org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoArgumentsCall"
+                                        }
 
 unmatchedAccessExpression ::= accessExpression
                               { elementType = accessExpression }

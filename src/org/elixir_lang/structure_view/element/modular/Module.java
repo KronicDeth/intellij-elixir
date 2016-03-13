@@ -12,7 +12,6 @@ import org.elixir_lang.structure_view.element.CallDefinition;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.Exception;
-import org.elixir_lang.structure_view.element.Implementation;
 import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity;

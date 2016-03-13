@@ -1,14 +1,14 @@
 package org.elixir_lang.psi.call.arguments;
 
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A call with no arguments; not even empty parentheses.
  */
-public interface None extends Call {
+public interface None extends Named {
     /**
      * @return Always {@code null} because a no argument call by definition has no arguments, not even an empty list
      *   of arguments.

@@ -121,7 +121,7 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
                                                 Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(childCalls.length);
 
                                                 for (Call childCall : childCalls) {
-                                                    /* portion of {@link org.elixir_lang.structure_view.element.modular.Module#childCallTreeElements}
+                                                    /* portion of {@link org.elixir_lang.structure_view.element.enclosingModular.Module#childCallTreeElements}
                                                        dealing with macros, restricted to __using__/1 */
                                                     if (CallDefinitionClause.isMacro(childCall)) {
                                                         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);

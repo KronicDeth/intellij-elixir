@@ -31,20 +31,114 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
         return call instanceof UnqualifiedParenthesesCall;
     }
 
+    @NotNull
+    public static PsiElement nameIdentifier(PsiElement head) {
+        PsiElement nameIdentifier;
+
+        if (head instanceof ElixirMatchedAtNonNumericOperation) {
+            AtNonNumericOperation atNonNumericOperation = (AtNonNumericOperation) head;
+            nameIdentifier =  atNonNumericOperation.operator();
+        } else {
+            PsiElement stripped = strip(head);
+
+            if (stripped instanceof Call) {
+                Call strippedCall = (Call) stripped;
+                nameIdentifier = strippedCall.functionNameElement();
+            } else {
+                nameIdentifier = stripped;
+            }
+        }
+
+        return nameIdentifier;
+    }
+
     @Nullable
     public static Pair<String, IntRange> nameArityRange(PsiElement head) {
         String name;
         IntRange arityRange;
-        Call headCall = null;
-        Pair<String, IntRange> pair= null;
+        Pair<String, IntRange> pair = null;
+
+        if (head instanceof ElixirMatchedAtNonNumericOperation) {
+            ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
+
+            name = matchedAtNonNumericOperation.operator().getText().trim();
+            arityRange = new IntRange(1);
+            pair = pair(name, arityRange);
+        } else {
+            PsiElement stripped = strip(head);
+
+            if (stripped instanceof Call) {
+                Call strippedCall = (Call) stripped;
+                name = strippedCall.functionName();
+                arityRange = strippedCall.resolvedFinalArityRange();
+                pair = pair(name, arityRange);
+            }
+        }
+
+        return pair;
+    }
+
+    /**
+     * Head without parentheses around the guard or guarded head
+     *
+     * @param head {@code ((((name(arg, ...))) when ...))}
+     * @return {@code name(arg, ...)}
+     */
+    @NotNull
+    public static PsiElement strip(@NotNull final PsiElement head) {
+        PsiElement strippedGuarded = stripAllOuterParentheses(head);
+        PsiElement unguarded = stripGuard(strippedGuarded);
+        return stripAllOuterParentheses(unguarded);
+    }
+
+    /**
+     * The head without the guard clause
+     * @param head {@code name(arg, ...) when ...}
+     * @return {@code name(arg, ...)}.  {@code head} if no guard clause.
+     */
+    @NotNull
+    public static PsiElement stripGuard(@NotNull final PsiElement head) {
+        PsiElement stripped = head;
 
         if (head instanceof ElixirMatchedWhenOperation) {
             ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
 
-            headCall = (Call) whenOperation.leftOperand();
-        } else if (head instanceof Call) {
-            headCall = (Call) head;
-        } else if (head instanceof ElixirAccessExpression) {
+            stripped = whenOperation.leftOperand();
+        }
+
+        return stripped;
+    }
+
+    /**
+     * Strips each set of outer parentheses from {@code head} until there aren't anymore.
+     *
+     * @param head {@code ((value))}
+     * @return {@code value}.  {@code head} if no outer parentheses
+     */
+    @NotNull
+    public static PsiElement stripAllOuterParentheses(@NotNull final PsiElement head) {
+        PsiElement stripped = head;
+        PsiElement previousStripped;
+
+        do {
+            previousStripped = stripped;
+            stripped = stripOuterParentheses(previousStripped);
+        } while (previousStripped != stripped);
+
+        return stripped;
+    }
+
+    /**
+     * Strips outer parentheses from {@code head}.
+     *
+     * @param head {@code (value)}
+     * @return {@code value}.  {@code head} if no outer parentheses
+     */
+    @NotNull
+    public static PsiElement stripOuterParentheses(PsiElement head) {
+        PsiElement stripped = head;
+
+        if (head instanceof ElixirAccessExpression) {
             PsiElement[] headChildren = head.getChildren();
 
             if (headChildren.length == 1) {
@@ -72,11 +166,7 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
                                     PsiElement[] stabBodyChildren = stabBody.getChildren();
 
                                     if (stabBodyChildren.length == 1) {
-                                        PsiElement stabBodyChild = stabBodyChildren[0];
-
-                                        if (stabBodyChild instanceof Call) {
-                                            headCall = (Call) stabBodyChild;
-                                        }
+                                        stripped = stabBodyChildren[0];
                                     }
                                 }
                             }
@@ -84,21 +174,9 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
                     }
                 }
             }
-        } else if (head instanceof ElixirMatchedAtNonNumericOperation) {
-            ElixirMatchedAtNonNumericOperation matchedAtNonNumericOperation = (ElixirMatchedAtNonNumericOperation) head;
-
-            name = matchedAtNonNumericOperation.operator().getText().trim();
-            arityRange = new IntRange(1);
-            pair = pair(name, arityRange);
         }
 
-        if (headCall != null) {
-            name = headCall.functionName();
-            arityRange = headCall.resolvedFinalArityRange();
-            pair = pair(name, arityRange);
-        }
-
-        return pair;
+        return stripped;
     }
 
     /*

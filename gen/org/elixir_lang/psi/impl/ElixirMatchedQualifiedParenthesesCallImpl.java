@@ -5,15 +5,21 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedParenthesesCall {
+public class ElixirMatchedQualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedQualifiedParenthesesCall> implements ElixirMatchedQualifiedParenthesesCall {
 
   public ElixirMatchedQualifiedParenthesesCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirMatchedQualifiedParenthesesCallImpl(MatchedQualifiedParenthesesCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -57,6 +63,19 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
   @Nullable
   public ElixirDoBlock getDoBlock() {
     return ElixirPsiImplUtil.getDoBlock(this);
+  }
+
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -129,6 +148,11 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends ElixirMatchedExpr
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

@@ -1,5 +1,5 @@
 Elixir File(0,23)
-  ElixirUnmatchedQualifiedNoArgumentsCallImpl(UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL)(0,23)
+  UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL(0,23)
     ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,12)
       ElixirCharListLineImpl(CHAR_LIST_LINE)(0,12)
         PsiElement(Char List Promoter ('))(''')(0,1)

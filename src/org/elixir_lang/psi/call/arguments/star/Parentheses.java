@@ -1,8 +1,9 @@
-package org.elixir_lang.psi.call.arguments;
+package org.elixir_lang.psi.call.arguments.star;
 
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.ElixirMatchedParenthesesArguments;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.arguments.Star;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * {@code <...> matchedParenthesesArguments}
  */
-public interface Parentheses extends Call {
+public interface Parentheses extends Star {
     @Contract(pure = true)
     @NotNull
     ElixirMatchedParenthesesArguments getMatchedParenthesesArguments();

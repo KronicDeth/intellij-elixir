@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementWalkingVisitor;
 import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.call.arguments.NoParentheses;
+import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

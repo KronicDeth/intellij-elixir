@@ -3,16 +3,18 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.arguments.NoParentheses;
+import org.elixir_lang.psi.call.StubBased;
+import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.qualification.Unqualified;
+import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, Call, NoParentheses, Unqualified, Quotable {
+public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, StubBased<UnqualifiedNoParenthesesManyArgumentsCall>, NoParentheses, Unqualified, Quotable, StubBasedPsiElement<UnqualifiedNoParenthesesManyArgumentsCall> {
 
   @NotNull
   List<ElixirEmptyParentheses> getEmptyParenthesesList();
@@ -40,6 +42,13 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   @Nullable
   ElixirDoBlock getDoBlock();
+
+  boolean hasDoBlockOrKeyword();
+
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -82,5 +91,8 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

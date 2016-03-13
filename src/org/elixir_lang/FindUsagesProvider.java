@@ -8,6 +8,12 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.*;
+import org.elixir_lang.structure_view.element.Quote;
+import org.elixir_lang.structure_view.element.modular.Implementation;
+import org.elixir_lang.structure_view.element.modular.Module;
+import org.elixir_lang.structure_view.element.modular.Protocol;
+import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,7 +67,8 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
 
         if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
             helpId = com.intellij.lang.HelpID.FIND_OTHER_USAGES;
-        } if (psiElement instanceof MaybeModuleName) {
+        }
+        if (psiElement instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) psiElement;
 
             if (maybeModuleName.isModuleName()) {
@@ -86,9 +93,41 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
         String type = null;
 
-        if (element instanceof AtUnqualifiedNoParenthesesCall) {
-            type = "module attribute";
-        } if (element instanceof MaybeModuleName) {
+        if (element instanceof Call) {
+            Call call = (Call) element;
+
+            if (CallDefinitionClause.isFunction(call)) {
+                type = "function";
+            } else if (CallDefinitionClause.isMacro(call)) {
+                type = "macro";
+            } else if (CallDefinitionSpecification.is(call)) {
+                type = "specification";
+            } else if (Callback.is(call)) {
+                type = "callback";
+            } else if (Delegation.is(call)) {
+                type = "delegation";
+            } else if (org.elixir_lang.structure_view.element.Exception.is(call)) {
+                type = "exception";
+            } else if (Implementation.is(call)) {
+                type = "implementation";
+            } else if (Module.is(call)) {
+                type = "module";
+            } else if (Overridable.is(call)) {
+                type = "overridable";
+            } else if (Protocol.is((call))) {
+                type = "protocol";
+            } else if (Quote.is(call)) {
+                type = "quote";
+            } else if (Structure.is(call)) {
+                type = "struct";
+            } else if (Type.is(call)) {
+                type = "type";
+            } else if (Use.is(call)) {
+                type = "use";
+            } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                type = "module attribute";
+            }
+        } else if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
 
             if (maybeModuleName.isModuleName()) {

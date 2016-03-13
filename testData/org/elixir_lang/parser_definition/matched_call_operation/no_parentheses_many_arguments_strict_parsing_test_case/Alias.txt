@@ -1,6 +1,6 @@
 Elixir File(0,34)
   ElixirAccessExpressionImpl(ACCESS_EXPRESSION)(0,5)
-    ALIAS(0,5)
+    ElixirAliasImpl(ALIAS)(0,5)
       PsiElement(Alias)('Alias')(0,5)
   PsiWhiteSpace(' ')(5,6)
   PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <+, ->, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^>, <=>, <end of expression>, <in>, <when>, <|>, <||, |||, or> or '[' expected, got 'positional'(6,16)

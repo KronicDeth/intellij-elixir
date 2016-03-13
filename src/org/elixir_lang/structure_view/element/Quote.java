@@ -2,6 +2,7 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
@@ -37,9 +38,8 @@ public class Quote extends Element<Call> {
     /**
      * Quote in top-level, outside of any Module
      */
-    public Quote(Call call) {
-        super(call);
-        this.parent = null;
+    public Quote(@NotNull Call call) {
+        this((Modular) null, call);
     }
 
     /**
@@ -47,7 +47,7 @@ public class Quote extends Element<Call> {
      *
      * @param modular Direct parent module or quote of {@code call}
      */
-    public Quote(@NotNull Modular modular, Call call) {
+    public Quote(@Nullable Modular modular, @NotNull Call call) {
         super(call);
         this.parent = modular;
     }
@@ -96,15 +96,7 @@ public class Quote extends Element<Call> {
     @NotNull
     @Override
     public TreeElement[] getChildren() {
-        Modular modular = null;
-
-        if (parent instanceof CallDefinitionClause) {
-            CallDefinitionClause callDefinitionClause = (CallDefinitionClause) parent;
-            modular = new org.elixir_lang.structure_view.element.modular.Quote(callDefinitionClause);
-        } else if (parent instanceof Modular) {
-            modular = (Modular) parent;
-        }
-
+        Modular modular = modular();
         TreeElement[] children;
 
         if (modular != null) {
@@ -114,6 +106,20 @@ public class Quote extends Element<Call> {
         }
 
         return children;
+    }
+
+    @Nullable
+    public Modular modular() {
+        Modular modular = null;
+
+        if (parent instanceof CallDefinitionClause) {
+            CallDefinitionClause callDefinitionClause = (CallDefinitionClause) parent;
+            modular = new org.elixir_lang.structure_view.element.modular.Quote(callDefinitionClause);
+        } else if (parent instanceof Modular) {
+            modular = (Modular) parent;
+        }
+
+        return modular;
     }
 
     /**

@@ -3,11 +3,13 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, QualifiedNoArgumentsCall {
+public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, QualifiedNoArgumentsCall<MatchedQualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedQualifiedNoArgumentsCall> {
 
   @NotNull
   ElixirDotInfixOperator getDotInfixOperator();
@@ -25,6 +27,13 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
 
   @Nullable
   ElixirDoBlock getDoBlock();
+
+  boolean hasDoBlockOrKeyword();
+
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -67,5 +76,8 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

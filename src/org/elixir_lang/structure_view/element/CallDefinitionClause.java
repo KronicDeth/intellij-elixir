@@ -8,13 +8,18 @@ import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Implementation;
+import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.modular.Module;
+import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
 
 public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
     /*
@@ -33,28 +38,118 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      * Public Static Methods
      */
 
-    public static boolean isFunction(Call call) {
+    /**
+     * The module or {@code quote} that encapsulates {@code call}
+     *
+     * @param call a def(macro)?p?
+     * @return {@code null} if gets to the enclosing file without finding a quote or module
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Modular enclosingModular(@NotNull Call call) {
+        Modular modular = null;
+
+        Call enclosingMacroCall = enclosingMacroCall(call);
+
+        if (enclosingMacroCall != null) {
+            modular = modular(enclosingMacroCall);
+        }
+
+        return modular;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Modular modular(@NotNull Call enclosingMacroCall) {
+        Modular modular = null;
+
+        // All classes under {@link org.elixir_lang.structure_view.element.Modular}
+        if (Implementation.is(enclosingMacroCall)) {
+            Modular grandScope = enclosingModular(enclosingMacroCall);
+            modular = new Implementation(grandScope, enclosingMacroCall);
+        } else if (Module.is(enclosingMacroCall)) {
+            Modular grandScope = enclosingModular(enclosingMacroCall);
+            modular = new Module(grandScope, enclosingMacroCall);
+        } else if (Protocol.is(enclosingMacroCall)) {
+            Modular grandScope = enclosingModular(enclosingMacroCall);
+            modular = new Protocol(grandScope, enclosingMacroCall);
+        } else if (Quote.is(enclosingMacroCall)) {
+            Call quoteEnclosingMacroCall = enclosingMacroCall(enclosingMacroCall);
+            Quote quote;
+
+            if (quoteEnclosingMacroCall == null) {
+                quote = new Quote(enclosingMacroCall);
+            } else if (CallDefinitionClause.is(quoteEnclosingMacroCall)) {
+                quote = new Quote(
+                        new CallDefinitionClause(quoteEnclosingMacroCall),
+                        enclosingMacroCall
+                );
+            } else {
+                quote = new Quote(modular(quoteEnclosingMacroCall), enclosingMacroCall);
+            }
+
+            modular = quote.modular();
+        }
+
+        return modular;
+    }
+
+    /**
+     * The head of the call definition.
+     *
+     * @param call a call that {@link #is(Call)}.
+     * @return element for {@code name(arg, ...) when ...} in {@code def* name(arg, ...) when ...}
+     */
+    @Nullable
+    public static PsiElement head(@NotNull Call call) {
+        PsiElement[] primaryArguments = call.primaryArguments();
+        PsiElement head = null;
+
+        if (primaryArguments != null && primaryArguments.length > 0) {
+            head = primaryArguments[0];
+        }
+
+        return head;
+    }
+
+    public static boolean is(@NotNull Call call) {
+        return isFunction(call) || isMacro(call);
+    }
+
+    public static boolean isFunction(@NotNull Call call) {
         return isPrivateFunction(call) || isPublicFunction(call);
     }
 
-    public static boolean isMacro(Call call) {
+    public static boolean isMacro(@NotNull Call call) {
         return isPrivateMacro(call) || isPublicMacro(call);
     }
 
-    public static boolean isPrivateFunction(Call call) {
+    public static boolean isPrivateFunction(@NotNull Call call) {
         return isCallingKernelMacroOrHead(call, "defp");
     }
 
-    public static boolean isPrivateMacro(Call call) {
+    public static boolean isPrivateMacro(@NotNull Call call) {
         return isCallingKernelMacroOrHead(call, "defmacrop");
     }
 
-    public static boolean isPublicFunction(Call call) {
+    public static boolean isPublicFunction(@NotNull Call call) {
         return isCallingKernelMacroOrHead(call, "def");
     }
 
-    public static boolean isPublicMacro(Call call) {
+    public static boolean isPublicMacro(@NotNull Call call) {
         return isCallingKernelMacroOrHead(call, "defmacro");
+    }
+
+    @Nullable
+    public static PsiElement nameIdentifier(@NotNull Call call) {
+        PsiElement head = head(call);
+        PsiElement nameIdentifier = null;
+
+        if (head != null) {
+            nameIdentifier = CallDefinitionHead.nameIdentifier(head);
+        }
+
+        return nameIdentifier;
     }
 
     /**
@@ -62,16 +157,15 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      *
      * @param call
      * @return The name and arities of the {@link CallDefinition} this clause belongs.  Multiple arities occur when
-     *   default arguments are used, which produces an arity for each default argument that is turned on and off.
+     * default arguments are used, which produces an arity for each default argument that is turned on and off.
      * @see Call#resolvedFinalArityRange()
      */
     @Nullable
     public static Pair<String, IntRange> nameArityRange(Call call) {
-        PsiElement[] primaryArguments = call.primaryArguments();
+        PsiElement head = head(call);
         Pair<String, IntRange> pair = null;
 
-        if (primaryArguments != null && primaryArguments.length > 0) {
-            PsiElement head = primaryArguments[0];
+        if (head != null) {
             pair = CallDefinitionHead.nameArityRange(head);
         }
 
@@ -79,10 +173,30 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     }
 
     /**
+     * Whether the {@code call} is defining something for runtime, like a function, or something for compile time, like
+     * a macro.
      *
+     * @param call def(macro)?p?
+     * @return {@link Timed.Time#COMPILE} for defmacrop?; {@link Timed.Time#RUN} for defp?
+     */
+    @NotNull
+    public static Timed.Time time(Call call) {
+        Timed.Time time = null;
+
+        if (isFunction(call)) {
+            time = Timed.Time.RUN;
+        } else if (isMacro(call)) {
+            time = Timed.Time.COMPILE;
+        }
+
+        //noinspection ConstantConditions
+        return time;
+    }
+
+    /**
      * @param call
      * @return {@code Visible.Visibility.PUBLIC} for {@code def} or {@code defmacro}; {@code Visible.Visibility.PRIVATE}
-     *   for {@code defp} and {@code defmacrop}; {@code null} only if {@code call} is unrecognized
+     * for {@code defp} and {@code defmacrop}; {@code null} only if {@code call} is unrecognized
      */
     @Nullable
     public static Visible.Visibility visibility(Call call) {
@@ -110,6 +224,21 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      * Constructors
      */
 
+    /**
+     * Constructs {@link #callDefinition} from {@code code}, such as when showing structure in Go To Symbol
+     *
+     * @param call a def(macro)?p? call
+     */
+    public CallDefinitionClause(Call call) {
+        this(new CallDefinition(call), call);
+    }
+
+    /**
+     * Constructs a clause for {@code callDefinition}.
+     *
+     * @param callDefinition holds all sibling clauses for {@code call} for the same name, arity. and time
+     * @param call           a def(macro)?p? call
+     */
     public CallDefinitionClause(CallDefinition callDefinition, Call call) {
         super(call);
         this.callDefinition = callDefinition;
@@ -142,12 +271,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @NotNull
     @Override
     public ItemPresentation getPresentation() {
-        PsiElement[] primaryArguments = navigationItem.primaryArguments();
-
-        assert primaryArguments != null;
-        assert primaryArguments.length > 0;
-
-        PsiElement head = primaryArguments[0];
+        PsiElement head = head(navigationItem);
 
         return new org.elixir_lang.navigation.item_presentation.CallDefinitionHead(
                 (NameArity) callDefinition.getPresentation(),
@@ -211,10 +335,11 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      *
      * @param arguments argument being passed to this clauses' function.
      * @return {@code true} if arguments matches up-to the available information about the arguments; otherwise,
-     *   {@code false}
+     * {@code false}
      */
     public boolean isMatch(PsiElement[] arguments) {
         return false;
     }
+
 }
 
