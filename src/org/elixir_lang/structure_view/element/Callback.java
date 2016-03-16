@@ -22,8 +22,28 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
     private final Modular modular;
 
     /*
+     *
      * Static Methods
+     *
      */
+
+    /*
+     * Public Static Methods
+     */
+
+    @Contract(pure = true)
+    @Nullable
+    public static Call headCall(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        ElixirNoParenthesesOneArgument noParenthesesOneArgument = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
+        Call headCall = null;
+
+        if (grandChildren.length == 1) {
+            headCall = specificationHeadCall(grandChildren[0]);
+        }
+
+        return headCall;
+    }
 
     @Contract(pure = true)
     public static boolean is(@NotNull final Call call) {
@@ -39,6 +59,72 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         }
 
         return is;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement nameIdentifier(@NotNull Call call) {
+        PsiElement nameIdentifier = null;
+
+        if (call instanceof AtUnqualifiedNoParenthesesCall) {
+            nameIdentifier = nameIdentifier((AtUnqualifiedNoParenthesesCall) call);
+        }
+
+        return nameIdentifier;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement nameIdentifier(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        Call headCall = headCall(atUnqualifiedNoParenthesesCall);
+        PsiElement nameIdentifier = null;
+
+        if (headCall != null) {
+            nameIdentifier = CallDefinitionHead.nameIdentifier(headCall);
+        }
+
+        return nameIdentifier;
+    }
+
+    /*
+     * Private Static Methods
+     */
+
+    @Nullable
+    private static Call parameterizedTypeHeadCall(ElixirMatchedWhenOperation whenOperation) {
+        PsiElement leftOperand = whenOperation.leftOperand();
+        Call headCall = null;
+
+        if (leftOperand instanceof ElixirMatchedTypeOperation) {
+            headCall = typeHeadCall((ElixirMatchedTypeOperation) leftOperand);
+        }
+
+        return headCall;
+    }
+
+    @Nullable
+    private static Call specificationHeadCall(PsiElement specification) {
+        Call headCall = null;
+
+        if (specification instanceof ElixirMatchedTypeOperation) {
+            headCall = typeHeadCall((ElixirMatchedTypeOperation) specification);
+        } else if (specification instanceof ElixirMatchedWhenOperation) {
+            headCall = parameterizedTypeHeadCall((ElixirMatchedWhenOperation) specification);
+        }
+
+        return headCall;
+    }
+
+    @Nullable
+    private static Call typeHeadCall(ElixirMatchedTypeOperation typeOperation) {
+        PsiElement leftOperand = typeOperation.leftOperand();
+        Call headCall = null;
+
+        if (leftOperand instanceof Call) {
+            headCall = (Call) leftOperand;
+        }
+
+        return headCall;
     }
 
     /*
@@ -107,7 +193,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
 
         String name = "?";
         int arity = -1;
-        Call headCall = headCall();
+        Call headCall = headCall(navigationItem);
 
         if (headCall != null) {
             name = headCall.functionName();
@@ -148,59 +234,5 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         assert time != null;
 
         return time;
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    @Nullable
-    private Call headCall() {
-        ElixirNoParenthesesOneArgument noParenthesesOneArgument = navigationItem.getNoParenthesesOneArgument();
-        PsiElement[] grandChildren = noParenthesesOneArgument.getChildren();
-        Call headCall = null;
-
-        if (grandChildren.length == 1) {
-            headCall = specificationHeadCall(grandChildren[0]);
-        }
-
-        return headCall;
-    }
-
-    @Nullable
-    private Call parameterizedTypeHeadCall(ElixirMatchedWhenOperation whenOperation) {
-        PsiElement leftOperand = whenOperation.leftOperand();
-        Call headCall = null;
-
-        if (leftOperand instanceof ElixirMatchedTypeOperation) {
-            headCall = typeHeadCall((ElixirMatchedTypeOperation) leftOperand);
-        }
-
-        return headCall;
-    }
-
-    @Nullable
-    private Call specificationHeadCall(PsiElement specification) {
-        Call headCall = null;
-
-        if (specification instanceof ElixirMatchedTypeOperation) {
-            headCall = typeHeadCall((ElixirMatchedTypeOperation) specification);
-        } else if (specification instanceof ElixirMatchedWhenOperation) {
-            headCall = parameterizedTypeHeadCall((ElixirMatchedWhenOperation) specification);
-        }
-
-        return headCall;
-    }
-
-    @Nullable
-    private Call typeHeadCall(ElixirMatchedTypeOperation typeOperation) {
-        PsiElement leftOperand = typeOperation.leftOperand();
-        Call headCall = null;
-
-        if (leftOperand instanceof Call) {
-            headCall = (Call) leftOperand;
-        }
-
-        return headCall;
     }
 }

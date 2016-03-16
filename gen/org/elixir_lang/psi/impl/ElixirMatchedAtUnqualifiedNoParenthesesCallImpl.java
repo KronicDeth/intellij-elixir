@@ -63,7 +63,6 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
     return ElixirPsiImplUtil.getName(this);
   }
 
-  @NotNull
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }

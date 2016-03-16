@@ -9,12 +9,12 @@ import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.navigation.item_presentation.CallDefinitionByTuple;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.structure_view.element.CallDefinition;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.Callback;
 import org.elixir_lang.structure_view.element.Timed;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
@@ -102,6 +102,13 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                             items.add(callDefinitionClause);
                         }
                     }
+                } else if (Callback.is(call)) {
+                    Modular modular = enclosingModularByCall.putNew(call);
+
+                    assert modular != null;
+
+                    Callback callback = new Callback(modular, call);
+                    items.add(callback);
                 }
             }
         }

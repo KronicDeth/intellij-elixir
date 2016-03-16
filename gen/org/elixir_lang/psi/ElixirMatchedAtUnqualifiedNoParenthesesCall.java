@@ -31,7 +31,6 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @Nullable
   String getName();
 
-  @NotNull
   PsiElement getNameIdentifier();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);

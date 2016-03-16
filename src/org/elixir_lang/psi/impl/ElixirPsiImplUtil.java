@@ -31,6 +31,7 @@ import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.Callback;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2015,12 +2016,6 @@ public class ElixirPsiImplUtil {
         return name;
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static PsiElement getNameIdentifier(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
-      return atUnqualifiedNoParenthesesCall.getAtIdentifier();
-    }
-
     @Nullable
     public static PsiElement getNameIdentifier(@NotNull ElixirAlias alias) {
         PsiElement parent = alias.getParent();
@@ -2051,7 +2046,7 @@ public class ElixirPsiImplUtil {
     public static PsiElement getNameIdentifier(
             @NotNull org.elixir_lang.psi.call.Named named
     ) {
-        PsiElement nameIdentifier = null;
+        PsiElement nameIdentifier;
 
         /* can't be a {@code public static PsiElement getNameIdentifier(@NotNull Operation operation)} because it leads
            to "reference to getNameIdentifier is ambiguous" */
@@ -2060,6 +2055,11 @@ public class ElixirPsiImplUtil {
             nameIdentifier = operation.operator();
         } else if (CallDefinitionClause.is(named)) {
             nameIdentifier = CallDefinitionClause.nameIdentifier(named);
+        } else if (Callback.is(named)) {
+            nameIdentifier = Callback.nameIdentifier(named);
+        } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute
+            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) named;
+            nameIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
         } else {
             nameIdentifier = named.functionNameElement();
         }
