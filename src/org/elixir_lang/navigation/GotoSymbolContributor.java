@@ -9,13 +9,11 @@ import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.structure_view.element.CallDefinition;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.Callback;
-import org.elixir_lang.structure_view.element.Timed;
+import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
@@ -102,6 +100,23 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                             items.add(callDefinitionClause);
                         }
                     }
+                } else if (CallDefinitionSpecification.is(call)) {
+                    Modular modular = enclosingModularByCall.putNew(call);
+
+                    assert modular != null;
+
+                    // pseudo-named-arguments
+                    boolean callback = false;
+                    Timed.Time time = Timed.Time.RUN;
+
+                    //noinspection ConstantConditions
+                    CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
+                            modular,
+                            (AtUnqualifiedNoParenthesesCall) call,
+                            callback,
+                            time
+                    );
+                    items.add(callDefinitionSpecification);
                 } else if (Callback.is(call)) {
                     Modular modular = enclosingModularByCall.putNew(call);
 

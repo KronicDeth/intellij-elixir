@@ -7,7 +7,6 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -31,6 +30,7 @@ import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -2055,6 +2055,8 @@ public class ElixirPsiImplUtil {
             nameIdentifier = operation.operator();
         } else if (CallDefinitionClause.is(named)) {
             nameIdentifier = CallDefinitionClause.nameIdentifier(named);
+        } else if (CallDefinitionSpecification.is(named)) {
+            nameIdentifier = CallDefinitionSpecification.nameIdentifier(named);
         } else if (Callback.is(named)) {
             nameIdentifier = Callback.nameIdentifier(named);
         } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute

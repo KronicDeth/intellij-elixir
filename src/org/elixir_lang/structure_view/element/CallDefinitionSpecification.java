@@ -64,6 +64,40 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     }
 
     @Nullable
+    public static Pair<String, Integer> moduleAttributeNameArity(Call call) {
+        Pair<String, Integer> nameArity = null;
+
+        if (call instanceof AtUnqualifiedNoParenthesesCall) {
+            nameArity = moduleAttributeNameArity((AtUnqualifiedNoParenthesesCall) call);
+        }
+
+        return nameArity;
+    }
+
+    @Nullable
+    public static PsiElement nameIdentifier(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        Call specification = specification(atUnqualifiedNoParenthesesCall);
+        PsiElement nameIdentifier = null;
+
+        if (specification != null) {
+            nameIdentifier = specificationNameIdentifier(specification);
+        }
+
+        return nameIdentifier;
+    }
+
+    @Nullable
+    public static PsiElement nameIdentifier(Call call) {
+        PsiElement nameIdentifier = null;
+
+        if (call instanceof AtUnqualifiedNoParenthesesCall) {
+            nameIdentifier = nameIdentifier((AtUnqualifiedNoParenthesesCall) call);
+        }
+
+        return nameIdentifier;
+    }
+
+    @Nullable
     public static Call specification(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
         PsiElement[] arguments = atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().arguments();
         Call specification = null;
@@ -80,17 +114,6 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     }
 
     @Nullable
-    public static Pair<String, Integer> moduleAttributeNameArity(Call call) {
-        Pair<String, Integer> nameArity = null;
-
-        if (call instanceof AtUnqualifiedNoParenthesesCall) {
-            nameArity = moduleAttributeNameArity((AtUnqualifiedNoParenthesesCall) call);
-        }
-
-        return nameArity;
-    }
-
-    @Nullable
     public static Pair<String, Integer> specificationNameArity(Call specification) {
         Pair<String, Integer> nameArity = null;
 
@@ -103,6 +126,18 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         return nameArity;
     }
 
+    @Nullable
+    public static PsiElement specificationNameIdentifier(Call specification) {
+        PsiElement nameIdentifier = null;
+
+        if (specification instanceof ElixirMatchedTypeOperation) {
+            nameIdentifier = typeNameIdentifier((ElixirMatchedTypeOperation) specification);
+        } else if (specification instanceof ElixirMatchedWhenOperation) {
+            nameIdentifier = typeNameIdentifier((ElixirMatchedWhenOperation) specification);
+        }
+
+        return nameIdentifier;
+    }
 
     @NotNull
     public static Pair<String, Integer> typeNameArity(Call call) {
@@ -134,6 +169,36 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         }
 
         return nameArity;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement typeNameIdentifier(Call call) {
+        return call.functionNameElement();
+    }
+
+    @Nullable
+    public static PsiElement typeNameIdentifier(ElixirMatchedTypeOperation matchedTypeOperation) {
+        PsiElement leftOperand = matchedTypeOperation.leftOperand();
+        PsiElement nameIdentifier = null;
+
+        if (leftOperand instanceof Call) {
+            nameIdentifier = typeNameIdentifier((Call) leftOperand);
+        }
+
+        return nameIdentifier;
+    }
+
+    @Nullable
+    public static PsiElement typeNameIdentifier(ElixirMatchedWhenOperation matchedWhenOperation) {
+        PsiElement leftOperand = matchedWhenOperation.leftOperand();
+        PsiElement nameIdentifier = null;
+
+        if (leftOperand instanceof ElixirMatchedTypeOperation) {
+            nameIdentifier = typeNameIdentifier((ElixirMatchedTypeOperation) leftOperand);
+        }
+
+        return nameIdentifier;
     }
 
     /*

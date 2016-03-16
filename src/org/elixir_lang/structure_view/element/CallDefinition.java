@@ -398,6 +398,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible,
         boolean callback = false;
         Timed.Time time = Time.RUN;
 
+        //noinspection ConstantConditions
         CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
                 modular,
                 moduleAttributeDefinition,
