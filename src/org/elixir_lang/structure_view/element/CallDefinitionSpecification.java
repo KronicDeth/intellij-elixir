@@ -57,7 +57,11 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         Pair<String, Integer> nameArity = null;
 
         if (specification != null) {
-            nameArity = specificationNameArity(specification);
+            Call type = specificationType(specification);
+
+            if (type != null) {
+                nameArity = typeNameArity(type);
+            }
         }
 
         return nameArity;
@@ -80,7 +84,11 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         PsiElement nameIdentifier = null;
 
         if (specification != null) {
-            nameIdentifier = specificationNameIdentifier(specification);
+            Call type = specificationType(specification);
+
+            if (type != null) {
+                nameIdentifier = typeNameIdentifier(type);
+            }
         }
 
         return nameIdentifier;
@@ -114,91 +122,53 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     }
 
     @Nullable
-    public static Pair<String, Integer> specificationNameArity(Call specification) {
-        Pair<String, Integer> nameArity = null;
+    public static Call specificationType(Call specification) {
+        Call type = null;
 
         if (specification instanceof ElixirMatchedTypeOperation) {
-            nameArity = typeNameArity((ElixirMatchedTypeOperation) specification);
+            type = type((ElixirMatchedTypeOperation) specification);
         } else if (specification instanceof ElixirMatchedWhenOperation) {
-            nameArity = typeNameArity((ElixirMatchedWhenOperation) specification);
+            type = type((ElixirMatchedWhenOperation) specification);
         }
 
-        return nameArity;
+        return type;
     }
 
     @Nullable
-    public static PsiElement specificationNameIdentifier(Call specification) {
-        PsiElement nameIdentifier = null;
-
-        if (specification instanceof ElixirMatchedTypeOperation) {
-            nameIdentifier = typeNameIdentifier((ElixirMatchedTypeOperation) specification);
-        } else if (specification instanceof ElixirMatchedWhenOperation) {
-            nameIdentifier = typeNameIdentifier((ElixirMatchedWhenOperation) specification);
-        }
-
-        return nameIdentifier;
-    }
-
-    @NotNull
-    public static Pair<String, Integer> typeNameArity(Call call) {
-        String name = call.functionName();
-        int arity = call.resolvedFinalArity();
-
-        return pair(name, arity);
-    }
-
-    @Nullable
-    public static Pair<String, Integer> typeNameArity(ElixirMatchedTypeOperation matchedTypeOperation) {
+    public static Call type(ElixirMatchedTypeOperation matchedTypeOperation) {
         PsiElement leftOperand = matchedTypeOperation.leftOperand();
-        Pair<String, Integer> nameArity = null;
+        Call type = null;
 
         if (leftOperand instanceof Call) {
-            nameArity = typeNameArity((Call) leftOperand);
+            type = (Call) leftOperand;
         }
 
-        return nameArity;
+        return type;
     }
 
     @Nullable
-    public static Pair<String, Integer> typeNameArity(ElixirMatchedWhenOperation matchedWhenOperation) {
-        PsiElement leftOperand = matchedWhenOperation.leftOperand();
-        Pair<String, Integer> nameArity = null;
+    public static Call type(ElixirMatchedWhenOperation matchedWhenOperation) {
+        PsiElement lefOperand = matchedWhenOperation.leftOperand();
+        Call type = null;
 
-        if (leftOperand instanceof ElixirMatchedTypeOperation) {
-            nameArity = typeNameArity((ElixirMatchedTypeOperation) leftOperand);
+        if (lefOperand instanceof ElixirMatchedTypeOperation) {
+            type = type((ElixirMatchedTypeOperation) lefOperand);
         }
 
-        return nameArity;
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static PsiElement typeNameIdentifier(Call call) {
-        return call.functionNameElement();
+        return type;
     }
 
     @Nullable
-    public static PsiElement typeNameIdentifier(ElixirMatchedTypeOperation matchedTypeOperation) {
-        PsiElement leftOperand = matchedTypeOperation.leftOperand();
-        PsiElement nameIdentifier = null;
+    public static Pair<String, Integer> typeNameArity(@NotNull Call type) {
+        String name = type.functionName();
+        int arity = type.resolvedFinalArity();
 
-        if (leftOperand instanceof Call) {
-            nameIdentifier = typeNameIdentifier((Call) leftOperand);
-        }
-
-        return nameIdentifier;
+       return pair(name, arity);
     }
 
     @Nullable
-    public static PsiElement typeNameIdentifier(ElixirMatchedWhenOperation matchedWhenOperation) {
-        PsiElement leftOperand = matchedWhenOperation.leftOperand();
-        PsiElement nameIdentifier = null;
-
-        if (leftOperand instanceof ElixirMatchedTypeOperation) {
-            nameIdentifier = typeNameIdentifier((ElixirMatchedTypeOperation) leftOperand);
-        }
-
-        return nameIdentifier;
+    public static PsiElement typeNameIdentifier(@NotNull Call type) {
+        return type.functionNameElement();
     }
 
     /*
