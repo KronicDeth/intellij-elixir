@@ -3,15 +3,13 @@ package org.elixir_lang.psi.stub.type.call;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubOutputStream;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
-import org.elixir_lang.structure_view.element.Callback;
+import org.elixir_lang.structure_view.element.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
-                            Psi extends org.elixir_lang.psi.call.StubBased> extends org.elixir_lang.psi.stub.type.Named<Stub, Psi> {
+        Psi extends org.elixir_lang.psi.call.StubBased> extends org.elixir_lang.psi.stub.type.Named<Stub, Psi> {
     /*
      * Constructors
      */
@@ -38,12 +36,31 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     public boolean shouldCreateStub(ASTNode node) {
         Call call = (Call) node.getPsi();
 
-        // TODO do reset of isSuitable
-        return (CallDefinitionClause.is(call) ||
+        return isNameable(call) && hasName(call);
+    }
+
+    /*
+     * Private Instance Methods
+     */
+
+    private boolean hasName(Call call) {
+        return call.getName() != null;
+    }
+
+    private boolean isDelegationCallDefinitionHead(Call call) {
+        return CallDefinitionHead.is(call) && CallDefinitionHead.enclosingDelegationCall(call) != null;
+    }
+
+    private boolean isEnclosableByModular(Call call) {
+        return CallDefinitionClause.is(call) ||
+                /* skip CallDefinitionHead because there can be false positives the the ancestor calls need to be
+                   checked */
                 CallDefinitionSpecification.is(call) ||
                 // skip CallDefinitionHead because it is covered by CallDefinitionClause
-                Callback.is(call)) &&
-                // if it doesn't have a name then it can't be searched for, so there's no reason to stub it.
-                call.getName() != null;
+                Callback.is(call);
+    }
+
+    private boolean isNameable(Call call) {
+        return isEnclosableByModular(call) || isDelegationCallDefinitionHead(call);
     }
 }

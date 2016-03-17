@@ -27,6 +27,46 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
      * Static Methods
      */
 
+    @Nullable
+    public static Call argumentEnclosingDelegationCall(@NotNull PsiElement arguments) {
+        Call delegationCall = null;
+
+        if (arguments instanceof ElixirNoParenthesesOneArgument) {
+            PsiElement argumentsParent = arguments.getParent();
+
+            if (argumentsParent instanceof Call) {
+                Call argumentsParentCall = (Call) argumentsParent;
+
+                if (Delegation.is(argumentsParentCall)) {
+                    delegationCall = argumentsParentCall;
+                }
+            }
+        }
+
+        return delegationCall;
+    }
+
+    @Nullable
+    public static Call enclosingDelegationCall(@NotNull Call call) {
+        // reverse of {@link org.elixir_lang.structure_view.element.Delegation.callDefinitionHeadCallList()}
+        PsiElement parent = call.getParent();
+        Call delegationCall = null;
+
+        if (parent instanceof ElixirList) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof ElixirAccessExpression) {
+                PsiElement greatGrandParent = parent.getParent();
+
+                delegationCall = argumentEnclosingDelegationCall(greatGrandParent);
+            }
+        } else {
+            delegationCall = argumentEnclosingDelegationCall(parent);
+        }
+
+        return delegationCall;
+    }
+
     public static boolean is(Call call) {
         return call instanceof UnqualifiedParenthesesCall;
     }
@@ -37,7 +77,7 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
 
         if (head instanceof ElixirMatchedAtNonNumericOperation) {
             AtNonNumericOperation atNonNumericOperation = (AtNonNumericOperation) head;
-            nameIdentifier =  atNonNumericOperation.operator();
+            nameIdentifier = atNonNumericOperation.operator();
         } else {
             PsiElement stripped = strip(head);
 
@@ -93,6 +133,7 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
 
     /**
      * The head without the guard clause
+     *
      * @param head {@code name(arg, ...) when ...}
      * @return {@code name(arg, ...)}.  {@code head} if no guard clause.
      */

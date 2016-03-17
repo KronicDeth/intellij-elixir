@@ -91,7 +91,7 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                             CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
 
                             if (callDefinition == null) {
-                                callDefinition = new CallDefinition(modular, time, name, arity);
+                                callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
                                 items.add(callDefinition);
                                 callDefinitionByTuple.put(tuple, callDefinition);
                             }
@@ -100,6 +100,42 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                             items.add(callDefinitionClause);
                         }
                     }
+                } else if (CallDefinitionHead.is(call)) {
+                    Call delegationCall = CallDefinitionHead.enclosingDelegationCall(call);
+
+                    assert delegationCall != null;
+
+                    Modular modular = enclosingModularByCall.putNew(delegationCall);
+
+                    assert modular != null;
+
+                    String callDefinitionName = call.functionName();
+
+                    assert callDefinitionName != null;
+
+                    int callDefinitionArity = call.resolvedFinalArity();
+
+                    CallDefinition.Tuple tuple = new CallDefinition.Tuple(
+                            modular,
+                            // Delegation can't delegate macros
+                            Timed.Time.RUN,
+                            callDefinitionName,
+                            callDefinitionArity
+                    );
+                    CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
+
+                    if (callDefinition == null) {
+                        callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
+                        items.add(callDefinition);
+                        callDefinitionByTuple.put(tuple, callDefinition);
+                    }
+
+                    // Delegation is always public as import should be used for private
+                    Visible.Visibility visibility = Visible.Visibility.PUBLIC;
+
+                    //noinspection ConstantConditions
+                    CallDefinitionHead callDefinitionHead = new CallDefinitionHead(callDefinition, visibility, call);
+                    items.add(callDefinitionHead);
                 } else if (CallDefinitionSpecification.is(call)) {
                     Modular modular = enclosingModularByCall.putNew(call);
 
