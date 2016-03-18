@@ -35,6 +35,7 @@ import org.elixir_lang.structure_view.element.Callback;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.modular.Module;
+import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2082,6 +2083,8 @@ public class ElixirPsiImplUtil {
             nameIdentifier = null;
         } else if (Module.is(named)) {
             nameIdentifier = Module.nameIdentifier(named);
+        } else if (Protocol.is(named)) {
+            nameIdentifier = Protocol.nameIdentifier(named);
         } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) named;
             nameIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
