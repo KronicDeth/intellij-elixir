@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v2.2.1](#v221)
   - [v2.2.0](#v220)
   - [v2.1.0](#v210)
   - [v2.0.0](#v200)
@@ -30,6 +31,10 @@
 
 # Changelog
 
+## v2.2.1
+* Bug Fixes
+  * [#256](https://github.com/KronicDeth/intellij-elixir/pull/256) - Fix Elixir Mix Run configuration not persisting past restart - [@zyuyou](https://github.com/zyuyou)
+  
 ## v2.2.0
 * Enhancement
   * [#240](https://github.com/KronicDeth/intellij-elixir/pull/240) - Code Commenter - [qertoip](https://github.com/qertoip)
