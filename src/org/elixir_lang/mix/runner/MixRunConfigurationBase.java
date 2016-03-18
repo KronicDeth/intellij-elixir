@@ -61,7 +61,7 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
   @Override
   public void writeExternal(@NotNull Element element) throws WriteExternalException{
     super.writeExternal(element);
-    XmlSerializer.deserializeInto(this, element);
+    XmlSerializer.serializeInto(this, element);
   }
 
   @Override
