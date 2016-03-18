@@ -6,7 +6,9 @@ import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +16,105 @@ import org.jetbrains.annotations.Nullable;
 
 public class Implementation extends Module {
     /*
+     *
      * Static Methods
+     *
      */
+
+    /*
+     * Public Static Methods
+     */
+
+    @Nullable
+    public static String forName(@Nullable Modular enclosingModular, @NotNull Call call) {
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        String forName = null;
+
+        if (finalArguments != null) {
+            if (finalArguments.length > 1) {
+                PsiElement finalArgument = finalArguments[finalArguments.length - 1];
+
+                if (finalArgument instanceof QuotableKeywordList) {
+                    QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
+                    PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, "for");
+
+                    forName = keywordValue.getText();
+                }
+            } else if (enclosingModular != null) {
+                org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) enclosingModular.getPresentation();
+                forName = parentPresentation.getLocatedPresentableText();
+            }
+        }
+
+        return forName;
+    }
 
     public static boolean is(Call call) {
         return call.isCallingMacro("Elixir.Kernel", "defimpl", 2) || call.isCallingMacro("Elixir.Kernel", "defimpl", 3);
+    }
+
+    public static String name(@NotNull Call call) {
+        // TODO Use CachedValueManager
+        return name(CallDefinitionClause.enclosingModular(call), call);
+    }
+
+
+    @Nullable
+    public static String name(@Nullable Modular enclosingModular, @NotNull Call call) {
+        String protocolName = protocolName(call);
+        String forName = forName(enclosingModular, call);
+        String name = null;
+
+        if (protocolName != null && forName != null) {
+          name = protocolName + "." + forName;
+        }
+
+        return name;
+    }
+
+    @Nullable
+    public static String protocolName(Call call) {
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        String protocolName = null;
+
+        if (finalArguments != null && finalArguments.length > 0) {
+            PsiElement firstFinalArgument = finalArguments[0];
+
+            if (firstFinalArgument instanceof ElixirAccessExpression) {
+                ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
+                PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+
+                if (accessExpressionChildren.length == 1) {
+                    PsiElement accessExpressionChild = accessExpressionChildren[0];
+
+                    if (accessExpressionChild instanceof QualifiableAlias) {
+                        protocolName = protocolName((QualifiableAlias) accessExpressionChild);
+                    }
+                }
+            } else if (firstFinalArgument instanceof QualifiableAlias) {
+                protocolName = protocolName((QualifiableAlias) firstFinalArgument);
+            }
+        }
+
+        return protocolName;
+    }
+
+
+    /*
+     * Private Static Methods
+     */
+
+    @Nullable
+    private static String protocolName(QualifiableAlias qualifiableAlias) {
+        String fullyQualifiedName = qualifiableAlias.fullyQualifiedName();
+        String protocolName = null;
+
+        if (fullyQualifiedName != null) {
+            // strip the `Elixir.` because no other presentation shows it
+            protocolName = fullyQualifiedName.replace("Elixir.", "");
+        }
+
+        return protocolName;
     }
 
     /*
@@ -85,49 +181,16 @@ public class Implementation extends Module {
         );
     }
 
+
     /**
-     *
+     * Unlike {@link #protocolName(Call)}, will return "?" when the protocol name can't be derived from the call.
      */
     @NotNull
     public String protocolName() {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
-
-        assert finalArguments != null;
-        assert finalArguments.length > 0;
-
-        PsiElement firstFinalArgument = finalArguments[0];
-        String protocolName = null;
-
-        if (firstFinalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
-
-            if (accessExpressionChildren.length == 1) {
-                PsiElement accessExpressionChild = accessExpressionChildren[0];
-
-                if (accessExpressionChild instanceof QualifiableAlias) {
-                    protocolName = protocolName((QualifiableAlias) accessExpressionChild);
-                }
-            }
-        } else if (firstFinalArgument instanceof QualifiableAlias) {
-            protocolName = protocolName((QualifiableAlias) firstFinalArgument);
-        }
+        String protocolName = protocolName(navigationItem);
 
         if (protocolName == null) {
             protocolName = "?";
-        }
-
-        return protocolName;
-    }
-
-    @Nullable
-    private String protocolName(QualifiableAlias qualifiableAlias) {
-        String fullyQualifiedName = qualifiableAlias.fullyQualifiedName();
-        String protocolName = null;
-
-        if (fullyQualifiedName != null) {
-            // strip the `Elixir.` because no other presentation shows it
-            protocolName = fullyQualifiedName.replace("Elixir.", "");
         }
 
         return protocolName;

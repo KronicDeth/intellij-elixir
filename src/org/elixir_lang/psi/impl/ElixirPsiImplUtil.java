@@ -32,6 +32,7 @@ import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2011,6 +2012,20 @@ public class ElixirPsiImplUtil {
 
         if (nameIdentifier != null) {
             name = nameIdentifier.getText();
+        } else {
+            if (namedElement instanceof Call) {
+                Call call = (Call) namedElement;
+
+                /* The name of the module defined by {@code defimpl PROTOCOL[ for: MODULE]} is derived by combining the
+                   PROTOCOL and MODULE name into PROTOCOL.MODULE.  Neither piece is really the "name" or
+                   "nameIdentifier" element of the implementation because changing the PROTOCOL make the implementation
+                   just for that different Protocol and changing the MODULE makes the implementation for a different
+                   MODULE.  If `for:` isn't given, it's really the enclosing {@code defmodule MODULE} whose name should
+                   be changed. */
+                if (Implementation.is(call)) {
+                    name = Implementation.name(call);
+                }
+            }
         }
 
         return name;
@@ -2059,6 +2074,10 @@ public class ElixirPsiImplUtil {
             nameIdentifier = CallDefinitionSpecification.nameIdentifier(named);
         } else if (Callback.is(named)) {
             nameIdentifier = Callback.nameIdentifier(named);
+        } else if (Implementation.is(named)) {
+            /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the name
+               identifier */
+            nameIdentifier = null;
         } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) named;
             nameIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();

@@ -14,6 +14,7 @@ import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.structure_view.element.*;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
@@ -160,6 +161,11 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
 
                     Callback callback = new Callback(modular, call);
                     items.add(callback);
+                } else if (Implementation.is(call)) {
+                    Modular modular = enclosingModularByCall.putNew(call);
+
+                    Implementation implementation = new Implementation(modular, call);
+                    items.add(implementation);
                 }
             }
         }
