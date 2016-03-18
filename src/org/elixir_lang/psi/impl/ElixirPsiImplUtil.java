@@ -33,6 +33,8 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
 import org.elixir_lang.structure_view.element.modular.Implementation;
+import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2078,6 +2080,8 @@ public class ElixirPsiImplUtil {
             /* have to set to null so that {@code else} clause doesn't return the {@code defimpl} element as the name
                identifier */
             nameIdentifier = null;
+        } else if (Module.is(named)) {
+            nameIdentifier = Module.nameIdentifier(named);
         } else if (named instanceof AtUnqualifiedNoParenthesesCall) { // module attribute
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) named;
             nameIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();

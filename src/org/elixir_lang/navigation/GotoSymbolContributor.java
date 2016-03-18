@@ -16,6 +16,7 @@ import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Modular;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -166,6 +167,11 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
 
                     Implementation implementation = new Implementation(modular, call);
                     items.add(implementation);
+                } else if (Module.is(call)) {
+                    Modular modular = enclosingModularByCall.putNew(call);
+
+                    Module module = new Module(modular, call);
+                    items.add(module);
                 }
             }
         }

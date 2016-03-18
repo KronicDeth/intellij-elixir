@@ -5,6 +5,7 @@ import com.intellij.psi.stubs.StubOutputStream;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
+import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -62,7 +63,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     private boolean isModular(Call call) {
-        return Implementation.is(call);
+        return Implementation.is(call) || Module.is(call);
     }
 
     private boolean isNameable(Call call) {
