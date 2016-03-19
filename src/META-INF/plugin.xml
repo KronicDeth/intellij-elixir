@@ -41,6 +41,10 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Fix Elixir Mix Run configuration not persisting past restart</li>
+            <li>
+              Allow <code>Infix#operator</code> to work on operations with errors, which eliminates the
+              <code>AssertionError</code> reported when typing infix operation and they are incomplete.
+            </li>
           </ul>
         </li>
       </ul>
