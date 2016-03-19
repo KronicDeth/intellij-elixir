@@ -913,9 +913,24 @@ public class ElixirPsiImplUtil {
     public static Operator operator(Infix infix) {
         PsiElement[] children = infix.getChildren();
 
-        assert children.length == 3;
+        /* 1. When the error is in the rightOperand, then the operator is the last of 2 elements ({@code children[1]}).
+         * 2. When there is no error, then the operator is the middle ({@code children[1]}) element.
+         * 3. When the error is in the leftOperand, then the leftOperand can actually be multiple elements, so it is
+         *    not possible determine which index to use.
+         *
+         * With all that in mind, it is simplest just detect by {@code instanceof}.
+         */
 
-        return (Operator) children[1];
+        Operator operator = null;
+
+        for (PsiElement child : children) {
+          if (child instanceof Operator) {
+              operator = (Operator) child;
+          }
+        }
+
+        //noinspection ConstantConditions
+        return operator;
     }
 
     @Contract(pure = true)
