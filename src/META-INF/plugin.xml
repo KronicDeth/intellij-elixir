@@ -45,6 +45,11 @@
               Allow <code>Infix#operator</code> to work on operations with errors, which eliminates the
               <code>AssertionError</code> reported when typing infix operation and they are incomplete.
             </li>
+            <li>
+              Add Keywords to the Preferences &gt; Editor &gt; Colors & Fonts &gt; Elixir settings page, so it can be
+              customized for just Elixir instead of having to change Preferences &gt; Editor &gt; Colors & Fonts &gt;
+              General &gt; Keyword.
+            </li>
           </ul>
         </li>
       </ul>
