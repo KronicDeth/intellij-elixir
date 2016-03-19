@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +15,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 
 public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPolyVariantReference {
     /*
@@ -25,6 +28,12 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     }
 
     /*
+     *
+     * Instance Methods
+     *
+     */
+
+    /*
      * Public Instance Methods
      */
 
@@ -32,43 +41,71 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
+        final String name = myElement.getName();
 
-        results.addAll(multiResolveUpFromElement(myElement));
+        if (name != null) {
+            results.addAll(multiResolveUpFromElement(myElement, name));
 
-        if (results.isEmpty()) {
-            results.addAll(multiResolveProject(myElement.getProject(), myElement.getContainingFile()));
+            if (results.isEmpty()) {
+                results.addAll(
+                        multiResolveProject(
+                                myElement.getProject(),
+                                name
+                        )
+                );
+            }
         }
 
         return results.toArray(new ResolveResult[results.size()]);
     }
 
-    private Collection<ResolveResult> multiResolveProject(Project project, PsiFile exceptFile) {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
-        final String fullyQualifiedName = myElement.fullyQualifiedName();
+    /*
+     * Private Instance Methods
+     */
 
-        if (fullyQualifiedName != null) {
-            Collection<NamedElement> namedElementCollection = StubIndex.getElements(
-                    AllName.KEY,
-                    fullyQualifiedName,
-                    project,
-                    GlobalSearchScope.allScope(project),
-                    NamedElement.class
-            );
+    private void addMatchingAsResolveResult(@NotNull List<ResolveResult> resultList,
+                                            @NotNull Named named,
+                                            @NotNull String targetName) {
+        String name = named.getName();
 
-            for (NamedElement namedElement : namedElementCollection) {
-                results.add(new PsiElementResolveResult(namedElement));
+        if (name != null && name.equals(targetName)) {
+            PsiElement nameIdentifier = named.getNameIdentifier();
+            PsiElement resolved = named;
+
+            if (nameIdentifier != null) {
+                resolved = nameIdentifier;
             }
+
+            resultList.add(new PsiElementResolveResult(resolved));
+        }
+    }
+
+    private Collection<ResolveResult> multiResolveProject(@NotNull Project project,
+                                                          @NotNull String name) {
+        List<ResolveResult> results = new ArrayList<ResolveResult>();
+
+        Collection<NamedElement> namedElementCollection = StubIndex.getElements(
+                AllName.KEY,
+                name,
+                project,
+                GlobalSearchScope.allScope(project),
+                NamedElement.class
+        );
+
+        for (NamedElement namedElement : namedElementCollection) {
+            results.add(new PsiElementResolveResult(namedElement));
         }
 
         return results;
     }
 
-    private List<ResolveResult> multiResolveUpFromElement(@NotNull final PsiElement element) {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();;
+    private List<ResolveResult> multiResolveUpFromElement(@NotNull final PsiElement element,
+                                                          @NotNull final String name) {
+        List<ResolveResult> results = new ArrayList<ResolveResult>();
         PsiElement lastSibling = element;
 
         while (results.isEmpty() && lastSibling != null) {
-            results.addAll(multiResolveSibling(lastSibling));
+            results.addAll(multiResolveSibling(lastSibling, name));
 
             lastSibling = lastSibling.getParent();
         }
@@ -76,41 +113,15 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
         return results;
     }
 
-    private List<ResolveResult> multiResolveSibling(@NotNull final PsiElement lastSibling) {
+    private List<ResolveResult> multiResolveSibling(@NotNull final PsiElement lastSibling, @NotNull final String name) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
 
         for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
-            if (sibling instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
-                ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) sibling;
+            if (sibling instanceof Named) {
+                Named named = (Named) sibling;
 
-                if (unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
-                    ElixirNoParenthesesOneArgument noParenthesesOneArgument = unmatchedUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
-                    PsiElement[] children = noParenthesesOneArgument.getChildren();
-
-                    assert children.length == 1;
-
-                    PsiElement child = children[0];
-
-                    if (child instanceof ElixirAccessExpression) {
-                        ElixirAccessExpression accessExpression = (ElixirAccessExpression) child;
-                        ElixirAlias alias = accessExpression.getAlias();
-
-                        if (alias != null) {
-                            if (alias.fullyQualifiedName().equals(myElement.fullyQualifiedName())) {
-                                results.add(new PsiElementResolveResult(alias));
-                            }
-                        }
-                    }
-
-                    List<ElixirMatchedExpression> matchedExpressionList = noParenthesesOneArgument.getMatchedExpressionList();
-
-                    if (matchedExpressionList.size() > 0) {
-                        ElixirMatchedExpression matchedExpression = matchedExpressionList.get(0);
-
-                        if (matchedExpression.getText().equals(getValue())) {
-                            results.add(new PsiElementResolveResult(matchedExpression));
-                        }
-                    }
+                if (isModular(named)) {
+                    addMatchingAsResolveResult(results, named, name);
                 }
             }
         }

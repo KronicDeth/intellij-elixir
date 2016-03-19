@@ -3,7 +3,10 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.structureView.StructureViewTreeElement;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.util.Pair;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.math.IntRange;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.NameArity;
@@ -20,10 +23,66 @@ import java.util.List;
 /**
  * A definition for a call: either a function or a macro
  */
-public class CallDefinition implements StructureViewTreeElement, Timed, Visible {
+public class CallDefinition implements StructureViewTreeElement, Timed, Visible, NavigationItem {
     /*
-     * Enums
+     * Classes
      */
+
+    /**
+     * All arguments to the CallDefinition constructor
+     */
+    public static class Tuple {
+        /*
+         * Fields
+         */
+
+        public final int arity;
+        public final Modular modular;
+        public final String name;
+        public final Time time;
+
+        /*
+         * Constructor
+         */
+
+        public Tuple(@NotNull Modular modular, @NotNull Time time, @NotNull String name, int arity) {
+            this.arity = arity;
+            this.modular = modular;
+            this.name = name;
+            this.time = time;
+        }
+
+        /*
+         * Instance Methods
+         */
+
+        @Override
+        public boolean equals(Object other) {
+            boolean equals = false;
+
+            if (other != null && Tuple.class.isAssignableFrom(other.getClass())) {
+                final Tuple tuple = (Tuple) other;
+
+                equals = new EqualsBuilder()
+                        .append(arity, tuple.arity)
+                        .append(modular, tuple.modular)
+                        .append(name, tuple.name)
+                        .append(time, tuple.time).isEquals();
+            }
+
+            return equals;
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(17, 31)
+                    .append(arity)
+                    .append(modular)
+                    .append(name)
+                    .append(time)
+                    .toHashCode();
+        }
+    }
 
     /*
      * Fields
@@ -53,6 +112,23 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      * Constructors
      */
 
+    /**
+     * @param call a def(macro)?p? call
+     */
+    public CallDefinition(@NotNull Call call) {
+        Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
+
+        assert nameArityRange != null;
+
+        /* arity is assumed to be max arity in the rane because that's how {@code h} and ExDoc treat functions with
+           defaults. */
+        this.arity = nameArityRange.second.getMaximumInteger();
+        this.modular = CallDefinitionClause.enclosingModular(call);
+        this.name = nameArityRange.first;
+        this.time = CallDefinitionClause.time(call);
+    }
+
+
     public CallDefinition(@NotNull Modular modular, @NotNull Time time, @NotNull String name, int arity) {
         this.arity = arity;
         this.modular = modular;
@@ -73,7 +149,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      *
      * @param clause the new clause for the macro
      */
-    public void clause(Call clause) {
+    public CallDefinitionClause clause(Call clause) {
         Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(clause);
 
         assert nameArityRange != null;
@@ -83,6 +159,8 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         CallDefinitionClause callDefinitionClause = new CallDefinitionClause(this, clause);
         childList.add(callDefinitionClause);
         clauseList.add(callDefinitionClause);
+
+        return callDefinitionClause;
     }
 
     public List<CallDefinitionClause> clauseList() {
@@ -150,6 +228,12 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         return clauseList.size() > 0;
     }
 
+    @NotNull
+    @Override
+    public String getName() {
+        return name + "/" + arity;
+    }
+
     /**
      * Returns the presentation of the tree element.
      *
@@ -193,7 +277,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
         assert nameArityRange != null;
         assert nameArityRange.first.equals(name);
-        assert nameArityRange.second.getMinimumInteger() <= arity &&  arity <= nameArityRange.second.getMaximumInteger();
+        assert nameArityRange.second.getMinimumInteger() <= arity && arity <= nameArityRange.second.getMaximumInteger();
 
         CallDefinitionHead callDefinitionHead = new CallDefinitionHead(this, Visibility.PUBLIC, head);
         childList.add(callDefinitionHead);
@@ -230,20 +314,20 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      *
      * @param arguments the arguments the clauses' arguments must match
      * @return {@code null} if no clauses match; multiple clauses if the types of arguments cannot be inferred and
-     *   simpler, relaxed matching has to be used.
+     * simpler, relaxed matching has to be used.
      */
     @Nullable
     public List<CallDefinitionClause> matchingClauseList(PsiElement[] arguments) {
         List<CallDefinitionClause> clauseList = null;
 
         for (CallDefinitionClause clause : this.clauseList) {
-           if (clause.isMatch(arguments)) {
-               if (clauseList == null) {
-                   clauseList = new ArrayList<CallDefinitionClause>(1);
-               }
+            if (clause.isMatch(arguments)) {
+                if (clauseList == null) {
+                    clauseList = new ArrayList<CallDefinitionClause>(1);
+                }
 
-               clauseList.add(clause);
-           }
+                clauseList.add(clause);
+            }
         }
 
         return clauseList;
@@ -270,7 +354,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      * When the defined call is usable
      *
      * @return {@link Timed.Time#COMPILE} for compile time ({@code defmacro}, {@code defmacrop});
-     *   {@link Timed.Time#RUN} for run time {@code def}, {@code defp})
+     * {@link Timed.Time#RUN} for run time {@code def}, {@code defp})
      */
     @Override
     @NotNull
@@ -282,7 +366,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
      * Set that this function overrides an overridable function
      *
      * @param override {@code true} to mark as an override of another function; {@code false} to mark as an independent
-     *   function
+     *                 function
      */
     public void setOverride(boolean override) {
         this.override = override;
@@ -290,15 +374,15 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
 
     /**
      * Set that this function can be overridden by another function of the same name and arity.
+     *
      * @param overridable {@code true} to mark as overridable by another function of the same name and arity;
-     *   {@code false} to make as non-overridable.
+     *                    {@code false} to make as non-overridable.
      */
     public void setOverridable(boolean overridable) {
         this.overridable = overridable;
     }
 
     /**
-     *
      * @param moduleAttributeDefinition
      */
     public void specification(AtUnqualifiedNoParenthesesCall moduleAttributeDefinition) {
@@ -314,6 +398,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         boolean callback = false;
         Timed.Time time = Time.RUN;
 
+        //noinspection ConstantConditions
         CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
                 modular,
                 moduleAttributeDefinition,
@@ -323,6 +408,7 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible 
         childList.add(callDefinitionSpecification);
         specificationList.add(callDefinitionSpecification);
     }
+
     /**
      * The visibility of the element.
      *

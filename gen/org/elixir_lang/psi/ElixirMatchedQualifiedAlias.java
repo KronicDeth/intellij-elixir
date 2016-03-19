@@ -5,13 +5,11 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
-import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
-import org.elixir_lang.psi.stub.MatchedQualifiedAlias;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, NamedElement, QualifiedAlias, StubBasedPsiElement<MatchedQualifiedAlias> {
+public interface ElixirMatchedQualifiedAlias extends ElixirMatchedExpression, NamedElement, QualifiedAlias {
 
   @NotNull
   ElixirAlias getAlias();

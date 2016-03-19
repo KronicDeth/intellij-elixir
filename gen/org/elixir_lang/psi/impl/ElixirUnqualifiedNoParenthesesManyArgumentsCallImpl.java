@@ -2,23 +2,27 @@
 package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrapperPsiElement implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
+public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedStubbedPsiElementBase<UnqualifiedNoParenthesesManyArgumentsCall> implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
 
   public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(UnqualifiedNoParenthesesManyArgumentsCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -77,13 +81,17 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -116,11 +124,6 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
-  }
-
-  @NotNull
-  public OtpErlangObject[] quoteArguments() {
-    return ElixirPsiImplUtil.quoteArguments(this);
   }
 
   @NotNull
@@ -161,6 +164,11 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends ASTWrap
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

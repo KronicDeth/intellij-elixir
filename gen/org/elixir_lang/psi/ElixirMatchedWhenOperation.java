@@ -4,14 +4,14 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.Infix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Call, Infix {
+public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Named, Infix {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
@@ -27,6 +27,13 @@ public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Cal
 
   @Nullable
   ElixirDoBlock getDoBlock();
+
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
+
+  boolean hasDoBlockOrKeyword();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -78,5 +85,8 @@ public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Cal
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

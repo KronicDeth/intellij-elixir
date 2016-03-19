@@ -12,5 +12,5 @@ Elixir File(0,10)
           <empty list>
     ElixirDotInfixOperatorImpl(DOT_INFIX_OPERATOR)(4,5)
       PsiElement(.)('.')(4,5)
-    ALIAS(5,10)
+    ElixirAliasImpl(ALIAS)(5,10)
       PsiElement(Alias)('Alias')(5,10)

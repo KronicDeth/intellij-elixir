@@ -85,6 +85,19 @@ public class ElixirCaptureNumericOperationImpl extends ASTWrapperPsiElement impl
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
   }
@@ -165,6 +178,11 @@ public class ElixirCaptureNumericOperationImpl extends ASTWrapperPsiElement impl
   @Nullable
   public Integer resolvedSecondaryArity() {
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

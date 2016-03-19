@@ -3,21 +3,26 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.MatchedDotCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedDotCall {
+public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<MatchedDotCall> implements ElixirMatchedDotCall {
 
   public ElixirMatchedDotCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirMatchedDotCallImpl(MatchedDotCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -58,9 +63,17 @@ public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implem
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -133,6 +146,11 @@ public class ElixirMatchedDotCallImpl extends ElixirMatchedExpressionImpl implem
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

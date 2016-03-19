@@ -3,18 +3,23 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedUnqualifiedNoParenthesesCall {
+public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedNoParenthesesCall> implements ElixirMatchedUnqualifiedNoParenthesesCall {
 
   public ElixirMatchedUnqualifiedNoParenthesesCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirMatchedUnqualifiedNoParenthesesCallImpl(MatchedUnqualifiedNoParenthesesCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -49,13 +54,17 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends ElixirMatched
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -128,6 +137,11 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends ElixirMatched
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

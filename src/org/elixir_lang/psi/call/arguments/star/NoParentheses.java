@@ -1,7 +1,9 @@
-package org.elixir_lang.psi.call.arguments;
+package org.elixir_lang.psi.call.arguments.star;
 
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.arguments.None;
+import org.elixir_lang.psi.call.arguments.Star;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * {@code <...> noParenthesesOneArgument}
  */
-public interface NoParentheses extends Call {
+public interface NoParentheses extends Star {
     /**
      * Unlike with a base {@link Call}, {@link NoParentheses#primaryArguments} are {@code @NotNull} because the first
      * set of arguments has to be there or it would be a {@link None}

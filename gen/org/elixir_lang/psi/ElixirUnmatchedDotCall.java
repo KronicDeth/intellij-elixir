@@ -2,15 +2,16 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.stub.UnmatchedDotCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCall {
+public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCall<UnmatchedDotCall>, StubBasedPsiElement<UnmatchedDotCall> {
 
   @Nullable
   ElixirDoBlock getDoBlock();
@@ -30,8 +31,12 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   @Nullable
   PsiElement functionNameElement();
 
-  @NotNull
-  ItemPresentation getPresentation();
+  boolean hasDoBlockOrKeyword();
+
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -74,5 +79,8 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

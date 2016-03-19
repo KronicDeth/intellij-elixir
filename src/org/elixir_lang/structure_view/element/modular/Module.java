@@ -3,16 +3,17 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.CallDefinition;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.Exception;
-import org.elixir_lang.structure_view.element.Implementation;
 import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity;
@@ -36,7 +37,13 @@ public class Module extends Element<Call> implements Modular {
     protected final Modular parent;
 
     /*
+     *
      * Static Methods
+     *
+     */
+
+    /*
+     * Public Static Methods
      */
 
     public static void addClausesToCallDefinition(
@@ -110,6 +117,21 @@ public class Module extends Element<Call> implements Modular {
     public static boolean is(Call call) {
         return call.isCallingMacro("Elixir.Kernel", "defmodule", 2);
     }
+
+    public static PsiElement nameIdentifier(Call call) {
+        PsiElement[] primaryArguments = call.primaryArguments();
+        PsiElement nameIdentifier = null;
+
+        if (primaryArguments != null && primaryArguments.length > 0) {
+            nameIdentifier = primaryArguments[0];
+        }
+
+        return nameIdentifier;
+    }
+
+    /*
+     * Private Static Methods
+     */
 
     @Contract(pure = true)
     @Nullable
@@ -261,5 +283,6 @@ public class Module extends Element<Call> implements Modular {
 
         return location;
     }
+
 }
 

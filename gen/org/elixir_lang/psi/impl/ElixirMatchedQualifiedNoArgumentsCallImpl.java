@@ -3,18 +3,23 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedQualifiedNoArgumentsCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedQualifiedNoArgumentsCall {
+public class ElixirMatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<MatchedQualifiedNoArgumentsCall> implements ElixirMatchedQualifiedNoArgumentsCall {
 
   public ElixirMatchedQualifiedNoArgumentsCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirMatchedQualifiedNoArgumentsCallImpl(MatchedQualifiedNoArgumentsCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -54,13 +59,17 @@ public class ElixirMatchedQualifiedNoArgumentsCallImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
-  public PsiElement getNameIdentifier() {
-    return ElixirPsiImplUtil.getNameIdentifier(this);
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
   }
 
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -133,6 +142,11 @@ public class ElixirMatchedQualifiedNoArgumentsCallImpl extends ElixirMatchedExpr
   @Nullable
   public Integer secondaryArity() {
     return ElixirPsiImplUtil.secondaryArity(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

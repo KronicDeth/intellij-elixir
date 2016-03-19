@@ -2,13 +2,14 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.StubBasedPsiElement;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatchedExpression, UnqualifiedParenthesesCall {
+public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatchedExpression, UnqualifiedParenthesesCall<UnmatchedUnqualifiedParenthesesCall>, StubBasedPsiElement<UnmatchedUnqualifiedParenthesesCall> {
 
   @Nullable
   ElixirDoBlock getDoBlock();
@@ -25,10 +26,12 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
   @NotNull
   PsiElement functionNameElement();
 
-  PsiElement getNameIdentifier();
+  boolean hasDoBlockOrKeyword();
 
-  @NotNull
-  ItemPresentation getPresentation();
+  @Nullable
+  String getName();
+
+  PsiElement getNameIdentifier();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
@@ -71,5 +74,8 @@ public interface ElixirUnmatchedUnqualifiedParenthesesCall extends ElixirUnmatch
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

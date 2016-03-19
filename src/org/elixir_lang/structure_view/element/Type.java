@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,7 @@ public class Type extends Element<AtUnqualifiedNoParenthesesCall> implements Vis
     public static Type fromAtUnqualifiedNoParenthesesCall(
             @NotNull Modular modular,
             @NotNull AtUnqualifiedNoParenthesesCall moduleAttributeDefinition) {
-        String moduleAttributeName = moduleAttributeDefinition.moduleAttributeName();
+        String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(moduleAttributeDefinition);
         boolean opaque = isOpaque(moduleAttributeName);
         Visibility visibility = visibility(moduleAttributeName);
 
@@ -46,7 +47,7 @@ public class Type extends Element<AtUnqualifiedNoParenthesesCall> implements Vis
 
         if (call instanceof AtUnqualifiedNoParenthesesCall) {
             AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) call;
-            String moduleAttributeName = atUnqualifiedNoParenthesesCall.moduleAttributeName();
+            String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
 
             is = moduleAttributeName.equals("@opaque") ||
                     moduleAttributeName.equals("@type") ||

@@ -13,6 +13,7 @@ import org.elixir_lang.psi.QuotableKeywordPair;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.Exception;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.elixir_lang.structure_view.element.structure.Field;
@@ -33,6 +34,29 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
      */
 
     private static final Collection<NodeProvider> NODE_PROVIDERS = Arrays.<NodeProvider>asList(new Used());
+
+    /*
+     * Static Methods
+     */
+
+    public static boolean isSuitable(Call call) {
+        // everything in {@link Module#childCallTreeElements}
+        return CallDefinitionClause.isFunction(call) ||
+                CallDefinitionClause.isMacro(call) ||
+                CallDefinitionHead.is(call) ||
+                CallDefinitionSpecification.is(call) ||
+                Callback.is(call) ||
+                Delegation.is(call) ||
+                Exception.is(call) ||
+                Implementation.is(call) ||
+                Module.is(call) ||
+                Overridable.is(call) ||
+                Protocol.is(call) ||
+                Quote.is(call) ||
+                Structure.is(call) ||
+                Type.is(call) ||
+                Use.is(call);
+    }
 
     /*
      * Constructors
@@ -103,22 +127,7 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
             // calls can be nested in calls, so need to check for sure
             if (element instanceof Call) {
                 Call call = (Call) element;
-                // everything in {@link Module#childCallTreeElements}
-                suitable = CallDefinitionClause.isFunction(call) ||
-                        CallDefinitionClause.isMacro(call) ||
-                        CallDefinitionHead.is(call) ||
-                        CallDefinitionSpecification.is(call) ||
-                        Callback.is(call) ||
-                        Delegation.is(call) ||
-                        Exception.is(call) ||
-                        Implementation.is(call) ||
-                        Module.is(call) ||
-                        Overridable.is(call) ||
-                        Protocol.is(call) ||
-                        Quote.is(call) ||
-                        Structure.is(call) ||
-                        Type.is(call) ||
-                        Use.is(call);
+                suitable = isSuitable(call);
             } else if (element instanceof ElixirAtom) {
                 ElixirAtom atom = (ElixirAtom) element;
                 suitable = Field.is(atom);

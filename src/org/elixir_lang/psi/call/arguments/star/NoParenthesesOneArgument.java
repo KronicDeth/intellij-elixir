@@ -1,6 +1,7 @@
-package org.elixir_lang.psi.call.arguments;
+package org.elixir_lang.psi.call.arguments.star;
 
 import org.elixir_lang.psi.ElixirNoParenthesesOneArgument;
+import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

@@ -7,8 +7,6 @@ import org.elixir_lang.psi.ElixirDoBlock;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.TreeSet;
-
 /**
  * A general function or macro call.
  */
@@ -34,6 +32,14 @@ public interface Call extends NavigatablePsiElement {
      */
     @Nullable
     ElixirDoBlock getDoBlock();
+
+    /**
+     * Whether this call has a {@code do} block or a {@code :do} keyword, so it is a macro
+     *
+     * @return {@code true} if {@link #getDoBlock()} is NOT {@code null} or there is a {@code "do"} keyword argument
+     * @see org.elixir_lang.psi.impl.ElixirPsiImplUtil#keywordArgument(Call, String)
+     */
+    boolean hasDoBlockOrKeyword();
 
     /**
      * Whether this call is calling the given `resolvedFunctionName` in the `resolvedModuleName` with any arity

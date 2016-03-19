@@ -3,18 +3,23 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
-import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.stub.MatchedAtUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatchedExpressionImpl implements ElixirMatchedAtUnqualifiedNoParenthesesCall {
+public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedAtUnqualifiedNoParenthesesCall> implements ElixirMatchedAtUnqualifiedNoParenthesesCall {
 
   public ElixirMatchedAtUnqualifiedNoParenthesesCallImpl(ASTNode node) {
     super(node);
+  }
+
+  public ElixirMatchedAtUnqualifiedNoParenthesesCallImpl(MatchedAtUnqualifiedNoParenthesesCall stub, IStubElementType nodeType) {
+    super(stub, nodeType);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -49,19 +54,17 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
     return ElixirPsiImplUtil.getDoBlock(this);
   }
 
+  public boolean hasDoBlockOrKeyword() {
+    return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
   @Nullable
   public String getName() {
     return ElixirPsiImplUtil.getName(this);
   }
 
-  @NotNull
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
-  }
-
-  @NotNull
-  public ItemPresentation getPresentation() {
-    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
@@ -74,11 +77,6 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends ElixirMatch
 
   public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
-  }
-
-  @NotNull
-  public String moduleAttributeName() {
-    return ElixirPsiImplUtil.moduleAttributeName(this);
   }
 
   @Nullable

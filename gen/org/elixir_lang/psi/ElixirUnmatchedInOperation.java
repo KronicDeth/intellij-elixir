@@ -28,6 +28,8 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, C
   @Nullable
   ElixirDoBlock getDoBlock();
 
+  boolean hasDoBlockOrKeyword();
+
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
@@ -78,5 +80,8 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, C
 
   @Nullable
   Integer secondaryArity();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }
