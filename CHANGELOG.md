@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v2.2.1](#v221)
+  - [v2.3.0](#v230)
   - [v2.2.0](#v220)
   - [v2.1.0](#v210)
   - [v2.0.0](#v200)
@@ -31,7 +31,17 @@
 
 # Changelog
 
-## v2.2.1
+## v2.3.0
+* Enhancements
+  * [#257](https://github.com/KronicDeth/intellij-elixir/pull/257) - [@KronicDeth](https://github.com/KronicDeth)
+    * Go To Symbol (⌥⌘O)
+      * Call definition clauses (`def`, `defp`, `defmacro`, and `defmacrop`)
+      * Callbacks (`@callback` and `@macrocallback`)
+      * Call definition specifications (`@spec`)
+      * Call definition heads (`foo(bar)`) for delegation (`defdelegate foo(bar), to: BAZ`)
+      * Implementations (`defimpl`)
+      * Protocols (`defprotocol`)
+    * Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for Go To Symbol.
 * Bug Fixes
   * [#256](https://github.com/KronicDeth/intellij-elixir/pull/256) - Fix Elixir Mix Run configuration not persisting past restart - [@zyuyou](https://github.com/zyuyou)
   
