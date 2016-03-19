@@ -82,7 +82,6 @@ public class InfixParsingTestCase extends ParsingTestCase {
             assertEquals("virtual file text mismatch", text, LoadTextUtil.loadText(myFile.getVirtualFile()));
             assertEquals("doc text mismatch", text, myFile.getViewProvider().getDocument().getText());
             assertEquals("psi text mismatch", text, myFile.getText());
-            ensureCorrectReparse(myFile);
             FileViewProvider fileViewProvider = myFile.getViewProvider();
             root = fileViewProvider.getPsi(ElixirLanguage.INSTANCE);
 
