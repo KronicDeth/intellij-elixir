@@ -33,7 +33,6 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
 import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.Contract;

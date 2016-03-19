@@ -13,6 +13,15 @@ import java.io.IOException;
 
 public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         Psi extends org.elixir_lang.psi.call.StubBased> extends org.elixir_lang.psi.stub.type.Named<Stub, Psi> {
+
+    /*
+     * Static Methods
+     */
+
+    public static boolean isModular(Call call) {
+        return Implementation.is(call) || Module.is(call) || Protocol.is(call);
+    }
+
     /*
      * Constructors
      */
@@ -63,9 +72,6 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
                 Callback.is(call);
     }
 
-    private boolean isModular(Call call) {
-        return Implementation.is(call) || Module.is(call) || Protocol.is(call);
-    }
 
     private boolean isNameable(Call call) {
         return isEnclosableByModular(call) || isDelegationCallDefinitionHead(call) || isModular(call);

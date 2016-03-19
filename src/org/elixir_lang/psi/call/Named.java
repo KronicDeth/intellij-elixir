@@ -3,6 +3,7 @@ package org.elixir_lang.psi.call;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.NamedElement;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface Named extends Call, NamedElement {
     /**
@@ -12,6 +13,6 @@ public interface Named extends Call, NamedElement {
      *
      * To get the name identifier without checking if a known Kernel macro, use {@link Call#functionNameElement()}.
      */
-    @NotNull
+    @Nullable
     PsiElement getNameIdentifier();
 }
