@@ -42,10 +42,26 @@
       * Implementations (`defimpl`)
       * Protocols (`defprotocol`)
     * Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for Go To Symbol.
+  * [#263](https://github.com/KronicDeth/intellij-elixir/pull/263) - Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility. - [@KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#256](https://github.com/KronicDeth/intellij-elixir/pull/256) - Fix Elixir Mix Run configuration not persisting past restart - [@zyuyou](https://github.com/zyuyou)
   * [#259](https://github.com/KronicDeth/intellij-elixir/pull/259) - Allow `Infix#operator` to work on operations with errors, which eliminates the `AssertionError` reported when typing infix operation and they are incomplete - [@KronicDeth](https://github.com/KronicDeth)
   * [#259](https://github.com/KronicDeth/intellij-elixir/pull/260) - Add Keywords to the Preferences > Editor > Colors & Fonts > Elixir settings page, so it can be customized for just Elixir instead of having to change Preferences > Editor > Colors & Fonts > General > Keyword - [@KronicDeth](https://github.com/KronicDeth)
+  * [#263](https://github.com/KronicDeth/intellij-elixir/pull/263) - Ensure compatibility from 14.0 to 2016.1 - [@KronicDeth](https://github.com/KronicDeth)
+    * Use `TextAttributesKey`s that aren't deprecated in 2016.1 and work back to 14.1
+         
+      All of `CodeInsightColors` is deprecated, so all constants from there had to be replaced.  Unfortunately, the recommended replacements don't have the same color as the original, so I used different `DefaultLanguageHighlighterColors` constants for some.
+    
+      "Module Attribute" is now based on `DefaultLanguageHighlighterColors.CONSTANT` (which is purplish in Darcula) instead of the recommended `METADATA`, which is yellow.  Although module attributes don't have to be constant since they can be set to accumulate, often they are used as constants and not really as metadata, since they are just data then.  All the `metadata` uses of module attributes have a separate color.
+    
+      "Specification" is now based on `DefaultLanguageHighlighterColors.FUNCTION_DECLARATION`, which maintains the golden color that `CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES` had.
+    
+      "Type" is now based on `DefaultLanguageHighlighterColors.METADATA`, which is bright yellow unlike `CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES`, which was a bright white.
+    
+      "Type Parameter" is now based on `DefaultLanguageHighlighterColors.PARAMETER`, which unfortunately has no attributes associated with it, but the constant name was too good a fit not to use, so if you want the old color, you'll need to customize it yourself.
+    * Restore compatibility with the IntelliJ IDEA 14.0 release line
+      * By using reflection to call `FileTemplateManager#getInstance` if `FileTemplateManager#getDefaultInstance` is not available
+      * By calling `FileChooserDescriptorFactory#createSingleLocalFileDescriptor` (which works in 14.0 through 2016.1) instead of `FileChooserDescriptorFactory#createSingleFileDescriptor` (which only works in 14.1 through 2016.1)
   
 ## v2.2.0
 * Enhancement

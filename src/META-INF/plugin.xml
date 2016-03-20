@@ -35,6 +35,7 @@
               Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for
               Go To Symbol.
             </li>
+            <li>Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility.</li>
           </ul>
         </li>
         <li>
@@ -49,6 +50,48 @@
               Add Keywords to the Preferences &gt; Editor &gt; Colors & Fonts &gt; Elixir settings page, so it can be
               customized for just Elixir instead of having to change Preferences &gt; Editor &gt; Colors & Fonts &gt;
               General &gt; Keyword.
+            </li>
+            <li>
+              <p>Use <code>TextAttributesKey</code>s that aren't deprecated in 2016.1 and work back to 14.1</p>
+              <p>
+                All of <code>CodeInsightColors</code> is deprecated, so all constants from there had to be replaced.
+                Unfortunately, the recommended replacements don't have the same color as the original, so I used
+                different <code>DefaultLanguageHighlighterColors</code> constants for some.
+              </p>
+              <p>
+                "Module Attribute" is now based on <code>DefaultLanguageHighlighterColors.CONSTANT</code> (which is
+                purplish in Darcula) instead of the recommended <code>METADATA</code>, which is yellow.  Although module
+                attributes don't have to be constant since they can be set to accumulate, often they are used as
+                constants and not really as metadata, since they are just data then.  All the <code>metadata</code> uses
+                of module attributes have a separate color.
+              </p>
+              <p>
+                "Specification" is now based on <code>DefaultLanguageHighlighterColors.FUNCTION_DECLARATION</code>,
+                which maintains the golden color that <code>CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES</code> had.
+              </p>
+              <p>
+                "Type" is now based on <code>DefaultLanguageHighlighterColors.METADATA</code>, which is bright yellow
+                unlike <code>CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES</code>, which was a bright white.
+              </p>
+              <p>
+                "Type Parameter" is now based on <code>DefaultLanguageHighlighterColors.PARAMETER</code>, which
+                unfortunately has no attributes associated with it, but the constant name was too good a fit not to use,
+                so if you want the old color, you'll need to customize it yourself.
+              </p>
+            </li>
+            <li>
+              <p>Restore compatibility with the IntelliJ IDEA 14.0 release line</p>
+              <ul>
+                <li>
+                  By using reflection to call <code>FileTemplateManager#getInstance</code> if
+                  <code>FileTemplateManager#getDefaultInstance</code> is not available
+                </li>
+                <li>
+                  By calling <code>FileChooserDescriptorFactory#createSingleLocalFileDescriptor</code> (which works in
+                  14.0 through 2016.1) instead of <code>FileChooserDescriptorFactory#createSingleFileDescriptor</code>
+                  (which only works in 14.1 through 2016.1)
+                </li>
+              </ul>
             </li>
           </ul>
         </li>
