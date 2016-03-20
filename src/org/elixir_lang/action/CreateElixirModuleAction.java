@@ -16,6 +16,8 @@ import org.elixir_lang.psi.ElixirFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,7 +146,39 @@ public class CreateElixirModuleAction extends CreateFromTemplateAction<ElixirFil
    * @link com.intellij.psi.impl.file.JavaDirectoryServiceImpl.createClassFromTemplate
    */
   private ElixirFile createModuleFromTemplate(PsiDirectory directory, String basename, String moduleName, String templateName) {
-    FileTemplateManager fileTemplateManager = FileTemplateManager.getDefaultInstance();
+    Class klass = FileTemplateManager.class;
+    FileTemplateManager fileTemplateManager = null;
+
+    try {
+      // After 14.0
+      Method getDefaultInstance = klass.getDeclaredMethod("getDefaultInstance");
+
+      try {
+        fileTemplateManager = (FileTemplateManager) getDefaultInstance.invoke(null);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    } catch (NoSuchMethodException getDefaultInstanceNoSuchMethodException) {
+      // In 14.0
+      try {
+        Method getInstance = klass.getDeclaredMethod("getInstance");
+
+        try {
+          fileTemplateManager = (FileTemplateManager) getInstance.invoke(null);
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+        } catch (InvocationTargetException e) {
+          e.printStackTrace();
+        }
+      } catch (NoSuchMethodException getInstanceNoSuchMethodException) {
+        getDefaultInstanceNoSuchMethodException.printStackTrace();
+      }
+    }
+
+    assert fileTemplateManager != null;
+
     FileTemplate template = fileTemplateManager.getInternalTemplate(templateName);
 
     Properties defaultProperties = fileTemplateManager.getDefaultProperties();
