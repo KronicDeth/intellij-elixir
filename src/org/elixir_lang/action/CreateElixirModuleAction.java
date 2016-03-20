@@ -31,10 +31,14 @@ public class CreateElixirModuleAction extends CreateFromTemplateAction<ElixirFil
   private static final String ALIAS_REGEXP = "[A-Z][0-9a-zA-Z_]*";
   private static final String MODULE_NAME_REGEXP = ALIAS_REGEXP + "(\\." + ALIAS_REGEXP + ")*";
   private static final Pattern MODULE_NAME_PATTERN = Pattern.compile(MODULE_NAME_REGEXP);
-  private static final String INVALID_MODULE_MESSAGE_FMT = "'%s' is not a valid Elixir module name. Valid pattern for Elixir modules is dot sequences of aliases (" + MODULE_NAME_REGEXP + ")";
+  public static final String DESCRIPTION = "Nested Aliases, like Foo.Bar.Baz, are created in subdirectory for the " +
+          "parent Aliases, foo/bar/Baz.ex";
+  private static final String INVALID_MODULE_MESSAGE_FMT = "'%s' is not a valid Elixir module name. Elixir module " +
+          "names should be a dot-separated-sequence of alphanumeric (and underscore) Aliases, each starting with a " +
+          "capital letter. " + DESCRIPTION;
 
   public CreateElixirModuleAction() {
-    super(NEW_ELIXIR_MODULE, "Nested Aliases, like Foo.Bar.Baz, are created in subdirectory for the parent Aliases, foo/bar/Baz.ex", ElixirIcons.FILE);
+    super(NEW_ELIXIR_MODULE, DESCRIPTION, ElixirIcons.FILE);
   }
 
   /**
