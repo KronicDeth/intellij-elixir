@@ -4,6 +4,7 @@
   <dirname property="module.intellij-elixir.basedir" file="${ant.file.module_intellij-elixir}"/>
 
   <import file="${module.intellij-elixir.basedir}/idea.xml"/>
+  <import file="${module.intellij-elixir.basedir}/elixir.xml"/>
 
   <property name="module.jdk.home.intellij-elixir" value="${project.jdk.home}"/>
   <property name="module.jdk.bin.intellij-elixir" value="${project.jdk.bin}"/>
@@ -16,11 +17,11 @@
   <property name="intellij-elixir.jps-builder.output.dir" value="${module.intellij-elixir.basedir}/out/production/jps-builder" />
   <property name="intellij-elixir.output.dir" value="${module.intellij-elixir.basedir}/out/production/intellij-elixir"/>
   <property name="intellij-elixir.testoutput.dir" value="${module.intellij-elixir.basedir}/out/test/intellij-elixir"/>
-  
+
   <path id="intellij-elixir.module.bootclasspath">
     <!-- Paths to be included in compilation bootclasspath -->
   </path>
-  
+
   <path id="intellij-elixir.module.production.classpath">
     <path refid="${module.jdk.classpath.intellij-elixir}"/>
     <path refid="library.junit.classpath"/>
@@ -28,7 +29,7 @@
     <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
-  
+
   <path id="intellij-elixir.runtime.production.module.classpath">
     <pathelement location="${intellij-elixir.output.dir}"/>
     <path refid="library.junit.classpath"/>
@@ -36,7 +37,7 @@
     <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
-  
+
   <path id="intellij-elixir.module.classpath">
     <path refid="${module.jdk.classpath.intellij-elixir}"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
@@ -47,7 +48,7 @@
     <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
-  
+
   <path id="intellij-elixir.runtime.module.classpath">
     <pathelement location="${intellij-elixir.testoutput.dir}"/>
     <pathelement location="${intellij-elixir.output.dir}"/>
@@ -56,12 +57,12 @@
     <pathelement location="${idea.cache}/lib/hamcrest-library-1.3.jar"/>
     <pathelement location="${idea.cache}/lib/junit-4.11.jar"/>
   </path>
-  
-  
+
+
   <patternset id="excluded.from.module.intellij-elixir">
     <patternset refid="ignored.files"/>
   </patternset>
-  
+
   <patternset id="excluded.from.compilation.intellij-elixir">
     <patternset refid="excluded.from.module.intellij-elixir"/>
   </patternset>
@@ -85,23 +86,29 @@
       <include name="res"/>
     </dirset>
   </path>
-  
+
   <path id="intellij-elixir.module.test.sourcepath">
     <dirset dir="${module.intellij-elixir.basedir}">
       <include name="tests"/>
       <include name="testData"/>
     </dirset>
   </path>
-  
-  
+
   <target name="compile.module.intellij-elixir" depends="compile.module.intellij-elixir.production,compile.module.intellij-elixir.tests" description="Compile module intellij-elixir"/>
 
-  <target name="compile.module.jps-shared.production" depends="register.custom.compilers" description="Compile module jps-shared; production classes">
+  <target name="compile.module.jps-shared.production" depends="register.custom.compilers,set.elixir.code.lib.dir" description="Compile module jps-shared; production classes">
     <mkdir dir="${intellij-elixir.jps-shared.output.dir}"/>
     <javac2 destdir="${intellij-elixir.jps-shared.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
       <bootclasspath refid="intellij-elixir.module.bootclasspath"/>
-      <classpath refid="intellij-elixir.module.production.classpath"/>
+      <classpath>
+        <path refid="intellij-elixir.module.production.classpath"/>
+        <path>
+          <fileset dir="${elixir.code.lib.dir}">
+            <include name="jinterface-*/priv/OtpErlang.jar"/>
+          </fileset>
+        </path>
+      </classpath>
       <src refid="intellij-elixir.module.jps-shared.sourcepath"/>
       <patternset refid="excluded.from.compilation.intellij-elixir"/>
     </javac2>
@@ -115,7 +122,7 @@
 
   </target>
 
-  <target name="compile.module.jps-builder.production" depends="register.custom.compilers,compile.module.jps-shared.production" description="Compile module jps-builder; production classes">
+  <target name="compile.module.jps-builder.production" depends="register.custom.compilers,compile.module.jps-shared.production,set.elixir.code.lib.dir" description="Compile module jps-builder; production classes">
     <mkdir dir="${intellij-elixir.jps-builder.output.dir}"/>
     <javac2 destdir="${intellij-elixir.jps-builder.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
@@ -135,7 +142,7 @@
 
   </target>
 
-  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers,compile.module.jps-shared.production,compile.module.jps-builder.production" description="Compile module intellij-elixir; production classes">
+  <target name="compile.module.intellij-elixir.production" depends="register.custom.compilers,compile.module.jps-shared.production,compile.module.jps-builder.production,set.elixir.code.lib.dir" description="Compile module intellij-elixir; production classes">
     <mkdir dir="${intellij-elixir.output.dir}"/>
     <javac2 destdir="${intellij-elixir.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
@@ -143,6 +150,13 @@
       <classpath refid="intellij-elixir.module.production.classpath"/>
       <classpath path="${intellij-elixir.jps-shared.output.dir}"/>
       <classpath path="${intellij-elixir.jps-builder.output.dir}"/>
+      <classpath>
+        <path>
+          <fileset dir="${elixir.code.lib.dir}">
+            <include name="jinterface-*/priv/OtpErlang.jar"/>
+          </fileset>
+        </path>
+      </classpath>
       <src refid="intellij-elixir.module.sourcepath"/>
       <patternset refid="excluded.from.compilation.intellij-elixir"/>
     </javac2>
@@ -163,16 +177,23 @@
     </copy>
   </target>
 
-  <target name="compile.module.intellij-elixir.tests" depends="register.custom.compilers,compile.module.intellij-elixir.production" description="compile module intellij-elixir; test classes" unless="skip.tests">
+  <target name="compile.module.intellij-elixir.tests" depends="register.custom.compilers,compile.module.intellij-elixir.production,set.elixir.code.lib.dir" description="compile module intellij-elixir; test classes" unless="skip.tests">
     <mkdir dir="${intellij-elixir.testoutput.dir}"/>
     <javac2 destdir="${intellij-elixir.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.intellij-elixir}/javac">
       <compilerarg line="${compiler.args.intellij-elixir}"/>
       <bootclasspath refid="intellij-elixir.module.bootclasspath"/>
       <classpath refid="intellij-elixir.module.classpath"/>
+      <classpath>
+        <path>
+          <fileset dir="${elixir.code.lib.dir}">
+            <include name="jinterface-*/priv/OtpErlang.jar"/>
+          </fileset>
+        </path>
+      </classpath>
       <src refid="intellij-elixir.module.test.sourcepath"/>
       <patternset refid="excluded.from.compilation.intellij-elixir"/>
     </javac2>
-    
+
     <copy todir="${intellij-elixir.testoutput.dir}">
       <fileset dir="${module.intellij-elixir.basedir}/tests">
         <patternset refid="compiler.resources"/>
@@ -184,7 +205,7 @@
       </fileset>
     </copy>
   </target>
-  
+
   <target name="clean.module.intellij-elixir" description="cleanup module">
     <delete dir="${intellij-elixir.jps-shared.output.dir}"/>
     <delete dir="${intellij-elixir.jps-builder.output.dir}"/>
@@ -204,12 +225,14 @@
   <import file="${module.intellij-elixir.basedir}/elixir.xml"/>
   <import file="${module.intellij-elixir.basedir}/intellij_elixir.xml"/>
 
-  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,release.intellij_elixir,unpack.elixir.zip" description="test module">
+  <target name="test.module.intellij-elixir" depends="compile.module.intellij-elixir,release.intellij_elixir,set.elixir.code.lib.dir,unpack.elixir.zip" description="test module">
     <mkdir dir="tmp"/>
     <mkdir dir="tmp/results"/>
 
+    <property environment="env"/>
     <exec executable="${intellij_elixir.executable}">
       <arg value="start"/>
+      <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
     </exec>
 
     <!-- must fork or env won't work -->
@@ -223,6 +246,11 @@
       <env key="INTELLIJ_ELIXIR_PATH" value="${module.intellij-elixir.basedir}"/>
       <classpath>
         <path refid="classpath.test" />
+        <path>
+          <fileset dir="${elixir.code.lib.dir}">
+            <include name="jinterface-*/priv/OtpErlang.jar"/>
+          </fileset>
+        </path>
         <pathelement location="${basedir}/tests/mockito-core-2.0.7-beta.jar"/>
         <pathelement location="${basedir}/tests/objenesis-2.1.jar"/>
         <pathelement location="${test.build}"/>

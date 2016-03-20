@@ -2,11 +2,12 @@
 <project default="get.idea" name="idea">
     <dirname property="idea.basedir" file="${ant.file.idea}"/>
 
-    <property name="idea.output.dir" value="${idea.basedir}/dependencies/idea"/>
-    <property name="idea.version" value="14.1.6"/>
+    <property environment="env"/>
+    <property name="idea.version" value="${env.IDEA_VERSION}"/>
+    <property name="idea.output.dir" value="${idea.basedir}/dependencies/idea/${idea.version}"/>
     <property name="idea.tarball" value="ideaIC-${idea.version}.tar.gz"/>
-    <property name="idea.cache" value="${idea.basedir}/cache/idea"/>
-    <property name="idea.tarball.root.basename" value="idea-IC-141.3056.4"/>
+    <property name="idea.cache" value="${idea.basedir}/cache/idea/${idea.version}"/>
+    <property name="idea.tarball.root.basename" value="${env.IDEA_TARBALL_ROOT_BASENAME}"/>
 
     <property name="idea.output.tarball.root.dir" value="${idea.output.dir}/${idea.tarball.root.basename}"/>
     <available file="${idea.output.tarball.root.dir}" property="idea.output.tarball.root.available"/>
