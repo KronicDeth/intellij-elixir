@@ -37,7 +37,7 @@ public class MixConfigurationForm {
 
   public MixConfigurationForm(){
     myMixPathSelector.addBrowseFolderListener("Select Mix executable", "", null,
-        FileChooserDescriptorFactory.createSingleFileDescriptor());
+        FileChooserDescriptorFactory.createSingleLocalFileDescriptor());
     myMixPathSelector.getTextField().getDocument().addDocumentListener(new DocumentAdapter() {
       @Override
       protected void textChanged(DocumentEvent documentEvent) {

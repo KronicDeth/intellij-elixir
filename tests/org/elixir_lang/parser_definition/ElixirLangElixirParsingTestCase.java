@@ -804,10 +804,6 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/utils.ex", Parse.CORRECT);
     }
 
-    public void testArchiveLibLocalSample() {
-        assertParsed("lib/mix/test/fixtures/archive/lib/local.sample.ex", Parse.CORRECT);
-    }
-
     public void testDepsStatusCustomRawRepoLibRawRepo() {
         assertParsed("lib/mix/test/fixtures/deps_status/custom/raw_repo/lib/raw_repo.ex", Parse.CORRECT);
     }

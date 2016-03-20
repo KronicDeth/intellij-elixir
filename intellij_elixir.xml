@@ -26,9 +26,12 @@
         </exec>
     </target>
 
-    <target name="deps.get.intellij_elixir" depends="local.hex.intellij_elixir">
-        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+    <import file="${intellij_elixir.basedir}/elixir.xml"/>
+
+    <target name="deps.get.intellij_elixir" depends="local.hex.intellij_elixir,make.elixir">
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="${elixir.output.zip.root.dir}/bin/mix">
             <arg value="deps.get"/>
+            <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
         </exec>
     </target>
 
@@ -38,28 +41,41 @@
         </exec>
     </target>
 
-    <target name="local.hex.intellij_elixir" depends="checkout.intellij_elixir">
-        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+    <target name="local.hex.intellij_elixir" depends="checkout.intellij_elixir,make.elixir">
+        <property environment="env"/>
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="${elixir.output.zip.root.dir}/bin/mix">
             <arg value="local.hex"/>
             <arg value="--force"/>
+            <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
         </exec>
     </target>
 
-    <target name="release.intellij_elixir" depends="deps.get.intellij_elixir">
-        <exec dir="${intellij_elixir.output.repo.dir}" executable="mix">
+    <target name="release.intellij_elixir" depends="deps.get.intellij_elixir,make.elixir">
+        <!-- Removing these files prevents `Application metadata file exists but is malformed` when doing `mix release`
+             for intellij_elixir -->
+        <delete file="${elixir.output.zip.root.dir}/lib/mix/test/fixtures/deps_status/_build/dev/lib/invalidapp/ebin/invalidapp.app"/>
+        <delete file="${elixir.output.zip.root.dir}/lib/mix/test/fixtures/deps_status/_build/dev/lib/invalidvsn/ebin/invalidvsn.app"/>
+        <delete file="${elixir.output.zip.root.dir}/lib/mix/test/fixtures/deps_status/_build/dev/lib/nosemver/ebin/nosemver.app"/>
+        <delete file="${elixir.output.zip.root.dir}/lib/mix/test/fixtures/deps_status/_build/dev/lib/ok/ebin/ok.app"/>
+        <delete dir="${elixir.output.zip.root.dir}/lib/mix/test/fixtures/archive"/>
+
+        <exec dir="${intellij_elixir.output.repo.dir}" executable="${elixir.output.zip.root.dir}/bin/mix">
             <arg value="release"/>
+            <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
         </exec>
     </target>
 
-    <target name="start.intellij_elixir" depends="release.intellij_elixir">
+    <target name="start.intellij_elixir" depends="release.intellij_elixir,make.elixir">
         <exec executable="${intellij_elixir.executable}">
             <arg value="start"/>
+            <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
         </exec>
     </target>
 
-     <target name="stop.intellij_elixir" depends="release.intellij_elixir">
+     <target name="stop.intellij_elixir" depends="release.intellij_elixir,make.elixir">
         <exec executable="${intellij_elixir.executable}">
             <arg value="stop"/>
+            <env key="PATH" value="${env.PATH}:${elixir.output.zip.root.dir}/bin"/>
         </exec>
     </target>
 </project>

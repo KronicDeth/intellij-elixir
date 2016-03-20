@@ -100,8 +100,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey MODULE_ATTRIBUTE = createTextAttributesKey(
             "ELIXIR_MODULE_ATTRIBUTE",
-            // Color used for "ERL_ATTRIBUTE" in intellij-erlang
-            CodeInsightColors.ANNOTATION_NAME_ATTRIBUTES
+            DefaultLanguageHighlighterColors.CONSTANT
     );
 
     public static final TextAttributesKey OBSOLETE_WHOLE_NUMBER_BASE = createTextAttributesKey(
@@ -122,7 +121,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey SPECIFICATION = createTextAttributesKey(
             "ELIXIR_SPECIFICATION",
-            CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES
+            DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
     );
 
     public static final TextAttributesKey CALLBACK = createTextAttributesKey(
@@ -137,13 +136,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     public static final TextAttributesKey TYPE = createTextAttributesKey(
             "ELIXIR_TYPE",
-            // matches ERL_TYPE
-            CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES
+            DefaultLanguageHighlighterColors.METADATA
     );
 
     public static final TextAttributesKey TYPE_PARAMETER = createTextAttributesKey(
             "ELIXIR_TYPE_PARAMETER",
-            CodeInsightColors.TYPE_PARAMETER_NAME_ATTRIBUTES
+            DefaultLanguageHighlighterColors.PARAMETER
     );
 
     public static final TextAttributesKey VALID_DIGIT = createTextAttributesKey(
