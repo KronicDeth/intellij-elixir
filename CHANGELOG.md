@@ -64,6 +64,7 @@
       * By calling `FileChooserDescriptorFactory#createSingleLocalFileDescriptor` (which works in 14.0 through 2016.1) instead of `FileChooserDescriptorFactory#createSingleFileDescriptor` (which only works in 14.1 through 2016.1)
   * [#264](https://github.com/KronicDeth/intellij-elixir/pull/264) - Use more human-readable error message for Elixir File action - [@KronicDeth](https://github.com/KronicDeth)
     * Instead of showing the regular expression pattern, which may be confusing to new developers, explain in English the expected pattern. I also included the description, which explains how nesting is mapped to directories, of the action since it doesn't actually show up in the dialog otherwise.
+  * [#265](https://github.com/KronicDeth/intellij-elixir/pull/265) - Check if a file exists before allowing Elixir Module to be created. If it exists, show an error with the conflicting path. - [@KronicDeth](https://github.com/KronicDeth)
    
 ## v2.2.0
 * Enhancement

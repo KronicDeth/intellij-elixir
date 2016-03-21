@@ -98,6 +98,10 @@
               English the expected pattern. I also included the description, which explains how nesting is mapped to
               directories, of the action since it doesn't actually show up in the dialog otherwise.
             </li>
+            <li>
+              Check if a file exists before allowing Elixir Module to be created. If it exists, show an error with the
+              conflicting path.
+            </li>
           </ul>
         </li>
       </ul>
