@@ -93,6 +93,11 @@
                 </li>
               </ul>
             </li>
+            <li>
+              Instead of showing the regular expression pattern, which may be confusing to new developers, explain in
+              English the expected pattern. I also included the description, which explains how nesting is mapped to
+              directories, of the action since it doesn't actually show up in the dialog otherwise.
+            </li>
           </ul>
         </li>
       </ul>
