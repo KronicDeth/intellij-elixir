@@ -32,10 +32,14 @@
               </ul>
             </li>
             <li>
-              Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for
+              Go To Declaration for Aliases now uses the same <code>isModular</code> checks as the stubbing for the index uses for
               Go To Symbol.
             </li>
             <li>Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility.</li>
+            <li>
+              Error reporting for type highlighter gives the Class, Excerpt and Full Text when an unknown element type
+              is encountered as the Excerpt alone is not enough sometimes.
+            </li>
           </ul>
         </li>
         <li>
@@ -109,6 +113,12 @@
               comprehension, which is common in Elixir libraries as was the case for <code>Postgrex</code>: any
               enclosing <code>for</code> comprehension(s) will now be ignored and the next enclosing macro will be
               checked to see if it is a <code>Modular</code>.
+            </li>
+            <li>
+              While typing before <code>:</code> in keyword pairs after the <code>when</code>, such as in
+              <code>@spec foo(id) :: id when id</code> before finishing typing
+              <code>@spec foo(id) :: id when id: String.t</code>, the keyword key will be properly highlighted as a
+              Type Parameter.
             </li>
           </ul>
         </li>
@@ -289,7 +299,7 @@
                 </li>
                 <li>
                   The module attribute value (from the declaration site) will be folded into the usage site.  It can be
-                  reverted to the literal `@module_name` text by clicking the + to unfold.
+                  reverted to the literal <code>@module_name</code> text by clicking the + to unfold.
                 </li>
               </ul>
             </li>

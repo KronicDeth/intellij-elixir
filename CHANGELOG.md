@@ -43,6 +43,7 @@
       * Protocols (`defprotocol`)
     * Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for Go To Symbol.
   * [#263](https://github.com/KronicDeth/intellij-elixir/pull/263) - Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#273](https://github.com/KronicDeth/intellij-elixir/pull/273) - Error reporting for type highlighter gives the Class, Excerpt and Full Text when an unknown element type is encountered as the Excerpt alone is not enough sometimes. - [@KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#256](https://github.com/KronicDeth/intellij-elixir/pull/256) - Fix Elixir Mix Run configuration not persisting past restart - [@zyuyou](https://github.com/zyuyou)
   * [#259](https://github.com/KronicDeth/intellij-elixir/pull/259) - Allow `Infix#operator` to work on operations with errors, which eliminates the `AssertionError` reported when typing infix operation and they are incomplete - [@KronicDeth](https://github.com/KronicDeth)
@@ -66,6 +67,7 @@
     * Instead of showing the regular expression pattern, which may be confusing to new developers, explain in English the expected pattern. I also included the description, which explains how nesting is mapped to directories, of the action since it doesn't actually show up in the dialog otherwise.
   * [#265](https://github.com/KronicDeth/intellij-elixir/pull/265) - Check if a file exists before allowing Elixir Module to be created. If it exists, show an error with the conflicting path. - [@KronicDeth](https://github.com/KronicDeth)
   * [#272](https://github.com/KronicDeth/intellij-elixir/pull/272) - Fix (one cause) of `AssertionError` in `GoToSymbolContributor` when the `Modular` (`defimpl`, `demodule`, `defprotocol`, and `quote`) could not be resolved due a `def` being surrounded by a `for` comprehension, which is common in Elixir libraries as was the case for `Postgrex`: any enclosing `for` comprehension(s) will now be ignored and the next enclosing macro will be checked to see if it is a `Modular`. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#273](https://github.com/KronicDeth/intellij-elixir/pull/273) - While typing, before `:` in keyword pairs, after the `when`, such as in `@spec foo(id) :: id when id` before finishing typing `@spec foo(id) :: id when id: String.t`, the keyword key will be properly highlighted as a Type Parameter - [@KronicDeth](https://github.com/KronicDeth)
    
 ## v2.2.0
 * Enhancement
