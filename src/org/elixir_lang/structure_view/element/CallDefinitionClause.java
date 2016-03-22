@@ -48,8 +48,18 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @Nullable
     public static Modular enclosingModular(@NotNull Call call) {
         Modular modular = null;
+        Call enclosedCall = call;
+        Call enclosingMacroCall;
 
-        Call enclosingMacroCall = enclosingMacroCall(call);
+        while(true) {
+            enclosingMacroCall = enclosingMacroCall(enclosedCall);
+
+            if (enclosingMacroCall != null && enclosingMacroCall.isCallingMacro("Elixir.Kernel", "for", 2)) {
+                enclosedCall = enclosingMacroCall;
+            } else {
+                break;
+            }
+        }
 
         if (enclosingMacroCall != null) {
             modular = modular(enclosingMacroCall);
