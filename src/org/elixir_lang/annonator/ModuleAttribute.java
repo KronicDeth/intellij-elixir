@@ -605,12 +605,34 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
+            highlightTypesAndSpecificationTypeParameterDeclarations(
+                    (UnqualifiedNoArgumentsCall) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
         } else {
             throw new NotImplementedException(
-                    "Highlighting types and type parameter declarations for " +
-                            psiElement.getClass().getCanonicalName() + " PsiElements is not implemented yet.  Please " +
-                            "open an issue " + "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the " +
-                            "class name of the sample text:\n" + psiElement.getText()
+                    "Highlighting types and type parameter declarations not implemented for your use case. Please " +
+                            "open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) using the " +
+                            "following:\n" +
+                            "\n" +
+                            "# Class\n" +
+                            "\n" +
+                            "`" + psiElement.getClass().getCanonicalName() + "`\n" +
+                            "\n" +
+                            "# Excerpt\n" +
+                            "\n" +
+                            "```\n" +
+                            psiElement.getText() + "\n" +
+                            "```\n" +
+                            "\n" +
+                            "# Full Text\n" +
+                            "\n" +
+                            "```\n" +
+                            psiElement.getContainingFile().getText() + "\n" +
+                            "```"
             );
         }
     }
@@ -625,6 +647,24 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
+            );
+        }
+    }
+
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(
+            UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall,
+            Set<String> typeParameterNameSet,
+            AnnotationHolder annotationHolder,
+            @SuppressWarnings("unused") TextAttributesKey textAttributesKey) {
+        if (typeParameterNameSet.contains(unqualifiedNoArgumentsCall.functionName())) {
+            PsiElement functionNameElement = unqualifiedNoArgumentsCall.functionNameElement();
+
+            assert functionNameElement != null;
+
+            highlight(
+                    functionNameElement.getTextRange(),
+                    annotationHolder,
+                    ElixirSyntaxHighlighter.TYPE_PARAMETER
             );
         }
     }
@@ -1085,12 +1125,29 @@ public class ModuleAttribute implements Annotator, DumbAware {
             return specificationTypeParameterNameSet((ElixirKeywordPair) psiElement);
         } else if (psiElement instanceof ElixirNoParenthesesKeywordPair) {
             return specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
+        } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
+            return specificationTypeParameterNameSet((UnqualifiedNoArgumentsCall) psiElement);
         } else {
             throw new NotImplementedException(
-                    "Extracting specification type parameter name set for " + psiElement.getClass().getCanonicalName() +
-                            " PsiElements is not implemented yet.  Please open an issue " +
-                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name of the " +
-                            "sample text:\n" + psiElement.getText()
+                    "Extracting specification type parameter name set not implemented for your use case. Please open " +
+                            "an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) using the " +
+                            "following:\n" +
+                            "\n" +
+                            "# Class\n" +
+                            "\n" +
+                            "`" + psiElement.getClass().getCanonicalName() + "`\n" +
+                            "\n" +
+                            "# Excerpt\n" +
+                            "\n" +
+                            "```\n" +
+                            psiElement.getText() + "\n" +
+                            "```\n" +
+                            "\n" +
+                            "# Full Text\n" +
+                            "\n" +
+                            "```\n" +
+                            psiElement.getContainingFile().getText() + "\n" +
+                            "```"
             );
         }
     }
@@ -1103,6 +1160,23 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
 
         return accumulatedTypeParameterNameSet;
+    }
+
+    /**
+     * Occurs temporarily while typing before {@code :} in KeywordPairs after the {@code when}, such as in
+     * {@code @spec foo(id) :: id when id} before finishing typing {@code @spec foo(id) :: id when id: String.t}.
+     */
+    private Set<String> specificationTypeParameterNameSet(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        String name = unqualifiedNoArgumentsCall.functionName();
+        Set<String> nameSet;
+
+        if (name != null) {
+            nameSet = Collections.singleton(unqualifiedNoArgumentsCall.functionName());
+        } else {
+            nameSet = Collections.emptySet();
+        }
+
+        return nameSet;
     }
 
     private Set<String> typeTypeParameterNameSet(
