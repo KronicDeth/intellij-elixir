@@ -102,6 +102,14 @@
               Check if a file exists before allowing Elixir Module to be created. If it exists, show an error with the
               conflicting path.
             </li>
+            <li>
+              Fix (one cause) of <code>AssertionError</code> in <code>GoToSymbolContributor</code> when the
+              <code>Modular</code> (<code>defimpl</code>, <code>demodule</code>, <code>defprotocol</code>, and
+              <code>quote</code>) could not be resolved due a <code>def</code> being surrounded by a <code>for</code>
+              comprehension, which is common in Elixir libraries as was the case for <code>Postgrex</code>: any
+              enclosing <code>for</code> comprehension(s) will now be ignored and the next enclosing macro will be
+              checked to see if it is a <code>Modular</code>.
+            </li>
           </ul>
         </li>
       </ul>
