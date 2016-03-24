@@ -1,8 +1,11 @@
 package org.elixir_lang.github.issues.create;
 
 import com.intellij.errorreport.bean.ErrorBean;
+import com.intellij.openapi.diagnostic.Attachment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class Request {
     /*
@@ -15,13 +18,35 @@ public class Request {
      * Static Methods
      */
 
+    private static void attachment(@NotNull StringBuilder stringBuilder, int level, Attachment attachment) {
+        header(stringBuilder, level, "`" + attachment.getPath() + "`");
+
+        stringBuilder.append(
+                "Please copy the contents of the above path into this report: files are too long to include in the " +
+                        "URL when opening the browser.  You can get the exact contents of that path when the error " +
+                        "occurred from the Attachments tab of the IDE Fatal Errors dialog that you had open before " +
+                        "clicking the button to submit this issue."
+        );
+    }
+
+    private static void attachments(@NotNull StringBuilder stringBuilder, int level, List<Attachment> attachmentList) {
+        if (!attachmentList.isEmpty()) {
+            header(stringBuilder, level, "Attachments");
+
+            for (Attachment attachment : attachmentList) {
+                attachment(stringBuilder, level + 1, attachment);
+            }
+        }
+    }
+
     private static String body(ErrorBean errorBean) {
         StringBuilder stringBuilder = new StringBuilder();
+        int level = 0;
 
         version(stringBuilder, errorBean.getPluginVersion());
-        description(stringBuilder, errorBean.getDescription());
-        message(stringBuilder, errorBean.getMessage());
-        stacktrace(stringBuilder, errorBean.getStackTrace());
+        description(stringBuilder, level + 1, errorBean.getDescription());
+        exception(stringBuilder, level + 1, errorBean);
+        attachments(stringBuilder, level + 1, errorBean.getAttachments());
 
         return stringBuilder.toString();
     }
@@ -29,14 +54,16 @@ public class Request {
     private static void codeBlock(@NotNull StringBuilder stringBuilder, @NotNull String code) {
         codeFence(stringBuilder);
         stringBuilder.append(code);
+        stringBuilder.append('\n');
         codeFence(stringBuilder);
     }
 
     private static void codeBlockSection(@NotNull StringBuilder stringBuilder,
+                                         int level,
                                          @NotNull String name,
                                          @Nullable String code) {
         if (code != null && !code.isEmpty()) {
-            header(stringBuilder, name);
+            header(stringBuilder, level, name);
             codeBlock(stringBuilder, code);
         }
     }
@@ -45,33 +72,51 @@ public class Request {
         stringBuilder.append("```\n");
     }
 
-    private static void description(@NotNull StringBuilder stringBuilder, @Nullable String description) {
-        if (description != null && !description.isEmpty()) {
-            header(stringBuilder, "Description");
-            stringBuilder.append(description);
-            stringBuilder.append("\n\n");
-        }
+    private static void description(@NotNull StringBuilder stringBuilder, int level, @Nullable String description) {
+        textSection(stringBuilder, level, "Description", description);
     }
 
-    private static void header(@NotNull StringBuilder stringBuilder, @NotNull String name) {
+    private static void exception(@NotNull StringBuilder stringBuilder, int level, @NotNull ErrorBean errorBean) {
+        header(stringBuilder, level, "Exception");
+        message(stringBuilder, level + 1, errorBean.getMessage());
+        stacktrace(stringBuilder, level + 1, errorBean.getStackTrace());
+    }
+
+    private static void header(@NotNull StringBuilder stringBuilder, int level, @NotNull String name) {
         stringBuilder.append("\n");
-        stringBuilder.append("# ");
+
+        for (int i = 0; i < level; i++) {
+            stringBuilder.append('#');
+        }
+
+        stringBuilder.append(' ');
         stringBuilder.append(name);
         stringBuilder.append("\n\n");
     }
 
 
-    private static void message(@NotNull StringBuilder stringBuilder, @Nullable String message) {
-        codeBlockSection(stringBuilder, "Message", message);
+    private static void message(@NotNull StringBuilder stringBuilder, int level, @Nullable String message) {
+        textSection(stringBuilder, level, "Message", message);
     }
 
-    private static void stacktrace(@NotNull StringBuilder stringBuilder, @Nullable String stacktrace) {
-        codeBlockSection(stringBuilder, "Stacktrace", stacktrace);
+    private static void stacktrace(@NotNull StringBuilder stringBuilder, int level, @Nullable String stacktrace) {
+        codeBlockSection(stringBuilder, level, "Stacktrace", stacktrace);
+    }
+
+    private static void textSection(@NotNull StringBuilder stringBuilder,
+                                    int level,
+                                    @NotNull String name,
+                                    @Nullable String text) {
+        if (text != null && !text.isEmpty()) {
+            header(stringBuilder, level, name);
+            stringBuilder.append(text);
+            stringBuilder.append("\n\n");
+        }
     }
 
     private static void version(@NotNull StringBuilder stringBuilder, @Nullable String version) {
         if (version != null) {
-            header(stringBuilder, "Version");
+            header(stringBuilder, 1, "Version");
             stringBuilder.append(version);
             stringBuilder.append("\n\n");
         }
