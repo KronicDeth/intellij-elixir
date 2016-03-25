@@ -44,6 +44,9 @@
     * Go To Declaration for Aliases now uses the same `isModular` checks as the stubbing for the index uses for Go To Symbol.
   * [#263](https://github.com/KronicDeth/intellij-elixir/pull/263) - Build against 14.0, 14.1, 15.0, and 2016.1 on travis-ci to ensure continued compatibility. - [@KronicDeth](https://github.com/KronicDeth)
   * [#273](https://github.com/KronicDeth/intellij-elixir/pull/273) - Error reporting for type highlighter gives the Class, Excerpt and Full Text when an unknown element type is encountered as the Excerpt alone is not enough sometimes. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#275](https://github.com/KronicDeth/intellij-elixir/pull/275) - [@KronicDeth](https://github.com/KronicDeth)
+    * Custom error handling that will open an issue against https://github.com/KronicDeth/intellij-elixir with the exception messsage and stacktrace filled in.
+    * Changed `NotImplementedExceptions` and (some) `assert`s to logging custom error message that include the `PsiElement` text and the containing file as an attachment.  The files make the URL too big for the error handler to put the file contents in when opening the browser with the error handler, so the issue body instead explains how to get the attachment text out of IntelliJ's "IDE Fatal Errors"
 * Bug Fixes
   * [#256](https://github.com/KronicDeth/intellij-elixir/pull/256) - Fix Elixir Mix Run configuration not persisting past restart - [@zyuyou](https://github.com/zyuyou)
   * [#259](https://github.com/KronicDeth/intellij-elixir/pull/259) - Allow `Infix#operator` to work on operations with errors, which eliminates the `AssertionError` reported when typing infix operation and they are incomplete - [@KronicDeth](https://github.com/KronicDeth)

@@ -40,6 +40,17 @@
               Error reporting for type highlighter gives the Class, Excerpt and Full Text when an unknown element type
               is encountered as the Excerpt alone is not enough sometimes.
             </li>
+            <li>
+              Custom error handling that will open an issue against https://github.com/KronicDeth/intellij-elixir with
+              the exception messsage and stacktrace filled in.
+            </li>
+            <li>
+              Changed <code>NotImplementedExceptions</code> and (some) <code>assert</code>s to logging custom error
+              message that include the <code>PsiElement</code> text and the containing file as an attachment.  The files
+              make the URL too big for the error handler to put the file contents in when opening the browser with the
+              error handler, so the issue body instead explains how to get the attachment text out of IntelliJ's
+              "IDE Fatal Errors"
+            </li>
           </ul>
         </li>
         <li>
