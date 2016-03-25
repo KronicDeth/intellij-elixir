@@ -12,6 +12,7 @@ import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.extensions.PluginId;
@@ -24,6 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.List;
 
 /**
  * @see <a href="https://github.com/JesusFreke/smali/blob/87d10dac2773cd35b7d5825d7957206e26c1727b/smalidea/src/main/java/org/jf/smalidea/errorReporting/ErrorReporter.java">{@code org.jf.smalidea.errorReporting.ErrorReporter}</a>
@@ -89,9 +94,51 @@ public class Submitter extends com.intellij.openapi.diagnostic.ErrorReportSubmit
         Object data = event.getData();
 
         if (data instanceof LogMessageEx) {
-            bean.setAttachments(((LogMessageEx) data).getIncludedAttachments());
+            bean.setAttachments(includedAttachments((LogMessageEx) data));
         }
         return bean;
+    }
+
+    /**
+     * Gets the attachment the user has marked to be included.  Tries to use
+     * {@link LogMessageEx#getIncludedAttachments()}, and then {@link LogMessageEx#getAttachments()}.
+     *
+     * @param logMessageEx with attachments
+     * @return the attachments
+     */
+    private static List<Attachment> includedAttachments(LogMessageEx logMessageEx) {
+        Class<LogMessageEx> klass = LogMessageEx.class;
+
+        List<Attachment> attachmentList = Collections.emptyList();
+
+        try {
+            Method getIncludedAttachments = klass.getDeclaredMethod("getIncludedAttachments", LogMessageEx.class);
+
+            try {
+                attachmentList = (List<Attachment>) getIncludedAttachments.invoke(logMessageEx);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } catch (NoSuchMethodException noSuchGetIncludedAttachmentsMethod) {
+            try {
+                Method getAttachments = klass.getDeclaredMethod("getAttachments", LogMessageEx.class);
+
+                try {
+                    attachmentList = (List<Attachment>) getAttachments.invoke(logMessageEx);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            } catch (NoSuchMethodException noSuchGetAttachmentsMethod) {
+                noSuchGetAttachmentsMethod.printStackTrace();
+            }
+        }
+
+
+        return attachmentList;
     }
 
     @Nullable
