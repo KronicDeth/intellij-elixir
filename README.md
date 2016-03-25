@@ -68,6 +68,7 @@
       - [In browser](#in-browser)
       - [In IDE](#in-ide)
   - [Screenshots](#screenshots)
+  - [Error reporting](#error-reporting)
   - [Donations](#donations)
     - [Donors](#donors)
 
@@ -2107,6 +2108,22 @@ The Visibility icons indicated whether the element is usable outside its definin
 
 ![Color Settings](/screenshots/Color%20Settings.png?raw=true "Color Settings")
 ![New Elixir File](/screenshots/New%20Elixir%20File.png?raw=true "New Elixir File")
+
+## Error reporting
+
+If the plugin encounters an error, there is a custom error handler registered, so you can open a pre-populated issue in your browser.
+ 
+1. Click the red error notification in bottom right corner of the IDE window.
+![Fatal IDE Errors](/screenshots/error_handler/IDE%20Fatal%20Errors.png?raw=true "Fatal IDE Errors")
+2. Fill in a description of what you were doing when the error occurred.
+3. Click "Open Issue against https://github.com/KronicDeth/intellij-elixir"
+4. The IDE will open your browser to https://github.com/KronicDeth/intellij-elixir/issues/new
+![Write New Issue](/screenshots/error_handler/Write%20New%20Issue.png?raw=true "Write New Issue")
+5. The title will be filled as `[auto-generated]`, but if you can summarize the issue, change the title.
+6. If the "Fatal IDE Errors" dialog has Attachments, copy their contents to the `Attachments` section of the issue body.
+7. **Review for IP disclosures. This will be public, so use your bet judgement of how much of your code to post in the issue.**
+8. Click the "Preview" tab to ensure the Markdown formatting looks correct.
+9. Click "Submit new issue".
 
 ## Donations
 
