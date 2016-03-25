@@ -760,6 +760,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
+            /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+               {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
         } else if (psiElement instanceof ElixirAccessExpression ||
                 psiElement instanceof ElixirAssociationsBase ||
                 psiElement instanceof ElixirAssociations ||
