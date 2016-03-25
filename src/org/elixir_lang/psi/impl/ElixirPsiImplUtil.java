@@ -756,8 +756,8 @@ public class ElixirPsiImplUtil {
     public static Quotable leftOperand(Infix infix) {
         PsiElement[] children = infix.getChildren();
 
-        if (children.length != 3) {
-            error(Infix.class, "Infix operation expected 3 children, but has " + children.length, infix);
+        if (children.length < 2 || 3 < children.length) {
+            error(Infix.class, "Infix operation expected 2-3 children, but has " + children.length, infix);
         }
 
         return (Quotable) children[0];
