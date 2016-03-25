@@ -43,6 +43,7 @@
     - [Go To Declaration](#go-to-declaration)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
+    - [Go To Symbol](#go-to-symbol)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
@@ -1062,6 +1063,19 @@ If you hold `Cmd` and hover over the Alias before clicking, the target declarati
   c. `Cmd+Click`
 
 If you hold `Cmd` and hover over the `@module_attribute` before clicking, the target declaration will be shown.
+
+### Go To Symbol
+
+Go To Symbol is a way to search for any of the following by name:
+
+* Call definition clauses (`def`, `defp`, `defmacro`, and `defmacrop`)
+* Callbacks (`@callback` and `@macrocallback`)
+* Call definition specifications (`@spec`)
+* Call definition heads (`foo(bar)`) for delegation (`defdelegate foo(bar), to: BAZ`)
+* Implementations (`defimpl`)
+* Protocols (`defprotocol`)
+
+You can bring up Go To Symbol with the keyboard shortcut (⌥⌘O on OSX) or using the menus (Navigate > Symbol...).
 
 ### Find Usage
 
