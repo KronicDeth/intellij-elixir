@@ -16,8 +16,12 @@ public class ElixirUnaryPrefixOperatorImpl extends ASTWrapperPsiElement implemen
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitUnaryPrefixOperator(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnaryPrefixOperator(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

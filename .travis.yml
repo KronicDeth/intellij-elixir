@@ -19,11 +19,6 @@ matrix:
       jdk: openjdk6
     - env: ELIXIR_VERSION="1.1.1" IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
       jdk: openjdk6
-
-    - env: ELIXIR_VERSION="1.2.3" IDEA_TARBALL_ROOT_BASENAME="idea-IC-139.1603.1" IDEA_VERSION="14.0.4"
-      jdk: openjdk6
-    - env: ELIXIR_VERSION="1.1.1" IDEA_TARBALL_ROOT_BASENAME="idea-IC-139.1603.1" IDEA_VERSION="14.0.4"
-      jdk: openjdk6
 before_install:
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"

@@ -14,8 +14,12 @@ public class ElixirInterpolatedStringHeredocLineImpl extends ASTWrapperPsiElemen
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitInterpolatedStringHeredocLine(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedStringHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

@@ -18,8 +18,12 @@ public class ElixirLiteralWordsLineImpl extends ASTWrapperPsiElement implements 
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitLiteralWordsLine(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralWordsLine(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

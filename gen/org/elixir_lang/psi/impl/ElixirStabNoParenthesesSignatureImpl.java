@@ -16,8 +16,12 @@ public class ElixirStabNoParenthesesSignatureImpl extends ASTWrapperPsiElement i
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitStabNoParenthesesSignature(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStabNoParenthesesSignature(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

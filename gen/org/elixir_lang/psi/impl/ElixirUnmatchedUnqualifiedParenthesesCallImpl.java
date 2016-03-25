@@ -22,8 +22,12 @@ public class ElixirUnmatchedUnqualifiedParenthesesCallImpl extends NamedStubbedP
     super(stub, nodeType);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitUnmatchedUnqualifiedParenthesesCall(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnmatchedUnqualifiedParenthesesCall(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

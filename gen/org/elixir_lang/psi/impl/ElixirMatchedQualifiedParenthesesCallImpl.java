@@ -22,8 +22,12 @@ public class ElixirMatchedQualifiedParenthesesCallImpl extends NamedStubbedPsiEl
     super(stub, nodeType);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitMatchedQualifiedParenthesesCall(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedQualifiedParenthesesCall(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

@@ -20,8 +20,12 @@ public class ElixirLiteralStringSigilHeredocImpl extends ASTWrapperPsiElement im
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitLiteralStringSigilHeredoc(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralStringSigilHeredoc(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

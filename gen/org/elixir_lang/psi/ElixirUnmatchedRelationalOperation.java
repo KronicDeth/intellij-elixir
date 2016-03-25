@@ -77,7 +77,7 @@ public interface ElixirUnmatchedRelationalOperation extends ElixirUnmatchedExpre
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

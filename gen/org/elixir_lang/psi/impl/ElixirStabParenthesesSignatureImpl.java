@@ -15,8 +15,12 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitStabParenthesesSignature(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitStabParenthesesSignature(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
@@ -65,7 +69,7 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
     return ElixirPsiImplUtil.quote(this);
   }
 
-  @NotNull
+  @Nullable
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);
   }

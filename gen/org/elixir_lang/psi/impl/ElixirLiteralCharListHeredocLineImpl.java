@@ -14,8 +14,12 @@ public class ElixirLiteralCharListHeredocLineImpl extends ASTWrapperPsiElement i
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitLiteralCharListHeredocLine(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralCharListHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

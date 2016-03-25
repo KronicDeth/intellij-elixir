@@ -19,8 +19,12 @@ public class ElixirUnmatchedRelationalOperationImpl extends ElixirUnmatchedExpre
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitUnmatchedRelationalOperation(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnmatchedRelationalOperation(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
@@ -136,7 +140,7 @@ public class ElixirUnmatchedRelationalOperationImpl extends ElixirUnmatchedExpre
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
 
-  @NotNull
+  @Nullable
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);
   }

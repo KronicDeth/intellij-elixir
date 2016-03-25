@@ -25,8 +25,12 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
     super(stub, nodeType);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitUnmatchedDotCall(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitUnmatchedDotCall(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

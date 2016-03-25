@@ -16,8 +16,12 @@ public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedEx
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitMatchedCaptureNonNumericOperation(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedCaptureNonNumericOperation(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

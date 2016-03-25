@@ -14,8 +14,12 @@ public class ElixirLiteralWordsHeredocLineImpl extends ASTWrapperPsiElement impl
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitLiteralWordsHeredocLine(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitLiteralWordsHeredocLine(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

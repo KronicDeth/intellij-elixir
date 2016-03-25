@@ -14,8 +14,12 @@ public class ElixirDecimalFloatExponentSignImpl extends ASTWrapperPsiElement imp
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitDecimalFloatExponentSign(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitDecimalFloatExponentSign(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

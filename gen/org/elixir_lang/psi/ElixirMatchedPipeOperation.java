@@ -77,7 +77,7 @@ public interface ElixirMatchedPipeOperation extends ElixirMatchedExpression, Nam
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

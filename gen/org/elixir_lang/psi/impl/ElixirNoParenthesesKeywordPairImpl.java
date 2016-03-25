@@ -15,8 +15,12 @@ public class ElixirNoParenthesesKeywordPairImpl extends ASTWrapperPsiElement imp
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitNoParenthesesKeywordPair(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitNoParenthesesKeywordPair(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

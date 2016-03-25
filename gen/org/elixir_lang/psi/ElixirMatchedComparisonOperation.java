@@ -77,7 +77,7 @@ public interface ElixirMatchedComparisonOperation extends ElixirMatchedExpressio
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

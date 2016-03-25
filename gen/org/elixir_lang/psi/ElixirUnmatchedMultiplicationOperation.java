@@ -77,7 +77,7 @@ public interface ElixirUnmatchedMultiplicationOperation extends ElixirUnmatchedE
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

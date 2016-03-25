@@ -312,12 +312,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 PsiElement rightOperand = infix.rightOperand();
 
-                highlightTypesAndTypeParameterUsages(
-                        rightOperand,
-                        typeParameterNameSet,
-                        annotationHolder,
-                        ElixirSyntaxHighlighter.TYPE
-                );
+                if (rightOperand != null) {
+                    highlightTypesAndTypeParameterUsages(
+                            rightOperand,
+                            typeParameterNameSet,
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
             } else if (grandChild instanceof ElixirMatchedUnqualifiedParenthesesCall) {
                 // seen as `unquote(ast)`, but could also be just the beginning of typing
                 ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
@@ -507,22 +509,28 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     PsiElement matchedTypeOperationRightOperand = matchedTypeOperation.rightOperand();
 
-                    highlightTypesAndTypeParameterUsages(
-                            matchedTypeOperationRightOperand,
-                            typeParameterNameSet,
-                            annotationHolder,
-                            ElixirSyntaxHighlighter.TYPE
-                    );
+                    if (matchedTypeOperationRightOperand != null) {
+                        highlightTypesAndTypeParameterUsages(
+                                matchedTypeOperationRightOperand,
+                                typeParameterNameSet,
+                                annotationHolder,
+                                ElixirSyntaxHighlighter.TYPE
+                        );
+                    }
                 } else {
                     cannotHighlightTypes(leftOperand);
                 }
 
-                highlightTypesAndSpecificationTypeParameterDeclarations(
-                        matchedWhenOperation.rightOperand(),
-                        typeParameterNameSet,
-                        annotationHolder,
-                        ElixirSyntaxHighlighter.TYPE
-                );
+                Quotable rightOperand = matchedWhenOperation.rightOperand();
+
+                if (rightOperand != null) {
+                    highlightTypesAndSpecificationTypeParameterDeclarations(
+                            rightOperand,
+                            typeParameterNameSet,
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
             }
         }
     }
@@ -552,7 +560,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
     }
 
-    private void highlightTypesAndSpecificationTypeParameterDeclarations(PsiElement psiElement,
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(@NotNull PsiElement psiElement,
                                                                          Set<String> typeParameterNameSet,
                                                                          AnnotationHolder annotationHolder,
                                                                          TextAttributesKey typeTextAttributesKey) {
@@ -718,7 +726,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private void highlightTypesAndTypeParameterUsages(
-            Infix infix,
+            @NotNull Infix infix,
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
@@ -728,15 +736,20 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 annotationHolder,
                 typeTextAttributesKey
         );
-        highlightTypesAndTypeParameterUsages(
-                infix.rightOperand(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-        );
+
+        PsiElement rightOperand = infix.rightOperand();
+
+        if (rightOperand != null) {
+            highlightTypesAndTypeParameterUsages(
+                    rightOperand,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        }
     }
 
-    private void highlightTypesAndTypeParameterUsages(PsiElement psiElement,
+    private void highlightTypesAndTypeParameterUsages(@NotNull PsiElement psiElement,
                                                       Set<String> typeParameterNameSet,
                                                       AnnotationHolder annotationHolder,
                                                       TextAttributesKey typeTextAttributesKey) {
@@ -747,6 +760,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
+            /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+               {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
         } else if (psiElement instanceof ElixirAccessExpression ||
                 psiElement instanceof ElixirAssociationsBase ||
                 psiElement instanceof ElixirAssociations ||
@@ -1058,7 +1074,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
         return Collections.singleton(noParenthesesKeywordPair.getKeywordKey().getText());
     }
 
-    private Set<String> specificationTypeParameterNameSet(PsiElement psiElement) {
+    private Set<String> specificationTypeParameterNameSet(@NotNull PsiElement psiElement) {
         Set<String> parameterNameSet;
 
         if (psiElement instanceof ElixirAccessExpression ||

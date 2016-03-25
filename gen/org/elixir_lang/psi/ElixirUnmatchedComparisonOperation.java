@@ -77,7 +77,7 @@ public interface ElixirUnmatchedComparisonOperation extends ElixirUnmatchedExpre
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable
