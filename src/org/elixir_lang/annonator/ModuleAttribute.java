@@ -11,8 +11,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.TokenSet;
-import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.ElixirSyntaxHighlighter;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -110,6 +110,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
+
+    private void cannotHighlightTypes(PsiElement element) {
+        error("Cannot highlight types", element);
+    }
+
+    private void error(@NotNull String userMessage, PsiElement element) {
+        Logger.error(this.getClass(), userMessage, element);
+    }
 
     /**
      * Highlights `textRange` with the given `textAttributesKey`.
@@ -296,20 +304,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             );
                         }
                     } else {
-                        throw new NotImplementedException(
-                                "Highlighting types for " + call.getClass().getCanonicalName() + " PsiElements is " +
-                                        "not implemented yet.  Please open an issue " +
-                                        "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class " +
-                                        "name of the sample text:\n" + ((PsiElement) call).getText()
-                        );
+                        cannotHighlightTypes(call);
                     }
                 } else {
-                    throw new NotImplementedException(
-                            "Highlighting types for " + leftOperand.getClass().getCanonicalName() + " PsiElements is " +
-                                    "not implemented yet.  Please open an issue " +
-                                    "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name of " +
-                                    "the sample text:\n" + leftOperand.getText()
-                    );
+                    cannotHighlightTypes(leftOperand);
                 }
 
                 PsiElement rightOperand = infix.rightOperand();
@@ -338,21 +336,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         );
                     }
                 } else {
-                    throw new NotImplementedException(
-                            "Highlighting types for " +
-                                    matchedUnqualifiedParenthesesCall.getClass().getCanonicalName() + " PsiElements " +
-                                    "is not implemented yet.  Please open an issue " +
-                                    "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name " +
-                                    "of the sample text:\n" + grandChild.getText()
-                    );
+                    cannotHighlightTypes(matchedUnqualifiedParenthesesCall);
                 }
             } else {
-                throw new NotImplementedException(
-                        "Highlighting types for " + grandChild.getClass().getCanonicalName() + " PsiElements is not " +
-                                "implemented yet.  Please open an issue " +
-                                "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name of " +
-                                "the sample text:\n" + grandChild.getText()
-                );
+                cannotHighlightTypes(grandChild);
             }
         }
     }
@@ -385,12 +372,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else {
-            throw new NotImplementedException(
-                    "Highlighting types and type type parameter declarations for " +
-                            psiElement.getClass().getCanonicalName() + " PsiElements is not implemented yet.  Please " +
-                            "open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) with the class " +
-                            "name of the sample text:\n" + psiElement.getText()
-            );
+            error("Cannot highlight types and type parameter declarations", psiElement);
         }
     }
 
@@ -520,15 +502,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             );
                         }
                     } else {
-                        throw new NotImplementedException(
-                                "Highlighting types for " +
-                                        matchedTypeOperationLeftOperand.getClass().getCanonicalName() +
-                                        " PsiElements that are the left operand of " +
-                                        matchedTypeOperation.getClass().getCanonicalName() + " is not implemented " +
-                                        "yet.  Please open an issue " +
-                                        "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class " +
-                                        "name of the sample text:\n" + matchedWhenOperation.getText()
-                        );
+                        cannotHighlightTypes(matchedTypeOperationLeftOperand);
                     }
 
                     PsiElement matchedTypeOperationRightOperand = matchedTypeOperation.rightOperand();
@@ -540,13 +514,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             ElixirSyntaxHighlighter.TYPE
                     );
                 } else {
-                    throw new NotImplementedException(
-                            "Highlighting types for " + leftOperand.getClass().getCanonicalName() + " PsiElements " +
-                                    "that are the left operand of " +
-                                    matchedWhenOperation.getClass().getCanonicalName() + " is not implemented yet.  " +
-                                    "Please open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) " +
-                                    "with the class name of the sample text:\n" + matchedWhenOperation.getText()
-                    );
+                    cannotHighlightTypes(leftOperand);
                 }
 
                 highlightTypesAndSpecificationTypeParameterDeclarations(
@@ -613,27 +581,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else {
-            throw new NotImplementedException(
-                    "Highlighting types and type parameter declarations not implemented for your use case. Please " +
-                            "open an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) using the " +
-                            "following:\n" +
-                            "\n" +
-                            "# Class\n" +
-                            "\n" +
-                            "`" + psiElement.getClass().getCanonicalName() + "`\n" +
-                            "\n" +
-                            "# Excerpt\n" +
-                            "\n" +
-                            "```\n" +
-                            psiElement.getText() + "\n" +
-                            "```\n" +
-                            "\n" +
-                            "# Full Text\n" +
-                            "\n" +
-                            "```\n" +
-                            psiElement.getContainingFile().getText() + "\n" +
-                            "```"
-            );
+            error("Cannot highlight types and specification type parameter declarations", psiElement);
         }
     }
 
@@ -658,8 +606,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
             @SuppressWarnings("unused") TextAttributesKey textAttributesKey) {
         if (typeParameterNameSet.contains(unqualifiedNoArgumentsCall.functionName())) {
             PsiElement functionNameElement = unqualifiedNoArgumentsCall.functionNameElement();
-
-            assert functionNameElement != null;
 
             highlight(
                     functionNameElement.getTextRange(),
@@ -754,12 +700,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else {
-            throw new NotImplementedException(
-                    "Highlighting types for " + stabParenthesesSignature.getClass().getCanonicalName() +
-                            " PsiElements with neither 1 nor 3 children is not implemented yet.  Please open an " +
-                            "issue (https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name " +
-                            "of the sample text:\n" + stabParenthesesSignature.getText()
-            );
+            error("Cannot highlight types and type parameter usages", stabParenthesesSignature);
         }
     }
 
@@ -929,12 +870,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else {
-            throw new NotImplementedException(
-                    "Highlighting types for " + psiElement.getClass().getCanonicalName() +
-                            " PsiElements is not implemented yet.  Please open an issue " +
-                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name of the " +
-                            "sample text:\n" + psiElement.getText()
-            );
+            cannotHighlightTypes(psiElement);
         }
     }
 
@@ -1032,15 +968,19 @@ public class ModuleAttribute implements Annotator, DumbAware {
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
         PsiElement functionNameElement = unqualifiedNoParenthesesCall.functionNameElement();
-        assert functionNameElement != null;
-        highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
-        highlightTypesAndTypeParameterUsages(
-                unqualifiedNoParenthesesCall.primaryArguments(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-        );
+        if (functionNameElement != null) {
+            highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
+
+            highlightTypesAndTypeParameterUsages(
+                    unqualifiedNoParenthesesCall.primaryArguments(),
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else {
+            error("Cannot highlight types and type parameter usages", unqualifiedNoParenthesesCall);
+        }
     }
 
     private void highlightTypesAndTypeParameterUsages(
@@ -1050,26 +990,29 @@ public class ModuleAttribute implements Annotator, DumbAware {
             TextAttributesKey typeTextAttributesKey) {
         PsiElement functionNameElement = unqualifiedParenthesesCall.functionNameElement();
 
-        assert functionNameElement != null;
+        if (functionNameElement != null) {
 
-        highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
+            highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
-        highlightTypesAndTypeParameterUsages(
-                unqualifiedParenthesesCall.primaryArguments(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-        );
-
-        PsiElement[] secondaryArguments = unqualifiedParenthesesCall.secondaryArguments();
-
-        if (secondaryArguments != null) {
             highlightTypesAndTypeParameterUsages(
-                    secondaryArguments,
+                    unqualifiedParenthesesCall.primaryArguments(),
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
             );
+
+            PsiElement[] secondaryArguments = unqualifiedParenthesesCall.secondaryArguments();
+
+            if (secondaryArguments != null) {
+                highlightTypesAndTypeParameterUsages(
+                        secondaryArguments,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                );
+            }
+        } else {
+            error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall);
         }
     }
 
@@ -1116,40 +1059,25 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> specificationTypeParameterNameSet(PsiElement psiElement) {
+        Set<String> parameterNameSet;
+
         if (psiElement instanceof ElixirAccessExpression ||
                 psiElement instanceof ElixirKeywords ||
                 psiElement instanceof ElixirList ||
                 psiElement instanceof ElixirNoParenthesesKeywords) {
-            return specificationTypeParameterNameSet(psiElement.getChildren());
+            parameterNameSet = specificationTypeParameterNameSet(psiElement.getChildren());
         } else if (psiElement instanceof ElixirKeywordPair) {
-            return specificationTypeParameterNameSet((ElixirKeywordPair) psiElement);
+            parameterNameSet = specificationTypeParameterNameSet((ElixirKeywordPair) psiElement);
         } else if (psiElement instanceof ElixirNoParenthesesKeywordPair) {
-            return specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
+            parameterNameSet = specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
         } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
-            return specificationTypeParameterNameSet((UnqualifiedNoArgumentsCall) psiElement);
+            parameterNameSet = specificationTypeParameterNameSet((UnqualifiedNoArgumentsCall) psiElement);
         } else {
-            throw new NotImplementedException(
-                    "Extracting specification type parameter name set not implemented for your use case. Please open " +
-                            "an issue (https://github.com/KronicDeth/intellij-elixir/issues/new) using the " +
-                            "following:\n" +
-                            "\n" +
-                            "# Class\n" +
-                            "\n" +
-                            "`" + psiElement.getClass().getCanonicalName() + "`\n" +
-                            "\n" +
-                            "# Excerpt\n" +
-                            "\n" +
-                            "```\n" +
-                            psiElement.getText() + "\n" +
-                            "```\n" +
-                            "\n" +
-                            "# Full Text\n" +
-                            "\n" +
-                            "```\n" +
-                            psiElement.getContainingFile().getText() + "\n" +
-                            "```"
-            );
+            error("Cannot extract specification type parameter name set", psiElement);
+            parameterNameSet = Collections.emptySet();
         }
+
+        return parameterNameSet;
     }
 
     private Set<String> specificationTypeParameterNameSet(PsiElement[] psiElements) {
@@ -1191,16 +1119,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> typeTypeParameterNameSet(PsiElement psiElement) {
+        Set<String> typeParameterNameSet;
+
         if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
-            return Collections.singleton(psiElement.getText());
+            typeParameterNameSet = Collections.singleton(psiElement.getText());
         } else {
-            throw new NotImplementedException(
-                    "Extracting type type parameter name set for " + psiElement.getClass().getCanonicalName() +
-                            " PsiElements is not implemented yet.  Please open an issue " +
-                            "(https://github.com/KronicDeth/intellij-elixir/issues/new) with the class name of the " +
-                            "sample text:\n" + psiElement.getText()
-            );
+            error("Cannot extract type type parameter name set", psiElement);
+            typeParameterNameSet = Collections.emptySet();
         }
+
+        return typeParameterNameSet;
     }
 
     private Set<String> typeTypeParameterNameSet(PsiElement[] psiElements) {

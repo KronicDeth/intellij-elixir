@@ -770,6 +770,8 @@
   <depends config-file="rich-platform-plugin.xml" optional="true">com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <errorHandler implementation="org.elixir_lang.errorreport.Submitter"/>
+
     <!-- Elixir Module Structure -->
     <sdkType implementation="org.elixir_lang.sdk.ElixirSdkType"/>
 

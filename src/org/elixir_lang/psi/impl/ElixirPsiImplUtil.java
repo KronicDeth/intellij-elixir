@@ -43,6 +43,7 @@ import javax.swing.*;
 import java.math.BigInteger;
 import java.util.*;
 
+import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 
 /**
@@ -755,7 +756,9 @@ public class ElixirPsiImplUtil {
     public static Quotable leftOperand(Infix infix) {
         PsiElement[] children = infix.getChildren();
 
-        assert children.length == 3;
+        if (children.length != 3) {
+            error(Infix.class, "Infix operation expected 3 children, but has " + children.length, infix);
+        }
 
         return (Quotable) children[0];
     }
@@ -903,7 +906,9 @@ public class ElixirPsiImplUtil {
     public static Quotable operand(Prefix prefix) {
         PsiElement[] children = prefix.getChildren();
 
-        assert children.length == 2;
+        if (children.length != 2) {
+            error(Prefix.class, "Prefix operation does not have 2 children, but " + children.length, prefix);
+        }
 
         return (Quotable) children[1];
     }
@@ -4241,7 +4246,9 @@ if (quoted == null) {
     public static Quotable rightOperand(Infix infix) {
         PsiElement[] children = infix.getChildren();
 
-        assert children.length == 3;
+        if (children.length != 3) {
+            error(Infix.class, "Excepted infix operations to have 3 children, but have " + children.length, infix);
+        }
 
         return (Quotable) children[2];
     }
