@@ -20,8 +20,12 @@ public class ElixirInterpolatedCharListSigilHeredocImpl extends ASTWrapperPsiEle
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitInterpolatedCharListSigilHeredoc(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitInterpolatedCharListSigilHeredoc(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

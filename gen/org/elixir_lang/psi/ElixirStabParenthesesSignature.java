@@ -32,7 +32,7 @@ public interface ElixirStabParenthesesSignature extends Quotable, When {
   @NotNull
   OtpErlangObject quote();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
 }

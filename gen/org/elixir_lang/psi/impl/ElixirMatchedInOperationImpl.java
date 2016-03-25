@@ -19,8 +19,12 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitMatchedInOperation(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitMatchedInOperation(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 
@@ -127,7 +131,7 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
     return ElixirPsiImplUtil.resolvedSecondaryArity(this);
   }
 
-  @NotNull
+  @Nullable
   public Quotable rightOperand() {
     return ElixirPsiImplUtil.rightOperand(this);
   }

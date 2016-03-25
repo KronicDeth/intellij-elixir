@@ -77,7 +77,7 @@ public interface ElixirUnmatchedAdditionOperation extends ElixirUnmatchedExpress
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

@@ -1286,7 +1286,14 @@ public class ElixirPsiImplUtil {
         OtpErlangObject quotedOperator = operator.quote();
 
         Quotable rightOperand = infix.rightOperand();
-        OtpErlangObject quotedRightOperand = rightOperand.quote();
+        OtpErlangObject quotedRightOperand;
+
+        if (rightOperand != null) {
+            quotedRightOperand = rightOperand.quote();
+        } else {
+            // this is not valid Elixir quoting, but something needs to be there for quoting to work
+            quotedRightOperand = NIL;
+        }
 
         return quotedFunctionCall(
                 quotedOperator,
@@ -4242,15 +4249,18 @@ if (quoted == null) {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static Quotable rightOperand(Infix infix) {
         PsiElement[] children = infix.getChildren();
+        Quotable rightOperand = null;
 
-        if (children.length != 3) {
-            error(Infix.class, "Excepted infix operations to have 3 children, but have " + children.length, infix);
+        /* rightOperand won't be there when Pratt Parser recovered from error in right-operand by matching up through
+           the operator only. */
+        if (children.length == 3) {
+            rightOperand = (Quotable) children[2];
         }
 
-        return (Quotable) children[2];
+        return rightOperand;
     }
 
     @Contract(pure = true)

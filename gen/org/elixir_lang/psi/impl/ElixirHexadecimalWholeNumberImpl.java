@@ -20,8 +20,12 @@ public class ElixirHexadecimalWholeNumberImpl extends ASTWrapperPsiElement imple
     super(node);
   }
 
+  public void accept(@NotNull ElixirVisitor visitor) {
+    visitor.visitHexadecimalWholeNumber(this);
+  }
+
   public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof ElixirVisitor) ((ElixirVisitor)visitor).visitHexadecimalWholeNumber(this);
+    if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
   }
 

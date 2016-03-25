@@ -77,7 +77,7 @@ public interface ElixirUnmatchedTwoOperation extends ElixirUnmatchedExpression, 
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable

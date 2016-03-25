@@ -72,7 +72,7 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, C
   @Nullable
   Integer resolvedSecondaryArity();
 
-  @NotNull
+  @Nullable
   Quotable rightOperand();
 
   @Nullable
