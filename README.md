@@ -2121,7 +2121,7 @@ If the plugin encounters an error, there is a custom error handler registered, s
 ![Write New Issue](/screenshots/error_handler/Write%20New%20Issue.png?raw=true "Write New Issue")
 5. The title will be filled as `[auto-generated]`, but if you can summarize the issue, change the title.
 6. If the "Fatal IDE Errors" dialog has Attachments, copy their contents to the `Attachments` section of the issue body.
-7. **Review for IP disclosures. This will be public, so use your bet judgement of how much of your code to post in the issue.**
+7. **Review for IP disclosures. This will be public, so use your best judgement of how much of your code to post in the issue.**
 8. Click the "Preview" tab to ensure the Markdown formatting looks correct.
 9. Click "Submit new issue".
 
