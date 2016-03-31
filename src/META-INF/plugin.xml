@@ -20,6 +20,12 @@
                  NOTE: This does not address error recovery recovery since I don't have a regression test case.
                </strong>
             </li>
+            <li>
+              All function name elements act as <code>PsiNameIdentifier</code>s now even if they don't resolve, but that
+              means they all need to support <code>FindUsagesProvider#getType</code>, which they don't, so use a
+              placeholder of "unknown call type" for any <code>Call</code> that can't be matched and "unknown element"
+              for anything else.
+            </li>
           </ul>
         <li>
       </ul>
