@@ -943,7 +943,9 @@ public class ElixirPsiImplUtil {
     public static Operator operator(Prefix prefix) {
         PsiElement[] children = prefix.getChildren();
 
-        assert children.length == 2;
+        if (children.length != 2) {
+            error(Prefix.class, "Prefix operation does not have 2 children, but " + children.length, prefix);
+        }
 
         return (Operator) children[0];
     }
