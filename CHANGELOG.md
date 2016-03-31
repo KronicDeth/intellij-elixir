@@ -36,7 +36,8 @@
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
   * [#283](https://github.com/KronicDeth/intellij-elixir/pull/283) - All function name elements act as `PsiNameIdentifier`s now even if they don't resolve, but that means they all need to support `FindUsagesProvider#getType`, which they don't, so use a placeholder of "unknown call type" for any `Call` that can't be matched and "unknown element" for anything else. - [@KronicDeth](https://github.com/KronicDeth)
-
+  * [#284](https://github.com/KronicDeth/intellij-elixir/pull/284) - Enumerate all Kernel Functions, Macros, and Special Forms in the Syntax Highlighting section of the README, so that users searching for which category controls highlighting a given call can find it. - [@KronicDeth](https://github.com/KronicDeth)
+  
 ## v3.0.0
 * Enhancements
   * [#257](https://github.com/KronicDeth/intellij-elixir/pull/257) - [@KronicDeth](https://github.com/KronicDeth)
