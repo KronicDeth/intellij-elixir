@@ -90,8 +90,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     @NotNull
     @Override
     public String getType(@NotNull final PsiElement element) {
-        // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
-        String type = null;
+        String type = "unknown element type";
 
         if (element instanceof Call) {
             Call call = (Call) element;
@@ -126,6 +125,8 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
                 type = "use";
             } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
                 type = "module attribute";
+            } else {
+                type = "unknown call type";
             }
         } else if (element instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) element;
@@ -135,7 +136,6 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
             }
         }
 
-        //noinspection ConstantConditions
         return type;
     }
 
