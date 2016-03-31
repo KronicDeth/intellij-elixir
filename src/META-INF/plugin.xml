@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>3.0.0</version>
+  <version>3.0.1</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,20 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v3.0.1</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+               Use the error reporter logger instead of plain <code>assert</code> in <code>Prefix#operator</code>.
+               <strong>
+                 NOTE: This does not address error recovery recovery since I don't have a regression test case.
+               </strong>
+            </li>
+          </ul>
+        <li>
+      </ul>
       <h1>v3.0.0</h1>
       <ul>
         <li>

@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v3.0.1](#v301)
   - [v3.0.0](#v300)
   - [v2.2.0](#v220)
   - [v2.1.0](#v210)
@@ -30,6 +31,10 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v3.0.1
+* Bug Fixes
+  * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v3.0.0
 * Enhancements
