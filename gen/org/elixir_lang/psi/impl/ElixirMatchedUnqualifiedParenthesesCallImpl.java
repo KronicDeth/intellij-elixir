@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
@@ -69,6 +70,11 @@ public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsi
 
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {

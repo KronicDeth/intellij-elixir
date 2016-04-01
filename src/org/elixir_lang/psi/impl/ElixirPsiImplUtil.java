@@ -29,6 +29,7 @@ import org.elixir_lang.psi.operation.Prefix;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
+import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
@@ -2166,6 +2167,11 @@ public class ElixirPsiImplUtil {
                 return call.getIcon(0);
             }
         };
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull Call call) {
+        return new Callable(call);
     }
 
     @Nullable

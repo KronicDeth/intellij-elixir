@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
@@ -34,6 +35,9 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   String getName();
 
   PsiElement getNameIdentifier();
+
+  @Nullable
+  PsiReference getReference();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 

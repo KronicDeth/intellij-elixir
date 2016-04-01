@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.modular.Implementation;
@@ -125,6 +126,8 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
                 type = "use";
             } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
                 type = "module attribute";
+            } else if (Callable.isParameter(call)) {
+                type = "parameter";
             } else {
                 type = "unknown call type";
             }

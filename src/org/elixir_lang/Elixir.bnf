@@ -16,6 +16,7 @@
     hasDoBlockOrKeyword
     getName
     getNameIdentifier
+    getReference
     getStub
     isCalling
     isCallingMacro
