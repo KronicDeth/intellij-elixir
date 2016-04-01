@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Infix;
 import org.elixir_lang.psi.operation.Operation;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
@@ -18,6 +19,32 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     /*
      * Static Methods
      */
+
+    @Nullable
+    public static Call enclosingCallForArgument(@NotNull Call call) {
+        PsiElement parent = call.getParent();
+        Call enclosingCall = null;
+
+        if (parent instanceof ElixirNoParenthesesOneArgument) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof Call) {
+                enclosingCall = (Call) grandParent;
+            }
+        } else if (parent instanceof ElixirParenthesesArguments) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof ElixirMatchedParenthesesArguments) {
+                PsiElement greatGrandParent = grandParent.getParent();
+
+                if (greatGrandParent instanceof Call) {
+                    enclosingCall = (Call) greatGrandParent;
+                }
+            }
+        }
+
+        return enclosingCall;
+    }
 
     public static boolean isParameter(@NotNull Call call) {
         PsiElement parent = call.getParent();
@@ -153,6 +180,65 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             resolveResultList.add(new PsiElementResolveResult(call));
         } else if (isParameterWithDefault(call)) {
             resolveResultList.add(new PsiElementResolveResult(call));
+        } else {
+            Call enclosingCall = enclosingCallForArgument(call);
+
+            if (enclosingCall != null) {
+                Call enclosingEnclosingCall = enclosingCallForArgument(enclosingCall);
+
+                if (enclosingEnclosingCall != null) {
+                    PsiElement parent = enclosingEnclosingCall.getParent();
+
+                    if (parent instanceof ElixirStabBody) {
+                        PsiElement grandParent = parent.getParent();
+
+                        if (grandParent instanceof ElixirStab) {
+                            PsiElement greatGrandParent = grandParent.getParent();
+
+                            if (greatGrandParent instanceof ElixirDoBlock) {
+                                PsiElement greatGreatGrandParent = greatGrandParent.getParent();
+
+                                if (greatGreatGrandParent instanceof Call) {
+                                    Call greatGreatGrandParentCall = (Call) greatGreatGrandParent;
+
+                                    if (CallDefinitionClause.is(greatGreatGrandParentCall)) {
+                                        PsiElement head = CallDefinitionClause.head(greatGreatGrandParentCall);
+
+                                        if (head != null) {
+                                            PsiElement stripped = CallDefinitionHead.strip(head);
+
+                                            if (stripped instanceof Call) {
+                                                Call strippedCall = (Call) stripped;
+
+                                                PsiElement[] parameters = ElixirPsiImplUtil.finalArguments(strippedCall);
+
+                                                if (parameters != null) {
+                                                    String name = call.getName();
+
+                                                    for (PsiElement parameter : parameters) {
+                                                        if (parameter instanceof PsiNamedElement) {
+                                                            PsiNamedElement namedParameter = (PsiNamedElement) parameter;
+                                                            String parameterName = namedParameter.getName();
+
+                                                            if (parameterName != null) {
+                                                                if (parameterName.equals(name)) {
+                                                                    resolveResultList.add(new PsiElementResolveResult(parameter));
+                                                                } else if (name != null && incompleteCode && parameterName.startsWith(name)) {
+                                                                    resolveResultList.add(new PsiElementResolveResult(parameter, false));
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         return resolveResultList;
