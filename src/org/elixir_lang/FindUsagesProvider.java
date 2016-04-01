@@ -128,6 +128,8 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
                 type = "module attribute";
             } else if (Callable.isParameter(call)) {
                 type = "parameter";
+            } else if (Callable.isParameterWithDefault(call)) {
+                type = "parameter with default";
             } else {
                 type = "unknown call type";
             }

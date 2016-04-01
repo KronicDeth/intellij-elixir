@@ -4,6 +4,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Operation;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionHead;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +52,27 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return isParameter;
+    }
+
+    public static boolean isParameterWithDefault(@NotNull Call call) {
+        PsiElement parent = call.getParent();
+        boolean isParameterWithDefault = false;
+
+        if (parent instanceof ElixirUnmatchedInMatchOperation) {
+            Infix parentOperation = (ElixirUnmatchedInMatchOperation) parent;
+            Operator operator = parentOperation.operator();
+            String operatorText = operator.getText();
+
+            if (operatorText.equals("\\\\")) {
+                PsiElement defaulted = parentOperation.leftOperand();
+
+                if (defaulted.isEquivalentTo(call)) {
+                    isParameterWithDefault = isParameter((Call) parentOperation);
+                }
+            }
+        }
+
+        return isParameterWithDefault;
     }
 
     /*
@@ -127,6 +150,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         List<ResolveResult> resolveResultList = new ArrayList<ResolveResult>();
 
         if (isParameter(call)) {
+            resolveResultList.add(new PsiElementResolveResult(call));
+        } else if (isParameterWithDefault(call)) {
             resolveResultList.add(new PsiElementResolveResult(call));
         }
 
