@@ -39,6 +39,8 @@ public interface ElixirMatchedAdditionOperation extends ElixirMatchedExpression,
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
   @NotNull

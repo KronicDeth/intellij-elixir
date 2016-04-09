@@ -70,6 +70,20 @@ public interface Call extends NavigatablePsiElement {
     /**
      * Whether {@code call} is of the named macro.
      *
+     * Differs from {@link #isCallingMacro(String, String, int)} because no arity is necessary,
+     * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
+     * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
+     *
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
+     */
+    boolean isCallingMacro(@NotNull final String resolvedModuleName,
+                           @NotNull final String resolvedFunctionName);
+
+    /**
+     * Whether {@code call} is of the named macro.
+     *
      * Differs from {@link #isCalling(String, String, int)} because this function ensures there is a {@code do}
      * block.  If the macro can be called without a {@code do} block, then
      * {@link #isCalling(String, String, int)} should be used instead.

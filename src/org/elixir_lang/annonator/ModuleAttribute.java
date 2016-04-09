@@ -17,6 +17,8 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Match;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.psi.operation.When;
 import org.jetbrains.annotations.NotNull;
 
@@ -248,12 +250,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof ElixirMatchedMatchOperation) {
+            if (grandChild instanceof Match) {
                 // TODO LocalInspectionTool with quick fix to "Use `::`, not `=`, to separate types declarations from their definitions"
-            } else if (grandChild instanceof ElixirMatchedTypeOperation) {
+            } else if (grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
-                Set<String> typeParameterNameSet = Collections.EMPTY_SET;
+                Set<String> typeParameterNameSet = Collections.emptySet();
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
@@ -282,7 +284,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                     primaryArguments,
                                     /* as stated above, if there are secondary arguments, then the primary arguments are
                                        to quote or some equivalent metaprogramming. */
-                                    Collections.EMPTY_SET,
+                                    Collections.<String>emptySet(),
                                     annotationHolder,
                                     ElixirSyntaxHighlighter.TYPE
                             );
@@ -413,7 +415,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof ElixirMatchedTypeOperation) {
+            if (grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
 
@@ -466,12 +468,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 PsiElement leftOperand = matchedWhenOperation.leftOperand();
 
-                if (leftOperand instanceof ElixirMatchedTypeOperation) {
-                    ElixirMatchedTypeOperation matchedTypeOperation = (ElixirMatchedTypeOperation) leftOperand;
-                    PsiElement matchedTypeOperationLeftOperand = matchedTypeOperation.leftOperand();
+                if (leftOperand instanceof Type) {
+                    Type typeOperation = (Type) leftOperand;
+                    PsiElement typeOperationLeftOperand = typeOperation.leftOperand();
 
-                    if (matchedTypeOperationLeftOperand instanceof Call) {
-                        Call call = (Call) matchedTypeOperationLeftOperand;
+                    if (typeOperationLeftOperand instanceof Call) {
+                        Call call = (Call) typeOperationLeftOperand;
                         PsiElement functionNameElement = call.functionNameElement();
 
                         if (functionNameElement != null) {
@@ -504,10 +506,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             );
                         }
                     } else {
-                        cannotHighlightTypes(matchedTypeOperationLeftOperand);
+                        cannotHighlightTypes(typeOperationLeftOperand);
                     }
 
-                    PsiElement matchedTypeOperationRightOperand = matchedTypeOperation.rightOperand();
+                    PsiElement matchedTypeOperationRightOperand = typeOperation.rightOperand();
 
                     if (matchedTypeOperationRightOperand != null) {
                         highlightTypesAndTypeParameterUsages(

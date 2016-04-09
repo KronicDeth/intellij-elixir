@@ -5,13 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Pipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedPipeOperation extends ElixirUnmatchedExpression, Named, Infix {
+public interface ElixirUnmatchedPipeOperation extends ElixirUnmatchedExpression, Named, Pipe {
 
   @NotNull
   ElixirPipeInfixOperator getPipeInfixOperator();
@@ -38,6 +38,8 @@ public interface ElixirUnmatchedPipeOperation extends ElixirUnmatchedExpression,
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 

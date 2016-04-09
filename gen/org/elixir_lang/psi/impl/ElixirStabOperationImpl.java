@@ -48,9 +48,24 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
     return findChildByClass(ElixirStabParenthesesSignature.class);
   }
 
+  @Nullable
+  public Quotable leftOperand() {
+    return ElixirPsiImplUtil.leftOperand(this);
+  }
+
+  @NotNull
+  public Operator operator() {
+    return ElixirPsiImplUtil.operator(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @Nullable
+  public Quotable rightOperand() {
+    return ElixirPsiImplUtil.rightOperand(this);
   }
 
 }

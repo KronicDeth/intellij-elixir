@@ -5,13 +5,13 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.InMatch;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedInMatchOperation extends ElixirMatchedExpression, Named, Infix {
+public interface ElixirMatchedInMatchOperation extends ElixirMatchedExpression, Named, InMatch {
 
   @NotNull
   ElixirInMatchInfixOperator getInMatchInfixOperator();
@@ -38,6 +38,8 @@ public interface ElixirMatchedInMatchOperation extends ElixirMatchedExpression, 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 

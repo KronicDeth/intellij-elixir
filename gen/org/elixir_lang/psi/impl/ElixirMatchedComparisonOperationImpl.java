@@ -76,6 +76,10 @@ public class ElixirMatchedComparisonOperationImpl extends ElixirMatchedExpressio
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName);
+  }
+
   public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }

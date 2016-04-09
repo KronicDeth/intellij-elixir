@@ -19,7 +19,16 @@ public interface ElixirStabOperation extends Quotable {
   @Nullable
   ElixirStabParenthesesSignature getStabParenthesesSignature();
 
+  @Nullable
+  Quotable leftOperand();
+
+  @NotNull
+  Operator operator();
+
   @NotNull
   OtpErlangObject quote();
+
+  @Nullable
+  Quotable rightOperand();
 
 }

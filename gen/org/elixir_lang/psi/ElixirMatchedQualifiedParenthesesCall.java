@@ -46,6 +46,8 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
   @NotNull

@@ -5,6 +5,7 @@ import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -126,10 +127,14 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
                 type = "use";
             } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
                 type = "module attribute";
+            } else if (Callable.isIgnored(call)) {
+                type = "ignored";
             } else if (Callable.isParameter(call)) {
                 type = "parameter";
             } else if (Callable.isParameterWithDefault(call)) {
                 type = "parameter with default";
+            } else if (Callable.isVariable(call)){
+                type = "variable";
             } else {
                 type = "unknown call type";
             }

@@ -4,7 +4,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.RowIcon;
 import org.elixir_lang.icons.ElixirIcons;
-import org.elixir_lang.psi.ElixirMatchedTypeOperation;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.Visible;
@@ -33,8 +32,8 @@ public class Type implements ItemPresentation {
     @Nullable static PsiElement head(@NotNull Call type) {
         PsiElement head = null;
 
-        if (type instanceof ElixirMatchedTypeOperation) {
-            head = head((ElixirMatchedTypeOperation) type);
+        if (type instanceof org.elixir_lang.psi.operation.Type) {
+            head = head((org.elixir_lang.psi.operation.Type) type);
         } else if (type instanceof ElixirMatchedWhenOperation) {
             head = head((ElixirMatchedWhenOperation) type);
         }
@@ -43,7 +42,7 @@ public class Type implements ItemPresentation {
     }
 
     @NotNull
-    private static PsiElement head(@NotNull ElixirMatchedTypeOperation typeOperation) {
+    private static PsiElement head(@NotNull org.elixir_lang.psi.operation.Type typeOperation) {
         return typeOperation.leftOperand();
     }
 
@@ -53,8 +52,8 @@ public class Type implements ItemPresentation {
 
         PsiElement parameterizedType = whenOperation.leftOperand();
 
-        if (parameterizedType instanceof ElixirMatchedTypeOperation) {
-            head = head((ElixirMatchedTypeOperation) parameterizedType);
+        if (parameterizedType instanceof org.elixir_lang.psi.operation.Type) {
+            head = head((org.elixir_lang.psi.operation.Type) parameterizedType);
         }
 
         return head;

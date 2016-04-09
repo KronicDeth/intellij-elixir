@@ -22,10 +22,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
-import org.elixir_lang.psi.operation.In;
-import org.elixir_lang.psi.operation.Infix;
-import org.elixir_lang.psi.operation.Operation;
-import org.elixir_lang.psi.operation.Prefix;
+import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -650,6 +647,24 @@ public class ElixirPsiImplUtil {
     /**
      * Whether {@code call} is of the named macro.
      *
+     * Differs from {@link ElixirPsiImplUtil#isCallingMacro(Call, String, String, int)} because no arity is necessary,
+     * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
+     * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
+     *
+     * @param call the call element
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
+     */
+    public static boolean isCallingMacro(@NotNull final Call call,
+                                         @NotNull final String resolvedModuleName,
+                                         @NotNull final String resolvedFunctionName) {
+        return call.isCalling(resolvedModuleName, resolvedFunctionName) && call.hasDoBlockOrKeyword();
+    }
+
+    /**
+     * Whether {@code call} is of the named macro.
+     *
      * Differs from {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} because this function ensures there
      * is a {@code do} block.  If the macro can be called without a {@code do} block, then
      * {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} should be called instead.
@@ -660,6 +675,7 @@ public class ElixirPsiImplUtil {
      * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
      * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
      */
+    @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final  String resolvedFunctionName,
@@ -676,10 +692,10 @@ public class ElixirPsiImplUtil {
     private static boolean isDefaultArgument(PsiElement argument) {
         boolean defaultArgument = false;
 
-        if (argument instanceof ElixirMatchedInMatchOperation || argument instanceof ElixirUnmatchedInMatchOperation) {
-            Operation matchedInMatchOperation = (Operation) argument;
+        if (argument instanceof InMatch) {
+            Operation operation = (Operation) argument;
 
-            if (matchedInMatchOperation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
+            if (operation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
                 defaultArgument = true;
             }
         }
@@ -750,6 +766,18 @@ public class ElixirPsiImplUtil {
         }
 
         return unquoted;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Quotable leftOperand(@NotNull final ElixirStabOperation stabOperation) {
+        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
+
+        if (leftOperand == null) {
+            leftOperand = stabOperation.getStabNoParenthesesSignature();
+        }
+
+        return leftOperand;
     }
 
     @Contract(pure = true)
@@ -912,6 +940,12 @@ public class ElixirPsiImplUtil {
         }
 
         return (Quotable) children[1];
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static Operator operator(@NotNull final ElixirStabOperation stabOperation) {
+        return stabOperation.getStabInfixOperator();
     }
 
     @Contract(pure = true)
@@ -1572,7 +1606,7 @@ public class ElixirPsiImplUtil {
                     }
                 }
             }
-        } else if (parent instanceof ElixirUnmatchedMatchOperation) {
+        } else if (parent instanceof Match) {
             enclosingMacroCall = enclosingMacroCall(parent);
         } else if (parent instanceof QuotableKeywordPair) {
             QuotableKeywordPair parentKeywordPair = (QuotableKeywordPair) parent;
@@ -2598,38 +2632,14 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
-        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
-
-        if (leftOperand == null) {
-            leftOperand = stabOperation.getStabNoParenthesesSignature();
-        }
-
-        OtpErlangObject quotedLeftOperand;
-
-        if (leftOperand != null) {
-            quotedLeftOperand = leftOperand.quote();
-        } else {
-            // when there is not signature before `->`.
-            quotedLeftOperand = new OtpErlangList();
-        }
-
-        Operator operator = stabOperation.getStabInfixOperator();
+        Operator operator = stabOperation.operator();
         OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable rightOperand = stabOperation.getStabBody();
-        OtpErlangObject quotedRightOperand;
-
-        if (rightOperand != null) {
-            quotedRightOperand = rightOperand.quote();
-        } else {
-            quotedRightOperand = NIL;
-        }
 
         return quotedFunctionCall(
                 quotedOperator,
                 metadata(operator),
-                quotedLeftOperand,
-                quotedRightOperand
+                quotedLeftOperand(stabOperation),
+                quotedRightOperand(stabOperation)
         );
     }
 
@@ -3844,6 +3854,22 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quotedLeftOperand(@NotNull final ElixirStabOperation stabOperation) {
+        Quotable leftOperand = stabOperation.leftOperand();
+        OtpErlangObject quotedLeftOperand;
+
+        if (leftOperand != null) {
+            quotedLeftOperand = leftOperand.quote();
+        } else {
+            // when there is not signature before `->`.
+            quotedLeftOperand = new OtpErlangList();
+        }
+
+        return quotedLeftOperand;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     private static OtpErlangObject quotedBlockCall(
             @NotNull OtpErlangObject quotedIdentifier,
             @NotNull final OtpErlangList callMetadata,
@@ -3936,6 +3962,21 @@ if (quoted == null) {
                         quotedFunctionArguments(arguments)
                 }
         );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quotedRightOperand(@NotNull final ElixirStabOperation stabOperation) {
+        Quotable rightOperand = stabOperation.rightOperand();
+        OtpErlangObject quotedRightOperand;
+
+        if (rightOperand != null) {
+            quotedRightOperand = rightOperand.quote();
+        } else {
+            quotedRightOperand = NIL;
+        }
+
+        return quotedRightOperand;
     }
 
     @Contract(pure = true)
@@ -4254,6 +4295,12 @@ if (quoted == null) {
         }
 
         return resolvedSecondaryArity;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Quotable rightOperand(ElixirStabOperation stabOperation) {
+        return stabOperation.getStabBody();
     }
 
     @Contract(pure = true)
