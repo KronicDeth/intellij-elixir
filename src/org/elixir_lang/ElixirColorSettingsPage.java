@@ -34,6 +34,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Identifier", ElixirSyntaxHighlighter.IDENTIFIER),
+            new AttributesDescriptor("Ignored Variable", ElixirSyntaxHighlighter.VARIABLE),
             new AttributesDescriptor("Invalid Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.INVALID_DIGIT),
             new AttributesDescriptor("Kernel Functions", ElixirSyntaxHighlighter.KERNEL_FUNCTION),
             new AttributesDescriptor("Kernel Macros", ElixirSyntaxHighlighter.KERNEL_MACRO),
@@ -43,11 +44,13 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Non-Decimal Base Prefix", ElixirSyntaxHighlighter.WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Obsolete Non-Decimal Base Prefix", ElixirSyntaxHighlighter.OBSOLETE_WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
+            new AttributesDescriptor("Parameter", ElixirSyntaxHighlighter.PARAMETER),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
             new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING),
             new AttributesDescriptor("Type", ElixirSyntaxHighlighter.TYPE),
-            new AttributesDescriptor("Type Parameter", ElixirSyntaxHighlighter.TYPE_PARAMETER)
+            new AttributesDescriptor("Type Parameter", ElixirSyntaxHighlighter.TYPE_PARAMETER),
+            new AttributesDescriptor("Variable", ElixirSyntaxHighlighter.VARIABLE)
     };
 
     @Nullable

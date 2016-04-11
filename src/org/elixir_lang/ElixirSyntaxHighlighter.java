@@ -113,6 +113,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.OPERATION_SIGN
     );
 
+    public static final TextAttributesKey PARAMETER = createTextAttributesKey(
+            "ELIXIR_PARAMETER",
+            DefaultLanguageHighlighterColors.PARAMETER
+    );
+
     public static final TextAttributesKey SIGIL = createTextAttributesKey(
             "ELIXIR_SIGIL",
             // Based on color used for Regular expression's boundaries in Ruby
@@ -152,6 +157,16 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey VALID_ESCAPE_SEQUENCE = createTextAttributesKey(
             "ELIXIR_VALID_ESCAPE_SEQUENCE",
             DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE
+    );
+
+    public static final TextAttributesKey VARIABLE = createTextAttributesKey(
+            "ELIXIR_VARIABLE",
+            DefaultLanguageHighlighterColors.LOCAL_VARIABLE
+    );
+
+    public static final TextAttributesKey IGNORED_VARIABLE = createTextAttributesKey(
+            "ELIXIR_IGNORED_VARIABLE",
+            VARIABLE
     );
 
     public static final TextAttributesKey WHOLE_NUMBER_BASE = createTextAttributesKey(
