@@ -111,6 +111,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 PsiElement parent = call.getParent();
                 isVariable = isVariable(parent);
             }
+        } else if (call.isCallingMacro("Elixir.Kernel", "for")) {
+            isVariable = true;
         }
 
         return isVariable;
@@ -213,19 +215,23 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     private static boolean isVariable(@NotNull PsiElement ancestor) {
         boolean isVariable = false;
 
-        if (ancestor instanceof ElixirStabNoParenthesesSignature ||
+        if (ancestor instanceof Call) {
+            isVariable = isVariable((Call) ancestor);
+        } else if (ancestor instanceof ElixirStabNoParenthesesSignature ||
                 ancestor instanceof ElixirStabParenthesesSignature ||
                 ancestor instanceof InMatch ||
                 ancestor instanceof Match) {
             isVariable = true;
         } else if (ancestor instanceof ElixirAccessExpression ||
+                ancestor instanceof ElixirBitString ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
+                ancestor instanceof ElixirParenthesesArguments ||
                 ancestor instanceof ElixirTuple ||
                 ancestor instanceof Type) {
             isVariable = isVariable(ancestor.getParent());
         } else {
-            assert null == null;
+            Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
         }
 
         return isVariable;
@@ -645,6 +651,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parameter instanceof ElixirAtomKeyword ||
                     parameter instanceof ElixirCharListLine ||
                     parameter instanceof ElixirCharToken ||
+                    parameter instanceof ElixirDecimalWholeNumber ||
                     parameter instanceof ElixirEndOfExpression ||
                     parameter instanceof ElixirStringLine ||
                     parameter instanceof PsiWhiteSpace ||
