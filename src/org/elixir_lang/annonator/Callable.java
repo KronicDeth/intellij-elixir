@@ -57,7 +57,8 @@ public class Callable implements Annotator, DumbAware {
                             PsiElement resolved = reference.resolve();
 
                             if (resolved != null) {
-                                highlight(resolved, holder);
+                                // TODO highlight referrer too
+                                highlight(call, resolved, holder);
                             }
                         }
                     }
@@ -69,26 +70,29 @@ public class Callable implements Annotator, DumbAware {
      * Private Instance Methods
      */
 
-    private void highlight(@NotNull Call call, @NotNull AnnotationHolder annotationHolder) {
+    private void highlight(@NotNull Call referrer, @NotNull Call resolved, @NotNull AnnotationHolder annotationHolder) {
         TextAttributesKey textAttributesKey = null;
 
-        if (org.elixir_lang.reference.Callable.isIgnored(call)) {
+        if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
             textAttributesKey = ElixirSyntaxHighlighter.IGNORED_VARIABLE;
-        } else if (org.elixir_lang.reference.Callable.isParameter(call) ||
-                org.elixir_lang.reference.Callable.isParameterWithDefault(call)) {
+        } else if (org.elixir_lang.reference.Callable.isParameter(resolved) ||
+                org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
             textAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
-        } else if (org.elixir_lang.reference.Callable.isVariable(call)) {
+        } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
             textAttributesKey = ElixirSyntaxHighlighter.VARIABLE;
         }
 
         if (textAttributesKey != null) {
-            highlight(call, annotationHolder, textAttributesKey);
+            highlight(referrer, annotationHolder, textAttributesKey);
+            highlight(resolved, annotationHolder, textAttributesKey);
         }
     }
 
-    private void highlight(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder) {
-        if (element instanceof Call) {
-            highlight((Call) element, annotationHolder);
+    private void highlight(@NotNull Call referrer,
+                           @NotNull PsiElement resolved,
+                           @NotNull AnnotationHolder annotationHolder) {
+        if (resolved instanceof Call) {
+            highlight(referrer, (Call) resolved, annotationHolder);
         }
     }
 
