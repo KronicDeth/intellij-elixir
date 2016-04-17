@@ -190,7 +190,13 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         if (parent instanceof Call) {
             isParameter = isParameter((Call) parent);
         } else if (parent instanceof ElixirAccessExpression ||
+                parent instanceof ElixirAssociations ||
+                parent instanceof ElixirAssociationsBase ||
                 parent instanceof ElixirBitString ||
+                parent instanceof ElixirKeywords ||
+                parent instanceof ElixirMapArguments ||
+                parent instanceof ElixirMapConstructionArguments ||
+                parent instanceof ElixirMapOperation ||
                 parent instanceof ElixirMatchedParenthesesArguments ||
                 parent instanceof ElixirNoParenthesesArguments ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
@@ -215,21 +221,31 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     private static boolean isVariable(@NotNull PsiElement ancestor) {
         boolean isVariable = false;
 
-        if (ancestor instanceof Call) {
-            isVariable = isVariable((Call) ancestor);
-        } else if (ancestor instanceof ElixirStabNoParenthesesSignature ||
+        if (ancestor instanceof ElixirMatchedParenthesesArguments ||
+                ancestor instanceof ElixirStabNoParenthesesSignature ||
                 ancestor instanceof ElixirStabParenthesesSignature ||
                 ancestor instanceof InMatch ||
                 ancestor instanceof Match) {
             isVariable = true;
         } else if (ancestor instanceof ElixirAccessExpression ||
+                ancestor instanceof ElixirAssociations ||
+                ancestor instanceof ElixirAssociationsBase ||
                 ancestor instanceof ElixirBitString ||
+                ancestor instanceof ElixirContainerAssociationOperation ||
+                ancestor instanceof ElixirKeywordPair ||
+                ancestor instanceof ElixirKeywords ||
+                ancestor instanceof ElixirMapArguments ||
+                ancestor instanceof ElixirMapConstructionArguments ||
+                ancestor instanceof ElixirMapOperation ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
                 ancestor instanceof ElixirParenthesesArguments ||
                 ancestor instanceof ElixirTuple ||
                 ancestor instanceof Type) {
             isVariable = isVariable(ancestor.getParent());
+        } else if (ancestor instanceof Call) {
+            // MUST be after any operations because operations also implement Call
+            isVariable = isVariable((Call) ancestor);
         } else {
             Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
         }
@@ -318,9 +334,12 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 }
             } else if (parent instanceof ElixirAccessExpression ||
                     parent instanceof ElixirAnonymousFunction ||
+                    parent instanceof ElixirAssociations ||
+                    parent instanceof ElixirAssociationsBase ||
                     parent instanceof ElixirBitString ||
                     parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirBlockList ||
+                    parent instanceof ElixirContainerAssociationOperation ||
                     parent instanceof ElixirDoBlock ||
                     parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirKeywordPair ||
@@ -328,6 +347,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parent instanceof ElixirList ||
                     parent instanceof ElixirMapArguments ||
                     parent instanceof ElixirMapConstructionArguments ||
+                    parent instanceof ElixirMapOperation ||
+                    parent instanceof ElixirMapUpdateArguments ||
                     parent instanceof ElixirMatchedParenthesesArguments ||
                     parent instanceof ElixirNoParenthesesArguments ||
                     parent instanceof ElixirNoParenthesesKeywordPair ||
@@ -446,6 +467,25 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     /**
+     * Only checks the right operand of the container association operation because the left operand is either a literal
+     * or a pinned variable, which means the variable is being used and was declared elsewhere.
+     */
+    @Nullable
+    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
+                                                              @NotNull String name,
+                                                              boolean incompleteCode,
+                                                              @NotNull ElixirContainerAssociationOperation match,
+                                                              @Nullable List<ResolveResult> resolveResultList) {
+        PsiElement[] children = match.getChildren();
+
+        if (children.length > 1) {
+            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, children[1], resolveResultList);
+        }
+
+        return resolveResultList;
+    }
+
+    /**
      * Only checks {@link ElixirMapArguments#getMapConstructionArguments()} and not
      * {@link ElixirMapArguments#getMapUpdateArguments()} since an update is not valid in a pattern match.
      */
@@ -523,6 +563,18 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return resolveVariableInMatch(referrer, name, incompleteCode, match.leftOperand(), resolveResultList);
     }
 
+    /**
+     * {@code in} can declare variable for {@code rescue} clauses like {@code rescue e in RuntimeException ->}
+     */
+    @Nullable
+    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
+                                                              @NotNull String name,
+                                                              boolean incompleteCode,
+                                                              @NotNull In match,
+                                                              @Nullable List<ResolveResult> resolveResultList) {
+        return resolveVariableInMatch(referrer, name, incompleteCode, match.leftOperand(), resolveResultList);
+    }
+
     @Nullable
     private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
                                                               @NotNull String name,
@@ -586,6 +638,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                                                               @NotNull PsiElement parameter,
                                                               @Nullable List<ResolveResult> resolveResultList) {
         if (parameter instanceof ElixirAccessExpression ||
+                parameter instanceof ElixirAssociations ||
+                parameter instanceof ElixirAssociationsBase ||
                 parameter instanceof ElixirBitString ||
                 parameter instanceof ElixirList ||
                 parameter instanceof ElixirMapConstructionArguments ||
@@ -598,6 +652,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parameter instanceof ElixirTuple) {
             resolveResultList = resolveVariableInMatch(
                     referrer, name, incompleteCode, parameter.getChildren(), resolveResultList
+            );
+        } else if (parameter instanceof ElixirContainerAssociationOperation) {
+            resolveResultList = resolveVariableInMatch(
+                    referrer, name, incompleteCode, (ElixirContainerAssociationOperation) parameter, resolveResultList
             );
         } else if (parameter instanceof ElixirMapArguments) {
             resolveResultList = resolveVariableInMatch(
@@ -622,6 +680,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (parameter instanceof ElixirStructOperation) {
             resolveResultList = resolveVariableInMatch(
                     referrer, name, incompleteCode, (ElixirStructOperation) parameter, resolveResultList
+            );
+        } else if (parameter instanceof In) {
+            resolveResultList = resolveVariableInMatch(
+                    referrer, name, incompleteCode, (In) parameter, resolveResultList
             );
         } else if (parameter instanceof InMatch) { // MUST be before Call as InMatch is a Call
             resolveResultList = resolveVariableInMatch(
