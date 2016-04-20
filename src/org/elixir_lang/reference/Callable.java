@@ -421,12 +421,14 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         previousSibling = previousSibling.getPrevSibling();
 
         while (previousSibling != null) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, previousSibling, resolveResultList
-            );
+            if (!(previousSibling instanceof PsiComment)) {
+                resolveResultList = resolveVariableInMatch(
+                        referrer, name, incompleteCode, previousSibling, resolveResultList
+                );
 
-            if (stop(incompleteCode, resolveResultList)) {
-                break;
+                if (stop(incompleteCode, resolveResultList)) {
+                    break;
+                }
             }
 
             previousSibling = previousSibling.getPrevSibling();
