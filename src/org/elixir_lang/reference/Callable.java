@@ -193,17 +193,22 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirAssociations ||
                 parent instanceof ElixirAssociationsBase ||
                 parent instanceof ElixirBitString ||
+                parent instanceof ElixirKeywordPair ||
                 parent instanceof ElixirKeywords ||
+                parent instanceof ElixirList ||
                 parent instanceof ElixirMapArguments ||
                 parent instanceof ElixirMapConstructionArguments ||
                 parent instanceof ElixirMapOperation ||
                 parent instanceof ElixirMatchedParenthesesArguments ||
                 parent instanceof ElixirNoParenthesesArguments ||
+                parent instanceof ElixirNoParenthesesKeywordPair ||
+                parent instanceof ElixirNoParenthesesKeywords ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
                 parent instanceof ElixirParenthesesArguments ||
                 parent instanceof ElixirStabNoParenthesesSignature ||
                 parent instanceof ElixirStabOperation ||
                 parent instanceof ElixirStabParenthesesSignature ||
+                parent instanceof ElixirStructOperation ||
                 parent instanceof ElixirTuple) {
             isParameter = isParameter(parent);
         } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
@@ -234,12 +239,19 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirContainerAssociationOperation ||
                 ancestor instanceof ElixirKeywordPair ||
                 ancestor instanceof ElixirKeywords ||
+                ancestor instanceof ElixirList ||
                 ancestor instanceof ElixirMapArguments ||
                 ancestor instanceof ElixirMapConstructionArguments ||
                 ancestor instanceof ElixirMapOperation ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
+                ancestor instanceof ElixirNoParenthesesKeywordPair ||
+                ancestor instanceof ElixirNoParenthesesKeywords ||
                 ancestor instanceof ElixirParenthesesArguments ||
+                ancestor instanceof ElixirParentheticalStab ||
+                ancestor instanceof ElixirStab ||
+                ancestor instanceof ElixirStabBody ||
+                ancestor instanceof ElixirStructOperation ||
                 ancestor instanceof ElixirTuple ||
                 ancestor instanceof Type) {
             isVariable = isVariable(ancestor.getParent());
@@ -332,15 +344,21 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     // use generic parent-type-check resolveVariable
                     resolveResultList = resolveVariable(referrer, name, incompleteCode, parent, resolveResultList);
                 }
-            } else if (parent instanceof ElixirAccessExpression ||
+            } else if (parent instanceof BracketOperation ||
+                    parent instanceof ElixirAccessExpression ||
                     parent instanceof ElixirAnonymousFunction ||
                     parent instanceof ElixirAssociations ||
                     parent instanceof ElixirAssociationsBase ||
+                    parent instanceof ElixirAtom ||
                     parent instanceof ElixirBitString ||
                     parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirBlockList ||
+                    parent instanceof ElixirBracketArguments ||
+                    parent instanceof ElixirCharListLine ||
                     parent instanceof ElixirContainerAssociationOperation ||
                     parent instanceof ElixirDoBlock ||
+                    parent instanceof ElixirInterpolatedStringBody ||
+                    parent instanceof ElixirInterpolatedStringSigilLine ||
                     parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirKeywordPair ||
                     parent instanceof ElixirKeywords ||
@@ -356,13 +374,19 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parent instanceof ElixirNoParenthesesOneArgument ||
                     parent instanceof ElixirParenthesesArguments ||
                     parent instanceof ElixirParentheticalStab ||
+                    parent instanceof ElixirQuoteCharListBody ||
                     parent instanceof ElixirQuoteStringBody ||
                     parent instanceof ElixirStab ||
                     parent instanceof ElixirStabNoParenthesesSignature ||
+                    parent instanceof ElixirStringHeredoc ||
+                    parent instanceof ElixirStringHeredocLine ||
                     parent instanceof ElixirStringLine ||
                     parent instanceof ElixirStructOperation ||
                     parent instanceof ElixirTuple ||
-                    parent instanceof Operation) {
+                    parent instanceof Operation ||
+                    parent instanceof QualifiedAlias ||
+                    parent instanceof QualifiedBracketOperation ||
+                    parent instanceof UnqualifiedBracketOperation) {
                 resolveResultList = resolveVariable(referrer, name, incompleteCode, parent, resolveResultList);
             } else if (parent instanceof ElixirStabBody) {
                 resolveResultList = resolveVariableInBlock(
@@ -709,15 +733,26 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             );
         } else {
             if (!(parameter instanceof AtNonNumericOperation || // a module attribute reference
+                    parameter instanceof BracketOperation ||
+                    /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
+                       be hit if the parameter is declared in the {@code fn} signature because that upward resolution
+                       from resolveVariable stops before this level */
+                    parameter instanceof ElixirAnonymousFunction ||
                     parameter instanceof ElixirAtom ||
                     parameter instanceof ElixirAtomKeyword ||
                     parameter instanceof ElixirCharListLine ||
                     parameter instanceof ElixirCharToken ||
+                    parameter instanceof ElixirDecimalFloat ||
                     parameter instanceof ElixirDecimalWholeNumber ||
                     parameter instanceof ElixirEndOfExpression ||
+                    parameter instanceof ElixirInterpolatedRegexLine ||
+                    parameter instanceof ElixirInterpolatedWordsLine ||
+                    parameter instanceof ElixirStringHeredoc ||
                     parameter instanceof ElixirStringLine ||
                     parameter instanceof PsiWhiteSpace ||
-                    parameter instanceof QualifiableAlias)) {
+                    parameter instanceof QualifiableAlias ||
+                    parameter instanceof QualifiedBracketOperation ||
+                    parameter instanceof UnqualifiedBracketOperation)) {
                 Logger.error(Callable.class, "Don't know how to resolve variable in match", parameter);
             }
         }
