@@ -1,16 +1,15 @@
 package org.elixir_lang.structure_view.element.modular;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.modular.Modular;
-import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,6 +23,16 @@ public class Implementation extends Module {
     /*
      * Public Static Methods
      */
+
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "implementation";
+        }
+
+        return elementDescription;
+    }
 
     @Nullable
     public static String forName(@Nullable Modular enclosingModular, @NotNull Call call) {

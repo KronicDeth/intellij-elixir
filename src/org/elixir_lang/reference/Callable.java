@@ -3,6 +3,9 @@ package org.elixir_lang.reference;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.usageView.UsageViewLongNameLocation;
+import com.intellij.usageView.UsageViewShortNameLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.xml.Resolve;
 import org.elixir_lang.errorreport.Logger;
@@ -44,6 +47,16 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     /*
      * Public Static Methods
      */
+
+    public static String ignoredElementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "ignored";
+        }
+
+        return elementDescription;
+    }
 
     @Contract(pure = true)
     public static boolean isIgnored(@NotNull Call call) {
@@ -116,6 +129,40 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return isVariable;
+    }
+
+    public static String parameterElementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewLongNameLocation.INSTANCE || location == UsageViewShortNameLocation.INSTANCE) {
+            elementDescription = call.getName();
+        } else if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "parameter";
+        }
+
+        return elementDescription;
+    }
+
+    public static String parameterWithDefaultElementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "parameter with default";
+        }
+
+        return elementDescription;
+    }
+
+    public static String variableElementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewLongNameLocation.INSTANCE || location == UsageViewShortNameLocation.INSTANCE) {
+            elementDescription = call.getName();
+        } else if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "variable";
+        }
+
+        return elementDescription;
     }
 
     /*

@@ -3,7 +3,9 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
@@ -37,6 +39,26 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     /*
      * Public Static Methods
      */
+
+    /**
+     * Description of element used in {@link org.elixir_lang.FindUsagesProvider}.
+     *
+     * @param call a {@link Call} that has already been checked with {@link #is(Call)}
+     * @param location where the description will be used
+     * @return
+     */
+    @Nullable
+    public static String elementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (isFunction(call)) {
+            elementDescription = functionElementDescription(call, location);
+        } else if (isMacro(call)) {
+            elementDescription = macroElementDescription(call, location);
+        }
+
+        return elementDescription;
+    }
 
     /**
      * The module or {@code quote} that encapsulates {@code call}
@@ -225,9 +247,30 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      * Private Static Methods
      */
 
+    @Nullable
+    private static String functionElementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "function";
+        }
+
+        return elementDescription;
+    }
+
     private static boolean isCallingKernelMacroOrHead(@NotNull final Call call, @NotNull final String resolvedName) {
         return call.isCallingMacro("Elixir.Kernel", resolvedName, 2) ||
                 call.isCalling("Elixir.Kernel", resolvedName, 1);
+    }
+
+    private static String macroElementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "macro";
+        }
+
+        return elementDescription;
     }
 
     /*

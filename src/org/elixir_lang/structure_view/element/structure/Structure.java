@@ -2,7 +2,9 @@ package org.elixir_lang.structure_view.element.structure;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -25,6 +27,16 @@ public class Structure extends Element<Call> {
     /*
      * Static Methods
      */
+
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "struct";
+        }
+
+        return elementDescription;
+    }
 
     public static boolean is(Call call) {
         return call.isCalling("Elixir.Kernel", "defstruct", 1);

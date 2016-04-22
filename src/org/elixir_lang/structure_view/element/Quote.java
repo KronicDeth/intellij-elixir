@@ -2,7 +2,8 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.ElementDescriptionLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
@@ -24,6 +25,16 @@ public class Quote extends Element<Call> {
     /*
      * Static Methods
      */
+
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "quote";
+        }
+
+        return elementDescription;
+    }
 
     public static boolean is(@NotNull final Call call) {
         // TODO change Elixir.Kernel to Elixir.Kernel.SpecialForms when resolving works
