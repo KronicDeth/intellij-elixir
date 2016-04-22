@@ -2245,7 +2245,13 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-        return new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
+        PsiReference reference = null;
+
+        if (!org.elixir_lang.reference.ModuleAttribute.isNonReferencing(atNonNumericOperation)) {
+            reference = new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
+        }
+
+        return reference;
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {

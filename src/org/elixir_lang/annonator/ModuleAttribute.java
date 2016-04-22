@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.elixir_lang.reference.ModuleAttribute.*;
+
 /**
  * Annotates module attributes.
  */
@@ -60,23 +62,19 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         ASTNode identifierNode = identifierNodes[0];
                         String identifier = identifierNode.getText();
 
-                        if (identifier.equals("callback") || identifier.equals("macrocallback")) {
+                        if (isCallbackName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightCallback(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("doc") ||
-                                identifier.equals("moduledoc") ||
-                                identifier.equals("typedoc")) {
+                        } else if (isDocumentationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
 
                             highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("opaque") ||
-                                identifier.equals("type") ||
-                                identifier.equals("typep")) {
+                        } else if (isTypeName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightType(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("spec")) {
+                        } else if (isSpecificationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
@@ -101,7 +99,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );
 
-                        if (atNonNumericOperation.getReference().resolve() == null) {
+                        if (!isNonReferencing(atNonNumericOperation) &&
+                                atNonNumericOperation.getReference().resolve() == null) {
                             holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
                         }
                     }
