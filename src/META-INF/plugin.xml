@@ -867,10 +867,8 @@
     <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.psi.FoldingBuilder"/>
-    <lang.namesValidator language="Elixir" implementationClass="org.elixir_lang.psi.module_attribute.NamesValidator"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
-    <lang.refactoringSupport language="Elixir" implementationClass="org.elixir_lang.refactoring.SupportProvider"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
@@ -881,6 +879,16 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
+
+    <!-- module attribute refactoring -->
+    <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>
+    <renameInputValidator implementation="org.elixir_lang.refactoring.module_attribute.rename.InputValidator"/>
+    <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.module_attribute.rename.Processor"/>
+
+    <!-- variable refactoring -->
+    <renameHandler implementation="org.elixir_lang.refactoring.variable.rename.Handler"/>
+    <renameInputValidator implementation="org.elixir_lang.refactoring.variable.rename.InputValidator"/>
+    <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
     <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
   </extensions>

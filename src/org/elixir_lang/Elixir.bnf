@@ -18,6 +18,7 @@
     getNameIdentifier
     getReference
     getStub
+    getUseScope
     isCalling
     isCallingMacro
     moduleName

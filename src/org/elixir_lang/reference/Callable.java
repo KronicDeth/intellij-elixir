@@ -3,11 +3,12 @@ package org.elixir_lang.reference;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
+import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.xml.Resolve;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DEFAULT_OPERATOR;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.followingSiblingsSearchScope;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
     /*
@@ -58,6 +60,16 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return elementDescription;
     }
 
+    /**
+     * Checks if call is a ignored, a parameter, a parameter with default or a variable, in that order.
+     * @param call that may be a variablic
+     * @return if {@link #isIgnored(Call)}, {@link #isParameter(Call)}, {@link #isParameterWithDefault(Call)} or
+     *   {@link #isVariable(Call)} is true
+     */
+    public static boolean isVariablic(@NotNull Call call) {
+        return isIgnored(call) || isParameter(call) || isParameterWithDefault(call) || isVariable(call);
+    }
+
     @Contract(pure = true)
     public static boolean isIgnored(@NotNull Call call) {
         boolean isIgnored = false;
@@ -81,7 +93,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else {
             PsiElement parent = call.getParent();
 
-            if (parent != null) {
+            if (parent != null && !(parent instanceof PsiFile)) {
                 isParameter = isParameter(call.getParent());
             } else {
                 isParameter = false;
@@ -163,6 +175,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return elementDescription;
+    }
+
+    public static LocalSearchScope variableUseScope(@NotNull UnqualifiedNoArgumentsCall match) {
+        return variableUseScope((PsiElement) match);
     }
 
     /*
@@ -782,6 +798,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             );
         } else {
             if (!(parameter instanceof AtNonNumericOperation || // a module attribute reference
+                    parameter instanceof AtUnqualifiedBracketOperation || // a module attribute reference with access
                     parameter instanceof BracketOperation ||
                     /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
                        be hit if the parameter is declared in the {@code fn} signature because that upward resolution
@@ -857,12 +874,72 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return !incompleteCode && hasValidResult(resolveResultList);
     }
 
+    private static LocalSearchScope variableUseScope(@NotNull Match match) {
+        LocalSearchScope useScope = null;
+
+        PsiElement parent = match.getParent();
+
+        if (parent instanceof ElixirStabBody) {
+            useScope = followingSiblingsSearchScope(match);
+        } else {
+            Logger.error(Callable.class, "Don't know how to find variable use scope for ", match);
+        }
+
+        return useScope;
+    }
+
+    private static LocalSearchScope variableUseScope(@NotNull PsiElement ancestor) {
+        LocalSearchScope useScope = null;
+
+        if (ancestor instanceof ElixirAccessExpression ||
+                ancestor instanceof ElixirAssociations ||
+                ancestor instanceof ElixirAssociationsBase ||
+                ancestor instanceof ElixirBitString ||
+                ancestor instanceof ElixirContainerAssociationOperation ||
+                ancestor instanceof ElixirKeywordPair ||
+                ancestor instanceof ElixirKeywords ||
+                ancestor instanceof ElixirList ||
+                ancestor instanceof ElixirMapArguments ||
+                ancestor instanceof ElixirMapConstructionArguments ||
+                ancestor instanceof ElixirMapOperation ||
+                ancestor instanceof ElixirNoParenthesesOneArgument ||
+                ancestor instanceof ElixirNoParenthesesArguments ||
+                ancestor instanceof ElixirNoParenthesesKeywordPair ||
+                ancestor instanceof ElixirNoParenthesesKeywords ||
+                ancestor instanceof ElixirParenthesesArguments ||
+                ancestor instanceof ElixirParentheticalStab ||
+                ancestor instanceof ElixirStab ||
+                ancestor instanceof ElixirStabBody ||
+                ancestor instanceof ElixirStabNoParenthesesSignature ||
+                ancestor instanceof ElixirStabParenthesesSignature ||
+                ancestor instanceof ElixirStructOperation ||
+                ancestor instanceof ElixirTuple ||
+                ancestor instanceof InMatch ||
+                ancestor instanceof Type ||
+                ancestor instanceof UnqualifiedNoArgumentsCall) {
+            useScope = variableUseScope(ancestor.getParent());
+        } else if (ancestor instanceof ElixirStabOperation) {
+            useScope = new LocalSearchScope(ancestor);
+        } else if (ancestor instanceof Match) {
+            useScope = variableUseScope((Match) ancestor);
+        } else {
+            Logger.error(Callable.class, "Don't know how to find variable use scope for ", ancestor);
+        }
+
+        return useScope;
+    }
+
     /*
      * Constructors
      */
 
     public Callable(@NotNull Call call) {
         super(call, TextRange.create(0, call.getTextLength()));
+    }
+
+    @Override
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+        return ((NamedElement) myElement).setName(newElementName);
     }
 
     /*

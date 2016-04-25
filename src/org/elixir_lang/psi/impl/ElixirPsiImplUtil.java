@@ -4,9 +4,15 @@ import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -43,6 +49,8 @@ import java.util.*;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
+import static org.elixir_lang.reference.Callable.*;
+import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -930,6 +938,19 @@ public class ElixirPsiImplUtil {
         return qualified.getFirstChild().getText();
     }
 
+    private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        Project project = element.getProject();
+        com.intellij.openapi.module.Module module = ModuleUtilCore.findModuleForFile(
+                virtualFile,
+                project
+        );
+
+        assert module != null;
+
+        return GlobalSearchScope.moduleWithDependentsScope(module);
+    }
+
     @Contract(pure = true)
     @NotNull
     public static Quotable operand(Prefix prefix) {
@@ -1676,6 +1697,21 @@ public class ElixirPsiImplUtil {
         return finalArguments;
     }
 
+    public static LocalSearchScope followingSiblingsSearchScope(PsiElement element) {
+        List<PsiElement> followingSiblingList = new ArrayList<PsiElement>();
+        PsiElement previousSibling = element;
+        PsiElement followingSibling = previousSibling.getNextSibling();
+
+        while (followingSibling != null) {
+            followingSiblingList.add(followingSibling);
+
+            previousSibling = followingSibling;
+            followingSibling = previousSibling.getNextSibling();
+        }
+
+        return new LocalSearchScope(followingSiblingList.toArray(new PsiElement[followingSiblingList.size()]));
+    }
+
     /**
      * Adds `Elixir.` to alias text.
      *
@@ -1910,6 +1946,55 @@ public class ElixirPsiImplUtil {
 
     public static IElementType getFragmentType(@SuppressWarnings("unused") WordsFragmented wordsFragmented) {
         return ElixirTypes.WORDS_FRAGMENT;
+    }
+
+    /**
+     * Returns the scope in which references to this element are searched.
+     *
+     * @return the search scope instance.
+     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
+     */
+    @NotNull
+    @Contract(pure=true)
+    static SearchScope getUseScope(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        SearchScope useScope;
+
+        if (isNonReferencing(atUnqualifiedNoParenthesesCall.getAtIdentifier())) {
+            useScope = moduleWithDependentsScope(atUnqualifiedNoParenthesesCall);
+        } else {
+            useScope = followingSiblingsSearchScope(atUnqualifiedNoParenthesesCall);
+        }
+
+        return useScope;
+    }
+
+    /**
+     * Returns the scope in which references to this element are searched.
+     *
+     * @return the search scope instance.
+     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
+     */
+    @NotNull
+    @Contract(pure=true)
+    static SearchScope getUseScope(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        SearchScope useScope = null;
+
+        if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
+            PsiElement ancestor = unqualifiedNoArgumentsCall.getParent();
+
+            while (!(ancestor instanceof Call && CallDefinitionClause.is((Call) ancestor))) {
+                ancestor = ancestor.getParent();
+            }
+
+            useScope = new LocalSearchScope(ancestor);
+        } else if (isVariable(unqualifiedNoArgumentsCall)) {
+            useScope = variableUseScope(unqualifiedNoArgumentsCall);
+        } else {
+            // if the type of callable isn't known, fallback to default scope
+            useScope = moduleWithDependentsScope(unqualifiedNoArgumentsCall);
+        }
+
+        return useScope;
     }
 
     public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
@@ -2247,7 +2332,7 @@ public class ElixirPsiImplUtil {
     public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
         PsiReference reference = null;
 
-        if (!org.elixir_lang.reference.ModuleAttribute.isNonReferencing(atNonNumericOperation)) {
+        if (!isNonReferencing(atNonNumericOperation)) {
             reference = new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
         }
 
@@ -4420,7 +4505,16 @@ if (quoted == null) {
     @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {
-        return null;
+        PsiElement functionNameElement = named.functionNameElement();
+        Call newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.getProject(), newName);
+
+        ASTNode nameNode = functionNameElement.getNode();
+        ASTNode newNameNode = newFunctionNameElementCall.functionNameElement().getNode();
+
+        ASTNode node = nameNode.getTreeParent();
+        node.replaceChild(nameNode, newNameNode);
+
+        return named;
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {

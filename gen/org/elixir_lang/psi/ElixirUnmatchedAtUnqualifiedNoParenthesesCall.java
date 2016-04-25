@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
+import com.intellij.psi.search.SearchScope;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,9 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   @Nullable
   PsiReference getReference();
+
+  @NotNull
+  SearchScope getUseScope();
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 

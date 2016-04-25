@@ -6,6 +6,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
@@ -76,6 +77,11 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStub
   @Nullable
   public PsiReference getReference() {
     return ElixirPsiImplUtil.getReference(this);
+  }
+
+  @NotNull
+  public SearchScope getUseScope() {
+    return ElixirPsiImplUtil.getUseScope(this);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
