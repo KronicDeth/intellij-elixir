@@ -118,7 +118,7 @@
    *
    * Have names (their operators), but aren't stubbed because they don't define structures.
    */
-  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture)NonNumeric)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Prefix"
   ]
@@ -159,6 +159,12 @@
     operator
     quote
   ]
+
+  // unaryNonNumeric operations
+  implements("(un)?matchedUnaryNonNumericOperation")=[
+    "org.elixir_lang.psi.UnaryNonNumericOperation"
+  ]
+  // method set by prefix operations above
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
