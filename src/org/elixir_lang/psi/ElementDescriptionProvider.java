@@ -41,6 +41,8 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
 
         if (element instanceof Call) {
             elementDescription = getElementDescription((Call) element, location);
+        } else if (element instanceof ElixirKeywordKey) {
+            elementDescription = getElementDescription((ElixirKeywordKey) element, location);
         } else if (element instanceof MaybeModuleName) {
             elementDescription = getElementDescription((MaybeModuleName) element, location);
 
@@ -52,6 +54,49 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
     /*
      * Private Instance Methods
      */
+
+    @Nullable
+    private String getElementDescription(@NotNull ElixirKeywordKey keywordKey,
+                                         @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        PsiElement innerKeywordPair = keywordKey.getParent();
+
+        if (innerKeywordPair instanceof ElixirKeywordPair) {
+            PsiElement innerKeywords = innerKeywordPair.getParent();
+
+            if (innerKeywords instanceof ElixirKeywords) {
+                PsiElement innerList = innerKeywords.getParent();
+
+                if (innerList instanceof ElixirList) {
+                    PsiElement outerAccessExpression = innerList.getParent();
+
+                    if (outerAccessExpression instanceof ElixirAccessExpression) {
+                        PsiElement outerKeywordPair = outerAccessExpression.getParent();
+
+                        if (outerKeywordPair instanceof QuotableKeywordPair) {
+                            QuotableKeywordPair outerQuotableKeywordPair = (QuotableKeywordPair) outerKeywordPair;
+                            Quotable outerKeywordKey = outerQuotableKeywordPair.getKeywordKey();
+
+                            if (outerKeywordKey.getText().equals("bind_quoted")) {
+                                if (location == UsageViewTypeLocation.INSTANCE) {
+                                    elementDescription = "quote bound variable";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (elementDescription == null) {
+            if (location == UsageViewTypeLocation.INSTANCE) {
+                elementDescription = "keyword key";
+            }
+        }
+
+        return elementDescription;
+    }
 
     @Nullable
     private String getElementDescription(@NotNull MaybeModuleName maybeModuleName,
