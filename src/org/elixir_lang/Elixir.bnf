@@ -2092,7 +2092,13 @@ private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabInfixOperator
 private stabBodyExpression ::= !stabOperationPrefix expression
 stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+             {
+               implements = "org.elixir_lang.psi.Quotable"
+               methods = [
+                 processDeclarations
+                 quote
+               ]
+             }
 
 stabOperation ::= stabOperationPrefix stabBody?
                   {
