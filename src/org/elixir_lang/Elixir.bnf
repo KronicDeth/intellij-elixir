@@ -447,7 +447,18 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  */
 
 variable ::= IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+             {
+               implements = [
+                 "org.elixir_lang.psi.NamedElement"
+                 "org.elixir_lang.psi.Quotable"
+               ]
+               methods = [
+                 getName
+                 getNameIdentifier
+                 quote
+                 setName
+               ]
+             }
 
 /*
  *

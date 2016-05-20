@@ -4560,6 +4560,11 @@ if (quoted == null) {
     }
 
     @NotNull
+    public static PsiElement setName(@NotNull ElixirVariable variable, @NotNull String newName) {
+        return null;
+    }
+
+    @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {
         PsiElement functionNameElement = named.functionNameElement();
