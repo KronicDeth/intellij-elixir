@@ -3,15 +3,17 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Type;
+import org.elixir_lang.psi.operation.Two;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedTwoOperation extends ElixirMatchedExpression, Named, Type {
+public interface ElixirMatchedTwoOperation extends ElixirMatchedExpression, Named, Two {
 
   @NotNull
   List<ElixirMatchedExpression> getMatchedExpressionList();
@@ -43,7 +45,7 @@ public interface ElixirMatchedTwoOperation extends ElixirMatchedExpression, Name
 
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
-  @NotNull
+  @Nullable
   Quotable leftOperand();
 
   @Nullable
@@ -57,6 +59,8 @@ public interface ElixirMatchedTwoOperation extends ElixirMatchedExpression, Name
 
   @Nullable
   Integer primaryArity();
+
+  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();

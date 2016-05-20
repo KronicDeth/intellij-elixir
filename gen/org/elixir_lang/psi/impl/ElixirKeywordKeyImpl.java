@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirCharListLine;
 import org.elixir_lang.psi.ElixirKeywordKey;
@@ -39,9 +40,24 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
     return findChildByClass(ElixirStringLine.class);
   }
 
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  @Nullable
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }

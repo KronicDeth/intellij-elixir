@@ -4,7 +4,9 @@ package org.elixir_lang.psi;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
@@ -70,6 +72,8 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
 
   @Nullable
   Integer primaryArity();
+
+  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();
