@@ -107,6 +107,12 @@ public interface Call extends NavigatablePsiElement {
     /**
      * The arguments directly after the {@link #functionName}.  If the function cannot have arguments, then this will `null`
      *
+     * <p>
+     *     NOTE: Individual elements of the returned {@code PsiElement[]} may be {@code null} to indicate the argument
+     *     is expected to be there, such as for {@link org.elixir_lang.psi.operation.Infix}, but it is missing or has an
+     *     error due to Pratt Parser error recovery.
+     * </p>
+     *
      * @return {@code null} if function cannot take arguments, such as an ambiguous variable or no parentheses,
      *   no arguments, function call like {@code foo}; * @return {@code PsiElement[]} if the function takes arguments.
      *   Importantly, {@code foo} can be distinguished from {@code foo()} because the former returns {@code null} while
