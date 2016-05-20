@@ -6,6 +6,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
@@ -74,6 +75,7 @@ public class ElixirPsiImplUtil {
             }
     );
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final Key<Boolean> DECLARING_SCOPE = new Key<Boolean>("DECLARING_SCOPE");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
@@ -693,6 +695,36 @@ public class ElixirPsiImplUtil {
                 call.hasDoBlockOrKeyword();
     }
 
+    public static boolean isDeclaringScope(@NotNull final ElixirStabOperation stabOperation) {
+        boolean declaringScope = true;
+        PsiElement parent = stabOperation.getParent();
+
+        if (parent instanceof ElixirStab) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof ElixirBlockItem) {
+                ElixirBlockItem blockItem = (ElixirBlockItem) grandParent;
+                ElixirBlockIdentifier blockIdentifier = blockItem.getBlockIdentifier();
+
+                String blockIdentifierText = blockIdentifier.getText();
+
+                /* `after` is not a declaring scope because the timeout value does not need to be pinned even though it
+                    must be a literal or declared in an outer scope */
+                if (blockIdentifierText.equals("after")) {
+                    declaringScope = false;
+                }
+            } else if (grandParent instanceof ElixirDoBlock) {
+                Call call = (Call) grandParent.getParent();
+
+                if (call.isCalling("Elixir.Kernel", "cond")) {
+                    declaringScope = false;
+                }
+            }
+        }
+
+        return declaringScope;
+    }
+
     /**
      * Whether the given element presents a default argument (with {@code \\} in it.
      * @param argument an argument to a {@link Call}
@@ -1267,6 +1299,23 @@ public class ElixirPsiImplUtil {
             }
 
             previousSibling = previousSibling.getPrevSibling();
+        }
+
+        return keepProcessing;
+    }
+
+    public static boolean processDeclarations(@NotNull final ElixirStabOperation stabOperation,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              @SuppressWarnings("unused") PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+        PsiElement signature = stabOperation.leftOperand();
+
+        if (signature != null) {
+            boolean declaringScope = isDeclaringScope(stabOperation);
+
+            keepProcessing = processor.execute(signature, state.put(DECLARING_SCOPE, declaringScope));
         }
 
         return keepProcessing;

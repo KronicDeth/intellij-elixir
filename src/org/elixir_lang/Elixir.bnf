@@ -2106,6 +2106,7 @@ stabOperation ::= stabOperationPrefix stabBody?
                     methods = [
                       leftOperand
                       operator
+                      processDeclarations
                       quote
                       rightOperand
                     ]
