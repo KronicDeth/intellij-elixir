@@ -2191,7 +2191,6 @@ accessExpression ::= atNumericOperation |
                        ]
                        methods = [
                          isModuleName
-                         processDeclarations
                          quote
                        ]
                      }
