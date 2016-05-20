@@ -1247,19 +1247,6 @@ public class ElixirPsiImplUtil {
         return primaryArity;
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
-                                              @NotNull PsiScopeProcessor processor,
-                                              @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                accessExpression,
-                processor,
-                state,
-                lastParent,
-                place
-        );
-    }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
                                               @NotNull PsiScopeProcessor processor,
