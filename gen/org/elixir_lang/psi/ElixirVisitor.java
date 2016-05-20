@@ -317,7 +317,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitKeywordKey(@NotNull ElixirKeywordKey o) {
-    visitQuotable(o);
+    visitNamedElement(o);
+    // visitQuotable(o);
   }
 
   public void visitKeywordPair(@NotNull ElixirKeywordPair o) {
@@ -455,7 +456,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedAndOperation(@NotNull ElixirMatchedAndOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitAnd(o);
   }
 
   public void visitMatchedArrowOperation(@NotNull ElixirMatchedArrowOperation o) {
@@ -585,7 +586,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedTwoOperation(@NotNull ElixirMatchedTwoOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
-    // visitType(o);
+    // visitTwo(o);
   }
 
   public void visitMatchedTypeOperation(@NotNull ElixirMatchedTypeOperation o) {
@@ -596,8 +597,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitMatchedUnaryNonNumericOperation(@NotNull ElixirMatchedUnaryNonNumericOperation o) {
     visitMatchedExpression(o);
-    // visitNamed(o);
-    // visitPrefix(o);
+    // visitUnaryNonNumericOperation(o);
   }
 
   public void visitMatchedUnqualifiedBracketOperation(@NotNull ElixirMatchedUnqualifiedBracketOperation o) {
@@ -800,7 +800,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnmatchedAndOperation(@NotNull ElixirUnmatchedAndOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitAnd(o);
   }
 
   public void visitUnmatchedArrowOperation(@NotNull ElixirUnmatchedArrowOperation o) {
@@ -920,7 +920,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnmatchedTwoOperation(@NotNull ElixirUnmatchedTwoOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
-    // visitType(o);
+    // visitTwo(o);
   }
 
   public void visitUnmatchedTypeOperation(@NotNull ElixirUnmatchedTypeOperation o) {
@@ -931,8 +931,7 @@ public class ElixirVisitor extends PsiElementVisitor {
 
   public void visitUnmatchedUnaryNonNumericOperation(@NotNull ElixirUnmatchedUnaryNonNumericOperation o) {
     visitUnmatchedExpression(o);
-    // visitNamed(o);
-    // visitPrefix(o);
+    // visitUnaryNonNumericOperation(o);
   }
 
   public void visitUnmatchedUnqualifiedBracketOperation(@NotNull ElixirUnmatchedUnqualifiedBracketOperation o) {
@@ -970,7 +969,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitVariable(@NotNull ElixirVariable o) {
-    visitQuotable(o);
+    visitNamedElement(o);
+    // visitQuotable(o);
   }
 
   public void visitWhenInfixOperator(@NotNull ElixirWhenInfixOperator o) {

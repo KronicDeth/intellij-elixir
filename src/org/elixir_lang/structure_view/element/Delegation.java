@@ -33,8 +33,46 @@ public class Delegation extends Element<Call>  {
      * Static Methods
      */
 
+    public static List<Call> callDefinitionHeadCallList(Call defdelegateCall) {
+        List<Call> callDefinitionHeadCallList = null;
+
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(defdelegateCall);
+
+        assert finalArguments != null;
+        assert finalArguments.length > 0;
+
+        PsiElement firstFinalArgument = finalArguments[0];
+
+        if (firstFinalArgument instanceof ElixirAccessExpression) {
+            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
+
+            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+
+            if (accessExpressionChildren.length == 1) {
+                PsiElement accessExpressionChild = accessExpressionChildren[0];
+
+                if (accessExpressionChild instanceof ElixirList) {
+                    ElixirList list = (ElixirList) accessExpressionChild;
+
+                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
+                    callDefinitionHeadCallList = filterCallDefinitionHeadCallList(listCalls);
+                }
+            }
+        } else if (firstFinalArgument instanceof Call) {
+            Call call = (Call) firstFinalArgument;
+
+            callDefinitionHeadCallList = filterCallDefinitionHeadCallList(call);
+        }
+
+        if (callDefinitionHeadCallList == null) {
+            callDefinitionHeadCallList = Collections.emptyList();
+        }
+
+        return callDefinitionHeadCallList;
+    }
+
     @NotNull
-    public static List<Call> callDefinitionHeadCallList(Call... calls) {
+    public static List<Call> filterCallDefinitionHeadCallList(Call... calls) {
         List<Call> callList = Collections.emptyList();
 
         if (calls != null) {
@@ -116,41 +154,7 @@ public class Delegation extends Element<Call>  {
 
     @NotNull
     public List<Call> callDefinitionHeadCallList() {
-        List<Call> callDefinitionHeadCallList = null;
-
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
-
-        assert finalArguments != null;
-        assert finalArguments.length > 0;
-
-        PsiElement firstFinalArgument = finalArguments[0];
-
-        if (firstFinalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
-
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
-
-            if (accessExpressionChildren.length == 1) {
-                PsiElement accessExpressionChild = accessExpressionChildren[0];
-
-                if (accessExpressionChild instanceof ElixirList) {
-                    ElixirList list = (ElixirList) accessExpressionChild;
-
-                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-                    callDefinitionHeadCallList = callDefinitionHeadCallList(listCalls);
-                }
-            }
-        } else if (firstFinalArgument instanceof Call) {
-            Call call = (Call) firstFinalArgument;
-
-            callDefinitionHeadCallList = callDefinitionHeadCallList(call);
-        }
-
-        if (callDefinitionHeadCallList == null) {
-            callDefinitionHeadCallList = Collections.emptyList();
-        }
-
-        return callDefinitionHeadCallList;
+        return callDefinitionHeadCallList(navigationItem);
     }
 
     public void definition(CallDefinition callDefinition) {

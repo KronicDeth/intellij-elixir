@@ -5,9 +5,12 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.operation.Match;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +87,7 @@ public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl
     return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
   }
 
-  @NotNull
+  @Nullable
   public Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
   }
@@ -107,6 +110,10 @@ public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl
   @Nullable
   public Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
+  }
+
+  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations((Match) this, processor, state, lastParent, place);
   }
 
   @NotNull

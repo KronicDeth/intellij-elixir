@@ -54,7 +54,7 @@ public class ElixirStabParenthesesSignatureImpl extends ASTWrapperPsiElement imp
     return findChildByClass(ElixirWhenInfixOperator.class);
   }
 
-  @NotNull
+  @Nullable
   public Quotable leftOperand() {
     return ElixirPsiImplUtil.leftOperand(this);
   }

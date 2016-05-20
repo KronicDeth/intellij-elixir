@@ -38,6 +38,7 @@ import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
+import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -51,6 +52,7 @@ import java.util.*;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
+import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
@@ -78,6 +80,7 @@ public class ElixirPsiImplUtil {
     public static final Key<Boolean> DECLARING_SCOPE = new Key<Boolean>("DECLARING_SCOPE");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
+    public static final Key<PsiElement> ENTRANCE = new Key<PsiElement>("ENTRANCE");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
@@ -404,6 +407,33 @@ public class ElixirPsiImplUtil {
                 };
             }
         };
+    }
+
+    /**
+     * @see <a href="https://elixir-lang.readthedocs.io/en/latest/technical/scoping.html">Elixir Scoping</a>
+     * @see <a href="https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-(and-Erlang)#scopes-that-change-the-existing-binding">Scoping Rules in Elixir (and Erlang)</a>
+     */
+    public static boolean createsNewScope(@NotNull PsiElement element) {
+        boolean newScope = false;
+
+        if (element instanceof ElixirAnonymousFunction) {
+            newScope = true;
+        } else if (element instanceof Call) {
+            Call call = (Call) element;
+
+            if (call.isCalling("Elixir.Kernel", "case") ||
+                    call.isCalling("Elixir.Kernel", "cond") ||
+                    call.isCalling("Elixir.Kernel", "if") ||
+                    call.isCalling("Elixir.Kernel", "receive") ||
+                    call.isCalling("Elixir.Kernel", "unless")
+                    ) {
+                newScope = false;
+            } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
+                newScope = true;
+            }
+        }
+
+        return newScope;
     }
 
     /**
@@ -1247,6 +1277,41 @@ public class ElixirPsiImplUtil {
         return primaryArity;
     }
 
+    /**
+     * {@code def(macro)?p?}, {@code for}, or {@code with} can declare variables
+     */
+    public static boolean processDeclarations(@NotNull final Call call,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+
+        // need to check if call is place because lastParent is set to place at start of treeWalkUp
+        if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
+            if (CallDefinitionClause.is(call) || // call parameters
+                    Delegation.is(call) || // delegation call parameters
+                    Module.is(call) || // module Alias
+                    call.isCallingMacro("Elixir.Kernel", "if") || // match in condition
+                    call.isCallingMacro("Elixir.Kernel", "unless") // match in condition
+                    ) {
+                keepProcessing = processor.execute(call, state);
+            } else if (call.isCallingMacro("Elixir.Kernel", "for") || // comprehension match variable
+                    call.isCallingMacro("Elixir.Kernel", "with") // <- or = variable
+                    ) {
+                keepProcessing = processor.execute(call, state);
+            } else if (org.elixir_lang.structure_view.element.Quote.is(call)) { // quote :bind_quoted keys{
+                PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(call, "bind_quoted");
+                /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
+                   bindQuoted already must be the bind_quoted values that must be declared before the quote */
+                if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
+                    keepProcessing = processor.execute(call, state);
+                }
+            }
+        }
+
+        return keepProcessing;
+    }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
                                               @NotNull PsiScopeProcessor processor,
@@ -1308,25 +1373,48 @@ public class ElixirPsiImplUtil {
         return keepProcessing;
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall,
+    public static boolean processDeclarations(@NotNull final Match match,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                unmatchedUnqualifiedNoParenthesesCall,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        PsiElement rightOperand = match.rightOperand();
+        PsiElement leftOperand = match.leftOperand();
+        boolean checkRight = false;
+        boolean checkLeft = false;
+
+        if (match.isEquivalentTo(lastParent)) {
+            checkRight = true;
+            checkLeft = true;
+        } else if (PsiTreeUtil.isAncestor(rightOperand, lastParent, false)) {
+            checkRight = true;
+            checkLeft = false;
+        } else if (PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
+            checkRight = false;
+            checkLeft = true;
+        }
+
+        assert checkRight || checkLeft;
+
+        boolean keepProcessing = true;
+
+        // check right-operand first if both sides need to be checked because only left-side can do rebinding
+        if (checkRight && rightOperand != null) {
+            keepProcessing = processor.execute(rightOperand, state);
+        }
+
+        if (checkLeft && keepProcessing) {
+            keepProcessing = processor.execute(leftOperand, state);
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
+                                              @SuppressWarnings("unused") PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
         return processor.execute(qualifiedAlias, state);
     }
 
@@ -1338,14 +1426,16 @@ public class ElixirPsiImplUtil {
         boolean keepProcessing = processor.execute(psiElement, state);
 
         if (keepProcessing) {
-            PsiElement[] children = psiElement.getChildren();
+            PsiElement child = psiElement.getFirstChild();
 
-            for (PsiElement child : children) {
+            while (child != lastParent) {
                 if (!child.processDeclarations(processor, state, lastParent, place)) {
                     keepProcessing = false;
 
                     break;
                 }
+
+                child = child.getNextSibling();
             }
         }
 
@@ -2016,12 +2106,35 @@ public class ElixirPsiImplUtil {
     @NotNull
     @Contract(pure=true)
     static SearchScope getUseScope(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
-        SearchScope useScope = null;
+        SearchScope useScope;
 
         if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
             PsiElement ancestor = unqualifiedNoArgumentsCall.getParent();
 
-            while (!(ancestor instanceof Call && CallDefinitionClause.is((Call) ancestor))) {
+            while (true) {
+                if (ancestor instanceof Call) {
+                    Call ancestorCall = (Call) ancestor;
+
+                    if (CallDefinitionClause.is(ancestorCall)) {
+                        PsiElement macroDefinitionClause = macroDefinitionClauseForArgument(ancestorCall);
+
+                        if (macroDefinitionClause != null) {
+                            ancestor = macroDefinitionClause;
+                        }
+
+                        break;
+                    } else if (Delegation.is(ancestorCall)) {
+                        break;
+                    }
+                } else if (ancestor instanceof PsiFile) {
+                    error(
+                            UnqualifiedNoArgumentsCall.class,
+                            "Use scope for parameter not found before reaching file scope",
+                            unqualifiedNoArgumentsCall
+                    );
+                    break;
+                }
+
                 ancestor = ancestor.getParent();
             }
 
@@ -2355,7 +2468,15 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull Call call) {
-        return new Callable(call);
+        PsiReference reference = null;
+
+        /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
+           and instead let {@link #getReference(AtNonNumbericOperation) handle it */
+        if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation)) {
+            reference = new Callable(call);
+        }
+
+        return reference;
     }
 
     @Nullable
@@ -4541,6 +4662,7 @@ if (quoted == null) {
         return null;
     }
 
+
     @NotNull
     public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                      @NotNull final String newName) {
@@ -4643,6 +4765,31 @@ if (quoted == null) {
             );
             mergedNodes.add(charListFragment);
         }
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static Call macroDefinitionClauseForArgument(Call callDefinitionClause) {
+        Call macroDefinitionClause = null;
+        PsiElement parent = callDefinitionClause.getParent();
+
+        if (parent instanceof ElixirMatchedWhenOperation) {
+            PsiElement grandParent =  parent.getParent();
+
+            if (grandParent instanceof ElixirNoParenthesesOneArgument) {
+                PsiElement greatGrandParent = grandParent.getParent();
+
+                if (greatGrandParent instanceof Call) {
+                    Call greatGrandParentCall = (Call) greatGrandParent;
+
+                    if (CallDefinitionClause.isMacro(greatGrandParentCall)) {
+                        macroDefinitionClause = greatGrandParentCall;
+                    }
+                }
+            }
+        }
+
+        return macroDefinitionClause;
     }
 
     @NotNull

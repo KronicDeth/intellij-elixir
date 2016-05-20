@@ -24,6 +24,7 @@
     moduleName
     primaryArguments
     primaryArity
+    processDeclarations
     quote
     resolvedFinalArity
     resolvedFinalArityRange
@@ -64,6 +65,7 @@
     operator
     primaryArguments
     primaryArity
+    processDeclarations
     quote
     resolvedFinalArity
     resolvedFinalArityRange

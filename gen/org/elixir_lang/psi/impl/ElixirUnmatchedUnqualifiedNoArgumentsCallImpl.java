@@ -6,6 +6,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.IStubElementType;
 import org.apache.commons.lang.math.IntRange;
@@ -110,6 +112,10 @@ public class ElixirUnmatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedP
   @Nullable
   public Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
+  }
+
+  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @NotNull

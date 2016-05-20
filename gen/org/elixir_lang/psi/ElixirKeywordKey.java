@@ -2,10 +2,11 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface ElixirKeywordKey extends Quotable {
+public interface ElixirKeywordKey extends NamedElement, Quotable {
 
   @Nullable
   ElixirCharListLine getCharListLine();
@@ -13,7 +14,16 @@ public interface ElixirKeywordKey extends Quotable {
   @Nullable
   ElixirStringLine getStringLine();
 
+  @Nullable
+  String getName();
+
+  @Nullable
+  PsiElement getNameIdentifier();
+
   @NotNull
   OtpErlangObject quote();
+
+  @NotNull
+  PsiElement setName(String newName);
 
 }

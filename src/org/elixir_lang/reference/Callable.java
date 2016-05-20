@@ -1,9 +1,12 @@
 package org.elixir_lang.reference;
 
+import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
@@ -14,8 +17,10 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.scope.variable.MultiResolve;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionHead;
+import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DEFAULT_OPERATOR;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.createsNewScope;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.followingSiblingsSearchScope;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
@@ -88,13 +94,13 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     public static boolean isParameter(@NotNull Call call) {
         boolean isParameter;
 
-        if (CallDefinitionClause.is(call)) {
+        if (CallDefinitionClause.is(call) || Delegation.is(call)) {
             isParameter = true;
         } else {
             PsiElement parent = call.getParent();
 
             if (parent != null && !(parent instanceof PsiFile)) {
-                isParameter = isParameter(call.getParent());
+                isParameter = isParameter(parent);
             } else {
                 isParameter = false;
             }
@@ -126,7 +132,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
 
     @Contract(pure = true)
     public static boolean isVariable(@NotNull Call call) {
-        boolean isVariable = false;
+        boolean isVariable;
 
         if (call instanceof UnqualifiedNoArgumentsCall) {
             String name = call.getName();
@@ -135,9 +141,17 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             if (name == null || !name.equals(IGNORED)) {
                 PsiElement parent = call.getParent();
                 isVariable = isVariable(parent);
+            } else {
+                isVariable = false;
             }
+        } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
+            // module attribute, so original may be a unqualified no argument type name
+            isVariable = false;
         } else if (call.isCallingMacro("Elixir.Kernel", "for")) {
             isVariable = true;
+        } else {
+            PsiElement parent = call.getParent();
+            isVariable = isVariable(parent);
         }
 
         return isVariable;
@@ -226,6 +240,42 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     /**
+     * Adds {@code namedElement} to {@code lookupElementList} in a {@link LookupElement} using
+     * {@link com.intellij.codeInsight.lookup.LookupElementBuilder#createWithSmartPointer(String, PsiElement)} if
+     * {@code lookupElementList} exists; otherwise, create new {@code List<LookupElement>}, and then add
+     * {@code namedElement}.
+     *
+     * @param lookupElementList The current accumulated {@link LookupElement}s for the {@link PsiElement}s that match
+     *                          the type of {@link #myElement}.  So, if it is an {@link UnqualifiedNoArgumentsCall},
+     *                          then this is a list of potential variables.
+     * @param namedElement an element that matches the criteria for {@link #getVariants()}
+     * @return the modified {@code lookupElementList} if it was not {@code null}; otherwise, a new
+     *   {@code List<LookupElement>}
+     */
+    @NotNull
+    private static List<LookupElement> add(@Nullable List<LookupElement> lookupElementList,
+                                           @NotNull PsiNamedElement namedElement) {
+        if (lookupElementList == null) {
+            lookupElementList = new ArrayList<LookupElement>();
+        }
+
+        String lookupString = namedElement.getName();
+
+        if (lookupString == null) {
+            lookupString = namedElement.getText();
+        }
+
+        lookupElementList.add(
+                LookupElementBuilder.createWithSmartPointer(
+                        lookupString,
+                        namedElement
+                )
+        );
+
+        return lookupElementList;
+    }
+
+    /**
      * Whether the {@code resolveResultList} has any {@link ResolveResult} where {@link ResolveResult#isValidResult()}
      * is {@code true}.
      *
@@ -252,10 +302,12 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
 
         if (parent instanceof Call) {
             isParameter = isParameter((Call) parent);
-        } else if (parent instanceof ElixirAccessExpression ||
+        } else if (parent instanceof AtNonNumericOperation ||
+                parent instanceof ElixirAccessExpression ||
                 parent instanceof ElixirAssociations ||
                 parent instanceof ElixirAssociationsBase ||
                 parent instanceof ElixirBitString ||
+                parent instanceof ElixirContainerAssociationOperation ||
                 parent instanceof ElixirKeywordPair ||
                 parent instanceof ElixirKeywords ||
                 parent instanceof ElixirList ||
@@ -268,7 +320,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirNoParenthesesKeywords ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
                 parent instanceof ElixirParenthesesArguments ||
+                parent instanceof ElixirParentheticalStab ||
+                parent instanceof ElixirStab ||
                 parent instanceof ElixirStabNoParenthesesSignature ||
+                parent instanceof ElixirStabBody ||
                 parent instanceof ElixirStabOperation ||
                 parent instanceof ElixirStabParenthesesSignature ||
                 parent instanceof ElixirStructOperation ||
@@ -277,7 +332,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
             isParameter = true;
         } else {
-            if (!(parent instanceof ElixirStab || parent instanceof ElixirStabBody)) {
+            if (!(parent instanceof ElixirBlockItem ||
+                    parent instanceof ElixirDoBlock ||
+                    parent instanceof ElixirQuoteStringBody)) {
                 Logger.error(Callable.class, "Don't know how to check if parameter", parent);
             }
         }
@@ -289,8 +346,12 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     private static boolean isVariable(@NotNull PsiElement ancestor) {
         boolean isVariable = false;
 
-        if (ancestor instanceof ElixirMatchedParenthesesArguments ||
+        if (ancestor instanceof ElixirInterpolation ||
                 ancestor instanceof ElixirStabNoParenthesesSignature ||
+                /* if a StabOperation is encountered before
+                   ElixirStabNoParenthesesSignature or
+                   ElixirStabParenthesesSignature, then must have come from body */
+                ancestor instanceof ElixirStabOperation ||
                 ancestor instanceof ElixirStabParenthesesSignature ||
                 ancestor instanceof InMatch ||
                 ancestor instanceof Match) {
@@ -300,12 +361,16 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirAssociationsBase ||
                 ancestor instanceof ElixirBitString ||
                 ancestor instanceof ElixirContainerAssociationOperation ||
+                ancestor instanceof ElixirDoBlock ||
                 ancestor instanceof ElixirKeywordPair ||
                 ancestor instanceof ElixirKeywords ||
                 ancestor instanceof ElixirList ||
                 ancestor instanceof ElixirMapArguments ||
                 ancestor instanceof ElixirMapConstructionArguments ||
                 ancestor instanceof ElixirMapOperation ||
+                /* parenthesesArguments can be used in @spec other type declarations, so may not be variable until
+                   ancestor call is checked */
+                ancestor instanceof ElixirMatchedParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesKeywordPair ||
@@ -316,573 +381,78 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirStabBody ||
                 ancestor instanceof ElixirStructOperation ||
                 ancestor instanceof ElixirTuple ||
+                ancestor instanceof QualifiedAlias ||
                 ancestor instanceof Type) {
             isVariable = isVariable(ancestor.getParent());
         } else if (ancestor instanceof Call) {
             // MUST be after any operations because operations also implement Call
             isVariable = isVariable((Call) ancestor);
         } else {
-            Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
+            if (!(ancestor instanceof AtNonNumericOperation || ancestor instanceof PsiFile)) {
+                Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
+            }
         }
 
         return isVariable;
     }
 
-    @Nullable
-    private static List<ResolveResult> resolveVariable(@NotNull PsiElement referrer,
-                                                       @NotNull String name,
-                                                       boolean incompleteCode,
-                                                       @NotNull Call ancestor,
-                                                       @Nullable List<ResolveResult> resolveResultList) {
-        if (CallDefinitionClause.is(ancestor) || ancestor.isCallingMacro("Elixir.Kernel", "for")) {
-            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, ancestor, resolveResultList);
-        }
+    private static LocalSearchScope variableUseScope(@NotNull Call call) {
+        LocalSearchScope useScope;
 
-        if (!stop(incompleteCode, resolveResultList)) {
-            // use generic parent-type-check resolveVariable
-            resolveResultList = resolveVariable(
-                    referrer, name, incompleteCode, (PsiElement) ancestor, resolveResultList
-            );
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariable(@NotNull final PsiElement referrer,
-                                                       @NotNull String name,
-                                                       boolean incompleteCode,
-                                                       @NotNull ElixirStabOperation ancestor,
-                                                       @Nullable List<ResolveResult> resolveResultList) {
-        PsiElement signature = ancestor.leftOperand();
-
-        if (signature != null) {
-            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, signature, resolveResultList);
-        }
-
-        if (!stop(incompleteCode, resolveResultList)) {
-            resolveResultList = resolveVariable(referrer, name, incompleteCode, ancestor.getParent(), resolveResultList);
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariable(@NotNull Call call, boolean incompleteCode) {
-        List<ResolveResult> resolveResultList = null;
-        String name = call.getName();
-
-        if (name != null) {
-            if (!incompleteCode && name.equals(IGNORED)) {
-                resolveResultList = Collections.<ResolveResult>singletonList(new PsiElementResolveResult(call));
-            } else {
-                resolveResultList = resolveVariable(call, name, incompleteCode, (PsiElement) call, null);
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariable(@NotNull PsiElement referrer,
-                                                       @NotNull String name,
-                                                       boolean incompleteCode,
-                                                       @NotNull PsiElement ancestor,
-                                                       @Nullable List<ResolveResult> resolveResultList) {
-        if (!(ancestor instanceof PsiFile)) {
-            PsiElement parent = ancestor.getParent();
-
-            if (parent instanceof Match) {
-                Infix matchOperation = (Match) parent;
-                PsiElement rightOperand = matchOperation.rightOperand();
-
-                // a variable in the right operand can't be declared in the left operand
-                if (rightOperand == null || !rightOperand.isEquivalentTo(ancestor)) {
-                    resolveResultList = resolveVariableInMatch(
-                            referrer, name, incompleteCode, matchOperation.leftOperand(), resolveResultList
-                    );
-                }
-
-                if (!stop(incompleteCode, resolveResultList)) {
-                    // use generic parent-type-check resolveVariable
-                    resolveResultList = resolveVariable(referrer, name, incompleteCode, parent, resolveResultList);
-                }
-            } else if (parent instanceof BracketOperation ||
-                    parent instanceof ElixirAccessExpression ||
-                    parent instanceof ElixirAnonymousFunction ||
-                    parent instanceof ElixirAssociations ||
-                    parent instanceof ElixirAssociationsBase ||
-                    parent instanceof ElixirAtom ||
-                    parent instanceof ElixirBitString ||
-                    parent instanceof ElixirBlockItem ||
-                    parent instanceof ElixirBlockList ||
-                    parent instanceof ElixirBracketArguments ||
-                    parent instanceof ElixirCharListLine ||
-                    parent instanceof ElixirContainerAssociationOperation ||
-                    parent instanceof ElixirDoBlock ||
-                    parent instanceof ElixirInterpolatedStringBody ||
-                    parent instanceof ElixirInterpolatedStringSigilLine ||
-                    parent instanceof ElixirInterpolation ||
-                    parent instanceof ElixirKeywordPair ||
-                    parent instanceof ElixirKeywords ||
-                    parent instanceof ElixirList ||
-                    parent instanceof ElixirMapArguments ||
-                    parent instanceof ElixirMapConstructionArguments ||
-                    parent instanceof ElixirMapOperation ||
-                    parent instanceof ElixirMapUpdateArguments ||
-                    parent instanceof ElixirMatchedParenthesesArguments ||
-                    parent instanceof ElixirNoParenthesesArguments ||
-                    parent instanceof ElixirNoParenthesesKeywordPair ||
-                    parent instanceof ElixirNoParenthesesKeywords ||
-                    parent instanceof ElixirNoParenthesesOneArgument ||
-                    parent instanceof ElixirParenthesesArguments ||
-                    parent instanceof ElixirParentheticalStab ||
-                    parent instanceof ElixirQuoteCharListBody ||
-                    parent instanceof ElixirQuoteStringBody ||
-                    parent instanceof ElixirStab ||
-                    parent instanceof ElixirStabNoParenthesesSignature ||
-                    parent instanceof ElixirStringHeredoc ||
-                    parent instanceof ElixirStringHeredocLine ||
-                    parent instanceof ElixirStringLine ||
-                    parent instanceof ElixirStructOperation ||
-                    parent instanceof ElixirTuple ||
-                    parent instanceof Operation ||
-                    parent instanceof QualifiedAlias ||
-                    parent instanceof QualifiedBracketOperation ||
-                    parent instanceof UnqualifiedBracketOperation) {
-                resolveResultList = resolveVariable(referrer, name, incompleteCode, parent, resolveResultList);
-            } else if (parent instanceof ElixirStabBody) {
-                resolveResultList = resolveVariableInBlock(
-                        referrer, name, incompleteCode, ancestor, resolveResultList
-                );
-
-                if (!stop(incompleteCode, resolveResultList)) {
-                    resolveResultList = resolveVariable(referrer, name, incompleteCode, parent, resolveResultList);
-                }
-            } else if (parent instanceof ElixirStabOperation) {
-                resolveResultList = resolveVariable(
-                        referrer, name, incompleteCode, (ElixirStabOperation) parent, resolveResultList
-                );
-            } else if (parent instanceof Call) {
-                resolveResultList = resolveVariable(referrer, name, incompleteCode, (Call) parent, resolveResultList);
-            } else {
-                if (!(parent instanceof PsiFile)) {
-                    Logger.error(Callable.class, "Don't know how to resolve variable", parent);
-                }
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInBlock(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull PsiElement previousSibling,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        previousSibling = previousSibling.getPrevSibling();
-
-        while (previousSibling != null) {
-            if (!(previousSibling instanceof PsiComment)) {
-                resolveResultList = resolveVariableInMatch(
-                        referrer, name, incompleteCode, previousSibling, resolveResultList
-                );
-
-                if (stop(incompleteCode, resolveResultList)) {
-                    break;
-                }
-            }
-
-            previousSibling = previousSibling.getPrevSibling();
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull Call match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        if (CallDefinitionClause.is(match)) {
-            PsiElement head = CallDefinitionClause.head(match);
-
-            if (head != null) {
-                PsiElement stripped = CallDefinitionHead.strip(head);
-
-                if (stripped instanceof Call) {
-                    Call strippedCall = (Call) stripped;
-
-                    PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(strippedCall);
-
-                    if (finalArguments != null) {
-                        resolveResultList = resolveVariableInMatch(
-                                referrer, name, incompleteCode, finalArguments, resolveResultList
-                        );
-                    }
-                }
-            }
-        } else if (match.isCallingMacro("Elixir.Kernel", "for")) {
-            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
-
-            if (finalArguments != null) {
-                // skip last argument since it is the keyword arguments
-                for (int i = 0; i < finalArguments.length; i++) {
-                    PsiElement finalArgument = finalArguments[i];
-
-                    resolveResultList = resolveVariableInMatch(
-                            referrer, name, incompleteCode, finalArgument, resolveResultList
-                    );
-
-                    if (stop(incompleteCode, resolveResultList)) {
-                        break;
-                    }
-                }
-            }
+        if (createsNewScope(call)) {
+            useScope = new LocalSearchScope(call);
         } else {
-            // unquote(var) can't declare var, only use it
-            if (!match.isCalling("Elixir.Kernel", "unquote", 1)) {
-                int resolvedFinalArity = match.resolvedFinalArity();
+            PsiElement parent = call.getParent();
 
-                if (resolvedFinalArity == 0) {
-                    resolveResultList = add(resolveResultList, name, incompleteCode, (PsiNamedElement) match);
+            if (parent instanceof ElixirStabBody) {
+                List<PsiElement> selfAndFollowingSiblingList = new ArrayList<PsiElement>();
+                PsiElement sibling = call;
+
+                while (sibling != null) {
+                    selfAndFollowingSiblingList.add(sibling);
+
+                    sibling = sibling.getNextSibling();
                 }
-            }
-        }
 
-        return resolveResultList;
-    }
-
-    /**
-     * Only checks the right operand of the container association operation because the left operand is either a literal
-     * or a pinned variable, which means the variable is being used and was declared elsewhere.
-     */
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirContainerAssociationOperation match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        PsiElement[] children = match.getChildren();
-
-        if (children.length > 1) {
-            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, children[1], resolveResultList);
-        }
-
-        return resolveResultList;
-    }
-
-    /**
-     * Only checks {@link ElixirMapArguments#getMapConstructionArguments()} and not
-     * {@link ElixirMapArguments#getMapUpdateArguments()} since an update is not valid in a pattern match.
-     */
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirMapArguments match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-
-        ElixirMapConstructionArguments mapConstructionArguments = match.getMapConstructionArguments();
-
-        if (mapConstructionArguments != null) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, mapConstructionArguments, resolveResultList
-            );
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirMapOperation match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.getMapArguments(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirMatchedWhenOperation match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.leftOperand(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirStabNoParenthesesSignature match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(
-                referrer, name, incompleteCode, match.getNoParenthesesArguments(), resolveResultList
-        );
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirStabParenthesesSignature match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.getParenthesesArguments(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull ElixirStructOperation match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.getMapArguments(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull Type match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.leftOperand(), resolveResultList);
-    }
-
-    /**
-     * {@code in} can declare variable for {@code rescue} clauses like {@code rescue e in RuntimeException ->}
-     */
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull In match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.leftOperand(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull Infix match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        resolveResultList = resolveVariableInMatch(
-                referrer, name, incompleteCode, match.leftOperand(), resolveResultList
-        );
-
-        if (!stop(incompleteCode, resolveResultList)) {
-            PsiElement rightOperand = match.rightOperand();
-
-            if (rightOperand != null) {
-                resolveResultList = resolveVariableInMatch(
-                        referrer, name, incompleteCode, rightOperand, resolveResultList
+                useScope = new LocalSearchScope(
+                        selfAndFollowingSiblingList.toArray(
+                                new PsiElement[selfAndFollowingSiblingList.size()]
+                        )
                 );
+
+                assert useScope != null;
+            } else {
+                useScope = variableUseScope(parent);
             }
         }
 
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull InMatch match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        Operator operator = match.operator();
-        String operatorText = operator.getText();
-
-        if (operatorText.equals(DEFAULT_OPERATOR)) {
-            PsiElement defaulted = match.leftOperand();
-
-            if (defaulted instanceof PsiNamedElement) {
-                resolveResultList = add(resolveResultList, name, incompleteCode, (PsiNamedElement) defaulted);
-            }
-        } else if (operatorText.equals("<-")) {
-            PsiElement leftOperand = match.leftOperand();
-
-            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, leftOperand, resolveResultList);
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull QuotableKeywordPair match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        return resolveVariableInMatch(referrer, name, incompleteCode, match.getKeywordValue(), resolveResultList);
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull PsiElement parameter,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        if (parameter instanceof ElixirAccessExpression ||
-                parameter instanceof ElixirAssociations ||
-                parameter instanceof ElixirAssociationsBase ||
-                parameter instanceof ElixirBitString ||
-                parameter instanceof ElixirList ||
-                parameter instanceof ElixirMapConstructionArguments ||
-                parameter instanceof ElixirNoParenthesesArguments ||
-                parameter instanceof ElixirNoParenthesesOneArgument ||
-                parameter instanceof ElixirParenthesesArguments ||
-                parameter instanceof ElixirParentheticalStab ||
-                parameter instanceof ElixirStab ||
-                parameter instanceof ElixirStabBody ||
-                parameter instanceof ElixirTuple) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, parameter.getChildren(), resolveResultList
-            );
-        } else if (parameter instanceof ElixirContainerAssociationOperation) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirContainerAssociationOperation) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirMapArguments) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirMapArguments) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirMapOperation) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirMapOperation) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirMatchedWhenOperation) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirMatchedWhenOperation) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirStabNoParenthesesSignature) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirStabNoParenthesesSignature) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirStabParenthesesSignature) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirStabParenthesesSignature) parameter, resolveResultList
-            );
-        } else if (parameter instanceof ElixirStructOperation) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (ElixirStructOperation) parameter, resolveResultList
-            );
-        } else if (parameter instanceof In) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (In) parameter, resolveResultList
-            );
-        } else if (parameter instanceof InMatch) { // MUST be before Call as InMatch is a Call
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (InMatch) parameter, resolveResultList
-            );
-        } else if (parameter instanceof Match ||
-                parameter instanceof Pipe ||
-                parameter instanceof Two) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (Infix) parameter, resolveResultList
-            );
-        } else if (parameter instanceof Type) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (Type) parameter, resolveResultList
-            );
-        } else if (parameter instanceof Call) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (Call) parameter, resolveResultList
-            );
-        } else if (parameter instanceof QuotableKeywordList) {
-            resolveResultList = resolveVariableInMatch(
-                    referrer, name, incompleteCode, (QuotableKeywordList) parameter, resolveResultList
-            );
-        } else {
-            if (!(parameter instanceof AtNonNumericOperation || // a module attribute reference
-                    parameter instanceof AtUnqualifiedBracketOperation || // a module attribute reference with access
-                    parameter instanceof BracketOperation ||
-                    /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
-                       be hit if the parameter is declared in the {@code fn} signature because that upward resolution
-                       from resolveVariable stops before this level */
-                    parameter instanceof ElixirAnonymousFunction ||
-                    parameter instanceof ElixirAtom ||
-                    parameter instanceof ElixirAtomKeyword ||
-                    parameter instanceof ElixirCharListLine ||
-                    parameter instanceof ElixirCharToken ||
-                    parameter instanceof ElixirDecimalFloat ||
-                    parameter instanceof ElixirDecimalWholeNumber ||
-                    parameter instanceof ElixirEndOfExpression ||
-                    parameter instanceof ElixirInterpolatedRegexLine ||
-                    parameter instanceof ElixirInterpolatedWordsLine ||
-                    parameter instanceof ElixirStringHeredoc ||
-                    parameter instanceof ElixirStringLine ||
-                    parameter instanceof PsiWhiteSpace ||
-                    parameter instanceof QualifiableAlias ||
-                    parameter instanceof QualifiedBracketOperation ||
-                    parameter instanceof UnqualifiedBracketOperation)) {
-                Logger.error(Callable.class, "Don't know how to resolve variable in match", parameter);
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompleteCode,
-                                                              @NotNull PsiElement[] parameters,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        for (PsiElement parameter : parameters) {
-            resolveResultList = resolveVariableInMatch(referrer, name, incompleteCode, parameter, resolveResultList);
-
-            if (stop(incompleteCode, resolveResultList)) {
-                break;
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    @Nullable
-    private static List<ResolveResult> resolveVariableInMatch(@NotNull PsiElement referrer,
-                                                              @NotNull String name,
-                                                              boolean incompletCode,
-                                                              @NotNull QuotableKeywordList match,
-                                                              @Nullable List<ResolveResult> resolveResultList) {
-        List<QuotableKeywordPair> keywordPairList = match.quotableKeywordPairList();
-
-        for (QuotableKeywordPair keywordPair : keywordPairList) {
-            resolveResultList = resolveVariableInMatch(referrer, name, incompletCode, keywordPair, resolveResultList);
-
-            if (stop(incompletCode, resolveResultList)) {
-                break;
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    /**
-     * Stop trying to resolve the reference if {@code resolveResultList} has a valid result and the code is complete
-     * @param incompleteCode whether the code is incomplete, such as when still being typed.
-     * @param resolveResultList the list of already found resolutions
-     * @return {@code true} if {@link #hasValidResult(List)} and {@code incompleteCode} is {@code false}, so only one
-     *   valid result is allowed.
-     */
-    @Contract(pure = true)
-    private static boolean stop(boolean incompleteCode, @Nullable List<ResolveResult> resolveResultList) {
-        return !incompleteCode && hasValidResult(resolveResultList);
+        return useScope;
     }
 
     private static LocalSearchScope variableUseScope(@NotNull Match match) {
-        LocalSearchScope useScope = null;
+        LocalSearchScope useScope;
 
         PsiElement parent = match.getParent();
 
         if (parent instanceof ElixirStabBody) {
-            useScope = followingSiblingsSearchScope(match);
+            PsiElement ancestor = PsiTreeUtil.getContextOfType(
+                    parent,
+                    ElixirAnonymousFunction.class,
+                    ElixirBlockItem.class,
+                    ElixirDoBlock.class,
+                    ElixirParentheticalStab.class,
+                    ElixirStabOperation.class
+            );
+
+            if (ancestor instanceof ElixirParentheticalStab) {
+                useScope = variableUseScope(parent);
+            } else {
+                /* all non-ElixirParentheticalStab are block-like and so could have multiple statements after the match
+                   where the match variable is used */
+                useScope = followingSiblingsSearchScope(match);
+            }
         } else {
-            Logger.error(Callable.class, "Don't know how to find variable use scope for ", match);
+            useScope = variableUseScope(parent);
         }
 
         return useScope;
@@ -902,6 +472,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirMapArguments ||
                 ancestor instanceof ElixirMapConstructionArguments ||
                 ancestor instanceof ElixirMapOperation ||
+                ancestor instanceof ElixirMatchedParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesKeywordPair ||
@@ -918,15 +489,43 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof Type ||
                 ancestor instanceof UnqualifiedNoArgumentsCall) {
             useScope = variableUseScope(ancestor.getParent());
-        } else if (ancestor instanceof ElixirStabOperation) {
+        } else if (ancestor instanceof ElixirStabOperation ||
+                ancestor instanceof QualifiedAlias) {
             useScope = new LocalSearchScope(ancestor);
         } else if (ancestor instanceof Match) {
             useScope = variableUseScope((Match) ancestor);
+        } else if (ancestor instanceof Call) {
+            useScope = variableUseScope((Call) ancestor);
         } else {
             Logger.error(Callable.class, "Don't know how to find variable use scope for ", ancestor);
         }
 
         return useScope;
+    }
+
+    private static List<LookupElement> variablesInElement(@NotNull PsiElement element,
+                                                          @Nullable List<LookupElement> lookupElementList) {
+        if (element instanceof UnqualifiedNoArgumentsCall) {
+            lookupElementList = add(lookupElementList, (UnqualifiedNoArgumentsCall) element);
+        } else {
+            if (!(element instanceof ElixirStabBody ||
+                    element instanceof ElixirEndOfExpression ||
+                    element instanceof PsiWhiteSpace)) {
+                Logger.error(Callable.class, "Don't know how to find variables in ", element);
+            }
+        }
+
+        return lookupElementList;
+    }
+
+    @Nullable
+    private static List<LookupElement> variablesInPreviousSiblings(@NotNull PsiElement lastSibling,
+                                                                   @Nullable List<LookupElement> lookupElementList) {
+        for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
+            lookupElementList = variablesInElement(sibling, lookupElementList);
+        }
+
+        return lookupElementList;
     }
 
     /*
@@ -978,19 +577,51 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> resolveResultList = new ArrayList<ResolveResult>();
-        // ensure that a pipe isn't make a no argument call really a 1-arity call
-        int resolvedFinalArity = myElement.resolvedFinalArity();
+        List<ResolveResult> resolveResultList = null;
 
-        if (resolvedFinalArity == 0) {
-            List<ResolveResult> resolvedVariableList = resolveVariable(myElement, incompleteCode);
+        /* to differentiate from UnqualifiedParenthesesCalls with no arguments in the parentheses that would have a
+           final arity of 0 too */
+        if (myElement instanceof UnqualifiedNoArgumentsCall) {
+            // ensure that a pipe isn't making a no argument call really a 1-arity call
+            int resolvedFinalArity = myElement.resolvedFinalArity();
 
-            if (resolvedVariableList != null) {
-                resolveResultList.addAll(resolvedVariableList);
+            if (resolvedFinalArity == 0) {
+                String name = myElement.getName();
+
+                if (name != null) {
+                    Type type = PsiTreeUtil.getContextOfType(myElement, Type.class);
+                    boolean isBitStringSegmentOption = false;
+
+                    if (type != null) {
+                        PsiElement typeParent = type.getParent();
+
+                        if (typeParent instanceof ElixirBitString) {
+                            PsiElement rightOperand = type.rightOperand();
+
+                            if (PsiTreeUtil.isAncestor(rightOperand, myElement, false)) {
+                                if (rightOperand.isEquivalentTo(myElement)) {
+                                    isBitStringSegmentOption = true;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!isBitStringSegmentOption) {
+                        resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
+                    }
+                }
             }
         }
 
-        return resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
+        ResolveResult[] resolveResults;
+
+        if (resolveResultList == null) {
+            resolveResults = new ResolveResult[0];
+        } else {
+            resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
+        }
+
+        return resolveResults;
     }
 
     /**

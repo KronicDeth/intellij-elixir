@@ -4,10 +4,12 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirVariable;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVariable {
 
@@ -24,9 +26,24 @@ public class ElixirVariableImpl extends ASTWrapperPsiElement implements ElixirVa
     else super.accept(visitor);
   }
 
+  @Nullable
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
+  @Nullable
+  public PsiElement getNameIdentifier() {
+    return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
   @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
+  }
+
+  @NotNull
+  public PsiElement setName(String newName) {
+    return ElixirPsiImplUtil.setName(this, newName);
   }
 
 }
