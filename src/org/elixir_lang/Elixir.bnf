@@ -2833,7 +2833,18 @@ keywordKey ::= AFTER |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
-               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+               {
+                 implements = [
+                   "org.elixir_lang.psi.NamedElement"
+                   "org.elixir_lang.psi.Quotable"
+                 ]
+                 methods = [
+                   getName
+                   getNameIdentifier
+                   quote
+                   setName
+                 ]
+               }
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 
