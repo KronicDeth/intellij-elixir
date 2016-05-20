@@ -103,7 +103,7 @@
 
   implements("(un)?matchedTwoOperation")=[
     "org.elixir_lang.psi.call.Named"
-    "org.elixir_lang.psi.operation.Type"
+    "org.elixir_lang.psi.operation.Two"
   ]
   // methods set by infix operations above
 
