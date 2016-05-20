@@ -1243,18 +1243,33 @@ public class ElixirPsiImplUtil {
         );
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument,
+    public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                noParenthesesOneArgument,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        assert scope.isEquivalentTo(lastParent.getParent());
+
+        boolean keepProcessing = true;
+        PsiElement previousSibling = lastParent.getPrevSibling();
+
+        while (previousSibling != null) {
+            if (!(previousSibling instanceof ElixirEndOfExpression ||
+                    previousSibling instanceof PsiComment ||
+                    previousSibling instanceof PsiWhiteSpace)) {
+                if (!createsNewScope(previousSibling)) {
+                    keepProcessing = processor.execute(previousSibling, state);
+
+                    if (!keepProcessing) {
+                        break;
+                    }
+                }
+            }
+
+            previousSibling = previousSibling.getPrevSibling();
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarations(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall,
