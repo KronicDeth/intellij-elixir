@@ -2197,6 +2197,32 @@ public class ElixirPsiImplUtil {
         return nameIdentifier;
     }
 
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull ElixirKeywordKey keywordKey) {
+        ElixirCharListLine charListLine = keywordKey.getCharListLine();
+        PsiElement nameIdentifier;
+
+        if (charListLine != null) {
+            nameIdentifier = null;
+        } else {
+            ElixirStringLine stringLine = keywordKey.getStringLine();
+
+            if (stringLine != null) {
+                nameIdentifier = null;
+            } else {
+                nameIdentifier = keywordKey;
+            }
+        }
+
+        return nameIdentifier;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull ElixirVariable variable) {
+        return variable;
+    }
+
     public static PsiElement getNameIdentifier(
             @NotNull org.elixir_lang.psi.call.Named named
     ) {
