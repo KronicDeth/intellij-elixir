@@ -941,9 +941,16 @@ public class ElixirPsiImplUtil {
                 project
         );
 
-        assert module != null;
+        GlobalSearchScope globalSearchScope;
 
-        return GlobalSearchScope.moduleWithDependentsScope(module);
+        // module can be null for scratch files
+        if (module != null) {
+            globalSearchScope = GlobalSearchScope.moduleWithDependentsScope(module);
+        } else {
+            globalSearchScope = GlobalSearchScope.allScope(project);
+        }
+
+        return globalSearchScope;
     }
 
     @Contract(pure = true)
