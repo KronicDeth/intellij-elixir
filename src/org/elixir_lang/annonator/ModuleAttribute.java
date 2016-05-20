@@ -50,7 +50,30 @@ public class ModuleAttribute implements Annotator, DumbAware {
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
                 new PsiRecursiveElementVisitor() {
-                    public void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                    /*
+                     *
+                     * Instance Methods
+                     *
+                     */
+
+                    /*
+                     * Public Instance Methods
+                     */
+
+                    @Override
+                    public void visitElement(@NotNull final PsiElement element) {
+                        if (element instanceof AtNonNumericOperation) {
+                            visitMaybeUsage((AtNonNumericOperation) element);
+                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                        }
+                    }
+
+                    /*
+                     * Private Instance Methods
+                     */
+
+                    private void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
                         ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
                         TextRange textRange = atIdentifier.getTextRange();
 
@@ -83,16 +106,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         }
                     }
 
-                    @Override
-                    public void visitElement(@NotNull final PsiElement element) {
-                        if (element instanceof AtNonNumericOperation) {
-                            visitUsage((AtNonNumericOperation) element);
-                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+
+                    private void visitMaybeUsage(@NotNull final AtNonNumericOperation element) {
+                        PsiElement operand = element.operand();
+
+                        if (!(operand instanceof ElixirAccessExpression)) {
+                            visitUsage(element);
                         }
                     }
 
-                    public void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+                    private void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
                         highlight(
                                 atNonNumericOperation.getTextRange(),
                                 holder,
