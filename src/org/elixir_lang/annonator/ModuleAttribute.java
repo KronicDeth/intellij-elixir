@@ -897,12 +897,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
             AnnotationHolder annotationHolder,
             TextAttributesKey textAttributesKey) {
         for (PsiElement psiElement : psiElements) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    textAttributesKey
-            );
+            if (psiElement != null) {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        textAttributesKey
+                );
+            }
         }
     }
 

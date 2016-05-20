@@ -29,6 +29,7 @@ import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -789,15 +790,9 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static Quotable leftOperand(Infix infix) {
-        PsiElement[] children = infix.getChildren();
-
-        if (children.length < 2 || 3 < children.length) {
-            error(Infix.class, "Infix operation expected 2-3 children, but has " + children.length, infix);
-        }
-
-        return (Quotable) children[0];
+        return Normalized.leftOperand(infix);
     }
 
     /* Returns the 0-indexed line number for the element */
@@ -972,26 +967,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static Operator operator(Infix infix) {
-        PsiElement[] children = infix.getChildren();
-
-        /* 1. When the error is in the rightOperand, then the operator is the last of 2 elements ({@code children[1]}).
-         * 2. When there is no error, then the operator is the middle ({@code children[1]}) element.
-         * 3. When the error is in the leftOperand, then the leftOperand can actually be multiple elements, so it is
-         *    not possible determine which index to use.
-         *
-         * With all that in mind, it is simplest just detect by {@code instanceof}.
-         */
-
-        Operator operator = null;
-
-        for (PsiElement child : children) {
-          if (child instanceof Operator) {
-              operator = (Operator) child;
-          }
-        }
-
-        //noinspection ConstantConditions
-        return operator;
+        return Normalized.operator(infix);
     }
 
     @Contract(pure = true)
@@ -1152,12 +1128,13 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
         PsiElement[] children = infix.getChildren();
-
-        assert children.length == 3;
+        int operatorIndex = Normalized.operatorIndex(children);
+        Quotable leftOperand = Normalized.leftOperand(children, operatorIndex);
+        Quotable rightOperand = Normalized.rightOperand(children, operatorIndex);
 
         return new PsiElement[]{
-                children[0],
-                children[2]
+                leftOperand,
+                rightOperand
         };
     }
 
@@ -1346,11 +1323,12 @@ public class ElixirPsiImplUtil {
         Operator operator = infix.operator();
         OtpErlangObject quotedOperator = operator.quote();
 
-        Quotable rightOperand = infix.rightOperand();
+        PsiElement rightOperand = infix.rightOperand();
         OtpErlangObject quotedRightOperand;
 
-        if (rightOperand != null) {
-            quotedRightOperand = rightOperand.quote();
+        if (rightOperand != null && rightOperand instanceof Quotable) {
+            Quotable quotableRightOperand = (Quotable) rightOperand;
+            quotedRightOperand = quotableRightOperand.quote();
         } else {
             // this is not valid Elixir quoting, but something needs to be there for quoting to work
             quotedRightOperand = NIL;
@@ -4061,11 +4039,12 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quotedRightOperand(@NotNull final ElixirStabOperation stabOperation) {
-        Quotable rightOperand = stabOperation.rightOperand();
+        PsiElement rightOperand = stabOperation.rightOperand();
         OtpErlangObject quotedRightOperand;
 
-        if (rightOperand != null) {
-            quotedRightOperand = rightOperand.quote();
+        if (rightOperand != null && rightOperand instanceof Quotable) {
+            Quotable quotableRightOperand = (Quotable) rightOperand;
+            quotedRightOperand = quotableRightOperand.quote();
         } else {
             quotedRightOperand = NIL;
         }
@@ -4400,16 +4379,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Quotable rightOperand(Infix infix) {
-        PsiElement[] children = infix.getChildren();
-        Quotable rightOperand = null;
-
-        /* rightOperand won't be there when Pratt Parser recovered from error in right-operand by matching up through
-           the operator only. */
-        if (children.length == 3) {
-            rightOperand = (Quotable) children[2];
-        }
-
-        return rightOperand;
+        return Normalized.rightOperand(infix);
     }
 
     @Contract(pure = true)
