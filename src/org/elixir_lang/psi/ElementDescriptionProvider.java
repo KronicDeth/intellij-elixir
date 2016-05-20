@@ -105,6 +105,10 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             elementDescription = Callable.parameterWithDefaultElementDescription(call, location);
         } else if (Callable.isVariable(call)) {
             elementDescription = Callable.variableElementDescription(call, location);
+        } else {
+            if (location == UsageViewTypeLocation.INSTANCE) {
+                elementDescription = "call";
+            }
         }
 
         return elementDescription;
