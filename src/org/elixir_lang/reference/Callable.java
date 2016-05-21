@@ -15,23 +15,18 @@ import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.scope.variable.MultiResolve;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.CallDefinitionHead;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.DEFAULT_OPERATOR;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.createsNewScope;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.followingSiblingsSearchScope;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
     /*
@@ -147,7 +142,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
             // module attribute, so original may be a unqualified no argument type name
             isVariable = false;
-        } else if (call.isCallingMacro("Elixir.Kernel", "for")) {
+        } else if (call.isCallingMacro(KERNEL_MODULE_NAME, "for")) {
             isVariable = true;
         } else {
             PsiElement parent = call.getParent();

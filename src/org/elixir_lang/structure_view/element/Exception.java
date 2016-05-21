@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+
 /**
  * A `defexception` with its fields and the callbacks `exception/1` and `message/1` if overridden.
  */
@@ -52,7 +54,7 @@ public class Exception extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling("Elixir.Kernel", "defexception", 1);
+        return call.isCalling(KERNEL_MODULE_NAME, "defexception", 1);
     }
 
     public static boolean isCallback(Pair<String, Integer> nameArity) {

@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+
 public class Structure extends Element<Call> {
     /*
      * Fields
@@ -39,7 +41,7 @@ public class Structure extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling("Elixir.Kernel", "defstruct", 1);
+        return call.isCalling(KERNEL_MODULE_NAME, "defstruct", 1);
     }
 
     /*

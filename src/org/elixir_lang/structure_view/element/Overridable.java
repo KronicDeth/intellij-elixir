@@ -21,6 +21,8 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+
 public class Overridable extends Element<Call> {
     /*
      * Fields
@@ -44,7 +46,7 @@ public class Overridable extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling("Elixir.Kernel", "defoverridable", 1);
+        return call.isCalling(KERNEL_MODULE_NAME, "defoverridable", 1);
     }
 
     /*

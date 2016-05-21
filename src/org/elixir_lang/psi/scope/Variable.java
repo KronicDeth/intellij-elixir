@@ -206,7 +206,7 @@ public abstract class Variable implements PsiScopeProcessor {
                     break;
                 }
             }
-        } else if (match.isCallingMacro("Elixir.Kernel", "for") || match.isCallingMacro("Elixir.Kernel", "with")) {
+        } else if (match.isCallingMacro(KERNEL_MODULE_NAME, "for") || match.isCallingMacro(KERNEL_MODULE_NAME, "with")) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null) {
@@ -235,7 +235,8 @@ public abstract class Variable implements PsiScopeProcessor {
                     }
                 }
             }
-        } else if (match.isCallingMacro("Elixir.Kernel", "if") || match.isCallingMacro("Elixir.Kernel", "unless")) {
+        } else if (match.isCallingMacro(KERNEL_MODULE_NAME, "if") ||
+                match.isCallingMacro(KERNEL_MODULE_NAME, "unless")) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null && finalArguments.length > 0) {
@@ -279,7 +280,7 @@ public abstract class Variable implements PsiScopeProcessor {
             }
         } else {
             // unquote(var) can't declare var, only use it
-            if (!match.isCalling("Elixir.Kernel", "unquote", 1)) {
+            if (!match.isCalling(KERNEL_MODULE_NAME, "unquote", 1)) {
                 int resolvedFinalArity = match.resolvedFinalArity();
 
                 if (resolvedFinalArity == 0) {

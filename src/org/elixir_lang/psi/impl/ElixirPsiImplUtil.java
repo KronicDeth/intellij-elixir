@@ -52,6 +52,7 @@ import java.util.*;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
+import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
@@ -80,6 +81,7 @@ public class ElixirPsiImplUtil {
     public static final Key<Boolean> DECLARING_SCOPE = new Key<Boolean>("DECLARING_SCOPE");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
+    public static final String KERNEL_MODULE_NAME = "Kernel";
     public static final Key<PsiElement> ENTRANCE = new Key<PsiElement>("ENTRANCE");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
@@ -421,11 +423,11 @@ public class ElixirPsiImplUtil {
         } else if (element instanceof Call) {
             Call call = (Call) element;
 
-            if (call.isCalling("Elixir.Kernel", "case") ||
-                    call.isCalling("Elixir.Kernel", "cond") ||
-                    call.isCalling("Elixir.Kernel", "if") ||
-                    call.isCalling("Elixir.Kernel", "receive") ||
-                    call.isCalling("Elixir.Kernel", "unless")
+            if (call.isCalling(KERNEL_MODULE_NAME, "case") ||
+                    call.isCalling(KERNEL_MODULE_NAME, "cond") ||
+                    call.isCalling(KERNEL_MODULE_NAME, "if") ||
+                    call.isCalling(KERNEL_MODULE_NAME, "receive") ||
+                    call.isCalling(KERNEL_MODULE_NAME, "unless")
                     ) {
                 newScope = false;
             } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
@@ -746,7 +748,7 @@ public class ElixirPsiImplUtil {
             } else if (grandParent instanceof ElixirDoBlock) {
                 Call call = (Call) grandParent.getParent();
 
-                if (call.isCalling("Elixir.Kernel", "cond")) {
+                if (call.isCalling(KERNEL_MODULE_NAME, "cond")) {
                     declaringScope = false;
                 }
             }
@@ -816,7 +818,7 @@ public class ElixirPsiImplUtil {
         if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
             ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
 
-            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2);
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro(KERNEL_MODULE_NAME, "defmodule", 2);
         }
 
         return isModuleName;
@@ -1292,12 +1294,12 @@ public class ElixirPsiImplUtil {
             if (CallDefinitionClause.is(call) || // call parameters
                     Delegation.is(call) || // delegation call parameters
                     Module.is(call) || // module Alias
-                    call.isCallingMacro("Elixir.Kernel", "if") || // match in condition
-                    call.isCallingMacro("Elixir.Kernel", "unless") // match in condition
+                    call.isCallingMacro(KERNEL_MODULE_NAME, "if") || // match in condition
+                    call.isCallingMacro(KERNEL_MODULE_NAME, "unless") // match in condition
                     ) {
                 keepProcessing = processor.execute(call, state);
-            } else if (call.isCallingMacro("Elixir.Kernel", "for") || // comprehension match variable
-                    call.isCallingMacro("Elixir.Kernel", "with") // <- or = variable
+            } else if (call.isCallingMacro(KERNEL_MODULE_NAME, "for") || // comprehension match variable
+                    call.isCallingMacro(KERNEL_MODULE_NAME, "with") // <- or = variable
                     ) {
                 keepProcessing = processor.execute(call, state);
             } else if (org.elixir_lang.structure_view.element.Quote.is(call)) { // quote :bind_quoted keys{
@@ -1841,16 +1843,10 @@ public class ElixirPsiImplUtil {
         return new LocalSearchScope(followingSiblingList.toArray(new PsiElement[followingSiblingList.size()]));
     }
 
-    /**
-     * Adds `Elixir.` to alias text.
-     *
-     * @param alias
-     * @return
-     */
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
-        return "Elixir." + alias.getName();
+        return alias.getName();
     }
 
     @Contract(pure = true)
@@ -2776,7 +2772,7 @@ public class ElixirPsiImplUtil {
         OtpErlangList interpolationMetadata = metadata(interpolation);
 
         OtpErlangObject quotedKernelToStringCall = quotedFunctionCall(
-                "Elixir.Kernel",
+                KERNEL_MODULE_NAME,
                 "to_string",
                 interpolationMetadata,
                 quotedChildren
@@ -4447,16 +4443,16 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull final Infix infix) {
-        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now, but some are actually from
+        /* TODO handle resolving module name from imports.  Assume KERNEL_MODULE_NAME for now, but some are actually from
            Bitwise */
-        return "Elixir.Kernel";
+        return KERNEL_MODULE_NAME;
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull final Prefix prefix) {
-        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now. */
-        return "Elixir.Kernel";
+        /* TODO handle resolving module name from imports.  Assume KERNEL_MODULE_NAME for now. */
+        return KERNEL_MODULE_NAME;
     }
 
     /**
@@ -4480,12 +4476,7 @@ if (quoted == null) {
             resolvedModuleName = stub.resolvedModuleName();
         } else {
             // TODO handle `alias`es and `import`s
-            String moduleName = qualified.moduleName();
-            resolvedModuleName = moduleName;
-
-            if (!moduleName.startsWith("Elixir.")) {
-                resolvedModuleName = "Elixir." + moduleName;
-            }
+            resolvedModuleName = stripElixirPrefix(qualified.moduleName());
         }
 
         //noinspection ConstantConditions
@@ -4515,7 +4506,7 @@ if (quoted == null) {
             resolvedModuleName = stub.resolvedModuleName();
         } else {
             // TODO handle `import`s
-            resolvedModuleName = "Elixir.Kernel";
+            resolvedModuleName = KERNEL_MODULE_NAME;
         }
 
         //noinspection ConstantConditions
@@ -4532,7 +4523,7 @@ if (quoted == null) {
     @NotNull
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually a local variable
-        return "Elixir.Kernel";
+        return KERNEL_MODULE_NAME;
     }
 
     @Contract(pure = true)

@@ -13,6 +13,8 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+
 public class Implementation extends Module {
     /*
      *
@@ -59,7 +61,8 @@ public class Implementation extends Module {
     }
 
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "defimpl", 2) || call.isCallingMacro("Elixir.Kernel", "defimpl", 3);
+        return call.isCallingMacro(KERNEL_MODULE_NAME, "defimpl", 2) ||
+                call.isCallingMacro(KERNEL_MODULE_NAME, "defimpl", 3);
     }
 
     public static String name(@NotNull Call call) {

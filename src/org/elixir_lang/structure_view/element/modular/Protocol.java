@@ -5,6 +5,8 @@ import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+
 /**
  * A protocol definition
  */
@@ -14,7 +16,7 @@ public class Protocol extends Module {
      */
 
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "defprotocol", 2);
+        return call.isCallingMacro(KERNEL_MODULE_NAME, "defprotocol", 2);
     }
 
     /*
