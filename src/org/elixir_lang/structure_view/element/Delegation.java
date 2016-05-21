@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Delegation extends Element<Call>  {
     /*
@@ -101,7 +101,7 @@ public class Delegation extends Element<Call>  {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling(KERNEL_MODULE_NAME, "defdelegate", 2);
+        return call.isCalling(KERNEL, "defdelegate", 2);
     }
 
     /*

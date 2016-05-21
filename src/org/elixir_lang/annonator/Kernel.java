@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+import static org.elixir_lang.psi.call.name.Function.FOR;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 /**
  * Annotates functions and macros from `Kernel` and `Kernel.SpecialForms` modules.
@@ -150,7 +151,7 @@ public class Kernel implements Annotator, DumbAware {
                             "case",
                             "cond",
                             "fn",
-                            "for",
+                            FOR,
                             "import",
                             "quote",
                             "receive",
@@ -183,7 +184,7 @@ public class Kernel implements Annotator, DumbAware {
                 public void visitCall(Call call) {
                     String resolvedModuleName = call.resolvedModuleName();
 
-                    if (resolvedModuleName != null && resolvedModuleName.equals(KERNEL_MODULE_NAME)) {
+                    if (resolvedModuleName != null && resolvedModuleName.equals(KERNEL)) {
                         String resolvedFunctionName = call.resolvedFunctionName();
 
                         // a function can't take a `do` block

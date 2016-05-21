@@ -11,7 +11,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.NotNull;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Use extends Element<Call> {
     /*
@@ -36,7 +36,7 @@ public class Use extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling(KERNEL_MODULE_NAME, "use", 1) || call.isCalling(KERNEL_MODULE_NAME, "use", 2);
+        return call.isCalling(KERNEL, "use", 1) || call.isCalling(KERNEL, "use", 2);
     }
 
     /*

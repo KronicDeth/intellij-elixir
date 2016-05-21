@@ -21,7 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.KERNEL_MODULE_NAME;
+import static org.elixir_lang.psi.call.name.Function.FOR;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
 
 public class CallDefinitionClause extends Element<Call> implements Presentable, Visible {
@@ -77,7 +78,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
         while(true) {
             enclosingMacroCall = enclosingMacroCall(enclosedCall);
 
-            if (enclosingMacroCall != null && enclosingMacroCall.isCallingMacro(KERNEL_MODULE_NAME, "for", 2)) {
+            if (enclosingMacroCall != null && enclosingMacroCall.isCallingMacro(KERNEL, FOR, 2)) {
                 enclosedCall = enclosingMacroCall;
             } else {
                 break;
@@ -260,8 +261,8 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     }
 
     private static boolean isCallingKernelMacroOrHead(@NotNull final Call call, @NotNull final String resolvedName) {
-        return call.isCallingMacro(KERNEL_MODULE_NAME, resolvedName, 2) ||
-                call.isCalling(KERNEL_MODULE_NAME, resolvedName, 1);
+        return call.isCallingMacro(KERNEL, resolvedName, 2) ||
+                call.isCalling(KERNEL, resolvedName, 1);
     }
 
     private static String macroElementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {

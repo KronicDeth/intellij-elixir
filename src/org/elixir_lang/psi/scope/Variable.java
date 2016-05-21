@@ -7,6 +7,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.name.Function;
+import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.operation.Type;
@@ -206,7 +208,7 @@ public abstract class Variable implements PsiScopeProcessor {
                     break;
                 }
             }
-        } else if (match.isCallingMacro(KERNEL_MODULE_NAME, "for") || match.isCallingMacro(KERNEL_MODULE_NAME, "with")) {
+        } else if (match.isCallingMacro(Module.KERNEL, Function.FOR) || match.isCallingMacro(Module.KERNEL, "with")) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null) {
@@ -235,8 +237,8 @@ public abstract class Variable implements PsiScopeProcessor {
                     }
                 }
             }
-        } else if (match.isCallingMacro(KERNEL_MODULE_NAME, "if") ||
-                match.isCallingMacro(KERNEL_MODULE_NAME, "unless")) {
+        } else if (match.isCallingMacro(Module.KERNEL, "if") ||
+                match.isCallingMacro(Module.KERNEL, "unless")) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null && finalArguments.length > 0) {
@@ -280,7 +282,7 @@ public abstract class Variable implements PsiScopeProcessor {
             }
         } else {
             // unquote(var) can't declare var, only use it
-            if (!match.isCalling(KERNEL_MODULE_NAME, "unquote", 1)) {
+            if (!match.isCalling(Module.KERNEL, "unquote", 1)) {
                 int resolvedFinalArity = match.resolvedFinalArity();
 
                 if (resolvedFinalArity == 0) {

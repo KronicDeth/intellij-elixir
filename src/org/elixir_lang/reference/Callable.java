@@ -15,6 +15,7 @@ import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.name.*;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.scope.variable.MultiResolve;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
@@ -142,7 +143,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
             // module attribute, so original may be a unqualified no argument type name
             isVariable = false;
-        } else if (call.isCallingMacro(KERNEL_MODULE_NAME, "for")) {
+        } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR)) {
             isVariable = true;
         } else {
             PsiElement parent = call.getParent();
