@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.elixir_lang.psi.call.name.Function.FOR;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 /**
@@ -97,20 +97,20 @@ public class Kernel implements Annotator, DumbAware {
                             "alias!",
                             "and",
                             "binding",
-                            "def",
-                            "defdelegate",
-                            "defexception",
-                            "defimpl",
-                            "defmacro",
-                            "defmacrop",
-                            "defmodule",
-                            "defoverridable",
-                            "defp",
-                            "defprotocol",
-                            "defstruct",
+                            DEF,
+                            DEFDELEGATE,
+                            DEFEXCEPTION,
+                            DEFIMPL,
+                            DEFMACRO,
+                            DEFMACROP,
+                            DEFMODULE,
+                            DEFOVERRIDABLE,
+                            DEFP,
+                            DEFPROTOCOL,
+                            DEFSTRUCT,
                             "destructure",
                             "get_and_update_in",
-                            "if",
+                            IF,
                             "in",
                             "is_nil",
                             "match?",
@@ -130,9 +130,9 @@ public class Kernel implements Annotator, DumbAware {
                             "sigil_w",
                             "to_char_list",
                             "to_string",
-                            "unless",
+                            UNLESS,
                             "update_in",
-                            "use",
+                            USE,
                             "var!"
                     }
             )
@@ -148,17 +148,17 @@ public class Kernel implements Annotator, DumbAware {
                             "__aliases__",
                             "__block__",
                             "alias",
-                            "case",
-                            "cond",
+                            CASE,
+                            COND,
                             "fn",
                             FOR,
                             "import",
-                            "quote",
-                            "receive",
+                            QUOTE,
+                            RECEIVE,
                             "require",
                             "super",
                             "try",
-                            "unquote",
+                            UNQUOTE,
                             "unquote_splicing"
                     }
             )

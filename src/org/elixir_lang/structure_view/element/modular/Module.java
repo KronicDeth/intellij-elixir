@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
+import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
 
@@ -146,7 +147,7 @@ public class Module extends Element<Call> implements Modular {
     }
 
     public static boolean is(Call call) {
-        return call.isCallingMacro(KERNEL, "defmodule", 2);
+        return call.isCallingMacro(KERNEL, DEFMODULE, 2);
     }
 
     public static PsiElement nameIdentifier(Call call) {

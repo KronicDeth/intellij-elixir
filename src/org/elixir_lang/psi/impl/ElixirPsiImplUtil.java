@@ -53,6 +53,7 @@ import java.util.*;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
@@ -423,11 +424,11 @@ public class ElixirPsiImplUtil {
         } else if (element instanceof Call) {
             Call call = (Call) element;
 
-            if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "case") ||
-                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "cond") ||
-                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "if") ||
-                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "receive") ||
-                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "unless")
+            if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, CASE) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, COND) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, IF) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, RECEIVE) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS)
                     ) {
                 newScope = false;
             } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
@@ -748,7 +749,7 @@ public class ElixirPsiImplUtil {
             } else if (grandParent instanceof ElixirDoBlock) {
                 Call call = (Call) grandParent.getParent();
 
-                if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, "cond")) {
+                if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, COND)) {
                     declaringScope = false;
                 }
             }
@@ -818,7 +819,7 @@ public class ElixirPsiImplUtil {
         if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
             ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
 
-            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, "defmodule", 2);
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, DEFMODULE, 2);
         }
 
         return isModuleName;
@@ -1294,8 +1295,8 @@ public class ElixirPsiImplUtil {
             if (CallDefinitionClause.is(call) || // call parameters
                     Delegation.is(call) || // delegation call parameters
                     Module.is(call) || // module Alias
-                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, "if") || // match in condition
-                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, "unless") // match in condition
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, IF) || // match in condition
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS) // match in condition
                     ) {
                 keepProcessing = processor.execute(call, state);
             } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR) || // comprehension match variable

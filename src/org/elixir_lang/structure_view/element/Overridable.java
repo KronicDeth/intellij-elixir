@@ -21,6 +21,7 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.psi.call.name.Function.DEFOVERRIDABLE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Overridable extends Element<Call> {
@@ -46,7 +47,7 @@ public class Overridable extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling(KERNEL, "defoverridable", 1);
+        return call.isCalling(KERNEL, DEFOVERRIDABLE, 1);
     }
 
     /*

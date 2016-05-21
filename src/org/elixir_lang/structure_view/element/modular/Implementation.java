@@ -13,6 +13,7 @@ import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
 import static org.elixir_lang.psi.call.name.Function.FOR;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
@@ -62,8 +63,8 @@ public class Implementation extends Module {
     }
 
     public static boolean is(Call call) {
-        return call.isCallingMacro(KERNEL, "defimpl", 2) ||
-                call.isCallingMacro(KERNEL, "defimpl", 3);
+        return call.isCallingMacro(KERNEL, DEFIMPL, 2) ||
+                call.isCallingMacro(KERNEL, DEFIMPL, 3);
     }
 
     public static String name(@NotNull Call call) {

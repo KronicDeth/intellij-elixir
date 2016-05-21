@@ -19,6 +19,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static org.elixir_lang.psi.call.name.Function.IF;
+import static org.elixir_lang.psi.call.name.Function.UNLESS;
+import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public abstract class Variable implements PsiScopeProcessor {
@@ -237,8 +240,8 @@ public abstract class Variable implements PsiScopeProcessor {
                     }
                 }
             }
-        } else if (match.isCallingMacro(Module.KERNEL, "if") ||
-                match.isCallingMacro(Module.KERNEL, "unless")) {
+        } else if (match.isCallingMacro(Module.KERNEL, IF) ||
+                match.isCallingMacro(Module.KERNEL, UNLESS)) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null && finalArguments.length > 0) {
@@ -282,7 +285,7 @@ public abstract class Variable implements PsiScopeProcessor {
             }
         } else {
             // unquote(var) can't declare var, only use it
-            if (!match.isCalling(Module.KERNEL, "unquote", 1)) {
+            if (!match.isCalling(Module.KERNEL, UNQUOTE, 1)) {
                 int resolvedFinalArity = match.resolvedFinalArity();
 
                 if (resolvedFinalArity == 0) {

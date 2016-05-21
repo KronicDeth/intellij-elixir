@@ -11,6 +11,7 @@ import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.call.name.Function.QUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 /**
@@ -40,8 +41,8 @@ public class Quote extends Element<Call> {
 
     public static boolean is(@NotNull final Call call) {
         // TODO change Elixir.Kernel to Elixir.Kernel.SpecialForms when resolving works
-        return call.isCallingMacro(KERNEL, "quote", 1) || // without keyword arguments
-                call.isCallingMacro(KERNEL, "quote", 2); // with keyword arguments
+        return call.isCallingMacro(KERNEL, QUOTE, 1) || // without keyword arguments
+                call.isCallingMacro(KERNEL, QUOTE, 2); // with keyword arguments
     }
 
     /*

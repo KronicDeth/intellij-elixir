@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.psi.call.name.Function.FOR;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
 
@@ -159,19 +159,19 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     }
 
     public static boolean isPrivateFunction(@NotNull Call call) {
-        return isCallingKernelMacroOrHead(call, "defp");
+        return isCallingKernelMacroOrHead(call, DEFP);
     }
 
     public static boolean isPrivateMacro(@NotNull Call call) {
-        return isCallingKernelMacroOrHead(call, "defmacrop");
+        return isCallingKernelMacroOrHead(call, DEFMACROP);
     }
 
     public static boolean isPublicFunction(@NotNull Call call) {
-        return isCallingKernelMacroOrHead(call, "def");
+        return isCallingKernelMacroOrHead(call, DEF);
     }
 
     public static boolean isPublicMacro(@NotNull Call call) {
-        return isCallingKernelMacroOrHead(call, "defmacro");
+        return isCallingKernelMacroOrHead(call, DEFMACRO);
     }
 
     @Nullable

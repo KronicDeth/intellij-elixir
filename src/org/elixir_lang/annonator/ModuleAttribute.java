@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 
 /**
@@ -348,7 +349,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 // seen as `unquote(ast)`, but could also be just the beginning of typing
                 ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
 
-                if (matchedUnqualifiedParenthesesCall.functionName().equals("unquote")) {
+                if (matchedUnqualifiedParenthesesCall.functionName().equals(UNQUOTE)) {
                     PsiElement[] secondaryArguments = matchedUnqualifiedParenthesesCall.secondaryArguments();
 
                     if (secondaryArguments != null) {

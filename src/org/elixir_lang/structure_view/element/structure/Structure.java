@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.psi.call.name.Function.DEFSTRUCT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Structure extends Element<Call> {
@@ -41,7 +42,7 @@ public class Structure extends Element<Call> {
     }
 
     public static boolean is(Call call) {
-        return call.isCalling(KERNEL, "defstruct", 1);
+        return call.isCalling(KERNEL, DEFSTRUCT, 1);
     }
 
     /*
