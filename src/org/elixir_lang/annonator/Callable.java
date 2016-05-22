@@ -70,7 +70,9 @@ public class Callable implements Annotator, DumbAware {
      * Private Instance Methods
      */
 
-    private void highlight(@NotNull Call referrer, @NotNull Call resolved, @NotNull AnnotationHolder annotationHolder) {
+    private void highlight(@NotNull Call referrer,
+                           @NotNull PsiElement resolved,
+                           @NotNull AnnotationHolder annotationHolder) {
         TextAttributesKey textAttributesKey = null;
 
         if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
@@ -85,14 +87,6 @@ public class Callable implements Annotator, DumbAware {
         if (textAttributesKey != null) {
             highlight(referrer, annotationHolder, textAttributesKey);
             highlight(resolved, annotationHolder, textAttributesKey);
-        }
-    }
-
-    private void highlight(@NotNull Call referrer,
-                           @NotNull PsiElement resolved,
-                           @NotNull AnnotationHolder annotationHolder) {
-        if (resolved instanceof Call) {
-            highlight(referrer, (Call) resolved, annotationHolder);
         }
     }
 

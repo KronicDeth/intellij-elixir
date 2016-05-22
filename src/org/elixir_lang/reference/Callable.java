@@ -73,11 +73,13 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     @Contract(pure = true)
-    public static boolean isIgnored(@NotNull Call call) {
+    public static boolean isIgnored(@NotNull PsiElement element) {
         boolean isIgnored = false;
 
-        if (call instanceof UnqualifiedNoArgumentsCall) {
-            String name = call.getName();
+        if (element instanceof ElixirKeywordKey ||
+                element instanceof UnqualifiedNoArgumentsCall) {
+            PsiNamedElement psiNamedElement = (PsiNamedElement) element;
+            String name = psiNamedElement.getName();
 
             if (name != null && name.equals(IGNORED)) {
                 isIgnored = true;
@@ -87,26 +89,55 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return isIgnored;
     }
 
-    public static boolean isParameter(@NotNull Call call) {
-        boolean isParameter;
+    @Contract(pure = true)
+    public static boolean isParameter(@NotNull PsiElement ancestor) {
+        PsiElement parent = ancestor.getParent();
+        boolean isParameter = false;
 
-        if (CallDefinitionClause.is(call) || Delegation.is(call)) {
+        if (parent instanceof Call) {
+            isParameter = isParameter((Call) parent);
+        } else if (parent instanceof AtNonNumericOperation ||
+                parent instanceof ElixirAccessExpression ||
+                parent instanceof ElixirAssociations ||
+                parent instanceof ElixirAssociationsBase ||
+                parent instanceof ElixirBitString ||
+                parent instanceof ElixirContainerAssociationOperation ||
+                parent instanceof ElixirKeywordPair ||
+                parent instanceof ElixirKeywords ||
+                parent instanceof ElixirList ||
+                parent instanceof ElixirMapArguments ||
+                parent instanceof ElixirMapConstructionArguments ||
+                parent instanceof ElixirMapOperation ||
+                parent instanceof ElixirMatchedParenthesesArguments ||
+                parent instanceof ElixirNoParenthesesArguments ||
+                parent instanceof ElixirNoParenthesesKeywordPair ||
+                parent instanceof ElixirNoParenthesesKeywords ||
+                parent instanceof ElixirNoParenthesesOneArgument ||
+                parent instanceof ElixirParenthesesArguments ||
+                parent instanceof ElixirParentheticalStab ||
+                parent instanceof ElixirStab ||
+                parent instanceof ElixirStabNoParenthesesSignature ||
+                parent instanceof ElixirStabBody ||
+                parent instanceof ElixirStabOperation ||
+                parent instanceof ElixirStabParenthesesSignature ||
+                parent instanceof ElixirStructOperation ||
+                parent instanceof ElixirTuple) {
+            isParameter = isParameter(parent);
+        } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
             isParameter = true;
         } else {
-            PsiElement parent = call.getParent();
-
-            if (parent != null && !(parent instanceof PsiFile)) {
-                isParameter = isParameter(parent);
-            } else {
-                isParameter = false;
+            if (!(parent instanceof ElixirBlockItem ||
+                    parent instanceof ElixirDoBlock ||
+                    parent instanceof ElixirQuoteStringBody)) {
+                Logger.error(Callable.class, "Don't know how to check if parameter", parent);
             }
         }
 
         return isParameter;
     }
 
-    public static boolean isParameterWithDefault(@NotNull Call call) {
-        PsiElement parent = call.getParent();
+    public static boolean isParameterWithDefault(@NotNull PsiElement element) {
+        PsiElement parent = element.getParent();
         boolean isParameterWithDefault = false;
 
         if (parent instanceof InMatch) {
@@ -117,7 +148,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             if (operatorText.equals(DEFAULT_OPERATOR)) {
                 PsiElement defaulted = parentOperation.leftOperand();
 
-                if (defaulted.isEquivalentTo(call)) {
+                if (defaulted.isEquivalentTo(element)) {
                     isParameterWithDefault = isParameter((Call) parentOperation);
                 }
             }
@@ -127,27 +158,56 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     @Contract(pure = true)
-    public static boolean isVariable(@NotNull Call call) {
-        boolean isVariable;
+    public static boolean isVariable(@NotNull PsiElement ancestor) {
+        boolean isVariable = false;
 
-        if (call instanceof UnqualifiedNoArgumentsCall) {
-            String name = call.getName();
-
-            // _ is an "ignored" not a variable
-            if (name == null || !name.equals(IGNORED)) {
-                PsiElement parent = call.getParent();
-                isVariable = isVariable(parent);
-            } else {
-                isVariable = false;
-            }
-        } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
-            // module attribute, so original may be a unqualified no argument type name
-            isVariable = false;
-        } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR)) {
+        if (ancestor instanceof ElixirInterpolation ||
+                // bound quoted variable name in {@code quote bind_quoted: [name: value] do ... end}
+                ancestor instanceof ElixirKeywordKey ||
+                ancestor instanceof ElixirStabNoParenthesesSignature ||
+                /* if a StabOperation is encountered before
+                   ElixirStabNoParenthesesSignature or
+                   ElixirStabParenthesesSignature, then must have come from body */
+                ancestor instanceof ElixirStabOperation ||
+                ancestor instanceof ElixirStabParenthesesSignature ||
+                ancestor instanceof InMatch ||
+                ancestor instanceof Match) {
             isVariable = true;
+        } else if (ancestor instanceof ElixirAccessExpression ||
+                ancestor instanceof ElixirAssociations ||
+                ancestor instanceof ElixirAssociationsBase ||
+                ancestor instanceof ElixirBitString ||
+                ancestor instanceof ElixirContainerAssociationOperation ||
+                ancestor instanceof ElixirDoBlock ||
+                ancestor instanceof ElixirKeywordPair ||
+                ancestor instanceof ElixirKeywords ||
+                ancestor instanceof ElixirList ||
+                ancestor instanceof ElixirMapArguments ||
+                ancestor instanceof ElixirMapConstructionArguments ||
+                ancestor instanceof ElixirMapOperation ||
+                /* parenthesesArguments can be used in @spec other type declarations, so may not be variable until
+                   ancestor call is checked */
+                ancestor instanceof ElixirMatchedParenthesesArguments ||
+                ancestor instanceof ElixirNoParenthesesOneArgument ||
+                ancestor instanceof ElixirNoParenthesesArguments ||
+                ancestor instanceof ElixirNoParenthesesKeywordPair ||
+                ancestor instanceof ElixirNoParenthesesKeywords ||
+                ancestor instanceof ElixirParenthesesArguments ||
+                ancestor instanceof ElixirParentheticalStab ||
+                ancestor instanceof ElixirStab ||
+                ancestor instanceof ElixirStabBody ||
+                ancestor instanceof ElixirStructOperation ||
+                ancestor instanceof ElixirTuple ||
+                ancestor instanceof QualifiedAlias ||
+                ancestor instanceof Type) {
+            isVariable = isVariable(ancestor.getParent());
+        } else if (ancestor instanceof Call) {
+            // MUST be after any operations because operations also implement Call
+            isVariable = isVariable((Call) ancestor);
         } else {
-            PsiElement parent = call.getParent();
-            isVariable = isVariable(parent);
+            if (!(ancestor instanceof AtNonNumericOperation || ancestor instanceof PsiFile)) {
+                Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
+            }
         }
 
         return isVariable;
@@ -291,102 +351,42 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return hasValidResult;
     }
 
-    @Contract(pure = true)
-    private static boolean isParameter(@NotNull PsiElement ancestor) {
-        PsiElement parent = ancestor.getParent();
-        boolean isParameter = false;
+    private static boolean isParameter(@NotNull Call call) {
+        boolean isParameter;
 
-        if (parent instanceof Call) {
-            isParameter = isParameter((Call) parent);
-        } else if (parent instanceof AtNonNumericOperation ||
-                parent instanceof ElixirAccessExpression ||
-                parent instanceof ElixirAssociations ||
-                parent instanceof ElixirAssociationsBase ||
-                parent instanceof ElixirBitString ||
-                parent instanceof ElixirContainerAssociationOperation ||
-                parent instanceof ElixirKeywordPair ||
-                parent instanceof ElixirKeywords ||
-                parent instanceof ElixirList ||
-                parent instanceof ElixirMapArguments ||
-                parent instanceof ElixirMapConstructionArguments ||
-                parent instanceof ElixirMapOperation ||
-                parent instanceof ElixirMatchedParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesKeywordPair ||
-                parent instanceof ElixirNoParenthesesKeywords ||
-                parent instanceof ElixirNoParenthesesOneArgument ||
-                parent instanceof ElixirParenthesesArguments ||
-                parent instanceof ElixirParentheticalStab ||
-                parent instanceof ElixirStab ||
-                parent instanceof ElixirStabNoParenthesesSignature ||
-                parent instanceof ElixirStabBody ||
-                parent instanceof ElixirStabOperation ||
-                parent instanceof ElixirStabParenthesesSignature ||
-                parent instanceof ElixirStructOperation ||
-                parent instanceof ElixirTuple) {
-            isParameter = isParameter(parent);
-        } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
+        if (CallDefinitionClause.is(call) || Delegation.is(call)) {
             isParameter = true;
         } else {
-            if (!(parent instanceof ElixirBlockItem ||
-                    parent instanceof ElixirDoBlock ||
-                    parent instanceof ElixirQuoteStringBody)) {
-                Logger.error(Callable.class, "Don't know how to check if parameter", parent);
-            }
+            PsiElement parent = call.getParent();
+
+            isParameter = parent != null && !(parent instanceof PsiFile) && isParameter(parent);
         }
 
         return isParameter;
     }
 
     @Contract(pure = true)
-    private static boolean isVariable(@NotNull PsiElement ancestor) {
-        boolean isVariable = false;
+    private static boolean isVariable(@NotNull Call call) {
+        boolean isVariable;
 
-        if (ancestor instanceof ElixirInterpolation ||
-                ancestor instanceof ElixirStabNoParenthesesSignature ||
-                /* if a StabOperation is encountered before
-                   ElixirStabNoParenthesesSignature or
-                   ElixirStabParenthesesSignature, then must have come from body */
-                ancestor instanceof ElixirStabOperation ||
-                ancestor instanceof ElixirStabParenthesesSignature ||
-                ancestor instanceof InMatch ||
-                ancestor instanceof Match) {
-            isVariable = true;
-        } else if (ancestor instanceof ElixirAccessExpression ||
-                ancestor instanceof ElixirAssociations ||
-                ancestor instanceof ElixirAssociationsBase ||
-                ancestor instanceof ElixirBitString ||
-                ancestor instanceof ElixirContainerAssociationOperation ||
-                ancestor instanceof ElixirDoBlock ||
-                ancestor instanceof ElixirKeywordPair ||
-                ancestor instanceof ElixirKeywords ||
-                ancestor instanceof ElixirList ||
-                ancestor instanceof ElixirMapArguments ||
-                ancestor instanceof ElixirMapConstructionArguments ||
-                ancestor instanceof ElixirMapOperation ||
-                /* parenthesesArguments can be used in @spec other type declarations, so may not be variable until
-                   ancestor call is checked */
-                ancestor instanceof ElixirMatchedParenthesesArguments ||
-                ancestor instanceof ElixirNoParenthesesOneArgument ||
-                ancestor instanceof ElixirNoParenthesesArguments ||
-                ancestor instanceof ElixirNoParenthesesKeywordPair ||
-                ancestor instanceof ElixirNoParenthesesKeywords ||
-                ancestor instanceof ElixirParenthesesArguments ||
-                ancestor instanceof ElixirParentheticalStab ||
-                ancestor instanceof ElixirStab ||
-                ancestor instanceof ElixirStabBody ||
-                ancestor instanceof ElixirStructOperation ||
-                ancestor instanceof ElixirTuple ||
-                ancestor instanceof QualifiedAlias ||
-                ancestor instanceof Type) {
-            isVariable = isVariable(ancestor.getParent());
-        } else if (ancestor instanceof Call) {
-            // MUST be after any operations because operations also implement Call
-            isVariable = isVariable((Call) ancestor);
-        } else {
-            if (!(ancestor instanceof AtNonNumericOperation || ancestor instanceof PsiFile)) {
-                Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
+        if (call instanceof UnqualifiedNoArgumentsCall) {
+            String name = call.getName();
+
+            // _ is an "ignored" not a variable
+            if (name == null || !name.equals(IGNORED)) {
+                PsiElement parent = call.getParent();
+                isVariable = isVariable(parent);
+            } else {
+                isVariable = false;
             }
+        } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
+            // module attribute, so original may be a unqualified no argument type name
+            isVariable = false;
+        } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR)) {
+            isVariable = true;
+        } else {
+            PsiElement parent = call.getParent();
+            isVariable = isVariable(parent);
         }
 
         return isVariable;
