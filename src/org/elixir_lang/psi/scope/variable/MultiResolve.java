@@ -201,7 +201,7 @@ public class MultiResolve extends Variable {
                recursive call.  If the recursive call got the same result, stop the recursion by not checking for
                rebinding */
             if (lastBinding == null || !element.isEquivalentTo(lastBinding)) {
-                if (!(element instanceof Call) || !isInDeclaringScope((Call) element)) {
+                if (!(element instanceof Call) || !isInDeclaringScope((Call) element, state)) {
                     Match matchAncestor = PsiTreeUtil.getContextOfType(element, Match.class);
 
                     if (matchAncestor != null) {

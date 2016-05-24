@@ -150,28 +150,35 @@ public abstract class Variable implements PsiScopeProcessor {
      */
     protected abstract boolean executeOnVariable(@NotNull final PsiNamedElement match, @NotNull ResolveState state);
 
-    protected boolean isInDeclaringScope(@NotNull Call call) {
-        PsiElement maybeDeclaringScopeContext = PsiTreeUtil.getContextOfType(
-                call,
-                false,
-                ElixirStabOperation.class,
-                InMatch.class
-        );
-        boolean inDeclaringScope = false;
+    protected boolean isInDeclaringScope(@NotNull Call call, @NotNull ResolveState state) {
+        Boolean declaringScope = state.get(DECLARING_SCOPE);
+        boolean inDeclaringScope;
 
-        if (maybeDeclaringScopeContext != null) {
-            if (maybeDeclaringScopeContext instanceof ElixirStabOperation) {
-                ElixirStabOperation stabOperation = (ElixirStabOperation) maybeDeclaringScopeContext;
-                PsiElement signature = stabOperation.leftOperand();
+        if (declaringScope != null) {
+            inDeclaringScope = declaringScope;
+        } else {
+            inDeclaringScope = false;
+            PsiElement maybeDeclaringScopeContext = PsiTreeUtil.getContextOfType(
+                    call,
+                    false,
+                    ElixirStabOperation.class,
+                    InMatch.class
+            );
 
-                if (PsiTreeUtil.isAncestor(signature, call, false)) {
-                    inDeclaringScope = isDeclaringScope(stabOperation);
-                }
-            } else if (maybeDeclaringScopeContext instanceof InMatch) {
-                InMatch inMatch = (InMatch) maybeDeclaringScopeContext;
+            if (maybeDeclaringScopeContext != null) {
+                if (maybeDeclaringScopeContext instanceof ElixirStabOperation) {
+                    ElixirStabOperation stabOperation = (ElixirStabOperation) maybeDeclaringScopeContext;
+                    PsiElement signature = stabOperation.leftOperand();
 
-                if (PsiTreeUtil.isAncestor(inMatch.leftOperand(), call, false)) {
-                    inDeclaringScope = true;
+                    if (PsiTreeUtil.isAncestor(signature, call, false)) {
+                        inDeclaringScope = isDeclaringScope(stabOperation);
+                    }
+                } else if (maybeDeclaringScopeContext instanceof InMatch) {
+                    InMatch inMatch = (InMatch) maybeDeclaringScopeContext;
+
+                    if (PsiTreeUtil.isAncestor(inMatch.leftOperand(), call, false)) {
+                        inDeclaringScope = true;
+                    }
                 }
             }
         }
@@ -291,7 +298,7 @@ public abstract class Variable implements PsiScopeProcessor {
 
                 if (resolvedFinalArity == 0) {
                     keepProcessing = executeOnVariable((PsiNamedElement) match, state);
-                } else if (maybeMacro(match)) {
+                } else if (maybeMacro(match, state)) {
                     /* macros uses in stab signatures see
                        @see https://github.com/elixir-lang/elixir/blob/0c9e72c8d7be3ee502c43762e0ccbbf244198aeb/lib/elixir/lib/stream/reducers.ex#L7 */
                     PsiElement[] finalArguments = finalArguments(match);
@@ -492,13 +499,14 @@ public abstract class Variable implements PsiScopeProcessor {
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(strippedCallDefinitionHead);
 
         if (finalArguments != null) {
-            keepProcessing = execute(finalArguments, state);
+            // set scope to declaring so that calls inside the arguments are treated as maybe macros
+            keepProcessing = execute(finalArguments, state.put(DECLARING_SCOPE, true));
         }
 
         return keepProcessing;
     }
 
-    private boolean maybeMacro(@NotNull Call call) {
-        return !hasDoBlockOrKeyword(call) && isInDeclaringScope(call);
+    private boolean maybeMacro(@NotNull Call call, @NotNull ResolveState state) {
+        return !hasDoBlockOrKeyword(call) && isInDeclaringScope(call, state);
     }
 }
