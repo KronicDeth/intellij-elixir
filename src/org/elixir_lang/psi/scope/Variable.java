@@ -114,6 +114,7 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirDecimalFloat ||
                     element instanceof ElixirDecimalWholeNumber ||
                     element instanceof ElixirEndOfExpression ||
+                    element instanceof ElixirHexadecimalWholeNumber ||
                     element instanceof ElixirInterpolatedRegexLine ||
                     element instanceof ElixirInterpolatedWordsLine ||
                     element instanceof ElixirStringHeredoc ||
