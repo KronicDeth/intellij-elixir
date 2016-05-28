@@ -33,7 +33,29 @@ import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
     /*
+     *
      * CONSTANTS
+     *
+     */
+
+    /*
+     * Public CONSTANTS
+     */
+
+    public static final Set<String> BIT_STRING_TYPES = Sets.newHashSet(
+            "binary",
+            "bits",
+            "bitstring",
+            "bytes",
+            "float",
+            "integer",
+            "utf16",
+            "utf32",
+            "utf8"
+    );
+
+    /*
+     * Private CONSTANTS
      */
 
     private static final Condition<ResolveResult> HAS_VALID_RESULT_CONDITION = new Condition<ResolveResult>() {
@@ -50,17 +72,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     private static final Set<String> BIT_STRING_SIGNEDNESS = Sets.newHashSet(
             "signed",
             "unsigned"
-    );
-    private static final Set<String> BIT_STRING_TYPES = Sets.newHashSet(
-            "binary",
-            "bits",
-            "bitstring",
-            "bytes",
-            "float",
-            "integer",
-            "utf16",
-            "utf32",
-            "utf8"
     );
     public static final String IGNORED = "_";
 

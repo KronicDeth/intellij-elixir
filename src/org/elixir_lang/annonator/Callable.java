@@ -14,6 +14,9 @@ import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
+import static org.elixir_lang.reference.Callable.BIT_STRING_TYPES;
+import static org.elixir_lang.reference.Callable.isBitStreamSegmentOption;
+
 /**
  * Annotates callables.
  */
@@ -58,6 +61,12 @@ public class Callable implements Annotator, DumbAware {
 
                             if (resolved != null) {
                                 highlight(call, resolved, holder);
+                            }
+                        } else if (isBitStreamSegmentOption(call)) {
+                            String name = call.getName();
+
+                            if (name != null && BIT_STRING_TYPES.contains(name)) {
+                                highlight(call, holder, ElixirSyntaxHighlighter.TYPE);
                             }
                         }
                     }
