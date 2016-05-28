@@ -7,13 +7,13 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Addition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirUnmatchedAdditionOperation extends ElixirUnmatchedExpression, Named, Infix {
+public interface ElixirUnmatchedAdditionOperation extends ElixirUnmatchedExpression, Named, Addition {
 
   @NotNull
   ElixirAdditionInfixOperator getAdditionInfixOperator();

@@ -142,6 +142,8 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             elementDescription = Use.elementDescription(call, location);
         } else if (call instanceof AtUnqualifiedNoParenthesesCall) {
             elementDescription = getElementDescription((AtUnqualifiedNoParenthesesCall) call, location);
+        } else if (Callable.isBitStreamSegmentOption(call)) {
+            elementDescription = Callable.bitStringSegmentOptionElementDescription(call, location);
         } else if (Callable.isIgnored(call)) {
             elementDescription = Callable.ignoredElementDescription(call, location);
         } else if (Callable.isParameter(call)) {

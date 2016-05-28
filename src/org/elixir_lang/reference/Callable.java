@@ -1,5 +1,6 @@
 package org.elixir_lang.reference;
 
+import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.Condition;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
@@ -40,6 +42,26 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             return resolveResult.isValidResult();
         }
     };
+    private static final Set<String> BIT_STRING_ENDIANNESS = Sets.newHashSet(
+            "big",
+            "little",
+            "native"
+    );
+    private static final Set<String> BIT_STRING_SIGNEDNESS = Sets.newHashSet(
+            "signed",
+            "unsigned"
+    );
+    private static final Set<String> BIT_STRING_TYPES = Sets.newHashSet(
+            "binary",
+            "bits",
+            "bitstring",
+            "bytes",
+            "float",
+            "integer",
+            "utf16",
+            "utf32",
+            "utf8"
+    );
     public static final String IGNORED = "_";
 
     /*
@@ -52,6 +74,71 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
      * Public Static Methods
      */
 
+    @Contract(pure = true)
+    @Nullable
+    public static String bitStringSegmentOptionElementDescription(@NotNull  Call call,
+                                                                  @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+        String name = call.getName();
+
+        if (name != null) {
+            if (BIT_STRING_ENDIANNESS.contains(name)) {
+                elementDescription = bitStringEndiannessElementDescription(call, location);
+            } else if (BIT_STRING_SIGNEDNESS.contains(name)) {
+                elementDescription = bitStringSignednessElementDescription(call, location);
+            } else if (BIT_STRING_TYPES.contains(name)) {
+                elementDescription = bitStringTypeElementDescription(call, location);
+            }
+        }
+
+        // getType is @NotNull, so must have fallback
+        if (elementDescription == null && location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "bitstring segment option";
+        }
+
+        return elementDescription;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static String bitStringEndiannessElementDescription(@NotNull @SuppressWarnings("unused") PsiElement element,
+                                                                @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "bitstring endianness";
+        }
+
+        return elementDescription;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static String bitStringSignednessElementDescription(@NotNull @SuppressWarnings("unused") PsiElement element,
+                                                                @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "bitstring signedness";
+        }
+
+        return elementDescription;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static String bitStringTypeElementDescription(@NotNull @SuppressWarnings("unused") PsiElement element,
+                                                          @NotNull ElementDescriptionLocation location) {
+
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "bitstring type";
+        }
+
+        return elementDescription;
+    }
+
     public static String ignoredElementDescription(Call call, ElementDescriptionLocation location) {
         String elementDescription = null;
 
@@ -60,6 +147,27 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return elementDescription;
+    }
+
+    @Contract(pure = true)
+    public static boolean isBitStreamSegmentOption(@NotNull PsiElement element) {
+        boolean isBitStreamSegmentOption = false;
+
+        Type type = PsiTreeUtil.getContextOfType(element, Type.class);
+
+        if (type != null) {
+            PsiElement typeParent = type.getParent();
+
+            if (typeParent instanceof ElixirBitString) {
+                PsiElement rightOperand = type.rightOperand();
+
+                if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
+                    isBitStreamSegmentOption = isBitStreamSegmentOptionDown(rightOperand, element);
+                }
+            }
+        }
+
+        return isBitStreamSegmentOption;
     }
 
     /**
@@ -351,6 +459,46 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return hasValidResult;
     }
 
+    /**
+     * Searches downward from {@code ancestor}, only returning true if {@code element} is a type, unit, size or
+     * modifier.
+     *
+     * @return {@code true} if {@code element} is a type, unit, size, or modifier.  i.e. something separated by
+     *   {@code -}. *   {@code false} if {@code element} is a variable used in {@code size(variable)}.
+     */
+    private static boolean isBitStreamSegmentOptionDown(@NotNull PsiElement ancestor, @NotNull  PsiElement element) {
+        boolean is = false;
+
+        if (ancestor.isEquivalentTo(element)) {
+            is = true;
+        } else if (ancestor instanceof Addition) {
+            Addition ancestorAddition = (Addition) ancestor;
+
+            PsiElement leftOperand = ancestorAddition.leftOperand();
+
+            if (leftOperand != null) {
+                is = isBitStreamSegmentOptionDown(leftOperand, element);
+            }
+
+            if (!is) {
+                PsiElement rightOperand = ancestorAddition.rightOperand();
+
+                if (rightOperand != null) {
+                    is = isBitStreamSegmentOptionDown(rightOperand, element);
+                }
+            }
+        } else if (ancestor instanceof UnqualifiedParenthesesCall) {
+            Call ancestorCall = (Call) ancestor;
+            PsiElement functionNameElement = ancestorCall.functionNameElement();
+
+            if (functionNameElement != null && functionNameElement.isEquivalentTo(element)) {
+                is = true;
+            }
+        }
+
+        return is;
+    }
+
     private static boolean isParameter(@NotNull Call call) {
         boolean isParameter;
 
@@ -585,24 +733,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 String name = myElement.getName();
 
                 if (name != null) {
-                    Type type = PsiTreeUtil.getContextOfType(myElement, Type.class);
-                    boolean isBitStringSegmentOption = false;
-
-                    if (type != null) {
-                        PsiElement typeParent = type.getParent();
-
-                        if (typeParent instanceof ElixirBitString) {
-                            PsiElement rightOperand = type.rightOperand();
-
-                            if (PsiTreeUtil.isAncestor(rightOperand, myElement, false)) {
-                                if (rightOperand.isEquivalentTo(myElement)) {
-                                    isBitStringSegmentOption = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!isBitStringSegmentOption) {
+                    if (!isBitStreamSegmentOption(myElement)) {
                         resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
                     }
                 }
@@ -631,4 +762,5 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         ResolveResult[] resolveResults = multiResolve(false);
         return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
+
 }
