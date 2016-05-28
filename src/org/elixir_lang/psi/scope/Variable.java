@@ -50,7 +50,9 @@ public abstract class Variable implements PsiScopeProcessor {
     public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
-        if (element instanceof ElixirAccessExpression ||
+        if (element instanceof Addition) {
+            keepProcessing = execute((Addition) element, state);
+        } else if (element instanceof ElixirAccessExpression ||
                 element instanceof ElixirAssociations ||
                 element instanceof ElixirAssociationsBase ||
                 element instanceof ElixirBitString ||
@@ -195,6 +197,14 @@ public abstract class Variable implements PsiScopeProcessor {
     /*
      * Private Instance Methods
      */
+
+    /**
+     * Addition turns off any DECLARING_SCOPE because there is no type where +/- can be used to declare a variable in
+     * the operands.
+     */
+    private boolean execute(@NotNull final Addition match, @NotNull ResolveState state) {
+       return execute((Infix) match, state.put(DECLARING_SCOPE, false));
+    }
 
     private boolean execute(@NotNull final Call match, @NotNull ResolveState state) {
         boolean keepProcessing = true;
