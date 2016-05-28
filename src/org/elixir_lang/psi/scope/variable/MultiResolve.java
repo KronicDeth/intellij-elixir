@@ -201,7 +201,11 @@ public class MultiResolve extends Variable {
                recursive call.  If the recursive call got the same result, stop the recursion by not checking for
                rebinding */
             if (lastBinding == null || !element.isEquivalentTo(lastBinding)) {
-                if (!(element instanceof Call) || !isInDeclaringScope((Call) element, state)) {
+                if (!(element instanceof Call) ||
+                        !isInDeclaringScope((Call) element, state) ||
+                        /* if maybe a macro, then it could potentially not be a macro, in which case prefer the early
+                           declaration */
+                        Boolean.TRUE.equals(state.get(MAYBE_MACRO))) {
                     Match matchAncestor = PsiTreeUtil.getContextOfType(element, Match.class);
 
                     if (matchAncestor != null) {
