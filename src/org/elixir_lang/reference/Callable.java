@@ -236,6 +236,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else {
             if (!(parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirDoBlock ||
+                    parent instanceof ElixirMapUpdateArguments ||
                     parent instanceof ElixirQuoteStringBody)) {
                 Logger.error(Callable.class, "Don't know how to check if parameter", parent);
             }
