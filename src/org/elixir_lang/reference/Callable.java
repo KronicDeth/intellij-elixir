@@ -736,9 +736,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 String name = myElement.getName();
 
                 if (name != null) {
-                    if (!isBitStreamSegmentOption(myElement)) {
-                        resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
-                    }
+                    resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
                 }
             }
         }

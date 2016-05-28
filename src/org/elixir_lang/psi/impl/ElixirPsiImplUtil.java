@@ -2482,7 +2482,9 @@ public class ElixirPsiImplUtil {
 
         /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
            and instead let {@link #getReference(AtNonNumbericOperation) handle it */
-        if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation)) {
+        if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation) &&
+                // if a bitstring segment option then the option is a pseudo-function
+                !isBitStreamSegmentOption(call)) {
             reference = new Callable(call);
         }
 
