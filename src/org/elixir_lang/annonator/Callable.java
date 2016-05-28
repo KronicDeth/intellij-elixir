@@ -57,7 +57,6 @@ public class Callable implements Annotator, DumbAware {
                             PsiElement resolved = reference.resolve();
 
                             if (resolved != null) {
-                                // TODO highlight referrer too
                                 highlight(call, resolved, holder);
                             }
                         }
