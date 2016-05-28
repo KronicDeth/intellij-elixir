@@ -412,15 +412,17 @@ public class ElixirPsiImplUtil {
         };
     }
 
-    /**
-     * @see <a href="https://elixir-lang.readthedocs.io/en/latest/technical/scoping.html">Elixir Scoping</a>
-     * @see <a href="https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-(and-Erlang)#scopes-that-change-the-existing-binding">Scoping Rules in Elixir (and Erlang)</a>
-     */
-    public static boolean createsNewScope(@NotNull PsiElement element) {
-        boolean newScope = false;
+    public enum UseScopeSelector {
+        PARENT,
+        SELF,
+        SELF_AND_FOLLOWING_SIBLINGS,
+    }
+
+    public static UseScopeSelector useScopeSelector(@NotNull PsiElement element) {
+        UseScopeSelector useScopeSelector = UseScopeSelector.PARENT;
 
         if (element instanceof ElixirAnonymousFunction) {
-            newScope = true;
+            useScopeSelector = UseScopeSelector.SELF;
         } else if (element instanceof Call) {
             Call call = (Call) element;
 
@@ -430,13 +432,21 @@ public class ElixirPsiImplUtil {
                     call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, RECEIVE) ||
                     call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS)
                     ) {
-                newScope = false;
+               useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS;
             } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
-                newScope = true;
+                useScopeSelector = UseScopeSelector.SELF;
             }
         }
 
-        return newScope;
+        return useScopeSelector;
+    }
+
+    /**
+     * @see <a href="https://elixir-lang.readthedocs.io/en/latest/technical/scoping.html">Elixir Scoping</a>
+     * @see <a href="https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-(and-Erlang)#scopes-that-change-the-existing-binding">Scoping Rules in Elixir (and Erlang)</a>
+     */
+    public static boolean createsNewScope(@NotNull PsiElement element) {
+        return useScopeSelector(element) == UseScopeSelector.SELF;
     }
 
     /**

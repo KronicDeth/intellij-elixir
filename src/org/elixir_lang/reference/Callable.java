@@ -540,15 +540,20 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return isVariable;
     }
 
+    @NotNull
     private static LocalSearchScope variableUseScope(@NotNull Call call) {
-        LocalSearchScope useScope;
+        LocalSearchScope useScope = null;
 
-        if (createsNewScope(call)) {
-            useScope = new LocalSearchScope(call);
-        } else {
-            PsiElement parent = call.getParent();
+        switch (useScopeSelector(call)) {
+            case PARENT:
+                useScope = variableUseScope(call.getParent());
 
-            if (parent instanceof ElixirStabBody) {
+                break;
+            case SELF:
+                useScope = new LocalSearchScope(call);
+
+                break;
+            case SELF_AND_FOLLOWING_SIBLINGS:
                 List<PsiElement> selfAndFollowingSiblingList = new ArrayList<PsiElement>();
                 PsiElement sibling = call;
 
@@ -564,10 +569,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                         )
                 );
 
-                assert useScope != null;
-            } else {
-                useScope = variableUseScope(parent);
-            }
+                break;
         }
 
         return useScope;
