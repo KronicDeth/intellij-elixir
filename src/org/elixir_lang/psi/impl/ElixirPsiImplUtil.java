@@ -2115,7 +2115,10 @@ public class ElixirPsiImplUtil {
     static SearchScope getUseScope(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         SearchScope useScope;
 
-        if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
+        if (isBitStreamSegmentOption(unqualifiedNoArgumentsCall)) {
+            // Bit Stream Segment Options aren't variables or even real functions, so no use scope
+            useScope = LocalSearchScope.EMPTY;
+        } else if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
             PsiElement ancestor = unqualifiedNoArgumentsCall.getParent();
 
             while (true) {
