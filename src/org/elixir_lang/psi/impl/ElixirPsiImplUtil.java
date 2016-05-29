@@ -1341,6 +1341,9 @@ public class ElixirPsiImplUtil {
                 if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
                     keepProcessing = processor.execute(call, state);
                 }
+            } else if (hasDoBlockOrKeyword(call)) {
+                // unknown macros that take do blocks often allow variables to be declared in their arguments
+                keepProcessing = processor.execute(call, state);
             }
         }
 
@@ -2155,6 +2158,8 @@ public class ElixirPsiImplUtil {
 
                         break;
                     } else if (Delegation.is(ancestorCall)) {
+                        break;
+                    } else if (ancestorCall.hasDoBlockOrKeyword()) {
                         break;
                     }
                 } else if (ancestor instanceof PsiFile) {

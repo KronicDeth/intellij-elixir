@@ -305,6 +305,20 @@ public abstract class Variable implements PsiScopeProcessor {
                     }
                 }
             }
+        } else if (hasDoBlockOrKeyword(match)) {
+            PsiElement[] finalArguments = finalArguments(match);
+
+            if (finalArguments != null) {
+                ResolveState macroArgumentsState = state.put(DECLARING_SCOPE, true);
+
+                for (PsiElement finalArgument : finalArguments) {
+                    keepProcessing = execute(finalArgument, macroArgumentsState);
+
+                    if (!keepProcessing) {
+                        break;
+                    }
+                }
+            }
         } else {
             // unquote(var) can't declare var, only use it
             if (!match.isCalling(Module.KERNEL, UNQUOTE, 1)) {
