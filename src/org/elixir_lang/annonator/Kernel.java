@@ -108,7 +108,7 @@ public class Kernel implements Annotator, DumbAware {
                             DEFP,
                             DEFPROTOCOL,
                             DEFSTRUCT,
-                            "destructure",
+                            DESTRUCTURE,
                             "get_and_update_in",
                             IF,
                             "in",

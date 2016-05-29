@@ -14,6 +14,7 @@ public class Function {
     public static final String DEFP = "defp";
     public static final String DEFPROTOCOL = "defprotocol";
     public static final String DEFSTRUCT = "defstruct";
+    public static final String DESTRUCTURE = "destructure";
     public static final String IF = "if";
     public static final String FOR = "for";
     public static final String QUOTE = Quote.FUNCTION;

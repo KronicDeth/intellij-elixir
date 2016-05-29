@@ -227,6 +227,12 @@ public abstract class Variable implements PsiScopeProcessor {
                     break;
                 }
             }
+        } else if  (match.isCalling(Module.KERNEL, Function.DESTRUCTURE, 2)) {
+            PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
+
+            if (finalArguments != null) {
+                keepProcessing = execute(finalArguments[0], state.put(DECLARING_SCOPE, true));
+            }
         } else if (match.isCallingMacro(Module.KERNEL, Function.FOR) || match.isCallingMacro(Module.KERNEL, "with")) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 

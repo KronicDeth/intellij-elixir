@@ -1327,11 +1327,10 @@ public class ElixirPsiImplUtil {
             if (CallDefinitionClause.is(call) || // call parameters
                     Delegation.is(call) || // delegation call parameters
                     Module.is(call) || // module Alias
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, DESTRUCTURE) || // left operand
                     call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, IF) || // match in condition
-                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS) // match in condition
-                    ) {
-                keepProcessing = processor.execute(call, state);
-            } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR) || // comprehension match variable
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR) || // comprehension match variable
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS) || // match in condition
                     call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, "with") // <- or = variable
                     ) {
                 keepProcessing = processor.execute(call, state);
