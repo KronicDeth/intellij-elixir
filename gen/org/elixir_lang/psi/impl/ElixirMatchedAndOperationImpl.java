@@ -10,6 +10,7 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.operation.And;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,7 +113,7 @@ public class ElixirMatchedAndOperationImpl extends ElixirMatchedExpressionImpl i
   }
 
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations((And) this, processor, state, lastParent, place);
   }
 
   @NotNull

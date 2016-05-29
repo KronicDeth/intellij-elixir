@@ -1291,6 +1291,27 @@ public class ElixirPsiImplUtil {
     }
 
     /**
+     * {@code {:ok, value} = func() && value == literal}
+     */
+    public static boolean processDeclarations(@NotNull final And and,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+
+        if (Normalized.operator(and).getText().equals("&&")) {
+            PsiElement leftOperand = Normalized.leftOperand(and);
+
+            if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
+                keepProcessing = processor.execute(leftOperand, state);
+            }
+        }
+
+        return keepProcessing;
+    }
+
+    /**
      * {@code def(macro)?p?}, {@code for}, or {@code with} can declare variables
      */
     public static boolean processDeclarations(@NotNull final Call call,
