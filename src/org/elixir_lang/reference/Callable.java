@@ -247,6 +247,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else {
             if (!(parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirDoBlock ||
+                    parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirMapUpdateArguments ||
                     parent instanceof ElixirQuoteStringBody)) {
                 Logger.error(Callable.class, "Don't know how to check if parameter", parent);
@@ -654,6 +655,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             useScope = variableUseScope((Match) ancestor);
         } else if (ancestor instanceof Call) {
             useScope = variableUseScope((Call) ancestor);
+        } else if (ancestor instanceof ElixirInterpolation) {
+            /* no variable can be declared inside an interpolation, so this is a variable usage missing a declaration,
+               so it has no use scope */
+            useScope = LocalSearchScope.EMPTY;
         } else {
             Logger.error(Callable.class, "Don't know how to find variable use scope for ", ancestor);
         }
