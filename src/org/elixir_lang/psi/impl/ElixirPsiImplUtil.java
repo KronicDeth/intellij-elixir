@@ -1304,7 +1304,8 @@ public class ElixirPsiImplUtil {
             PsiElement leftOperand = Normalized.leftOperand(and);
 
             if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
-                keepProcessing = processor.execute(leftOperand, state);
+                // the left operand is not inherently declaring, it should only be if a match is in the left operand
+                keepProcessing = processor.execute(leftOperand, state.put(DECLARING_SCOPE, false));
             }
         }
 

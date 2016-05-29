@@ -50,8 +50,8 @@ public abstract class Variable implements PsiScopeProcessor {
     public boolean execute(@NotNull PsiElement element, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
-        if (element instanceof Addition) {
-            keepProcessing = execute((Addition) element, state);
+        if (element instanceof Addition || element instanceof And) {
+            keepProcessing = executeNonDeclaringScopeInfix((Infix) element, state);
         } else if (element instanceof ElixirAccessExpression ||
                 element instanceof ElixirAssociations ||
                 element instanceof ElixirAssociationsBase ||
@@ -197,14 +197,6 @@ public abstract class Variable implements PsiScopeProcessor {
     /*
      * Private Instance Methods
      */
-
-    /**
-     * Addition turns off any DECLARING_SCOPE because there is no type where +/- can be used to declare a variable in
-     * the operands.
-     */
-    private boolean execute(@NotNull final Addition match, @NotNull ResolveState state) {
-       return execute((Infix) match, state.put(DECLARING_SCOPE, false));
-    }
 
     private boolean execute(@NotNull final Call match, @NotNull ResolveState state) {
         boolean keepProcessing = true;
@@ -495,6 +487,17 @@ public abstract class Variable implements PsiScopeProcessor {
         }
 
         return keepProcessing;
+    }
+
+    /**
+     * Turns off any DECLARING_SCOPE because the {@link Infix} subclass can never be used to declare a variable in a
+     * match.
+     *
+     * The rule is, if a lone variable by itself as an operand would declare that variable in a match then call,
+     * {@link #execute(Infix, ResolveState)}; otherwise, call this method.
+     */
+    private boolean executeNonDeclaringScopeInfix(@NotNull final Infix match, @NotNull ResolveState state) {
+       return execute(match, state.put(DECLARING_SCOPE, false));
     }
 
     private boolean executeOnMaybeVariable(@NotNull UnqualifiedNoArgumentsCall match, @NotNull ResolveState state) {
