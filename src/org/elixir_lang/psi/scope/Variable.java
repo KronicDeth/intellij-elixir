@@ -19,9 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static org.elixir_lang.psi.call.name.Function.IF;
-import static org.elixir_lang.psi.call.name.Function.UNLESS;
-import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public abstract class Variable implements PsiScopeProcessor {
@@ -262,18 +260,19 @@ public abstract class Variable implements PsiScopeProcessor {
                     }
                 }
             }
-        } else if (match.isCallingMacro(Module.KERNEL, IF) ||
+        } else if (match.isCallingMacro(Module.KERNEL, CASE) ||
+                match.isCallingMacro(Module.KERNEL, COND) ||
+                match.isCallingMacro(Module.KERNEL, IF) ||
                 match.isCallingMacro(Module.KERNEL, UNLESS)) {
             PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(match);
 
             if (finalArguments != null && finalArguments.length > 0) {
-                PsiElement firstFinalArgument = finalArguments[0];
-
-                /* prevents variable condition (`if foo do .. end`) from counting as declaration of that
-                   variable (`foo`) */
-                if (PsiTreeUtil.findChildOfType(firstFinalArgument, Match.class, false) != null) {
-                    keepProcessing = execute(finalArguments[0], state);
-                }
+                keepProcessing = execute(
+                        finalArguments[0],
+                        /* prevents variable condition (`if foo do .. end`) from counting as declaration of that
+                           variable (`foo`) */
+                        state.put(DECLARING_SCOPE, false)
+                );
             }
         } else if (org.elixir_lang.structure_view.element.Quote.is(match)) {
             PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(match, "bind_quoted");
