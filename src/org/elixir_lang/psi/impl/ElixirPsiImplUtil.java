@@ -54,6 +54,7 @@ import java.util.*;
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 import static org.elixir_lang.psi.call.name.Function.*;
+import static org.elixir_lang.psi.call.name.Module.prependElixirPrefix;
 import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
@@ -2814,7 +2815,7 @@ public class ElixirPsiImplUtil {
         OtpErlangList interpolationMetadata = metadata(interpolation);
 
         OtpErlangObject quotedKernelToStringCall = quotedFunctionCall(
-                org.elixir_lang.psi.call.name.Module.KERNEL,
+                prependElixirPrefix(org.elixir_lang.psi.call.name.Module.KERNEL),
                 "to_string",
                 interpolationMetadata,
                 quotedChildren
