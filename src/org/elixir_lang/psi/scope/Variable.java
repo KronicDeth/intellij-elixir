@@ -118,14 +118,13 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirAtomKeyword ||
                     element instanceof ElixirCharToken ||
                     element instanceof ElixirDecimalFloat ||
-                    element instanceof ElixirDecimalWholeNumber ||
                     element instanceof ElixirEndOfExpression ||
-                    element instanceof ElixirHexadecimalWholeNumber ||
                     element instanceof Line ||
                     element instanceof PsiWhiteSpace ||
                     element instanceof QualifiableAlias ||
                     element instanceof QualifiedBracketOperation ||
-                    element instanceof UnqualifiedBracketOperation)) {
+                    element instanceof UnqualifiedBracketOperation ||
+                    element instanceof WholeNumber)) {
                 Logger.error(Callable.class, "Don't know how to resolve variable in match", element);
             }
         }
