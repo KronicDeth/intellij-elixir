@@ -1421,7 +1421,7 @@ public class ElixirPsiImplUtil {
         boolean checkRight = false;
         boolean checkLeft = false;
 
-        if (match.isEquivalentTo(lastParent)) {
+        if (match.isEquivalentTo(lastParent) || match.operator().isEquivalentTo(lastParent)) {
             checkRight = true;
             checkLeft = true;
         } else if (PsiTreeUtil.isAncestor(rightOperand, lastParent, false)) {
