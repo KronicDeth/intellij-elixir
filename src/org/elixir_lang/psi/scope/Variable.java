@@ -153,6 +153,8 @@ public abstract class Variable implements PsiScopeProcessor {
     /**
      * Decides whether {@code match} matches the criteria being searched for.  All other {@link #execute} methods
      * eventually end here.
+     *
+     * @return {@code true} to keep processing; {@code false} to stop processing.
      */
     protected abstract boolean executeOnVariable(@NotNull final PsiNamedElement match, @NotNull ResolveState state);
 

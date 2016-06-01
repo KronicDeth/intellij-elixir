@@ -19,6 +19,7 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.name.*;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.scope.variable.MultiResolve;
+import org.elixir_lang.psi.scope.variable.Variants;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
@@ -729,7 +730,17 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public Object[] getVariants() {
-        return new Object[0];
+        List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
+
+        Object[] variants;
+
+        if (lookupElementList == null) {
+            variants = new Object[0];
+        } else {
+            variants = lookupElementList.toArray(new Object[lookupElementList.size()]);
+        }
+
+        return variants;
     }
 
     /**
@@ -782,5 +793,4 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         ResolveResult[] resolveResults = multiResolve(false);
         return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
     }
-
 }
