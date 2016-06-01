@@ -108,6 +108,7 @@ public abstract class Variable implements PsiScopeProcessor {
         } else {
             if (!(element instanceof AtNonNumericOperation || // a module attribute reference
                     element instanceof AtUnqualifiedBracketOperation || // a module attribute reference with access
+                    element instanceof Heredoc ||
                     element instanceof BracketOperation ||
                     /* an anonymous function is a new scope, so it can't be used to declare a variable.  This won't ever
                        be hit if the element is declared in the {@code fn} signature because that upward resolution
@@ -115,16 +116,12 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirAnonymousFunction ||
                     element instanceof ElixirAtom ||
                     element instanceof ElixirAtomKeyword ||
-                    element instanceof ElixirCharListLine ||
                     element instanceof ElixirCharToken ||
                     element instanceof ElixirDecimalFloat ||
                     element instanceof ElixirDecimalWholeNumber ||
                     element instanceof ElixirEndOfExpression ||
                     element instanceof ElixirHexadecimalWholeNumber ||
-                    element instanceof ElixirInterpolatedRegexLine ||
-                    element instanceof ElixirInterpolatedWordsLine ||
-                    element instanceof ElixirStringHeredoc ||
-                    element instanceof ElixirStringLine ||
+                    element instanceof Line ||
                     element instanceof PsiWhiteSpace ||
                     element instanceof QualifiableAlias ||
                     element instanceof QualifiedBracketOperation ||
