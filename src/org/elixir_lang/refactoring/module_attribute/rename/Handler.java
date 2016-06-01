@@ -23,7 +23,7 @@ public class Handler extends VariableInplaceRenameHandler {
      * Static Methods
      */
 
-    static boolean isAvailable(@NotNull PsiElement element) {
+    static boolean isAvailable(@Nullable PsiElement element) {
         return element instanceof AtUnqualifiedNoParenthesesCall;
     }
 
@@ -38,7 +38,7 @@ public class Handler extends VariableInplaceRenameHandler {
     }
 
     @Override
-    protected boolean isAvailable(PsiElement element, Editor editor, PsiFile file) {
+    protected boolean isAvailable(@Nullable PsiElement element, @NotNull Editor editor, PsiFile file) {
        return editor.getSettings().isVariableInplaceRenameEnabled() && isAvailable(element);
     }
 }
