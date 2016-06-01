@@ -250,7 +250,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parent instanceof ElixirDoBlock ||
                     parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirMapUpdateArguments ||
-                    parent instanceof ElixirQuoteStringBody)) {
+                    parent instanceof ElixirQuoteStringBody ||
+                    parent instanceof QualifiedAlias)) {
                 Logger.error(Callable.class, "Don't know how to check if parameter", parent);
             }
         }
