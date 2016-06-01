@@ -119,6 +119,8 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirCharToken ||
                     element instanceof ElixirDecimalFloat ||
                     element instanceof ElixirEndOfExpression ||
+                    // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
+                    element instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                     element instanceof Line ||
                     element instanceof PsiWhiteSpace ||
                     element instanceof QualifiableAlias ||
