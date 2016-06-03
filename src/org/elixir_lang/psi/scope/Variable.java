@@ -123,6 +123,7 @@ public abstract class Variable implements PsiScopeProcessor {
                     // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
                     element instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                     element instanceof Line ||
+                    element instanceof PsiErrorElement ||
                     element instanceof PsiWhiteSpace ||
                     element instanceof QualifiableAlias ||
                     element instanceof QualifiedBracketOperation ||
