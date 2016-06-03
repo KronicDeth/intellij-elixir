@@ -6,6 +6,7 @@ import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,35 +37,39 @@ public class FoldingBuilder extends FoldingBuilderEx {
         );
 
         for (final AtNonNumericOperation atNonNumericOperation : atNonNumericOperationCollection) {
-            PsiElement target = atNonNumericOperation.getReference().resolve();
+            PsiReference reference = atNonNumericOperation.getReference();
 
-            if (target != null) {
-                assert target instanceof AtUnqualifiedNoParenthesesCall;
+            if (reference != null) {
+                PsiElement target = reference.resolve();
 
-                final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) target;
+                if (target != null) {
+                    assert target instanceof AtUnqualifiedNoParenthesesCall;
 
-                String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
-                FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
+                    final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) target;
 
-                if (foldingGroup == null) {
-                    foldingGroup = FoldingGroup.newGroup(moduleAttributeName);
-                    foldingGroupByModuleAttributeName.put(moduleAttributeName, foldingGroup);
-                }
+                    String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
+                    FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
 
-                foldingDescriptorList.add(
-                        new FoldingDescriptor(
-                                atNonNumericOperation.getNode(),
-                                atNonNumericOperation.getTextRange(),
-                                foldingGroup,
-                                Collections.<Object>singleton(atUnqualifiedNoParenthesesCall)
-                        ) {
-                            @Nullable
-                            @Override
-                            public String getPlaceholderText() {
-                                return atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText();
+                    if (foldingGroup == null) {
+                        foldingGroup = FoldingGroup.newGroup(moduleAttributeName);
+                        foldingGroupByModuleAttributeName.put(moduleAttributeName, foldingGroup);
+                    }
+
+                    foldingDescriptorList.add(
+                            new FoldingDescriptor(
+                                    atNonNumericOperation.getNode(),
+                                    atNonNumericOperation.getTextRange(),
+                                    foldingGroup,
+                                    Collections.<Object>singleton(atUnqualifiedNoParenthesesCall)
+                            ) {
+                                @Nullable
+                                @Override
+                                public String getPlaceholderText() {
+                                    return atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText();
+                                }
                             }
-                        }
-                );
+                    );
+                }
             }
         }
 
