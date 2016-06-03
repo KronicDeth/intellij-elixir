@@ -1,18 +1,21 @@
 package org.elixir_lang.structure_view.element.modular;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.QuotableKeywordList;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.modular.Modular;
-import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
+import static org.elixir_lang.psi.call.name.Function.FOR;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Implementation extends Module {
     /*
@@ -25,6 +28,16 @@ public class Implementation extends Module {
      * Public Static Methods
      */
 
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "implementation";
+        }
+
+        return elementDescription;
+    }
+
     @Nullable
     public static String forName(@Nullable Modular enclosingModular, @NotNull Call call) {
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
@@ -36,7 +49,7 @@ public class Implementation extends Module {
 
                 if (finalArgument instanceof QuotableKeywordList) {
                     QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
-                    PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, "for");
+                    PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
 
                     forName = keywordValue.getText();
                 }
@@ -50,7 +63,8 @@ public class Implementation extends Module {
     }
 
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "defimpl", 2) || call.isCallingMacro("Elixir.Kernel", "defimpl", 3);
+        return call.isCallingMacro(KERNEL, DEFIMPL, 2) ||
+                call.isCallingMacro(KERNEL, DEFIMPL, 3);
     }
 
     public static String name(@NotNull Call call) {
@@ -151,7 +165,7 @@ public class Implementation extends Module {
 
             if (finalArgument instanceof QuotableKeywordList) {
                 QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
-                PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, "for");
+                PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
 
                 forName = keywordValue.getText();
             } else {

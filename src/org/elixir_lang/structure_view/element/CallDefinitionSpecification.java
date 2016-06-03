@@ -3,13 +3,15 @@ package org.elixir_lang.structure_view.element;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElixirMatchedTypeOperation;
 import org.elixir_lang.psi.ElixirMatchedWhenOperation;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,16 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     /*
      * Static Methods
      */
+
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "specification";
+        }
+
+        return elementDescription;
+    }
 
     @Contract(pure = true)
     public static boolean is(@NotNull final Call call) {
@@ -125,8 +137,8 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     public static Call specificationType(Call specification) {
         Call type = null;
 
-        if (specification instanceof ElixirMatchedTypeOperation) {
-            type = type((ElixirMatchedTypeOperation) specification);
+        if (specification instanceof Type) {
+            type = type((Type) specification);
         } else if (specification instanceof ElixirMatchedWhenOperation) {
             type = type((ElixirMatchedWhenOperation) specification);
         }
@@ -135,8 +147,8 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
     }
 
     @Nullable
-    public static Call type(ElixirMatchedTypeOperation matchedTypeOperation) {
-        PsiElement leftOperand = matchedTypeOperation.leftOperand();
+    public static Call type(Type typeOperation) {
+        PsiElement leftOperand = typeOperation.leftOperand();
         Call type = null;
 
         if (leftOperand instanceof Call) {
@@ -151,8 +163,8 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         PsiElement lefOperand = matchedWhenOperation.leftOperand();
         Call type = null;
 
-        if (lefOperand instanceof ElixirMatchedTypeOperation) {
-            type = type((ElixirMatchedTypeOperation) lefOperand);
+        if (lefOperand instanceof Type) {
+            type = type((Type) lefOperand);
         }
 
         return type;

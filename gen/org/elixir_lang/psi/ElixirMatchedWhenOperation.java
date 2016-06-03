@@ -3,6 +3,8 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.operation.Infix;
@@ -39,9 +41,11 @@ public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Nam
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
-  @NotNull
+  @Nullable
   Quotable leftOperand();
 
   @Nullable
@@ -55,6 +59,8 @@ public interface ElixirMatchedWhenOperation extends ElixirMatchedExpression, Nam
 
   @Nullable
   Integer primaryArity();
+
+  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();

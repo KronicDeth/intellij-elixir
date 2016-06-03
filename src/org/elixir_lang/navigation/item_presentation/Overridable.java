@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static org.elixir_lang.psi.call.name.Function.DEFOVERRIDABLE;
+
 public class Overridable implements ItemPresentation {
     /*
      * Fields
@@ -57,7 +59,7 @@ public class Overridable implements ItemPresentation {
     @Nullable
     @Override
     public String getPresentableText() {
-        return "defoverridable";
+        return DEFOVERRIDABLE;
     }
 
 }

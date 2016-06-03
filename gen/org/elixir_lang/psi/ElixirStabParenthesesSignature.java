@@ -23,7 +23,7 @@ public interface ElixirStabParenthesesSignature extends Quotable, When {
   @Nullable
   ElixirWhenInfixOperator getWhenInfixOperator();
 
-  @NotNull
+  @Nullable
   Quotable leftOperand();
 
   @NotNull

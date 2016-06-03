@@ -4,9 +4,16 @@ import com.ericsson.otp.erlang.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.module.ModuleUtilCore;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.LocalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -22,16 +29,17 @@ import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
 import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
-import org.elixir_lang.psi.operation.In;
-import org.elixir_lang.psi.operation.Infix;
-import org.elixir_lang.psi.operation.Operation;
-import org.elixir_lang.psi.operation.Prefix;
+import org.elixir_lang.psi.call.name.Function;
+import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
+import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
 import org.elixir_lang.structure_view.element.Callback;
+import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -45,6 +53,12 @@ import java.util.*;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
+import static org.elixir_lang.psi.call.name.Function.*;
+import static org.elixir_lang.psi.call.name.Module.prependElixirPrefix;
+import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
+import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
+import static org.elixir_lang.reference.Callable.*;
+import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -67,8 +81,10 @@ public class ElixirPsiImplUtil {
             }
     );
     public static final OtpErlangAtom BLOCK = new OtpErlangAtom("__block__");
+    public static final Key<Boolean> DECLARING_SCOPE = new Key<Boolean>("DECLARING_SCOPE");
     public static final String DEFAULT_OPERATOR = "\\\\";
     public static final OtpErlangAtom DO = new OtpErlangAtom("do");
+    public static final Key<PsiElement> ENTRANCE = new Key<PsiElement>("ENTRANCE");
     public static final OtpErlangAtom EXCLAMATION_POINT = new OtpErlangAtom("!");
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
@@ -397,6 +413,43 @@ public class ElixirPsiImplUtil {
         };
     }
 
+    public enum UseScopeSelector {
+        PARENT,
+        SELF,
+        SELF_AND_FOLLOWING_SIBLINGS,
+    }
+
+    public static UseScopeSelector useScopeSelector(@NotNull PsiElement element) {
+        UseScopeSelector useScopeSelector = UseScopeSelector.PARENT;
+
+        if (element instanceof ElixirAnonymousFunction) {
+            useScopeSelector = UseScopeSelector.SELF;
+        } else if (element instanceof Call) {
+            Call call = (Call) element;
+
+            if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, CASE) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, COND) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, IF) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, RECEIVE) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS)
+                    ) {
+               useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS;
+            } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {
+                useScopeSelector = UseScopeSelector.SELF;
+            }
+        }
+
+        return useScopeSelector;
+    }
+
+    /**
+     * @see <a href="https://elixir-lang.readthedocs.io/en/latest/technical/scoping.html">Elixir Scoping</a>
+     * @see <a href="https://github.com/alco/elixir/wiki/Scoping-Rules-in-Elixir-(and-Erlang)#scopes-that-change-the-existing-binding">Scoping Rules in Elixir (and Erlang)</a>
+     */
+    public static boolean createsNewScope(@NotNull PsiElement element) {
+        return useScopeSelector(element) == UseScopeSelector.SELF;
+    }
+
     /**
      * The number of arguments that have defaults.
      * @param arguments arguments to a definition call
@@ -649,6 +702,24 @@ public class ElixirPsiImplUtil {
     /**
      * Whether {@code call} is of the named macro.
      *
+     * Differs from {@link ElixirPsiImplUtil#isCallingMacro(Call, String, String, int)} because no arity is necessary,
+     * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
+     * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
+     *
+     * @param call the call element
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
+     */
+    public static boolean isCallingMacro(@NotNull final Call call,
+                                         @NotNull final String resolvedModuleName,
+                                         @NotNull final String resolvedFunctionName) {
+        return call.isCalling(resolvedModuleName, resolvedFunctionName) && call.hasDoBlockOrKeyword();
+    }
+
+    /**
+     * Whether {@code call} is of the named macro.
+     *
      * Differs from {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} because this function ensures there
      * is a {@code do} block.  If the macro can be called without a {@code do} block, then
      * {@link ElixirPsiImplUtil#isCalling(Call, String, String, int)} should be called instead.
@@ -659,12 +730,43 @@ public class ElixirPsiImplUtil {
      * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
      * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
      */
+    @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
                                          @NotNull final  String resolvedFunctionName,
                                          final int resolvedFinalArity) {
         return call.isCalling(resolvedModuleName, resolvedFunctionName, resolvedFinalArity) &&
                 call.hasDoBlockOrKeyword();
+    }
+
+    public static boolean isDeclaringScope(@NotNull final ElixirStabOperation stabOperation) {
+        boolean declaringScope = true;
+        PsiElement parent = stabOperation.getParent();
+
+        if (parent instanceof ElixirStab) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof ElixirBlockItem) {
+                ElixirBlockItem blockItem = (ElixirBlockItem) grandParent;
+                ElixirBlockIdentifier blockIdentifier = blockItem.getBlockIdentifier();
+
+                String blockIdentifierText = blockIdentifier.getText();
+
+                /* `after` is not a declaring scope because the timeout value does not need to be pinned even though it
+                    must be a literal or declared in an outer scope */
+                if (blockIdentifierText.equals("after")) {
+                    declaringScope = false;
+                }
+            } else if (grandParent instanceof ElixirDoBlock) {
+                Call call = (Call) grandParent.getParent();
+
+                if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, COND)) {
+                    declaringScope = false;
+                }
+            }
+        }
+
+        return declaringScope;
     }
 
     /**
@@ -675,10 +777,10 @@ public class ElixirPsiImplUtil {
     private static boolean isDefaultArgument(PsiElement argument) {
         boolean defaultArgument = false;
 
-        if (argument instanceof ElixirMatchedInMatchOperation || argument instanceof ElixirUnmatchedInMatchOperation) {
-            Operation matchedInMatchOperation = (Operation) argument;
+        if (argument instanceof InMatch) {
+            Operation operation = (Operation) argument;
 
-            if (matchedInMatchOperation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
+            if (operation.operator().getText().trim().equals(DEFAULT_OPERATOR)) {
                 defaultArgument = true;
             }
         }
@@ -728,7 +830,7 @@ public class ElixirPsiImplUtil {
         if (parent instanceof ElixirUnmatchedUnqualifiedNoParenthesesCall) {
             ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall = (ElixirUnmatchedUnqualifiedNoParenthesesCall) parent;
 
-            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro("Elixir.Kernel", "defmodule", 2);
+            isModuleName = unmatchedUnqualifiedNoParenthesesCall.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, DEFMODULE, 2);
         }
 
         return isModuleName;
@@ -752,15 +854,21 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static Quotable leftOperand(Infix infix) {
-        PsiElement[] children = infix.getChildren();
+    @Nullable
+    public static Quotable leftOperand(@NotNull final ElixirStabOperation stabOperation) {
+        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
 
-        if (children.length < 2 || 3 < children.length) {
-            error(Infix.class, "Infix operation expected 2-3 children, but has " + children.length, infix);
+        if (leftOperand == null) {
+            leftOperand = stabOperation.getStabNoParenthesesSignature();
         }
 
-        return (Quotable) children[0];
+        return leftOperand;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Quotable leftOperand(Infix infix) {
+        return Normalized.leftOperand(infix);
     }
 
     /* Returns the 0-indexed line number for the element */
@@ -901,6 +1009,26 @@ public class ElixirPsiImplUtil {
         return qualified.getFirstChild().getText();
     }
 
+    private static GlobalSearchScope moduleWithDependentsScope(PsiElement element) {
+        VirtualFile virtualFile = element.getContainingFile().getVirtualFile();
+        Project project = element.getProject();
+        com.intellij.openapi.module.Module module = ModuleUtilCore.findModuleForFile(
+                virtualFile,
+                project
+        );
+
+        GlobalSearchScope globalSearchScope;
+
+        // module can be null for scratch files
+        if (module != null) {
+            globalSearchScope = GlobalSearchScope.moduleWithDependentsScope(module);
+        } else {
+            globalSearchScope = GlobalSearchScope.allScope(project);
+        }
+
+        return globalSearchScope;
+    }
+
     @Contract(pure = true)
     @NotNull
     public static Quotable operand(Prefix prefix) {
@@ -915,27 +1043,14 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static Operator operator(@NotNull final ElixirStabOperation stabOperation) {
+        return stabOperation.getStabInfixOperator();
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static Operator operator(Infix infix) {
-        PsiElement[] children = infix.getChildren();
-
-        /* 1. When the error is in the rightOperand, then the operator is the last of 2 elements ({@code children[1]}).
-         * 2. When there is no error, then the operator is the middle ({@code children[1]}) element.
-         * 3. When the error is in the leftOperand, then the leftOperand can actually be multiple elements, so it is
-         *    not possible determine which index to use.
-         *
-         * With all that in mind, it is simplest just detect by {@code instanceof}.
-         */
-
-        Operator operator = null;
-
-        for (PsiElement child : children) {
-          if (child instanceof Operator) {
-              operator = (Operator) child;
-          }
-        }
-
-        //noinspection ConstantConditions
-        return operator;
+        return Normalized.operator(infix);
     }
 
     @Contract(pure = true)
@@ -943,8 +1058,11 @@ public class ElixirPsiImplUtil {
     public static Operator operator(Prefix prefix) {
         PsiElement[] children = prefix.getChildren();
 
-        if (children.length != 2) {
-            error(Prefix.class, "Prefix operation does not have 2 children, but " + children.length, prefix);
+        if (children.length < 1) {
+            error(
+                    Prefix.class, "Prefix operation does not have at least one child (the operator), but " +
+                            children.length + " children", prefix
+            );
         }
 
         return (Operator) children[0];
@@ -1093,12 +1211,13 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
         PsiElement[] children = infix.getChildren();
-
-        assert children.length == 3;
+        int operatorIndex = Normalized.operatorIndex(children);
+        Quotable leftOperand = Normalized.leftOperand(children, operatorIndex);
+        Quotable rightOperand = Normalized.rightOperand(children, operatorIndex);
 
         return new PsiElement[]{
-                children[0],
-                children[2]
+                leftOperand,
+                rightOperand
         };
     }
 
@@ -1172,18 +1291,64 @@ public class ElixirPsiImplUtil {
         return primaryArity;
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirAccessExpression accessExpression,
+    /**
+     * {@code {:ok, value} = func() && value == literal}
+     */
+    public static boolean processDeclarations(@NotNull final And and,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                accessExpression,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+
+        if (Normalized.operator(and).getText().equals("&&")) {
+            PsiElement leftOperand = Normalized.leftOperand(and);
+
+            if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
+                // the left operand is not inherently declaring, it should only be if a match is in the left operand
+                keepProcessing = processor.execute(leftOperand, state.put(DECLARING_SCOPE, false));
+            }
+        }
+
+        return keepProcessing;
+    }
+
+    /**
+     * {@code def(macro)?p?}, {@code for}, or {@code with} can declare variables
+     */
+    public static boolean processDeclarations(@NotNull final Call call,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+
+        // need to check if call is place because lastParent is set to place at start of treeWalkUp
+        if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
+            if (CallDefinitionClause.is(call) || // call parameters
+                    Delegation.is(call) || // delegation call parameters
+                    Module.is(call) || // module Alias
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, DESTRUCTURE) || // left operand
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, IF) || // match in condition
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR) || // comprehension match variable
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS) || // match in condition
+                    call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, "with") // <- or = variable
+                    ) {
+                keepProcessing = processor.execute(call, state);
+            } else if (org.elixir_lang.structure_view.element.Quote.is(call)) { // quote :bind_quoted keys{
+                PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(call, "bind_quoted");
+                /* the bind_quoted keys declare variable only valid inside the do block, so any place in the
+                   bindQuoted already must be the bind_quoted values that must be declared before the quote */
+                if (bindQuoted != null && !PsiTreeUtil.isAncestor(bindQuoted, place, false)) {
+                    keepProcessing = processor.execute(call, state);
+                }
+            } else if (hasDoBlockOrKeyword(call)) {
+                // unknown macros that take do blocks often allow variables to be declared in their arguments
+                keepProcessing = processor.execute(call, state);
+            }
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarations(@NotNull final ElixirAlias alias,
@@ -1200,39 +1365,94 @@ public class ElixirPsiImplUtil {
         );
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirNoParenthesesOneArgument noParenthesesOneArgument,
+    public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                noParenthesesOneArgument,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        assert scope.isEquivalentTo(lastParent.getParent());
+
+        boolean keepProcessing = true;
+        PsiElement previousSibling = lastParent.getPrevSibling();
+
+        while (previousSibling != null) {
+            if (!(previousSibling instanceof ElixirEndOfExpression ||
+                    previousSibling instanceof PsiComment ||
+                    previousSibling instanceof PsiWhiteSpace)) {
+                if (!createsNewScope(previousSibling)) {
+                    keepProcessing = processor.execute(previousSibling, state);
+
+                    if (!keepProcessing) {
+                        break;
+                    }
+                }
+            }
+
+            previousSibling = previousSibling.getPrevSibling();
+        }
+
+        return keepProcessing;
     }
 
-    public static boolean processDeclarations(@NotNull final ElixirUnmatchedUnqualifiedNoParenthesesCall unmatchedUnqualifiedNoParenthesesCall,
+    public static boolean processDeclarations(@NotNull final ElixirStabOperation stabOperation,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              @SuppressWarnings("unused") PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        boolean keepProcessing = true;
+        PsiElement signature = stabOperation.leftOperand();
+
+        if (signature != null) {
+            boolean declaringScope = isDeclaringScope(stabOperation);
+
+            keepProcessing = processor.execute(signature, state.put(DECLARING_SCOPE, declaringScope));
+        }
+
+        return keepProcessing;
+    }
+
+    public static boolean processDeclarations(@NotNull final Match match,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
-                                              @NotNull PsiElement place) {
-        return processDeclarationsRecursively(
-                unmatchedUnqualifiedNoParenthesesCall,
-                processor,
-                state,
-                lastParent,
-                place
-        );
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
+        PsiElement rightOperand = match.rightOperand();
+        PsiElement leftOperand = match.leftOperand();
+        boolean checkRight = false;
+        boolean checkLeft = false;
+
+        if (match.isEquivalentTo(lastParent) || match.operator().isEquivalentTo(lastParent)) {
+            checkRight = true;
+            checkLeft = true;
+        } else if (PsiTreeUtil.isAncestor(rightOperand, lastParent, false)) {
+            checkRight = true;
+            checkLeft = false;
+        } else if (PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
+            checkRight = false;
+            checkLeft = true;
+        }
+
+        assert checkRight || checkLeft;
+
+        boolean keepProcessing = true;
+
+        // check right-operand first if both sides need to be checked because only left-side can do rebinding
+        if (checkRight && rightOperand != null) {
+            keepProcessing = processor.execute(rightOperand, state);
+        }
+
+        if (checkLeft && keepProcessing) {
+            keepProcessing = processor.execute(leftOperand, state);
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarations(@NotNull final QualifiedAlias qualifiedAlias,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
-                                              PsiElement lastParent,
-                                              @NotNull PsiElement place) {
+                                              @SuppressWarnings("unused") PsiElement lastParent,
+                                              @NotNull @SuppressWarnings("unused") PsiElement place) {
         return processor.execute(qualifiedAlias, state);
     }
 
@@ -1244,14 +1464,16 @@ public class ElixirPsiImplUtil {
         boolean keepProcessing = processor.execute(psiElement, state);
 
         if (keepProcessing) {
-            PsiElement[] children = psiElement.getChildren();
+            PsiElement child = psiElement.getFirstChild();
 
-            for (PsiElement child : children) {
+            while (child != lastParent) {
                 if (!child.processDeclarations(processor, state, lastParent, place)) {
                     keepProcessing = false;
 
                     break;
                 }
+
+                child = child.getNextSibling();
             }
         }
 
@@ -1287,11 +1509,12 @@ public class ElixirPsiImplUtil {
         Operator operator = infix.operator();
         OtpErlangObject quotedOperator = operator.quote();
 
-        Quotable rightOperand = infix.rightOperand();
+        PsiElement rightOperand = infix.rightOperand();
         OtpErlangObject quotedRightOperand;
 
-        if (rightOperand != null) {
-            quotedRightOperand = rightOperand.quote();
+        if (rightOperand != null && rightOperand instanceof Quotable) {
+            Quotable quotableRightOperand = (Quotable) rightOperand;
+            quotedRightOperand = quotableRightOperand.quote();
         } else {
             // this is not valid Elixir quoting, but something needs to be there for quoting to work
             quotedRightOperand = NIL;
@@ -1571,7 +1794,7 @@ public class ElixirPsiImplUtil {
                     }
                 }
             }
-        } else if (parent instanceof ElixirUnmatchedMatchOperation) {
+        } else if (parent instanceof Match) {
             enclosingMacroCall = enclosingMacroCall(parent);
         } else if (parent instanceof QuotableKeywordPair) {
             QuotableKeywordPair parentKeywordPair = (QuotableKeywordPair) parent;
@@ -1641,16 +1864,25 @@ public class ElixirPsiImplUtil {
         return finalArguments;
     }
 
-    /**
-     * Adds `Elixir.` to alias text.
-     *
-     * @param alias
-     * @return
-     */
+    public static LocalSearchScope followingSiblingsSearchScope(PsiElement element) {
+        List<PsiElement> followingSiblingList = new ArrayList<PsiElement>();
+        PsiElement previousSibling = element;
+        PsiElement followingSibling = previousSibling.getNextSibling();
+
+        while (followingSibling != null) {
+            followingSiblingList.add(followingSibling);
+
+            previousSibling = followingSibling;
+            followingSibling = previousSibling.getNextSibling();
+        }
+
+        return new LocalSearchScope(followingSiblingList.toArray(new PsiElement[followingSiblingList.size()]));
+    }
+
     @Contract(pure = true)
     @NotNull
     public static String fullyQualifiedName(@NotNull final ElixirAlias alias) {
-        return "Elixir." + alias.getName();
+        return alias.getName();
     }
 
     @Contract(pure = true)
@@ -1877,6 +2109,83 @@ public class ElixirPsiImplUtil {
         return ElixirTypes.WORDS_FRAGMENT;
     }
 
+    /**
+     * Returns the scope in which references to this element are searched.
+     *
+     * @return the search scope instance.
+     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
+     */
+    @NotNull
+    @Contract(pure=true)
+    static SearchScope getUseScope(AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        SearchScope useScope;
+
+        if (isNonReferencing(atUnqualifiedNoParenthesesCall.getAtIdentifier())) {
+            useScope = moduleWithDependentsScope(atUnqualifiedNoParenthesesCall);
+        } else {
+            useScope = followingSiblingsSearchScope(atUnqualifiedNoParenthesesCall);
+        }
+
+        return useScope;
+    }
+
+    /**
+     * Returns the scope in which references to this element are searched.
+     *
+     * @return the search scope instance.
+     * @see {@link com.intellij.psi.search.PsiSearchHelper#getUseScope(PsiElement)}
+     */
+    @NotNull
+    @Contract(pure=true)
+    static SearchScope getUseScope(UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
+        SearchScope useScope;
+
+        if (isBitStreamSegmentOption(unqualifiedNoArgumentsCall)) {
+            // Bit Stream Segment Options aren't variables or even real functions, so no use scope
+            useScope = LocalSearchScope.EMPTY;
+        } else if (isParameter(unqualifiedNoArgumentsCall) || isParameterWithDefault(unqualifiedNoArgumentsCall)) {
+            PsiElement ancestor = unqualifiedNoArgumentsCall.getParent();
+
+            while (true) {
+                if (ancestor instanceof Call) {
+                    Call ancestorCall = (Call) ancestor;
+
+                    if (CallDefinitionClause.is(ancestorCall)) {
+                        PsiElement macroDefinitionClause = macroDefinitionClauseForArgument(ancestorCall);
+
+                        if (macroDefinitionClause != null) {
+                            ancestor = macroDefinitionClause;
+                        }
+
+                        break;
+                    } else if (Delegation.is(ancestorCall)) {
+                        break;
+                    } else if (ancestorCall.hasDoBlockOrKeyword()) {
+                        break;
+                    }
+                } else if (ancestor instanceof PsiFile) {
+                    error(
+                            UnqualifiedNoArgumentsCall.class,
+                            "Use scope for parameter not found before reaching file scope",
+                            unqualifiedNoArgumentsCall
+                    );
+                    break;
+                }
+
+                ancestor = ancestor.getParent();
+            }
+
+            useScope = new LocalSearchScope(ancestor);
+        } else if (isVariable(unqualifiedNoArgumentsCall)) {
+            useScope = variableUseScope(unqualifiedNoArgumentsCall);
+        } else {
+            // if the type of callable isn't known, fallback to default scope
+            useScope = moduleWithDependentsScope(unqualifiedNoArgumentsCall);
+        }
+
+        return useScope;
+    }
+
     public static List<HeredocLine> getHeredocLineList(InterpolatedCharListHeredocLined interpolatedCharListHeredocLined) {
         List<ElixirInterpolatedCharListHeredocLine> interpolatedCharListHeredocLineList = interpolatedCharListHeredocLined.getInterpolatedCharListHeredocLineList();
         List<HeredocLine> heredocLineList = new ArrayList<HeredocLine>(interpolatedCharListHeredocLineList.size());
@@ -2089,6 +2398,32 @@ public class ElixirPsiImplUtil {
         return nameIdentifier;
     }
 
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull ElixirKeywordKey keywordKey) {
+        ElixirCharListLine charListLine = keywordKey.getCharListLine();
+        PsiElement nameIdentifier;
+
+        if (charListLine != null) {
+            nameIdentifier = null;
+        } else {
+            ElixirStringLine stringLine = keywordKey.getStringLine();
+
+            if (stringLine != null) {
+                nameIdentifier = null;
+            } else {
+                nameIdentifier = keywordKey;
+            }
+        }
+
+        return nameIdentifier;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement getNameIdentifier(@NotNull ElixirVariable variable) {
+        return variable;
+    }
+
     public static PsiElement getNameIdentifier(
             @NotNull org.elixir_lang.psi.call.Named named
     ) {
@@ -2169,6 +2504,21 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
+    public static PsiReference getReference(@NotNull Call call) {
+        PsiReference reference = null;
+
+        /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
+           and instead let {@link #getReference(AtNonNumbericOperation) handle it */
+        if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation) &&
+                // if a bitstring segment option then the option is a pseudo-function
+                !isBitStreamSegmentOption(call)) {
+            reference = new Callable(call);
+        }
+
+        return reference;
+    }
+
+    @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
         PsiElement parent = qualifiableAlias.getParent();
         PsiReference reference = null;
@@ -2205,7 +2555,13 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
-        return new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
+        PsiReference reference = null;
+
+        if (!isNonReferencing(atNonNumericOperation)) {
+            reference = new org.elixir_lang.reference.ModuleAttribute(atNonNumericOperation);
+        }
+
+        return reference;
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
@@ -2459,7 +2815,7 @@ public class ElixirPsiImplUtil {
         OtpErlangList interpolationMetadata = metadata(interpolation);
 
         OtpErlangObject quotedKernelToStringCall = quotedFunctionCall(
-                "Elixir.Kernel",
+                prependElixirPrefix(org.elixir_lang.psi.call.name.Module.KERNEL),
                 "to_string",
                 interpolationMetadata,
                 quotedChildren
@@ -2592,38 +2948,14 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quote(ElixirStabOperation stabOperation) {
-        Quotable leftOperand = stabOperation.getStabParenthesesSignature();
-
-        if (leftOperand == null) {
-            leftOperand = stabOperation.getStabNoParenthesesSignature();
-        }
-
-        OtpErlangObject quotedLeftOperand;
-
-        if (leftOperand != null) {
-            quotedLeftOperand = leftOperand.quote();
-        } else {
-            // when there is not signature before `->`.
-            quotedLeftOperand = new OtpErlangList();
-        }
-
-        Operator operator = stabOperation.getStabInfixOperator();
+        Operator operator = stabOperation.operator();
         OtpErlangObject quotedOperator = operator.quote();
-
-        Quotable rightOperand = stabOperation.getStabBody();
-        OtpErlangObject quotedRightOperand;
-
-        if (rightOperand != null) {
-            quotedRightOperand = rightOperand.quote();
-        } else {
-            quotedRightOperand = NIL;
-        }
 
         return quotedFunctionCall(
                 quotedOperator,
                 metadata(operator),
-                quotedLeftOperand,
-                quotedRightOperand
+                quotedLeftOperand(stabOperation),
+                quotedRightOperand(stabOperation)
         );
     }
 
@@ -3838,6 +4170,22 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quotedLeftOperand(@NotNull final ElixirStabOperation stabOperation) {
+        Quotable leftOperand = stabOperation.leftOperand();
+        OtpErlangObject quotedLeftOperand;
+
+        if (leftOperand != null) {
+            quotedLeftOperand = leftOperand.quote();
+        } else {
+            // when there is not signature before `->`.
+            quotedLeftOperand = new OtpErlangList();
+        }
+
+        return quotedLeftOperand;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     private static OtpErlangObject quotedBlockCall(
             @NotNull OtpErlangObject quotedIdentifier,
             @NotNull final OtpErlangList callMetadata,
@@ -3930,6 +4278,22 @@ if (quoted == null) {
                         quotedFunctionArguments(arguments)
                 }
         );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quotedRightOperand(@NotNull final ElixirStabOperation stabOperation) {
+        PsiElement rightOperand = stabOperation.rightOperand();
+        OtpErlangObject quotedRightOperand;
+
+        if (rightOperand != null && rightOperand instanceof Quotable) {
+            Quotable quotableRightOperand = (Quotable) rightOperand;
+            quotedRightOperand = quotableRightOperand.quote();
+        } else {
+            quotedRightOperand = NIL;
+        }
+
+        return quotedRightOperand;
     }
 
     @Contract(pure = true)
@@ -4122,16 +4486,16 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull final Infix infix) {
-        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now, but some are actually from
+        /* TODO handle resolving module name from imports.  Assume KERNEL for now, but some are actually from
            Bitwise */
-        return "Elixir.Kernel";
+        return org.elixir_lang.psi.call.name.Module.KERNEL;
     }
 
     @Contract(pure = true)
     @NotNull
     public static String resolvedModuleName(@NotNull final Prefix prefix) {
-        /* TODO handle resolving module name from imports.  Assume "Elixir.Kernel" for now. */
-        return "Elixir.Kernel";
+        /* TODO handle resolving module name from imports.  Assume KERNEL for now. */
+        return org.elixir_lang.psi.call.name.Module.KERNEL;
     }
 
     /**
@@ -4155,12 +4519,7 @@ if (quoted == null) {
             resolvedModuleName = stub.resolvedModuleName();
         } else {
             // TODO handle `alias`es and `import`s
-            String moduleName = qualified.moduleName();
-            resolvedModuleName = moduleName;
-
-            if (!moduleName.startsWith("Elixir.")) {
-                resolvedModuleName = "Elixir." + moduleName;
-            }
+            resolvedModuleName = stripElixirPrefix(qualified.moduleName());
         }
 
         //noinspection ConstantConditions
@@ -4190,7 +4549,7 @@ if (quoted == null) {
             resolvedModuleName = stub.resolvedModuleName();
         } else {
             // TODO handle `import`s
-            resolvedModuleName = "Elixir.Kernel";
+            resolvedModuleName = org.elixir_lang.psi.call.name.Module.KERNEL;
         }
 
         //noinspection ConstantConditions
@@ -4207,7 +4566,7 @@ if (quoted == null) {
     @NotNull
     public static String resolvedModuleName(@NotNull @SuppressWarnings("unused") final UnqualifiedNoArgumentsCall unqualifiedNoArgumentsCall) {
         // TODO handle `import`s and determine whether actually a local variable
-        return "Elixir.Kernel";
+        return org.elixir_lang.psi.call.name.Module.KERNEL;
     }
 
     @Contract(pure = true)
@@ -4252,17 +4611,14 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @Nullable
+    public static Quotable rightOperand(ElixirStabOperation stabOperation) {
+        return stabOperation.getStabBody();
+    }
+
+    @Contract(pure = true)
+    @Nullable
     public static Quotable rightOperand(Infix infix) {
-        PsiElement[] children = infix.getChildren();
-        Quotable rightOperand = null;
-
-        /* rightOperand won't be there when Pratt Parser recovered from error in right-operand by matching up through
-           the operator only. */
-        if (children.length == 3) {
-            rightOperand = (Quotable) children[2];
-        }
-
-        return rightOperand;
+        return Normalized.rightOperand(infix);
     }
 
     @Contract(pure = true)
@@ -4340,6 +4696,7 @@ if (quoted == null) {
         return null;
     }
 
+
     @NotNull
     public static PsiElement setName(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                      @NotNull final String newName) {
@@ -4359,9 +4716,23 @@ if (quoted == null) {
     }
 
     @NotNull
+    public static PsiElement setName(@NotNull ElixirVariable variable, @NotNull String newName) {
+        return null;
+    }
+
+    @NotNull
     public static PsiElement setName(@NotNull final org.elixir_lang.psi.call.Named named,
                                      @NotNull final String newName) {
-        return null;
+        PsiElement functionNameElement = named.functionNameElement();
+        Call newFunctionNameElementCall = ElementFactory.createUnqualifiedNoArgumentsCall(named.getProject(), newName);
+
+        ASTNode nameNode = functionNameElement.getNode();
+        ASTNode newNameNode = newFunctionNameElementCall.functionNameElement().getNode();
+
+        ASTNode node = nameNode.getTreeParent();
+        node.replaceChild(nameNode, newNameNode);
+
+        return named;
     }
 
     public static char sigilName(@NotNull org.elixir_lang.psi.Sigil sigil) {
@@ -4428,6 +4799,31 @@ if (quoted == null) {
             );
             mergedNodes.add(charListFragment);
         }
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static Call macroDefinitionClauseForArgument(Call callDefinitionClause) {
+        Call macroDefinitionClause = null;
+        PsiElement parent = callDefinitionClause.getParent();
+
+        if (parent instanceof ElixirMatchedWhenOperation) {
+            PsiElement grandParent =  parent.getParent();
+
+            if (grandParent instanceof ElixirNoParenthesesOneArgument) {
+                PsiElement greatGrandParent = grandParent.getParent();
+
+                if (greatGrandParent instanceof Call) {
+                    Call greatGrandParentCall = (Call) greatGrandParent;
+
+                    if (CallDefinitionClause.isMacro(greatGrandParentCall)) {
+                        macroDefinitionClause = greatGrandParentCall;
+                    }
+                }
+            }
+        }
+
+        return macroDefinitionClause;
     }
 
     @NotNull

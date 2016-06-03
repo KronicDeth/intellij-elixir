@@ -16,12 +16,15 @@
     hasDoBlockOrKeyword
     getName
     getNameIdentifier
+    getReference
     getStub
+    getUseScope
     isCalling
     isCallingMacro
     moduleName
     primaryArguments
     primaryArity
+    processDeclarations
     quote
     resolvedFinalArity
     resolvedFinalArityRange
@@ -44,7 +47,7 @@
   /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
      return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
      the free arrow operators */
-  implements(        "(un)?matched(Addition|And|Arrow|Comparison|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+  implements(        "(un)?matched(Arrow|Comparison|Multiplication|Or|Relational|When)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
@@ -62,6 +65,7 @@
     operator
     primaryArguments
     primaryArity
+    processDeclarations
     quote
     resolvedFinalArity
     resolvedFinalArityRange
@@ -75,12 +79,54 @@
     setName
   ]
 
+  implements("(un)?matchedAdditionOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Addition"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedAndOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.And"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedInMatchOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.InMatch"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedMatchOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Match"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedPipeOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Pipe"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedTwoOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Two"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedTypeOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Type"
+  ]
+  // methods set by infix operations above
+
   /*
    * Prefix operations
    *
    * Have names (their operators), but aren't stubbed because they don't define structures.
    */
-  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture|Unary)NonNumeric)Operation")=[
+  implements(        "((at|capture|unary)Numeric|(un)?matched(Capture)NonNumeric)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Prefix"
   ]
@@ -121,6 +167,12 @@
     operator
     quote
   ]
+
+  // unaryNonNumeric operations
+  implements("(un)?matchedUnaryNonNumericOperation")=[
+    "org.elixir_lang.psi.UnaryNonNumericOperation"
+  ]
+  // method set by prefix operations above
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -403,7 +455,18 @@ noParenthesesKeywordPair ::= keywordKeyColonEOL noParenthesesExpression
  */
 
 variable ::= IDENTIFIER_TOKEN !KEYWORD_PAIR_COLON
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+             {
+               implements = [
+                 "org.elixir_lang.psi.NamedElement"
+                 "org.elixir_lang.psi.Quotable"
+               ]
+               methods = [
+                 getName
+                 getNameIdentifier
+                 quote
+                 setName
+               ]
+             }
 
 /*
  *
@@ -2048,10 +2111,25 @@ private stabOperationPrefix ::= stabParenthesesSignature stabInfixOperator |
                                 stabInfixOperator
 private stabBodyExpression ::= !stabOperationPrefix expression
 stabBody ::= stabBodyExpression (endOfExpression stabBodyExpression)*
-             { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+             {
+               implements = "org.elixir_lang.psi.Quotable"
+               methods = [
+                 processDeclarations
+                 quote
+               ]
+             }
 
 stabOperation ::= stabOperationPrefix stabBody?
-                  { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                  {
+                    implements = "org.elixir_lang.psi.Quotable"
+                    methods = [
+                      leftOperand
+                      operator
+                      processDeclarations
+                      quote
+                      rightOperand
+                    ]
+                  }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L268-L269
 stab ::= stabOperation (endOfExpression stabOperation)* |
@@ -2132,7 +2210,6 @@ accessExpression ::= atNumericOperation |
                        ]
                        methods = [
                          isModuleName
-                         processDeclarations
                          quote
                        ]
                      }
@@ -2781,7 +2858,18 @@ keywordKey ::= AFTER |
                UNARY_OPERATOR |
                WHEN_OPERATOR |
                quote
-               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+               {
+                 implements = [
+                   "org.elixir_lang.psi.NamedElement"
+                   "org.elixir_lang.psi.Quotable"
+                 ]
+                 methods = [
+                   getName
+                   getNameIdentifier
+                   quote
+                   setName
+                 ]
+               }
 // @see https://github.com/elixir-lang/elixir/blob/39b6789a8625071e149f0a7347ca7a2111f7c8f2/lib/elixir/src/elixir_parser.yrl#L499
 private keywordKeyColonEOL ::= keywordKey KEYWORD_PAIR_COLON EOL*
 

@@ -1,6 +1,8 @@
 package org.elixir_lang.psi;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.ElixirFileType;
@@ -51,15 +53,34 @@ public class ElementFactory {
         String text = "defmodule Dummy do\n" +
                       "  " + name + "\n" +
                       "end";
-        final ElixirFile file = createFile(project, text);
-        Collection<AtNonNumericOperation> elementCollection = PsiTreeUtil.collectElementsOfType(
-                file, AtNonNumericOperation.class
-        );
+        return onlyElementOfType(project, text, AtNonNumericOperation.class);
+    }
 
-        assert elementCollection.size() == 1;
+    public static UnqualifiedNoArgumentsCall createUnqualifiedNoArgumentsCall(Project project, String name) {
+        return onlyElementOfType(project, name, UnqualifiedNoArgumentsCall.class);
+    }
 
-        AtNonNumericOperation[] atNonNumericOperations = elementCollection.toArray(new AtNonNumericOperation[1]);
+    /*
+     * Private Static Methods
+     */
 
-        return atNonNumericOperations[0];
+    @NotNull
+    private static <T extends PsiElement> T onlyElementOfType(@NotNull PsiFile file, @NotNull Class<T> clazz) {
+        Collection<T> elementCollection = PsiTreeUtil.collectElementsOfType(file, clazz);
+        int size = elementCollection.size();
+
+        assert size == 1;
+
+        PsiElement[] elements = elementCollection.toArray(new PsiElement[size]);
+
+        return (T) elements[0];
+    }
+
+    @NotNull
+    private static <T extends PsiElement> T onlyElementOfType(@NotNull Project project,
+                                                              @NotNull String text,
+                                                              @NotNull Class<T> clazz) {
+        ElixirFile file = createFile(project, text);
+        return onlyElementOfType(file, clazz);
     }
 }

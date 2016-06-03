@@ -2,12 +2,15 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +33,16 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
     /*
      * Public Static Methods
      */
+
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "callback";
+        }
+
+        return elementDescription;
+    }
 
     @Contract(pure = true)
     @Nullable
@@ -95,8 +108,8 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         PsiElement leftOperand = whenOperation.leftOperand();
         Call headCall = null;
 
-        if (leftOperand instanceof ElixirMatchedTypeOperation) {
-            headCall = typeHeadCall((ElixirMatchedTypeOperation) leftOperand);
+        if (leftOperand instanceof Type) {
+            headCall = typeHeadCall((Type) leftOperand);
         }
 
         return headCall;
@@ -106,8 +119,8 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
     private static Call specificationHeadCall(PsiElement specification) {
         Call headCall = null;
 
-        if (specification instanceof ElixirMatchedTypeOperation) {
-            headCall = typeHeadCall((ElixirMatchedTypeOperation) specification);
+        if (specification instanceof Type) {
+            headCall = typeHeadCall((Type) specification);
         } else if (specification instanceof ElixirMatchedWhenOperation) {
             headCall = parameterizedTypeHeadCall((ElixirMatchedWhenOperation) specification);
         }
@@ -116,7 +129,7 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
     }
 
     @Nullable
-    private static Call typeHeadCall(ElixirMatchedTypeOperation typeOperation) {
+    private static Call typeHeadCall(Type typeOperation) {
         PsiElement leftOperand = typeOperation.leftOperand();
         Call headCall = null;
 

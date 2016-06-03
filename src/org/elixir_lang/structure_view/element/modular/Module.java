@@ -3,11 +3,15 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.ElementDescriptionLocation;
+import com.intellij.psi.ElementDescriptionUtil;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewLongNameLocation;
+import com.intellij.usageView.UsageViewShortNameLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.CallDefinition;
@@ -27,6 +31,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
+import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
 
 public class Module extends Element<Call> implements Modular {
     /*
@@ -114,8 +121,33 @@ public class Module extends Element<Call> implements Modular {
         return children;
     }
 
+    @Nullable
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewLongNameLocation.INSTANCE) {
+            Call enclosingCall = enclosingMacroCall(call);
+            // indirect recursion through ElementDescriptionUtil.getElementDescription because it is @NotNull and will
+            // default to element text when not implemented, so a bug, but not an error will result.
+            String relative = ElementDescriptionUtil.getElementDescription(call, UsageViewShortNameLocation.INSTANCE);
+
+            if (enclosingCall != null) {
+                String qualified = ElementDescriptionUtil.getElementDescription(enclosingCall, location);
+                elementDescription = qualified + "." + relative;
+            } else {
+                elementDescription = relative;
+            }
+        } else if (location == UsageViewShortNameLocation.INSTANCE) {
+           elementDescription = call.getName();
+        } else if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "module";
+        }
+
+        return elementDescription;
+    }
+
     public static boolean is(Call call) {
-        return call.isCallingMacro("Elixir.Kernel", "defmodule", 2);
+        return call.isCallingMacro(KERNEL, DEFMODULE, 2);
     }
 
     public static PsiElement nameIdentifier(Call call) {

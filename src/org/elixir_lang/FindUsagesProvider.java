@@ -4,16 +4,13 @@ import com.intellij.find.FindManager;
 import com.intellij.find.impl.HelpID;
 import com.intellij.lang.cacheBuilder.SimpleWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
+import com.intellij.psi.ElementDescriptionUtil;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewLongNameLocation;
+import com.intellij.usageView.UsageViewNodeTextLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.structure_view.element.*;
-import org.elixir_lang.structure_view.element.Quote;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
-import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +39,7 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
         boolean canFindUsages = false;
 
-        if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
+        if (psiElement instanceof Call) {
             canFindUsages = true;
         } else if (psiElement instanceof MaybeModuleName) {
             MaybeModuleName maybeModuleName = (MaybeModuleName) psiElement;
@@ -51,6 +48,20 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
         }
 
         return canFindUsages;
+    }
+
+    /**
+     * Returns an expanded user-visible name of the specified element, shown in the "Find Usages"
+     * dialog. For classes, this can return a fully qualified name of the class; for methods -
+     * a signature of the method with parameters.
+     *
+     * @param element the element for which the name is requested.
+     * @return the user-visible name.
+     */
+    @NotNull
+    @Override
+    public String getDescriptiveName(@NotNull PsiElement element) {
+        return ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE);
     }
 
     /**
@@ -81,103 +92,6 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     }
 
     /**
-     * Returns the user-visible type of the specified element, shown in the "Find Usages"
-     * dialog (for example, "class" or "variable"). The type name should not be upper-cased.
-     *
-     * @param element the element for which the type is requested.
-     * @return the type of the element.
-     */
-    @NotNull
-    @Override
-    public String getType(@NotNull final PsiElement element) {
-        String type = "unknown element type";
-
-        if (element instanceof Call) {
-            Call call = (Call) element;
-
-            if (CallDefinitionClause.isFunction(call)) {
-                type = "function";
-            } else if (CallDefinitionClause.isMacro(call)) {
-                type = "macro";
-            } else if (CallDefinitionSpecification.is(call)) {
-                type = "specification";
-            } else if (Callback.is(call)) {
-                type = "callback";
-            } else if (Delegation.is(call)) {
-                type = "delegation";
-            } else if (org.elixir_lang.structure_view.element.Exception.is(call)) {
-                type = "exception";
-            } else if (Implementation.is(call)) {
-                type = "implementation";
-            } else if (Module.is(call)) {
-                type = "module";
-            } else if (Overridable.is(call)) {
-                type = "overridable";
-            } else if (Protocol.is((call))) {
-                type = "protocol";
-            } else if (Quote.is(call)) {
-                type = "quote";
-            } else if (Structure.is(call)) {
-                type = "struct";
-            } else if (Type.is(call)) {
-                type = "type";
-            } else if (Use.is(call)) {
-                type = "use";
-            } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                type = "module attribute";
-            } else {
-                type = "unknown call type";
-            }
-        } else if (element instanceof MaybeModuleName) {
-            MaybeModuleName maybeModuleName = (MaybeModuleName) element;
-
-            if (maybeModuleName.isModuleName()) {
-                type = "module";
-            }
-        }
-
-        return type;
-    }
-
-    /**
-     * Returns an expanded user-visible name of the specified element, shown in the "Find Usages"
-     * dialog. For classes, this can return a fully qualified name of the class; for methods -
-     * a signature of the method with parameters.
-     *
-     * @param element the element for which the name is requested.
-     * @return the user-visible name.
-     */
-    @NotNull
-    @Override
-    public String getDescriptiveName(@NotNull PsiElement element) {
-        // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
-        String descriptiveName = null;
-
-        if (element instanceof AtUnqualifiedNoParenthesesCall) {
-            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
-
-            descriptiveName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
-        } else if (element instanceof ElixirFile) {
-            ElixirFile file = (ElixirFile) element;
-
-            descriptiveName = file.getVirtualFile().getPresentableUrl();
-        } else if (element instanceof MaybeModuleName) {
-            MaybeModuleName maybeModuleName = (MaybeModuleName) element;
-
-            if (maybeModuleName.isModuleName()) {
-                if (maybeModuleName instanceof QualifiableAlias) {
-                    QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeModuleName;
-
-                    descriptiveName = qualifiableAlias.fullyQualifiedName();
-                }
-            }
-        }
-
-        //noinspection ConstantConditions
-        return descriptiveName;
-    }
-
-    /**
      * Returns the text representing the specified PSI element in the Find Usages tree.
      *
      * @param element     the element for which the node text is requested.
@@ -187,53 +101,27 @@ public class FindUsagesProvider implements com.intellij.lang.findUsages.FindUsag
     @NotNull
     @Override
     public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
-        // Intentionally use `null` to trigger `@NotNull` when a new element type is passed.
-        String nodeText = null;
+        String nodeText;
 
-        if (element instanceof AtUnqualifiedNoParenthesesCall) {
-            AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) element;
-            nodeText = atUnqualifiedNoParenthesesCall.getName();
-        } else if (element instanceof Call) {
-            Call call = (Call) element;
-
-            if (call.isCallingMacro("Elixir.Kernel", "defmodule", 2)) {
-                NamedElement namedElement = (NamedElement) call;
-                nodeText = namedElement.getName();
-            } else if (call.isCallingMacro("Elixir.Kernel", "def", 2)) {
-                NamedElement namedElement = (NamedElement) call;
-                nodeText = namedElement.getName();
-            } else {
-                PsiElement parent = element.getParent();
-
-                if (parent instanceof ElixirNoParenthesesOneArgument) {
-                    PsiElement grandParent = parent.getParent();
-
-                    if (grandParent instanceof Call) {
-                        Call grandParentCall = (Call) grandParent;
-
-                        if (grandParentCall.isCallingMacro("Elixir.Kernel", "def", 2)) {
-                            nodeText = element.getText();
-                        }
-                    }
-                }
-            }
-        } else if (element instanceof MaybeModuleName) {
-            MaybeModuleName maybeModuleName = (MaybeModuleName) element;
-
-            if (maybeModuleName.isModuleName()) {
-                if (useFullName) {
-                    if (maybeModuleName instanceof QualifiableAlias) {
-                        QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeModuleName;
-
-                        nodeText = qualifiableAlias.fullyQualifiedName();
-                    }
-                } else {
-                    nodeText = maybeModuleName.getText();
-                }
-            }
+        if (useFullName) {
+            nodeText = ElementDescriptionUtil.getElementDescription(element, UsageViewLongNameLocation.INSTANCE);
+        } else {
+            nodeText = ElementDescriptionUtil.getElementDescription(element, UsageViewNodeTextLocation.INSTANCE);
         }
 
-        //noinspection ConstantConditions
         return nodeText;
+    }
+
+    /**
+     * Returns the user-visible type of the specified element, shown in the "Find Usages"
+     * dialog (for example, "class" or "variable"). The type name should not be upper-cased.
+     *
+     * @param element the element for which the type is requested.
+     * @return the type of the element.
+     */
+    @NotNull
+    @Override
+    public String getType(@NotNull final PsiElement element) {
+            return ElementDescriptionUtil.getElementDescription(element, UsageViewTypeLocation.INSTANCE);
     }
 }

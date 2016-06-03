@@ -1,5 +1,6 @@
 package org.elixir_lang.reference;
 
+import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
@@ -9,20 +10,123 @@ import com.intellij.psi.PsiPolyVariantReferenceBase;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.psi.AtNonNumericOperation;
-import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
-import org.elixir_lang.psi.ElementFactory;
-import org.elixir_lang.psi.ElixirAtIdentifier;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by limhoff on 12/30/15.
  */
 public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
+    /*
+     * CONSTANTS
+     */
+
+    private static final String BEHAVIOUR_NAME = "behaviour";
+    private static final Set<String> CALLBACK_NAME_SET = Sets.newHashSet("callback", "macrocallback");
+    private static final Set<String> DOCUMENTATION_NAME_SET = Sets.newHashSet("doc", "moduledoc", "typedoc");
+    private static final Set<String> NON_REFERENCING_NAME_SET;
+    private static final String SPECIFICATION_NAME = "spec";
+    private static final Set<String> TYPE_NAME_SET = Sets.newHashSet("opaque", "type", "typep");
+
+    static {
+        NON_REFERENCING_NAME_SET = new java.util.HashSet<String>();
+
+        NON_REFERENCING_NAME_SET.add(BEHAVIOUR_NAME);
+        NON_REFERENCING_NAME_SET.addAll(CALLBACK_NAME_SET);
+        NON_REFERENCING_NAME_SET.addAll(DOCUMENTATION_NAME_SET);
+        NON_REFERENCING_NAME_SET.add(SPECIFICATION_NAME);
+        NON_REFERENCING_NAME_SET.addAll(TYPE_NAME_SET);
+    }
+
+    /*
+     *
+     * Static Methods
+     *
+     */
+
+    /*
+     * Public Static Methods
+     */
+
+    /**
+     * Whether the module attribute is used to declare function or macro callbacks for behaviours
+     *
+     * @return {@code true} if {@code "@callback"} or {@code "@macrocallback"}; otherwise, {@code false}.
+     */
+    public static boolean isCallbackName(@NotNull String name) {
+        return CALLBACK_NAME_SET.contains(name);
+    }
+
+    /**
+     * Whether the module attribute is used to declare function, module, or type documentation
+     *
+     * @return {@code true} if {@code "doc"}, {@code "moduledoc"}, or {@code "typedoc"}; otherwise, {@code false}.
+     */
+    public static boolean isDocumentationName(@NotNull String name) {
+        return DOCUMENTATION_NAME_SET.contains(name);
+    }
+
+    /**
+     * All the predefined module attributes that aren't used to define constants, but for defining behaviors, callback,
+     * documents, or types.
+     *
+     * @param moduleAttribute the module attribute
+     * @return {@code true} if the module attribute should have a {@code null} reference because it is used for
+     *   library control instead of constant definition; otherwise, {@code false}.
+     */
+    public static boolean isNonReferencing(AtNonNumericOperation moduleAttribute) {
+        String text = moduleAttribute.getText();
+        String name = text.substring(1);
+
+        return isNonReferencingName(name);
+    }
+
+    /**
+     * All the predefined module attributes that aren't used to define constants, but for defining behaviors, callback,
+     * documents, or types.
+     *
+     * @param moduleAttribute the module attribute
+     * @return {@code true} if the module attribute should have a {@code null} reference because it is used for
+     *   library control instead of constant definition; otherwise, {@code false}.
+     */
+    public static boolean isNonReferencing(ElixirAtIdentifier moduleAttribute) {
+        String text = moduleAttribute.getText();
+        String name = text.substring(1);
+
+        return isNonReferencingName(name);
+    }
+
+    /**
+     * Whether the module attribute is used to declare the specification for a function or macro.
+     *
+     * @return {@code true} if {@code "spec"}; otherwise, {@code false}
+     */
+    public static boolean isSpecificationName(@NotNull String name) {
+        return SPECIFICATION_NAME.equals(name);
+    }
+
+    /**
+     * Whether the module attribute is used to declare opaque, transparent, or private types.
+     *
+     * @return {@code true} if {@code "opaque"}, {@code "type"}, or {@code "typep"; otherwise, {@code false}.
+     */
+    public static boolean isTypeName(@NotNull String name) {
+        return TYPE_NAME_SET.contains(name);
+    }
+
+    /*
+     * Private Static Methods
+     */
+
+    private static boolean isNonReferencingName(@NotNull String name) {
+        return NON_REFERENCING_NAME_SET.contains(name);
+    }
+
     /*
      * Constructors
      */
@@ -87,8 +191,17 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> resultList = new ArrayList<ResolveResult>();
+        boolean isNonReferencing = false;
 
-        resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+        if (myElement instanceof AtNonNumericOperation) {
+            isNonReferencing = isNonReferencing((AtNonNumericOperation) myElement);
+        } else if (myElement instanceof ElixirAtIdentifier) {
+            isNonReferencing = isNonReferencing((ElixirAtIdentifier) myElement);
+        }
+
+        if (!isNonReferencing) {
+            resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+        }
 
         return resultList.toArray(new ResolveResult[resultList.size()]);
     }

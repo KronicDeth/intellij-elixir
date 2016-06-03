@@ -2,8 +2,10 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirList;
@@ -16,6 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 public class Delegation extends Element<Call>  {
     /*
@@ -31,8 +36,46 @@ public class Delegation extends Element<Call>  {
      * Static Methods
      */
 
+    public static List<Call> callDefinitionHeadCallList(Call defdelegateCall) {
+        List<Call> callDefinitionHeadCallList = null;
+
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(defdelegateCall);
+
+        assert finalArguments != null;
+        assert finalArguments.length > 0;
+
+        PsiElement firstFinalArgument = finalArguments[0];
+
+        if (firstFinalArgument instanceof ElixirAccessExpression) {
+            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
+
+            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+
+            if (accessExpressionChildren.length == 1) {
+                PsiElement accessExpressionChild = accessExpressionChildren[0];
+
+                if (accessExpressionChild instanceof ElixirList) {
+                    ElixirList list = (ElixirList) accessExpressionChild;
+
+                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
+                    callDefinitionHeadCallList = filterCallDefinitionHeadCallList(listCalls);
+                }
+            }
+        } else if (firstFinalArgument instanceof Call) {
+            Call call = (Call) firstFinalArgument;
+
+            callDefinitionHeadCallList = filterCallDefinitionHeadCallList(call);
+        }
+
+        if (callDefinitionHeadCallList == null) {
+            callDefinitionHeadCallList = Collections.emptyList();
+        }
+
+        return callDefinitionHeadCallList;
+    }
+
     @NotNull
-    public static List<Call> callDefinitionHeadCallList(Call... calls) {
+    public static List<Call> filterCallDefinitionHeadCallList(Call... calls) {
         List<Call> callList = Collections.emptyList();
 
         if (calls != null) {
@@ -48,8 +91,18 @@ public class Delegation extends Element<Call>  {
         return callList;
     }
 
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "delegation";
+        }
+
+        return elementDescription;
+    }
+
     public static boolean is(Call call) {
-        return call.isCalling("Elixir.Kernel", "defdelegate", 2);
+        return call.isCalling(KERNEL, DEFDELEGATE, 2);
     }
 
     /*
@@ -104,41 +157,7 @@ public class Delegation extends Element<Call>  {
 
     @NotNull
     public List<Call> callDefinitionHeadCallList() {
-        List<Call> callDefinitionHeadCallList = null;
-
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
-
-        assert finalArguments != null;
-        assert finalArguments.length > 0;
-
-        PsiElement firstFinalArgument = finalArguments[0];
-
-        if (firstFinalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
-
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
-
-            if (accessExpressionChildren.length == 1) {
-                PsiElement accessExpressionChild = accessExpressionChildren[0];
-
-                if (accessExpressionChild instanceof ElixirList) {
-                    ElixirList list = (ElixirList) accessExpressionChild;
-
-                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-                    callDefinitionHeadCallList = callDefinitionHeadCallList(listCalls);
-                }
-            }
-        } else if (firstFinalArgument instanceof Call) {
-            Call call = (Call) firstFinalArgument;
-
-            callDefinitionHeadCallList = callDefinitionHeadCallList(call);
-        }
-
-        if (callDefinitionHeadCallList == null) {
-            callDefinitionHeadCallList = Collections.emptyList();
-        }
-
-        return callDefinitionHeadCallList;
+        return callDefinitionHeadCallList(navigationItem);
     }
 
     public void definition(CallDefinition callDefinition) {

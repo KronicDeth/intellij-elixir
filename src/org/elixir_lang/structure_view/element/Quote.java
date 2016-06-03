@@ -2,13 +2,17 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.ElementDescriptionLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Modular;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static org.elixir_lang.psi.call.name.Function.QUOTE;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
 /**
  * A `quote ... do ... end` block
@@ -25,10 +29,20 @@ public class Quote extends Element<Call> {
      * Static Methods
      */
 
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "quote";
+        }
+
+        return elementDescription;
+    }
+
     public static boolean is(@NotNull final Call call) {
         // TODO change Elixir.Kernel to Elixir.Kernel.SpecialForms when resolving works
-        return call.isCallingMacro("Elixir.Kernel", "quote", 1) || // without keyword arguments
-                call.isCallingMacro("Elixir.Kernel", "quote", 2); // with keyword arguments
+        return call.isCallingMacro(KERNEL, QUOTE, 1) || // without keyword arguments
+                call.isCallingMacro(KERNEL, QUOTE, 2); // with keyword arguments
     }
 
     /*

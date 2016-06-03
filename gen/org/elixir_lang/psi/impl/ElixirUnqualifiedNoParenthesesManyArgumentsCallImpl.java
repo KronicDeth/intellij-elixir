@@ -5,6 +5,9 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
@@ -98,12 +101,21 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
     return ElixirPsiImplUtil.getNameIdentifier(this);
   }
 
+  @Nullable
+  public PsiReference getReference() {
+    return ElixirPsiImplUtil.getReference(this);
+  }
+
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
   }
 
   public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
     return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  }
+
+  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName);
   }
 
   public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
@@ -123,6 +135,10 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   @Nullable
   public Integer primaryArity() {
     return ElixirPsiImplUtil.primaryArity(this);
+  }
+
+  public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @NotNull

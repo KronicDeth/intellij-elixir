@@ -17,6 +17,8 @@ import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Match;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.psi.operation.When;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +26,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
+import static org.elixir_lang.reference.ModuleAttribute.*;
 
 /**
  * Annotates module attributes.
@@ -46,7 +51,30 @@ public class ModuleAttribute implements Annotator, DumbAware {
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
                 new PsiRecursiveElementVisitor() {
-                    public void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                    /*
+                     *
+                     * Instance Methods
+                     *
+                     */
+
+                    /*
+                     * Public Instance Methods
+                     */
+
+                    @Override
+                    public void visitElement(@NotNull final PsiElement element) {
+                        if (element instanceof AtNonNumericOperation) {
+                            visitMaybeUsage((AtNonNumericOperation) element);
+                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+                        }
+                    }
+
+                    /*
+                     * Private Instance Methods
+                     */
+
+                    private void visitDeclaration(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
                         ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
                         TextRange textRange = atIdentifier.getTextRange();
 
@@ -58,23 +86,19 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         ASTNode identifierNode = identifierNodes[0];
                         String identifier = identifierNode.getText();
 
-                        if (identifier.equals("callback") || identifier.equals("macrocallback")) {
+                        if (isCallbackName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightCallback(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("doc") ||
-                                identifier.equals("moduledoc") ||
-                                identifier.equals("typedoc")) {
+                        } else if (isDocumentationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE);
 
                             highlightDocumentationText(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("opaque") ||
-                                identifier.equals("type") ||
-                                identifier.equals("typep")) {
+                        } else if (isTypeName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightType(atUnqualifiedNoParenthesesCall, holder);
-                        } else if (identifier.equals("spec")) {
+                        } else if (isSpecificationName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
 
                             highlightSpecification(atUnqualifiedNoParenthesesCall, holder);
@@ -83,23 +107,24 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         }
                     }
 
-                    @Override
-                    public void visitElement(@NotNull final PsiElement element) {
-                        if (element instanceof AtNonNumericOperation) {
-                            visitUsage((AtNonNumericOperation) element);
-                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
-                            visitDeclaration((AtUnqualifiedNoParenthesesCall) element);
+
+                    private void visitMaybeUsage(@NotNull final AtNonNumericOperation element) {
+                        PsiElement operand = element.operand();
+
+                        if (!(operand instanceof ElixirAccessExpression)) {
+                            visitUsage(element);
                         }
                     }
 
-                    public void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+                    private void visitUsage(@NotNull final AtNonNumericOperation atNonNumericOperation) {
                         highlight(
                                 atNonNumericOperation.getTextRange(),
                                 holder,
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );
 
-                        if (atNonNumericOperation.getReference().resolve() == null) {
+                        if (!isNonReferencing(atNonNumericOperation) &&
+                                atNonNumericOperation.getReference().resolve() == null) {
                             holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
                         }
                     }
@@ -248,12 +273,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof ElixirMatchedMatchOperation) {
+            if (grandChild instanceof Match) {
                 // TODO LocalInspectionTool with quick fix to "Use `::`, not `=`, to separate types declarations from their definitions"
-            } else if (grandChild instanceof ElixirMatchedTypeOperation) {
+            } else if (grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
-                Set<String> typeParameterNameSet = Collections.EMPTY_SET;
+                Set<String> typeParameterNameSet = Collections.emptySet();
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
@@ -282,7 +307,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                     primaryArguments,
                                     /* as stated above, if there are secondary arguments, then the primary arguments are
                                        to quote or some equivalent metaprogramming. */
-                                    Collections.EMPTY_SET,
+                                    Collections.<String>emptySet(),
                                     annotationHolder,
                                     ElixirSyntaxHighlighter.TYPE
                             );
@@ -324,7 +349,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 // seen as `unquote(ast)`, but could also be just the beginning of typing
                 ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
 
-                if (matchedUnqualifiedParenthesesCall.functionName().equals("unquote")) {
+                if (matchedUnqualifiedParenthesesCall.functionName().equals(UNQUOTE)) {
                     PsiElement[] secondaryArguments = matchedUnqualifiedParenthesesCall.secondaryArguments();
 
                     if (secondaryArguments != null) {
@@ -413,7 +438,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof ElixirMatchedTypeOperation) {
+            if (grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
 
@@ -466,12 +491,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 PsiElement leftOperand = matchedWhenOperation.leftOperand();
 
-                if (leftOperand instanceof ElixirMatchedTypeOperation) {
-                    ElixirMatchedTypeOperation matchedTypeOperation = (ElixirMatchedTypeOperation) leftOperand;
-                    PsiElement matchedTypeOperationLeftOperand = matchedTypeOperation.leftOperand();
+                if (leftOperand instanceof Type) {
+                    Type typeOperation = (Type) leftOperand;
+                    PsiElement typeOperationLeftOperand = typeOperation.leftOperand();
 
-                    if (matchedTypeOperationLeftOperand instanceof Call) {
-                        Call call = (Call) matchedTypeOperationLeftOperand;
+                    if (typeOperationLeftOperand instanceof Call) {
+                        Call call = (Call) typeOperationLeftOperand;
                         PsiElement functionNameElement = call.functionNameElement();
 
                         if (functionNameElement != null) {
@@ -504,10 +529,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             );
                         }
                     } else {
-                        cannotHighlightTypes(matchedTypeOperationLeftOperand);
+                        cannotHighlightTypes(typeOperationLeftOperand);
                     }
 
-                    PsiElement matchedTypeOperationRightOperand = matchedTypeOperation.rightOperand();
+                    PsiElement matchedTypeOperationRightOperand = typeOperation.rightOperand();
 
                     if (matchedTypeOperationRightOperand != null) {
                         highlightTypesAndTypeParameterUsages(
@@ -896,12 +921,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
             AnnotationHolder annotationHolder,
             TextAttributesKey textAttributesKey) {
         for (PsiElement psiElement : psiElements) {
-            highlightTypesAndTypeParameterUsages(
-                    psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    textAttributesKey
-            );
+            if (psiElement != null) {
+                highlightTypesAndTypeParameterUsages(
+                        psiElement,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        textAttributesKey
+                );
+            }
         }
     }
 

@@ -12,6 +12,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
+import static org.elixir_lang.psi.call.name.Function.QUOTE;
+import static org.elixir_lang.psi.call.name.Quote.KeywordArgument.LOCATION;
+import static org.elixir_lang.psi.call.name.Quote.KeywordArgument.UNQUOTE;
+
 public class Quote implements ItemPresentation {
     /*
      * Fields
@@ -66,13 +70,17 @@ public class Quote implements ItemPresentation {
     @Nullable
     @Override
     public String getPresentableText() {
-        StringBuilder presentableTextBuilder = new StringBuilder("quote");
+        StringBuilder presentableTextBuilder = new StringBuilder(QUOTE);
 
-        PsiElement locationValueElement = ElixirPsiImplUtil.keywordArgument(call, "location");
-        PsiElement unquoteValueElement = ElixirPsiImplUtil.keywordArgument(call, "unquote");
+        PsiElement locationValueElement = ElixirPsiImplUtil.keywordArgument(call, LOCATION);
+        PsiElement unquoteValueElement = ElixirPsiImplUtil.keywordArgument(call, org.elixir_lang.psi.call.name.Quote.KeywordArgument.UNQUOTE);
 
         if (locationValueElement != null) {
-            presentableTextBuilder.append(" location: ").append(locationValueElement.getText());
+            presentableTextBuilder
+                    .append(" ")
+                    .append(LOCATION)
+                    .append(": ")
+                    .append(locationValueElement.getText());
 
             if (unquoteValueElement != null) {
                 presentableTextBuilder.append(",");
@@ -80,7 +88,11 @@ public class Quote implements ItemPresentation {
         }
 
         if (unquoteValueElement != null) {
-            presentableTextBuilder.append(", unquote: ").append(unquoteValueElement.getText());
+            presentableTextBuilder
+                    .append(", ")
+                    .append(UNQUOTE)
+                    .append(": ")
+                    .append(unquoteValueElement.getText());
         }
 
         // leave out :bind_quoted and :context because they aren't simple atoms

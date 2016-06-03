@@ -3,15 +3,17 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.ResolveState;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.operation.Infix;
+import org.elixir_lang.psi.operation.Addition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirMatchedAdditionOperation extends ElixirMatchedExpression, Named, Infix {
+public interface ElixirMatchedAdditionOperation extends ElixirMatchedExpression, Named, Addition {
 
   @NotNull
   ElixirAdditionInfixOperator getAdditionInfixOperator();
@@ -39,9 +41,11 @@ public interface ElixirMatchedAdditionOperation extends ElixirMatchedExpression,
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
-  @NotNull
+  @Nullable
   Quotable leftOperand();
 
   @Nullable
@@ -55,6 +59,8 @@ public interface ElixirMatchedAdditionOperation extends ElixirMatchedExpression,
 
   @Nullable
   Integer primaryArity();
+
+  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();

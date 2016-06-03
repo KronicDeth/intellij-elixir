@@ -6,6 +6,8 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.ericsson.otp.erlang.OtpErlangRangeException;
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.ElementDescriptionLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.Quotable;
 import org.elixir_lang.psi.QuotableKeywordList;
@@ -19,6 +21,9 @@ import java.lang.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.psi.call.name.Function.DEFOVERRIDABLE;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+
 public class Overridable extends Element<Call> {
     /*
      * Fields
@@ -31,8 +36,18 @@ public class Overridable extends Element<Call> {
      * Static Methods
      */
 
+    public static String elementDescription(Call call, ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "overridable";
+        }
+
+        return elementDescription;
+    }
+
     public static boolean is(Call call) {
-        return call.isCalling("Elixir.Kernel", "defoverridable", 1);
+        return call.isCalling(KERNEL, DEFOVERRIDABLE, 1);
     }
 
     /*

@@ -3,7 +3,10 @@ package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveState;
 import com.intellij.psi.StubBasedPsiElement;
+import com.intellij.psi.scope.PsiScopeProcessor;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
@@ -33,9 +36,14 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   PsiElement getNameIdentifier();
 
+  @Nullable
+  PsiReference getReference();
+
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+
+  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
 
   boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
 
@@ -47,6 +55,8 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   @Nullable
   Integer primaryArity();
+
+  boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
   OtpErlangObject quote();

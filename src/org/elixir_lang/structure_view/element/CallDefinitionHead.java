@@ -48,7 +48,7 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
 
     @Nullable
     public static Call enclosingDelegationCall(@NotNull Call call) {
-        // reverse of {@link org.elixir_lang.structure_view.element.Delegation.callDefinitionHeadCallList()}
+        // reverse of {@link org.elixir_lang.structure_view.element.Delegation.filterCallDefinitionHeadCallList()}
         PsiElement parent = call.getParent();
         Call delegationCall = null;
 

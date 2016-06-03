@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.elixir_lang.psi.call.name.Function.*;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+
 /**
  * Annotates functions and macros from `Kernel` and `Kernel.SpecialForms` modules.
  */
@@ -94,20 +97,20 @@ public class Kernel implements Annotator, DumbAware {
                             "alias!",
                             "and",
                             "binding",
-                            "def",
-                            "defdelegate",
-                            "defexception",
-                            "defimpl",
-                            "defmacro",
-                            "defmacrop",
-                            "defmodule",
-                            "defoverridable",
-                            "defp",
-                            "defprotocol",
-                            "defstruct",
-                            "destructure",
+                            DEF,
+                            DEFDELEGATE,
+                            DEFEXCEPTION,
+                            DEFIMPL,
+                            DEFMACRO,
+                            DEFMACROP,
+                            DEFMODULE,
+                            DEFOVERRIDABLE,
+                            DEFP,
+                            DEFPROTOCOL,
+                            DEFSTRUCT,
+                            DESTRUCTURE,
                             "get_and_update_in",
-                            "if",
+                            IF,
                             "in",
                             "is_nil",
                             "match?",
@@ -127,9 +130,9 @@ public class Kernel implements Annotator, DumbAware {
                             "sigil_w",
                             "to_char_list",
                             "to_string",
-                            "unless",
+                            UNLESS,
                             "update_in",
-                            "use",
+                            USE,
                             "var!"
                     }
             )
@@ -145,17 +148,17 @@ public class Kernel implements Annotator, DumbAware {
                             "__aliases__",
                             "__block__",
                             "alias",
-                            "case",
-                            "cond",
+                            CASE,
+                            COND,
                             "fn",
-                            "for",
+                            FOR,
                             "import",
-                            "quote",
-                            "receive",
+                            QUOTE,
+                            RECEIVE,
                             "require",
                             "super",
                             "try",
-                            "unquote",
+                            UNQUOTE,
                             "unquote_splicing"
                     }
             )
@@ -181,7 +184,7 @@ public class Kernel implements Annotator, DumbAware {
                 public void visitCall(Call call) {
                     String resolvedModuleName = call.resolvedModuleName();
 
-                    if (resolvedModuleName != null && resolvedModuleName.equals("Elixir.Kernel")) {
+                    if (resolvedModuleName != null && resolvedModuleName.equals(KERNEL)) {
                         String resolvedFunctionName = call.resolvedFunctionName();
 
                         // a function can't take a `do` block

@@ -70,6 +70,20 @@ public interface Call extends NavigatablePsiElement {
     /**
      * Whether {@code call} is of the named macro.
      *
+     * Differs from {@link #isCallingMacro(String, String, int)} because no arity is necessary,
+     * which is useful for special forms, which don't have a set arity.  (That's actually why they need to be special
+     * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
+     *
+     * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
+     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
+     */
+    boolean isCallingMacro(@NotNull final String resolvedModuleName,
+                           @NotNull final String resolvedFunctionName);
+
+    /**
+     * Whether {@code call} is of the named macro.
+     *
      * Differs from {@link #isCalling(String, String, int)} because this function ensures there is a {@code do}
      * block.  If the macro can be called without a {@code do} block, then
      * {@link #isCalling(String, String, int)} should be used instead.
@@ -92,6 +106,12 @@ public interface Call extends NavigatablePsiElement {
 
     /**
      * The arguments directly after the {@link #functionName}.  If the function cannot have arguments, then this will `null`
+     *
+     * <p>
+     *     NOTE: Individual elements of the returned {@code PsiElement[]} may be {@code null} to indicate the argument
+     *     is expected to be there, such as for {@link org.elixir_lang.psi.operation.Infix}, but it is missing or has an
+     *     error due to Pratt Parser error recovery.
+     * </p>
      *
      * @return {@code null} if function cannot take arguments, such as an ambiguous variable or no parentheses,
      *   no arguments, function call like {@code foo}; * @return {@code PsiElement[]} if the function takes arguments.
