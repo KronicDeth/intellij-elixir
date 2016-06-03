@@ -365,6 +365,19 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 } else {
                     cannotHighlightTypes(matchedUnqualifiedParenthesesCall);
                 }
+            } else if (grandChild instanceof UnqualifiedNoArgumentsCall) {
+                // assume it's a type name that is being typed
+                Call grandChildCall = (Call) grandChild;
+                PsiElement functionNameElement = grandChildCall.functionNameElement();
+
+                if (functionNameElement != null) {
+                    highlight(
+                            functionNameElement.getTextRange(),
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
+
             } else {
                 cannotHighlightTypes(grandChild);
             }

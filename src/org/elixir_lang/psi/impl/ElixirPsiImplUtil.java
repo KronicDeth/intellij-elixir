@@ -1441,7 +1441,7 @@ public class ElixirPsiImplUtil {
             keepProcessing = processor.execute(rightOperand, state);
         }
 
-        if (checkLeft && keepProcessing) {
+        if (checkLeft && leftOperand != null && keepProcessing) {
             keepProcessing = processor.execute(leftOperand, state);
         }
 
