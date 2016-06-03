@@ -3,6 +3,7 @@ package org.elixir_lang.psi.scope.variable;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.psi.*;
@@ -133,6 +134,7 @@ public class MultiResolve extends Variable {
         do {
             expression = expression.getPrevSibling();
         } while (expression instanceof ElixirEndOfExpression ||
+                expression instanceof LeafPsiElement ||
                 expression instanceof PsiComment ||
                 expression instanceof PsiWhiteSpace);
 
