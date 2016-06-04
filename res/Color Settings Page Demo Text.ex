@@ -106,9 +106,9 @@ A__0 == 3
 
 # Modules
 defmodule Long.Module.Name do
-  @moduledoc "Simple module docstring"
+  <documentation-module-attribute>@moduledoc</documentation-module-attribute> "Simple module docstring"
 
-  @doc """
+  <documentation-module-attribute>@doc</documentation-module-attribute> """
   Multiline docstring
   "with quotes"
   and #{ inspect %{"interpolation" => "in" <> "action"} }
@@ -120,7 +120,7 @@ defmodule Long.Module.Name do
   """
   defstruct [:a, :name, :height]
 
-  @doc ~S'''
+  <documentation-module-attribute>@doc</documentation-module-attribute> ~S'''
   No #{interpolation} of any kind.
   \000 \x{ff}
 
@@ -128,7 +128,7 @@ defmodule Long.Module.Name do
   '''
   def func(a, b \\ []), do: :ok
 
-  @doc false
+  <documentation-module-attribute>@doc</documentation-module-attribute> false
   def __before_compile__(_) do
     :ok
   end
@@ -147,10 +147,10 @@ defmodule M do
 
   @before_compile Long.Module.Name
 
-  @typedoc "This is a type"
+  <documentation-module-attribute>@typedoc</documentation-module-attribute> "This is a type"
   @type typ :: integer
 
-  @typedoc """
+  <documentation-module-attribute>@typedoc</documentation-module-attribute> """
   Another type
   """
   @opaque typtyp :: 1..10

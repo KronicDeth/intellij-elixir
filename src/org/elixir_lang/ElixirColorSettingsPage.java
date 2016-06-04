@@ -5,6 +5,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
+import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.icons.ElixirIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +21,7 @@ import static com.intellij.openapi.util.io.FileUtil.loadTextAndClose;
  * Created by luke.imhoff on 8/3/14.
  */
 public class ElixirColorSettingsPage implements ColorSettingsPage {
+    private static final Map<String, TextAttributesKey> TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG;
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
             new AttributesDescriptor("Alias", ElixirSyntaxHighlighter.ALIAS),
             new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
@@ -53,6 +55,14 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Variable", ElixirSyntaxHighlighter.VARIABLE)
     };
 
+    static {
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG = ContainerUtil.newHashMap();
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "documentation-module-attribute",
+                ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE
+        );
+    }
+
     @Nullable
     @Override
     public Icon getIcon() {
@@ -83,7 +93,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
     @Nullable
     @Override
     public Map<String, TextAttributesKey> getAdditionalHighlightingTagToDescriptorMap() {
-        return null;
+        return TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG;
     }
 
     @NotNull
