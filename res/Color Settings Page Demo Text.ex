@@ -9,19 +9,19 @@
 0B01 ; 0XAF ; 0O123
 
 # Characters
-?a ; ?1 ; ?\n ; ?\s ; ?\c ; ? ; ?,
-?\x{12} ; ?\x{abcd}
-?\x34 ; ?\xF
+?a ; ?1 ; ?<escape-sequence>\n</escape-sequence> ; ?<escape-sequence>\s</escape-sequence> ; ?<escape-sequence>\c</escape-sequence> ; ? ; ?,
+?<escape-sequence>\x{12}</escape-sequence> ; ?<escape-sequence>\x{abcd}</escape-sequence>
+?<escape-sequence>\x34</escape-sequence> ; ?<escape-sequence>\xF</escape-sequence>
 
 # these show that only the first digit is part of the character
-?\123 ; ?\12 ; ?\7
+?<escape-sequence>\1</escape-sequence>23 ; ?<escape-sequence>\1</escape-sequence>2 ; <escape-sequence>?\7</escape-sequence>
 
 # Atoms
 :this ; :that
 :'complex atom'
-:"with' \"\" 'quotes"
+:"with' <escape-sequence>\"</escape-sequence><escape-sequence>\"</escape-sequence> 'quotes"
 :" multi
- line ' \s \123 \xff
+ line ' <escape-sequence>\s</escape-sequence> <escape-sequence>\1</escape-sequence>23 <escape-sequence>\xff</escape-sequence>
 atom"
 :... ; :<<>> ; :%{} ; :% ; :{}
 :++; :--; :*; :~~~; :::
@@ -29,14 +29,14 @@ atom"
 
 # Strings
 "Hello world"
-"Interspersed \x{ff} codes \7 \8 \65 \016 and \t\s\\s\z\+ \\ escapes"
-"Quotes ' inside \" \123 the \"\" \xF \\xF string \\\" end"
+"Interspersed <escape-sequence>\x{ff}</escape-sequence> codes <escape-sequence>\7</escape-sequence> <escape-sequence>\8</escape-sequence> <escape-sequence>\6</escape-sequence>5 <escape-sequence>\0</escape-sequence>16 and <escape-sequence>\t</escape-sequence><escape-sequence>\s</escape-sequence><escape-sequence>\\</escape-sequence>s<escape-sequence>\z</escape-sequence><escape-sequence>\+</escape-sequence> <escape-sequence>\\</escape-sequence> escapes"
+"Quotes ' inside <escape-sequence>\"</escape-sequence> <escape-sequence>\1</escape-sequence>23 the <escape-sequence>\"</escape-sequence><escape-sequence>\"</escape-sequence> <escape-sequence>\xF</escape-sequence> <escape-sequence>\\</escape-sequence>xF string <escape-sequence>\\</escape-sequence><escape-sequence>\"</escape-sequence> end"
 "Multiline
    string"
 
 # Char lists
 'this is a list'
-'escapes \' \t \\\''
+'escapes <escape-sequence>\'</escape-sequence> <escape-sequence>\t</escape-sequence> <escape-sequence>\\</escape-sequence><escape-sequence>\'</escape-sequence>'
 'Multiline
     char
   list
@@ -47,12 +47,12 @@ atom"
 <<"hello"::binary, c :: utf8, x::[4, unit(2)]>> = "hello™1"
 
 # Sigils
-~r/this + i\s "a" regex/
+~r/this + i<escape-sequence>\s</escape-sequence> "a" regex/
 ~R'this + i\s "a" regex too'
-~w(hello #{ ["has" <> "123", '\c\d', "\123 interpol" | []] } world)s
+~w(hello #{ ["has" <> "123", '<escape-sequence>\c</escape-sequence><escape-sequence>\d</escape-sequence>', "<escape-sequence>\1</escape-sequence>23 interpol" | []] } world)s
 ~W(hello #{no "123" \c\d \123 interpol} world)s
 
-~s{Escapes terminators \{ and \}, but no {balancing} # outside of sigil here }
+~s{Escapes terminators <escape-sequence>\{</escape-sequence> and <escape-sequence>\}</escape-sequence>, but no {balancing} # outside of sigil here }
 
 ~S"No escapes \s\t\n and no #{interpolation}"
 

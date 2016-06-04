@@ -65,6 +65,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "documentation-text",
                 ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "escape-sequence",
+                ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE
+        );
     }
 
     @Nullable
