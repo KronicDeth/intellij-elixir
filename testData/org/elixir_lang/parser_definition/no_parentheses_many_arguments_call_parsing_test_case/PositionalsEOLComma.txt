@@ -16,9 +16,12 @@ Elixir File(0,144)
         ElixirIdentifierImpl(IDENTIFIER)(78,93)
           PsiElement(identifier)('last_positional')(78,93)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(93,94)
+    PsiErrorElement:<end of expression> expected, got '
+'(93,93)
+      <empty list>
     PsiElement(\\n, \\r\\n)('\n')(93,94)
   PsiWhiteSpace('           ')(94,105)
-  PsiErrorElement:'!==, ===, !=, ==, =~', '&&&, `and`, &&', '(', '*, /', '++, --, .., <>', '.', '::', ';', <, <=, >=, >, <-, \\\\, <<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^, <unmatched expression>, '=', '\\n, \\r\\n', identifier, in, when, '|', '|||, `or` or ||' expected, got ','(105,106)
+  PsiErrorElement:';', '\\n or \\r\\n' expected, got ','(105,106)
     PsiElement(,)(',')(105,106)
   PsiWhiteSpace(' ')(106,107)
   PsiElement(identifier)('first_keyword_key')(107,124)

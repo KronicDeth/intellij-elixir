@@ -343,6 +343,15 @@ endOfExpression ::= infixSemicolon | EOL+ { implements = "org.elixir_lang.psi.Un
 private expression ::= emptyParentheses |
                        unmatchedExpression |
                        unqualifiedNoParenthesesManyArgumentsCall
+                       { recoverWhile = expressionRecoverWhile }
+// EOL and SEMICOLON for endOfExpression
+/* INTERPOLATION_END because interpolation(elixirFile(expression)) needs expression to stop of on INTERPOLATION_END for
+   interpolation */
+// END for stabBody's usage of expression
+// CLOSING_* because they are endings to subexpressions
+// STAB_OPERATOR because it ends when clause for no parentheses stab guard clauses
+// blockIdentifier for one-liner blockItems where there isn't a newline between block expressions and following blockIdentifier.
+private expressionRecoverWhile ::= !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier)
 
 private expressionList ::= expression (endOfExpression expression)*
 
