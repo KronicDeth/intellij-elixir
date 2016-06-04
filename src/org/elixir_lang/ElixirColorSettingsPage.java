@@ -61,6 +61,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "documentation-module-attribute",
                 ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "documentation-text",
+                ElixirSyntaxHighlighter.DOCUMENTATION_TEXT
+        );
     }
 
     @Nullable

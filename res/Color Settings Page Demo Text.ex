@@ -106,14 +106,14 @@ A__0 == 3
 
 # Modules
 defmodule Long.Module.Name do
-  <documentation-module-attribute>@moduledoc</documentation-module-attribute> "Simple module docstring"
+  <documentation-module-attribute>@moduledoc</documentation-module-attribute> "<documentation-text>Simple module docstring</documentation-text>"
 
   <documentation-module-attribute>@doc</documentation-module-attribute> """
-  Multiline docstring
+  <documentation-text>Multiline docstring
   "with quotes"
-  and #{ inspect %{"interpolation" => "in" <> "action"} }
-  now with #{ {:a, 'tuple'} }
-  and #{ inspect {
+  and </documentation-text>#{ inspect %{"interpolation" => "in" <> "action"} }<documentation-text>
+  now with </documentation-text>#{ {:a, 'tuple'} }<documentation-text>
+  and </documentation-text>#{ inspect {
       :tuple,
       %{ with: "nested #{ inspect %{ :interpolation => %{} } }" }
   } }
@@ -121,10 +121,10 @@ defmodule Long.Module.Name do
   defstruct [:a, :name, :height]
 
   <documentation-module-attribute>@doc</documentation-module-attribute> ~S'''
-  No #{interpolation} of any kind.
+  <documentation-text>No #{interpolation} of any kind.
   \000 \x{ff}
 
-  \n #{\x{ff}}
+  \n #{\x{ff}}</documentation-text>
   '''
   def func(a, b \\ []), do: :ok
 
@@ -147,11 +147,11 @@ defmodule M do
 
   @before_compile Long.Module.Name
 
-  <documentation-module-attribute>@typedoc</documentation-module-attribute> "This is a type"
+  <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>This is a type</documentation-text>"
   @type typ :: integer
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> """
-  Another type
+  <documentation-text>Another type</documentation-text>
   """
   @opaque typtyp :: 1..10
 
