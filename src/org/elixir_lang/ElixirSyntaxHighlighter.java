@@ -23,7 +23,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.CLASS_NAME
     );
 
-    static final TextAttributesKey ATOM = createTextAttributesKey(
+    public static final TextAttributesKey ATOM = createTextAttributesKey(
             "ELIXIR_ATOM",
             DefaultLanguageHighlighterColors.INSTANCE_FIELD
     );

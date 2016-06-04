@@ -859,6 +859,7 @@
     <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
     <!-- end liveTemplates -->
 
+    <annotator implementationClass="org.elixir_lang.annonator.Atom" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Callable" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Kernel" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
