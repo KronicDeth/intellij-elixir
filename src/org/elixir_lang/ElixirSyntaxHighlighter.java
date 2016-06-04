@@ -191,7 +191,6 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_DIGITS_KEYS = new TextAttributesKey[]{VALID_DIGIT};
-    private static final TextAttributesKey[] VALID_ESCAPE_SEQUENCE_KEYS = new TextAttributesKey[]{VALID_ESCAPE_SEQUENCE};
     private static final TextAttributesKey[] WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{WHOLE_NUMBER_BASE};
 
     private static final TokenSet ATOMS = TokenSet.create(
