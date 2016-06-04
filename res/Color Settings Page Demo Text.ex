@@ -44,7 +44,7 @@ atom"
 
 # Binaries
 <<1, 2, 3>>
-<<"hello"::binary, c :: utf8, x::[4, unit(2)]>> = "hello™1"
+<<"hello"::binary, c :: utf8, x:: 4 * 2>> = "hello™1"
 
 # Sigils
 ~r/this + i<escape-sequence>\s</escape-sequence> "a" regex/
