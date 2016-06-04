@@ -2163,6 +2163,8 @@ public class ElixirPsiImplUtil {
                     } else if (ancestorCall.hasDoBlockOrKeyword()) {
                         break;
                     }
+                } else if (ancestor instanceof ElixirStabOperation) {
+                    break;
                 } else if (ancestor instanceof PsiFile) {
                     error(
                             UnqualifiedNoArgumentsCall.class,
