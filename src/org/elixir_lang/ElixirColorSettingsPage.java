@@ -36,6 +36,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                     "Braces and Operators//Interpolation",
                     ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK
             ),
+            new AttributesDescriptor("Braces and Operators//Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Braces and Operators//Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
@@ -55,7 +56,6 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Module Attributes", ElixirSyntaxHighlighter.MODULE_ATTRIBUTE),
             new AttributesDescriptor("Non-Decimal Base Prefix", ElixirSyntaxHighlighter.WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Obsolete Non-Decimal Base Prefix", ElixirSyntaxHighlighter.OBSOLETE_WHOLE_NUMBER_BASE),
-            new AttributesDescriptor("Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Parameter", ElixirSyntaxHighlighter.PARAMETER),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
