@@ -69,6 +69,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "escape-sequence",
                 ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "type",
+                ElixirSyntaxHighlighter.TYPE
+        );
     }
 
     @Nullable

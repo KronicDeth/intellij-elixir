@@ -44,7 +44,7 @@ atom"
 
 # Binaries
 <<1, 2, 3>>
-<<"hello"::binary, c :: utf8, x:: 4 * 2>> = "hello™1"
+<<"hello"::<type>binary</type>, c :: <type>utf8</type>, x:: 4 * 2>> = "hello™1"
 
 # Sigils
 ~r/this + i<escape-sequence>\s</escape-sequence> "a" regex/
@@ -148,14 +148,14 @@ defmodule M do
   @before_compile Long.Module.Name
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>This is a type</documentation-text>"
-  @type typ :: integer
+  @type <type>typ</type> :: <type>integer</type>
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> """
   <documentation-text>Another type</documentation-text>
   """
-  @opaque typtyp :: 1..10
+  @opaque <type>typtyp</type> :: 1..10
 
-  @spec func(typ, typtyp) :: :ok | :fail
+  @spec func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
   def func(a, b) do
     a || b || :ok || :fail
     Path.expand("..", __DIR__)
