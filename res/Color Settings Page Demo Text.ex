@@ -59,20 +59,19 @@ atom"
 :"atoms work #{"to" <> "o"}"
 
 # Operators
-x = 1 + 2.0 * 3
-y = true and false; z = false or true
-... = 144
-... == !x && y || z
+<variable>x</variable> = 1 + 2.0 * 3
+<variable>y</variable> = true and false; <variable>z</variable> = false or true
+<variable>...</variable> = 144
+<variable>...</variable> == !<variable>x</variable> && <variable>y</variable> || <variable>z</variable>
 "hello" |> String.upcase |> String.downcase()
-{^z, a} = {true, x}
+{^<variable>z</variable>, <variable>a</variable>} = {true, <variable>x</variable>}
 
 # Free operators (added in 1.0.0)
-p  ~>> f  = bind(p, f)
-p1 ~>  p2 = pair_right(p1, p2)
-p1 <~  p2 = pair_left(p1, p2)
-p1 <~> p2 = pair_both(p1, p2)
-p  |~> f  = map(p, f)
-p1 <|> p2 = either(p1, p2)
+<variable>p</variable>  ~>> <variable>f</variable>  = bind(p, f)
+<variable>p1</variable> ~>  <variable>p2</variable> = pair_right(p1, p2)
+<variable>p1</variable> <~  <variable>p2</variable> = pair_left(<variable>p1</variable>, <variable>p2</variable>)
+<variable>p1</variable> <~> <variable>p2</variable> = pair_both(<variable>p1</variable>, <variable>p2</variable>)
+<variable>p1</variable> <|> <variable>p2</variable> = either(<variable>p1</variable>, <variable>p2</variable>)
 
 # Lists, tuples, maps, keywords
 [1, :a, 'hello'] ++ [2, 3]
@@ -85,14 +84,14 @@ p1 <|> p2 = either(p1, p2)
 [option: "value", key: :word]
 [++: "operator", ~~~: :&&&]
 
-map = %{shortcut: "syntax"}
-%{map | "update" => "me"}
+<variable>map</variable> = %{shortcut: "syntax"}
+%{<variable>map</variable> | "update" => "me"}
 %{ 12 => 13, :weird => ['thing'] }
 
 # Comprehensions
 for x <- 1..10, x < 5, do: {x, x}
-pixels = "12345678"
-for << <<r::4, g::4, b::4, a::size(4)>> <- pixels >> do
+<variable>pixels</variable> = "12345678"
+for << <<r::4, g::4, b::4, a::size(4)>> <- <variable>pixels</variable> >> do
   [r, {g, %{"b" => a}}]
 end
 
@@ -100,8 +99,8 @@ end
 "String #{inspect "interpolation"} is quite #{1+4+7} difficult"
 
 # Identifiers
-abc_123 = 1
-_018OP = 2
+<variable>abc_123</variable> = 1
+<variable>_018OP</variable> = 2
 A__0 == 3
 
 # Modules
@@ -136,9 +135,9 @@ end
 
 # Structs
 defmodule Second.Module do
-  s = %Long.Module.Name{name: "Silly"}
-  %Long.Module.Name{s | height: {192, :cm}}
-  ".. #{%Long.Module.Name{s | height: {192, :cm}}} .."
+  <variable>s</variable> = %Long.Module.Name{name: "Silly"}
+  %Long.Module.Name{<variable>s</variable> | height: {192, :cm}}
+  ".. #{%Long.Module.Name{<variable>s</variable> | height: {192, :cm}}} .."
 end
 
 # Types, pseudo-vars, attributes
@@ -160,7 +159,7 @@ defmodule M do
     a || b || :ok || :fail
     Path.expand("..", __DIR__)
     IO.inspect __ENV__
-    __NOTAPSEUDOVAR__ = 11
+    <variable>__NOTAPSEUDOVAR__</variable> = 11
     __MODULE__.func(b, a)
   end
 
@@ -170,7 +169,7 @@ defmodule M do
 end
 
 # Functions
-anon = fn x, y, z ->
+<variable>anon</variable> = fn x, y, z ->
   fn(a, b, c) ->
     &(x + y - z * a / &1 + b + div(&2, c))
   end
@@ -179,7 +178,7 @@ end
 &Set.put(&1, &2) ; & Set.put(&1, &2) ; &( Set.put(&1, &1) )
 
 # Function calls
-anon.(1, 2, 3); self; hd([1,2,3])
+<variable>anon</variable>.(1, 2, 3); self; hd([1,2,3])
 Kernel.spawn(fn -> :ok end)
 IO.ANSI.black
 
@@ -190,16 +189,16 @@ else
   :otherwise
 end
 
-pid = self
+<variable>pid</variable> = self
 receive do
   {:EXIT, _} -> :done
-  {^pid, :_} -> nil
+  {^<variable>pid</variable>, :_} -> nil
   after 100 -> :no_luck
 end
 
 case __ENV__.line do
-  x when is_integer(x) -> x
-  x when x in 1..12 -> -x
+  <variable>x</variable> when is_integer(<variable>x</variable>) -> <variable>x</variable>
+  <variable>x</variable> when <variable>x</variable> in 1..12 -> -<variable>x</variable>
 end
 
 cond do

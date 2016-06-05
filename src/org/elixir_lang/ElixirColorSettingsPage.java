@@ -79,6 +79,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "valid-digit", ElixirSyntaxHighlighter.VALID_DIGIT
         );
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "variable",
+                ElixirSyntaxHighlighter.VARIABLE
+        );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "type",
                 ElixirSyntaxHighlighter.TYPE
         );
