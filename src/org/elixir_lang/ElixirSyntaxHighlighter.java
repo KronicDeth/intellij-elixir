@@ -34,6 +34,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             HighlighterColors.BAD_CHARACTER
     );
 
+    static final TextAttributesKey BIT = createTextAttributesKey(
+            "ELIXIR_BIT"
+    );
+
     public static final TextAttributesKey BRACES = createTextAttributesKey(
             "ELIXIR_BRACES",
             DefaultLanguageHighlighterColors.BRACES
@@ -204,6 +208,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
+    private static final TextAttributesKey[] BIT_KEYS = new TextAttributesKey[]{BIT};
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
     private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
@@ -233,6 +238,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.FALSE,
             ElixirTypes.NIL,
             ElixirTypes.TRUE
+    );
+    private static final TokenSet BIT_TOKEN_SET = TokenSet.create(
+            ElixirTypes.CLOSING_BIT,
+            ElixirTypes.OPENING_BIT
     );
     private static final TokenSet BRACES_TOKEN_SET = TokenSet.create(
             ElixirTypes.OPENING_CURLY,
@@ -374,6 +383,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return ATOM_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
+        } else if (BIT_TOKEN_SET.contains(tokenType)) {
+            return BIT_KEYS;
         } else if (BRACES_TOKEN_SET.contains(tokenType)) {
             return BRACES_KEYS;
         } else if (BRACKETS_TOKEN_SET.contains(tokenType)) {

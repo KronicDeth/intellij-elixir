@@ -27,6 +27,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Alias", ElixirSyntaxHighlighter.ALIAS),
             new AttributesDescriptor("Atom", ElixirSyntaxHighlighter.ATOM),
             new AttributesDescriptor("Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.VALID_DIGIT),
+            new AttributesDescriptor("Braces and Operators//Bit", ElixirSyntaxHighlighter.BIT),
             new AttributesDescriptor("Braces and Operators//Braces", ElixirSyntaxHighlighter.BRACES),
             new AttributesDescriptor("Braces and Operators//Brackets", ElixirSyntaxHighlighter.BRACKETS),
             new AttributesDescriptor("Braces and Operators//Comma", ElixirSyntaxHighlighter.COMMA),
