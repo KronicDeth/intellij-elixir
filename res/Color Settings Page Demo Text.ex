@@ -79,17 +79,17 @@ atom"
 
 {:one, 2.0, "three"}
 
-[...: "this", <<>>: "is", %{}: "a keyword", %: "list", {}: "too"]
+[<atom>...:</atom> "this", <atom><<>></atom>: "is", <atom>%{}:</atom> "a keyword", <atom>%:</atom> "list", <atom>{}:</atom> "too"]
 ["this is an atom too": 1, "so is this": 2]
-[option: "value", key: :word]
-[++: "operator", ~~~: :&&&]
+[<atom>option:</atom> "value", <atom>key:</atom> :word]
+[<atom>++:</atom> "operator", <atom>~~~:</atom> :&&&]
 
-<variable>map</variable> = %{shortcut: "syntax"}
+<variable>map</variable> = %{<atom>shortcut:</atom> "syntax"}
 %{<variable>map</variable> | "update" => "me"}
 %{ 12 => 13, :weird => ['thing'] }
 
 # Comprehensions
-for x <- 1..10, x < 5, do: {x, x}
+<predefined-call><macro-call>for</macro-call></predefined-call> x <- 1..10, x < 5, <atom>do:</atom> {x, x}
 <variable>pixels</variable> = "12345678"
 for << <<r::4, g::4, b::4, a::size(4)>> <- <variable>pixels</variable> >> do
   [r, {g, %{"b" => a}}]
@@ -114,7 +114,7 @@ defmodule <alias>Long.Module.Name</alias> do
   now with </documentation-text>#{ {:a, 'tuple'} }<documentation-text>
   and </documentation-text>#{ inspect {
       :tuple,
-      %{ with: "nested #{ inspect %{ :interpolation => %{} } }" }
+      %{ <atom>with:</atom> "nested #{ inspect %{ :interpolation => %{} } }" }
   } }
   """
   defstruct [:a, :name, :height]
@@ -135,9 +135,9 @@ end
 
 # Structs
 defmodule <alias>Second.Module</alias> do
-  <variable>s</variable> = %<alias>Long.Module.Name</alias>{name: "Silly"}
-  %<alias>Long.Module.Name</alias>{<variable>s</variable> | height: {192, :cm}}
-  ".. #{%<alias>Long.Module.Name</alias>{<variable>s</variable> | height: {192, :cm}}} .."
+  <variable>s</variable> = %<alias>Long.Module.Name</alias>{<atom>name:</atom> "Silly"}
+  %<alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}}
+  ".. #{%<alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}}} .."
 end
 
 # Types, pseudo-vars, attributes
@@ -208,8 +208,8 @@ cond do
 end
 
 # Lexical scope modifiers
-import <alias>Kernel</alias>, except: [spawn: 1, +: 2, /: 2, unless: 2]
-alias <alias>Long.Module.Name</alias>, as: <alias>N0men123_and4</alias>
+import <alias>Kernel</alias>, <atom>except:</atom> [<atom>spawn:</atom> 1, <atom>+:</atom> 2, <atom>/:</atom> 2, <atom>unless:</atom> 2]
+alias <alias>Long.Module.Name</alias>, <atom>as:</atom> <alias>N0men123_and4</alias>
 use <alias>Bitwise</alias>
 
 4 &&& 5
@@ -221,7 +221,7 @@ defprotocol <alias>Useless</alias> do
   def func2(that)
 end
 
-defimpl <alias>Useless</alias>, for: <alias>Atom</alias> do
+defimpl <alias>Useless</alias>, <atom>for:</atom> <alias>Atom</alias> do
 end
 
 # Exceptions
@@ -229,4 +229,4 @@ defmodule <alias>NotAnError</alias> do
   defexception [:message]
 end
 
-raise <alias>NotAnError</alias>, message: "This is not an error"
+raise <alias>NotAnError</alias>, <atom>message:</atom> "This is not an error"
