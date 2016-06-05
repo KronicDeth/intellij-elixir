@@ -836,6 +836,25 @@ public class ElixirPsiImplUtil {
         return isModuleName;
     }
 
+    @Contract(pure = true)
+    public static boolean isOutermostQualifiableAlias(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        boolean outermost = false;
+
+        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
+           reference from overall chain */
+        if (!(parent instanceof QualifiableAlias)) {
+            PsiElement grandParent = parent.getParent();
+
+            // prevents first Alias of a qualified chain from having a separate reference from overall chain
+            if (!(grandParent instanceof QualifiableAlias)) {
+                outermost = true;
+            }
+        }
+
+        return outermost;
+    }
+
     /*
      * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
      *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
@@ -2535,18 +2554,10 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiElement parent = qualifiableAlias.getParent();
         PsiReference reference = null;
 
-        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
-           reference from overall chain */
-        if (!(parent instanceof QualifiableAlias)) {
-            PsiElement grandParent = parent.getParent();
-
-            // prevents first Alias of a qualified chain from having a separate reference from overall chain
-            if (!(grandParent instanceof QualifiableAlias)) {
-                reference = new org.elixir_lang.reference.Module(qualifiableAlias);
-            }
+        if (isOutermostQualifiableAlias(qualifiableAlias)) {
+            reference = new org.elixir_lang.reference.Module(qualifiableAlias);
         }
 
         return reference;

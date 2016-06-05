@@ -18,7 +18,7 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by luke.imhoff on 8/2/14.
  */
 public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
-    static final TextAttributesKey ALIAS = createTextAttributesKey(
+    public static final TextAttributesKey ALIAS = createTextAttributesKey(
             "ELIXIR_ALIAS",
             DefaultLanguageHighlighterColors.CLASS_NAME
     );
