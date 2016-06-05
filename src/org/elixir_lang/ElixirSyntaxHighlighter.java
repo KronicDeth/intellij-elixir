@@ -176,6 +176,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
 
     private static final TextAttributesKey[] ALIAS_KEYS = new TextAttributesKey[]{ALIAS};
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
+    private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
@@ -196,6 +197,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TokenSet ATOMS = TokenSet.create(
             ElixirTypes.COLON,
             ElixirTypes.ATOM_FRAGMENT
+    );
+    private static final TokenSet ATOM_KEYWORDS = TokenSet.create(
+            ElixirTypes.FALSE,
+            ElixirTypes.NIL,
+            ElixirTypes.TRUE
     );
     private static final TokenSet CHAR_LISTS = TokenSet.create(
             ElixirTypes.CHAR_LIST_FRAGMENT,
@@ -323,6 +329,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
         if (tokenType.equals(ElixirTypes.ALIAS)) {
             return ALIAS_KEYS;
+        } else if (ATOM_KEYWORDS.contains(tokenType)) {
+            return ATOM_KEYWORD_KEYS;
         } else if (ATOMS.contains(tokenType)) {
             return ATOM_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
