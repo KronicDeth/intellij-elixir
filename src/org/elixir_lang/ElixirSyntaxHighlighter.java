@@ -49,6 +49,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.COMMA
     );
 
+    static final TextAttributesKey DOT = createTextAttributesKey(
+            "ELIXIR_DOT",
+            DefaultLanguageHighlighterColors.DOT
+    );
+
     public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
             "ELIXIR_CHAR_LIST",
             DefaultLanguageHighlighterColors.STRING
@@ -206,6 +211,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] DECIMAL_KEYS = new TextAttributesKey[]{DECIMAL};
+    private static final TextAttributesKey[] DOT_KEYS = new TextAttributesKey[]{DOT};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
     private static final TextAttributesKey[] EXPRESSION_SUBSTITUTION_MARK_KEYS = new TextAttributesKey[]{EXPRESSION_SUBSTITUTION_MARK};
     private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
@@ -382,6 +388,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return COMMENT_KEYS;
         } else if (DECIMAL_TOKEN_SET.contains(tokenType)) {
             return DECIMAL_KEYS;
+        } else if (tokenType.equals(ElixirTypes.DOT_OPERATOR)) {
+            return DOT_KEYS;
         } else if (EXPRESSION_SUBSTITUTION_MARKS.contains(tokenType)) {
             return EXPRESSION_SUBSTITUTION_MARK_KEYS;
         } else if (tokenType.equals(ElixirTypes.IDENTIFIER)) {
