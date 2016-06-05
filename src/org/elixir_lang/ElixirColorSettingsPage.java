@@ -1,5 +1,6 @@
 package org.elixir_lang;
 
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
@@ -68,6 +69,14 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "escape-sequence",
                 ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE
+        );
+        // see https://github.com/JetBrains/intellij-community/blob/9aa6a55984e5d0563013e6c918b6f787587b3bf8/platform/lang-impl/src/com/intellij/openapi/options/colors/pages/GeneralColorsPage.java#L147
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "error", CodeInsightColors.ERRORS_ATTRIBUTES
+        );
+        // needed so that <error></error> doesn't override VALID_DIGIT token highlighting
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "valid-digit", ElixirSyntaxHighlighter.VALID_DIGIT
         );
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "type",

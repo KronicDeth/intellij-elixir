@@ -14,7 +14,7 @@
 ?<escape-sequence>\x34</escape-sequence> ; ?<escape-sequence>\xF</escape-sequence>
 
 # these show that only the first digit is part of the character
-?<escape-sequence>\1</escape-sequence>23 ; ?<escape-sequence>\1</escape-sequence>2 ; <escape-sequence>?\7</escape-sequence>
+?<escape-sequence>\1</escape-sequence><error><valid-digit>23</valid-digit></error> ; ?<escape-sequence>\1</escape-sequence><error><valid-digit>2</valid-digit></error> ; <escape-sequence>?\7</escape-sequence>
 
 # Atoms
 :this ; :that
