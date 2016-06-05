@@ -9,6 +9,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.xmlb.annotations.Text;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey(
             "ELIXIR_BAD_CHARACTER",
             HighlighterColors.BAD_CHARACTER
+    );
+
+    public static final TextAttributesKey BRACES = createTextAttributesKey(
+            "ELIXIR_BRACES",
+            DefaultLanguageHighlighterColors.BRACES
     );
 
     public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
@@ -183,6 +189,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] ATOM_KEYS = new TextAttributesKey[]{ATOM};
     private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
+    private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
@@ -208,6 +215,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.FALSE,
             ElixirTypes.NIL,
             ElixirTypes.TRUE
+    );
+    private static final TokenSet BRACES_TOKEN_SET = TokenSet.create(
+            ElixirTypes.OPENING_CURLY,
+            ElixirTypes.CLOSING_CURLY
     );
     private static final TokenSet CHAR_LISTS = TokenSet.create(
             ElixirTypes.CHAR_LIST_FRAGMENT,
@@ -341,6 +352,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return ATOM_KEYS;
         } else if (tokenType.equals(TokenType.BAD_CHARACTER)) {
             return BAD_CHAR_KEYS;
+        } else if (BRACES_TOKEN_SET.contains(tokenType)) {
+            return BRACES_KEYS;
         } else if (CHAR_LISTS.contains(tokenType)) {
             return CHAR_LIST_KEYS;
         } else if (tokenType == ElixirTypes.CHAR_TOKENIZER) {
