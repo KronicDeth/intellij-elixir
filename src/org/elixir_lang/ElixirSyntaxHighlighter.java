@@ -118,6 +118,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.PARAMETER
     );
 
+    public static final TextAttributesKey SEMICOLON = createTextAttributesKey(
+            "ELIXIR_SEMICOLON",
+            DefaultLanguageHighlighterColors.SEMICOLON
+    );
+
     public static final TextAttributesKey SIGIL = createTextAttributesKey(
             "ELIXIR_SIGIL",
             // Based on color used for Regular expression's boundaries in Ruby
@@ -189,6 +194,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
     private static final TextAttributesKey[] OBSOLETE_WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{OBSOLETE_WHOLE_NUMBER_BASE};
     private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
+    private static final TextAttributesKey[] SEMICOLON_KEYS = new TextAttributesKey[]{SEMICOLON};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
     private static final TextAttributesKey[] VALID_DIGITS_KEYS = new TextAttributesKey[]{VALID_DIGIT};
@@ -355,6 +361,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return OBSOLETE_WHOLE_NUMBER_BASE_KEYS;
         } else if (OPERATION_SIGNS.contains(tokenType)) {
             return OPERATION_SIGN_KEYS;
+        } else if (tokenType.equals(ElixirTypes.SEMICOLON)) {
+            return SEMICOLON_KEYS;
         } else if (SIGILS.contains(tokenType)) {
             return SIGIL_KEYS;
         } else if (STRINGS.contains(tokenType)) {

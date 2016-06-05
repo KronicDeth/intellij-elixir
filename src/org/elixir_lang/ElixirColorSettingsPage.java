@@ -48,6 +48,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Obsolete Non-Decimal Base Prefix", ElixirSyntaxHighlighter.OBSOLETE_WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Parameter", ElixirSyntaxHighlighter.PARAMETER),
+            new AttributesDescriptor("Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
             new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING),
