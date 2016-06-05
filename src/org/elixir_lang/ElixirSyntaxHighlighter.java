@@ -39,6 +39,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.BRACES
     );
 
+    static final TextAttributesKey BRACKETS = createTextAttributesKey(
+            "ELIXIR_BRACKET",
+            DefaultLanguageHighlighterColors.BRACKETS
+    );
+
     static final TextAttributesKey COMMA = createTextAttributesKey(
             "ELIXIR_COMMA",
             DefaultLanguageHighlighterColors.COMMA
@@ -195,6 +200,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] ATOM_KEYWORD_KEYS = new TextAttributesKey[]{ATOM, KEYWORD};
     private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
+    private static final TextAttributesKey[] BRACKETS_KEYS = new TextAttributesKey[]{BRACKETS};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
     private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
@@ -225,6 +231,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TokenSet BRACES_TOKEN_SET = TokenSet.create(
             ElixirTypes.OPENING_CURLY,
             ElixirTypes.CLOSING_CURLY
+    );
+    private static final TokenSet BRACKETS_TOKEN_SET = TokenSet.create(
+            ElixirTypes.OPENING_BRACKET,
+            ElixirTypes.CLOSING_BRACKET
     );
     private static final TokenSet CHAR_LISTS = TokenSet.create(
             ElixirTypes.CHAR_LIST_FRAGMENT,
@@ -360,6 +370,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return BAD_CHAR_KEYS;
         } else if (BRACES_TOKEN_SET.contains(tokenType)) {
             return BRACES_KEYS;
+        } else if (BRACKETS_TOKEN_SET.contains(tokenType)) {
+            return BRACKETS_KEYS;
         } else if (CHAR_LISTS.contains(tokenType)) {
             return CHAR_LIST_KEYS;
         } else if (tokenType == ElixirTypes.CHAR_TOKENIZER) {
