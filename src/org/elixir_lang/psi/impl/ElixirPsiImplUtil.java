@@ -1370,28 +1370,7 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull @SuppressWarnings("unused") PsiElement place) {
-        assert scope.isEquivalentTo(lastParent.getParent());
-
-        boolean keepProcessing = true;
-        PsiElement previousSibling = lastParent.getPrevSibling();
-
-        while (previousSibling != null) {
-            if (!(previousSibling instanceof ElixirEndOfExpression ||
-                    previousSibling instanceof PsiComment ||
-                    previousSibling instanceof PsiWhiteSpace)) {
-                if (!createsNewScope(previousSibling)) {
-                    keepProcessing = processor.execute(previousSibling, state);
-
-                    if (!keepProcessing) {
-                        break;
-                    }
-                }
-            }
-
-            previousSibling = previousSibling.getPrevSibling();
-        }
-
-        return keepProcessing;
+        return processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirStabOperation stabOperation,
@@ -1454,6 +1433,40 @@ public class ElixirPsiImplUtil {
                                               @SuppressWarnings("unused") PsiElement lastParent,
                                               @NotNull @SuppressWarnings("unused") PsiElement place) {
         return processor.execute(qualifiedAlias, state);
+    }
+
+    /**
+     * Processes declarations in siblings of {@code lastParent} backwards from {@code lastParent}.
+     *
+     * @param scope an {@link ElixirStabBody} or {@link ElixirFile} that has a sequence of expressions as children
+     */
+    public static boolean processDeclarationsInPreviousSibling(@NotNull final PsiElement scope,
+                                                               @NotNull PsiScopeProcessor processor,
+                                                               @NotNull ResolveState state,
+                                                               PsiElement lastParent,
+                                                               @NotNull @SuppressWarnings("unused") PsiElement entrance) {
+        assert scope.isEquivalentTo(lastParent.getParent());
+
+        boolean keepProcessing = true;
+        PsiElement previousSibling = lastParent.getPrevSibling();
+
+        while (previousSibling != null) {
+            if (!(previousSibling instanceof ElixirEndOfExpression ||
+                    previousSibling instanceof PsiComment ||
+                    previousSibling instanceof PsiWhiteSpace)) {
+                if (!createsNewScope(previousSibling)) {
+                    keepProcessing = processor.execute(previousSibling, state);
+
+                    if (!keepProcessing) {
+                        break;
+                    }
+                }
+            }
+
+            previousSibling = previousSibling.getPrevSibling();
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,

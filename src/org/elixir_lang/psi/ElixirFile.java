@@ -42,6 +42,6 @@ public class ElixirFile extends PsiFileBase {
                                        @NotNull ResolveState state,
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
-        return ElixirPsiImplUtil.processDeclarationsRecursively(this, processor, state, lastParent, place);
+        return ElixirPsiImplUtil.processDeclarationsInPreviousSibling(this, processor, state, lastParent, place);
     }
 }
