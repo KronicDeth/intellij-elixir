@@ -55,7 +55,13 @@ public class Atom implements Annotator, DumbAware {
 
                        // a normal, non-quoted keyword key
                        if (child instanceof LeafPsiElement) {
-                           highlight(keywordKey, holder, ElixirSyntaxHighlighter.ATOM);
+                           TextRange keywordKeyTextRange = keywordKey.getTextRange();
+                           // highlight the `:` as part of the pseudo-atom
+                           TextRange atomTextRange = new TextRange(
+                                   keywordKeyTextRange.getStartOffset(),
+                                   keywordKeyTextRange.getEndOffset() + 1
+                           );
+                           highlight(atomTextRange, holder, ElixirSyntaxHighlighter.ATOM);
                        }
                    }
                }
@@ -65,12 +71,6 @@ public class Atom implements Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
-
-    private void highlight(@NotNull final PsiElement element,
-                           @NotNull AnnotationHolder annotationHolder,
-                           @NotNull final TextAttributesKey textAttributesKey) {
-        highlight(element.getTextRange(), annotationHolder, textAttributesKey);
-    }
 
     /**
      * Highlights `textRange` with the given `textAttributesKey`.
