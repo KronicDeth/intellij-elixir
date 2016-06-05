@@ -63,7 +63,7 @@ atom"
 <variable>y</variable> = true and false; <variable>z</variable> = false or true
 <variable>...</variable> = 144
 <variable>...</variable> == !<variable>x</variable> && <variable>y</variable> || <variable>z</variable>
-"hello" |> String.upcase |> String.downcase()
+"hello" |> <alias>String</alias>.upcase |> <alias>String</alias>.downcase()
 {^<variable>z</variable>, <variable>a</variable>} = {true, <variable>x</variable>}
 
 # Free operators (added in 1.0.0)
@@ -101,10 +101,10 @@ end
 # Identifiers
 <variable>abc_123</variable> = 1
 <variable>_018OP</variable> = 2
-A__0 == 3
+<alias>A__0</alias> == 3
 
 # Modules
-defmodule Long.Module.Name do
+defmodule <alias>Long.Module.Name</alias> do
   <documentation-module-attribute>@moduledoc</documentation-module-attribute> "<documentation-text>Simple module docstring</documentation-text>"
 
   <documentation-module-attribute>@doc</documentation-module-attribute> """
@@ -134,17 +134,17 @@ defmodule Long.Module.Name do
 end
 
 # Structs
-defmodule Second.Module do
-  <variable>s</variable> = %Long.Module.Name{name: "Silly"}
-  %Long.Module.Name{<variable>s</variable> | height: {192, :cm}}
-  ".. #{%Long.Module.Name{<variable>s</variable> | height: {192, :cm}}} .."
+defmodule <alias>Second.Module</alias> do
+  <variable>s</variable> = %<alias>Long.Module.Name</alias>{name: "Silly"}
+  %<alias>Long.Module.Name</alias>{<variable>s</variable> | height: {192, :cm}}
+  ".. #{%<alias>Long.Module.Name</alias>{<variable>s</variable> | height: {192, :cm}}} .."
 end
 
 # Types, pseudo-vars, attributes
-defmodule M do
+defmodule <alias>M</alias> do
   @custom_attr :some_constant
 
-  @before_compile Long.Module.Name
+  @before_compile <alias>Long.Module.Name</alias>
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>This is a type</documentation-text>"
   @type <type>typ</type> :: <type>integer</type>
@@ -157,8 +157,8 @@ defmodule M do
   @spec func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
   def func(a, b) do
     a || b || :ok || :fail
-    Path.expand("..", __DIR__)
-    IO.inspect __ENV__
+    <alias>Path</alias>.expand("..", __DIR__)
+    <alias>IO</alias>.inspect __ENV__
     <variable>__NOTAPSEUDOVAR__</variable> = 11
     __MODULE__.func(b, a)
   end
@@ -175,12 +175,12 @@ end
   end
 end
 
-&Set.put(&1, &2) ; & Set.put(&1, &2) ; &( Set.put(&1, &1) )
+&<alias>set</alias>.put(&1, &2) ; & <alias>Set</alias>.put(&1, &2) ; &( <alias>Set</alias>.put(&1, &1) )
 
 # Function calls
 <variable>anon</variable>.(1, 2, 3); self; hd([1,2,3])
-Kernel.spawn(fn -> :ok end)
-IO.ANSI.black
+<alias>Kernel</alias>.spawn(fn -> :ok end)
+<alias>IO.ANSI</alias>.black
 
 # Control flow
 if :this do
@@ -208,25 +208,25 @@ cond do
 end
 
 # Lexical scope modifiers
-import Kernel, except: [spawn: 1, +: 2, /: 2, Unless: 2]
-alias Long.Module.Name, as: N0men123_and4
-use Bitwise
+import <alias>Kernel</alias>, except: [spawn: 1, +: 2, /: 2, unless: 2]
+alias <alias>Long.Module.Name</alias>, as: <alias>N0men123_and4</alias>
+use <alias>Bitwise</alias>
 
 4 &&& 5
 2 <<< 3
 
 # Protocols
-defprotocol Useless do
+defprotocol <alias>Useless</alias> do
   def func1(this)
   def func2(that)
 end
 
-defimpl Useless, for: Atom do
+defimpl <alias>Useless</alias>, for: <alias>Atom</alias> do
 end
 
 # Exceptions
-defmodule NotAnError do
+defmodule <alias>NotAnError</alias> do
   defexception [:message]
 end
 
-raise NotAnError, message: "This is not an error"
+raise <alias>NotAnError</alias>, message: "This is not an error"

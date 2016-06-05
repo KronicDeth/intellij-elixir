@@ -59,6 +59,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
     static {
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG = ContainerUtil.newHashMap();
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
+                "alias",
+                ElixirSyntaxHighlighter.ALIAS
+        );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "documentation-module-attribute",
                 ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE
         );
