@@ -2,6 +2,7 @@ package org.elixir_lang.psi.scope;
 
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.errorreport.Logger;
@@ -122,6 +123,7 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirEndOfExpression ||
                     // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
                     element instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
+                    element instanceof LeafPsiElement ||
                     element instanceof Line ||
                     element instanceof PsiErrorElement ||
                     element instanceof PsiWhiteSpace ||
