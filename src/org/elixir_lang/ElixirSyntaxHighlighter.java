@@ -88,9 +88,9 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE
     );
 
-    public static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
+    static final TextAttributesKey EXPRESSION_SUBSTITUTION_MARK = createTextAttributesKey(
             "ELIXIR_EXPRESSION_SUBSTITUTION_MARK",
-            DefaultLanguageHighlighterColors.PARENTHESES
+            DefaultLanguageHighlighterColors.BRACES
     );
 
     public static final TextAttributesKey IDENTIFIER = createTextAttributesKey(

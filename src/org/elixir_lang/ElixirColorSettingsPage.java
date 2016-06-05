@@ -32,6 +32,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Braces and Operators//Brackets", ElixirSyntaxHighlighter.BRACKETS),
             new AttributesDescriptor("Braces and Operators//Comma", ElixirSyntaxHighlighter.COMMA),
             new AttributesDescriptor("Braces and Operators//Dot", ElixirSyntaxHighlighter.DOT),
+            new AttributesDescriptor(
+                    "Braces and Operators//Interpolation",
+                    ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK
+            ),
             new AttributesDescriptor("Braces and Operators//Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
@@ -41,7 +45,6 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Documentation Module Attributes", ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE),
             new AttributesDescriptor("Documentation Text", ElixirSyntaxHighlighter.DOCUMENTATION_TEXT),
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
-            new AttributesDescriptor("Expression Substitution Mark", ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK),
             new AttributesDescriptor("Identifier", ElixirSyntaxHighlighter.IDENTIFIER),
             new AttributesDescriptor("Ignored Variable", ElixirSyntaxHighlighter.VARIABLE),
             new AttributesDescriptor("Invalid Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.INVALID_DIGIT),
