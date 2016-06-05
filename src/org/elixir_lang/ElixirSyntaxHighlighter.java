@@ -39,6 +39,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.BRACES
     );
 
+    static final TextAttributesKey COMMA = createTextAttributesKey(
+            "ELIXIR_COMMA",
+            DefaultLanguageHighlighterColors.COMMA
+    );
+
     public static final TextAttributesKey CHAR_LIST = createTextAttributesKey(
             "ELIXIR_CHAR_LIST",
             DefaultLanguageHighlighterColors.STRING
@@ -192,6 +197,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] BRACES_KEYS = new TextAttributesKey[]{BRACES};
     private static final TextAttributesKey[] CHAR_LIST_KEYS = new TextAttributesKey[]{CHAR_LIST};
     private static final TextAttributesKey[] CHAR_TOKEN_KEYS = new TextAttributesKey[]{CHAR_TOKEN_TOKEN};
+    private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
     private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
     private static final TextAttributesKey[] DECIMAL_KEYS = new TextAttributesKey[]{DECIMAL};
     private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
@@ -358,6 +364,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return CHAR_LIST_KEYS;
         } else if (tokenType == ElixirTypes.CHAR_TOKENIZER) {
             return CHAR_TOKEN_KEYS;
+        } else if (tokenType.equals(ElixirTypes.COMMA)) {
+            return COMMA_KEYS;
         } else if (tokenType.equals(ElixirTypes.COMMENT)) {
             return COMMENT_KEYS;
         } else if (DECIMAL_TOKEN_SET.contains(tokenType)) {
