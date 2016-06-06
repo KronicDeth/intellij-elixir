@@ -89,7 +89,7 @@ atom"
 <map>%{</map> 12 => 13, :weird => ['thing'] <map>}</map>
 
 # Comprehensions
-<predefined-call><macro-call>for</macro-call></predefined-call> x <- 1..10, x < 5, <atom>do:</atom> {x, x}
+<predefined-call><macro-call>for</macro-call></predefined-call> <parameter>x</parameter> <- 1..10, <parameter>x</parameter> < 5, <atom>do:</atom> {<parameter>x</parameter>, <parameter>x</parameter>}
 <variable>pixels</variable> = "12345678"
 <predefined-call><macro-call>for</macro-call></predefined-call> << <<<parameter>r</parameter>::4, <parameter>g</parameter>::4, <parameter>b</parameter>::4, <parameter>a</parameter>::size(4)>> <- <variable>pixels</variable> >> do
   [<parameter>r</parameter>, {<parameter>g</parameter>, <map>%{</map>"b" => <parameter>a</parameter><map>}</map>}]
@@ -125,10 +125,10 @@ end
 
   \n #{\x{ff}}</documentation-text>
   '''
-  <predefined-call><macro-call>def</macro-call></predefined-call> func(a, b \\ []), do: :ok
+  <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter> \\ []), do: :ok
 
   <documentation-module-attribute>@doc</documentation-module-attribute> false
-  <predefined-call><macro-call>def</macro-call></predefined-call> __before_compile__(_) do
+  <predefined-call><macro-call>def</macro-call></predefined-call> __before_compile__(<ignored>_</ignored>) do
     :ok
   end
 end
@@ -155,12 +155,12 @@ end
   @opaque <type>typtyp</type> :: 1..10
 
   @spec func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
-  <predefined-call><macro-call>def</macro-call></predefined-call> func(a, b) do
-    a || b || :ok || :fail
+  <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter>) do
+    <parameter>a</parameter> || <parameter>b</parameter> || :ok || :fail
     <alias>Path</alias>.expand("..", <predefined-call><macro-call>__DIR__</macro-call></predefined-call>)
     <alias>IO</alias>.inspect <predefined-call><macro-call>__ENV__</macro-call></predefined-call>
     <variable>__NOTAPSEUDOVAR__</variable> = 11
-    <predefined-call><macro-call>__MODULE__</macro-call></predefined-call>.func(b, a)
+    <predefined-call><macro-call>__MODULE__</macro-call></predefined-call>.func(<parameter>b</parameter>, <parameter>a</parameter>)
   end
 
   <predefined-call><macro-call>defmacro</macro-call></predefined-call> m() do
@@ -169,9 +169,9 @@ end
 end
 
 # Functions
-<variable>anon</variable> = fn x, y, z ->
-  fn(a, b, c) ->
-    &(x + y - z * a / &1 + b + <predefined-call><function-call>div</function-call></predefined-call>(&2, c))
+<variable>anon</variable> = fn <parameter>x</parameter>, <parameter>y</parameter>, <parameter>z</parameter> ->
+  fn(<parameter>a</parameter>, <parameter>b</parameter>, <parameter>c</parameter>) ->
+    &(<parameter>x</parameter> + <parameter>y</parameter> - <parameter>z</parameter> * <parameter>a</parameter> / &1 + <parameter>b</parameter> + <predefined-call><function-call>div</function-call></predefined-call>(&2, <parameter>c</parameter>))
   end
 end
 
@@ -191,7 +191,7 @@ end
 
 <variable>pid</variable> = <predefined-call><function-call>self</function-call></predefined-call>
 <predefined-call><macro-call>receive</macro-call></predefined-call> do
-  {:EXIT, _} -> :done
+  {:EXIT, <ignored>_</ignored>} -> :done
   {^<variable>pid</variable>, :_} -> nil
   after 100 -> :no_luck
 end
@@ -217,8 +217,8 @@ end
 
 # Protocols
 <predefined-call><macro-call>defprotocol</macro-call></predefined-call> <alias>Useless</alias> do
-  <predefined-call><macro-call>def</macro-call></predefined-call> func1(this)
-  <predefined-call><macro-call>def</macro-call></predefined-call> func2(that)
+  <predefined-call><macro-call>def</macro-call></predefined-call> func1(<parameter>this</parameter>)
+  <predefined-call><macro-call>def</macro-call></predefined-call> func2(<parameter>that</parameter>)
 end
 
 <predefined-call><macro-call>defimpl</macro-call></predefined-call> <alias>Useless</alias>, <atom>for:</atom> <alias>Atom</alias> do
