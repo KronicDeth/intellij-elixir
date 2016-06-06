@@ -60,7 +60,7 @@ atom"
 
 # Operators
 <variable>x</variable> = 1 + 2.0 * 3
-<variable>y</variable> = true and false; <variable>z</variable> = false or true
+<variable>y</variable> = true <predefined-call><macro-call>and</macro-call></predefined-call> false; <variable>z</variable> = false <predefined-call><macro-call>or</macro-call></predefined-call> true
 <variable>...</variable> = 144
 <variable>...</variable> == !<variable>x</variable> && <variable>y</variable> || <variable>z</variable>
 "hello" |> <alias>String</alias>.upcase |> <alias>String</alias>.downcase()
@@ -96,7 +96,7 @@ atom"
 end
 
 # String interpolation
-"String #{inspect "interpolation"} is quite #{1+4+7} difficult"
+"String #{<predefined-call><function-call>inspect</function-call></predefined-call> "interpolation"} is quite #{1+4+7} difficult"
 
 # Identifiers
 <variable>abc_123</variable> = 1
@@ -104,20 +104,20 @@ end
 <alias>A__0</alias> == 3
 
 # Modules
-defmodule <alias>Long.Module.Name</alias> do
+<predefined-call><macro-call>defmodule</macro-call></predefined-call> <alias>Long.Module.Name</alias> do
   <documentation-module-attribute>@moduledoc</documentation-module-attribute> "<documentation-text>Simple module docstring</documentation-text>"
 
   <documentation-module-attribute>@doc</documentation-module-attribute> """
   <documentation-text>Multiline docstring
   "with quotes"
-  and </documentation-text>#{ inspect %{"interpolation" => "in" <> "action"} }<documentation-text>
+  and </documentation-text>#{ <predefined-call><function-call>inspect</function-call></predefined-call> %{"interpolation" => "in" <> "action"} }<documentation-text>
   now with </documentation-text>#{ {:a, 'tuple'} }<documentation-text>
-  and </documentation-text>#{ inspect {
+  and </documentation-text>#{ <predefined-call><function-call>inspect</function-call></predefined-call> {
       :tuple,
-      <map>%{</map> <atom>with:</atom> "nested #{ inspect <map>%{</map> :interpolation => <map>%{</map><map>}</map> <map>}</map> }" <map>}</map>
+      <map>%{</map> <atom>with:</atom> "nested #{ <predefined-call><function-call>inspect</function-call></predefined-call> <map>%{</map> :interpolation => <map>%{</map><map>}</map> <map>}</map> }" <map>}</map>
   } }
   """
-  defstruct [:a, :name, :height]
+  <predefined-call><macro-call>defstruct</macro-call></predefined-call> [:a, :name, :height]
 
   <documentation-module-attribute>@doc</documentation-module-attribute> ~S'''
   <documentation-text>No #{interpolation} of any kind.
@@ -125,23 +125,23 @@ defmodule <alias>Long.Module.Name</alias> do
 
   \n #{\x{ff}}</documentation-text>
   '''
-  def func(a, b \\ []), do: :ok
+  <predefined-call><macro-call>def</macro-call></predefined-call> func(a, b \\ []), do: :ok
 
   <documentation-module-attribute>@doc</documentation-module-attribute> false
-  def __before_compile__(_) do
+  <predefined-call><macro-call>def</macro-call></predefined-call> __before_compile__(_) do
     :ok
   end
 end
 
 # Structs
-defmodule <alias>Second.Module</alias> do
+<predefined-call><macro-call>defmodule</macro-call></predefined-call> <alias>Second.Module</alias> do
   <variable>s</variable> = <struct>%</struct><alias>Long.Module.Name</alias>{<atom>name:</atom> "Silly"<struct>}</struct>
   <struct>%</struct><alias>Long.Module.Name</alias><struct>{</struct><variable>s</variable> | <atom>height:</atom> {192, :cm}<struct>}</struct>
   ".. #{<struct>%</struct><alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}<struct>}</struct>} .."
 end
 
 # Types, pseudo-vars, attributes
-defmodule <alias>M</alias> do
+<predefined-call><macro-call>defmodule</macro-call></predefined-call> <alias>M</alias> do
   @custom_attr :some_constant
 
   @before_compile <alias>Long.Module.Name</alias>
@@ -155,78 +155,78 @@ defmodule <alias>M</alias> do
   @opaque <type>typtyp</type> :: 1..10
 
   @spec func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
-  def func(a, b) do
+  <predefined-call><macro-call>def</macro-call></predefined-call> func(a, b) do
     a || b || :ok || :fail
-    <alias>Path</alias>.expand("..", __DIR__)
-    <alias>IO</alias>.inspect __ENV__
+    <alias>Path</alias>.expand("..", <predefined-call><macro-call>__DIR__</macro-call></predefined-call>)
+    <alias>IO</alias>.inspect <predefined-call><macro-call>__ENV__</macro-call></predefined-call>
     <variable>__NOTAPSEUDOVAR__</variable> = 11
-    __MODULE__.func(b, a)
+    <predefined-call><macro-call>__MODULE__</macro-call></predefined-call>.func(b, a)
   end
 
-  defmacro m() do
-    __CALLER__
+  <predefined-call><macro-call>defmacro</macro-call></predefined-call> m() do
+    <predefined-call><macro-call>__CALLER__</macro-call></predefined-call>
   end
 end
 
 # Functions
 <variable>anon</variable> = fn x, y, z ->
   fn(a, b, c) ->
-    &(x + y - z * a / &1 + b + div(&2, c))
+    &(x + y - z * a / &1 + b + <predefined-call><function-call>div</function-call></predefined-call>(&2, c))
   end
 end
 
 &<alias>set</alias>.put(&1, &2) ; & <alias>Set</alias>.put(&1, &2) ; &( <alias>Set</alias>.put(&1, &1) )
 
 # Function calls
-<variable>anon</variable>.(1, 2, 3); self; hd([1,2,3])
-<alias>Kernel</alias>.spawn(fn -> :ok end)
+<variable>anon</variable>.(1, 2, 3); <predefined-call><function-call>self</function-call></predefined-call>; <predefined-call><function-call>hd</function-call></predefined-call>([1,2,3])
+<alias>Kernel</alias>.<predefined-call><function-call>spawn</function-call></predefined-call>(fn -> :ok end)
 <alias>IO.ANSI</alias>.black
 
 # Control flow
-if :this do
+<predefined-call><macro-call>if</macro-call></predefined-call> :this do
   :that
 else
   :otherwise
 end
 
-<variable>pid</variable> = self
-receive do
+<variable>pid</variable> = <predefined-call><function-call>self</function-call></predefined-call>
+<predefined-call><macro-call>receive</macro-call></predefined-call> do
   {:EXIT, _} -> :done
   {^<variable>pid</variable>, :_} -> nil
   after 100 -> :no_luck
 end
 
-case __ENV__.line do
-  <variable>x</variable> when is_integer(<variable>x</variable>) -> <variable>x</variable>
+<predefined-call><macro-call>case</macro-call></predefined-call> <predefined-call><macro-call>__ENV__</macro-call></predefined-call>.line do
+  <variable>x</variable> when <predefined-call><function-call>is__integer</function-call></predefined-call>(<variable>x</variable>) -> <variable>x</variable>
   <variable>x</variable> when <variable>x</variable> in 1..12 -> -<variable>x</variable>
 end
 
-cond do
+<predefined-call><macro-call>cond</macro-call></predefined-call> do
   false -> "too bad"
   4 > 5 -> "oops"
   true -> nil
 end
 
 # Lexical scope modifiers
-import <alias>Kernel</alias>, <atom>except:</atom> [<atom>spawn:</atom> 1, <atom>+:</atom> 2, <atom>/:</atom> 2, <atom>unless:</atom> 2]
-alias <alias>Long.Module.Name</alias>, <atom>as:</atom> <alias>N0men123_and4</alias>
-use <alias>Bitwise</alias>
+<predefined-call><macro-call>import</macro-call></predefined-call> <alias>Kernel</alias>, <atom>except:</atom> [<atom>spawn:</atom> 1, <atom>+:</atom> 2, <atom>/:</atom> 2, <atom>unless:</atom> 2]
+<predefined-call><macro-call>alias</macro-call></predefined-call> <alias>Long.Module.Name</alias>, <atom>as:</atom> <alias>N0men123_and4</alias>
+<predefined-call><macro-call>use</macro-call></predefined-call> <alias>Bitwise</alias>
 
 4 &&& 5
 2 <<< 3
 
 # Protocols
-defprotocol <alias>Useless</alias> do
-  def func1(this)
-  def func2(that)
+<predefined-call><macro-call>defprotocol</macro-call></predefined-call> <alias>Useless</alias> do
+  <predefined-call><macro-call>def</macro-call></predefined-call> func1(this)
+  <predefined-call><macro-call>def</macro-call></predefined-call> func2(that)
 end
 
-defimpl <alias>Useless</alias>, <atom>for:</atom> <alias>Atom</alias> do
+<predefined-call><macro-call>defimpl</macro-call></predefined-call> <alias>Useless</alias>, <atom>for:</atom> <alias>Atom</alias> do
 end
 
 # Exceptions
-defmodule <alias>NotAnError</alias> do
-  defexception [:message]
+<predefined-call><macro-call>defmodule</macro-call></predefined-call> <alias>NotAnError</alias> do
+  <predefined-call><macro-call>defexception</macro-call></predefined-call> [:message]
 end
 
-raise <alias>NotAnError</alias>, <atom>message:</atom> "This is not an error"
+<predefined-call><macro-call>raise</macro-call></predefined-call> <alias>NotAnError</alias>, <atom>message:</atom> "This is not an error"

@@ -93,6 +93,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.BRACES
     );
 
+    public static final TextAttributesKey FUNCTION_CALL = createTextAttributesKey(
+            "ELIXIR_FUNCTION_CALL",
+            DefaultLanguageHighlighterColors.FUNCTION_CALL
+    );
+
     public static final TextAttributesKey IDENTIFIER = createTextAttributesKey(
             "ELIXIR_IDENTIFIER",
             DefaultLanguageHighlighterColors.IDENTIFIER
@@ -103,24 +108,14 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             HighlighterColors.BAD_CHARACTER
     );
 
-    public static final TextAttributesKey KERNEL_FUNCTION = createTextAttributesKey(
-            "ELIXIR_KERNEL_FUNCTION",
-            DefaultLanguageHighlighterColors.FUNCTION_CALL
-    );
-
-    public static final TextAttributesKey KERNEL_MACRO = createTextAttributesKey(
-            "ELIXIR_KERNEL_MACRO",
-            DefaultLanguageHighlighterColors.FUNCTION_CALL
-    );
-
-    public static final TextAttributesKey KERNEL_SPECIAL_FORMS_MACRO = createTextAttributesKey(
-            "ELIXIR_KERNEL_SPECIAL_FORMS_MACRO",
-            KERNEL_MACRO
-    );
-
     public static final TextAttributesKey KEYWORD = createTextAttributesKey(
             "ELIXIR_KEYWORD",
             DefaultLanguageHighlighterColors.KEYWORD
+    );
+
+    public static final TextAttributesKey MACRO_CALL = createTextAttributesKey(
+            "ELIXIR_MACRO_CALL",
+            FUNCTION_CALL
     );
 
     public static final TextAttributesKey MAP = createTextAttributesKey(
@@ -152,6 +147,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey PARAMETER = createTextAttributesKey(
             "ELIXIR_PARAMETER",
             DefaultLanguageHighlighterColors.PARAMETER
+    );
+
+    public static final TextAttributesKey PREDEFINED_CALL = createTextAttributesKey(
+            "ELIXIR_PREDEFINED",
+            DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL
     );
 
     public static final TextAttributesKey SEMICOLON = createTextAttributesKey(

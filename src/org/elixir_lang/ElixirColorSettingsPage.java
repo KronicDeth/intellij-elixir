@@ -49,9 +49,6 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Escape Sequence", ElixirSyntaxHighlighter.VALID_ESCAPE_SEQUENCE),
             new AttributesDescriptor("Identifier", ElixirSyntaxHighlighter.IDENTIFIER),
             new AttributesDescriptor("Ignored Variable", ElixirSyntaxHighlighter.VARIABLE),
-            new AttributesDescriptor("Kernel Functions", ElixirSyntaxHighlighter.KERNEL_FUNCTION),
-            new AttributesDescriptor("Kernel Macros", ElixirSyntaxHighlighter.KERNEL_MACRO),
-            new AttributesDescriptor("Kernel.SpecialForms Macros", ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO),
             new AttributesDescriptor("Keywords", ElixirSyntaxHighlighter.KEYWORD),
             new AttributesDescriptor("Module Attributes", ElixirSyntaxHighlighter.MODULE_ATTRIBUTE),
             new AttributesDescriptor("Numbers//Binary, Decimal, Hexadecimal, and Octal Digits", ElixirSyntaxHighlighter.VALID_DIGIT),
@@ -60,6 +57,9 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Numbers//Non-Decimal Base Prefix", ElixirSyntaxHighlighter.WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Numbers//Obsolete Non-Decimal Base Prefix", ElixirSyntaxHighlighter.OBSOLETE_WHOLE_NUMBER_BASE),
             new AttributesDescriptor("Parameter", ElixirSyntaxHighlighter.PARAMETER),
+            new AttributesDescriptor("Calls//Function", ElixirSyntaxHighlighter.FUNCTION_CALL),
+            new AttributesDescriptor("Calls//Predefined", ElixirSyntaxHighlighter.PREDEFINED_CALL),
+            new AttributesDescriptor("Calls//Macro", ElixirSyntaxHighlighter.MACRO_CALL),
             new AttributesDescriptor("Sigil", ElixirSyntaxHighlighter.SIGIL),
             new AttributesDescriptor("Specification", ElixirSyntaxHighlighter.SPECIFICATION),
             new AttributesDescriptor("String", ElixirSyntaxHighlighter.STRING),
@@ -94,7 +94,10 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "error", CodeInsightColors.ERRORS_ATTRIBUTES
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("function-call", ElixirSyntaxHighlighter.FUNCTION_CALL);
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("macro-call", ElixirSyntaxHighlighter.MACRO_CALL);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("map", ElixirSyntaxHighlighter.MAP);
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("predefined-call", ElixirSyntaxHighlighter.PREDEFINED_CALL);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("struct", ElixirSyntaxHighlighter.STRUCT);
         // needed so that <error></error> doesn't override VALID_DIGIT token highlighting
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
