@@ -29,6 +29,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Braces and Operators//Bit", ElixirSyntaxHighlighter.BIT),
             new AttributesDescriptor("Braces and Operators//Braces", ElixirSyntaxHighlighter.BRACES),
             new AttributesDescriptor("Braces and Operators//Brackets", ElixirSyntaxHighlighter.BRACKETS),
+            new AttributesDescriptor("Braces and Operators//Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN_TOKEN),
             new AttributesDescriptor("Braces and Operators//Comma", ElixirSyntaxHighlighter.COMMA),
             new AttributesDescriptor("Braces and Operators//Dot", ElixirSyntaxHighlighter.DOT),
             new AttributesDescriptor(
@@ -41,7 +42,6 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Braces and Operators//Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),
-            new AttributesDescriptor("Character Token", ElixirSyntaxHighlighter.CHAR_TOKEN_TOKEN),
             new AttributesDescriptor("Comment", ElixirSyntaxHighlighter.COMMENT),
             new AttributesDescriptor("Documentation Module Attributes", ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE),
             new AttributesDescriptor("Documentation Text", ElixirSyntaxHighlighter.DOCUMENTATION_TEXT),
