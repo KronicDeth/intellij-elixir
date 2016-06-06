@@ -320,6 +320,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.DUAL_OPERATOR,
             ElixirTypes.IN_OPERATOR,
             ElixirTypes.IN_MATCH_OPERATOR,
+            ElixirTypes.MATCH_OPERATOR,
             ElixirTypes.MULTIPLICATION_OPERATOR,
             ElixirTypes.OR_OPERATOR,
             ElixirTypes.PIPE_OPERATOR,
