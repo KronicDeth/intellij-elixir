@@ -864,6 +864,7 @@
     <annotator implementationClass="org.elixir_lang.annonator.Callable" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.EscapeSequence" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Kernel" language="Elixir"/>
+    <annotator implementationClass="org.elixir_lang.annonator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
     <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>

@@ -123,6 +123,12 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.KEYWORD
     );
 
+    public static final TextAttributesKey MAP = createTextAttributesKey(
+            "ELIXIR_MAP",
+            // DO NOT link to {@link ElixirSyntaxHighlighter.BRACES} since that's for Tuples in standard Elixir
+            DefaultLanguageHighlighterColors.BRACES
+    );
+
     public static final TextAttributesKey MODULE_ATTRIBUTE = createTextAttributesKey(
             "ELIXIR_MODULE_ATTRIBUTE",
             DefaultLanguageHighlighterColors.CONSTANT
@@ -157,6 +163,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey SPECIFICATION = createTextAttributesKey(
             "ELIXIR_SPECIFICATION",
             DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
+    );
+
+    public static final TextAttributesKey STRUCT = createTextAttributesKey(
+            "ELIXIR_STRUCT",
+            MAP
     );
 
     public static final TextAttributesKey CALLBACK = createTextAttributesKey(
@@ -243,7 +254,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.CLOSING_BIT,
             ElixirTypes.OPENING_BIT
     );
-    private static final TokenSet BRACES_TOKEN_SET = TokenSet.create(
+    public static final TokenSet BRACES_TOKEN_SET = TokenSet.create(
             ElixirTypes.OPENING_CURLY,
             ElixirTypes.CLOSING_CURLY
     );

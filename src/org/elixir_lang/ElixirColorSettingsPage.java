@@ -36,6 +36,8 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                     "Braces and Operators//Interpolation",
                     ElixirSyntaxHighlighter.EXPRESSION_SUBSTITUTION_MARK
             ),
+            new AttributesDescriptor("Braces and Operators//Maps and Structs//Maps", ElixirSyntaxHighlighter.MAP),
+            new AttributesDescriptor("Braces and Operators//Maps and Structs//Structs", ElixirSyntaxHighlighter.STRUCT),
             new AttributesDescriptor("Braces and Operators//Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
             new AttributesDescriptor("Braces and Operators//Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
@@ -91,6 +93,8 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "error", CodeInsightColors.ERRORS_ATTRIBUTES
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("map", ElixirSyntaxHighlighter.MAP);
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("struct", ElixirSyntaxHighlighter.STRUCT);
         // needed so that <error></error> doesn't override VALID_DIGIT token highlighting
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "valid-digit", ElixirSyntaxHighlighter.VALID_DIGIT

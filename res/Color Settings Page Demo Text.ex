@@ -84,15 +84,15 @@ atom"
 [<atom>option:</atom> "value", <atom>key:</atom> :word]
 [<atom>++:</atom> "operator", <atom>~~~:</atom> :&&&]
 
-<variable>map</variable> = %{<atom>shortcut:</atom> "syntax"}
-%{<variable>map</variable> | "update" => "me"}
-%{ 12 => 13, :weird => ['thing'] }
+<variable>map</variable> = <map>%{</map><atom>shortcut:</atom> "syntax"<map>}</map>
+<map>%{</map><variable>map</variable> | "update" => "me"<map>}</map>
+<map>%{</map> 12 => 13, :weird => ['thing'] <map>}</map>
 
 # Comprehensions
 <predefined-call><macro-call>for</macro-call></predefined-call> x <- 1..10, x < 5, <atom>do:</atom> {x, x}
 <variable>pixels</variable> = "12345678"
-for << <<r::4, g::4, b::4, a::size(4)>> <- <variable>pixels</variable> >> do
-  [r, {g, %{"b" => a}}]
+<predefined-call><macro-call>for</macro-call></predefined-call> << <<<parameter>r</parameter>::4, <parameter>g</parameter>::4, <parameter>b</parameter>::4, <parameter>a</parameter>::size(4)>> <- <variable>pixels</variable> >> do
+  [<parameter>r</parameter>, {<parameter>g</parameter>, <map>%{</map>"b" => <parameter>a</parameter><map>}</map>}]
 end
 
 # String interpolation
@@ -114,7 +114,7 @@ defmodule <alias>Long.Module.Name</alias> do
   now with </documentation-text>#{ {:a, 'tuple'} }<documentation-text>
   and </documentation-text>#{ inspect {
       :tuple,
-      %{ <atom>with:</atom> "nested #{ inspect %{ :interpolation => %{} } }" }
+      <map>%{</map> <atom>with:</atom> "nested #{ inspect <map>%{</map> :interpolation => <map>%{</map><map>}</map> <map>}</map> }" <map>}</map>
   } }
   """
   defstruct [:a, :name, :height]
@@ -135,9 +135,9 @@ end
 
 # Structs
 defmodule <alias>Second.Module</alias> do
-  <variable>s</variable> = %<alias>Long.Module.Name</alias>{<atom>name:</atom> "Silly"}
-  %<alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}}
-  ".. #{%<alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}}} .."
+  <variable>s</variable> = <struct>%</struct><alias>Long.Module.Name</alias>{<atom>name:</atom> "Silly"<struct>}</struct>
+  <struct>%</struct><alias>Long.Module.Name</alias><struct>{</struct><variable>s</variable> | <atom>height:</atom> {192, :cm}<struct>}</struct>
+  ".. #{<struct>%</struct><alias>Long.Module.Name</alias>{<variable>s</variable> | <atom>height:</atom> {192, :cm}<struct>}</struct>} .."
 end
 
 # Types, pseudo-vars, attributes
