@@ -39,6 +39,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Braces and Operators//Maps and Structs//Maps", ElixirSyntaxHighlighter.MAP),
             new AttributesDescriptor("Braces and Operators//Maps and Structs//Structs", ElixirSyntaxHighlighter.STRUCT),
             new AttributesDescriptor("Braces and Operators//Operation Sign", ElixirSyntaxHighlighter.OPERATION_SIGN),
+            new AttributesDescriptor("Braces and Operators//Parentheses", ElixirSyntaxHighlighter.PARENTHESES),
             new AttributesDescriptor("Braces and Operators//Semicolon", ElixirSyntaxHighlighter.SEMICOLON),
             new AttributesDescriptor("Callback", ElixirSyntaxHighlighter.CALLBACK),
             new AttributesDescriptor("Character List", ElixirSyntaxHighlighter.CHAR_LIST),

@@ -144,6 +144,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.OPERATION_SIGN
     );
 
+    static final TextAttributesKey PARENTHESES = createTextAttributesKey(
+            "ELIXIR_PARENTHESES",
+            DefaultLanguageHighlighterColors.PARENTHESES
+    );
+
     public static final TextAttributesKey PARAMETER = createTextAttributesKey(
             "ELIXIR_PARAMETER",
             DefaultLanguageHighlighterColors.PARAMETER
@@ -235,6 +240,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
     private static final TextAttributesKey[] OBSOLETE_WHOLE_NUMBER_BASE_KEYS = new TextAttributesKey[]{OBSOLETE_WHOLE_NUMBER_BASE};
     private static final TextAttributesKey[] OPERATION_SIGN_KEYS = new TextAttributesKey[]{OPERATION_SIGN};
+    private static final TextAttributesKey[] PARENTHESES_KEYS = new TextAttributesKey[]{PARENTHESES};
     private static final TextAttributesKey[] SEMICOLON_KEYS = new TextAttributesKey[]{SEMICOLON};
     private static final TextAttributesKey[] SIGIL_KEYS = new TextAttributesKey[]{SIGIL};
     private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
@@ -323,6 +329,10 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.TYPE_OPERATOR,
             ElixirTypes.UNARY_OPERATOR,
             ElixirTypes.WHEN_OPERATOR
+    );
+    private static final TokenSet PARENTHESES_TOKEN_SET = TokenSet.create(
+            ElixirTypes.CLOSING_PARENTHESIS,
+            ElixirTypes.OPENING_PARENTHESIS
     );
     // @todo Highlight each type of sigil separately and group char list and string with non-sigil versions
     private static final TokenSet SIGILS = TokenSet.create(
@@ -424,6 +434,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             return OBSOLETE_WHOLE_NUMBER_BASE_KEYS;
         } else if (OPERATION_SIGNS.contains(tokenType)) {
             return OPERATION_SIGN_KEYS;
+        } else if (PARENTHESES_TOKEN_SET.contains(tokenType)) {
+            return PARENTHESES_KEYS;
         } else if (tokenType.equals(ElixirTypes.SEMICOLON)) {
             return SEMICOLON_KEYS;
         } else if (SIGILS.contains(tokenType)) {
