@@ -78,6 +78,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "atom",
                 ElixirSyntaxHighlighter.ATOM
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("callback", ElixirSyntaxHighlighter.CALLBACK);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put(
                 "documentation-module-attribute",
                 ElixirSyntaxHighlighter.DOCUMENTATION_MODULE_ATTRIBUTE

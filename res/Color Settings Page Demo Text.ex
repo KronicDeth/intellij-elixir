@@ -157,6 +157,11 @@ end
   """
   <module-attribute>@opaque</module-attribute> <type>typtyp</type> :: 1..10
 
+  <documentation-module-attribute>@doc</documentation-module-attribute> """
+  <documentation-text>Will be called by M to `func` the `typ` with the `typtyp`</documentation-text>
+  """
+  <module-attribute>@callback</module-attribute> <callback>func</callback>(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
+
   <module-attribute>@spec</module-attribute> func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
   <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter>) do
     <parameter>a</parameter> || <parameter>b</parameter> || :ok || :fail
