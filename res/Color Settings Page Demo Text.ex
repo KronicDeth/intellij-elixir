@@ -149,6 +149,9 @@ end
   <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>This is a type</documentation-text>"
   <module-attribute>@type</module-attribute> <type>typ</type> :: <type>integer</type>
 
+  <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>Type with parameters</documentation-text>"
+  <module-attribute>@type</module-attribute> <type>parameterized</type>(<type-parameter>type_parameter</type-parameter>) :: <type-parameter>type_parameter</type-parameter>
+
   <documentation-module-attribute>@typedoc</documentation-module-attribute> """
   <documentation-text>Another type</documentation-text>
   """
