@@ -111,6 +111,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
                 "variable",
                 ElixirSyntaxHighlighter.VARIABLE
         );
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("specification", ElixirSyntaxHighlighter.SPECIFICATION);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("type", ElixirSyntaxHighlighter.TYPE);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("type-parameter", ElixirSyntaxHighlighter.TYPE_PARAMETER);
     }

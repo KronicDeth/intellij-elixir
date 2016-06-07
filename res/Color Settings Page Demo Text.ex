@@ -162,7 +162,7 @@ end
   """
   <module-attribute>@callback</module-attribute> <callback>func</callback>(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
 
-  <module-attribute>@spec</module-attribute> func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
+  <module-attribute>@spec</module-attribute> <specification>func</specification>(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
   <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter>) do
     <parameter>a</parameter> || <parameter>b</parameter> || :ok || :fail
     <alias>Path</alias>.expand("..", <predefined-call><macro-call>__DIR__</macro-call></predefined-call>)
