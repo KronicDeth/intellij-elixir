@@ -829,6 +829,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 psiElement instanceof ElixirCharToken ||
                 psiElement instanceof ElixirDecimalWholeNumber ||
                 psiElement instanceof ElixirKeywordKey ||
+                /* happens when :: is typed in `@spec` above function clause that uses `do:` */
+                psiElement instanceof ElixirNoParenthesesKeywords ||
                 psiElement instanceof ElixirStringLine ||
                 psiElement instanceof ElixirUnaryNumericOperation) {
             // leave normal highlighting
