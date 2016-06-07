@@ -98,6 +98,7 @@ public class ElixirColorSettingsPage implements ColorSettingsPage {
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("ignored", ElixirSyntaxHighlighter.IGNORED_VARIABLE);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("macro-call", ElixirSyntaxHighlighter.MACRO_CALL);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("map", ElixirSyntaxHighlighter.MAP);
+        TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("module-attribute", ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("parameter", ElixirSyntaxHighlighter.PARAMETER);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("predefined-call", ElixirSyntaxHighlighter.PREDEFINED_CALL);
         TEXT_ATTRIBUTES_KEY_BY_HIGHLIGHTING_TAG.put("struct", ElixirSyntaxHighlighter.STRUCT);

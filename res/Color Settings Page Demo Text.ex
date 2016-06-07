@@ -142,19 +142,19 @@ end
 
 # Types, pseudo-vars, attributes
 <predefined-call><macro-call>defmodule</macro-call></predefined-call> <alias>M</alias> do
-  @custom_attr :some_constant
+  <module-attribute>@custom_attr</module-attribute> :some_constant
 
-  @before_compile <alias>Long.Module.Name</alias>
+  <module-attribute>@before_compile</module-attribute> <alias>Long.Module.Name</alias>
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> "<documentation-text>This is a type</documentation-text>"
-  @type <type>typ</type> :: <type>integer</type>
+  <module-attribute>@type</module-attribute> <type>typ</type> :: <type>integer</type>
 
   <documentation-module-attribute>@typedoc</documentation-module-attribute> """
   <documentation-text>Another type</documentation-text>
   """
-  @opaque <type>typtyp</type> :: 1..10
+  <module-attribute>@opaque</module-attribute> <type>typtyp</type> :: 1..10
 
-  @spec func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
+  <module-attribute>@spec</module-attribute> func(<type>typ</type>, <type>typtyp</type>) :: :ok | :fail
   <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter>) do
     <parameter>a</parameter> || <parameter>b</parameter> || :ok || :fail
     <alias>Path</alias>.expand("..", <predefined-call><macro-call>__DIR__</macro-call></predefined-call>)
