@@ -159,7 +159,8 @@ public class Kernel implements Annotator, DumbAware {
                             "super",
                             "try",
                             UNQUOTE,
-                            "unquote_splicing"
+                            "unquote_splicing",
+                            "with"
                     }
             )
     );
