@@ -42,7 +42,7 @@ public interface ElixirMatchedUnaryNonNumericOperation extends ElixirMatchedExpr
   @Nullable
   String moduleName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

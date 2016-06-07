@@ -123,7 +123,7 @@ public class ElixirAtNumericOperationImpl extends ASTWrapperPsiElement implement
     return ElixirPsiImplUtil.moduleName(this);
   }
 
-  @NotNull
+  @Nullable
   public Quotable operand() {
     return ElixirPsiImplUtil.operand(this);
   }

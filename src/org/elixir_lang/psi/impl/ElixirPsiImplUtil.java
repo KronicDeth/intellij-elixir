@@ -31,7 +31,6 @@ import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -887,7 +886,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static Quotable leftOperand(Infix infix) {
-        return Normalized.leftOperand(infix);
+        return org.elixir_lang.psi.operation.infix.Normalized.leftOperand(infix);
     }
 
     /* Returns the 0-indexed line number for the element */
@@ -1049,15 +1048,9 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static Quotable operand(Prefix prefix) {
-        PsiElement[] children = prefix.getChildren();
-
-        if (children.length != 2) {
-            error(Prefix.class, "Prefix operation does not have 2 children, but " + children.length, prefix);
-        }
-
-        return (Quotable) children[1];
+        return org.elixir_lang.psi.operation.prefix.Normalized.operand(prefix);
     }
 
     @Contract(pure = true)
@@ -1075,16 +1068,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static Operator operator(Prefix prefix) {
-        PsiElement[] children = prefix.getChildren();
-
-        if (children.length < 1) {
-            error(
-                    Prefix.class, "Prefix operation does not have at least one child (the operator), but " +
-                            children.length + " children", prefix
-            );
-        }
-
-        return (Operator) children[0];
+        return Normalized.operator(prefix);
     }
 
     @Contract(pure = true)
@@ -1231,8 +1215,8 @@ public class ElixirPsiImplUtil {
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
         PsiElement[] children = infix.getChildren();
         int operatorIndex = Normalized.operatorIndex(children);
-        Quotable leftOperand = Normalized.leftOperand(children, operatorIndex);
-        Quotable rightOperand = Normalized.rightOperand(children, operatorIndex);
+        Quotable leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
+        Quotable rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex);
 
         return new PsiElement[]{
                 leftOperand,
@@ -1321,7 +1305,7 @@ public class ElixirPsiImplUtil {
         boolean keepProcessing = true;
 
         if (Normalized.operator(and).getText().equals("&&")) {
-            PsiElement leftOperand = Normalized.leftOperand(and);
+            PsiElement leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(and);
 
             if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
                 // the left operand is not inherently declaring, it should only be if a match is in the left operand
@@ -4644,7 +4628,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Quotable rightOperand(Infix infix) {
-        return Normalized.rightOperand(infix);
+        return org.elixir_lang.psi.operation.infix.Normalized.rightOperand(infix);
     }
 
     @Contract(pure = true)

@@ -111,7 +111,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     private void visitMaybeUsage(@NotNull final AtNonNumericOperation element) {
                         PsiElement operand = element.operand();
 
-                        if (!(operand instanceof ElixirAccessExpression)) {
+                        if (operand != null && !(operand instanceof ElixirAccessExpression)) {
                             visitUsage(element);
                         }
                     }
