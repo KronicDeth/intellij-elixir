@@ -175,7 +175,7 @@ end
   end
 end
 
-&<alias>set</alias>.put(&1, &2) ; & <alias>Set</alias>.put(&1, &2) ; &( <alias>Set</alias>.put(&1, &1) )
+&<alias>Set</alias>.put(&1, &2) ; & <alias>Set</alias>.put(&1, &2) ; &( <alias>Set</alias>.put(&1, &1) )
 
 # Function calls
 <variable>anon</variable>.(1, 2, 3); <predefined-call><function-call>self</function-call></predefined-call>; <predefined-call><function-call>hd</function-call></predefined-call>([1,2,3])
