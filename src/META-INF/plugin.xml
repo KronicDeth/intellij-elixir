@@ -859,6 +859,8 @@
     <liveTemplateContext implementation="org.elixir_lang.templates.ElixirContextType"/>
     <!-- end liveTemplates -->
 
+    <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
+
     <annotator implementationClass="org.elixir_lang.annonator.Alias" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Atom" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Callable" language="Elixir"/>
