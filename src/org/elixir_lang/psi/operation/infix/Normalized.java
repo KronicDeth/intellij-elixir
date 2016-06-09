@@ -1,19 +1,22 @@
 package org.elixir_lang.psi.operation.infix;
 
 import com.intellij.psi.PsiElement;
-import org.elixir_lang.psi.Operator;
 import org.elixir_lang.psi.Quotable;
 import org.elixir_lang.psi.operation.Infix;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
+
 /**
- * Canonical children of an {@link Infix}, which converts any errors in the operands to
+ * Canonical children of an {@link Infix}, which converts any errors in the operands to `null`
  */
 public class Normalized {
     /*
+     *
      * Static Methods
+     *
      */
 
     /*
@@ -49,29 +52,6 @@ public class Normalized {
     }
 
     @Contract(pure = true)
-    @NotNull
-    public static Operator operator(@NotNull Infix infix) {
-        PsiElement[] children = infix.getChildren();
-        int operatorIndex = operatorIndex(children);
-
-        return operator(children, operatorIndex);
-    }
-
-    public static int operatorIndex(PsiElement[] children) {
-        int operatorIndex = -1;
-        for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof Operator) {
-                operatorIndex = i;
-                break;
-            }
-        }
-
-        assert operatorIndex != -1;
-
-        return operatorIndex;
-    }
-
-    @Contract(pure = true)
     @Nullable
     public static Quotable rightOperand(@NotNull Infix infix) {
         PsiElement[] children = infix.getChildren();
@@ -96,15 +76,5 @@ public class Normalized {
         }
 
         return rightOperand;
-    }
-
-    /*
-     * Private Static Methods
-     */
-
-    @Contract(pure = true)
-    @NotNull
-    private static Operator operator(@NotNull PsiElement[] children, int operatorIndex) {
-        return (Operator) children[operatorIndex];
     }
 }

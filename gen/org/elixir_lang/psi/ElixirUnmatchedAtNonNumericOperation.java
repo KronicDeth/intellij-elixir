@@ -20,7 +20,7 @@ public interface ElixirUnmatchedAtNonNumericOperation extends ElixirUnmatchedExp
   @NotNull
   String moduleAttributeName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

@@ -91,7 +91,10 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                         Modular modular = enclosingModularByCall.putNew(call);
 
                         if (modular == null) {
-                            error("Cannot find enclosing Modular", call);
+                            // don't throw an error if really EEX, but has wrong extension
+                            if (!element.getText().contains("<%=")) {
+                                error("Cannot find enclosing Modular", call);
+                            }
                         } else {
                             for (int arity = arityRange.getMinimumInteger(); arity <= arityRange.getMaximumInteger(); arity++) {
                                 CallDefinition.Tuple tuple = new CallDefinition.Tuple(modular, time, callName, arity);

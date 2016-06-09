@@ -159,7 +159,8 @@ public class Kernel implements Annotator, DumbAware {
                             "super",
                             "try",
                             UNQUOTE,
-                            "unquote_splicing"
+                            "unquote_splicing",
+                            "with"
                     }
             )
     );
@@ -181,33 +182,52 @@ public class Kernel implements Annotator, DumbAware {
     public void annotate(@NotNull final PsiElement element, @NotNull final AnnotationHolder holder) {
         element.accept(
             new PsiRecursiveElementVisitor() {
-                public void visitCall(Call call) {
-                    String resolvedModuleName = call.resolvedModuleName();
-
-                    if (resolvedModuleName != null && resolvedModuleName.equals(KERNEL)) {
-                        String resolvedFunctionName = call.resolvedFunctionName();
-
-                        // a function can't take a `do` block
-                        if (call.getDoBlock() == null) {
-                            if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
-                                highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_FUNCTION);
-                            }
-                        }
-
-                        if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_MACRO);
-                        }
-
-                        if (RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
-                            highlight(call, holder, ElixirSyntaxHighlighter.KERNEL_SPECIAL_FORMS_MACRO);
-                        }
-                    }
-                }
+                /*
+                 * Public Instance Methods
+                 */
 
                 @Override
                 public void visitElement(PsiElement element) {
                     if (element instanceof Call) {
                         visitCall((Call) element);
+                    }
+                }
+
+                /*
+                 * Private Instance Methods
+                 */
+
+                private void visitCall(Call call) {
+                    String resolvedModuleName = call.resolvedModuleName();
+
+                    if (resolvedModuleName != null && resolvedModuleName.equals(KERNEL)) {
+                        PsiElement functionNameElement = call.functionNameElement();
+
+                        if (functionNameElement != null) {
+                            String resolvedFunctionName = call.resolvedFunctionName();
+
+                            // a function can't take a `do` block
+                            if (call.getDoBlock() == null) {
+                                if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
+                                    highlight(
+                                            functionNameElement,
+                                            holder,
+                                            ElixirSyntaxHighlighter.FUNCTION_CALL,
+                                            ElixirSyntaxHighlighter.PREDEFINED_CALL
+                                    );
+                                }
+                            }
+
+                            if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName) ||
+                                    RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                                highlight(
+                                        functionNameElement,
+                                        holder,
+                                        ElixirSyntaxHighlighter.MACRO_CALL,
+                                        ElixirSyntaxHighlighter.PREDEFINED_CALL
+                                );
+                            }
+                        }
                     }
                 }
             }
@@ -223,25 +243,22 @@ public class Kernel implements Annotator, DumbAware {
      *
      * @param element element to highlight
      * @param annotationHolder the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the `element`.
+     * @param textAttributesKeys text attributes to apply to the `element`.
      */
-    private void highlight(@NotNull final PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
-        annotationHolder.createInfoAnnotation(element, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
-        annotationHolder.createInfoAnnotation(element, null).setEnforcedTextAttributes(EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey));
-    }
+    private void highlight(@NotNull final PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey... textAttributesKeys) {
+        annotationHolder
+                .createInfoAnnotation(element, null)
+                .setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
 
-    /**
-     * Highlights function name of call.
-     *
-     * @param call
-     * @param annotationHolder  the container which receives annotations created by the plugin.
-     * @param textAttributesKey text attributes to apply to the `call`'s `Call#functionNameNode`.
-     */
-    private void highlight(@NotNull final Call call, @NotNull AnnotationHolder annotationHolder, @NotNull final TextAttributesKey textAttributesKey) {
-        PsiElement functionNameElement = call.functionNameElement();
-
-        assert functionNameElement != null;
-
-        highlight(functionNameElement, annotationHolder, textAttributesKey);
+        for (TextAttributesKey textAttributesKey : textAttributesKeys) {
+            annotationHolder
+                    .createInfoAnnotation(element, null)
+                    .setEnforcedTextAttributes(
+                            EditorColorsManager
+                                    .getInstance()
+                                    .getGlobalScheme()
+                                    .getAttributes(textAttributesKey)
+                    );
+        }
     }
 }

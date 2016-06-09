@@ -2,6 +2,7 @@ package org.elixir_lang.psi.scope;
 
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.errorreport.Logger;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static com.intellij.lang.parser.GeneratedParserUtilBase.DUMMY_BLOCK;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
@@ -122,13 +124,15 @@ public abstract class Variable implements PsiScopeProcessor {
                     element instanceof ElixirEndOfExpression ||
                     // noParenthesesManyStrictNoParenthesesExpression exists only to be marked as an error
                     element instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
+                    element instanceof LeafPsiElement ||
                     element instanceof Line ||
                     element instanceof PsiErrorElement ||
                     element instanceof PsiWhiteSpace ||
                     element instanceof QualifiableAlias ||
                     element instanceof QualifiedBracketOperation ||
                     element instanceof UnqualifiedBracketOperation ||
-                    element instanceof WholeNumber)) {
+                    element instanceof WholeNumber ||
+                    element.getNode().getElementType().equals(DUMMY_BLOCK))) {
                 Logger.error(Callable.class, "Don't know how to resolve variable in match", element);
             }
         }

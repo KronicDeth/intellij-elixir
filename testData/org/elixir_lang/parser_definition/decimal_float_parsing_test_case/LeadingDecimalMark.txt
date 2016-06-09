@@ -1,4 +1,4 @@
 Elixir File(0,2)
-  PsiErrorElement:'(', <end of expression>, <unmatched expression> or identifier expected, got '.'(0,1)
+  PsiErrorElement:'.' unexpected(0,1)
     PsiElement(.)('.')(0,1)
   PsiElement(0-9)('0')(1,2)

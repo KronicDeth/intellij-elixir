@@ -62,7 +62,7 @@ public interface ElixirUnaryNumericOperation extends Named, Prefix {
   @Nullable
   String moduleName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

@@ -2157,11 +2157,11 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   static boolean expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression")) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_);
     r = emptyParentheses(b, l + 1);
     if (!r) r = unmatchedExpression(b, l + 1, -1);
     if (!r) r = unqualifiedNoParenthesesManyArgumentsCall(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, expressionRecoverWhile_parser_);
     return r;
   }
 
@@ -2196,6 +2196,36 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = endOfExpression(b, l + 1);
     r = r && expression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !(EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier)
+  static boolean expressionRecoverWhile(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionRecoverWhile")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !expressionRecoverWhile_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // EOL | CLOSING_BIT | CLOSING_BRACKET | CLOSING_CURLY | CLOSING_PARENTHESIS | INTERPOLATION_END | SEMICOLON | STAB_OPERATOR | END | blockIdentifier
+  private static boolean expressionRecoverWhile_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expressionRecoverWhile_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EOL);
+    if (!r) r = consumeToken(b, CLOSING_BIT);
+    if (!r) r = consumeToken(b, CLOSING_BRACKET);
+    if (!r) r = consumeToken(b, CLOSING_CURLY);
+    if (!r) r = consumeToken(b, CLOSING_PARENTHESIS);
+    if (!r) r = consumeToken(b, INTERPOLATION_END);
+    if (!r) r = consumeToken(b, SEMICOLON);
+    if (!r) r = consumeToken(b, STAB_OPERATOR);
+    if (!r) r = consumeToken(b, END);
+    if (!r) r = blockIdentifier(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -6540,4 +6570,9 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  final static Parser expressionRecoverWhile_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return expressionRecoverWhile(b, l + 1);
+    }
+  };
 }

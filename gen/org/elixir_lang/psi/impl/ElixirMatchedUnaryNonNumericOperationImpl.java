@@ -86,7 +86,7 @@ public class ElixirMatchedUnaryNonNumericOperationImpl extends ElixirMatchedExpr
     return ElixirPsiImplUtil.moduleName(this);
   }
 
-  @NotNull
+  @Nullable
   public Quotable operand() {
     return ElixirPsiImplUtil.operand(this);
   }

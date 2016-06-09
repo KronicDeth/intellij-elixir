@@ -44,7 +44,7 @@ public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedEx
   @Nullable
   String moduleName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

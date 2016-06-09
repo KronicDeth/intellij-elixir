@@ -31,7 +31,6 @@ import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -836,6 +835,25 @@ public class ElixirPsiImplUtil {
         return isModuleName;
     }
 
+    @Contract(pure = true)
+    public static boolean isOutermostQualifiableAlias(@NotNull QualifiableAlias qualifiableAlias) {
+        PsiElement parent = qualifiableAlias.getParent();
+        boolean outermost = false;
+
+        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
+           reference from overall chain */
+        if (!(parent instanceof QualifiableAlias)) {
+            PsiElement grandParent = parent.getParent();
+
+            // prevents first Alias of a qualified chain from having a separate reference from overall chain
+            if (!(grandParent instanceof QualifiableAlias)) {
+                outermost = true;
+            }
+        }
+
+        return outermost;
+    }
+
     /*
      * @return {@code true} if {@code element} should not have {@code quote} called on it because Elixir natively
      *   ignores such tokens.  {@code false} if {@code element} should have {@code quote} called on it.
@@ -868,7 +886,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static Quotable leftOperand(Infix infix) {
-        return Normalized.leftOperand(infix);
+        return org.elixir_lang.psi.operation.infix.Normalized.leftOperand(infix);
     }
 
     /* Returns the 0-indexed line number for the element */
@@ -1030,15 +1048,9 @@ public class ElixirPsiImplUtil {
     }
 
     @Contract(pure = true)
-    @NotNull
+    @Nullable
     public static Quotable operand(Prefix prefix) {
-        PsiElement[] children = prefix.getChildren();
-
-        if (children.length != 2) {
-            error(Prefix.class, "Prefix operation does not have 2 children, but " + children.length, prefix);
-        }
-
-        return (Quotable) children[1];
+        return org.elixir_lang.psi.operation.prefix.Normalized.operand(prefix);
     }
 
     @Contract(pure = true)
@@ -1056,16 +1068,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static Operator operator(Prefix prefix) {
-        PsiElement[] children = prefix.getChildren();
-
-        if (children.length < 1) {
-            error(
-                    Prefix.class, "Prefix operation does not have at least one child (the operator), but " +
-                            children.length + " children", prefix
-            );
-        }
-
-        return (Operator) children[0];
+        return Normalized.operator(prefix);
     }
 
     @Contract(pure = true)
@@ -1212,8 +1215,8 @@ public class ElixirPsiImplUtil {
     public static PsiElement[] primaryArguments(@NotNull final Infix infix) {
         PsiElement[] children = infix.getChildren();
         int operatorIndex = Normalized.operatorIndex(children);
-        Quotable leftOperand = Normalized.leftOperand(children, operatorIndex);
-        Quotable rightOperand = Normalized.rightOperand(children, operatorIndex);
+        Quotable leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
+        Quotable rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(children, operatorIndex);
 
         return new PsiElement[]{
                 leftOperand,
@@ -1302,7 +1305,7 @@ public class ElixirPsiImplUtil {
         boolean keepProcessing = true;
 
         if (Normalized.operator(and).getText().equals("&&")) {
-            PsiElement leftOperand = Normalized.leftOperand(and);
+            PsiElement leftOperand = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(and);
 
             if (leftOperand != null && !PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
                 // the left operand is not inherently declaring, it should only be if a match is in the left operand
@@ -1370,28 +1373,7 @@ public class ElixirPsiImplUtil {
                                               @NotNull ResolveState state,
                                               PsiElement lastParent,
                                               @NotNull @SuppressWarnings("unused") PsiElement place) {
-        assert scope.isEquivalentTo(lastParent.getParent());
-
-        boolean keepProcessing = true;
-        PsiElement previousSibling = lastParent.getPrevSibling();
-
-        while (previousSibling != null) {
-            if (!(previousSibling instanceof ElixirEndOfExpression ||
-                    previousSibling instanceof PsiComment ||
-                    previousSibling instanceof PsiWhiteSpace)) {
-                if (!createsNewScope(previousSibling)) {
-                    keepProcessing = processor.execute(previousSibling, state);
-
-                    if (!keepProcessing) {
-                        break;
-                    }
-                }
-            }
-
-            previousSibling = previousSibling.getPrevSibling();
-        }
-
-        return keepProcessing;
+        return processDeclarationsInPreviousSibling(scope, processor, state, lastParent, place);
     }
 
     public static boolean processDeclarations(@NotNull final ElixirStabOperation stabOperation,
@@ -1454,6 +1436,40 @@ public class ElixirPsiImplUtil {
                                               @SuppressWarnings("unused") PsiElement lastParent,
                                               @NotNull @SuppressWarnings("unused") PsiElement place) {
         return processor.execute(qualifiedAlias, state);
+    }
+
+    /**
+     * Processes declarations in siblings of {@code lastParent} backwards from {@code lastParent}.
+     *
+     * @param scope an {@link ElixirStabBody} or {@link ElixirFile} that has a sequence of expressions as children
+     */
+    public static boolean processDeclarationsInPreviousSibling(@NotNull final PsiElement scope,
+                                                               @NotNull PsiScopeProcessor processor,
+                                                               @NotNull ResolveState state,
+                                                               PsiElement lastParent,
+                                                               @NotNull @SuppressWarnings("unused") PsiElement entrance) {
+        assert scope.isEquivalentTo(lastParent.getParent());
+
+        boolean keepProcessing = true;
+        PsiElement previousSibling = lastParent.getPrevSibling();
+
+        while (previousSibling != null) {
+            if (!(previousSibling instanceof ElixirEndOfExpression ||
+                    previousSibling instanceof PsiComment ||
+                    previousSibling instanceof PsiWhiteSpace)) {
+                if (!createsNewScope(previousSibling)) {
+                    keepProcessing = processor.execute(previousSibling, state);
+
+                    if (!keepProcessing) {
+                        break;
+                    }
+                }
+            }
+
+            previousSibling = previousSibling.getPrevSibling();
+        }
+
+        return keepProcessing;
     }
 
     public static boolean processDeclarationsRecursively(@NotNull final PsiElement psiElement,
@@ -2163,6 +2179,8 @@ public class ElixirPsiImplUtil {
                     } else if (ancestorCall.hasDoBlockOrKeyword()) {
                         break;
                     }
+                } else if (ancestor instanceof ElixirStabOperation) {
+                    break;
                 } else if (ancestor instanceof PsiFile) {
                     error(
                             UnqualifiedNoArgumentsCall.class,
@@ -2520,18 +2538,10 @@ public class ElixirPsiImplUtil {
 
     @Nullable
     public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiElement parent = qualifiableAlias.getParent();
         PsiReference reference = null;
 
-        /* prevents individual Aliases or tail qualified aliases of qualified chain from having reference separate
-           reference from overall chain */
-        if (!(parent instanceof QualifiableAlias)) {
-            PsiElement grandParent = parent.getParent();
-
-            // prevents first Alias of a qualified chain from having a separate reference from overall chain
-            if (!(grandParent instanceof QualifiableAlias)) {
-                reference = new org.elixir_lang.reference.Module(qualifiableAlias);
-            }
+        if (isOutermostQualifiableAlias(qualifiableAlias)) {
+            reference = new org.elixir_lang.reference.Module(qualifiableAlias);
         }
 
         return reference;
@@ -4618,7 +4628,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Quotable rightOperand(Infix infix) {
-        return Normalized.rightOperand(infix);
+        return org.elixir_lang.psi.operation.infix.Normalized.rightOperand(infix);
     }
 
     @Contract(pure = true)

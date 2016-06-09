@@ -44,7 +44,7 @@ public interface ElixirUnmatchedCaptureNonNumericOperation extends ElixirUnmatch
   @Nullable
   String moduleName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

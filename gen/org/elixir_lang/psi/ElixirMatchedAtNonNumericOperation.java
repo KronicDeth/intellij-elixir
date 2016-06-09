@@ -20,7 +20,7 @@ public interface ElixirMatchedAtNonNumericOperation extends ElixirMatchedExpress
   @NotNull
   String moduleAttributeName();
 
-  @NotNull
+  @Nullable
   Quotable operand();
 
   @NotNull

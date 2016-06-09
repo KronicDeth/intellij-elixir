@@ -617,6 +617,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                    where the match variable is used */
                 useScope = followingSiblingsSearchScope(match);
             }
+        } else if (parent instanceof PsiFile) {
+            useScope = followingSiblingsSearchScope(match);
         } else {
             useScope = variableUseScope(parent);
         }

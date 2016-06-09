@@ -11,13 +11,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.elixir_lang.ElixirSyntaxHighlighter;
+import org.elixir_lang.psi.ElixirAlias;
 import org.elixir_lang.psi.ElixirKeywordKey;
+import org.elixir_lang.psi.QualifiableAlias;
 import org.jetbrains.annotations.NotNull;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.isOutermostQualifiableAlias;
+
 /**
- * Annotates things that act like Atom as Atom
+ * Annotates aliases
  */
-public class Atom implements Annotator, DumbAware {
+public class Alias implements Annotator, DumbAware {
     /*
      * Public Instance Methods
      */
@@ -41,8 +45,8 @@ public class Atom implements Annotator, DumbAware {
 
                    @Override
                    public void visitElement(PsiElement element) {
-                       if (element instanceof ElixirKeywordKey) {
-                         visitKeywordKey((ElixirKeywordKey) element);
+                       if (element instanceof QualifiableAlias) {
+                         visitQualifiableAlias((QualifiableAlias) element);
                        }
                    }
 
@@ -50,18 +54,9 @@ public class Atom implements Annotator, DumbAware {
                     * Private Instance Methods
                     */
 
-                   private void visitKeywordKey(ElixirKeywordKey keywordKey) {
-                       PsiElement child = keywordKey.getFirstChild();
-
-                       // a normal, non-quoted keyword key
-                       if (child instanceof LeafPsiElement) {
-                           TextRange keywordKeyTextRange = keywordKey.getTextRange();
-                           // highlight the `:` as part of the pseudo-atom
-                           TextRange atomTextRange = new TextRange(
-                                   keywordKeyTextRange.getStartOffset(),
-                                   keywordKeyTextRange.getEndOffset() + 1
-                           );
-                           highlight(atomTextRange, holder, ElixirSyntaxHighlighter.ATOM);
+                   private void visitQualifiableAlias(QualifiableAlias qualifiableAlias) {
+                       if (isOutermostQualifiableAlias(qualifiableAlias)) {
+                           highlight(qualifiableAlias, holder, ElixirSyntaxHighlighter.ALIAS);
                        }
                    }
                }
@@ -71,6 +66,12 @@ public class Atom implements Annotator, DumbAware {
     /*
      * Private Instance Methods
      */
+
+    private void highlight(@NotNull final PsiElement element,
+                           @NotNull AnnotationHolder annotationHolder,
+                           @NotNull final TextAttributesKey textAttributesKey) {
+        highlight(element.getTextRange(), annotationHolder, textAttributesKey);
+    }
 
     /**
      * Highlights `textRange` with the given `textAttributesKey`.
