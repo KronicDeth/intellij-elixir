@@ -22,6 +22,44 @@
 
 # Contributing
 
+## Development
+
+### Color Schemes
+
+JetBrains plugins are able to set the text attribute values for `TextAttributeKey`s that are unique to the plugin by using `additionalTextAttributes` entries in `src/META-INF/plugin.xml`.  If you have a Color Scheme for Elixir you like, you can propose it as the default for a named theme by extracting the `additionTextAttributes` `file` from an Exported Settings `.jar`.
+
+#### Customizing Scheme
+
+1. Preferences > Editor > Colors & Fonts > Elixir
+2. Customize the colors
+3. Click "Save As" to name the Scheme (`My $SCHEME_NAME`)_
+
+#### Exporting Settings
+
+1. File > Export Settings
+2. Click "Select None"
+3. Check "Editor Colors"
+4. Change the "Export settings to:" path to a place you can easily access it in the terminal
+5. Click "OK"
+
+#### Unpack Settings
+
+1. `mkdir settings`
+2. `cd settings`
+3. `jar xf $SAVE_DIRECTORY/settings.jar`
+
+#### Convert ICLS to Additional Text Attributes format
+
+1. `mv colors/colors/My\ $SCHEME_NAME.icls $INTELLIJ_ELIXIR/colorSchemes/ElixirSCHEME_NAME.xml` (`$SCHEME_NAME` will be `Default`, `Darcula` or another shared theme name.)
+2. Remove all elements except for `scheme attributes`.
+3. Remove the outer `scheme` tag
+4. Rename the `attributes` tag to `list`.
+5. Add `<?xml version='1.0'?>` to the top of the file
+
+#### Add Additional Text Attributes to plugin
+
+1. In `plugin.xml` inside the `idea-plugin extensions[defaultExtensionNs="com.intellij"]` tag, add a new additionalTextAttribute tag: `<additionalTextAttributes file="colorSchemes/Elixir$SCHEME_NAME.xml" scheme="SCHEME_NAME"/>`
+
 ## Building
 
 ### Documentation
