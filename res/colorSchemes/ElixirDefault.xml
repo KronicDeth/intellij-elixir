@@ -2,51 +2,51 @@
 <list>
     <option name="ELIXIR_ALIAS">
         <value>
-            <option name="FOREGROUND" value="e6da00" />
+            <option name="FOREGROUND" value="310066" />
             <option name="FONT_TYPE" value="1" />
-            <option name="EFFECT_TYPE" value="5" />
         </value>
     </option>
     <option name="ELIXIR_BIT">
         <value>
-            <option name="FOREGROUND" value="4963e6" />
+            <option name="FOREGROUND" value="68990c" />
         </value>
     </option>
     <option name="ELIXIR_BRACES">
         <value>
-            <option name="FOREGROUND" value="48b9e6" />
+            <option name="FOREGROUND" value="997d0b" />
         </value>
     </option>
     <option name="ELIXIR_BRACKET">
         <value>
-            <option name="FOREGROUND" value="49e6e6" />
+            <option name="FOREGROUND" value="99570b" />
         </value>
     </option>
     <option name="ELIXIR_CALLBACK">
         <value>
-            <option name="FOREGROUND" value="ffc670" />
+            <option name="FOREGROUND" value="301d99" />
             <option name="FONT_TYPE" value="1" />
-            <option name="EFFECT_TYPE" value="4" />
         </value>
     </option>
     <option name="ELIXIR_CHAR_LIST">
         <value>
-            <option name="FOREGROUND" value="6a8759" />
+            <option name="FOREGROUND" value="803380" />
+            <option name="FONT_TYPE" value="1" />
         </value>
     </option>
     <option name="ELIXIR_CHAR_TOKEN">
         <value>
-            <option name="FOREGROUND" value="a0a349" />
+            <option name="FOREGROUND" value="441a66" />
+            <option name="FONT_TYPE" value="1" />
         </value>
     </option>
     <option name="ELIXIR_DOT">
         <value>
-            <option name="FOREGROUND" value="49e697" />
+            <option name="FOREGROUND" value="990d0b" />
         </value>
     </option>
     <option name="ELIXIR_EXPRESSION_SUBSTITUTION_MARK">
         <value>
-            <option name="FOREGROUND" value="49e649" />
+            <option name="FOREGROUND" value="990b4d" />
         </value>
     </option>
     <option name="ELIXIR_FUNCTION_CALL">
@@ -59,18 +59,6 @@
             <option name="FOREGROUND" value="727272" />
         </value>
     </option>
-    <option name="ELIXIR_INTERPOLATION">
-        <value>
-            <option name="FOREGROUND" value="49e649" />
-        </value>
-    </option>
-    <option name="ELIXIR_KERNEL_MACRO">
-        <value>
-            <option name="FOREGROUND" value="cc7832" />
-            <option name="FONT_TYPE" value="3" />
-            <option name="EFFECT_TYPE" value="4" />
-        </value>
-    </option>
     <option name="ELIXIR_MACRO_CALL">
         <value>
             <option name="FONT_TYPE" value="3" />
@@ -78,70 +66,70 @@
     </option>
     <option name="ELIXIR_MAP">
         <value>
-            <option name="FOREGROUND" value="4997e6" />
+            <option name="FOREGROUND" value="92990b" />
         </value>
     </option>
     <option name="ELIXIR_OPERATION_SIGN">
         <value>
-            <option name="FOREGROUND" value="97e649" />
+            <option name="FOREGROUND" value="990b92" />
         </value>
     </option>
     <option name="ELIXIR_PARAMETER">
         <value>
-            <option name="FOREGROUND" value="e047ff" />
+            <option name="FOREGROUND" value="6993a" />
         </value>
     </option>
     <option name="ELIXIR_PARENTHESES">
         <value>
-            <option name="FOREGROUND" value="e6e649" />
+            <option name="FOREGROUND" value="662b99" />
         </value>
     </option>
     <option name="ELIXIR_PREDEFINED">
         <value>
-            <option name="FOREGROUND" value="cc7832" />
-            <option name="EFFECT_TYPE" value="1" />
+            <option name="FOREGROUND" value="80" />
         </value>
     </option>
     <option name="ELIXIR_SIGIL">
         <value>
-            <option name="FOREGROUND" value="47A6B3" />
-            <option name="BACKGROUND" value="232525" />
+            <option name="FOREGROUND" value="996c18" />
+            <option name="BACKGROUND" value="1a3333" />
         </value>
     </option>
     <option name="ELIXIR_SPECIFICATION">
         <value>
-            <option name="FOREGROUND" value="ffc670" />
+            <option name="FOREGROUND" value="301d99" />
         </value>
     </option>
     <option name="ELIXIR_STRING">
         <value>
-            <option name="FOREGROUND" value="70b347" />
+            <option name="FOREGROUND" value="660f58" />
+            <option name="FONT_TYPE" value="1" />
         </value>
     </option>
     <option name="ELIXIR_STRUCT">
         <value>
-            <option name="FOREGROUND" value="49cbe6" />
+            <option name="FOREGROUND" value="996e0b" />
         </value>
     </option>
     <option name="ELIXIR_TYPE">
         <value>
-            <option name="FOREGROUND" value="bbb529" />
+            <option name="FOREGROUND" value="4a0099" />
         </value>
     </option>
     <option name="ELIXIR_TYPE_PARAMETER">
         <value>
-            <option name="FOREGROUND" value="cc6672" />
+            <option name="FOREGROUND" value="266b99" />
         </value>
     </option>
     <option name="ELIXIR_VALID_ESCAPE_SEQUENCE">
         <value>
+            <option name="FOREGROUND" value="2c993d" />
             <option name="FONT_TYPE" value="1" />
-            <option name="FOREGROUND" value="80529C" />
         </value>
     </option>
     <option name="ELIXIR_VARIABLE">
         <value>
-            <option name="FOREGROUND" value="8547ff" />
+            <option name="FOREGROUND" value="179906" />
         </value>
     </option>
 </list>
