@@ -135,7 +135,8 @@
     </option>
     <option name="ELIXIR_VALID_ESCAPE_SEQUENCE">
         <value>
-            <option name="FOREGROUND" value="cc7832" />
+            <option name="FONT_TYPE" value="1" />
+            <option name="FOREGROUND" value="80529C" />
         </value>
     </option>
     <option name="ELIXIR_VARIABLE">
