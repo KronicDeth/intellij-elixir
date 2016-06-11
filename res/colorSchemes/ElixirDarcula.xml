@@ -88,7 +88,7 @@
     </option>
     <option name="ELIXIR_PARAMETER">
         <value>
-            <option name="FOREGROUND" value="cc39c5" />
+            <option name="FOREGROUND" value="e047ff" />
         </value>
     </option>
     <option name="ELIXIR_PARENTHESES">
@@ -130,7 +130,7 @@
     </option>
     <option name="ELIXIR_TYPE_PARAMETER">
         <value>
-            <option name="FOREGROUND" value="cc6578" />
+            <option name="FOREGROUND" value="cc6672" />
         </value>
     </option>
     <option name="ELIXIR_VALID_ESCAPE_SEQUENCE">
@@ -141,7 +141,7 @@
     </option>
     <option name="ELIXIR_VARIABLE">
         <value>
-            <option name="FOREGROUND" value="418ac6" />
+            <option name="FOREGROUND" value="8547ff" />
         </value>
     </option>
 </list>
