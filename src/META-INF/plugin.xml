@@ -860,6 +860,7 @@
     <!-- end liveTemplates -->
 
     <additionalTextAttributes file="colorSchemes/ElixirDarcula.xml" scheme="Darcula"/>
+    <additionalTextAttributes file="colorSchemes/ElixirDefault.xml" scheme="Default"/>
 
     <annotator implementationClass="org.elixir_lang.annonator.Alias" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.Atom" language="Elixir"/>
