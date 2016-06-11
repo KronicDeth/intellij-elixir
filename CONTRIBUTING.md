@@ -84,6 +84,7 @@ doctoc .
 
 #### IntelliJ IDEA
 
+##### For Plugin
 An IntelliJ Platform Plugin SDK must be setup to develop plugins, but the paths are tied to the version of IntellIJ IDEA
 you have installed, so you will likely need to fix the paths to match your environment.
 
@@ -101,7 +102,7 @@ you have installed, so you will likely need to fix the paths to match your envir
             1. You can download [JDK 1.6 from Apple](https://support.apple.com/kb/DL1572?locale=en_US)
         3. Click OK
     5. In the “Select Home Directory for IntelliJ Platform Plugin SDK” select the IntelliJ IDEA Community Edition
-       Contents: `/Applications/IntelliJ IDEA 15 CE.app/Contents`.
+       Contents: `/Applications/IntelliJ IDEA 14.1 CE.app/Contents`.
         **NOTE: Use Community Edition even if you have IntelliJ IDEA Ultimate Edition installed, so that the built
                 plugin works with Community Edition.**
     6. In the “Select Internal Java  Platform” window
@@ -112,6 +113,50 @@ you have installed, so you will likely need to fix the paths to match your envir
         2. Click the + Icon
         3. Select “~/git/JetBrains/intellij-community”
         4. In the “Detected Roots” window, click “OK” to add all roots.
+    8. Click OK to close “Project Structure”
+
+##### For JPS Builder Compile Server
+
+Compile servers must be compatible all the way back to Java 1.6, but they also link to `openapi.jar`, which in new IntelliJ versions, like 2016.1, contains Java 1.8 only (`MAJOR.MINOR` `52.0`) `.class` files.  To ensure the jps-builder module is built so it will only use Java 1.6 compatible `.class` files in IntelliJ 14.1 through IntelliJ 2016.1, a separate, minimal IntelliJ Platform Plugin SDK is used for the `jps-builder` and `jps-shared` modules.
+ 
+ 1. Files > Project Structure
+ 2. In the "Project Structure" window
+     1. Select Platform Settings > SDKs
+    2. Click “+”
+    3. Chose “IntelliJ Platform Plugin SDK”
+    4. A modal **may** pop-up saying “Cannot Create SDK”, “You need to configure a Java SDK first”.
+        1. Click OK
+        2. In the “Select Home Directory for JDK” select the JDK 1.6 directory:
+           “/Library/Java/JavaVirtualMachines/1.6.0.jdk/Contents/Home”.
+           **NOTE: JDK 1.6 is used, even though it is unsupported by Oracle, to give the greatest compatibility with
+                   older JetBrains IDE versions**
+            1. You can download [JDK 1.6 from Apple](https://support.apple.com/kb/DL1572?locale=en_US)
+        3. Click OK
+    5. In the “Select Home Directory for IntelliJ Platform Plugin SDK” select the IntelliJ IDEA Community Edition
+       Contents: `/Applications/IntelliJ IDEA 14.1 CE.app/Contents`.
+        **NOTE: Use Community Edition even if you have IntelliJ IDEA Ultimate Edition installed, so that the built
+                plugin works with Community Edition.**
+    6. In the “Select Internal Java  Platform” window
+        1. Select “1.6”
+        2. Click OK
+    7. Select the “IntelliJ IDEA Community Edition” SDK.
+        1. Change the Name to "IntelliJ IDEA Community Edition (JPS-Builder)"
+        2. Minimize the number of jars included from "IntelliJ IDEA Community Edition"
+            1. Select all `/Applications/IntelliJ IDEA 14.1 CE.app/Contents` jars
+            2. Unselect (with Cmd+Click) the minimal jars needed
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/annotations.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/jdom.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/jps-model.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/jps-server.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/openapi.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/trove4j.jar` 
+                * `/Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/util.jar` 
+            3. Click the - Icon to remove the unneeded jars
+        3. Add the Sourcepath
+            1. Select the Sourcepath tab
+            2. Click the + Icon
+            3. Select “~/git/JetBrains/intellij-community”
+            4. In the “Detected Roots” window, click “OK” to add all roots.
     8. Click OK to close “Project Structure”
 
 #### IntelliJ Erlang
