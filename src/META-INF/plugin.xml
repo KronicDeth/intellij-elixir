@@ -108,6 +108,160 @@
               Highlight keyword keys (<code>key:</code> in <code>key: value</code>) that aren't quotes
               (<code>"key": value</code> or <code>'key': value</code>) as Atom.
             </li>
+            <li>
+              <p>Show annotator applied highlights in the Preferences > Editor > Colors & Fonts > Elixir.</p>
+              <ul>
+                <li>Errors</li>
+                <li><code>Alias</code></li>
+                <li>
+                  <p><code>Braces and Operators</code></p>
+                  <ul>
+                    <li><code>Bit</code> (<code><<</code> and <code>>></code>)</li>
+                    <li><code>Braces</code> (<code>{</code> and <code>}</code>)</li>
+                    <li><code>Brackets</code> (<code>[</code> and <code>]</code>)</li>
+                    <li><code>Char Tokens</code> (<code>?</code>)</li>
+                    <li><code>Comma</code> (<code>,</code>)</li>
+                    <li><code>Dot</code> (<code>.</code>)</li>
+                    <li><code>Interpolation</code> (<code>#{</code> and <code>}</code>)</li>
+                    <li>
+                      <p><code>Maps and Structs</code><p>
+                      <ul>
+                        <li><code>Maps</code> (<code>%{</code> and <code>}</code>)</li>
+                        <li>
+                          <code>Structs</code> (<code>%{</code> and <code>}</code> when used for struct.  The Alias is
+                          still highlighted using <code>Alias</code>)
+                        </li>
+                      </ul>
+                    </li>
+                    <li><code>Operation Sign</code></li>
+                    <li><code>Parentheses</code> (<code>(</code> and <code>)</code>)</li>
+                    <li><code>Semicolon</code> (<code>;</code>)</li>
+                  </ul>
+                </li>
+                <li>
+                  <p><code>Calls</code></p>
+                  <ul>
+                    <li>
+                      <code>Function</code> (currently only combined with <code>Predefined</code> to highlight
+                      <code>Kernel</code> functions.  Will be used later for all function calls once function references
+                      are implemented.)
+                    </li>
+                    <li>
+                      <code>Macro</code> (curently only combined with <code>Predefined</code> to highlight
+                      <code>Kernel</code> and <code>Kernel.SpecialForms</code> macros. Will be used later for all macro
+                      calls once macro references are implemented.)
+                    </li>
+                    <li>
+                      <code>Predefined</code> (Combined with <code>Function</code> to highlight <code>Kernel</code>
+                      functions.  Combined with <code>Macro</code> to highlight <code>Kernel</code> and
+                      <code>Kernel.SpecialForms</code> macros.)
+                    </li>
+                  </ul>
+                </li>
+                <li><code>Escape Sequence</code></li>
+                <li>
+                  <p><code>Module Attributes</code></p>
+                  <ul>
+                    <li>
+                      <p><code>Documentation</code> (Previously <code>Documentation Module Attributes</code>)</p>
+                      <ul>
+                        <li><code>Text</code> (Previously <code>Documentation Text</code>)</li>
+                      </ul>
+                    </li>
+                    <li>
+                      <p><code>Types</code></p>
+                      <ul>
+                        <li>
+                          <code>Callback</code> (<code>my_callback</code> in <code>@callback my_callback() :: :ok</code>
+                          or <code>my_macro_callback</code> in <code>@macrocallback my_macro_callback</code>)
+                        </li>
+                        <li>
+                          <code>Specification</code> (<code>my_function</code> in
+                          <code>@spec my_function() :: :ok</code>)
+                        </li>
+                        <li>
+                          <p><code>Type</code></p>
+                          <ul>
+                            <li><code>typ</code> and <code>integer</code> in  <code>@type typ :: integer</code></li>
+                            <li>
+                              <code>parameterized</code> in
+                              <code>@type parameterized(type_parameter) :: type_parameter</code>
+                            </li>
+                            <li><code>typtyp</code> in <code>@opaque typtyp :: 1..10</code></li>
+                            <li>
+                              <code>typ</code> and <code>typtyp</code> in
+                              <code>@callback func(typ, typtyp) :: :ok | :fail</code>
+                            </li>
+                            <li>
+                              <code>binary</code> and <code>utf8</code> in
+                              <code><< "hello" :: binary, c :: utf8, x = 4 * 2 >> = "hello™1"</code>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <code>Type Parameters</code> (<code>type_parameter</code> in
+                      <code>@type parameterized(type_parameter) :: type_parameter</code>)
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <p><code>Numbers</code></p>
+                  <ul>
+                    <li><code>Binary, Decimal, Hexadecimal, and Octal Digits</code> (Previously at top-level.)</li>
+                    <li><code>Decimal Exponent, Mark and Separator</code> (Previously at top-level)</li>
+                    <li>
+                      <code>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</code> (Previously at top-level.)
+                    </li>
+                    <li><code>Non-Decimal Base Prefix</code> (Previously at top-level.)</li>
+                    <li><code>Obsolete Non-Decimal Base Prefix</code></li>
+                  </ul>
+                </li>
+                <li>
+                  <p><code>Variables</code></p>
+                  <ul>
+                    <li><code>Ignored</code></li>
+                    <li><code>Parameter</code></li>
+                    <li><code>Variable</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p>Recover in expression until close of subexpression</p>
+              <ul>
+                <li><code>\n</code></li>
+                <li><code>\r\n</code></li>
+                <li><code>>></code></li>
+                <li><code>]</code></li>
+                <li><code>}</code></li>
+                <li><code>)</code></li>
+                <li><code>;</code></li>
+                <li><code>-></code></li>
+                <li><code>end</code></li>
+                <li><code>after</code></li>
+                <li><code>catch</code></li>
+                <li><code>else</code></li>
+                <li><code>rescue</code></li>
+              </ul>
+            </li>
+            <li>
+              Update Preferences > Editor > Colors & Fonts > Elixir example text's bitstring syntax to Elixir post-1.0.0
+              (Use <code>-</code> to separate segment options instead of a list.)
+            </li>
+            <li>
+              Use same algorithm for <code>ElixirStabBody</code> and <code>ElixirFile</code> because they are sequences
+              of expressions.
+            </li>
+            <li>
+              Highlight atom keywords (<code>false</code>, <code>nil</code>, and <code>true</code>) as merge of
+              <code>Atom</code> and <code>Keyword</code> text attributes.  If both only use foreground color,
+              <code>Keyword</code> wins.
+            </li>
+            <li>Annotate <code>QualifiableAlias</code> as <code>Alias</code>.</li>
+            <li>Highlight keyword list and map keywords (<code><key>:</code>) as <code>Atom</code>.</li>
+            <li>Add <code>with</code> to highlighted special forms</li>
           </ul>
         </li>
         <li>
@@ -149,6 +303,65 @@
               <code>null</code> reference when they are non-referencing, like <code>@spec</code>.
             </li>
             <li>Leave normal highlighting for char tokens when highlighting types</li>
+            <li>Stab operation parameter Use Scope is the stab operation.</li>
+            <li>
+              Skip over <code>PsiLeafElement</code> when looking for variables because the <code>PsiLeafElement</code>
+              is an error.
+            </li>
+            <li>
+              In a script file where the parent of a <code>Match</code> is a <code>PsiFile</code>, the
+              <code>Match</code> Use Scope is the rest of the file.
+            </li>
+            <li>Add <code>=</code> to <code>Operator Signs</code></li>
+            <li>
+              Skip <code>NoParenthesesKeywords</code> when highlighting types, which occurs when the <code>::</code> has
+              no proper right operand and the following one-liner function clause with <code>do:</code> is parsed as the
+              right operand.
+            </li>
+            <li>Skip <code>DUMMY_BLOCK</code> when looking for Variable, which prevents walking through errors.</li>
+            <li>
+              Use <code>Normalized</code> pattern for <code>Prefix</code>, so that the operand is <code>null</code> when
+              only the operator matches or the operand has errors.
+            </li>
+            <li>
+              Work-around Phoenix .ex templates that contain EEX: if <code><%=</code> from EEX is detected, don't throw
+              error when <code>Modular</code> can't be found.
+            </li>
+            <li>Fix capitalization error in example text</li>
+          </ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              <p>
+                Preferences > Editor > Colors & Fonts > Elixir restructured to group together related highlights and to
+                match grouping used for Colors & Fonts > Language Defaults and Colors & Fonts > Java.
+              </p>
+              <ul>
+                <li>
+                  <code>Documentation Module Attributes</code> renamed to
+                  <code>Module Attributes</code> > <code>Documentation</code>
+                </li>
+                <li>
+                  <code>Documentation Text</code> renamed to <code>Module Attributes > Documentation > Text</code>
+                </li>
+                <li>
+                  <code>Expression Substitution Mark</code> renamed to
+                  <code>Braces and Operators > Interpolation</code>.
+                </li>
+                <li>
+                  <p>The following are now nested under <code>Numbers</code> instead of being at the top-level:<p>
+                  <ul>
+                    <li><code>Binary, Decimal, Hexadecimal, and Octal Digits</code>
+                    <li><code>Decimal Exponent, Mark and Separator</code> </li>
+                    <li><code>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</code></li>
+                    <li><code>Non-Decimal Base Prefix</code></li>
+                    <li><code>Obsolete Non-Decimal Base Prefix</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
