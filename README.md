@@ -21,7 +21,7 @@
       - [Elixir Supervisor](#elixir-supervisor)
       - [Elixir GenServer](#elixir-genserver)
       - [Elixir GenEvent](#elixir-genevent)
-    - [Syntax Highlighting](#syntax-highlighting)
+    - [Syntax Highlighting and Semantic Annotation](#syntax-highlighting-and-semantic-annotation)
     - [Grammar parsing](#grammar-parsing)
     - [Inspections](#inspections)
       - [Ambiguous nested calls](#ambiguous-nested-calls)
@@ -358,195 +358,603 @@ defmodule MyNamespace.MyModule do
 end
 ```
 
-### Syntax Highlighting
+### Syntax Highlighting and Semantic Annotation
 
-Syntax highlighting for the following tokens:
+Syntax highlighting of lexer tokens and semantic annotating of parser elements can be customized in in the Color Settings page for Elixir (Preferences > Editor > Color & Fonts > Elixir).
 
-* [Aliases](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L454), in other words, module names.
-* [Atoms](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L238-L303) (`:`, `:''`, or `:""`)
-* Anonymous functions (`fn end`)
-* Access/Bracket expressions (`foo[key]` and `@foo[key]`)
-* Binaries/Bit Strings (`<<>>`)
-* [Character Tokens](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L166-L221) (`?<character>` or `?<escape_sequence>`)
-* [Comments](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`#`)
-* Documentation Module Attributes (`@doc`, `@moduledoc`, and `@typedoc`)
-* Documentation Text (the string or heredoc value to `@doc`, `@moduledoc`, and `@typedoc`)
-* [End of Lines](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L305-L332) (`;`, `\n`, `\r\n`)
-* [Escape Sequences](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_interpolation.erl#L71-L116) (`\\<character>`, `\\x<hexadecimal>`, or `\\x{<hexadecimal>}`)
-* [Heredocs](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L223-L229) (`"""` or `'''`)
-* [Identifiers](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L460-L470), in other words, variable, function and macro names.
-* [Kernel Functions](http://elixir-lang.org/docs/stable/elixir/Kernel.html#functions)
-  * `abs`
-  * `apply`
-  * `apply`
-  * `binary_part`
-  * `bit_size`
-  * `byte_size`
-  * `div`
-  * `elem`
-  * `exit`
-  * `function_exported?`
-  * `get_and_update_in`
-  * `get_in`
-  * `hd`
-  * `inspect`
-  * `is_atom`
-  * `is_binary`
-  * `is_bitstring`
-  * `is_boolean`
-  * `is_float`
-  * `is_function`
-  * `is_function`
-  * `is_integer`
-  * `is_list`
-  * `is_map`
-  * `is_number`
-  * `is_pid`
-  * `is_port`
-  * `is_reference`
-  * `is_tuple`
-  * `length`
-  * `macro_exported?`
-  * `make_ref`
-  * `map_size`
-  * `max`
-  * `min`
-  * `node`
-  * `node`
-  * `not`
-  * `put_elem`
-  * `put_in`
-  * `rem`
-  * `round`
-  * `self`
-  * `send`
-  * `spawn`
-  * `spawn`
-  * `spawn_link`
-  * `spawn_link`
-  * `spawn_monitor`
-  * `spawn_monitor`
-  * `struct`
-  * `throw`
-  * `tl`
-  * `trunc`
-  * `tuple_size`
-  * `update_in`
-* [Kernel Macros](http://elixir-lang.org/docs/stable/elixir/Kernel.html#macros)
-  * `@`
-  * `alias!`
-  * `and`
-  * `binding`
-  * `def`
-  * `defdelegate`
-  * `defexception`
-  * `defimpl`
-  * `defmacro`
-  * `defmacrop`
-  * `defmodule`
-  * `defoverridable`
-  * `defp`
-  * `defprotocol`
-  * `defstruct`
-  * `destructure`
-  * `get_and_update_in`
-  * `if`
-  * `in`
-  * `is_nil`
-  * `match?`
-  * `or`
-  * `put_in`
-  * `raise`
-  * `raise`
-  * `reraise`
-  * `reraise`
-  * `sigil_C`
-  * `sigil_R`
-  * `sigil_S`
-  * `sigil_W`
-  * `sigil_c`
-  * `sigil_r`
-  * `sigil_s`
-  * `sigil_w`
-  * `to_char_list`
-  * `to_string`
-  * `unless`
-  * `update_in`
-  * `use`
-  * `var!`
-* [Kernel.SpecialForms Macros](http://elixir-lang.org/docs/stable/elixir/Kernel.SpecialForms.html)
-  * `__CALLER__`
-  * `__DIR__`
-  * `__ENV__`
-  * `__MODULE__`
-  * `__aliases__`
-  * `__block__`
-  * `alias`
-  * `case`
-  * `cond`
-  * `fn`
-  * `for`
-  * `import`
-  * `quote`
-  * `receive`
-  * `require`
-  * `super`
-  * `try`
-  * `unquote`
-  * `unquote_splicing`
-* Keywords (`after`, `catch`, `do`, `else`, `end`, `fn`, and `rescue`)
-* Maps (`%{}` and `%{ current | <update> }`)
-* Numbers
-  * Binary (`0b`) with invalid digit highlighting and missing digit recovery
-  * Decimal with invalid digit highlighting
-  * Hexadecimal (`0x`) with invalid digit highlighting and missing digit recovery
-  * Obsolete Binary (`0B`) with invalid digit highlighting and missing digit recovery
-  * Obsolete Hexadecimal (`0X`) with invalid digit highlighting and missing digit recovery
-  * Octal (`0o`) with invalid digit highlighting and missing digit recovery
-  * Unknown Non-Decimal (`0[A-Za-z]`) with invalid digit highlighting and missing digit recovery
-* [Operators](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L343-L424) with [arity, associativity, and precedence](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L44-L71):
-  * Addition (`+` and `-`)
-  * And (`&&`, `&&&`, and `and`)
-  * Arrow (`|>`, `<<<`, `>>>`, `~>>`, `<<~`, `~>`, `<~`, `<~>`, and `<|>`)
-  * Association (`=>`)
-  * At (`@`)
-  * Capture (`&`)
-  * Comparison (`==`, `!=`, `=~`, `===`, and `!==`)
-  * Dot (`.`)
-  * Hat (`^^^`)
-  * In (`in`)
-  * In Match (`<-` and `\\`)
-  * Match (`=`)
-  * Multiplication (`*` and `/`)
-  * Or (`||`, `|||`, and `or`)
-  * Pipe (`|`)
-  * Relational (`<`, `>`, `<=`, and `>=`)
-  * Stab (`->`)
-  * Two (`++`, `--`, `..`, and `<>`)
-  * Type (`::`)
-  * Unary (`+`, `-`, `!`, `^`, `not`, and `~~~`)
-  * When (`when`)
-* Parentheticals (`(1 + 2)`)
-* [Regular Keywords](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L963-L968) (`end`, `false`, `fn`, `nil`, and `true`)
-* [Sigils](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L139-L143) (`~`)
-  * CharList Sigils (`~c` and `~C`)
-  * Regex Sigils (`~r` and `~R`)
-  * String Sigils (`~s` and `~S`)
-  * Word Sigils (`~w` and `~W`)
-  * Custom Sigils (`~<lower_case_character>` and `~<UPPER_CASE_CHARACTER>`)
-* Specifications (function names passed to `@callback`, `@macrocallback` or `@spec`
-* Stabs (`->`)
-* Structs (`%MyStruct{}`)
-* [Strings and Char List](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L231-L236) (`"` or `'`)
-* [Tuples] (`{}`)
-* Type (Variables/calls in the parameters and return of `@callback`, `@macrocallback`, `@spec`)
-* Type Parameters
-  * Parameters of `@opaque`, `@type`, `@typep` name
-  * Keyword keys from the `when` clause of `@callback`, `@macrocallback` or `@spec` definitions and their usage
-  
-The syntax highlighting colors can be customized in the Color Settings page for Elixir (Preferences > Editor > Color & Fonts > Elixir).
-
-![Module Attribute annotator](/screenshots/annotator/Module%20Attribute.png?raw=true "Module Attribute annotator")
+<table>
+  <thead>
+    <tr>
+      <th colspan="3" rowspan="2">Text Attribute Key Display Name</th>
+      <th rowspan="2">Tokens/Elements</th>
+      <th colspan="2">Scheme</th>
+    </tr>
+    <tr>
+      <th>Default</th>
+      <th>Darcula</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alias</td>
+      <td></td>
+      <td></td>
+      <td><code>String</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Alias.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Alias.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Atom</td>
+      <td></td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>:one</code></li>
+          <li><code>&lt;&lt;&gt;&gt;:</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Atom.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Atom.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Bit</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>&lt;&lt;</code></li>
+          <li><code>&gt;&gt</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Bit.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Bit.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Braces</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>{</code></li>
+          <li><code>}</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Braces.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Braces.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Brackets</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>[</code></li>
+          <li><code>]</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Brackets.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Brackets.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Character Token</td>
+      <td></td>
+      <td><code>?</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Character%20Token.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Comma</td>
+      <td></td>
+      <td><code>,</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Comma.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Comma.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Dot</td>
+      <td></td>
+      <td><code>.</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Dot.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Dot.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Interpolation</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>#{</code></li>
+          <li><code>}</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Interpolation.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Interpolation.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Maps and Structs</td>
+      <td>Maps</td>
+      <td>
+        <ul>
+          <li><code>%{</code></li>
+          <li><code>}</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Maps.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Maps and Structs</td>
+      <td>Maps</td>
+      <td>
+        <ul>
+          <li><code>%</code></li>
+          <li><code>{</code></li>
+          <li><code>}</code></li>
+        </ul></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Maps%20and%20Structs/Structs.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Operation Sign</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>=</code></li>
+          <li><code>+</code></li>
+          <li><code>*</code></li>
+          <li><code>==</code></li>
+          <li><code>!</code></li>
+          <li><code>&&</code></li>
+          <li><code>||</code></li>
+          <li><code>|&gt;</code></li>
+          <li><code>^</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Operation%20Sign.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Parentheses</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>(</code></li>
+          <li><code>)</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Parentheses.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Parentheses.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Braces and Operators</td>
+      <td>Semicolon</td>
+      <td></td>
+      <td><code>;</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Braces%20and%20Operators/Semicolon.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Braces%20and%20Operators/Semicolon.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Calls</td>
+      <td>Function</td>
+      <td></td>
+      <td><code>inspect</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Function.png?raw=true"/>*Only the Italic attribute
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Function.png?raw=true"/>*Only the Italic attribute
+      </td>
+    </tr>
+    <tr>
+      <td>Calls</td>
+      <td>Macro</td>
+      <td></td>
+      <td><code>inspect</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Macro.png?raw=true"/>*Only the Bold and Italic attributes
+      </td>
+    </tr>
+    <tr>
+      <td>Calls</td>
+      <td>Predefined</td>
+      <td></td>
+      <td>
+        <ul>
+          <li>
+            <code>Kernel</code>
+            <ul>
+              <li>functions</li>
+              <li>macros</li>
+            </ul>
+          </li>
+          <li>
+            <code>Kernel.SpecialForms</code>
+            <ul>
+              <li>macros</li>
+            </ul>
+          </li>
+        <ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Calls/Predefined.png?raw=true"/>*Only the Foreground attribute
+      </td>
+    </tr>
+    <tr>
+      <td>Comment</td>
+      <td></td>
+      <td></td>
+      <td><code># Numbers</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Comment.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Comment.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Keywords</td>
+      <td></td>
+      <td></td>
+      <td><code>end</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Keywords.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Keywords.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td></td>
+      <td></td>
+      <td><code>@custom_attr</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Documentation</td>
+      <td></td>
+      <td><code>@doc</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Documentation</td>
+      <td>Text</td>
+      <td><code>Simple module docstring</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Documentation/Text.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Documentation/Text.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Types</td>
+      <td>Callback</td>
+      <td><code>func</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Callback.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Callback.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Types</td>
+      <td>Specification</td>
+      <td><code>func</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Specification.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Specification.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Types</td>
+      <td>Type</td>
+      <td><code>parameterized</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Module Attributes</td>
+      <td>Types</td>
+      <td>Type Parameter</td>
+      <td><code>type_parameter</code></td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Module%20Attributes/Types/Type%20Parameter.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Numbers</td>
+      <td>Base Prefix</td>
+      <td>Non-Decimal</td>
+      <td>
+        <ul>
+          <li><code>0b</code></li>
+          <li><code>0x</code></li>
+          <li><code>0o</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Non-Decimal.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Numbers</td>
+      <td>Base Prefix</td>
+      <td>Obsolete Non-Decimal</td>
+      <td>
+        <ul>
+          <li><code>0B</code></li>
+          <li><code>0X</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Base%20Prefix/Obsolete%20Non-Decimal.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Numbers</td>
+      <td>Decimal Exponent, Mark, and Separator</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>e</code></li>
+          <li><code>.</code></li>
+          <li><code>_</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Decimal%20Exponent%2C%20Mark%2C%20and%20Separator.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Numbers</td>
+      <td>Digits</td>
+      <td>Invalid</td>
+      <td>
+        <ul>
+          <li><code>2</code></li>
+          <li><code>o</code></li>
+          <li><code>r</code></li>
+          <li><code>888</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Invalid.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Invalid.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Numbers</td>
+      <td>Digits</td>
+      <td>Valid</td>
+      <td>
+        <ul>
+          <li><code>1234</code></li>
+          <li><code>1A</code></li>
+          <li><code>beef</code></li>
+          <li><code>123</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Numbers/Digits/Valid.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Numbers/Digits/Valid.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Textual</td>
+      <td>Character List</td>
+      <td></td>
+      <td>
+        <code>'This is a list'</code>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Character%20List.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Character%20List.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Textual</td>
+      <td>Escape Sequence</td>
+      <td></td>
+      <td>
+        <code>\x{12}</code>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Escape%20Sequence.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Escape%20Sequence.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Textual</td>
+      <td>Sigil</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>~r//</code></li>
+          <li><code>~R''</code></li>
+          <li><code>~w()</code></li>
+          <li><code>~W()</code></li>
+        </ul>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/Sigil.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/Sigil.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Textual</td>
+      <td>String</td>
+      <td></td>
+      <td>
+        <code>"Hello world"</code>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Textual/String.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Textual/String.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Variables</td>
+      <td>Ignored</td>
+      <td></td>
+      <td>
+        <code>_</code>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Ignored.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Ignored.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Variables</td>
+      <td>Parameter</td>
+      <td></td>
+      <td>
+        <ul>
+          <li><code>a</code></li>
+          <li><code>b</code></li>
+        </ul>
+        
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Parameter.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Parameter.png?raw=true"/>
+      </td>
+    </tr>
+    <tr>
+      <td>Variables</td>
+      <td>Variable</td>
+      <td></td>
+      <td>
+        <code>pid</code>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Variable.png?raw=true"/>
+      </td>
+      <td>
+        <img src="screenshots/preferences/editor/colors_and_fonts/darcula/Variables/Variable.png?raw=true"/>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Grammar parsing
 
