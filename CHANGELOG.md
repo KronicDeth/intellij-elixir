@@ -75,7 +75,11 @@
     * Default to `"call"` for Call type
     * Fix typo that had `*Two` operations using `Type` interface
     * Don't process `AccessExpression` declarations
-
+  * [#316](https://github.com/KronicDeth/intellij-elixir/pull/316) - [@KronicDeth](https://github.com/KronicDeth)
+    * Highlight `foo` in `@spec foo` as a type, which occurs while typing a new `@spec` before `::` can be typed.
+    * Check if `leftOperand` is `null` even when `checkLeft` is `true` because `checkLeft` can be `true` and `leftOperand` is `null` when the `lastParent` is the operand or operation as a whole, but there is an error in the unnormalized `leftOperand` leading to the normalized `leftOperand` being `null`.
+    * Check if reference is `null` before checking if it resolves to `null` when replacing module attribute usages with their value because `AtNonNumericOperation`s can have a `null` reference when they are non-referencing, like `@spec`.
+    
 ## v3.0.1
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)

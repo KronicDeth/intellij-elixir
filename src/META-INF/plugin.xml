@@ -128,6 +128,22 @@
             <li>Default to <code>"call"</code> for Call type</li>
             <li>Fix typo that had <code>*Two</code> operations using <code>Type</code> interface</li>
             <li>Don't process <code>AccessExpression</code> declarations</li>
+            <li>
+              Highlight <code>foo</code> in <code>@spec foo</code> as a type, which occurs while typing a new
+              <code>@spec</code> before <code>::</code> can be typed.
+            </li>
+            <li>
+              Check if <code>leftOperand</code> is <code>null</code> even when <code>checkLeft</code> is
+              <code>true</code> because <code>checkLeft</code> can be <code>true</code> and <code>leftOperand</code> is
+              <code>null</code> when the <code>lastParent</code> is the operand or operation as a whole, but there is an
+              error in the unnormalized <code>leftOperand</code> leading to the normalized <code>leftOperand</code>
+              being <code>null</code>.
+            </li>
+            <li>
+              Check if reference is <code>null</code> before checking if it resolves to <code>null</code> when replacing
+              module attribute usages with their value because <code>AtNonNumericOperation</code>s can have a
+              <code>null</code> reference when they are non-referencing, like <code>@spec</code>.
+            </li>
           </ul>
         </li>
       </ul>
