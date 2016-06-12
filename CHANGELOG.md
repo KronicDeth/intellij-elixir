@@ -133,6 +133,11 @@
     * Annotate `QualifiableAlias` as `Alias`.
     * Highlight keyword list and map keywords (`<key>:`) as `Atom`.
     * Add `with` to highlighted special forms  
+  * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - Additional Text Attributes - [@KronicDeth](https://github.com/KronicDeth)
+    * Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique hue for the Foreground color.
+    * Explain how to add `additionalTextAttributes` to `plugin.xml` in `CONTRIBUTING.md`
+    * Group Textual Text Attribute Keys Together: Next "Textual" group is created and "Character List", "Escape Sequence", "Sigil", and "String" are moved under the group.
+    * Describe relations between different text attributes in `COLOR_SCHEMA_DESIGN.xml`, so they can be applied to different base schemes, such as applying the current Darcula additonalTextAttributes to Default.
 * Bug Fixes
   * [#314](https://github.com/KronicDeth/intellij-elixir/pull/314) - [@KronicDeth](https://github.com/KronicDeth)
     * Don't generate module attribute references for control attributes: Module attributes that control compilation or are predefined by the standard library: `@behaviour`, `@callback`, `@macrocallback`, `@doc`, `@moduledoc`, `@typedoc`, `@spec`, `@opaque`, `@type`, and `@typep`, should not have references because their uses are unrelated.
@@ -169,7 +174,7 @@
         * `Invalid Binary, Decimal, Hexadecimal, and Octal Digits`
         * `Non-Decimal Base Prefix`
         * `Obsolete Non-Decimal Base Prefix`
-
+  * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - "Character List", "Escape Sequence", "Sigil", and "String" are moved under the new "Textual" group. - [@KronicDeth](https://github.com/KronicDeth)
 ## v3.0.1
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)

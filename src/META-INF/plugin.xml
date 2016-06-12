@@ -262,6 +262,23 @@
             <li>Annotate <code>QualifiableAlias</code> as <code>Alias</code>.</li>
             <li>Highlight keyword list and map keywords (<code><key>:</code>) as <code>Atom</code>.</li>
             <li>Add <code>with</code> to highlighted special forms</li>
+            <li>
+              Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique
+              hue for the Foreground color.
+            </li>
+            <li>
+              Explain how to add <code>additionalTextAttributes</code> to <code>plugin.xml</code> in
+              <code>CONTRIBUTING.md</code>
+            </li>
+            <li>
+              Group Textual Text Attribute Keys Together: Next "Textual" group is created and "Character List",
+              "Escape Sequence", "Sigil", and "String" are moved under the group.
+            </li>
+            <li>
+              Describe relations between different text attributes in <code>COLOR_SCHEMA_DESIGN.xml</code>, so they can
+              be applied to different base schemes, such as applying the current Darcula additonalTextAttributes to
+              Default.
+            </li>
           </ul>
         </li>
         <li>
@@ -362,6 +379,7 @@
                 </li>
               </ul>
             </li>
+            <li>"Character List", "Escape Sequence", "Sigil", and "String" are moved under the new "Textual" group.</li>
           </ul>
         </li>
       </ul>
