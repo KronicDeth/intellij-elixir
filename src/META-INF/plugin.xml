@@ -144,6 +144,7 @@
               module attribute usages with their value because <code>AtNonNumericOperation</code>s can have a
               <code>null</code> reference when they are non-referencing, like <code>@spec</code>.
             </li>
+            <li>Leave normal highlighting for char tokens when highlighting types</li>
           </ul>
         </li>
       </ul>
