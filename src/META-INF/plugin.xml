@@ -345,6 +345,27 @@
               error when <code>Modular</code> can't be found.
             </li>
             <li>Fix capitalization error in example text</li>
+            <li>
+              <p>
+                In IntelliJ 14.1, all of <code>openapi.jar</code> targets Java 1.6 (with <code>MAJOR.MINOR</code>
+                <code>50.0</code>), but in IntelliJ 2016.1, some of <code>openapi.jar</code> targets only Java 1.8
+                (with <code>MAJOR.MINOR</code> <code>52.0</code>), since <code>jps-builders</code> require parts of
+                <code>openapi.jar</code> and must target Java 1.6 even for IntelliJ 2016.1, the <code>52.0</code>
+                <code>.class</code>es needed to be ported into <code>org.elixir_lang.jps.builder</code>, so that the
+                <code>52.0</code> version in <code>openapi.jar</code> wouldn't be attempted to be loaded.
+              </p>
+              <p>
+                This ended up being 5 classes:
+                <ul>
+                   <li><code>ExecutionException</code></li>
+                   <li><code>GeneralCommandLine</code></li>
+                   <li><code>ParametersList</code></li>
+                   <li><code>ParamsGroup</code></li>
+                   <li><code>ProcessNotCreatedException</code></li>
+                </ul>
+                Only <code>GeneralCommandLine</code> was used directly, all others are dependencies of it.
+              </p>
+            </li>
           </ul>
         </li>
         <li>

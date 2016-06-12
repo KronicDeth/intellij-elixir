@@ -162,6 +162,18 @@
     * Use `Normalized` pattern for `Prefix`, so that the operand is `null` when only the operator matches or the operand has errors.
     * Work-around Phoenix .ex templates that contain EEX: if `<%=` from EEX is detected, don't throw error when `Modular` can't be found.
     * Fix capitalization error in example text
+  * [#323](https://github.com/KronicDeth/intellij-elixir/pull/323) - Build `jps-builder` using only Java 1.6 compatible `.class`es - [@KronicDeth](https://github.com/KronicDeth)
+    * In IntelliJ 14.1, all of `openapi.jar` targets Java 1.6 (with `MAJOR.MINOR` `50.0`), but in IntelliJ 2016.1, some of `openapi.jar` targets only Java 1.8 (with `MAJOR.MINOR` `52.0`), since `jps-builders` require parts of `openapi.jar` and must target Java 1.6 even for IntelliJ 2016.1, the `52.0` `.class`es needed to be ported into `org.elixir_lang.jps.builder`, so that the `52.0` version in `openapi.jar` wouldn't be attempted to be loaded.
+      
+      This ended up being 5 classes:
+    
+      * `ExecutionException`
+      * `GeneralCommandLine`
+      * `ParametersList`
+      * `ParamsGroup`
+      * `ProcessNotCreatedException`
+    
+      Only `GeneralCommandLine` was used directly, all others are dependencies of it.
 * Incompatible Changes
   * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
     * Preferences > Editor > Colors & Fonts > Elixir restructured to group together related highlights and to match grouping used for Colors & Fonts > Language Defaults and Colors & Fonts > Java.
