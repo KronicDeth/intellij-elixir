@@ -104,6 +104,10 @@
               constants.
             </li>
             <li>Parameter and Variable completion</li>
+            <li>
+              Highlight keyword keys (<code>key:</code> in <code>key: value</code>) that aren't quotes
+              (<code>"key": value</code> or <code>'key': value</code>) as Atom.
+            </li>
           </ul>
         </li>
         <li>
