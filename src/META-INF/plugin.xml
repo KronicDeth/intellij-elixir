@@ -9,6 +9,128 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v3.1.0</h1>
+      <ul>
+        <li>
+          <p>Enhancments</p>
+          <ul>
+            <li>
+              <p>Resolve and highlight parameter references</p>
+              <ul>
+                <li>Resolve call definition clause (<code>def(macro)?p?</code>) parameters to themselves</li>
+                <li>Resolve call definition parameter with default to itself</li>
+                <li>Add Parameter ot Color Settings Page</li>
+                <li>Parameters in any macro with do block or keyword pair</li>
+              </ul>
+            </li>
+            <li>
+              <p>Resolve and highlight variable references</p>
+              <ul>
+                <li>Properly identifier variable declared in <code>for</code> comprehension as variable</li>
+                <li>Add Variable to Color Settings Page</li>
+                <li>Highlight bind quoted keyword key as Variable</li>
+                <li>
+                  Resolve references to earlier <code>&&</code> operands, which handles code that matches a variable and
+                  only uses the variable on success like
+                  [<code>((cwd = cwd()) && write_tmp_dir(cwd))</code>](https://github.com/elixir-lang/elixir/blob/ccf6d14e3ec2eb96090222dad6f395b5b9ab72ac/lib/elixir/lib/system.ex#L268)
+                </li>
+                <li>Resolve variables from <code>destructure</code></li>
+              </ul>
+            </li>
+            <li>
+              <p>Detect bitstring segment options and don't treat them as variables.</p>
+              <ul>
+                <li>
+                  Highlight bitstring segment type options as Type, the same highlight as used for <code>@type</code>
+                  names.
+                </li>
+                <li>Don't generate (unresolved) references for bitstring segment options</li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                Resolve <code>_</code> to only itself, no matter how many are used to reflect that it is non-binding,
+                while <code>_<name></code>  will resolve to <code>_<name></code> as it does bind.
+              </p>
+              <li>Add Ignored Variable to Color Settings Page</li>
+            </li>
+            <li>
+              Reimplement module attribute renaming so that variable renaming can be implemented using a different
+              validator for renaming (since module attribute names include the <code>@</code>).  Non-inplace renaming
+              should also be supported, but inplace is preferred.  (There's a setting to turn off in-place renaming in
+              JetBrains IDEs.)
+            </li>
+            <li>
+              <p>
+                <code>operation.infix.Normalized</code>
+              </p>
+              <ul>
+                <li>
+                  Normalizes leftOperand, operator, and rightOperand for an Infix operation that may have errors (in
+                  either operand).  If there is an error in the operand then its normalized value is <code>null</code>.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p>Keyword key type descriptions</p>
+              <ul>
+                <li>Default to <code>"keyword key"</code>. </li>
+                <li>Detect <code>bind_quoted:</code> usage and call those <code>"quote bound variable"</code>.</li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                Add interfaces to unify matching of <code>Matched</code> and <code>Unmatched</code> form of operations
+                when the code cares about the operator
+              </p>
+              <ul>
+                <li><code>And</code></li>
+                <li><code>UnaryNonNumericOperation</code></li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                Add <code>processDeclarations</code> to support variable and parameter resolution using
+                <code>PsiTreeUtil.treeWalkUp</code> and <code>PsiScopeProcessors</code>
+              </p>
+              <ul>
+                <li><code>ElixirStabBody</code></li>
+                <li>StabOperations</li>
+              </ul>
+            </li>
+            <li>Treat variables and parameters as <code>NamedElements</code>, so they can be Rename Refactored.</li>
+            <li>
+              Move reused Module and Function names to <code>org.elixir_lang.psi.name.{Module,Function}</code>
+              constants.
+            </li>
+            <li>Parameter and Variable completion</li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Don't generate module attribute references for control attributes: Module attributes that control
+              compilation or are predefined by the standard library: <code>@behaviour</code>, <code>@callback</code>,
+              <code>@macrocallback</code>, <code>@doc</code>, <code>@moduledoc</code>, <code>@typedoc</code>,
+              <code>@spec</code>, <code>@opaque</code>, <code>@type</code>, and <code>@typep</code>, should not have
+              references because their uses are unrelated.
+            </li>
+            <li>
+              Drop requirement that there are 2 children and only require there be 1 and assume that is the Operator.
+            </li>
+            <li>
+              Don't count @(...) as a module attribute usage: Module attribute declarations are defined as
+              <code>defmacro @(...)</code> in Kernel and that <code>@</code> should count as a function name, not a
+              prefix for a module attribute name.
+            </li>
+            <li>Allow <code>null</code> Module for Scratch File use scope</li>
+            <li>Default to <code>"call"</code> for Call type</li>
+            <li>Fix typo that had <code>*Two</code> operations using <code>Type</code> interface</li>
+            <li>Don't process <code>AccessExpression</code> declarations</li>
+          </ul>
+        </li>
+      </ul>
       <h1>v3.0.1</h1>
       <ul>
         <li>

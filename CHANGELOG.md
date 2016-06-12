@@ -32,6 +32,50 @@
 
 # Changelog
 
+## v3.1.0
+* Enhancements
+  * [#314](https://github.com/KronicDeth/intellij-elixir/pull/314) - Call references for unqualified no argument calls that work as variables or parameters - [@KronicDeth](https://github.com/KronicDeth)
+    * Resolve and highlight parameter references
+      * Resolve call definition clause (`def(macro)?p?`) parameters to themselves
+      * Resolve call definition parameter with default to itself
+      * Add Parameter ot Color Settings Page
+      * Parameters in any macro with do block or keyword pair
+    * Resolve and highlight variable references
+      * Properly identifier variable declared in `for` comprehension as variable
+      * Add Variable to Color Settings Page
+      * Highlight bind quoted keyword key as Variable
+      * Resolve references to earlier `&&` operands, which handles code that matches a variable and only uses the variable on success like [`((cwd = cwd()) && write_tmp_dir(cwd))`](https://github.com/elixir-lang/elixir/blob/ccf6d14e3ec2eb96090222dad6f395b5b9ab72ac/lib/elixir/lib/system.ex#L268)
+      * Resolve variables from `destructure`
+    * Detect bitstring segment options and don't treat them as variables.
+      * Highlight bitstring segment type options as Type, the same highlight as used for `@type` names.
+      * Don't generate (unresolved) references for bitstring segment options
+    * Resolve `_` to only itself, no matter how many are used to reflect that it is non-binding, while `_<name>`  will resolve to `_<name>` as it does bind.
+      * Add Ignored Variable to Color Settings Page
+    * Reimplement module attribute renaming so that variable renaming can be implemented using a different validator for renaming (since module attribute names include the `@`).  Non-inplace renaming should also be supported, but inplace is preferred.  (There's a setting to turn off in-place renaming in JetBrains IDEs.)
+    * `operation.infix.Normalized`
+      * Normalizes leftOperand, operator, and rightOperand for an Infix operation that may have errors (in either operand).  If there is an error in the operand then its normalized value is `null`.
+    * Keyword key type descriptions
+      * Default to `"keyword key"`. 
+      * Detect `bind_quoted:` usage and call those `"quote bound variable"`.
+    * Add interfaces to unify matching of `Matched` and `Unmatched` form of operations when the code cares about the operator
+      * `And`
+      * `UnaryNonNumericOperation`
+    * Add `processDeclarations` to support variable and parameter resolution using `PsiTreeUtil.treeWalkUp` and `PsiScopeProcessors`
+      * `ElixirStabBody`
+      * StabOperations
+    * Treat variables and parameters as `NamedElements`, so they can be Rename Refactored.
+    * Move reused Module and Function names to `org.elixir_lang.psi.name.{Module,Function}` constants.
+    * Parameter and Variable completion  
+* Bug Fixes
+  * [#314](https://github.com/KronicDeth/intellij-elixir/pull/314) - [@KronicDeth](https://github.com/KronicDeth)
+    * Don't generate module attribute references for control attributes: Module attributes that control compilation or are predefined by the standard library: `@behaviour`, `@callback`, `@macrocallback`, `@doc`, `@moduledoc`, `@typedoc`, `@spec`, `@opaque`, `@type`, and `@typep`, should not have references because their uses are unrelated.
+    * Drop requirement that there are 2 children and only require there be 1 and assume that is the Operator.
+    * Don't count @(...) as a module attribute usage: Module attribute declarations are defined as `defmacro @(...)` in Kernel and that `@` should count as a function name, not a prefix for a module attribute name.
+    * Allow `null` Module for Scratch File use scope
+    * Default to `"call"` for Call type
+    * Fix typo that had `*Two` operations using `Type` interface
+    * Don't process `AccessExpression` declarations
+
 ## v3.0.1
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
