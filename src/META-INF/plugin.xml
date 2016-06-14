@@ -389,14 +389,20 @@
                   <code>Braces and Operators > Interpolation</code>.
                 </li>
                 <li>
-                  <p>The following are now nested under <code>Numbers</code> instead of being at the top-level:<p>
-                  <ul>
-                    <li><code>Binary, Decimal, Hexadecimal, and Octal Digits</code>
-                    <li><code>Decimal Exponent, Mark and Separator</code> </li>
-                    <li><code>Invalid Binary, Decimal, Hexadecimal, and Octal Digits</code></li>
-                    <li><code>Non-Decimal Base Prefix</code></li>
-                    <li><code>Obsolete Non-Decimal Base Prefix</code></li>
-                  </ul>
+                  <code>Binary, Decimal, Hexadecimal, and Octal Digits</code> was renamed to
+                  <code>Numbers > Digits > Valid</code>
+                </li>
+                <li>
+                  <code>Decimal Exponent, Mark and Separator</code> was renamed to
+                  <code>Number > Digits > Invalid</code>
+                </li>
+                <li>
+                  <code>Numbers > Non-Decimal Base Prefix</code> renamed to
+                  <code>Numbers > Base Prefix > Non-Decimal</code>
+                </li>
+                <li>
+                  <code>Numbers > Obsolete Non-Decimal Base</code> renamed to
+                  <code>Numbers > Base Prefix > Obsolete > Non-Decimal</code>
                 </li>
               </ul>
             </li>

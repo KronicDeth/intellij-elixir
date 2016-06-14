@@ -187,6 +187,11 @@
         * `Non-Decimal Base Prefix`
         * `Obsolete Non-Decimal Base Prefix`
   * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - "Character List", "Escape Sequence", "Sigil", and "String" are moved under the new "Textual" group. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#324](https://github.com/KronicDeth/intellij-elixir/pull/324) - Group Numbers subcategories and lower display name verbosity - [@KronicDeth](https://github.com/KronicDeth)
+    * "Numbers > Binary, Decimal, Hexadecimal, and Octal Digits" renamed to "Numbers > Digits > Valid"
+    * "Numbers > Invalid Binary, Decimal, Hexadecimal, and Octal Digits" renamed to "Numbers > Digits > Invalid"
+    * "Numbers > Non-Decimal Base Prefix" renamed to "Numbers > Base Prefix > Non-Decimal"
+    * "Numbers > Obsolete Non-Decimal Base" renamed to "Numbers > Base Prefix > Obsolete > Non-Decimal"
 ## v3.0.1
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
