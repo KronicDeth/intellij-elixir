@@ -40,19 +40,22 @@
     - [Live Templates](#live-templates)
     - [Run Configurations](#run-configurations)
       - [Mix Tasks](#mix-tasks)
+    - [Completion](#completion)
+      - [Module Attributes](#module-attributes)
+      - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
-      - [Parameters and Variables](#parameters-and-variables)
+      - [Parameters and Variables](#parameters-and-variables-1)
     - [Go To Symbol](#go-to-symbol)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
-      - [Parameters and Variables](#parameters-and-variables-1)
+      - [Parameters and Variables](#parameters-and-variables-2)
     - [Refactor](#refactor)
       - [Rename](#rename)
         - [Module Attribute](#module-attribute-2)
-        - [Parameters and Variables](#parameters-and-variables-2)
+        - [Parameters and Variables](#parameters-and-variables-3)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -1564,6 +1567,16 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 8. The Run pane will open, showing the results of the `mix` task.
     * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
       ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
+
+### Completion
+
+#### Module Attributes
+
+Module attributes declared earlier in the file can be completed whenever you type `@` and some letter.  If you want to see all module attributes, you can type `@a`, wait for the completions to appear, then delete the `@` to remove the filtering to `a`.
+
+#### Parameters and Variables
+
+Parameter and variable usages can be completed whenever typing an identifier.  The completions will include all variables know up from that part of the file.  It can include variables from outside macros, like quote blocks.
 
 ### Go To Declaration
 
