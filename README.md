@@ -43,13 +43,16 @@
     - [Go To Declaration](#go-to-declaration)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
+      - [Parameters and Variables](#parameters-and-variables)
     - [Go To Symbol](#go-to-symbol)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
+      - [Parameters and Variables](#parameters-and-variables-1)
     - [Refactor](#refactor)
       - [Rename](#rename)
         - [Module Attribute](#module-attribute-2)
+        - [Parameters and Variables](#parameters-and-variables-2)
     - [Structure](#structure)
       - [Viewing Structure](#viewing-structure)
       - [Buttons](#buttons)
@@ -1589,6 +1592,16 @@ If you hold `Cmd` and hover over the Alias before clicking, the target declarati
 
 If you hold `Cmd` and hover over the `@module_attribute` before clicking, the target declaration will be shown.
 
+#### Parameters and Variables
+
+1. Place the cursor over a parameter or variable usage
+2. Active the Go To Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+
+If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color. 
+
 ### Go To Symbol
 
 Go To Symbol is a way to search for any of the following by name:
@@ -1629,6 +1642,16 @@ in a `defmodule`, is used, including in strings and comments.
   b. Select Edit &gt; Find &gt; Find Usages from the menu
   c. `Alt+F7`
 
+#### Parameters and Variables
+
+1. Place cursor over the parameter or variable declaration.
+2. Active the Find Usage action with one of the following:
+   a.
+    i. Right-click the Alias
+    ii. Select "Find Usages" from the context menu
+  b. Select Edit &gt; Find &gt; Find Usages from the menu
+  c. `Alt+F7`
+
 ### Refactor
 
 #### Rename
@@ -1636,6 +1659,17 @@ in a `defmodule`, is used, including in strings and comments.
 ##### Module Attribute
 
 1. Place the cursor over the `@module_attribute` usage or declaration.
+2. Active the Rename Refactoring action with one of the following:
+  a.
+    i. Right-click the module attribute
+    ii. Select Refactoring from the context menu
+    iii. Select "Rename..." from the Refactoring submenu
+  b. `Shift+F6`
+3. Edit the name inline and have the declaration and usages update.
+
+##### Parameters and Variables
+
+1. Place the cursor over the parameter or variable usage or declaration
 2. Active the Rename Refactoring action with one of the following:
   a.
     i. Right-click the module attribute
