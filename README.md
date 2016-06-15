@@ -76,7 +76,7 @@
   - [Screenshots](#screenshots)
   - [Error reporting](#error-reporting)
   - [Donations](#donations)
-    - [Donors](#donors)
+    - [Public Donors](#public-donors)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -2704,10 +2704,12 @@ If you would like to make a donation you can use Paypal:
 
 If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
 
-### Donors
+### Public Donors
 
 I'd like to thank those who have donated to help support this project.
 
 * Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
 * William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
 * Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
+* [TreasureData](https://www.treasuredata.com/)
+
