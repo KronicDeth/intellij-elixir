@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v4.0.0](#v400)
   - [v3.0.1](#v301)
   - [v3.0.0](#v300)
   - [v2.2.0](#v220)
@@ -32,6 +33,166 @@
 
 # Changelog
 
+## v4.0.0
+* Enhancements
+  * [#314](https://github.com/KronicDeth/intellij-elixir/pull/314) - Call references for unqualified no argument calls that work as variables or parameters - [@KronicDeth](https://github.com/KronicDeth)
+    * Resolve and highlight parameter references
+      * Resolve call definition clause (`def(macro)?p?`) parameters to themselves
+      * Resolve call definition parameter with default to itself
+      * Add Parameter ot Color Settings Page
+      * Parameters in any macro with do block or keyword pair
+    * Resolve and highlight variable references
+      * Properly identifier variable declared in `for` comprehension as variable
+      * Add Variable to Color Settings Page
+      * Highlight bind quoted keyword key as Variable
+      * Resolve references to earlier `&&` operands, which handles code that matches a variable and only uses the variable on success like [`((cwd = cwd()) && write_tmp_dir(cwd))`](https://github.com/elixir-lang/elixir/blob/ccf6d14e3ec2eb96090222dad6f395b5b9ab72ac/lib/elixir/lib/system.ex#L268)
+      * Resolve variables from `destructure`
+    * Detect bitstring segment options and don't treat them as variables.
+      * Highlight bitstring segment type options as Type, the same highlight as used for `@type` names.
+      * Don't generate (unresolved) references for bitstring segment options
+    * Resolve `_` to only itself, no matter how many are used to reflect that it is non-binding, while `_<name>`  will resolve to `_<name>` as it does bind.
+      * Add Ignored Variable to Color Settings Page
+    * Reimplement module attribute renaming so that variable renaming can be implemented using a different validator for renaming (since module attribute names include the `@`).  Non-inplace renaming should also be supported, but inplace is preferred.  (There's a setting to turn off in-place renaming in JetBrains IDEs.)
+    * `operation.infix.Normalized`
+      * Normalizes leftOperand, operator, and rightOperand for an Infix operation that may have errors (in either operand).  If there is an error in the operand then its normalized value is `null`.
+    * Keyword key type descriptions
+      * Default to `"keyword key"`. 
+      * Detect `bind_quoted:` usage and call those `"quote bound variable"`.
+    * Add interfaces to unify matching of `Matched` and `Unmatched` form of operations when the code cares about the operator
+      * `And`
+      * `UnaryNonNumericOperation`
+    * Add `processDeclarations` to support variable and parameter resolution using `PsiTreeUtil.treeWalkUp` and `PsiScopeProcessors`
+      * `ElixirStabBody`
+      * StabOperations
+    * Treat variables and parameters as `NamedElements`, so they can be Rename Refactored.
+    * Move reused Module and Function names to `org.elixir_lang.psi.name.{Module,Function}` constants.
+    * Parameter and Variable completion  
+  * [#318](https://github.com/KronicDeth/intellij-elixir/pull/318) - Highlight keyword keys (`key:` in `key: value`) that aren't quotes (`"key": value` or `'key': value`) as Atom. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
+    * Show annotator applied highlights in the Preferences > Editor > Colors & Fonts > Elixir.
+      * Errors
+      * `Alias`
+      * `Braces and Operators`
+        * `Bit` (`<<` and `>>`)
+        * `Braces` (`{` and `}`)
+        * `Brackets` (`[` and `]`)
+        * `Char Tokens` (`?`)
+        * `Comma` (`,`)
+        * `Dot` (`.`)
+        * `Interpolation` (`#{` and `}`)
+        * `Maps and Structs`
+          * `Maps` (`%{` and `}`)
+          * `Structs` (`%{` and `}` when used for struct.  The Alias is still highlighted using `Alias`)
+        * `Operation Sign`
+        * `Parentheses` (`(` and `)`)
+        * `Semicolon` (`;`)
+      * `Calls`
+        * `Function` (currently only combined with `Predefined` to highlight `Kernel` functions.  Will be used later for all function calls once function references are implemented.)
+        * `Macro` (curently only combined with `Predefined` to highlight `Kernel` and `Kernel.SpecialForms` macros. Will be used later for all macro calls once macro references are implemented.)
+        * `Predefined` (Combined with `Function` to highlight `Kernel` functions.  Combined with `Macro` to highlight `Kernel` and `Kernel.SpecialForms` macros.)
+      * `Escape Sequence`
+      * `Module Attributes`
+        * `Documentation` (Previously `Documentation Module Attributes`)
+          * `Text` (Previously `Documentation Text`)
+        * `Types`
+          * `Callback` (`my_callback` in `@callback my_callback() :: :ok` or `my_macro_callback` in `@macrocallback my_macro_callback`)
+          * `Specification` (`my_function` in `@spec my_function() :: :ok`)
+          * `Type`
+            * `typ` and `integer` in  `@type typ :: integer`
+            * `parameterized` in `@type parameterized(type_parameter) :: type_parameter`
+            * `typtyp` in `@opaque typtyp :: 1..10`
+            * `typ` and `typtyp` in `@callback func(typ, typtyp) :: :ok | :fail`
+            * `binary` and `utf8` in `<< "hello" :: binary, c :: utf8, x = 4 * 2 >> = "hello™1"`
+        * `Type Parameters` (`type_parameter` in `@type parameterized(type_parameter) :: type_parameter`)      
+      * `Numbers`
+        * `Binary, Decimal, Hexadecimal, and Octal Digits` (Previously at top-level.)
+        * `Decimal Exponent, Mark and Separator` (Previously at top-level)
+        * `Invalid Binary, Decimal, Hexadecimal, and Octal Digits` (Previously at top-level.)
+        * `Non-Decimal Base Prefix` (Previously at top-level.)
+        * `Obsolete Non-Decimal Base Prefix`
+      * `Variables`
+        * `Ignored`
+        * `Parameter`
+        * `Variable`
+    * Recover in expression until close of subexpression
+      * `\n`
+      * `\r\n`
+      * `>>`
+      * `]`
+      * `}`
+      * `)`
+      * `;`
+      * `->`
+      * `end`
+      * `after`
+      * `catch`
+      * `else`
+      * `rescue`
+    * Update Preferences > Editor > Colors & Fonts > Elixir example text's bitstring syntax to Elixir post-1.0.0 (Use `-` to separate segment options instead of a list.)
+    * Use same algorithm for `ElixirStabBody` and `ElixirFile` because they are sequences of expressions.
+    * Highlight atom keywords (`false`, `nil`, and `true`) as merge of `Atom` and `Keyword` text attributes.  If both only use foreground color, `Keyword` wins.
+    * Annotate `QualifiableAlias` as `Alias`.
+    * Highlight keyword list and map keywords (`<key>:`) as `Atom`.
+    * Add `with` to highlighted special forms  
+  * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - Additional Text Attributes - [@KronicDeth](https://github.com/KronicDeth)
+    * Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique hue for the Foreground color.
+    * Explain how to add `additionalTextAttributes` to `plugin.xml` in `CONTRIBUTING.md`
+    * Group Textual Text Attribute Keys Together: Next "Textual" group is created and "Character List", "Escape Sequence", "Sigil", and "String" are moved under the group.
+    * Describe relations between different text attributes in `COLOR_SCHEMA_DESIGN.xml`, so they can be applied to different base schemes, such as applying the current Darcula additonalTextAttributes to Default.
+* Bug Fixes
+  * [#314](https://github.com/KronicDeth/intellij-elixir/pull/314) - [@KronicDeth](https://github.com/KronicDeth)
+    * Don't generate module attribute references for control attributes: Module attributes that control compilation or are predefined by the standard library: `@behaviour`, `@callback`, `@macrocallback`, `@doc`, `@moduledoc`, `@typedoc`, `@spec`, `@opaque`, `@type`, and `@typep`, should not have references because their uses are unrelated.
+    * Drop requirement that there are 2 children and only require there be 1 and assume that is the Operator.
+    * Don't count @(...) as a module attribute usage: Module attribute declarations are defined as `defmacro @(...)` in Kernel and that `@` should count as a function name, not a prefix for a module attribute name.
+    * Allow `null` Module for Scratch File use scope
+    * Default to `"call"` for Call type
+    * Fix typo that had `*Two` operations using `Type` interface
+    * Don't process `AccessExpression` declarations
+  * [#316](https://github.com/KronicDeth/intellij-elixir/pull/316) - [@KronicDeth](https://github.com/KronicDeth)
+    * Highlight `foo` in `@spec foo` as a type, which occurs while typing a new `@spec` before `::` can be typed.
+    * Check if `leftOperand` is `null` even when `checkLeft` is `true` because `checkLeft` can be `true` and `leftOperand` is `null` when the `lastParent` is the operand or operation as a whole, but there is an error in the unnormalized `leftOperand` leading to the normalized `leftOperand` being `null`.
+    * Check if reference is `null` before checking if it resolves to `null` when replacing module attribute usages with their value because `AtNonNumericOperation`s can have a `null` reference when they are non-referencing, like `@spec`.
+  * [#317](https://github.com/KronicDeth/intellij-elixir/pull/317) - Leave normal highlighting for char tokens when highlighting types - [@KronicDeth](https://github.com/KronicDeth)
+  * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
+    * Stab operation parameter Use Scope is the stab operation.
+    * Skip over `PsiLeafElement` when looking for variables because the `PsiLeafElement` is an error.
+    * In a script file where the parent of a `Match` is a `PsiFile`, the `Match` Use Scope is the rest of the file.
+    * Add `=` to `Operator Signs`
+    * Skip `NoParenthesesKeywords` when highlighting types, which occurs when the `::` has no proper right operand and the following one-liner function clause with `do:` is parsed as the right operand.
+    * Skip `DUMMY_BLOCK` when looking for Variable, which prevents walking through errors.
+    * Use `Normalized` pattern for `Prefix`, so that the operand is `null` when only the operator matches or the operand has errors.
+    * Work-around Phoenix .ex templates that contain EEX: if `<%=` from EEX is detected, don't throw error when `Modular` can't be found.
+    * Fix capitalization error in example text
+  * [#323](https://github.com/KronicDeth/intellij-elixir/pull/323) - Build `jps-builder` using only Java 1.6 compatible `.class`es - [@KronicDeth](https://github.com/KronicDeth)
+    * In IntelliJ 14.1, all of `openapi.jar` targets Java 1.6 (with `MAJOR.MINOR` `50.0`), but in IntelliJ 2016.1, some of `openapi.jar` targets only Java 1.8 (with `MAJOR.MINOR` `52.0`), since `jps-builders` require parts of `openapi.jar` and must target Java 1.6 even for IntelliJ 2016.1, the `52.0` `.class`es needed to be ported into `org.elixir_lang.jps.builder`, so that the `52.0` version in `openapi.jar` wouldn't be attempted to be loaded.
+      
+      This ended up being 5 classes:
+    
+      * `ExecutionException`
+      * `GeneralCommandLine`
+      * `ParametersList`
+      * `ParamsGroup`
+      * `ProcessNotCreatedException`
+    
+      Only `GeneralCommandLine` was used directly, all others are dependencies of it.
+* Incompatible Changes
+  * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
+    * Preferences > Editor > Colors & Fonts > Elixir restructured to group together related highlights and to match grouping used for Colors & Fonts > Language Defaults and Colors & Fonts > Java.
+      * `Documentation Module Attributes` renamed to `Module Attributes` > `Documentation`
+      * `Documentation Text` renamed to `Module Attributes > Documentation > Text`
+      * `Expression Substitution Mark` renamed to `Braces and Operators > Interpolation`.
+      * The following are now nested under `Numbers` instead of being at the top-level:
+        * `Binary, Decimal, Hexadecimal, and Octal Digits`
+        * `Decimal Exponent, Mark and Separator` 
+        * `Invalid Binary, Decimal, Hexadecimal, and Octal Digits`
+        * `Non-Decimal Base Prefix`
+        * `Obsolete Non-Decimal Base Prefix`
+  * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - "Character List", "Escape Sequence", "Sigil", and "String" are moved under the new "Textual" group. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#324](https://github.com/KronicDeth/intellij-elixir/pull/324) - Group Numbers subcategories and lower display name verbosity - [@KronicDeth](https://github.com/KronicDeth)
+    * "Numbers > Binary, Decimal, Hexadecimal, and Octal Digits" renamed to "Numbers > Digits > Valid"
+    * "Numbers > Invalid Binary, Decimal, Hexadecimal, and Octal Digits" renamed to "Numbers > Digits > Invalid"
+    * "Numbers > Non-Decimal Base Prefix" renamed to "Numbers > Base Prefix > Non-Decimal"
+    * "Numbers > Obsolete Non-Decimal Base" renamed to "Numbers > Base Prefix > Obsolete > Non-Decimal"
 ## v3.0.1
 * Bug Fixes
   * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
