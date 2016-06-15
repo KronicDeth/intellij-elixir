@@ -3,8 +3,10 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Upgrading](#upgrading)
-  - [v2.0.0](#v200)
+  - [v4.0.0](#v400)
     - [Preferences/Settings](#preferencessettings)
+  - [v2.0.0](#v200)
+    - [Preferences/Settings](#preferencessettings-1)
     - [Quick Fix](#quick-fix)
   - [v1.0.0](#v100)
   - [v0.3.1](#v031)
@@ -13,6 +15,12 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Upgrading
+
+## v4.0.0
+
+### Preferences/Settings
+
+The Preferences > Editor > Colors & Fonts > Elixir has been reorganized and all the Text Attribute Keys have default Text Attributes for the `Darcula` and `Default` schemes, so if you have a custom scheme, you may want to try using the `Darcula` or `Default` schemes, or at least save a new custom scheme from those defaults.  If you want to use the same font as used in the new screenshots, with the ligatures that make the pipe arrow one grapheme, that is [Fira Code](https://github.com/tonsky/FiraCode).  There are installation instructions in that repository.
 
 ## v2.0.0
 
