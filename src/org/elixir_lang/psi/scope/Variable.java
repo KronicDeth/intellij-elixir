@@ -457,10 +457,12 @@ public abstract class Variable implements PsiScopeProcessor {
         boolean keepProcessing = true;
 
         for (PsiElement parameter : parameters) {
-            keepProcessing = execute(parameter, state);
+            if (parameter != null) {
+                keepProcessing = execute(parameter, state);
 
-            if (!keepProcessing) {
-                break;
+                if (!keepProcessing) {
+                    break;
+                }
             }
         }
 
