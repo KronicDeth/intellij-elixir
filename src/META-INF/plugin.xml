@@ -9,10 +9,22 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.0.1</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Check if <code>parameter</code> is <code>null</code> before <code>Variable#execute</code> call in
+              <code>Variable#execute(PsiElement[], ResolveState)</code>.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.0.0</h1>
       <ul>
         <li>
-          <p>Enhancments</p>
+          <p>Enhancements</p>
           <ul>
             <li>
               <p>Resolve and highlight parameter references</p>

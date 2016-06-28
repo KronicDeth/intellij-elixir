@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v4.0.1](#v401)
   - [v4.0.0](#v400)
   - [v3.0.1](#v301)
   - [v3.0.0](#v300)
@@ -32,6 +33,11 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v4.0.1
+
+* Bug Fixes
+  * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.0.0
 * Enhancements
