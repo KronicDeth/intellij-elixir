@@ -5,6 +5,7 @@ import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.FoldingGroup;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.PsiElementProcessor;
@@ -59,6 +60,8 @@ public class FoldingBuilder extends FoldingBuilderEx {
                             keepProcessing = execute((AtNonNumericOperation) element);
                         } else if (element instanceof ElixirDoBlock) {
                             keepProcessing = execute((ElixirDoBlock) element);
+                        } else if (element instanceof ElixirStabOperation) {
+                            keepProcessing = execute((ElixirStabOperation) element);
                         }
 
                         return keepProcessing;
@@ -79,11 +82,19 @@ public class FoldingBuilder extends FoldingBuilderEx {
                     }
 
                     private boolean execute(@NotNull ElixirDoBlock doBlock) {
-                        boolean keepProcessing = true;
-
                         foldingDescriptorList.add(new FoldingDescriptor(doBlock, doBlock.getTextRange()));
 
-                        return keepProcessing;
+                        return true;
+                    }
+
+                    private boolean execute(@NotNull ElixirStabOperation stabOperation) {
+                        int startOffset = stabOperation.operator().getTextOffset();
+                        int endOffset = stabOperation.getTextRange().getEndOffset();
+                        TextRange textRange = new TextRange(startOffset, endOffset);
+
+                        foldingDescriptorList.add(new FoldingDescriptor(stabOperation, textRange));
+
+                        return true;
                     }
 
                     private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation) {
@@ -162,6 +173,8 @@ public class FoldingBuilder extends FoldingBuilderEx {
 
         if (element instanceof ElixirDoBlock) {
             placeholderText = "do: ...";
+        } else if (element instanceof ElixirStabOperation) {
+            placeholderText = "-> ...";
         }
 
         return placeholderText;
