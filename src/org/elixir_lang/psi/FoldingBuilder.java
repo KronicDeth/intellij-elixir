@@ -10,6 +10,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.operation.Type;
+import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.reference.ModuleAttribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,8 +100,44 @@ public class FoldingBuilder extends FoldingBuilderEx {
                                     new FoldingDescriptor(
                                             noParenthesesOneArgument,
                                             noParenthesesOneArgument.getTextRange()
-                                    )
+                                    ) {
+                                        @NotNull
+                                        @Override
+                                        public String getPlaceholderText() {
+                                            return "\"...\"";
+                                        }
+                                    }
                             );
+                        } else if (ModuleAttribute.isTypeName(name)) {
+                            ElixirNoParenthesesOneArgument noParenthesesOneArgument =
+                                    atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+
+                            PsiElement[] children = noParenthesesOneArgument.getChildren();
+
+                            if (children.length == 1) {
+                                PsiElement child = children[0];
+
+                                if (child instanceof Type) {
+                                    Type type = (Type) child;
+
+                                    PsiElement rightOperand = Normalized.rightOperand(type);
+
+                                    if (rightOperand != null) {
+                                        foldingDescriptorList.add(
+                                                new FoldingDescriptor(
+                                                        rightOperand,
+                                                        rightOperand.getTextRange()
+                                                ) {
+                                                    @NotNull
+                                                    @Override
+                                                    public String getPlaceholderText() {
+                                                        return "...";
+                                                    }
+                                                }
+                                        );
+                                    }
+                                }
+                            }
                         }
 
                         return true;
@@ -199,8 +237,6 @@ public class FoldingBuilder extends FoldingBuilderEx {
             placeholderText = "do: ...";
         } else if (element instanceof ElixirStabOperation) {
             placeholderText = "-> ...";
-        } else if (element instanceof ElixirNoParenthesesOneArgument) {
-            placeholderText = "\"...\"";
         }
 
         return placeholderText;
@@ -214,6 +250,13 @@ public class FoldingBuilder extends FoldingBuilderEx {
      */
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-        return true;
+        PsiElement element = node.getPsi();
+        boolean collapsedByDefault = false;
+
+        if (element instanceof AtNonNumericOperation) {
+            collapsedByDefault = true;
+        }
+
+        return collapsedByDefault;
     }
 }
