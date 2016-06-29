@@ -10,11 +10,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.reference.ModuleAttribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName;
 
 public class FoldingBuilder extends FoldingBuilderEx {
     /*
@@ -56,8 +58,11 @@ public class FoldingBuilder extends FoldingBuilderEx {
                     public boolean execute(@NotNull PsiElement element) {
                         boolean keepProcessing = true;
 
+
                         if (element instanceof AtNonNumericOperation) {
                             keepProcessing = execute((AtNonNumericOperation) element);
+                        } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
+                            keepProcessing = execute((AtUnqualifiedNoParenthesesCall) element);
                         } else if (element instanceof ElixirDoBlock) {
                             keepProcessing = execute((ElixirDoBlock) element);
                         } else if (element instanceof ElixirStabOperation) {
@@ -79,6 +84,25 @@ public class FoldingBuilder extends FoldingBuilderEx {
                         }
 
                         return keepProcessing;
+                    }
+
+                    private boolean execute(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+                        String moduleAttributeName = moduleAttributeName(atUnqualifiedNoParenthesesCall);
+                        String name = moduleAttributeName.substring(1);
+
+                        if (ModuleAttribute.isDocumentationName(name)) {
+                            ElixirNoParenthesesOneArgument noParenthesesOneArgument =
+                                    atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
+
+                            foldingDescriptorList.add(
+                                    new FoldingDescriptor(
+                                            noParenthesesOneArgument,
+                                            noParenthesesOneArgument.getTextRange()
+                                    )
+                            );
+                        }
+
+                        return true;
                     }
 
                     private boolean execute(@NotNull ElixirDoBlock doBlock) {
@@ -175,6 +199,8 @@ public class FoldingBuilder extends FoldingBuilderEx {
             placeholderText = "do: ...";
         } else if (element instanceof ElixirStabOperation) {
             placeholderText = "-> ...";
+        } else if (element instanceof ElixirNoParenthesesOneArgument) {
+            placeholderText = "\"...\"";
         }
 
         return placeholderText;
