@@ -7,65 +7,15 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public class FoldingBuilder extends FoldingBuilderEx {
-    /*
-     * Static Methods
-     */
-
-    @NotNull
-    private static List<FoldingDescriptor> buildFoldRegions(
-            @NotNull Collection<AtNonNumericOperation> atNonNumericOperationCollection
-    ) {
-        List<FoldingDescriptor> foldingDescriptorList = new ArrayList<FoldingDescriptor>();
-
-        Map<String, FoldingGroup> foldingGroupByModuleAttributeName = new HashMap<String, FoldingGroup>();
-
-        for (final AtNonNumericOperation atNonNumericOperation : atNonNumericOperationCollection) {
-            PsiReference reference = atNonNumericOperation.getReference();
-
-            if (reference != null) {
-                PsiElement target = reference.resolve();
-
-                if (target != null) {
-                    assert target instanceof AtUnqualifiedNoParenthesesCall;
-
-                    final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) target;
-
-                    String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
-                    FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
-
-                    if (foldingGroup == null) {
-                        foldingGroup = FoldingGroup.newGroup(moduleAttributeName);
-                        foldingGroupByModuleAttributeName.put(moduleAttributeName, foldingGroup);
-                    }
-
-                    foldingDescriptorList.add(
-                            new FoldingDescriptor(
-                                    atNonNumericOperation.getNode(),
-                                    atNonNumericOperation.getTextRange(),
-                                    foldingGroup,
-                                    Collections.<Object>singleton(atUnqualifiedNoParenthesesCall)
-                            ) {
-                                @Nullable
-                                @Override
-                                public String getPlaceholderText() {
-                                    return atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText();
-                                }
-                            }
-                    );
-                }
-            }
-        }
-
-        return foldingDescriptorList;
-    }
-
     /*
      * Instance Methods
      */
@@ -83,11 +33,116 @@ public class FoldingBuilder extends FoldingBuilderEx {
      */
     @NotNull
     @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
-        Collection<AtNonNumericOperation> atNonNumericOperationCollection = PsiTreeUtil.collectElementsOfType(
-                root, AtNonNumericOperation.class
+    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, final boolean quick) {
+        final List<FoldingDescriptor> foldingDescriptorList = new ArrayList<FoldingDescriptor>();
+
+        PsiTreeUtil.processElements(root,
+                new PsiElementProcessor() {
+                    private Map<String, FoldingGroup> foldingGroupByModuleAttributeName =
+                            new HashMap<String, FoldingGroup>();
+
+                    /*
+                     *
+                     * Instance Methods
+                     *
+                     */
+
+                    /*
+                     * Public Instance Methods
+                     */
+
+                    @Override
+                    public boolean execute(@NotNull PsiElement element) {
+                        boolean keepProcessing = true;
+
+                        if (element instanceof AtNonNumericOperation) {
+                            keepProcessing = execute((AtNonNumericOperation) element);
+                        } else if (element instanceof ElixirDoBlock) {
+                            keepProcessing = execute((ElixirDoBlock) element);
+                        }
+
+                        return keepProcessing;
+                    }
+
+                    /*
+                     * Private Instance Methods
+                     */
+
+                    private boolean execute(@NotNull AtNonNumericOperation atNonNumericOperation) {
+                        boolean keepProcessing = true;
+
+                        if (!quick) {
+                            keepProcessing = slowExecute(atNonNumericOperation);
+                        }
+
+                        return keepProcessing;
+                    }
+
+                    private boolean execute(@NotNull ElixirDoBlock doBlock) {
+                        boolean keepProcessing = true;
+
+                        foldingDescriptorList.add(new FoldingDescriptor(doBlock, doBlock.getTextRange()));
+
+                        return keepProcessing;
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation) {
+                        boolean keepProcessing = true;
+                        PsiReference reference = atNonNumericOperation.getReference();
+
+                        if (reference != null) {
+                            keepProcessing = slowExecute(atNonNumericOperation, reference);
+                        }
+
+                        return keepProcessing;
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
+                                                @NotNull PsiElement target) {
+                        assert target instanceof AtUnqualifiedNoParenthesesCall;
+
+                        final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall =
+                                (AtUnqualifiedNoParenthesesCall) target;
+
+                        String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
+                        FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
+
+                        if (foldingGroup == null) {
+                            foldingGroup = FoldingGroup.newGroup(moduleAttributeName);
+                            foldingGroupByModuleAttributeName.put(moduleAttributeName, foldingGroup);
+                        }
+
+                        foldingDescriptorList.add(
+                                new FoldingDescriptor(
+                                        atNonNumericOperation.getNode(),
+                                        atNonNumericOperation.getTextRange(),
+                                        foldingGroup,
+                                        Collections.<Object>singleton(atUnqualifiedNoParenthesesCall)
+                                ) {
+                                    @Nullable
+                                    @Override
+                                    public String getPlaceholderText() {
+                                        return atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText();
+                                    }
+                                }
+                        );
+
+                        return true;
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
+                                                @NotNull PsiReference reference) {
+                        PsiElement target = reference.resolve();
+                        boolean keepProcessing = true;
+
+                        if (target != null) {
+                            keepProcessing = slowExecute(atNonNumericOperation, target);
+                        }
+
+                        return keepProcessing;
+                    }
+                }
         );
-        List<FoldingDescriptor> foldingDescriptorList = buildFoldRegions(atNonNumericOperationCollection);
 
         return foldingDescriptorList.toArray(new FoldingDescriptor[foldingDescriptorList.size()]);
     }
@@ -102,7 +157,14 @@ public class FoldingBuilder extends FoldingBuilderEx {
     @Nullable
     @Override
     public String getPlaceholderText(@NotNull ASTNode node) {
-        return null;
+        PsiElement element = node.getPsi();
+        String placeholderText = null;
+
+        if (element instanceof ElixirDoBlock) {
+            placeholderText = "do: ...";
+        }
+
+        return placeholderText;
     }
 
     /**
