@@ -14,27 +14,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class FoldingBuilder extends FoldingBuilderEx {
-    /**
-     * Builds the folding regions for the specified node in the AST tree and its children.
-     *
-     * @param root     the element for which folding is requested.
-     * @param document the document for which folding is built. Can be used to retrieve line
-     *                 numbers for folding regions.
-     * @param quick    whether the result should be provided as soon as possible. Is true, when
-     *                 an editor is opened and we need to auto-fold something immediately, like Java imports.
-     *                 If true, one should perform no reference resolving and avoid complex checks if possible.
-     * @return the array of folding descriptors.
+    /*
+     * Static Methods
      */
-    @NotNull
-    @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
-        Map<String, FoldingGroup> foldingGroupByModuleAttributeName = new HashMap<String, FoldingGroup>();
 
+    @NotNull
+    private static List<FoldingDescriptor> buildFoldRegions(
+            @NotNull Collection<AtNonNumericOperation> atNonNumericOperationCollection
+    ) {
         List<FoldingDescriptor> foldingDescriptorList = new ArrayList<FoldingDescriptor>();
 
-        Collection<AtNonNumericOperation> atNonNumericOperationCollection = PsiTreeUtil.collectElementsOfType(
-                root, AtNonNumericOperation.class
-        );
+        Map<String, FoldingGroup> foldingGroupByModuleAttributeName = new HashMap<String, FoldingGroup>();
 
         for (final AtNonNumericOperation atNonNumericOperation : atNonNumericOperationCollection) {
             PsiReference reference = atNonNumericOperation.getReference();
@@ -72,6 +62,32 @@ public class FoldingBuilder extends FoldingBuilderEx {
                 }
             }
         }
+
+        return foldingDescriptorList;
+    }
+
+    /*
+     * Instance Methods
+     */
+
+    /**
+     * Builds the folding regions for the specified node in the AST tree and its children.
+     *
+     * @param root     the element for which folding is requested.
+     * @param document the document for which folding is built. Can be used to retrieve line
+     *                 numbers for folding regions.
+     * @param quick    whether the result should be provided as soon as possible. Is true, when
+     *                 an editor is opened and we need to auto-fold something immediately, like Java imports.
+     *                 If true, one should perform no reference resolving and avoid complex checks if possible.
+     * @return the array of folding descriptors.
+     */
+    @NotNull
+    @Override
+    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement root, @NotNull Document document, boolean quick) {
+        Collection<AtNonNumericOperation> atNonNumericOperationCollection = PsiTreeUtil.collectElementsOfType(
+                root, AtNonNumericOperation.class
+        );
+        List<FoldingDescriptor> foldingDescriptorList = buildFoldRegions(atNonNumericOperationCollection);
 
         return foldingDescriptorList.toArray(new FoldingDescriptor[foldingDescriptorList.size()]);
     }
