@@ -3,6 +3,7 @@ package org.elixir_lang.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
+import com.intellij.lang.folding.NamedFoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.openapi.util.TextRange;
@@ -10,6 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.psi.operation.infix.Normalized;
 import org.elixir_lang.reference.ModuleAttribute;
@@ -18,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName;
+import static org.elixir_lang.psi.call.name.Function.ALIAS;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public class FoldingBuilder extends FoldingBuilderEx {
     /*
@@ -60,7 +64,6 @@ public class FoldingBuilder extends FoldingBuilderEx {
                     public boolean execute(@NotNull PsiElement element) {
                         boolean keepProcessing = true;
 
-
                         if (element instanceof AtNonNumericOperation) {
                             keepProcessing = execute((AtNonNumericOperation) element);
                         } else if (element instanceof AtUnqualifiedNoParenthesesCall) {
@@ -69,6 +72,8 @@ public class FoldingBuilder extends FoldingBuilderEx {
                             keepProcessing = execute((ElixirDoBlock) element);
                         } else if (element instanceof ElixirStabOperation) {
                             keepProcessing = execute((ElixirStabOperation) element);
+                        } else if (element instanceof Call) {
+                            keepProcessing = execute((Call) element);
                         }
 
                         return keepProcessing;
@@ -97,16 +102,12 @@ public class FoldingBuilder extends FoldingBuilderEx {
                                     atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument();
 
                             foldingDescriptorList.add(
-                                    new FoldingDescriptor(
-                                            noParenthesesOneArgument,
-                                            noParenthesesOneArgument.getTextRange()
-                                    ) {
-                                        @NotNull
-                                        @Override
-                                        public String getPlaceholderText() {
-                                            return "\"...\"";
-                                        }
-                                    }
+                                    new NamedFoldingDescriptor(
+                                            noParenthesesOneArgument.getNode(),
+                                            noParenthesesOneArgument.getTextRange(),
+                                            null,
+                                            "\"...\""
+                                    )
                             );
                         } else if (ModuleAttribute.isTypeName(name)) {
                             ElixirNoParenthesesOneArgument noParenthesesOneArgument =
@@ -124,18 +125,41 @@ public class FoldingBuilder extends FoldingBuilderEx {
 
                                     if (rightOperand != null) {
                                         foldingDescriptorList.add(
-                                                new FoldingDescriptor(
-                                                        rightOperand,
-                                                        rightOperand.getTextRange()
-                                                ) {
-                                                    @NotNull
-                                                    @Override
-                                                    public String getPlaceholderText() {
-                                                        return "...";
-                                                    }
-                                                }
+                                                new NamedFoldingDescriptor(
+                                                        rightOperand.getNode(),
+                                                        rightOperand.getTextRange(),
+                                                        null,
+                                                        "..."
+                                                )
                                         );
                                     }
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    private boolean execute(@NotNull Call call) {
+                        if (call.isCalling(KERNEL, ALIAS)) {
+                            if (isFirstAliasInGroup(call)) {
+                                Call last = lastAliasInGroup(call);
+                                PsiElement[] finalArguments = finalArguments(call);
+
+                                if (finalArguments != null && finalArguments.length >= 1) {
+                                    TextRange textRange = new TextRange(
+                                            finalArguments[0].getTextOffset(),
+                                            last.getTextRange().getEndOffset()
+                                    );
+
+                                    foldingDescriptorList.add(
+                                            new NamedFoldingDescriptor(
+                                                    call.getParent().getNode(),
+                                                    textRange,
+                                                    null,
+                                                    "..."
+                                            )
+                                    );
                                 }
                             }
                         }
@@ -157,6 +181,43 @@ public class FoldingBuilder extends FoldingBuilderEx {
                         foldingDescriptorList.add(new FoldingDescriptor(stabOperation, textRange));
 
                         return true;
+                    }
+
+                    private boolean isFirstAliasInGroup(@NotNull Call alias) {
+                        PsiElement previousSiblingExpression = previousSiblingExpression(alias);
+                        boolean first = true;
+
+                        if (previousSiblingExpression instanceof Call) {
+                            Call previousSiblingExpressionCall = (Call) previousSiblingExpression;
+
+                            first = !previousSiblingExpressionCall.isCalling(KERNEL, ALIAS);
+                        }
+
+                        return first;
+                    }
+
+                    @NotNull
+                    private Call lastAliasInGroup(@NotNull Call first) {
+                        PsiElement expression = first;
+                        Call last = first;
+
+                        while (true) {
+                            expression = nextSiblingExpression(expression);
+
+                            if (expression instanceof Call) {
+                                Call call = (Call) expression;
+
+                                if (call.isCalling(KERNEL, ALIAS)) {
+                                    last = call;
+
+                                    continue;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        return last;
                     }
 
                     private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation) {
@@ -251,12 +312,7 @@ public class FoldingBuilder extends FoldingBuilderEx {
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
         PsiElement element = node.getPsi();
-        boolean collapsedByDefault = false;
 
-        if (element instanceof AtNonNumericOperation) {
-            collapsedByDefault = true;
-        }
-
-        return collapsedByDefault;
+        return element instanceof AtNonNumericOperation || element instanceof ElixirStabBody;
     }
 }

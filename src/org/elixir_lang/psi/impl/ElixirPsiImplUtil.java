@@ -10,6 +10,7 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.LocalSearchScope;
@@ -1049,6 +1050,18 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @Nullable
+    public static PsiElement nextSiblingExpression(@NotNull PsiElement element) {
+        return siblingExpression(element, new com.intellij.util.Function<PsiElement, PsiElement>() {
+                    @Override
+                    public PsiElement fun(PsiElement element) {
+                        return element.getNextSibling();
+                    }
+                }
+        );
+    }
+
+    @Contract(pure = true)
+    @Nullable
     public static Quotable operand(Prefix prefix) {
         return org.elixir_lang.psi.operation.prefix.Normalized.operand(prefix);
     }
@@ -1199,6 +1212,18 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
         return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static PsiElement previousSiblingExpression(@NotNull PsiElement element) {
+        return siblingExpression(element, new com.intellij.util.Function<PsiElement, PsiElement>() {
+                    @Override
+                    public PsiElement fun(PsiElement element) {
+                        return element.getPrevSibling();
+                    }
+                }
+        );
     }
 
     @Contract(pure = true)
@@ -5075,6 +5100,22 @@ if (quoted == null) {
         }
 
         return builtString.toString();
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    private static PsiElement siblingExpression(@NotNull PsiElement element,
+                                                @NotNull com.intellij.util.Function<PsiElement, PsiElement> function) {
+        PsiElement expression = element;
+
+        do {
+            expression = function.fun(expression);
+        } while (expression instanceof ElixirEndOfExpression ||
+                expression instanceof LeafPsiElement ||
+                expression instanceof PsiComment ||
+                expression instanceof PsiWhiteSpace);
+
+        return expression;
     }
 
     /**
