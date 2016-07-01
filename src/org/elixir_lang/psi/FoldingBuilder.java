@@ -20,11 +20,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static org.elixir_lang.psi.call.name.Function.ALIAS;
+import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public class FoldingBuilder extends FoldingBuilderEx {
+    /*
+     * CONSTANTS
+     */
+
+    private static final String[] RESOLVED_FUNCTION_NAMES = new String[]{ALIAS, IMPORT, REQUIRE, USE};
+
     /*
      * Instance Methods
      */
@@ -141,25 +147,27 @@ public class FoldingBuilder extends FoldingBuilderEx {
                     }
 
                     private boolean execute(@NotNull Call call) {
-                        if (call.isCalling(KERNEL, ALIAS)) {
-                            if (isFirstAliasInGroup(call)) {
-                                Call last = lastAliasInGroup(call);
-                                PsiElement[] finalArguments = finalArguments(call);
+                        for (String resolvedFunctionName : RESOLVED_FUNCTION_NAMES) {
+                            if (call.isCalling(KERNEL, resolvedFunctionName)) {
+                                if (isFirstInGroup(call, KERNEL, resolvedFunctionName)) {
+                                    Call last = lastInGroup(call, KERNEL, resolvedFunctionName);
+                                    PsiElement[] finalArguments = finalArguments(call);
 
-                                if (finalArguments != null && finalArguments.length >= 1) {
-                                    TextRange textRange = new TextRange(
-                                            finalArguments[0].getTextOffset(),
-                                            last.getTextRange().getEndOffset()
-                                    );
+                                    if (finalArguments != null && finalArguments.length >= 1) {
+                                        TextRange textRange = new TextRange(
+                                                finalArguments[0].getTextOffset(),
+                                                last.getTextRange().getEndOffset()
+                                        );
 
-                                    foldingDescriptorList.add(
-                                            new NamedFoldingDescriptor(
-                                                    call.getParent().getNode(),
-                                                    textRange,
-                                                    null,
-                                                    "..."
-                                            )
-                                    );
+                                        foldingDescriptorList.add(
+                                                new NamedFoldingDescriptor(
+                                                        call.getParent().getNode(),
+                                                        textRange,
+                                                        null,
+                                                        "..."
+                                                )
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -183,21 +191,25 @@ public class FoldingBuilder extends FoldingBuilderEx {
                         return true;
                     }
 
-                    private boolean isFirstAliasInGroup(@NotNull Call alias) {
-                        PsiElement previousSiblingExpression = previousSiblingExpression(alias);
+                    private boolean isFirstInGroup(@NotNull Call call,
+                                                   @NotNull String resolvedModuleName,
+                                                   @NotNull String resolvedFunctionName) {
+                        PsiElement previousSiblingExpression = previousSiblingExpression(call);
                         boolean first = true;
 
                         if (previousSiblingExpression instanceof Call) {
                             Call previousSiblingExpressionCall = (Call) previousSiblingExpression;
 
-                            first = !previousSiblingExpressionCall.isCalling(KERNEL, ALIAS);
+                            first = !previousSiblingExpressionCall.isCalling(resolvedModuleName, resolvedFunctionName);
                         }
 
                         return first;
                     }
 
                     @NotNull
-                    private Call lastAliasInGroup(@NotNull Call first) {
+                    private Call lastInGroup(@NotNull Call first,
+                                             @NotNull String resolvedModuleName,
+                                             @NotNull String resolvedFunctionName) {
                         PsiElement expression = first;
                         Call last = first;
 
@@ -207,7 +219,7 @@ public class FoldingBuilder extends FoldingBuilderEx {
                             if (expression instanceof Call) {
                                 Call call = (Call) expression;
 
-                                if (call.isCalling(KERNEL, ALIAS)) {
+                                if (call.isCalling(resolvedModuleName, resolvedFunctionName)) {
                                     last = call;
 
                                     continue;
