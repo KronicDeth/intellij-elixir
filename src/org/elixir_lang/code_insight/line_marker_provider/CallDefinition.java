@@ -12,8 +12,10 @@ import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.reference.ModuleAttribute;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ATOM_KEYWORDS;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.moduleAttributeName;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
@@ -63,7 +67,9 @@ public class CallDefinition implements LineMarkerProvider {
     public LineMarkerInfo getLineMarkerInfo(@NotNull PsiElement element) {
         LineMarkerInfo lineMarkerInfo = null;
 
-        if (element instanceof Call) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            lineMarkerInfo = getLineMarkerInfo((AtUnqualifiedNoParenthesesCall) element);
+        } else if (element instanceof Call) {
             lineMarkerInfo = getLineMarkerInfo((Call) element);
         }
 
@@ -74,21 +80,52 @@ public class CallDefinition implements LineMarkerProvider {
      * Private Instance Methods
      */
 
+    @NotNull
+    private LineMarkerInfo callDefinitionSeparator(@NotNull Call call) {
+        LineMarkerInfo lineMarkerInfo;
+        lineMarkerInfo = new LineMarkerInfo<Call>(
+                call,
+                call.getTextRange(),
+                null,
+                Pass.UPDATE_ALL,
+                null,
+                null,
+                GutterIconRenderer.Alignment.RIGHT
+        );
+        EditorColorsScheme editorColorsScheme = editorColorsManager.getGlobalScheme();
+        lineMarkerInfo.separatorColor = editorColorsScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
+        lineMarkerInfo.separatorPlacement = SeparatorPlacement.TOP;
+        return lineMarkerInfo;
+    }
+
+    @Nullable
+    private LineMarkerInfo getLineMarkerInfo(@NotNull AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall) {
+        LineMarkerInfo lineMarkerInfo = null;
+
+        String moduleAttributeName = moduleAttributeName(atUnqualifiedNoParenthesesCall);
+
+        if (moduleAttributeName.equals("@doc")) {
+            lineMarkerInfo = callDefinitionSeparator(atUnqualifiedNoParenthesesCall);
+        }
+
+        return lineMarkerInfo;
+    }
+
     @Nullable
     private LineMarkerInfo getLineMarkerInfo(@NotNull Call call) {
         LineMarkerInfo lineMarkerInfo = null;
 
         if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS && CallDefinitionClause.is(call)) {
-            Call previous = previousCallDefinitionClause(call);
+            Call previousCallDefinitionClause = previousCallDefinitionClause(call);
             boolean firstClause;
 
-            if (previous == null) {
+            if (previousCallDefinitionClause == null) {
                 firstClause = true;
             } else {
                 Pair<String, IntRange> callNameArityRange = nameArityRange(call);
 
                 if (callNameArityRange != null) {
-                    Pair<String, IntRange> previousNameArityRange = nameArityRange(previous);
+                    Pair<String, IntRange> previousNameArityRange = nameArityRange(previousCallDefinitionClause);
 
                     firstClause = previousNameArityRange == null || !previousNameArityRange.equals(callNameArityRange);
                 } else {
@@ -97,18 +134,21 @@ public class CallDefinition implements LineMarkerProvider {
             }
 
             if (firstClause) {
-                lineMarkerInfo = new LineMarkerInfo<Call>(
-                        call,
-                        call.getTextRange(),
-                        null,
-                        Pass.UPDATE_ALL,
-                        null,
-                        null,
-                        GutterIconRenderer.Alignment.RIGHT
-                );
-                EditorColorsScheme editorColorsScheme = editorColorsManager.getGlobalScheme();
-                lineMarkerInfo.separatorColor = editorColorsScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
-                lineMarkerInfo.separatorPlacement = SeparatorPlacement.TOP;
+                PsiElement previousExpression = previousSiblingExpression(call);
+
+                if (previousExpression instanceof AtUnqualifiedNoParenthesesCall) {
+                    AtUnqualifiedNoParenthesesCall previousModuleAttributeDefinition =
+                            (AtUnqualifiedNoParenthesesCall) previousExpression;
+                    String moduleAttributeName = moduleAttributeName(previousModuleAttributeDefinition);
+
+                    if (moduleAttributeName.equals("@doc")) {
+                        firstClause = false;
+                    }
+                }
+            }
+
+            if (firstClause) {
+                lineMarkerInfo = callDefinitionSeparator(call);
             }
         }
 
