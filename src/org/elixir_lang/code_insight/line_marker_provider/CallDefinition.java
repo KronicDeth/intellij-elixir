@@ -9,14 +9,20 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.SeparatorPlacement;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.previousSiblingExpression;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class CallDefinition implements LineMarkerProvider {
     /*
@@ -73,20 +79,60 @@ public class CallDefinition implements LineMarkerProvider {
         LineMarkerInfo lineMarkerInfo = null;
 
         if (daemonCodeAnalyzerSettings.SHOW_METHOD_SEPARATORS && CallDefinitionClause.is(call)) {
-            lineMarkerInfo = new LineMarkerInfo<Call>(
-                    call,
-                    call.getTextRange(),
-                    null,
-                    Pass.UPDATE_ALL,
-                    null,
-                    null,
-                    GutterIconRenderer.Alignment.RIGHT
-            );
-            EditorColorsScheme editorColorsScheme = editorColorsManager.getGlobalScheme();
-            lineMarkerInfo.separatorColor = editorColorsScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
-            lineMarkerInfo.separatorPlacement = SeparatorPlacement.TOP;
+            Call previous = previousCallDefinitionClause(call);
+            boolean firstClause;
+
+            if (previous == null) {
+                firstClause = true;
+            } else {
+                Pair<String, IntRange> callNameArityRange = nameArityRange(call);
+
+                if (callNameArityRange != null) {
+                    Pair<String, IntRange> previousNameArityRange = nameArityRange(previous);
+
+                    firstClause = previousNameArityRange == null || !previousNameArityRange.equals(callNameArityRange);
+                } else {
+                    firstClause = true;
+                }
+            }
+
+            if (firstClause) {
+                lineMarkerInfo = new LineMarkerInfo<Call>(
+                        call,
+                        call.getTextRange(),
+                        null,
+                        Pass.UPDATE_ALL,
+                        null,
+                        null,
+                        GutterIconRenderer.Alignment.RIGHT
+                );
+                EditorColorsScheme editorColorsScheme = editorColorsManager.getGlobalScheme();
+                lineMarkerInfo.separatorColor = editorColorsScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
+                lineMarkerInfo.separatorPlacement = SeparatorPlacement.TOP;
+            }
         }
 
         return lineMarkerInfo;
+    }
+
+    @Nullable
+    private Call previousCallDefinitionClause(@NotNull PsiElement element) {
+        PsiElement expression = element;
+        Call previous = null;
+
+        while (expression != null) {
+            expression = previousSiblingExpression(expression);
+
+            if (expression instanceof Call) {
+                Call call = (Call) expression;
+
+                if (CallDefinitionClause.is(call)) {
+                    previous = call;
+                    break;
+                }
+            }
+        }
+
+        return previous;
     }
 }
