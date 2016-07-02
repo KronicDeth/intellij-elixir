@@ -3,11 +3,11 @@ package org.elixir_lang.psi.scope.variable;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Match;
 import org.elixir_lang.psi.scope.Variable;
 import org.jetbrains.annotations.Contract;
@@ -99,7 +99,7 @@ public class MultiResolve extends Variable {
     @Contract(pure = true)
     @Nullable
     private static PsiElement previousExpression(@NotNull PsiElement element) {
-        PsiElement expression = previousSiblingExpression(element);
+        PsiElement expression = ElixirPsiImplUtil.previousSiblingExpression(element);
 
         if (expression == null) {
             expression = previousParentExpression(element);
@@ -118,25 +118,6 @@ public class MultiResolve extends Variable {
         } while (expression instanceof ElixirDoBlock ||
                 expression instanceof ElixirStab ||
                 expression instanceof ElixirStabBody);
-
-        return expression;
-    }
-
-    /*
-     * Constructors
-     */
-
-    @Contract(pure = true)
-    @Nullable
-    private static PsiElement previousSiblingExpression(@NotNull PsiElement element) {
-        PsiElement expression = element;
-
-        do {
-            expression = expression.getPrevSibling();
-        } while (expression instanceof ElixirEndOfExpression ||
-                expression instanceof LeafPsiElement ||
-                expression instanceof PsiComment ||
-                expression instanceof PsiWhiteSpace);
 
         return expression;
     }

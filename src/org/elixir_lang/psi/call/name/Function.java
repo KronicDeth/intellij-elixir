@@ -1,6 +1,7 @@
 package org.elixir_lang.psi.call.name;
 
 public class Function {
+    public static final String ALIAS = "alias";
     public static final String CASE = "case";
     public static final String COND = "cond";
     public static final String DEF = "def";
@@ -16,9 +17,11 @@ public class Function {
     public static final String DEFSTRUCT = "defstruct";
     public static final String DESTRUCTURE = "destructure";
     public static final String IF = "if";
+    public static final String IMPORT = "import";
     public static final String FOR = "for";
     public static final String QUOTE = Quote.FUNCTION;
     public static final String RECEIVE = "receive";
+    public static final String REQUIRE = "require";
     public static final String UNLESS = "unless";
     public static final String USE = "use";
     public static final String UNQUOTE = "unquote";
