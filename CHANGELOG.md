@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v4.0.1](#v401)
+  - [v4.0.1-dev](#v401-dev)
   - [v4.0.0](#v400)
   - [v3.0.1](#v301)
   - [v3.0.0](#v300)
@@ -34,8 +34,15 @@
 
 # Changelog
 
-## v4.0.1
+## v4.0.1-dev
 
+* Enhancements
+  * [#331](https://github.com/KronicDeth/intellij-elixir/pull/331) - [@KronicDeth](https://github.com/KronicDeth)
+    * Allow `do end` blocks to fold to `do: ...`
+    * Allow `->` operator and the right operand to fold to `-> ...`
+    * Allow `@doc`, `@moduledoc` and `@typedoc` value to fold to `"..."`.
+    * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`. 
+  
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
 

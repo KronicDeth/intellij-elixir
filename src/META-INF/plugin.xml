@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.0.0</version>
+  <version>4.0.1-dev</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,8 +9,24 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v4.0.1</h1>
+      <h1>v4.0.1-dev</h1>
       <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>Allow <code>do end</code> blocks to fold to <code>do: ...</code></li>
+            <li>Allow <code>-></code> operator and the right operand to fold to <code>-> ...</code></li>
+            <li>
+              Allow <code>@doc</code>, <code>@moduledoc</code> and <code>@typedoc</code> value to fold to
+              <code>"..."</code>.
+            </li>
+            <li>
+              Fold runs of adjacent <code>alias</code>, <code>import</code>, <code>require</code>, or <code>use</code>
+              to be followed to a single <code>alias</code>, <code>import</code>, <code>require</code>, or
+              <code>use</code> followed by <code>...</code>.
+            </li>
+          </ul>
+        </li>
         <li>
           <p>Bug Fixes</p>
           <ul>
