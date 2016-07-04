@@ -111,6 +111,18 @@ public class ElixirPsiImplUtil {
     // NOTE: Unknown is all bases not 2, 8, 10, or 16, but 36 is used because all digits and letters are parsed.
     public static final int UNKNOWN_BASE = 36;
     public static final TokenSet IDENTIFIER_TOKEN_SET = TokenSet.create(ElixirTypes.IDENTIFIER_TOKEN);
+    public static final com.intellij.util.Function<PsiElement, PsiElement> NEXT_SIBLING = new com.intellij.util.Function<PsiElement, PsiElement>() {
+                @Override
+                public PsiElement fun(PsiElement element) {
+                    return element.getNextSibling();
+                }
+            };
+    public static final com.intellij.util.Function<PsiElement, PsiElement> PREVIOUS_SIBLING = new com.intellij.util.Function<PsiElement, PsiElement>() {
+                @Override
+                public PsiElement fun(PsiElement element) {
+                    return element.getPrevSibling();
+                }
+            };
 
     @Contract(pure = true)
     @NotNull
@@ -1051,13 +1063,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static PsiElement nextSiblingExpression(@NotNull PsiElement element) {
-        return siblingExpression(element, new com.intellij.util.Function<PsiElement, PsiElement>() {
-                    @Override
-                    public PsiElement fun(PsiElement element) {
-                        return element.getNextSibling();
-                    }
-                }
-        );
+        return siblingExpression(element, NEXT_SIBLING);
     }
 
     @Contract(pure = true)
@@ -1217,13 +1223,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @Nullable
     public static PsiElement previousSiblingExpression(@NotNull PsiElement element) {
-        return siblingExpression(element, new com.intellij.util.Function<PsiElement, PsiElement>() {
-                    @Override
-                    public PsiElement fun(PsiElement element) {
-                        return element.getPrevSibling();
-                    }
-                }
-        );
+        return siblingExpression(element, PREVIOUS_SIBLING);
     }
 
     @Contract(pure = true)
@@ -2555,7 +2555,37 @@ public class ElixirPsiImplUtil {
         if (!(call instanceof UnqualifiedNoArgumentsCall && call.getParent() instanceof AtNonNumericOperation) &&
                 // if a bitstring segment option then the option is a pseudo-function
                 !isBitStreamSegmentOption(call)) {
-            reference = new Callable(call);
+            PsiElement parent = call.getParent();
+
+            if (parent instanceof Type) {
+                PsiElement grandParent = parent.getParent();
+                AtUnqualifiedNoParenthesesCall moduleAttribute = null;
+                PsiElement maybeArgument = grandParent;
+
+                if (grandParent instanceof When) {
+                    maybeArgument = grandParent.getParent();
+                }
+
+                if (maybeArgument instanceof ElixirNoParenthesesOneArgument) {
+                    PsiElement maybeModuleAttribute = maybeArgument.getParent();
+
+                    if (maybeModuleAttribute instanceof AtUnqualifiedNoParenthesesCall) {
+                        moduleAttribute = (AtUnqualifiedNoParenthesesCall) maybeModuleAttribute;
+                    }
+
+                    if (moduleAttribute != null) {
+                        String name = moduleAttributeName(moduleAttribute);
+
+                        if (name.equals("@spec")) {
+                            reference = new org.elixir_lang.reference.CallDefinitionClause(call, moduleAttribute);
+                        }
+                    }
+                }
+            }
+
+            if (reference == null) {
+                reference = new Callable(call);
+            }
         }
 
         return reference;
@@ -5104,7 +5134,7 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @Nullable
-    private static PsiElement siblingExpression(@NotNull PsiElement element,
+    public static PsiElement siblingExpression(@NotNull PsiElement element,
                                                 @NotNull com.intellij.util.Function<PsiElement, PsiElement> function) {
         PsiElement expression = element;
 

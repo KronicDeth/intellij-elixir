@@ -170,7 +170,7 @@ public class CallDefinitionSpecification extends Element<AtUnqualifiedNoParenthe
         return type;
     }
 
-    @Nullable
+    @NotNull
     public static Pair<String, Integer> typeNameArity(@NotNull Call type) {
         String name = type.functionName();
         int arity = type.resolvedFinalArity();

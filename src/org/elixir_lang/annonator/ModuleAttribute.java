@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 
 /**
@@ -1047,31 +1048,34 @@ public class ModuleAttribute implements Annotator, DumbAware {
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
-        PsiElement functionNameElement = unqualifiedParenthesesCall.functionNameElement();
+        if (!unqualifiedParenthesesCall.isCalling(KERNEL, UNQUOTE, 1)) {
+            PsiElement functionNameElement = unqualifiedParenthesesCall.functionNameElement();
 
-        if (functionNameElement != null) {
+            if (functionNameElement != null) {
 
-            highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
-            highlightTypesAndTypeParameterUsages(
-                    unqualifiedParenthesesCall.primaryArguments(),
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            );
+                highlight(functionNameElement.getTextRange(), annotationHolder, typeTextAttributesKey);
 
-            PsiElement[] secondaryArguments = unqualifiedParenthesesCall.secondaryArguments();
-
-            if (secondaryArguments != null) {
                 highlightTypesAndTypeParameterUsages(
-                        secondaryArguments,
+                        unqualifiedParenthesesCall.primaryArguments(),
                         typeParameterNameSet,
                         annotationHolder,
                         typeTextAttributesKey
                 );
+
+                PsiElement[] secondaryArguments = unqualifiedParenthesesCall.secondaryArguments();
+
+                if (secondaryArguments != null) {
+                    highlightTypesAndTypeParameterUsages(
+                            secondaryArguments,
+                            typeParameterNameSet,
+                            annotationHolder,
+                            typeTextAttributesKey
+                    );
+                }
+            } else {
+                error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall);
             }
-        } else {
-            error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall);
         }
     }
 

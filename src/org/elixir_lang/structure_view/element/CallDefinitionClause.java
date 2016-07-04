@@ -72,6 +72,22 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
     @Nullable
     public static Modular enclosingModular(@NotNull Call call) {
         Modular modular = null;
+        Call enclosingMacroCall = enclosingModularMacroCall(call);
+
+        if (enclosingMacroCall != null) {
+            modular = modular(enclosingMacroCall);
+        }
+
+        return modular;
+    }
+
+    /**
+     * The enclosing macro call that acts as the modular scope of {@code call}.  Ignores enclosing {@code for} calls that
+     * {@link ElixirPsiImplUtil#enclosingMacroCall} doesn't.
+     *
+     * @param call a def(macro)?p?
+     */
+    public static Call enclosingModularMacroCall(@NotNull Call call) {
         Call enclosedCall = call;
         Call enclosingMacroCall;
 
@@ -84,12 +100,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
                 break;
             }
         }
-
-        if (enclosingMacroCall != null) {
-            modular = modular(enclosingMacroCall);
-        }
-
-        return modular;
+        return enclosingMacroCall;
     }
 
     @Contract(pure = true)
