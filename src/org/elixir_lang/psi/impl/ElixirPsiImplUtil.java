@@ -443,7 +443,8 @@ public class ElixirPsiImplUtil {
                     call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, COND) ||
                     call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, IF) ||
                     call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, RECEIVE) ||
-                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS)
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, UNLESS) ||
+                    call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, VAR_BANG)
                     ) {
                useScopeSelector = UseScopeSelector.SELF_AND_FOLLOWING_SIBLINGS;
             } else if (CallDefinitionClause.is(call) || isModular(call) || hasDoBlockOrKeyword(call)) {

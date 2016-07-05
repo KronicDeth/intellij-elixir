@@ -133,7 +133,7 @@ public class Kernel implements Annotator, DumbAware {
                             UNLESS,
                             "update_in",
                             USE,
-                            "var!"
+                            VAR_BANG
                     }
             )
     );
