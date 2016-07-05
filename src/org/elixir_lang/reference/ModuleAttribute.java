@@ -3,6 +3,7 @@ package org.elixir_lang.reference;
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.util.BusyObject;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -271,6 +272,23 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
                                 atUnqualifiedNoParenthesesCall
                         )
                 );
+            } else if (sibling instanceof Call) {
+                Call siblingCall = (Call) sibling;
+
+                if (Implementation.is(siblingCall)) {
+                    PsiElement element = Implementation.protocolNameElement(siblingCall);
+
+                    if (element == null) {
+                        element = siblingCall;
+                    }
+
+                    lookupElementList.add(
+                            LookupElementBuilder.createWithSmartPointer(
+                                    "@protocol",
+                                    element
+                            )
+                    );
+                }
             }
         }
 
