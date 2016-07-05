@@ -25,4 +25,5 @@ public class Function {
     public static final String UNLESS = "unless";
     public static final String USE = "use";
     public static final String UNQUOTE = "unquote";
+    public static final String VAR_BANG = "var!";
 }

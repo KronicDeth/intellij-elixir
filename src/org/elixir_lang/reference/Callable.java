@@ -17,6 +17,7 @@ import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.name.*;
+import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.scope.variable.MultiResolve;
 import org.elixir_lang.psi.scope.variable.Variants;
@@ -551,6 +552,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (call.isCalling(org.elixir_lang.psi.call.name.Module.KERNEL, Function.DESTRUCTURE)) {
             isVariable = true;
         } else if (call.isCallingMacro(org.elixir_lang.psi.call.name.Module.KERNEL, Function.FOR)) {
+            isVariable = true;
+        } else if (call.isCalling(Module.KERNEL, Function.VAR_BANG)) {
             isVariable = true;
         } else {
             PsiElement parent = call.getParent();
