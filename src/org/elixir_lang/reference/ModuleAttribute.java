@@ -3,20 +3,27 @@ package org.elixir_lang.reference;
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
-import com.intellij.psi.PsiPolyVariantReferenceBase;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
+import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.structure_view.element.modular.Implementation.protocolNameElement;
 
 /**
  * Created by limhoff on 12/30/15.
@@ -200,7 +207,15 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         if (!isNonReferencing) {
-            resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+            String value = getValue();
+
+            if (value.equals("@protocol")) {
+                resultList.addAll(
+                        org.elixir_lang.psi.scope.module_attribute.Implementation.resolveResultList(incompleteCode, myElement)
+                );
+            } else {
+                resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+            }
         }
 
         return resultList.toArray(new ResolveResult[resultList.size()]);

@@ -87,9 +87,21 @@ public class Implementation extends Module {
     }
 
     @Nullable
-    public static String protocolName(Call call) {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+    public static String protocolName(@NotNull Call call) {
+        QualifiableAlias protocolNameElement = protocolNameElement(call);
         String protocolName = null;
+
+        if (protocolNameElement != null) {
+            protocolName = protocolName(protocolNameElement);
+        }
+
+        return protocolName;
+    }
+
+    @Nullable
+    public static QualifiableAlias protocolNameElement(@NotNull Call call) {
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        QualifiableAlias protocolNameElement = null;
 
         if (finalArguments != null && finalArguments.length > 0) {
             PsiElement firstFinalArgument = finalArguments[0];
@@ -102,17 +114,16 @@ public class Implementation extends Module {
                     PsiElement accessExpressionChild = accessExpressionChildren[0];
 
                     if (accessExpressionChild instanceof QualifiableAlias) {
-                        protocolName = protocolName((QualifiableAlias) accessExpressionChild);
+                        protocolNameElement = (QualifiableAlias) accessExpressionChild;
                     }
                 }
             } else if (firstFinalArgument instanceof QualifiableAlias) {
-                protocolName = protocolName((QualifiableAlias) firstFinalArgument);
+                protocolNameElement = (QualifiableAlias) firstFinalArgument;
             }
         }
 
-        return protocolName;
+        return protocolNameElement;
     }
-
 
     /*
      * Private Static Methods
