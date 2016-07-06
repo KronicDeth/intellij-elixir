@@ -87,6 +87,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      *
      * @param call a def(macro)?p?
      */
+    @Nullable
     public static Call enclosingModularMacroCall(@NotNull Call call) {
         Call enclosedCall = call;
         Call enclosingMacroCall;
@@ -100,6 +101,7 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
                 break;
             }
         }
+
         return enclosingMacroCall;
     }
 

@@ -1,4 +1,4 @@
-package org.elixir_lang.psi.scope.module_attribute;
+package org.elixir_lang.psi.scope.module_attribute.implemetation;
 
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
@@ -17,7 +17,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
-public class Implementation implements PsiScopeProcessor {
+public class Protocol implements PsiScopeProcessor {
     /*
      *
      * Static Methods
@@ -27,15 +27,15 @@ public class Implementation implements PsiScopeProcessor {
     public static List<ResolveResult> resolveResultList(boolean incompleteCode, @NotNull PsiElement entrance) {
         List<ResolveResult> resolveResultList;
 
-        Implementation implementation = new Implementation(incompleteCode);
+        Protocol protocol = new Protocol(incompleteCode);
         PsiTreeUtil.treeWalkUp(
-                implementation,
+                protocol,
                 entrance,
                 entrance.getContainingFile(),
                 ResolveState.initial().put(ENTRANCE, entrance)
         );
 
-        return implementation.getResolveResultList();
+        return protocol.getResolveResultList();
     }
 
     /*
@@ -50,7 +50,7 @@ public class Implementation implements PsiScopeProcessor {
      * Constructors
      */
 
-    public Implementation(boolean incompleteCode) {
+    public Protocol(boolean incompleteCode) {
         this.incompleteCode = incompleteCode;
     }
 
@@ -105,7 +105,7 @@ public class Implementation implements PsiScopeProcessor {
 
             if (protocolNameElement != null) {
                 element = protocolNameElement;
-                validResult = incompleteCode;
+                validResult = !incompleteCode;
             } else {
                 element = call;
                 validResult = false;

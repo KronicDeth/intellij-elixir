@@ -40,26 +40,34 @@ public class Implementation extends Module {
 
     @Nullable
     public static String forName(@Nullable Modular enclosingModular, @NotNull Call call) {
-        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        PsiElement forNameElement = forNameElement(call);
         String forName = null;
 
-        if (finalArguments != null) {
-            if (finalArguments.length > 1) {
-                PsiElement finalArgument = finalArguments[finalArguments.length - 1];
-
-                if (finalArgument instanceof QuotableKeywordList) {
-                    QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
-                    PsiElement keywordValue = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
-
-                    forName = keywordValue.getText();
-                }
-            } else if (enclosingModular != null) {
-                org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) enclosingModular.getPresentation();
-                forName = parentPresentation.getLocatedPresentableText();
-            }
+        if (forNameElement != null) {
+            forName = forNameElement.getText();
+        } else if (enclosingModular != null) {
+            org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) enclosingModular.getPresentation();
+            forName = parentPresentation.getLocatedPresentableText();
         }
 
         return forName;
+    }
+
+    @Nullable
+    public static PsiElement forNameElement(@NotNull Call call) {
+        PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(call);
+        PsiElement forNameElement = null;
+
+        if (finalArguments != null && finalArguments.length > 0) {
+            PsiElement finalArgument = finalArguments[finalArguments.length - 1];
+
+            if (finalArgument instanceof QuotableKeywordList) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) finalArgument;
+                forNameElement = ElixirPsiImplUtil.keywordValue(quotableKeywordList, FOR);
+            }
+        }
+
+        return forNameElement;
     }
 
     public static boolean is(Call call) {

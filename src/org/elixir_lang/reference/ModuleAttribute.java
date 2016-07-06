@@ -3,28 +3,23 @@ package org.elixir_lang.reference;
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.util.BusyObject;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.intellij.psi.scope.PsiScopeProcessor;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.structure_view.element.modular.Implementation.protocolNameElement;
+import static org.elixir_lang.psi.scope.variable.MultiResolve.HAS_VALID_RESULT_CONDITION;
 
 /**
  * Created by limhoff on 12/30/15.
@@ -212,10 +207,36 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
 
             if (value.equals("@protocol")) {
                 resultList.addAll(
-                        org.elixir_lang.psi.scope.module_attribute.Implementation.resolveResultList(incompleteCode, myElement)
+                        org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(incompleteCode, myElement)
                 );
-            } else {
-                resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+            }
+
+            if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                if (incompleteCode && "@protocol".startsWith(value)) {
+                    resultList.addAll(
+                            org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(true, myElement)
+                    );
+                }
+
+                if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                    if (value.equals("@for")) {
+                        resultList.addAll(
+                                org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(incompleteCode, myElement)
+                        );
+                    }
+
+                    if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                        if (incompleteCode && "@for".startsWith(value)) {
+                            resultList.addAll(
+                                    org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(true, myElement)
+                            );
+                        }
+
+                        if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                            resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+                        }
+                    }
+                }
             }
         }
 

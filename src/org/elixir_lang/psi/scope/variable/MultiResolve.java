@@ -31,7 +31,7 @@ public class MultiResolve extends Variable {
      */
 
     private static final Key<PsiElement> LAST_BINDING_KEY = new Key<PsiElement>("LAST_BINDING_KEY");
-    private static final Condition<ResolveResult> HAS_VALID_RESULT_CONDITION = new Condition<ResolveResult>() {
+    public static final Condition<ResolveResult> HAS_VALID_RESULT_CONDITION = new Condition<ResolveResult>() {
         @Override
         public boolean value(ResolveResult resolveResult) {
             return resolveResult.isValidResult();
