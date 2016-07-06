@@ -13,6 +13,7 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,27 +204,16 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         if (!isNonReferencing) {
-            String value = getValue();
-            Boolean validResult = null;
+            Boolean validResult;
 
-            if (value.equals("@protocol")) {
-                validResult = true;
-            } else if (incompleteCode && "@protocol".startsWith(value)) {
-                validResult = false;
-            }
+            validResult = validResult("@protocol", incompleteCode);
 
             if (validResult != null) {
                 resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(validResult, myElement));
             }
 
             if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                validResult = null;
-
-                if (value.equals("@for")) {
-                    validResult = true;
-                } else if (incompleteCode && "@for".startsWith(value)) {
-                    validResult = false;
-                }
+                validResult = validResult("@for", incompleteCode);
 
                 if (validResult != null) {
                     resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(validResult, myElement));
@@ -322,5 +312,19 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         return lookupElementList;
+    }
+
+    @Nullable
+    private Boolean validResult(@NotNull String moduleAttributeName, boolean incompleteCode) {
+        Boolean validResult = null;
+        String value = getValue();
+
+        if (value.equals(moduleAttributeName)) {
+            validResult = true;
+        } else if (incompleteCode && moduleAttributeName.startsWith(value)) {
+            validResult = false;
+        }
+
+        return validResult;
     }
 }
