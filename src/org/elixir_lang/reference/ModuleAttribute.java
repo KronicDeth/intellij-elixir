@@ -204,38 +204,33 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
 
         if (!isNonReferencing) {
             String value = getValue();
+            Boolean validResult = null;
 
             if (value.equals("@protocol")) {
-                resultList.addAll(
-                        org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(incompleteCode, myElement)
-                );
+                validResult = true;
+            } else if (incompleteCode && "@protocol".startsWith(value)) {
+                validResult = false;
+            }
+
+            if (validResult != null) {
+                resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(validResult, myElement));
             }
 
             if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                if (incompleteCode && "@protocol".startsWith(value)) {
-                    resultList.addAll(
-                            org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(true, myElement)
-                    );
+                validResult = null;
+
+                if (value.equals("@for")) {
+                    validResult = true;
+                } else if (incompleteCode && "@for".startsWith(value)) {
+                    validResult = false;
+                }
+
+                if (validResult != null) {
+                    resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(validResult, myElement));
                 }
 
                 if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                    if (value.equals("@for")) {
-                        resultList.addAll(
-                                org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(incompleteCode, myElement)
-                        );
-                    }
-
-                    if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                        if (incompleteCode && "@for".startsWith(value)) {
-                            resultList.addAll(
-                                    org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(true, myElement)
-                            );
-                        }
-
-                        if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                            resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
-                        }
-                    }
+                    resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
                 }
             }
         }

@@ -7,7 +7,6 @@ import com.intellij.psi.ResolveResult;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
-import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,6 @@ import java.util.List;
 import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
-import static org.elixir_lang.structure_view.element.CallDefinitionClause.elementDescription;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 
 public class For implements PsiScopeProcessor {
@@ -29,10 +27,8 @@ public class For implements PsiScopeProcessor {
      *
      */
 
-    public static List<ResolveResult> resolveResultList(boolean incompleteCode, @NotNull PsiElement entrance) {
-        List<ResolveResult> resolveResultList;
-
-        For scopeProcessor = new For(incompleteCode);
+    public static List<ResolveResult> resolveResultList(boolean validResult, @NotNull PsiElement entrance) {
+        For scopeProcessor = new For(validResult);
         PsiTreeUtil.treeWalkUp(
                 scopeProcessor,
                 entrance,
@@ -47,7 +43,7 @@ public class For implements PsiScopeProcessor {
      * Fields
      */
 
-    private final boolean incompleteCode;
+    private final boolean validResult;
     @Nullable
     private List<ResolveResult> resolveResultList = null;
 
@@ -55,8 +51,8 @@ public class For implements PsiScopeProcessor {
      * Constructors
      */
 
-    public For(boolean incompleteCode) {
-        this.incompleteCode = incompleteCode;
+    public For(boolean validResult) {
+        this.validResult = validResult;
     }
 
     /*
@@ -108,14 +104,14 @@ public class For implements PsiScopeProcessor {
             boolean validResult;
 
             if (element != null) {
-                validResult = !incompleteCode;
+                validResult = this.validResult;
             } else {
                 Call enclosingModularMacroCall = enclosingModularMacroCall(call);
 
                 if (enclosingModularMacroCall != null) {
                     if (enclosingModularMacroCall.isCalling(KERNEL, DEFMODULE)) {
                         element = Module.nameIdentifier(enclosingModularMacroCall);
-                        validResult = !incompleteCode;
+                        validResult = this.validResult;
                     } else {
                         element = enclosingModularMacroCall;
                         validResult = false;

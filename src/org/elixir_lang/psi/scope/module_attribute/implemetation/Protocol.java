@@ -24,10 +24,8 @@ public class Protocol implements PsiScopeProcessor {
      *
      */
 
-    public static List<ResolveResult> resolveResultList(boolean incompleteCode, @NotNull PsiElement entrance) {
-        List<ResolveResult> resolveResultList;
-
-        Protocol protocol = new Protocol(incompleteCode);
+    public static List<ResolveResult> resolveResultList(boolean validResult, @NotNull PsiElement entrance) {
+        Protocol protocol = new Protocol(validResult);
         PsiTreeUtil.treeWalkUp(
                 protocol,
                 entrance,
@@ -42,7 +40,7 @@ public class Protocol implements PsiScopeProcessor {
      * Fields
      */
 
-    private final boolean incompleteCode;
+    private final boolean validResult;
     @Nullable
     private List<ResolveResult> resolveResultList = null;
 
@@ -50,8 +48,8 @@ public class Protocol implements PsiScopeProcessor {
      * Constructors
      */
 
-    public Protocol(boolean incompleteCode) {
-        this.incompleteCode = incompleteCode;
+    public Protocol(boolean validResult) {
+        this.validResult = !validResult;
     }
 
     /*
@@ -105,7 +103,7 @@ public class Protocol implements PsiScopeProcessor {
 
             if (protocolNameElement != null) {
                 element = protocolNameElement;
-                validResult = !incompleteCode;
+                validResult = this.validResult;
             } else {
                 element = call;
                 validResult = false;
