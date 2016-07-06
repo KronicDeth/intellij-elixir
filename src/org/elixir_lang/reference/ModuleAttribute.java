@@ -4,19 +4,23 @@ import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
-import com.intellij.psi.PsiPolyVariantReferenceBase;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static org.elixir_lang.psi.scope.variable.MultiResolve.HAS_VALID_RESULT_CONDITION;
 
 /**
  * Created by limhoff on 12/30/15.
@@ -200,7 +204,25 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         if (!isNonReferencing) {
-            resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+            Boolean validResult;
+
+            validResult = validResult("@protocol", incompleteCode);
+
+            if (validResult != null) {
+                resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol.resolveResultList(validResult, myElement));
+            }
+
+            if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                validResult = validResult("@for", incompleteCode);
+
+                if (validResult != null) {
+                    resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(validResult, myElement));
+                }
+
+                if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
+                    resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
+                }
+            }
         }
 
         return resultList.toArray(new ResolveResult[resultList.size()]);
@@ -256,6 +278,23 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
                                 atUnqualifiedNoParenthesesCall
                         )
                 );
+            } else if (sibling instanceof Call) {
+                Call siblingCall = (Call) sibling;
+
+                if (Implementation.is(siblingCall)) {
+                    PsiElement element = Implementation.protocolNameElement(siblingCall);
+
+                    if (element == null) {
+                        element = siblingCall;
+                    }
+
+                    lookupElementList.add(
+                            LookupElementBuilder.createWithSmartPointer(
+                                    "@protocol",
+                                    element
+                            )
+                    );
+                }
             }
         }
 
@@ -273,5 +312,19 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         return lookupElementList;
+    }
+
+    @Nullable
+    private Boolean validResult(@NotNull String moduleAttributeName, boolean incompleteCode) {
+        Boolean validResult = null;
+        String value = getValue();
+
+        if (value.equals(moduleAttributeName)) {
+            validResult = true;
+        } else if (incompleteCode && moduleAttributeName.startsWith(value)) {
+            validResult = false;
+        }
+
+        return validResult;
     }
 }

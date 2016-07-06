@@ -243,13 +243,57 @@ public class FoldingBuilder extends FoldingBuilderEx {
                         return keepProcessing;
                     }
 
+
+                    private boolean slowExecute(
+                            @NotNull AtNonNumericOperation atNonNumericOperation,
+                            @NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall
+                    ) {
+                        return slowExecute(
+                                atNonNumericOperation,
+                                atUnqualifiedNoParenthesesCall,
+                                atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText()
+                        );
+                    }
+
                     private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
                                                 @NotNull PsiElement target) {
-                        assert target instanceof AtUnqualifiedNoParenthesesCall;
+                        boolean keepProcessing = true;
 
-                        final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall =
-                                (AtUnqualifiedNoParenthesesCall) target;
+                        if (target instanceof AtUnqualifiedNoParenthesesCall) {
+                            keepProcessing = slowExecute(
+                                    atNonNumericOperation,
+                                    (AtUnqualifiedNoParenthesesCall) target
+                            );
+                        } else if (target instanceof QualifiableAlias) {
+                            keepProcessing = slowExecute(
+                                    atNonNumericOperation,
+                                    (QualifiableAlias) target
+                            );
+                        }
 
+                        return keepProcessing;
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
+                                                @NotNull PsiReference reference) {
+                        PsiElement target = reference.resolve();
+                        boolean keepProcessing = true;
+
+                        if (target != null) {
+                            keepProcessing = slowExecute(atNonNumericOperation, target);
+                        }
+
+                        return keepProcessing;
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
+                                                @NotNull final QualifiableAlias qualifiableAlias) {
+                        return slowExecute(atNonNumericOperation, qualifiableAlias, qualifiableAlias.getName());
+                    }
+
+                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
+                                                @NotNull PsiElement element,
+                                                @Nullable final String placeHolderText) {
                         String moduleAttributeName = atNonNumericOperation.moduleAttributeName();
                         FoldingGroup foldingGroup = foldingGroupByModuleAttributeName.get(moduleAttributeName);
 
@@ -263,29 +307,17 @@ public class FoldingBuilder extends FoldingBuilderEx {
                                         atNonNumericOperation.getNode(),
                                         atNonNumericOperation.getTextRange(),
                                         foldingGroup,
-                                        Collections.<Object>singleton(atUnqualifiedNoParenthesesCall)
+                                        Collections.<Object>singleton(element)
                                 ) {
                                     @Nullable
                                     @Override
                                     public String getPlaceholderText() {
-                                        return atUnqualifiedNoParenthesesCall.getNoParenthesesOneArgument().getText();
+                                        return placeHolderText;
                                     }
                                 }
                         );
 
                         return true;
-                    }
-
-                    private boolean slowExecute(@NotNull AtNonNumericOperation atNonNumericOperation,
-                                                @NotNull PsiReference reference) {
-                        PsiElement target = reference.resolve();
-                        boolean keepProcessing = true;
-
-                        if (target != null) {
-                            keepProcessing = slowExecute(atNonNumericOperation, target);
-                        }
-
-                        return keepProcessing;
                     }
                 }
         );
