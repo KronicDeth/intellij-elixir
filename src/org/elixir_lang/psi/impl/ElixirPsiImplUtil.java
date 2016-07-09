@@ -1440,17 +1440,24 @@ public class ElixirPsiImplUtil {
             checkLeft = true;
         }
 
-        assert checkRight || checkLeft;
-
         boolean keepProcessing = true;
 
-        // check right-operand first if both sides need to be checked because only left-side can do rebinding
-        if (checkRight && rightOperand != null) {
-            keepProcessing = processor.execute(rightOperand, state);
-        }
+        if (checkRight || checkLeft) {
+            // check right-operand first if both sides need to be checked because only left-side can do rebinding
+            if (checkRight && rightOperand != null) {
+                keepProcessing = processor.execute(rightOperand, state);
+            }
 
-        if (checkLeft && leftOperand != null && keepProcessing) {
-            keepProcessing = processor.execute(leftOperand, state);
+            if (checkLeft && leftOperand != null && keepProcessing) {
+                keepProcessing = processor.execute(leftOperand, state);
+            }
+        } else {
+            error(
+                    Match.class,
+                    "Could not determine whether to check left operand, right operand, or both of match, " +
+                            "so checking none when processing declarations",
+                    match
+            );
         }
 
         return keepProcessing;
