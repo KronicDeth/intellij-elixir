@@ -1,7 +1,10 @@
 package org.elixir_lang.mix.settings;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Pair;
@@ -14,7 +17,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
-import org.elixir_lang.utils.ExtProcessUtil;
+import org.elixir_lang.sdk.ElixirSystemUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +31,21 @@ import java.util.List;
  * Created by zyuyou on 2015/5/26.
  */
 public class MixConfigurationForm {
+  /*
+   * CONSTANTS
+   */
+
+  private static final Logger LOGGER = Logger.getInstance(MixConfigurationForm.class);
+  private static final String[][] MIX_ARGUMENTS_ARRAY = new String[][]{
+          {"--version"},
+          // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
+          {"--", "--version"}
+  };
+
+  /*
+   * Fields
+   */
+
   private JPanel myPanel;
   private JTextField myMixVersionText;
   private JPanel myLinkContainer;
@@ -70,31 +88,51 @@ public class MixConfigurationForm {
 
   private boolean validateMixPath(){
     String mixPath = myMixPathSelector.getText();
-    if(!new File(mixPath).exists()) return false;
+    File mix = new File(mixPath);
 
-    ExtProcessUtil.ExtProcessOutput output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--version");
-    String version = output.getStdOut();
-
-    // Elixir X.Y.Z for mix.bat before 1.2
-    // Mix X.Y.Z for all others
-    if (version.startsWith("Mix")) {
-      myMixVersionText.setText(version);
-      return true;
+    if (!mix.exists()) {
+      return false;
     }
 
-    // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
-    output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--", "--version");
-    version = output.getStdOut();
-
-    // Elixir X.Y.Z for mix.bat before 1.2
-    // Mix X.Y.Z for all others
-    if (version.startsWith("Mix")) {
-      myMixVersionText.setText(version);
-      return true;
+    if (!mix.canExecute()) {
+      String reason = mix.getPath() + "is not executable.";
+      LOGGER.warn("Can't detect Mix version: " + reason);
+      return false;
     }
 
-    String stdErr = output.getStdErr();
-    myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
+    File exeFile = mix.getAbsoluteFile();
+    String exePath = exeFile.getPath();
+    String workDir = exeFile.getParent();
+    ProcessOutput output = null;
+
+    for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
+      try {
+        output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
+        List<String> lines;
+
+        if (output.getExitCode() != 0 || output.isTimeout() || output.isCancelled()) {
+          lines = ContainerUtil.emptyList();
+        } else {
+          lines = output.getStdoutLines();
+        }
+
+        for (String line : lines) {
+          // Elixir X.Y.Z for mix.bat before 1.2
+          // Mix X.Y.Z for all others
+          if (line.startsWith("Mix")) {
+            myMixVersionText.setText(line);
+            return true;
+          }
+        }
+      } catch (ExecutionException executionException) {
+        LOGGER.warn(executionException);
+      }
+    }
+
+    if (output != null) {
+      String stdErr = output.getStderr();
+      myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
+    }
 
     return false;
   }
