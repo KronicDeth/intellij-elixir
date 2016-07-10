@@ -13,6 +13,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.labels.ActionLink;
+import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
@@ -26,6 +27,8 @@ import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.io.File;
 import java.util.List;
+
+import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 /**
  * Created by zyuyou on 2015/5/26.
@@ -108,21 +111,26 @@ public class MixConfigurationForm {
     for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
       try {
         output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
-        List<String> lines;
 
-        if (output.getExitCode() != 0 || output.isTimeout() || output.isCancelled()) {
-          lines = ContainerUtil.emptyList();
-        } else {
-          lines = output.getStdoutLines();
-        }
+        String myMixVersionTextText = transformStdoutLine(
+                output,
+                new Function<String, String>(){
+                  @Override
+                  public String fun(String line) {
+                    // Elixir X.Y.Z for mix.bat before 1.2
+                    // Mix X.Y.Z for all others
+                    if (line.startsWith("Mix")) {
+                      return line;
+                    }
 
-        for (String line : lines) {
-          // Elixir X.Y.Z for mix.bat before 1.2
-          // Mix X.Y.Z for all others
-          if (line.startsWith("Mix")) {
-            myMixVersionText.setText(line);
-            return true;
-          }
+                    return null;
+                  }
+                }
+        );
+
+        if (myMixVersionTextText != null) {
+          myMixVersionText.setText(myMixVersionTextText);
+          return true;
         }
       } catch (ExecutionException executionException) {
         LOGGER.warn(executionException);

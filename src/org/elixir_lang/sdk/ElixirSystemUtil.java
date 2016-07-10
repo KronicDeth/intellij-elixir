@@ -4,17 +4,44 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.util.Function;
 import com.intellij.util.PlatformUtils;
+import com.intellij.util.containers.ContainerUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by zyuyou on 2015/5/27.
- * 
+ *
  */
 public class ElixirSystemUtil {
   public static final int STANDARD_TIMEOUT = 10 * 1000;
+
+  @Nullable
+  public static <T> T transformStdoutLine(ProcessOutput output, Function<String, T> lineTransformer) {
+    List<String> lines;
+
+    if (output.getExitCode() != 0 || output.isTimeout() || output.isCancelled()) {
+      lines = ContainerUtil.emptyList();
+    } else {
+      lines = output.getStdoutLines();
+    }
+
+    T transformed = null;
+
+    for (String line : lines) {
+      transformed = lineTransformer.fun(line);
+
+      if (transformed != null) {
+        break;
+      }
+    }
+
+    return transformed;
+  }
 
   @NotNull
   public static ProcessOutput getProcessOutput(@NotNull String workDir,
