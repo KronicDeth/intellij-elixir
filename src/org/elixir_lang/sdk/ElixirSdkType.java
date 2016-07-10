@@ -34,6 +34,7 @@ import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
+import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 /**
@@ -186,28 +187,25 @@ public class ElixirSdkType extends SdkType {
       return null;
     }
 
-    try{
-      ProcessOutput output = ElixirSystemUtil.getProcessOutput(sdkHome, elixir.getAbsolutePath(), "-e", "IO.puts System.build_info[:version]");
-
-      ElixirSdkRelease release = transformStdoutLine(
-              output,
-              new Function<String, ElixirSdkRelease>() {
-                @Override
-                public ElixirSdkRelease fun(String line) {
-                  return ElixirSdkRelease.fromString(line);
-                }
+    ElixirSdkRelease release = transformStdoutLine(
+            new Function<String, ElixirSdkRelease>() {
+              @Override
+              public ElixirSdkRelease fun(String line) {
+                return ElixirSdkRelease.fromString(line);
               }
-      );
+            },
+            STANDARD_TIMEOUT,
+            sdkHome,
+            elixir.getAbsolutePath(),
+            "-e",
+            "IO.puts System.build_info[:version]"
+    );
 
-      if (release != null) {
-        mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
-        return release;
-      }
-    } catch (ExecutionException ignore) {
-      LOG.warn(ignore);
+    if (release != null) {
+      mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
     }
 
-    return null;
+    return release;
   }
 
   @Nullable

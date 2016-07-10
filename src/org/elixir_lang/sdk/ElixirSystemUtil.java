@@ -4,6 +4,7 @@ import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.CapturingProcessHandler;
 import com.intellij.execution.process.ProcessOutput;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.Function;
 import com.intellij.util.PlatformUtils;
 import com.intellij.util.containers.ContainerUtil;
@@ -18,10 +19,15 @@ import java.util.List;
  *
  */
 public class ElixirSystemUtil {
+  /*
+   * CONSTANTS
+   */
+
+  public static final Logger LOGGER = Logger.getInstance(ElixirSystemUtil.class);
   public static final int STANDARD_TIMEOUT = 10 * 1000;
 
   @Nullable
-  public static <T> T transformStdoutLine(ProcessOutput output, Function<String, T> lineTransformer) {
+  public static <T> T transformStdoutLine(@NotNull ProcessOutput output, @NotNull Function<String, T> lineTransformer) {
     List<String> lines;
 
     if (output.getExitCode() != 0 || output.isTimeout() || output.isCancelled()) {
@@ -38,6 +44,25 @@ public class ElixirSystemUtil {
       if (transformed != null) {
         break;
       }
+    }
+
+    return transformed;
+  }
+
+  @Nullable
+  public static <T> T transformStdoutLine(@NotNull Function<String, T> lineTransformer,
+                                          int timeout,
+                                          @NotNull String workDir,
+                                          @NotNull String exePath,
+                                          @NotNull String... arguments) {
+    T transformed = null;
+
+    try {
+      ProcessOutput output = getProcessOutput(timeout, workDir, exePath, arguments);
+
+      transformed = transformStdoutLine(output, lineTransformer);
+    } catch (ExecutionException executionException) {
+      LOGGER.warn(executionException);
     }
 
     return transformed;

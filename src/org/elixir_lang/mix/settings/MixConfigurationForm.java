@@ -109,38 +109,35 @@ public class MixConfigurationForm {
     ProcessOutput output = null;
 
     for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
-      try {
-        output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
-
-        String myMixVersionTextText = transformStdoutLine(
-                output,
-                new Function<String, String>(){
-                  @Override
-                  public String fun(String line) {
-                    // Elixir X.Y.Z for mix.bat before 1.2
-                    // Mix X.Y.Z for all others
-                    if (line.startsWith("Mix")) {
-                      return line;
-                    }
-
-                    return null;
+      String myMixVersionTextText = transformStdoutLine(
+              new Function<String, String>(){
+                @Override
+                public String fun(String line) {
+                  // Elixir X.Y.Z for mix.bat before 1.2
+                  // Mix X.Y.Z for all others
+                  if (line.startsWith("Mix")) {
+                    return line;
                   }
-                }
-        );
 
-        if (myMixVersionTextText != null) {
-          myMixVersionText.setText(myMixVersionTextText);
-          return true;
-        }
-      } catch (ExecutionException executionException) {
-        LOGGER.warn(executionException);
+                  return null;
+                }
+              },
+              3000,
+              workDir,
+              exePath,
+              arguments
+      );
+
+      if (myMixVersionTextText != null) {
+        myMixVersionText.setText(myMixVersionTextText);
+        return true;
       }
     }
 
-    if (output != null) {
-      String stdErr = output.getStderr();
-      myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
-    }
+//    if (output != null) {
+//      String stdErr = output.getStderr();
+//      myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
+//    }
 
     return false;
   }
