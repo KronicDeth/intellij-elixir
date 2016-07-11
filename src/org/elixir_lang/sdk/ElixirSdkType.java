@@ -20,6 +20,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
@@ -32,6 +33,9 @@ import org.jetbrains.annotations.TestOnly;
 import javax.swing.*;
 import java.io.File;
 import java.util.*;
+
+import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
+import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 /**
  * Created by zyuyou on 2015/5/27.
@@ -183,23 +187,25 @@ public class ElixirSdkType extends SdkType {
       return null;
     }
 
-    try{
-      ProcessOutput output = ElixirSystemUtil.getProcessOutput(sdkHome, elixir.getAbsolutePath(), "-e", "IO.puts System.build_info[:version]");
-      List<String> lines = output.getExitCode() != 0 || output.isTimeout() || output.isCancelled() ?
-          ContainerUtil.<String>emptyList() : output.getStdoutLines();
+    ElixirSdkRelease release = transformStdoutLine(
+            new Function<String, ElixirSdkRelease>() {
+              @Override
+              public ElixirSdkRelease fun(String line) {
+                return ElixirSdkRelease.fromString(line);
+              }
+            },
+            STANDARD_TIMEOUT,
+            sdkHome,
+            elixir.getAbsolutePath(),
+            "-e",
+            "IO.puts System.build_info[:version]"
+    );
 
-      for (String line : lines) {
-        ElixirSdkRelease release = ElixirSdkRelease.fromString(line);
-
-        if (release != null) {
-          mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
-          return release;
-        }
-      }
-    }catch (ExecutionException ignore){
-      LOG.warn(ignore);
+    if (release != null) {
+      mySdkHomeToReleaseCache.put(getVersionCacheKey(sdkHome), release);
     }
-    return null;
+
+    return release;
   }
 
   @Nullable

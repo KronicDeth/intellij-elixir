@@ -1,7 +1,10 @@
 package org.elixir_lang.mix.settings;
 
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.Pair;
@@ -10,11 +13,12 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.components.labels.ActionLink;
+import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
-import org.elixir_lang.utils.ExtProcessUtil;
+import org.elixir_lang.sdk.ElixirSystemUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,10 +28,39 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 
+import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
+
 /**
  * Created by zyuyou on 2015/5/26.
  */
 public class MixConfigurationForm {
+  /*
+   * CONSTANTS
+   */
+
+  private static final Logger LOGGER = Logger.getInstance(MixConfigurationForm.class);
+  private static final String[][] MIX_ARGUMENTS_ARRAY = new String[][]{
+          {"--version"},
+          // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
+          {"--", "--version"}
+  };
+  private static final Function<String, String> STDOUT_LINE_TRANSFORMER = new Function<String, String>() {
+    @Override
+    public String fun(String line) {
+      // Elixir X.Y.Z for mix.bat before 1.2
+      // Mix X.Y.Z for all others
+      if (line.startsWith("Mix")) {
+        return line;
+      }
+
+      return null;
+    }
+  };
+
+  /*
+   * Fields
+   */
+
   private JPanel myPanel;
   private JTextField myMixVersionText;
   private JPanel myLinkContainer;
@@ -70,33 +103,53 @@ public class MixConfigurationForm {
 
   private boolean validateMixPath(){
     String mixPath = myMixPathSelector.getText();
-    if(!new File(mixPath).exists()) return false;
+    File mix = new File(mixPath);
 
-    ExtProcessUtil.ExtProcessOutput output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--version");
-    String version = output.getStdOut();
-
-    // Elixir X.Y.Z for mix.bat before 1.2
-    // Mix X.Y.Z for all others
-    if (version.startsWith("Mix")) {
-      myMixVersionText.setText(version);
-      return true;
+    if (!mix.exists()) {
+      return false;
     }
 
-    // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
-    output = ExtProcessUtil.execAndGetFirstLine(3000, mixPath, "--", "--version");
-    version = output.getStdOut();
-
-    // Elixir X.Y.Z for mix.bat before 1.2
-    // Mix X.Y.Z for all others
-    if (version.startsWith("Mix")) {
-      myMixVersionText.setText(version);
-      return true;
+    if (!mix.canExecute()) {
+      String reason = mix.getPath() + "is not executable.";
+      LOGGER.warn("Can't detect Mix version: " + reason);
+      return false;
     }
 
-    String stdErr = output.getStdErr();
-    myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
+    File exeFile = mix.getAbsoluteFile();
+    String exePath = exeFile.getPath();
+    String workDir = exeFile.getParent();
+    ProcessOutput output = null;
+    boolean valid = false;
 
-    return false;
+    for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
+      try {
+        output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
+      } catch (ExecutionException executionException) {
+        LOGGER.warn(executionException);
+      }
+
+      if (output != null) {
+        String transformedStdout = transformStdoutLine(output, STDOUT_LINE_TRANSFORMER);
+
+        if (transformedStdout != null) {
+          myMixVersionText.setText(transformedStdout);
+          valid = true;
+
+          break;
+        } else {
+          String stderr = output.getStderr();
+          StringBuilder text = new StringBuilder("N/A");
+
+          if (StringUtil.isNotEmpty(stderr)) {
+            text.append(": Error: ").append(stderr);
+          }
+
+          myMixVersionText.setText(text.toString());
+        }
+      }
+    }
+
+    return valid;
   }
 
   private void createUIComponents(){
