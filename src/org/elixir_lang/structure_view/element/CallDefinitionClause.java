@@ -10,10 +10,7 @@ import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.structure_view.element.modular.Implementation;
-import org.elixir_lang.structure_view.element.modular.Modular;
-import org.elixir_lang.structure_view.element.modular.Module;
-import org.elixir_lang.structure_view.element.modular.Protocol;
+import org.elixir_lang.structure_view.element.modular.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,6 +133,9 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
             }
 
             modular = quote.modular();
+        } else if (Unknown.is(enclosingMacroCall)) {
+            Modular grandScope = enclosingModular(enclosingMacroCall);
+            modular = new Unknown(grandScope, enclosingMacroCall);
         }
 
         return modular;
