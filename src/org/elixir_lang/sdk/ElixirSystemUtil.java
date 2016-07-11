@@ -69,13 +69,6 @@ public class ElixirSystemUtil {
   }
 
   @NotNull
-  public static ProcessOutput getProcessOutput(@NotNull String workDir,
-                                               @NotNull String exePath,
-                                               @NotNull String... arguments) throws ExecutionException{
-    return getProcessOutput(STANDARD_TIMEOUT, workDir, exePath, arguments);
-  }
-
-  @NotNull
   public static ProcessOutput getProcessOutput(int timeout,
                                                @NotNull String workDir,
                                                @NotNull String exePath,

@@ -44,6 +44,18 @@ public class MixConfigurationForm {
           // Elixir X.Y.Z for mix.bat before 1.2.  See https://github.com/elixir-lang/elixir/issues/4075
           {"--", "--version"}
   };
+  private static final Function<String, String> STDOUT_LINE_TRANSFORMER = new Function<String, String>() {
+    @Override
+    public String fun(String line) {
+      // Elixir X.Y.Z for mix.bat before 1.2
+      // Mix X.Y.Z for all others
+      if (line.startsWith("Mix")) {
+        return line;
+      }
+
+      return null;
+    }
+  };
 
   /*
    * Fields
@@ -107,39 +119,37 @@ public class MixConfigurationForm {
     String exePath = exeFile.getPath();
     String workDir = exeFile.getParent();
     ProcessOutput output = null;
+    boolean valid = false;
 
     for (String[] arguments : MIX_ARGUMENTS_ARRAY) {
-      String myMixVersionTextText = transformStdoutLine(
-              new Function<String, String>(){
-                @Override
-                public String fun(String line) {
-                  // Elixir X.Y.Z for mix.bat before 1.2
-                  // Mix X.Y.Z for all others
-                  if (line.startsWith("Mix")) {
-                    return line;
-                  }
+      try {
+        output = ElixirSystemUtil.getProcessOutput(3000, workDir, exePath, arguments);
+      } catch (ExecutionException executionException) {
+        LOGGER.warn(executionException);
+      }
 
-                  return null;
-                }
-              },
-              3000,
-              workDir,
-              exePath,
-              arguments
-      );
+      if (output != null) {
+        String transformedStdout = transformStdoutLine(output, STDOUT_LINE_TRANSFORMER);
 
-      if (myMixVersionTextText != null) {
-        myMixVersionText.setText(myMixVersionTextText);
-        return true;
+        if (transformedStdout != null) {
+          myMixVersionText.setText(transformedStdout);
+          valid = true;
+
+          break;
+        } else {
+          String stderr = output.getStderr();
+          StringBuilder text = new StringBuilder("N/A");
+
+          if (StringUtil.isNotEmpty(stderr)) {
+            text.append(": Error: ").append(stderr);
+          }
+
+          myMixVersionText.setText(text.toString());
+        }
       }
     }
 
-//    if (output != null) {
-//      String stdErr = output.getStderr();
-//      myMixVersionText.setText("N/A" + (StringUtil.isNotEmpty(stdErr) ? ": Error: " + stdErr : ""));
-//    }
-
-    return false;
+    return valid;
   }
 
   private void createUIComponents(){
