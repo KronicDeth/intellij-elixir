@@ -16,6 +16,7 @@ import org.elixir_lang.structure_view.element.Exception;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
+import org.elixir_lang.structure_view.element.modular.Unknown;
 import org.elixir_lang.structure_view.element.structure.Field;
 import org.elixir_lang.structure_view.element.structure.FieldWithDefaultValue;
 import org.elixir_lang.structure_view.element.structure.Structure;
@@ -55,7 +56,8 @@ public class Model extends TextEditorBasedStructureViewModel implements Structur
                 Quote.is(call) ||
                 Structure.is(call) ||
                 Type.is(call) ||
-                Use.is(call);
+                Use.is(call) ||
+                Unknown.is(call);
     }
 
     /*

@@ -8,6 +8,7 @@ import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
+import org.elixir_lang.structure_view.element.modular.Unknown;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -47,6 +48,8 @@ public class File extends Element<ElixirFile> {
                     treeElementList.add(new Protocol(call));
                 } else if (Quote.is(call)) {
                     treeElementList.add(new Quote(call));
+                } else if (Unknown.is(call)) { // should always be last because it will match all macro calls
+                    treeElementList.add(new Unknown(call));
                 }
             }
 

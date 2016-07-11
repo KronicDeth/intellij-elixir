@@ -211,6 +211,8 @@ public class Module extends Element<Call> implements Modular {
                     org.elixir_lang.structure_view.element.Use use = new org.elixir_lang.structure_view.element.Use(modular, childCall);
                     useSet.add(use);
                     treeElementList.add(use);
+                } else if (Unknown.is(childCall)) { // Should always be last since it will match all macro calls
+                    treeElementList.add(new Unknown(modular, childCall));
                 }
             }
 

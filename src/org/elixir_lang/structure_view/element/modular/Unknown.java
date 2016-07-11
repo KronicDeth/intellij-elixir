@@ -18,6 +18,10 @@ public class Unknown extends Module {
      * Constructors
      */
 
+    public Unknown(@NotNull Call call) {
+        super(call);
+    }
+
     /**
      * @param parent the parent {@link Module} or {@link org.elixir_lang.structure_view.element.Quote} that scopes
      *               {@code call}.
