@@ -44,10 +44,15 @@
     * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`. 
   * [#334](https://github.com/KronicDeth/intellij-elixir/pull/334) - Function separators - [@KronicDeth](https://github.com/KronicDeth)
     * Show a function separator (Preferences > Editor > General > Appearance > Show method separators) above the group of `@doc`, `@spec` and `def`, `defp`, `defmacro`, and `defmacrop` (call definition clauses) of the same name and arity range.  Arity range will be used if one of the call definition clauses uses default arguments.
-  
+  * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
+    * `@for` folds to the resolved module name in `defimpl`
+    * `@protocol` folds to the protocol name in `defimpl`
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
   * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
+  * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
+    * `@for` is no longer marked as unresolved in `defimpl` and instead resolve to the either the `<name>` in `for: <name>` or the module name for the enclosing module when `for: ` is not given.
+    * `@protocol` is no longer marked as unresolved in `defimpl` and instead resolve to the `<name>` in `defimpl <name>`.
 
 ## v4.0.0
 * Enhancements

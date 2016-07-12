@@ -32,6 +32,8 @@
               <code>defmacrop</code> (call definition clauses) of the same name and arity range.  Arity range will be
               used if one of the call definition clauses uses default arguments.
             </li>
+            <li><code>@for</code> folds to the resolved module name in <code>defimpl</code></li>
+            <li><code>@protocol</code> folds to the protocol name in <code>defimpl</code></li>
           </ul>
         </li>
         <li>
@@ -43,6 +45,15 @@
             </li>
             <li>
               Fix <code>isVariable</code> and <code>variableUseScope</code> for <code>var!(name)[...]</code>
+            </li>
+            <li>
+              <code>@for</code> is no longer marked as unresolved in <code>defimpl</code> and instead resolve to the
+              either the <code>&lt;name&gt;</code> in <code>for: &lt;name&gt;</code> or the module name for the
+              enclosing module when <code>for: </code> is not given.
+            </li>
+            <li>
+              <code>@protocol</code> is no longer marked as unresolved in <code>defimpl</code> and instead resolve to
+              the <code>&lt;name&gt;</code> in <code>defimpl &lt;name&gt;</code>.
             </li>
           </ul>
         </li>
