@@ -35,6 +35,12 @@
             <li><code>@for</code> folds to the resolved module name in <code>defimpl</code></li>
             <li><code>@protocol</code> folds to the protocol name in <code>defimpl</code></li>
             <li>Share code between <code>mix</code> and <code>elixir</code> version parsing.</li>
+            <li>
+              If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown,
+              which accepts any macro with a <code>do</code> block or keyword.  This allows Go To Symbol to no error in
+              projects using Dogma as <code>defrule</code> is now treated as Unknown instead of causing an error that
+              the enclosing modular could not be found.
+            </li>
           </ul>
         </li>
         <li>
@@ -68,6 +74,12 @@
               (<code>Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]</code>)
               on the first line and <code>Mix &lt;version&gt;</code> on the 3rd line.  Previously the parsing expected
               <code>Mix &lt;version&gt;</code> to be the first line.
+            </li>
+            <li>
+              If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown,
+              which accepts any macro with a <code>do</code> block or keyword.  This allows Go To Symbol to no error in
+              projects using Dogma as <code>defrule</code> is now treated as Unknown instead of causing an error that
+              the enclosing modular could not be found.
             </li>
           </ul>
         </li>

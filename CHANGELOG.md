@@ -48,6 +48,8 @@
     * `@for` folds to the resolved module name in `defimpl`
     * `@protocol` folds to the protocol name in `defimpl`
   * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Share code between `mix` and `elixir` version parsing. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
+    * Allow Unknown modulars in the Structure pane, in addition to Go To Symbol.  Their icon is a big ? to indicate their correct usage is unknown.
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
   * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
@@ -57,7 +59,9 @@
   * [#342](https://github.com/KronicDeth/intellij-elixir/pull/342) - [@KronicDeth](https://github.com/KronicDeth)
     * Instead of `assert checkRight || checkLeft` in `Match#processDeclaraions`, do the normal code if `checkRight || checkLeft` and log an error report otherwise, so that the exact code that trigger this error can be reported and the method fixed to handle that form of `Match` later.
   * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Be able to parse mix version from 1.3.0+ - [@KronicDeth](https://github.com/KronicDeth)
-    * Check all lines of output for mix version as Elixir 1.3.0 changed the format of `mix --version`, so that it includes the Erlang header (`Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]`) on the first line and `Mix <version>` on the 3rd line.  Previously the parsing expected `Mix <version>` to be the first line. 
+    * Check all lines of output for mix version as Elixir 1.3.0 changed the format of `mix --version`, so that it includes the Erlang header (`Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]`) on the first line and `Mix <version>` on the 3rd line.  Previously the parsing expected `Mix <version>` to be the first line.
+  * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
+    * If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown, which accepts any macro with a `do` block or keyword.  This allows Go To Symbol to no error in projects using Dogma as `defrule` is now treated as Unknown instead of causing an error that the enclosing modular could not be found.
 
 ## v4.0.0
 * Enhancements
