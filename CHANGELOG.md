@@ -47,6 +47,7 @@
   
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.0.0
 * Enhancements

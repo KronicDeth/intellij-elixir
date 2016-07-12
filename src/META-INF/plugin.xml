@@ -41,6 +41,9 @@
               Check if <code>parameter</code> is <code>null</code> before <code>Variable#execute</code> call in
               <code>Variable#execute(PsiElement[], ResolveState)</code>.
             </li>
+            <li>
+              Fix <code>isVariable</code> and <code>variableUseScope</code> for <code>var!(name)[...]</code>
+            </li>
           </ul>
         </li>
       </ul>
