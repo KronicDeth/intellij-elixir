@@ -34,6 +34,7 @@
             </li>
             <li><code>@for</code> folds to the resolved module name in <code>defimpl</code></li>
             <li><code>@protocol</code> folds to the protocol name in <code>defimpl</code></li>
+            <li>Share code between <code>mix</code> and <code>elixir</code> version parsing.</li>
           </ul>
         </li>
         <li>
@@ -60,6 +61,13 @@
               normal code if <code>checkRight || checkLeft</code> and log an error report otherwise, so that the exact
               code that trigger this error can be reported and the method fixed to handle that form of
               <code>Match</code> later.
+            </li>
+            <li>
+              Check all lines of output for mix version as Elixir 1.3.0 changed the format of
+              <code>mix --version</code>, so that it includes the Erlang header
+              (<code>Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]</code>)
+              on the first line and <code>Mix &lt;version&gt;</code> on the 3rd line.  Previously the parsing expected
+              <code>Mix &lt;version&gt;</code> to be the first line.
             </li>
           </ul>
         </li>

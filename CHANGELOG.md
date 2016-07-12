@@ -47,6 +47,7 @@
   * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
     * `@for` folds to the resolved module name in `defimpl`
     * `@protocol` folds to the protocol name in `defimpl`
+  * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Share code between `mix` and `elixir` version parsing. - [@KronicDeth](https://github.com/KronicDeth)
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
   * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
@@ -55,6 +56,8 @@
     * `@protocol` is no longer marked as unresolved in `defimpl` and instead resolve to the `<name>` in `defimpl <name>`.
   * [#342](https://github.com/KronicDeth/intellij-elixir/pull/342) - [@KronicDeth](https://github.com/KronicDeth)
     * Instead of `assert checkRight || checkLeft` in `Match#processDeclaraions`, do the normal code if `checkRight || checkLeft` and log an error report otherwise, so that the exact code that trigger this error can be reported and the method fixed to handle that form of `Match` later.
+  * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Be able to parse mix version from 1.3.0+ - [@KronicDeth](https://github.com/KronicDeth)
+    * Check all lines of output for mix version as Elixir 1.3.0 changed the format of `mix --version`, so that it includes the Erlang header (`Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]`) on the first line and `Mix <version>` on the 3rd line.  Previously the parsing expected `Mix <version>` to be the first line. 
 
 ## v4.0.0
 * Enhancements
