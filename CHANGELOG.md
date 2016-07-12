@@ -42,6 +42,8 @@
     * Allow `->` operator and the right operand to fold to `-> ...`
     * Allow `@doc`, `@moduledoc` and `@typedoc` value to fold to `"..."`.
     * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`. 
+  * [#334](https://github.com/KronicDeth/intellij-elixir/pull/334) - Function separators - [@KronicDeth](https://github.com/KronicDeth)
+    * Show a function separator (Preferences > Editor > General > Appearance > Show method separators) above the group of `@doc`, `@spec` and `def`, `defp`, `defmacro`, and `defmacrop` (call definition clauses) of the same name and arity range.  Arity range will be used if one of the call definition clauses uses default arguments.
   
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)

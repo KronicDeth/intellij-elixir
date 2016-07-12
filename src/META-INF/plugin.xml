@@ -25,6 +25,13 @@
               to be followed to a single <code>alias</code>, <code>import</code>, <code>require</code>, or
               <code>use</code> followed by <code>...</code>.
             </li>
+            <li>
+              Show a function separator
+              (Preferences &gt; Editor &gt; General &gt; Appearance &gt; Show method separators) above the group of
+              <code>@doc</code>, <code>@spec</code> and <code>def</code>, <code>defp</code>, <code>defmacro</code>, and
+              <code>defmacrop</code> (call definition clauses) of the same name and arity range.  Arity range will be
+              used if one of the call definition clauses uses default arguments.
+            </li>
           </ul>
         </li>
         <li>
