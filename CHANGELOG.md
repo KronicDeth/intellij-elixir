@@ -53,6 +53,8 @@
   * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
     * `@for` is no longer marked as unresolved in `defimpl` and instead resolve to the either the `<name>` in `for: <name>` or the module name for the enclosing module when `for: ` is not given.
     * `@protocol` is no longer marked as unresolved in `defimpl` and instead resolve to the `<name>` in `defimpl <name>`.
+  * [#342](https://github.com/KronicDeth/intellij-elixir/pull/342) - [@KronicDeth](https://github.com/KronicDeth)
+    * Instead of `assert checkRight || checkLeft` in `Match#processDeclaraions`, do the normal code if `checkRight || checkLeft` and log an error report otherwise, so that the exact code that trigger this error can be reported and the method fixed to handle that form of `Match` later.
 
 ## v4.0.0
 * Enhancements

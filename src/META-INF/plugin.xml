@@ -55,6 +55,12 @@
               <code>@protocol</code> is no longer marked as unresolved in <code>defimpl</code> and instead resolve to
               the <code>&lt;name&gt;</code> in <code>defimpl &lt;name&gt;</code>.
             </li>
+            <li>
+              Instead of <code>assert checkRight || checkLeft</code> in <code>Match#processDeclaraions</code>, do the
+              normal code if <code>checkRight || checkLeft</code> and log an error report otherwise, so that the exact
+              code that trigger this error can be reported and the method fixed to handle that form of
+              <code>Match</code> later.
+            </li>
           </ul>
         </li>
       </ul>
