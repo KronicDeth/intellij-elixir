@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v4.0.1-dev](#v401-dev)
+  - [v4.1.0-dev](#v410-dev)
   - [v4.0.0](#v400)
   - [v3.0.1](#v301)
   - [v3.0.0](#v300)
@@ -34,7 +34,7 @@
 
 # Changelog
 
-## v4.0.1-dev
+## v4.1.0-dev
 
 * Enhancements
   * [#331](https://github.com/KronicDeth/intellij-elixir/pull/331) - [@KronicDeth](https://github.com/KronicDeth)
