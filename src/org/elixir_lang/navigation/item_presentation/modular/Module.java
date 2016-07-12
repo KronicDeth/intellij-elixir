@@ -1,5 +1,6 @@
 package org.elixir_lang.navigation.item_presentation.modular;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.icons.ElixirIcons;
@@ -16,7 +17,7 @@ public class Module implements ItemPresentation, Parent {
      */
 
     @NotNull
-    private final Call call;
+    protected final Call call;
     @Nullable
     private final String location;
 
@@ -48,7 +49,7 @@ public class Module implements ItemPresentation, Parent {
     public String getPresentableText() {
         PsiElement[] primaryArguments = call.primaryArguments();
 
-        assert primaryArguments.length > 0;
+        assert primaryArguments != null && primaryArguments.length > 0;
 
         return primaryArguments[0].getText();
     }
@@ -88,13 +89,13 @@ public class Module implements ItemPresentation, Parent {
     }
 
     /**
-     * The module icon.
+     * Question mark icon
      *
      * @param unused Used to mean if open/close icons for tree renderer. No longer in use. The parameter is only there for API compatibility reason.
      */
     @Override
     @NotNull
     public Icon getIcon(boolean unused) {
-        return ElixirIcons.MODULE;
+        return AllIcons.General.QuestionDialog;
     }
 }
