@@ -9,6 +9,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.stub.UnmatchedQualifiedParenthesesCall;
@@ -37,31 +38,31 @@ public class ElixirUnmatchedQualifiedParenthesesCallImpl extends NamedStubbedPsi
   @Override
   @Nullable
   public ElixirDoBlock getDoBlock() {
-    return findChildByClass(ElixirDoBlock.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDoBlock.class);
   }
 
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
   @NotNull
   public ElixirMatchedParenthesesArguments getMatchedParenthesesArguments() {
-    return findNotNullChildByClass(ElixirMatchedParenthesesArguments.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchedParenthesesArguments.class));
   }
 
   @Override
   @NotNull
   public ElixirRelativeIdentifier getRelativeIdentifier() {
-    return findNotNullChildByClass(ElixirRelativeIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelativeIdentifier.class));
   }
 
   @Override
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return findNotNullChildByClass(ElixirUnmatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
   }
 
   @Nullable

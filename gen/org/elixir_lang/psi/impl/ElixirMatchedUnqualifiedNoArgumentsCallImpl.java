@@ -10,6 +10,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirIdentifier;
@@ -41,7 +42,7 @@ public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedPsi
   @Override
   @NotNull
   public ElixirIdentifier getIdentifier() {
-    return findNotNullChildByClass(ElixirIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirIdentifier.class));
   }
 
   @Nullable

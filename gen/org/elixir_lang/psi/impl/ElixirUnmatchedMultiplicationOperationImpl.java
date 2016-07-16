@@ -33,7 +33,7 @@ public class ElixirUnmatchedMultiplicationOperationImpl extends ElixirUnmatchedE
   @Override
   @NotNull
   public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
-    return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMultiplicationInfixOperator.class));
   }
 
   @Override

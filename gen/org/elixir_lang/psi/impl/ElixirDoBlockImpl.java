@@ -30,7 +30,7 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
   @Override
   @Nullable
   public ElixirBlockList getBlockList() {
-    return findChildByClass(ElixirBlockList.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirBlockList.class);
   }
 
   @Override
@@ -42,7 +42,7 @@ public class ElixirDoBlockImpl extends ASTWrapperPsiElement implements ElixirDoB
   @Override
   @Nullable
   public ElixirStab getStab() {
-    return findChildByClass(ElixirStab.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStab.class);
   }
 
   @NotNull

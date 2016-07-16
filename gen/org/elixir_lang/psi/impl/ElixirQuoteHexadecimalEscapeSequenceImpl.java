@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,19 +27,19 @@ public class ElixirQuoteHexadecimalEscapeSequenceImpl extends ASTWrapperPsiEleme
   @Override
   @Nullable
   public ElixirEnclosedHexadecimalEscapeSequence getEnclosedHexadecimalEscapeSequence() {
-    return findChildByClass(ElixirEnclosedHexadecimalEscapeSequence.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirEnclosedHexadecimalEscapeSequence.class);
   }
 
   @Override
   @NotNull
   public ElixirHexadecimalEscapePrefix getHexadecimalEscapePrefix() {
-    return findNotNullChildByClass(ElixirHexadecimalEscapePrefix.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHexadecimalEscapePrefix.class));
   }
 
   @Override
   @Nullable
   public ElixirOpenHexadecimalEscapeSequence getOpenHexadecimalEscapeSequence() {
-    return findChildByClass(ElixirOpenHexadecimalEscapeSequence.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirOpenHexadecimalEscapeSequence.class);
   }
 
   public int codePoint() {

@@ -10,6 +10,7 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
@@ -38,19 +39,19 @@ public class ElixirUnmatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStub
   @Override
   @NotNull
   public ElixirAtIdentifier getAtIdentifier() {
-    return findNotNullChildByClass(ElixirAtIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAtIdentifier.class));
   }
 
   @Override
   @Nullable
   public ElixirDoBlock getDoBlock() {
-    return findChildByClass(ElixirDoBlock.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDoBlock.class);
   }
 
   @Override
   @NotNull
   public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
-    return findNotNullChildByClass(ElixirNoParenthesesOneArgument.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesOneArgument.class));
   }
 
   @Nullable

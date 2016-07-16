@@ -32,7 +32,7 @@ public class ElixirLiteralWordsHeredocImpl extends ASTWrapperPsiElement implemen
   @Override
   @Nullable
   public ElixirHeredocPrefix getHeredocPrefix() {
-    return findChildByClass(ElixirHeredocPrefix.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirHeredocPrefix.class);
   }
 
   @Override
@@ -44,7 +44,7 @@ public class ElixirLiteralWordsHeredocImpl extends ASTWrapperPsiElement implemen
   @Override
   @Nullable
   public ElixirSigilModifiers getSigilModifiers() {
-    return findChildByClass(ElixirSigilModifiers.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirSigilModifiers.class);
   }
 
   @NotNull

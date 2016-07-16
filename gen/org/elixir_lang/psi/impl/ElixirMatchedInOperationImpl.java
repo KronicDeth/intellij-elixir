@@ -33,7 +33,7 @@ public class ElixirMatchedInOperationImpl extends ElixirMatchedExpressionImpl im
   @Override
   @NotNull
   public ElixirInInfixOperator getInInfixOperator() {
-    return findNotNullChildByClass(ElixirInInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInInfixOperator.class));
   }
 
   @Override

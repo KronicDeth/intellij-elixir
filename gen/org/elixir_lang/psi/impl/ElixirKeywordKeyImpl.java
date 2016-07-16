@@ -6,6 +6,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirCharListLine;
 import org.elixir_lang.psi.ElixirKeywordKey;
 import org.elixir_lang.psi.ElixirStringLine;
@@ -31,13 +32,13 @@ public class ElixirKeywordKeyImpl extends ASTWrapperPsiElement implements Elixir
   @Override
   @Nullable
   public ElixirCharListLine getCharListLine() {
-    return findChildByClass(ElixirCharListLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
   }
 
   @Override
   @Nullable
   public ElixirStringLine getStringLine() {
-    return findChildByClass(ElixirStringLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
   @Nullable

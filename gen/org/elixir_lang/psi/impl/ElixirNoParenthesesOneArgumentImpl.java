@@ -43,7 +43,7 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
   @Override
   @Nullable
   public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesKeywords.class);
   }
 
   @Override
@@ -55,13 +55,13 @@ public class ElixirNoParenthesesOneArgumentImpl extends ASTWrapperPsiElement imp
   @Override
   @Nullable
   public ElixirNoParenthesesStrict getNoParenthesesStrict() {
-    return findChildByClass(ElixirNoParenthesesStrict.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesStrict.class);
   }
 
   @Override
   @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
-    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull

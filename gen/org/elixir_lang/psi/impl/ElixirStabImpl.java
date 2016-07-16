@@ -36,7 +36,7 @@ public class ElixirStabImpl extends ASTWrapperPsiElement implements ElixirStab {
   @Override
   @Nullable
   public ElixirStabBody getStabBody() {
-    return findChildByClass(ElixirStabBody.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStabBody.class);
   }
 
   @Override

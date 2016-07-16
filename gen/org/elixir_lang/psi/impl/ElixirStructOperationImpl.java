@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,37 +28,37 @@ public class ElixirStructOperationImpl extends ASTWrapperPsiElement implements E
   @Override
   @Nullable
   public ElixirAlias getAlias() {
-    return findChildByClass(ElixirAlias.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAlias.class);
   }
 
   @Override
   @Nullable
   public ElixirAtom getAtom() {
-    return findChildByClass(ElixirAtom.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAtom.class);
   }
 
   @Override
   @NotNull
   public ElixirMapArguments getMapArguments() {
-    return findNotNullChildByClass(ElixirMapArguments.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMapArguments.class));
   }
 
   @Override
   @NotNull
   public ElixirMapPrefixOperator getMapPrefixOperator() {
-    return findNotNullChildByClass(ElixirMapPrefixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMapPrefixOperator.class));
   }
 
   @Override
   @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class);
   }
 
   @Override
   @Nullable
   public ElixirVariable getVariable() {
-    return findChildByClass(ElixirVariable.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirVariable.class);
   }
 
   @NotNull

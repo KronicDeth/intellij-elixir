@@ -3,6 +3,4 @@ package org.elixir_lang.psi;
 
 public interface ElixirEscapedEOL extends EscapeSequence {
 
-  int codePoint();
-
 }

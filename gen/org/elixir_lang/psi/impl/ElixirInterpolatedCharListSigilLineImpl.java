@@ -7,6 +7,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,13 +31,13 @@ public class ElixirInterpolatedCharListSigilLineImpl extends ASTWrapperPsiElemen
   @Override
   @NotNull
   public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
-    return findNotNullChildByClass(ElixirInterpolatedCharListBody.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListBody.class));
   }
 
   @Override
   @NotNull
   public ElixirSigilModifiers getSigilModifiers() {
-    return findNotNullChildByClass(ElixirSigilModifiers.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirSigilModifiers.class));
   }
 
   @NotNull

@@ -184,7 +184,7 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitEscapeSequence(o);
   }
 
-  public void visitEscapedEOL(@NotNull ElixirEscapedEOL o) {
+  public void visitEscapedEol(@NotNull ElixirEscapedEOL o) {
     visitEscapeSequence(o);
   }
 

@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,13 +27,13 @@ public class ElixirLiteralRegexHeredocLineImpl extends ASTWrapperPsiElement impl
   @Override
   @NotNull
   public ElixirHeredocLinePrefix getHeredocLinePrefix() {
-    return findNotNullChildByClass(ElixirHeredocLinePrefix.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirHeredocLinePrefix.class));
   }
 
   @Override
   @NotNull
   public ElixirLiteralRegexBody getLiteralRegexBody() {
-    return findNotNullChildByClass(ElixirLiteralRegexBody.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexBody.class));
   }
 
   public Body getBody() {

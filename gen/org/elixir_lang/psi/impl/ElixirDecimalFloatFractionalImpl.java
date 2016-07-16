@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirDecimalFloatFractional;
 import org.elixir_lang.psi.ElixirDecimalWholeNumber;
 import org.elixir_lang.psi.ElixirVisitor;
@@ -27,7 +28,7 @@ public class ElixirDecimalFloatFractionalImpl extends ASTWrapperPsiElement imple
   @Override
   @NotNull
   public ElixirDecimalWholeNumber getDecimalWholeNumber() {
-    return findNotNullChildByClass(ElixirDecimalWholeNumber.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalWholeNumber.class));
   }
 
 }

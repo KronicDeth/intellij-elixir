@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirBracketArguments;
 import org.elixir_lang.psi.ElixirMatchedBracketOperation;
 import org.elixir_lang.psi.ElixirMatchedExpression;
@@ -28,13 +29,13 @@ public class ElixirMatchedBracketOperationImpl extends ElixirMatchedExpressionIm
   @Override
   @NotNull
   public ElixirBracketArguments getBracketArguments() {
-    return findNotNullChildByClass(ElixirBracketArguments.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirBracketArguments.class));
   }
 
   @Override
   @NotNull
   public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class));
   }
 
   @NotNull
