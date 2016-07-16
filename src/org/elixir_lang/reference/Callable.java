@@ -333,7 +333,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             // MUST be after any operations because operations also implement Call
             isVariable = isVariable((Call) ancestor);
         } else {
-            if (!(ancestor instanceof AtNonNumericOperation || ancestor instanceof PsiFile)) {
+            if (!(ancestor instanceof AtNonNumericOperation ||
+                    ancestor instanceof BracketOperation ||
+                    ancestor instanceof PsiFile)) {
                 Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
             }
         }
