@@ -247,7 +247,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
             isParameter = true;
         } else {
-            if (!(parent instanceof ElixirBlockItem ||
+            if (!(parent instanceof BracketOperation ||
+                    parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirDoBlock ||
                     parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirMapUpdateArguments ||
