@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,265 +28,265 @@ public class ElixirAccessExpressionImpl extends ASTWrapperPsiElement implements 
   @Override
   @Nullable
   public ElixirAlias getAlias() {
-    return findChildByClass(ElixirAlias.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAlias.class);
   }
 
   @Override
   @Nullable
   public ElixirAnonymousFunction getAnonymousFunction() {
-    return findChildByClass(ElixirAnonymousFunction.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAnonymousFunction.class);
   }
 
   @Override
   @Nullable
   public ElixirAtNumericOperation getAtNumericOperation() {
-    return findChildByClass(ElixirAtNumericOperation.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAtNumericOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirAtom getAtom() {
-    return findChildByClass(ElixirAtom.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAtom.class);
   }
 
   @Override
   @Nullable
   public ElixirAtomKeyword getAtomKeyword() {
-    return findChildByClass(ElixirAtomKeyword.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAtomKeyword.class);
   }
 
   @Override
   @Nullable
   public ElixirBinaryWholeNumber getBinaryWholeNumber() {
-    return findChildByClass(ElixirBinaryWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirBinaryWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirBitString getBitString() {
-    return findChildByClass(ElixirBitString.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirBitString.class);
   }
 
   @Override
   @Nullable
   public ElixirCaptureNumericOperation getCaptureNumericOperation() {
-    return findChildByClass(ElixirCaptureNumericOperation.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCaptureNumericOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirCharListHeredoc getCharListHeredoc() {
-    return findChildByClass(ElixirCharListHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCharListHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirCharListLine getCharListLine() {
-    return findChildByClass(ElixirCharListLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCharListLine.class);
   }
 
   @Override
   @Nullable
   public ElixirCharToken getCharToken() {
-    return findChildByClass(ElixirCharToken.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCharToken.class);
   }
 
   @Override
   @Nullable
   public ElixirDecimalFloat getDecimalFloat() {
-    return findChildByClass(ElixirDecimalFloat.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalFloat.class);
   }
 
   @Override
   @Nullable
   public ElixirDecimalWholeNumber getDecimalWholeNumber() {
-    return findChildByClass(ElixirDecimalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
-    return findChildByClass(ElixirHexadecimalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirHexadecimalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedCharListSigilHeredoc getInterpolatedCharListSigilHeredoc() {
-    return findChildByClass(ElixirInterpolatedCharListSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedCharListSigilLine getInterpolatedCharListSigilLine() {
-    return findChildByClass(ElixirInterpolatedCharListSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedRegexHeredoc getInterpolatedRegexHeredoc() {
-    return findChildByClass(ElixirInterpolatedRegexHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedRegexLine getInterpolatedRegexLine() {
-    return findChildByClass(ElixirInterpolatedRegexLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedRegexLine.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedSigilHeredoc getInterpolatedSigilHeredoc() {
-    return findChildByClass(ElixirInterpolatedSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedSigilLine getInterpolatedSigilLine() {
-    return findChildByClass(ElixirInterpolatedSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedStringSigilHeredoc getInterpolatedStringSigilHeredoc() {
-    return findChildByClass(ElixirInterpolatedStringSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedStringSigilLine getInterpolatedStringSigilLine() {
-    return findChildByClass(ElixirInterpolatedStringSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedStringSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedWordsHeredoc getInterpolatedWordsHeredoc() {
-    return findChildByClass(ElixirInterpolatedWordsHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirInterpolatedWordsLine getInterpolatedWordsLine() {
-    return findChildByClass(ElixirInterpolatedWordsLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedWordsLine.class);
   }
 
   @Override
   @Nullable
   public ElixirList getList() {
-    return findChildByClass(ElixirList.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirList.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralCharListSigilHeredoc getLiteralCharListSigilHeredoc() {
-    return findChildByClass(ElixirLiteralCharListSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralCharListSigilLine getLiteralCharListSigilLine() {
-    return findChildByClass(ElixirLiteralCharListSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralCharListSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralRegexHeredoc getLiteralRegexHeredoc() {
-    return findChildByClass(ElixirLiteralRegexHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralRegexLine getLiteralRegexLine() {
-    return findChildByClass(ElixirLiteralRegexLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralRegexLine.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralSigilHeredoc getLiteralSigilHeredoc() {
-    return findChildByClass(ElixirLiteralSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralSigilLine getLiteralSigilLine() {
-    return findChildByClass(ElixirLiteralSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralStringSigilHeredoc getLiteralStringSigilHeredoc() {
-    return findChildByClass(ElixirLiteralStringSigilHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringSigilHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralStringSigilLine getLiteralStringSigilLine() {
-    return findChildByClass(ElixirLiteralStringSigilLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralStringSigilLine.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralWordsHeredoc getLiteralWordsHeredoc() {
-    return findChildByClass(ElixirLiteralWordsHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirLiteralWordsLine getLiteralWordsLine() {
-    return findChildByClass(ElixirLiteralWordsLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirLiteralWordsLine.class);
   }
 
   @Override
   @Nullable
   public ElixirMapOperation getMapOperation() {
-    return findChildByClass(ElixirMapOperation.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMapOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
-    return findChildByClass(ElixirOctalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirOctalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirParentheticalStab getParentheticalStab() {
-    return findChildByClass(ElixirParentheticalStab.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirParentheticalStab.class);
   }
 
   @Override
   @Nullable
   public ElixirStringHeredoc getStringHeredoc() {
-    return findChildByClass(ElixirStringHeredoc.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStringHeredoc.class);
   }
 
   @Override
   @Nullable
   public ElixirStringLine getStringLine() {
-    return findChildByClass(ElixirStringLine.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStringLine.class);
   }
 
   @Override
   @Nullable
   public ElixirStructOperation getStructOperation() {
-    return findChildByClass(ElixirStructOperation.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStructOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirTuple getTuple() {
-    return findChildByClass(ElixirTuple.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirTuple.class);
   }
 
   @Override
   @Nullable
   public ElixirUnaryNumericOperation getUnaryNumericOperation() {
-    return findChildByClass(ElixirUnaryNumericOperation.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnaryNumericOperation.class);
   }
 
   @Override
   @Nullable
   public ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber() {
-    return findChildByClass(ElixirUnknownBaseWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnknownBaseWholeNumber.class);
   }
 
   public boolean isModuleName() {

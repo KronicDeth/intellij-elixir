@@ -38,7 +38,7 @@ public class ElixirAnonymousFunctionImpl extends ASTWrapperPsiElement implements
   @Override
   @NotNull
   public ElixirStab getStab() {
-    return findNotNullChildByClass(ElixirStab.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStab.class));
   }
 
   @NotNull

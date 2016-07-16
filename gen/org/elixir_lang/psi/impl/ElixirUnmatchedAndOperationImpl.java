@@ -34,7 +34,7 @@ public class ElixirUnmatchedAndOperationImpl extends ElixirUnmatchedExpressionIm
   @Override
   @NotNull
   public ElixirAndInfixOperator getAndInfixOperator() {
-    return findNotNullChildByClass(ElixirAndInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAndInfixOperator.class));
   }
 
   @Override

@@ -40,13 +40,13 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   @Override
   @Nullable
   public ElixirDoBlock getDoBlock() {
-    return findChildByClass(ElixirDoBlock.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDoBlock.class);
   }
 
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   @Override
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return findNotNullChildByClass(ElixirUnmatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
   }
 
   @Nullable

@@ -4,6 +4,7 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,25 +26,25 @@ public class ElixirUnmatchedQualifiedBracketOperationImpl extends ElixirUnmatche
   @Override
   @NotNull
   public ElixirBracketArguments getBracketArguments() {
-    return findNotNullChildByClass(ElixirBracketArguments.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirBracketArguments.class));
   }
 
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
   @NotNull
   public ElixirRelativeIdentifier getRelativeIdentifier() {
-    return findNotNullChildByClass(ElixirRelativeIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelativeIdentifier.class));
   }
 
   @Override
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return findNotNullChildByClass(ElixirUnmatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
   }
 
   @NotNull

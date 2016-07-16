@@ -37,7 +37,7 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
   @Override
   @Nullable
   public ElixirKeywords getKeywords() {
-    return findChildByClass(ElixirKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirKeywords.class);
   }
 
   @Override
@@ -49,7 +49,7 @@ public class ElixirParenthesesArgumentsImpl extends ASTWrapperPsiElement impleme
   @Override
   @Nullable
   public ElixirUnqualifiedNoParenthesesManyArgumentsCall getUnqualifiedNoParenthesesManyArgumentsCall() {
-    return findChildByClass(ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnqualifiedNoParenthesesManyArgumentsCall.class);
   }
 
   @NotNull

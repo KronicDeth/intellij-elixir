@@ -39,7 +39,7 @@ public class ElixirMatchedMultiplicationOperationImpl extends ElixirMatchedExpre
   @Override
   @NotNull
   public ElixirMultiplicationInfixOperator getMultiplicationInfixOperator() {
-    return findNotNullChildByClass(ElixirMultiplicationInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMultiplicationInfixOperator.class));
   }
 
   @Nullable

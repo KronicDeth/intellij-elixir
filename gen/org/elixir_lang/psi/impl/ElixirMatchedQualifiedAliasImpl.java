@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,19 +31,19 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
   @Override
   @NotNull
   public ElixirAlias getAlias() {
-    return findNotNullChildByClass(ElixirAlias.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAlias.class));
   }
 
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
   @NotNull
   public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class));
   }
 
   @Nullable

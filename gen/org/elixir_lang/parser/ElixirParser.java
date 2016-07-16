@@ -327,101 +327,11 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == MATCH_INFIX_OPERATOR) {
       r = matchInfixOperator(b, 0);
     }
-    else if (t == MATCHED_ADDITION_OPERATION) {
-      r = matchedExpression(b, 0, 13);
-    }
-    else if (t == MATCHED_AND_OPERATION) {
-      r = matchedExpression(b, 0, 7);
-    }
-    else if (t == MATCHED_ARROW_OPERATION) {
-      r = matchedExpression(b, 0, 10);
-    }
-    else if (t == MATCHED_AT_NON_NUMERIC_OPERATION) {
-      r = matchedAtNonNumericOperation(b, 0);
-    }
-    else if (t == MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION) {
-      r = matchedAtUnqualifiedBracketOperation(b, 0);
-    }
-    else if (t == MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL) {
-      r = matchedAtUnqualifiedNoParenthesesCall(b, 0);
-    }
-    else if (t == MATCHED_BRACKET_OPERATION) {
-      r = matchedExpression(b, 0, 20);
-    }
-    else if (t == MATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
-      r = matchedCaptureNonNumericOperation(b, 0);
-    }
-    else if (t == MATCHED_COMPARISON_OPERATION) {
-      r = matchedExpression(b, 0, 8);
-    }
-    else if (t == MATCHED_DOT_CALL) {
-      r = matchedExpression(b, 0, 16);
-    }
     else if (t == MATCHED_EXPRESSION) {
       r = matchedExpression(b, 0, -1);
     }
-    else if (t == MATCHED_IN_MATCH_OPERATION) {
-      r = matchedExpression(b, 0, 0);
-    }
-    else if (t == MATCHED_IN_OPERATION) {
-      r = matchedExpression(b, 0, 11);
-    }
-    else if (t == MATCHED_MATCH_OPERATION) {
-      r = matchedExpression(b, 0, 5);
-    }
-    else if (t == MATCHED_MULTIPLICATION_OPERATION) {
-      r = matchedExpression(b, 0, 14);
-    }
-    else if (t == MATCHED_OR_OPERATION) {
-      r = matchedExpression(b, 0, 6);
-    }
     else if (t == MATCHED_PARENTHESES_ARGUMENTS) {
       r = matchedParenthesesArguments(b, 0);
-    }
-    else if (t == MATCHED_PIPE_OPERATION) {
-      r = matchedExpression(b, 0, 4);
-    }
-    else if (t == MATCHED_QUALIFIED_ALIAS) {
-      r = matchedExpression(b, 0, 21);
-    }
-    else if (t == MATCHED_QUALIFIED_BRACKET_OPERATION) {
-      r = matchedExpression(b, 0, 22);
-    }
-    else if (t == MATCHED_QUALIFIED_NO_ARGUMENTS_CALL) {
-      r = matchedExpression(b, 0, 24);
-    }
-    else if (t == MATCHED_QUALIFIED_NO_PARENTHESES_CALL) {
-      r = matchedExpression(b, 0, 17);
-    }
-    else if (t == MATCHED_QUALIFIED_PARENTHESES_CALL) {
-      r = matchedExpression(b, 0, 23);
-    }
-    else if (t == MATCHED_RELATIONAL_OPERATION) {
-      r = matchedExpression(b, 0, 9);
-    }
-    else if (t == MATCHED_TWO_OPERATION) {
-      r = matchedExpression(b, 0, 12);
-    }
-    else if (t == MATCHED_TYPE_OPERATION) {
-      r = matchedExpression(b, 0, 3);
-    }
-    else if (t == MATCHED_UNARY_NON_NUMERIC_OPERATION) {
-      r = matchedUnaryNonNumericOperation(b, 0);
-    }
-    else if (t == MATCHED_UNQUALIFIED_BRACKET_OPERATION) {
-      r = matchedUnqualifiedBracketOperation(b, 0);
-    }
-    else if (t == MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL) {
-      r = matchedUnqualifiedNoArgumentsCall(b, 0);
-    }
-    else if (t == MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL) {
-      r = matchedUnqualifiedNoParenthesesCall(b, 0);
-    }
-    else if (t == MATCHED_UNQUALIFIED_PARENTHESES_CALL) {
-      r = matchedUnqualifiedParenthesesCall(b, 0);
-    }
-    else if (t == MATCHED_WHEN_OPERATION) {
-      r = matchedExpression(b, 0, 2);
     }
     else if (t == MULTIPLICATION_INFIX_OPERATOR) {
       r = multiplicationInfixOperator(b, 0);
@@ -537,98 +447,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     else if (t == UNKNOWN_BASE_WHOLE_NUMBER) {
       r = unknownBaseWholeNumber(b, 0);
     }
-    else if (t == UNMATCHED_ADDITION_OPERATION) {
-      r = unmatchedExpression(b, 0, 13);
-    }
-    else if (t == UNMATCHED_AND_OPERATION) {
-      r = unmatchedExpression(b, 0, 7);
-    }
-    else if (t == UNMATCHED_ARROW_OPERATION) {
-      r = unmatchedExpression(b, 0, 10);
-    }
-    else if (t == UNMATCHED_AT_NON_NUMERIC_OPERATION) {
-      r = unmatchedAtNonNumericOperation(b, 0);
-    }
-    else if (t == UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION) {
-      r = unmatchedAtUnqualifiedBracketOperation(b, 0);
-    }
-    else if (t == UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL) {
-      r = unmatchedAtUnqualifiedNoParenthesesCall(b, 0);
-    }
-    else if (t == UNMATCHED_BRACKET_OPERATION) {
-      r = unmatchedExpression(b, 0, 20);
-    }
-    else if (t == UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION) {
-      r = unmatchedCaptureNonNumericOperation(b, 0);
-    }
-    else if (t == UNMATCHED_COMPARISON_OPERATION) {
-      r = unmatchedExpression(b, 0, 8);
-    }
-    else if (t == UNMATCHED_DOT_CALL) {
-      r = unmatchedExpression(b, 0, 16);
-    }
     else if (t == UNMATCHED_EXPRESSION) {
       r = unmatchedExpression(b, 0, -1);
-    }
-    else if (t == UNMATCHED_IN_MATCH_OPERATION) {
-      r = unmatchedExpression(b, 0, 0);
-    }
-    else if (t == UNMATCHED_IN_OPERATION) {
-      r = unmatchedExpression(b, 0, 11);
-    }
-    else if (t == UNMATCHED_MATCH_OPERATION) {
-      r = unmatchedExpression(b, 0, 5);
-    }
-    else if (t == UNMATCHED_MULTIPLICATION_OPERATION) {
-      r = unmatchedExpression(b, 0, 14);
-    }
-    else if (t == UNMATCHED_OR_OPERATION) {
-      r = unmatchedExpression(b, 0, 6);
-    }
-    else if (t == UNMATCHED_PIPE_OPERATION) {
-      r = unmatchedExpression(b, 0, 4);
-    }
-    else if (t == UNMATCHED_QUALIFIED_ALIAS) {
-      r = unmatchedExpression(b, 0, 21);
-    }
-    else if (t == UNMATCHED_QUALIFIED_BRACKET_OPERATION) {
-      r = unmatchedExpression(b, 0, 22);
-    }
-    else if (t == UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL) {
-      r = unmatchedExpression(b, 0, 24);
-    }
-    else if (t == UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL) {
-      r = unmatchedExpression(b, 0, 17);
-    }
-    else if (t == UNMATCHED_QUALIFIED_PARENTHESES_CALL) {
-      r = unmatchedExpression(b, 0, 23);
-    }
-    else if (t == UNMATCHED_RELATIONAL_OPERATION) {
-      r = unmatchedExpression(b, 0, 9);
-    }
-    else if (t == UNMATCHED_TWO_OPERATION) {
-      r = unmatchedExpression(b, 0, 12);
-    }
-    else if (t == UNMATCHED_TYPE_OPERATION) {
-      r = unmatchedExpression(b, 0, 3);
-    }
-    else if (t == UNMATCHED_UNARY_NON_NUMERIC_OPERATION) {
-      r = unmatchedUnaryNonNumericOperation(b, 0);
-    }
-    else if (t == UNMATCHED_UNQUALIFIED_BRACKET_OPERATION) {
-      r = unmatchedUnqualifiedBracketOperation(b, 0);
-    }
-    else if (t == UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL) {
-      r = unmatchedUnqualifiedNoArgumentsCall(b, 0);
-    }
-    else if (t == UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL) {
-      r = unmatchedUnqualifiedNoParenthesesCall(b, 0);
-    }
-    else if (t == UNMATCHED_UNQUALIFIED_PARENTHESES_CALL) {
-      r = unmatchedUnqualifiedParenthesesCall(b, 0);
-    }
-    else if (t == UNMATCHED_WHEN_OPERATION) {
-      r = unmatchedExpression(b, 0, 2);
     }
     else if (t == UNQUALIFIED_NO_PARENTHESES_MANY_ARGUMENTS_CALL) {
       r = unqualifiedNoParenthesesManyArgumentsCall(b, 0);
@@ -650,22 +470,22 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
-    create_token_set_(MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION, MATCHED_AT_NON_NUMERIC_OPERATION,
-      MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_BRACKET_OPERATION, MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-      MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL, MATCHED_EXPRESSION, MATCHED_IN_MATCH_OPERATION,
-      MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION, MATCHED_OR_OPERATION,
-      MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS, MATCHED_QUALIFIED_BRACKET_OPERATION, MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-      MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL, MATCHED_RELATIONAL_OPERATION, MATCHED_TWO_OPERATION,
-      MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_BRACKET_OPERATION, MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
-      MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION),
-    create_token_set_(UNMATCHED_ADDITION_OPERATION, UNMATCHED_AND_OPERATION, UNMATCHED_ARROW_OPERATION, UNMATCHED_AT_NON_NUMERIC_OPERATION,
-      UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_BRACKET_OPERATION, UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-      UNMATCHED_COMPARISON_OPERATION, UNMATCHED_DOT_CALL, UNMATCHED_EXPRESSION, UNMATCHED_IN_MATCH_OPERATION,
-      UNMATCHED_IN_OPERATION, UNMATCHED_MATCH_OPERATION, UNMATCHED_MULTIPLICATION_OPERATION, UNMATCHED_OR_OPERATION,
-      UNMATCHED_PIPE_OPERATION, UNMATCHED_QUALIFIED_ALIAS, UNMATCHED_QUALIFIED_BRACKET_OPERATION, UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-      UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_QUALIFIED_PARENTHESES_CALL, UNMATCHED_RELATIONAL_OPERATION, UNMATCHED_TWO_OPERATION,
-      UNMATCHED_TYPE_OPERATION, UNMATCHED_UNARY_NON_NUMERIC_OPERATION, UNMATCHED_UNQUALIFIED_BRACKET_OPERATION, UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
-      UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, UNMATCHED_WHEN_OPERATION),
+    create_token_set_(ACCESS_EXPRESSION, MATCHED_ADDITION_OPERATION, MATCHED_AND_OPERATION, MATCHED_ARROW_OPERATION,
+      MATCHED_AT_NON_NUMERIC_OPERATION, MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_BRACKET_OPERATION,
+      MATCHED_CAPTURE_NON_NUMERIC_OPERATION, MATCHED_COMPARISON_OPERATION, MATCHED_DOT_CALL, MATCHED_EXPRESSION,
+      MATCHED_IN_MATCH_OPERATION, MATCHED_IN_OPERATION, MATCHED_MATCH_OPERATION, MATCHED_MULTIPLICATION_OPERATION,
+      MATCHED_OR_OPERATION, MATCHED_PIPE_OPERATION, MATCHED_QUALIFIED_ALIAS, MATCHED_QUALIFIED_BRACKET_OPERATION,
+      MATCHED_QUALIFIED_NO_ARGUMENTS_CALL, MATCHED_QUALIFIED_NO_PARENTHESES_CALL, MATCHED_QUALIFIED_PARENTHESES_CALL, MATCHED_RELATIONAL_OPERATION,
+      MATCHED_TWO_OPERATION, MATCHED_TYPE_OPERATION, MATCHED_UNARY_NON_NUMERIC_OPERATION, MATCHED_UNQUALIFIED_BRACKET_OPERATION,
+      MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, MATCHED_UNQUALIFIED_PARENTHESES_CALL, MATCHED_WHEN_OPERATION),
+    create_token_set_(ACCESS_EXPRESSION, UNMATCHED_ADDITION_OPERATION, UNMATCHED_AND_OPERATION, UNMATCHED_ARROW_OPERATION,
+      UNMATCHED_AT_NON_NUMERIC_OPERATION, UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_BRACKET_OPERATION,
+      UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, UNMATCHED_COMPARISON_OPERATION, UNMATCHED_DOT_CALL, UNMATCHED_EXPRESSION,
+      UNMATCHED_IN_MATCH_OPERATION, UNMATCHED_IN_OPERATION, UNMATCHED_MATCH_OPERATION, UNMATCHED_MULTIPLICATION_OPERATION,
+      UNMATCHED_OR_OPERATION, UNMATCHED_PIPE_OPERATION, UNMATCHED_QUALIFIED_ALIAS, UNMATCHED_QUALIFIED_BRACKET_OPERATION,
+      UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_QUALIFIED_PARENTHESES_CALL, UNMATCHED_RELATIONAL_OPERATION,
+      UNMATCHED_TWO_OPERATION, UNMATCHED_TYPE_OPERATION, UNMATCHED_UNARY_NON_NUMERIC_OPERATION, UNMATCHED_UNQUALIFIED_BRACKET_OPERATION,
+      UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, UNMATCHED_WHEN_OPERATION),
   };
 
   /* ********************************************************** */

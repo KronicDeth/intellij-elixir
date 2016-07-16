@@ -43,7 +43,7 @@ public class ElixirNoParenthesesStrictImpl extends ASTWrapperPsiElement implemen
   @Override
   @Nullable
   public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesKeywords.class);
   }
 
   @Override

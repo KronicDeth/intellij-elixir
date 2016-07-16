@@ -39,7 +39,7 @@ public class ElixirMatchedRelationalOperationImpl extends ElixirMatchedExpressio
   @Override
   @NotNull
   public ElixirRelationalInfixOperator getRelationalInfixOperator() {
-    return findNotNullChildByClass(ElixirRelationalInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelationalInfixOperator.class));
   }
 
   @Nullable

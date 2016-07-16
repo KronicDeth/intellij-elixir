@@ -5,6 +5,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirAtIdentifier;
 import org.elixir_lang.psi.ElixirAtPrefixOperator;
 import org.elixir_lang.psi.ElixirVisitor;
@@ -28,7 +29,7 @@ public class ElixirAtIdentifierImpl extends ASTWrapperPsiElement implements Elix
   @Override
   @NotNull
   public ElixirAtPrefixOperator getAtPrefixOperator() {
-    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAtPrefixOperator.class));
   }
 
   @NotNull

@@ -8,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,25 +31,25 @@ public class ElixirStabOperationImpl extends ASTWrapperPsiElement implements Eli
   @Override
   @Nullable
   public ElixirStabBody getStabBody() {
-    return findChildByClass(ElixirStabBody.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStabBody.class);
   }
 
   @Override
   @NotNull
   public ElixirStabInfixOperator getStabInfixOperator() {
-    return findNotNullChildByClass(ElixirStabInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirStabInfixOperator.class));
   }
 
   @Override
   @Nullable
   public ElixirStabNoParenthesesSignature getStabNoParenthesesSignature() {
-    return findChildByClass(ElixirStabNoParenthesesSignature.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStabNoParenthesesSignature.class);
   }
 
   @Override
   @Nullable
   public ElixirStabParenthesesSignature getStabParenthesesSignature() {
-    return findChildByClass(ElixirStabParenthesesSignature.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStabParenthesesSignature.class);
   }
 
   @Nullable

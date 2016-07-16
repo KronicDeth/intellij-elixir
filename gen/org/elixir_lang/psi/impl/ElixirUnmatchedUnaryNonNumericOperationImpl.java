@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +29,13 @@ public class ElixirUnmatchedUnaryNonNumericOperationImpl extends ElixirUnmatched
   @Override
   @NotNull
   public ElixirUnaryPrefixOperator getUnaryPrefixOperator() {
-    return findNotNullChildByClass(ElixirUnaryPrefixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnaryPrefixOperator.class));
   }
 
   @Override
   @Nullable
   public ElixirUnmatchedExpression getUnmatchedExpression() {
-    return findChildByClass(ElixirUnmatchedExpression.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class);
   }
 
   @Nullable

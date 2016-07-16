@@ -39,7 +39,7 @@ public class ElixirMatchedTwoOperationImpl extends ElixirMatchedExpressionImpl i
   @Override
   @NotNull
   public ElixirTwoInfixOperator getTwoInfixOperator() {
-    return findNotNullChildByClass(ElixirTwoInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirTwoInfixOperator.class));
   }
 
   @Nullable

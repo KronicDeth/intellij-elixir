@@ -33,7 +33,7 @@ public class ElixirUnmatchedPipeOperationImpl extends ElixirUnmatchedExpressionI
   @Override
   @NotNull
   public ElixirPipeInfixOperator getPipeInfixOperator() {
-    return findNotNullChildByClass(ElixirPipeInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirPipeInfixOperator.class));
   }
 
   @Override

@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +29,13 @@ public class ElixirMatchedCaptureNonNumericOperationImpl extends ElixirMatchedEx
   @Override
   @NotNull
   public ElixirCapturePrefixOperator getCapturePrefixOperator() {
-    return findNotNullChildByClass(ElixirCapturePrefixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirCapturePrefixOperator.class));
   }
 
   @Override
   @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class);
   }
 
   @Nullable

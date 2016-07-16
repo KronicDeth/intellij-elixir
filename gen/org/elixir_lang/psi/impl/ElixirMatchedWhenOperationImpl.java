@@ -39,7 +39,7 @@ public class ElixirMatchedWhenOperationImpl extends ElixirMatchedExpressionImpl 
   @Override
   @NotNull
   public ElixirWhenInfixOperator getWhenInfixOperator() {
-    return findNotNullChildByClass(ElixirWhenInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirWhenInfixOperator.class));
   }
 
   @Nullable

@@ -33,7 +33,7 @@ public class ElixirUnmatchedOrOperationImpl extends ElixirUnmatchedExpressionImp
   @Override
   @NotNull
   public ElixirOrInfixOperator getOrInfixOperator() {
-    return findNotNullChildByClass(ElixirOrInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirOrInfixOperator.class));
   }
 
   @Override

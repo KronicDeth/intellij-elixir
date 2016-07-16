@@ -7,6 +7,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.Body;
 import org.elixir_lang.psi.ElixirCharListLine;
 import org.elixir_lang.psi.ElixirQuoteCharListBody;
@@ -33,7 +34,7 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
   @Override
   @NotNull
   public ElixirQuoteCharListBody getQuoteCharListBody() {
-    return findNotNullChildByClass(ElixirQuoteCharListBody.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class));
   }
 
   @NotNull

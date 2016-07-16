@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,19 +28,19 @@ public class ElixirCharTokenImpl extends ASTWrapperPsiElement implements ElixirC
   @Override
   @Nullable
   public ElixirEscapedCharacter getEscapedCharacter() {
-    return findChildByClass(ElixirEscapedCharacter.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedCharacter.class);
   }
 
   @Override
   @Nullable
   public ElixirEscapedEOL getEscapedEOL() {
-    return findChildByClass(ElixirEscapedEOL.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirEscapedEOL.class);
   }
 
   @Override
   @Nullable
   public ElixirQuoteHexadecimalEscapeSequence getQuoteHexadecimalEscapeSequence() {
-    return findChildByClass(ElixirQuoteHexadecimalEscapeSequence.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirQuoteHexadecimalEscapeSequence.class);
   }
 
   @NotNull
