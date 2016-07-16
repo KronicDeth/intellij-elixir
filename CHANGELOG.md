@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v4.0.1-dev](#v401-dev)
+  - [v4.1.0-dev](#v410-dev)
   - [v4.0.0](#v400)
   - [v3.0.1](#v301)
   - [v3.0.0](#v300)
@@ -34,7 +34,7 @@
 
 # Changelog
 
-## v4.0.1-dev
+## v4.1.0-dev
 
 * Enhancements
   * [#331](https://github.com/KronicDeth/intellij-elixir/pull/331) - [@KronicDeth](https://github.com/KronicDeth)
@@ -42,9 +42,26 @@
     * Allow `->` operator and the right operand to fold to `-> ...`
     * Allow `@doc`, `@moduledoc` and `@typedoc` value to fold to `"..."`.
     * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`. 
-  
+  * [#334](https://github.com/KronicDeth/intellij-elixir/pull/334) - Function separators - [@KronicDeth](https://github.com/KronicDeth)
+    * Show a function separator (Preferences > Editor > General > Appearance > Show method separators) above the group of `@doc`, `@spec` and `def`, `defp`, `defmacro`, and `defmacrop` (call definition clauses) of the same name and arity range.  Arity range will be used if one of the call definition clauses uses default arguments.
+  * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
+    * `@for` folds to the resolved module name in `defimpl`
+    * `@protocol` folds to the protocol name in `defimpl`
+  * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Share code between `mix` and `elixir` version parsing. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
+    * Allow Unknown modulars in the Structure pane, in addition to Go To Symbol.  Their icon is a big ? to indicate their correct usage is unknown.
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
+  * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
+  * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
+    * `@for` is no longer marked as unresolved in `defimpl` and instead resolve to the either the `<name>` in `for: <name>` or the module name for the enclosing module when `for: ` is not given.
+    * `@protocol` is no longer marked as unresolved in `defimpl` and instead resolve to the `<name>` in `defimpl <name>`.
+  * [#342](https://github.com/KronicDeth/intellij-elixir/pull/342) - [@KronicDeth](https://github.com/KronicDeth)
+    * Instead of `assert checkRight || checkLeft` in `Match#processDeclaraions`, do the normal code if `checkRight || checkLeft` and log an error report otherwise, so that the exact code that trigger this error can be reported and the method fixed to handle that form of `Match` later.
+  * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Be able to parse mix version from 1.3.0+ - [@KronicDeth](https://github.com/KronicDeth)
+    * Check all lines of output for mix version as Elixir 1.3.0 changed the format of `mix --version`, so that it includes the Erlang header (`Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]`) on the first line and `Mix <version>` on the 3rd line.  Previously the parsing expected `Mix <version>` to be the first line.
+  * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
+    * If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown, which accepts any macro with a `do` block or keyword.  This allows Go To Symbol to no error in projects using Dogma as `defrule` is now treated as Unknown instead of causing an error that the enclosing modular could not be found.
 
 ## v4.0.0
 * Enhancements
