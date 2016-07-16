@@ -50,6 +50,8 @@
   * [#343](https://github.com/KronicDeth/intellij-elixir/pull/343) - Share code between `mix` and `elixir` version parsing. - [@KronicDeth](https://github.com/KronicDeth)
   * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
     * Allow Unknown modulars in the Structure pane, in addition to Go To Symbol.  Their icon is a big ? to indicate their correct usage is unknown.
+  * [#348](https://github.com/KronicDeth/intellij-elixir/pull/348) - [@KronicDeth](https://github.com/KronicDeth)
+    * Regenerate `gen` folder using Grammar Kit 1.4.1 and fix some bugs (including [JetBrains/Grammar-Kit#126](https://github.com/JetBrains/Grammar-Kit/issues/126)) manually.
 * Bug Fixes
   * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
   * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
