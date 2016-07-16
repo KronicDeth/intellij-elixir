@@ -33,8 +33,8 @@ public class ElixirLiteralCharListBodyImpl extends ASTWrapperPsiElement implemen
 
   @Override
   @NotNull
-  public List<ElixirEscapedEOL> getEscapedEOLList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedEOL.class);
+  public List<ElixirEscapedEol> getEscapedEolList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, ElixirEscapedEol.class);
   }
 
   @Override

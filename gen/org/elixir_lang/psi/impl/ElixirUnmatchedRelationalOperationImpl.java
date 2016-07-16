@@ -33,7 +33,7 @@ public class ElixirUnmatchedRelationalOperationImpl extends ElixirUnmatchedExpre
   @Override
   @NotNull
   public ElixirRelationalInfixOperator getRelationalInfixOperator() {
-    return findNotNullChildByClass(ElixirRelationalInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelationalInfixOperator.class));
   }
 
   @Override

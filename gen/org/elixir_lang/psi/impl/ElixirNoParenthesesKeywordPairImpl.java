@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,25 +28,25 @@ public class ElixirNoParenthesesKeywordPairImpl extends ASTWrapperPsiElement imp
   @Override
   @Nullable
   public ElixirEmptyParentheses getEmptyParentheses() {
-    return findChildByClass(ElixirEmptyParentheses.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirEmptyParentheses.class);
   }
 
   @Override
   @NotNull
   public ElixirKeywordKey getKeywordKey() {
-    return findNotNullChildByClass(ElixirKeywordKey.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirKeywordKey.class));
   }
 
   @Override
   @Nullable
   public ElixirMatchedExpression getMatchedExpression() {
-    return findChildByClass(ElixirMatchedExpression.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class);
   }
 
   @Override
   @Nullable
   public ElixirNoParenthesesManyStrictNoParenthesesExpression getNoParenthesesManyStrictNoParenthesesExpression() {
-    return findChildByClass(ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesManyStrictNoParenthesesExpression.class);
   }
 
   public Quotable getKeywordValue() {

@@ -9,6 +9,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
@@ -37,19 +38,19 @@ public class ElixirMatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiEl
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
   @NotNull
   public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class));
   }
 
   @Override
   @NotNull
   public ElixirRelativeIdentifier getRelativeIdentifier() {
-    return findNotNullChildByClass(ElixirRelativeIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirRelativeIdentifier.class));
   }
 
   @Nullable

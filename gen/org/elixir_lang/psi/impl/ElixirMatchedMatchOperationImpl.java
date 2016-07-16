@@ -10,7 +10,6 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.operation.Match;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +33,7 @@ public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl
   @Override
   @NotNull
   public ElixirMatchInfixOperator getMatchInfixOperator() {
-    return findNotNullChildByClass(ElixirMatchInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchInfixOperator.class));
   }
 
   @Override
@@ -113,7 +112,7 @@ public class ElixirMatchedMatchOperationImpl extends ElixirMatchedExpressionImpl
   }
 
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations((Match) this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @NotNull

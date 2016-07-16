@@ -39,7 +39,7 @@ public class ElixirMatchedPipeOperationImpl extends ElixirMatchedExpressionImpl 
   @Override
   @NotNull
   public ElixirPipeInfixOperator getPipeInfixOperator() {
-    return findNotNullChildByClass(ElixirPipeInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirPipeInfixOperator.class));
   }
 
   @Nullable

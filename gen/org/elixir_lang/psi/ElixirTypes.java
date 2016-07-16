@@ -468,7 +468,7 @@ public interface ElixirTypes {
         return new ElixirEscapedCharacterImpl(node);
       }
       else if (type == ESCAPED_EOL) {
-        return new ElixirEscapedEOLImpl(node);
+        return new ElixirEscapedEolImpl(node);
       }
       else if (type == HEREDOC_LINE_PREFIX) {
         return new ElixirHeredocLinePrefixImpl(node);

@@ -10,7 +10,6 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.operation.And;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +33,7 @@ public class ElixirUnmatchedAndOperationImpl extends ElixirUnmatchedExpressionIm
   @Override
   @NotNull
   public ElixirAndInfixOperator getAndInfixOperator() {
-    return findNotNullChildByClass(ElixirAndInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAndInfixOperator.class));
   }
 
   @Override
@@ -113,7 +112,7 @@ public class ElixirUnmatchedAndOperationImpl extends ElixirUnmatchedExpressionIm
   }
 
   public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place) {
-    return ElixirPsiImplUtil.processDeclarations((And) this, processor, state, lastParent, place);
+    return ElixirPsiImplUtil.processDeclarations(this, processor, state, lastParent, place);
   }
 
   @NotNull

@@ -6,6 +6,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,19 +29,19 @@ public class ElixirMapConstructionArgumentsImpl extends ASTWrapperPsiElement imp
   @Override
   @Nullable
   public ElixirAssociations getAssociations() {
-    return findChildByClass(ElixirAssociations.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAssociations.class);
   }
 
   @Override
   @Nullable
   public ElixirAssociationsBase getAssociationsBase() {
-    return findChildByClass(ElixirAssociationsBase.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirAssociationsBase.class);
   }
 
   @Override
   @Nullable
   public ElixirKeywords getKeywords() {
-    return findChildByClass(ElixirKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirKeywords.class);
   }
 
   @NotNull

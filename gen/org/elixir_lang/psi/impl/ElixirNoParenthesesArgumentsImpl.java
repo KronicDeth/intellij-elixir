@@ -42,7 +42,7 @@ public class ElixirNoParenthesesArgumentsImpl extends ASTWrapperPsiElement imple
   @Override
   @Nullable
   public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesKeywords.class);
   }
 
   @Override
@@ -54,7 +54,7 @@ public class ElixirNoParenthesesArgumentsImpl extends ASTWrapperPsiElement imple
   @Override
   @Nullable
   public ElixirNoParenthesesOneArgument getNoParenthesesOneArgument() {
-    return findChildByClass(ElixirNoParenthesesOneArgument.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesOneArgument.class);
   }
 
   @NotNull

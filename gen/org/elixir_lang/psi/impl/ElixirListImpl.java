@@ -36,7 +36,7 @@ public class ElixirListImpl extends ASTWrapperPsiElement implements ElixirList {
   @Override
   @Nullable
   public ElixirKeywords getKeywords() {
-    return findChildByClass(ElixirKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirKeywords.class);
   }
 
   @Override

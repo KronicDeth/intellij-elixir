@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.ElixirMapArguments;
 import org.elixir_lang.psi.ElixirMapConstructionArguments;
 import org.elixir_lang.psi.ElixirMapUpdateArguments;
@@ -30,13 +31,13 @@ public class ElixirMapArgumentsImpl extends ASTWrapperPsiElement implements Elix
   @Override
   @Nullable
   public ElixirMapConstructionArguments getMapConstructionArguments() {
-    return findChildByClass(ElixirMapConstructionArguments.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMapConstructionArguments.class);
   }
 
   @Override
   @Nullable
   public ElixirMapUpdateArguments getMapUpdateArguments() {
-    return findChildByClass(ElixirMapUpdateArguments.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirMapUpdateArguments.class);
   }
 
   @NotNull

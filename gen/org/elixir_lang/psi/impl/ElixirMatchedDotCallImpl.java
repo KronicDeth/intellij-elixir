@@ -40,13 +40,13 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
   @Override
   @NotNull
   public ElixirDotInfixOperator getDotInfixOperator() {
-    return findNotNullChildByClass(ElixirDotInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDotInfixOperator.class));
   }
 
   @Override
   @NotNull
   public ElixirMatchedExpression getMatchedExpression() {
-    return findNotNullChildByClass(ElixirMatchedExpression.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirMatchedExpression.class));
   }
 
   @Override

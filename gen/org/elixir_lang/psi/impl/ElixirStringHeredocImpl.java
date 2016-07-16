@@ -32,7 +32,7 @@ public class ElixirStringHeredocImpl extends ASTWrapperPsiElement implements Eli
   @Override
   @Nullable
   public ElixirHeredocPrefix getHeredocPrefix() {
-    return findChildByClass(ElixirHeredocPrefix.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirHeredocPrefix.class);
   }
 
   @Override

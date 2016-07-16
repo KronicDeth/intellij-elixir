@@ -46,7 +46,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   @Override
   @NotNull
   public ElixirIdentifier getIdentifier() {
-    return findNotNullChildByClass(ElixirIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirIdentifier.class));
   }
 
   @Override
@@ -58,7 +58,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   @Override
   @Nullable
   public ElixirNoParenthesesKeywords getNoParenthesesKeywords() {
-    return findChildByClass(ElixirNoParenthesesKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesKeywords.class);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   @Override
   @Nullable
   public ElixirNoParenthesesStrict getNoParenthesesStrict() {
-    return findChildByClass(ElixirNoParenthesesStrict.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirNoParenthesesStrict.class);
   }
 
   @Nullable

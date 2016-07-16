@@ -6,6 +6,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -29,49 +30,49 @@ public class ElixirAtNumericOperationImpl extends ASTWrapperPsiElement implement
   @Override
   @NotNull
   public ElixirAtPrefixOperator getAtPrefixOperator() {
-    return findNotNullChildByClass(ElixirAtPrefixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAtPrefixOperator.class));
   }
 
   @Override
   @Nullable
   public ElixirBinaryWholeNumber getBinaryWholeNumber() {
-    return findChildByClass(ElixirBinaryWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirBinaryWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirCharToken getCharToken() {
-    return findChildByClass(ElixirCharToken.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirCharToken.class);
   }
 
   @Override
   @Nullable
   public ElixirDecimalFloat getDecimalFloat() {
-    return findChildByClass(ElixirDecimalFloat.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalFloat.class);
   }
 
   @Override
   @Nullable
   public ElixirDecimalWholeNumber getDecimalWholeNumber() {
-    return findChildByClass(ElixirDecimalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirHexadecimalWholeNumber getHexadecimalWholeNumber() {
-    return findChildByClass(ElixirHexadecimalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirHexadecimalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirOctalWholeNumber getOctalWholeNumber() {
-    return findChildByClass(ElixirOctalWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirOctalWholeNumber.class);
   }
 
   @Override
   @Nullable
   public ElixirUnknownBaseWholeNumber getUnknownBaseWholeNumber() {
-    return findChildByClass(ElixirUnknownBaseWholeNumber.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirUnknownBaseWholeNumber.class);
   }
 
   @Nullable

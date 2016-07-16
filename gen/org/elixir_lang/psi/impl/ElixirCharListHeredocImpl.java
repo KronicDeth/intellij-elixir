@@ -38,7 +38,7 @@ public class ElixirCharListHeredocImpl extends ASTWrapperPsiElement implements E
   @Override
   @Nullable
   public ElixirHeredocPrefix getHeredocPrefix() {
-    return findChildByClass(ElixirHeredocPrefix.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirHeredocPrefix.class);
   }
 
   @NotNull

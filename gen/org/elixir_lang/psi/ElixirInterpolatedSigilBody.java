@@ -11,7 +11,7 @@ public interface ElixirInterpolatedSigilBody extends Body {
   List<ElixirEscapedCharacter> getEscapedCharacterList();
 
   @NotNull
-  List<ElixirEscapedEOL> getEscapedEOLList();
+  List<ElixirEscapedEol> getEscapedEolList();
 
   @NotNull
   List<ElixirHexadecimalEscapePrefix> getHexadecimalEscapePrefixList();

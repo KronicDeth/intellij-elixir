@@ -5,6 +5,7 @@ import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,19 +28,19 @@ public class ElixirDecimalFloatImpl extends ASTWrapperPsiElement implements Elix
   @Override
   @Nullable
   public ElixirDecimalFloatExponent getDecimalFloatExponent() {
-    return findChildByClass(ElixirDecimalFloatExponent.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatExponent.class);
   }
 
   @Override
   @NotNull
   public ElixirDecimalFloatFractional getDecimalFloatFractional() {
-    return findNotNullChildByClass(ElixirDecimalFloatFractional.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatFractional.class));
   }
 
   @Override
   @NotNull
   public ElixirDecimalFloatIntegral getDecimalFloatIntegral() {
-    return findNotNullChildByClass(ElixirDecimalFloatIntegral.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirDecimalFloatIntegral.class));
   }
 
   @NotNull

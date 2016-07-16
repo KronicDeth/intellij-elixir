@@ -30,7 +30,7 @@ public class ElixirBlockItemImpl extends ASTWrapperPsiElement implements ElixirB
   @Override
   @NotNull
   public ElixirBlockIdentifier getBlockIdentifier() {
-    return findNotNullChildByClass(ElixirBlockIdentifier.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirBlockIdentifier.class));
   }
 
   @Override
@@ -42,7 +42,7 @@ public class ElixirBlockItemImpl extends ASTWrapperPsiElement implements ElixirB
   @Override
   @Nullable
   public ElixirStab getStab() {
-    return findChildByClass(ElixirStab.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirStab.class);
   }
 
   @NotNull

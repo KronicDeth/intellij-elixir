@@ -33,7 +33,7 @@ public class ElixirUnmatchedAdditionOperationImpl extends ElixirUnmatchedExpress
   @Override
   @NotNull
   public ElixirAdditionInfixOperator getAdditionInfixOperator() {
-    return findNotNullChildByClass(ElixirAdditionInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirAdditionInfixOperator.class));
   }
 
   @Override

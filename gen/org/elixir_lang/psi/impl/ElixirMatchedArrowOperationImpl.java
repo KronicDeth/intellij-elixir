@@ -33,7 +33,7 @@ public class ElixirMatchedArrowOperationImpl extends ElixirMatchedExpressionImpl
   @Override
   @NotNull
   public ElixirArrowInfixOperator getArrowInfixOperator() {
-    return findNotNullChildByClass(ElixirArrowInfixOperator.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirArrowInfixOperator.class));
   }
 
   @Override

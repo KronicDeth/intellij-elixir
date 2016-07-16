@@ -7,6 +7,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.Body;
 import org.elixir_lang.psi.ElixirQuoteStringBody;
 import org.elixir_lang.psi.ElixirStringLine;
@@ -33,7 +34,7 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   @Override
   @NotNull
   public ElixirQuoteStringBody getQuoteStringBody() {
-    return findNotNullChildByClass(ElixirQuoteStringBody.class);
+    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirQuoteStringBody.class));
   }
 
   @NotNull

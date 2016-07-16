@@ -11,7 +11,7 @@ public interface ElixirQuoteStringBody extends Body {
   List<ElixirEscapedCharacter> getEscapedCharacterList();
 
   @NotNull
-  List<ElixirEscapedEOL> getEscapedEOLList();
+  List<ElixirEscapedEol> getEscapedEolList();
 
   @NotNull
   List<ElixirInterpolation> getInterpolationList();

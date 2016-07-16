@@ -36,7 +36,7 @@ public class ElixirTupleImpl extends ASTWrapperPsiElement implements ElixirTuple
   @Override
   @Nullable
   public ElixirKeywords getKeywords() {
-    return findChildByClass(ElixirKeywords.class);
+    return PsiTreeUtil.getChildOfType(this, ElixirKeywords.class);
   }
 
   @Override
