@@ -98,6 +98,7 @@
   * Allow Unknown modulars in the Structure pane, in addition to Go To Symbol.  Their icon is a big ? to indicate their correct usage is unknown.
 * [#348](https://github.com/KronicDeth/intellij-elixir/pull/348) - [@KronicDeth](https://github.com/KronicDeth)
   * Regenerate `gen` folder using Grammar Kit 1.4.1 and fix some bugs (including [JetBrains/Grammar-Kit#126](https://github.com/JetBrains/Grammar-Kit/issues/126)) manually.
+* [#349](https://github.com/KronicDeth/intellij-elixir/pull/349) - Have both `QualifiedBracketOperation` and `UnqualifiedBracketOperation` extend `BracketOperation`, so that `BracketOperation` can be used to match both when the qualification does not matter. - [@KronicDeth](https://github.com/KronicDeth)
   
 ### Bug Fixes
 * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -111,6 +112,7 @@
   * Check all lines of output for mix version as Elixir 1.3.0 changed the format of `mix --version`, so that it includes the Erlang header (`Erlang/OTP ... [erts-...] [source] [64-bit] [smp:..:..] [async-threads:..] [hipe] [kernel-poll:false] [dtrace]`) on the first line and `Mix <version>` on the 3rd line.  Previously the parsing expected `Mix <version>` to be the first line.
 * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
   * If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown, which accepts any macro with a `do` block or keyword.  This allows Go To Symbol to no error in projects using Dogma as `defrule` is now treated as Unknown instead of causing an error that the enclosing modular could not be found.
+* [#349](https://github.com/KronicDeth/intellij-elixir/pull/349) - `BracketOperations` are neither parameters nor variables. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.0.0
 

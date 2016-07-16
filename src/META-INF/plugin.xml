@@ -45,6 +45,11 @@
               Regenerate <code>gen</code> folder using Grammar Kit 1.4.1 and fix some bugs (including
               <a href="https://github.com/JetBrains/Grammar-Kit/issues/126">JetBrains/Grammar-Kit#126</a>) manually.
             </li>
+            <li>
+              Have both <code>QualifiedBracketOperation</code> and <code>UnqualifiedBracketOperation</code> extend
+              <code>BracketOperation</code>, so that <code>BracketOperation</code> can be used to match both when the
+              qualification does not matter.
+            </li>
           </ul>
         </li>
         <li>
@@ -85,6 +90,7 @@
               projects using Dogma as <code>defrule</code> is now treated as Unknown instead of causing an error that
               the enclosing modular could not be found.
             </li>
+            <li><code>BracketOperations</code> are neither parameters nor variables.</li>
           </ul>
         </li>
       </ul>
