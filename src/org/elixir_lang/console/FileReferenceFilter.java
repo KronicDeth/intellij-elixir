@@ -30,7 +30,7 @@ public final class FileReferenceFilter implements Filter {
   public static final String LINE_MACROS = "$LINE$";
   public static final String COLUMN_MACROS = "$COLUMN$";
 
-  private static final String FILE_PATH_REGEXP = "((?:\\p{Alpha}\\:)?[0-9 a-z_A-Z\\-\\\\./]+)";
+  private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
   private static final String NUMBER_REGEXP = "([0-9]+)";
 
   private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.ex)$");
