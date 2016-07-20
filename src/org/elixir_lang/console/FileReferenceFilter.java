@@ -30,7 +30,7 @@ public final class FileReferenceFilter implements Filter {
   public static final String LINE_MACROS = "$LINE$";
   public static final String COLUMN_MACROS = "$COLUMN$";
 
-  private static final String FILE_PATH_REGEXP = "((?:\\p{Alpha}\\:)?[0-9 a-z_A-Z\\-\\\\./]+)";
+  private static final String FILE_PATH_REGEXP = "\\s*([0-9 a-z_A-Z\\-\\\\./]+)";
   private static final String NUMBER_REGEXP = "([0-9]+)";
 
   private static final Pattern PATTERN_FILENAME = Pattern.compile("[/\\\\]?([^/\\\\]*?\\.ex)$");
@@ -101,8 +101,8 @@ public final class FileReferenceFilter implements Filter {
     int fileLine = matchGroupToNumber(matcher, myLineMatchGroup);
     int fileColumn = matchGroupToNumber(matcher, myColumnMatchGroup);
 
-    int highlightStartOffset = entireLength - line.length() + matcher.start(0);
-    int highlightEndOffset = highlightStartOffset + matcher.end(0) - matcher.start(0);
+    int highlightStartOffset = entireLength - line.length() + matcher.start(0) + 1;
+    int highlightEndOffset = highlightStartOffset + matcher.end(0) - matcher.start(0) - 1;
 
     VirtualFile absolutePath = resolveAbsolutePath(filePath);
     HyperlinkInfo hyperlinkInfo = absolutePath != null ? new OpenFileHyperlinkInfo(myProject, absolutePath, fileLine, fileColumn) : null;
