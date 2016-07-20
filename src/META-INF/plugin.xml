@@ -91,6 +91,19 @@
               the enclosing modular could not be found.
             </li>
             <li><code>BracketOperations</code> are neither parameters nor variables.</li>
+            <li>
+              <p>Fix stacktrace linking picking wrong file with same basename</p>
+              <ul>
+                <li>
+                  Strip spaces from front of file path in <code>mix</code> output, which allows file looks to work
+                  correctly.
+                </li>
+                <li>
+                  Ensure file reference highlight doesn't include the leading and trailing characters by fix off-by-one
+                  errors.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>

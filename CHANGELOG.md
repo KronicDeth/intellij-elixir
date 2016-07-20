@@ -113,6 +113,9 @@
 * [#344](https://github.com/KronicDeth/intellij-elixir/pull/344) - [@KronicDeth](https://github.com/KronicDeth)
   * If no known modular (Module, Implementation, Protocol, Quote, or Use) matches the call, then use Unknown, which accepts any macro with a `do` block or keyword.  This allows Go To Symbol to no error in projects using Dogma as `defrule` is now treated as Unknown instead of causing an error that the enclosing modular could not be found.
 * [#349](https://github.com/KronicDeth/intellij-elixir/pull/349) - `BracketOperations` are neither parameters nor variables. - [@KronicDeth](https://github.com/KronicDeth)
+* [353](https://github.com/KronicDeth/intellij-elixir/pull/353) - Fix stacktrace linking picking wrong file with same basename - [@KronicDeth](https://github.com/KronicDeth)
+  * Strip spaces from front of file path in `mix` output, which allows file looks to work correctly.
+  * Ensure file reference highlight doesn't include the leading and trailing characters by fix off-by-one errors.
 
 ## v4.0.0
 
