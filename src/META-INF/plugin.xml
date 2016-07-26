@@ -104,6 +104,11 @@
                 </li>
               </ul>
             </li>
+            <li>
+              Determine whether to check left, right, or both by doing isAncestor checks for all operands, not just the
+              normalized operand.  The normalized operand is still used for <code>PsiScopeProcessor#execute</code> since
+              <code>#execute</code> is not expected to handle error elements.
+            </li>
           </ul>
         </li>
       </ul>
