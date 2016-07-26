@@ -32,6 +32,8 @@ import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.operation.infix.Position;
+import org.elixir_lang.psi.operation.infix.Triple;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -1429,15 +1431,24 @@ public class ElixirPsiImplUtil {
         boolean checkRight = false;
         boolean checkLeft = false;
 
-        if (match.isEquivalentTo(lastParent) || match.operator().isEquivalentTo(lastParent)) {
+        Triple triple = new Triple(match.getChildren());
+        Position position = triple.ancestorPosition(lastParent);
+
+        if (position != null) {
+            switch (position) {
+                case LEFT:
+                    checkLeft  = true;
+                    checkRight = false;
+                case OPERATOR:
+                    checkLeft  = true;
+                    checkRight = true;
+                case RIGHT:
+                    checkLeft  = false;
+                    checkRight = true;
+            }
+        } else if (PsiTreeUtil.isAncestor(match, lastParent, false)) {
+            checkLeft  = true;
             checkRight = true;
-            checkLeft = true;
-        } else if (PsiTreeUtil.isAncestor(rightOperand, lastParent, false)) {
-            checkRight = true;
-            checkLeft = false;
-        } else if (PsiTreeUtil.isAncestor(leftOperand, lastParent, false)) {
-            checkRight = false;
-            checkLeft = true;
         }
 
         boolean keepProcessing = true;
