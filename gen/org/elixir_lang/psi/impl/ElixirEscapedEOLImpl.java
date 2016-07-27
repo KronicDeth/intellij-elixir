@@ -15,7 +15,7 @@ public class ElixirEscapedEOLImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
-    visitor.visitEscapedEol(this);
+    visitor.visitEscapedEOL(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

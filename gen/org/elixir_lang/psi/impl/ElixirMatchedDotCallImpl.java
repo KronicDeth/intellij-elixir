@@ -20,12 +20,12 @@ import java.util.List;
 
 public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<MatchedDotCall> implements ElixirMatchedDotCall {
 
-  public ElixirMatchedDotCallImpl(ASTNode node) {
-    super(node);
-  }
-
   public ElixirMatchedDotCallImpl(MatchedDotCall stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public ElixirMatchedDotCallImpl(ASTNode node) {
+    super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {

@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedParenthesesCall> implements ElixirMatchedUnqualifiedParenthesesCall {
 
-  public ElixirMatchedUnqualifiedParenthesesCallImpl(ASTNode node) {
-    super(node);
-  }
-
   public ElixirMatchedUnqualifiedParenthesesCallImpl(MatchedUnqualifiedParenthesesCall stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public ElixirMatchedUnqualifiedParenthesesCallImpl(ASTNode node) {
+    super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {

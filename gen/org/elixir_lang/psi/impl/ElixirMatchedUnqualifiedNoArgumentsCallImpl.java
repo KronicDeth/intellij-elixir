@@ -22,12 +22,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirMatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedNoArgumentsCall> implements ElixirMatchedUnqualifiedNoArgumentsCall {
 
-  public ElixirMatchedUnqualifiedNoArgumentsCallImpl(ASTNode node) {
-    super(node);
-  }
-
   public ElixirMatchedUnqualifiedNoArgumentsCallImpl(MatchedUnqualifiedNoArgumentsCall stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public ElixirMatchedUnqualifiedNoArgumentsCallImpl(ASTNode node) {
+    super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {

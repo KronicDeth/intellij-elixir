@@ -15,13 +15,13 @@ public interface ElixirStringLine extends Atomable, InterpolatedString, Line, Qu
   ElixirQuoteStringBody getQuoteStringBody();
 
   @NotNull
-  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull
-  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node);
 
   Body getBody();
 
