@@ -91,6 +91,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
     public static final OtpErlangAtom MINUS = new OtpErlangAtom("-");
+    public static final OtpErlangAtom MULTIPLE_ALIASES = new OtpErlangAtom("{}");
     public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
     public static final OtpErlangAtom PLUS = new OtpErlangAtom("+");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
@@ -3377,6 +3378,21 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMultipleAliases multipleAliases) {
+        PsiElement[] children = multipleAliases.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return quotedFunctionArguments(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression) {
         PsiElement[] children = noParenthesesManyStrictNoParenthesesExpression.getChildren();
 
@@ -3625,6 +3641,38 @@ if (quoted == null) {
                 ALIASES,
                 qualifiedAliasMetdata,
                 mergedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final QualifiedMultipleAliases qualifiedMultipleAliases) {
+        PsiElement[] children = qualifiedMultipleAliases.getChildren();
+
+        assert children.length == 3;
+
+        Quotable multipleAliases = (Quotable) children[2];
+        OtpErlangObject quotedMultipleAliases = multipleAliases.quote();
+
+        Quotable expression = (Quotable) children[0];
+        OtpErlangObject quotedExpression = expression.quote();
+
+        OtpErlangList metadata = metadata((Operator) children[1]);
+
+        // See https://github.com/lexmag/elixir/blob/8c57c9110301c1ee02d84b574c59feff00e14ba3/lib/elixir/src/elixir_parser.yrl#L644
+        OtpErlangObject head = quotedFunctionCall(
+                ".",
+                metadata,
+                quotedExpression,
+                MULTIPLE_ALIASES
+        );
+
+        return new OtpErlangTuple(
+                new OtpErlangObject[] {
+                        head,
+                        metadata,
+                        quotedMultipleAliases
+                }
         );
     }
 

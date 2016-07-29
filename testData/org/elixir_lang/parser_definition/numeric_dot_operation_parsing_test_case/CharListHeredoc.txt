@@ -4,7 +4,7 @@ Elixir File(0,143)
       PsiElement(?)('?')(0,1)
       PsiElement(Char List Fragment)('c')(1,2)
   PsiElement(.)('.')(2,3)
-  PsiErrorElement:'(', <relative identifier>, Alias, '\\n or \\r\\n' expected, got '''''(3,6)
+  PsiErrorElement:'(', <relative identifier>, Alias, '\\n, \\r\\n' or '{' expected, got '''''(3,6)
     PsiElement(Char List Heredoc Promoter ('''))(''''')(3,6)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(6,7)
     PsiErrorElement:<end of expression> expected, got '
