@@ -180,6 +180,14 @@
   ]
   // method set by prefix operations above
 
+  // QualifiedMultipleAliases
+  implements("(un)?matchedQualifiedMultipleAliases")=[
+    "org.elixir_lang.psi.QualifiedMultipleAliases"
+  ]
+  methods(   "(un)?matchedQualifiedMultipleAliases")=[
+    quote
+  ]
+
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
@@ -1819,12 +1827,6 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
  * See https://github.com/elixir-lang/elixir/pull/3666
  */
 matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleAliases
-                                    {
-                                      implements = "org.elixir_lang.psi.QualifiedMultipleAliases"
-                                      methods = [
-                                        quote
-                                      ]
-                                    }
 
 // same rules as tuple, but quoting is different, so separate rule.
 multipleAliases ::= OPENING_CURLY EOL*
@@ -2542,12 +2544,6 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
  * See https://github.com/elixir-lang/elixir/pull/3666
  */
 unmatchedQualifiedMultipleAliases ::= unmatchedExpression dotInfixOperator multipleAliases
-                                      {
-                                        implements = "org.elixir_lang.psi.QualifiedMultipleAliases"
-                                        methods = [
-                                          quote
-                                        ]
-                                      }
 
 /*
  * Qualified Identifier Bracket Operation
