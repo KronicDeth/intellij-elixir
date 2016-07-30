@@ -1,5 +1,7 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.sdk.ElixirSdkRelease;
+
 /**
  * atom is invalid to the right of `.`, so unlike in {@link MatchedDotOperationParsingTestcase}, this tests only when
  * atom is left of `.` and the right operand varies based on the test name.
@@ -10,95 +12,95 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
      */
 
     public void testMatchedCaptureNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedInMatchOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedWhenNoParenthesesKeywordsOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedWhenOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedTypeOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedPipeOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedMatchOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedOrOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedAndOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedComparisonOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedRelationalOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedArrowOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedInOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedTwoOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedAdditionOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedMultiplicationOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedUnaryNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedDotCallOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedQualifiedAliasOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedQualifiedCallOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedAtNonNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testMatchedUnqualifiedCallOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testVariable() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     /*
@@ -106,35 +108,35 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
      */
 
     public void testAtNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testCaptureNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testUnaryNumericOperation() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testEmptyBlock() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testList() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testSigil() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testAtomKeyword() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testAlias() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     /*
@@ -142,19 +144,19 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
      */
 
     public void testCharToken() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testBinaryWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testHexadecimalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testOctalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testUnknownBaseWholeNumber() {
@@ -162,31 +164,67 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
     }
 
     public void testDecimalFloat() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testDecimalWholeNumber() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testStringLine() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testStringHeredoc() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testCharListLine() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
 
     public void testCharListHeredoc() {
-        assertParsedAndQuotedCorrectly();
+        assertParsedAndQuotedCorrectlyInOneThree();
     }
+
+    /*
+     * Protected Instance Methods
+     */
 
     @Override
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/matched_qualified_multiple_aliases_parsing_test_case";
+    }
+
+    private void assertParsedAndQuotedCorrectlyInOneThree() {
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_2) >= 0) {
+            assertParsedAndQuotedCorrectly();
+        } else {
+            assertParsedAndQuotedAroundError();
+        }
+    }
+
+    /*
+     * Private Instance Methods
+     */
+
+    private ElixirSdkRelease elixirSdkRelease() {
+        String elixirVersion = elixirVersion();
+        ElixirSdkRelease elixirSdkRelease = ElixirSdkRelease.fromString((elixirVersion));
+
+        assertNotNull(
+                "ELIXIR_VERSION (" + elixirVersion  + ") could not be parsed into an ElixirSdkRelease",
+                elixirSdkRelease
+        );
+
+        return elixirSdkRelease;
+    }
+
+    private String elixirVersion() {
+        String elixirVersion = System.getenv("ELIXIR_VERSION");
+
+        assertNotNull("ELIXIR_VERSION is not set", elixirVersion);
+
+        return elixirVersion;
     }
 }
