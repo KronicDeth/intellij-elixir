@@ -34,8 +34,8 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
      * The full name of the qualifiable alias, with any multiple aliases expanded
      */
     @Nullable
-    private String resolvableName(@NotNull PsiNamedElement  namedElement) {
-        String resolvableName = namedElement.getName();
+    private String resolvableName(@NotNull QualifiableAlias qualifiableAlias) {
+        String resolvableName = qualifiableAlias.fullyQualifiedName();
         List<String> tail = null;
 
         if (resolvableName != null) {
@@ -43,7 +43,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
             tail.add(resolvableName);
         }
 
-        return resolvableNameUp(namedElement.getParent(), tail);
+        return resolvableNameUp(qualifiableAlias.getParent(), tail);
     }
 
     @Nullable
