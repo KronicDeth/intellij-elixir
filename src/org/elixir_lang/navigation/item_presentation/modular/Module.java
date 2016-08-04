@@ -6,12 +6,27 @@ import com.intellij.psi.PsiElement;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
 public class Module implements ItemPresentation, Parent {
+    /*
+     * Static Methods
+     */
+
+    @Contract(pure = true)
+    @NotNull
+    public static String presentableText(Call call) {
+        PsiElement[] primaryArguments = call.primaryArguments();
+
+        assert primaryArguments != null && primaryArguments.length > 0;
+
+        return primaryArguments[0].getText();
+    }
+
     /*
      * Fields
      */
@@ -47,11 +62,7 @@ public class Module implements ItemPresentation, Parent {
     @Override
     @NotNull
     public String getPresentableText() {
-        PsiElement[] primaryArguments = call.primaryArguments();
-
-        assert primaryArguments != null && primaryArguments.length > 0;
-
-        return primaryArguments[0].getText();
+        return presentableText(call);
     }
 
     /**

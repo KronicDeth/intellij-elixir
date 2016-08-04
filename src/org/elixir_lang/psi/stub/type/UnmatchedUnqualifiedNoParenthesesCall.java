@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.stub.type;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedNoParenthesesCall;
@@ -36,7 +37,8 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 psi.resolvedFunctionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
-                psi.getName()
+                StringUtil.notNullize(psi.getName(), "?"),
+                StringUtil.notNullize(psi.canonicalName(), "?")
         );
     }
 
@@ -50,6 +52,7 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 dataStream.readName(),
                 dataStream.readInt(),
                 dataStream.readBoolean(),
+                dataStream.readName(),
                 dataStream.readName()
         );
     }

@@ -29,6 +29,9 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   ElixirUnmatchedExpression getUnmatchedExpression();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   @Nullable

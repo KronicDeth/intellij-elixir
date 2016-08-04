@@ -1,9 +1,9 @@
 package org.elixir_lang.psi.stub.type;
 
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirUnmatchedDotCall;
-import org.elixir_lang.psi.impl.ElixirMatchedDotCallImpl;
 import org.elixir_lang.psi.impl.ElixirUnmatchedDotCallImpl;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,8 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 psi.resolvedFunctionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
-                psi.getName()
+                StringUtil.notNullize(psi.getName(), "?"),
+                StringUtil.notNullize(psi.canonicalName(), "?")
         );
     }
 
@@ -51,6 +52,7 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 dataStream.readName(),
                 dataStream.readInt(),
                 dataStream.readBoolean(),
+                dataStream.readName(),
                 dataStream.readName()
         );
     }

@@ -56,6 +56,11 @@ public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<Matched
   }
 
   @Nullable
+  public String canonicalName() {
+    return ElixirPsiImplUtil.canonicalName(this);
+  }
+
+  @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }

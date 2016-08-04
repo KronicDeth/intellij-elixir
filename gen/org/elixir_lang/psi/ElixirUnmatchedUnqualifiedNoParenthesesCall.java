@@ -24,6 +24,9 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   ElixirNoParenthesesOneArgument getNoParenthesesOneArgument();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   @NotNull

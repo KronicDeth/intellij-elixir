@@ -24,6 +24,9 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   ElixirRelativeIdentifier getRelativeIdentifier();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   PsiElement functionNameElement();

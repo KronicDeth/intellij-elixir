@@ -27,6 +27,9 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   ElixirUnmatchedExpression getUnmatchedExpression();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   PsiElement functionNameElement();

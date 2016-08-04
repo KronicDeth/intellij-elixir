@@ -60,6 +60,11 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends NamedStubbedPsi
   }
 
   @Nullable
+  public String canonicalName() {
+    return ElixirPsiImplUtil.canonicalName(this);
+  }
+
+  @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }

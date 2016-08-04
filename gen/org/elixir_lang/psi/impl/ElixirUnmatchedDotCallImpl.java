@@ -62,6 +62,11 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Nullable
+  public String canonicalName() {
+    return ElixirPsiImplUtil.canonicalName(this);
+  }
+
+  @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
   }

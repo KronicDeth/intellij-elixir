@@ -10,6 +10,7 @@
   // name identifier owner calls - no argument calls are included because in a pipeline they can have effective arguments
   elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
   methods(           "((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
+    canonicalName
     functionName
     functionNameElement
     getDoBlock

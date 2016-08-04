@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
@@ -61,6 +62,7 @@ import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -293,6 +295,50 @@ public class ElixirPsiImplUtil {
                 blockMetadata,
                 quotedArray
         );
+    }
+
+    @Nullable
+    public static String canonicalName(@NotNull StubBased stubBased) {
+        String canonicalName;
+
+        if (isModular(stubBased)) {
+            String canonicalNameSuffix = null;
+
+            if (Implementation.is(stubBased)) {
+                String protocolName = Implementation.protocolName(stubBased);
+                PsiElement forNameElement = Implementation.forNameElement(stubBased);
+                String forName = null;
+
+                if (forNameElement != null) {
+                    forName = forNameElement.getText();
+                }
+
+                canonicalNameSuffix = StringUtil.notNullize(protocolName, "?") +
+                        "." +
+                        StringUtil.notNullize(forName, "?");
+            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
+                canonicalNameSuffix = org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
+                        stubBased
+                );
+            }
+
+            Call enclosing = enclosingModularMacroCall(stubBased);
+
+            if (enclosing instanceof StubBased) {
+                StubBased enclosingStubBased = (StubBased) enclosing;
+                String canonicalNamePrefix = enclosingStubBased.canonicalName();
+
+                canonicalName = StringUtil.notNullize(canonicalNamePrefix, "?") +
+                        "." +
+                        StringUtil.notNullize(canonicalNameSuffix, "?");
+            } else {
+                canonicalName = StringUtil.notNullize(canonicalNameSuffix, "?");
+            }
+        } else {
+            canonicalName = stubBased.getName();
+        }
+
+        return canonicalName;
     }
 
     // @return -1 if codePoint cannot be parsed.

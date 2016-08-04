@@ -9,11 +9,47 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<ElixirUnmatchedUnqualifiedNoParenthesesCall> {
-    public UnmatchedUnqualifiedNoParenthesesCall(StubElement parent, @NotNull IStubElementType elementType, @Nullable StringRef resolvedModuleName, @Nullable StringRef resolvedFunctionName, int resolvedFinalArity, boolean hasDoBlockOrKeyword, @NotNull StringRef name) {
-        super(parent, elementType, resolvedModuleName, resolvedFunctionName, resolvedFinalArity, hasDoBlockOrKeyword, name);
+    public UnmatchedUnqualifiedNoParenthesesCall(
+            StubElement parent,
+            @NotNull IStubElementType elementType,
+            @Nullable StringRef resolvedModuleName,
+            @Nullable StringRef resolvedFunctionName,
+            int resolvedFinalArity,
+            boolean hasDoBlockOrKeyword,
+            @NotNull StringRef name,
+            @NotNull StringRef canonicalName
+    ) {
+        super(
+                parent,
+                elementType,
+                resolvedModuleName,
+                resolvedFunctionName,
+                resolvedFinalArity,
+                hasDoBlockOrKeyword,
+                name,
+                canonicalName
+        );
     }
 
-    public UnmatchedUnqualifiedNoParenthesesCall(StubElement parent, @NotNull IStubElementType elementType, @Nullable String resolvedModuleName, @Nullable String resolvedFunctionName, int resolvedFinalArity, boolean hasDoBlockOrKeyword, @NotNull String name) {
-        super(parent, elementType, resolvedModuleName, resolvedFunctionName, resolvedFinalArity, hasDoBlockOrKeyword, name);
+    public UnmatchedUnqualifiedNoParenthesesCall(
+            StubElement parent,
+            @NotNull IStubElementType elementType,
+            @Nullable String resolvedModuleName,
+            @Nullable String resolvedFunctionName,
+            int resolvedFinalArity,
+            boolean hasDoBlockOrKeyword,
+            @NotNull String name,
+            @NotNull String canonicalName
+    ) {
+        super(
+                parent,
+                elementType,
+                resolvedModuleName,
+                resolvedFunctionName,
+                resolvedFinalArity,
+                hasDoBlockOrKeyword,
+                name,
+                canonicalName
+        );
     }
 }
