@@ -20,12 +20,12 @@ import java.util.List;
 
 public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<UnmatchedDotCall> implements ElixirUnmatchedDotCall {
 
-  public ElixirUnmatchedDotCallImpl(ASTNode node) {
-    super(node);
-  }
-
   public ElixirUnmatchedDotCallImpl(UnmatchedDotCall stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public ElixirUnmatchedDotCallImpl(ASTNode node) {
+    super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
@@ -59,6 +59,11 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
+  }
+
+  @Nullable
+  public String canonicalName() {
+    return ElixirPsiImplUtil.canonicalName(this);
   }
 
   @Nullable

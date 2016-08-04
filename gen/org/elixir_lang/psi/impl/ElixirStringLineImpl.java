@@ -38,18 +38,18 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @NotNull
-  public List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child) {
-    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, child);
+  public List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node) {
+    return ElixirPsiImplUtil.addEscapedCharacterCodePoints(this, codePointList, node);
   }
 
   @NotNull
-  public List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child) {
-    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, child);
+  public List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node) {
+    return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
   }
 
   @NotNull
-  public List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child) {
-    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, child);
+  public List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node) {
+    return ElixirPsiImplUtil.addHexadecimalEscapeSequenceCodePoints(this, codePointList, node);
   }
 
   public Body getBody() {

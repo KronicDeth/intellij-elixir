@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.stub.call;
 
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.NamedStubBase;
 import com.intellij.psi.stubs.StubElement;
@@ -14,6 +15,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      * Fields
      */
 
+    private final StringRef canonicalName;
     private final boolean hasDoBlockOrKeyword;
     private final int resolvedFinalArity;
     private final StringRef resolvedFunctionName;
@@ -30,7 +32,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 @Nullable String resolvedFunctionName,
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
-                @NotNull String name) {
+                @NotNull String name,
+                @NotNull String canonicalName) {
         this(
                 parent,
                 elementType,
@@ -38,7 +41,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 StringRef.fromString(resolvedFunctionName),
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
-                StringRef.fromString(name)
+                StringRef.fromString(name),
+                StringRef.fromString(canonicalName)
         );
     }
 
@@ -48,8 +52,10 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 @Nullable StringRef resolvedFunctionName,
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
-                @NotNull StringRef name) {
+                @NotNull StringRef name,
+                @NotNull StringRef canonicalName) {
         super(parent, elementType, name);
+        this.canonicalName = canonicalName;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
         this.resolvedFinalArity = resolvedFinalArity;
         this.resolvedFunctionName = resolvedFunctionName;
@@ -59,6 +65,16 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     /*
      * Instance Methods
      */
+
+    /**
+     * The name does not depend on aliases or nested modules
+     *
+     * @return the canonical text of the reference.
+     * @see PsiReference#getCanonicalText()
+     */
+    public String canonicalName() {
+        return StringRef.toString(canonicalName);
+    }
 
     /**
      * Whether this call has a {@code do} block or a {@code :do} keyword, so it is a macro

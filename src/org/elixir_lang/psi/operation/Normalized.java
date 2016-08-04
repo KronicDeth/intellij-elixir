@@ -30,7 +30,7 @@ public class Normalized {
     }
 
     @Contract(pure = true)
-    public static int operatorIndex(PsiElement[] children) {
+    public static int operatorIndex(@NotNull PsiElement[] children) {
         int operatorIndex = -1;
         for (int i = 0; i < children.length; i++) {
             if (children[i] instanceof Operator) {

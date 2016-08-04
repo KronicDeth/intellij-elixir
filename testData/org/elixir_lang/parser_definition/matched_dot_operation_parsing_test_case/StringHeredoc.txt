@@ -13,7 +13,7 @@ Elixir File(0,31)
         <empty list>
       PsiElement(String Heredoc Terminator ("""))('"""')(8,11)
   PsiElement(.)('.')(11,12)
-  PsiErrorElement:'(', <relative identifier>, Alias, '\\n or \\r\\n' expected, got '"""'(12,15)
+  PsiErrorElement:'(', <relative identifier>, Alias, '\\n, \\r\\n' or '{' expected, got '"""'(12,15)
     PsiElement(String Heredoc Promoter ("""))('"""')(12,15)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(15,16)
     PsiErrorElement:<end of expression> expected, got '

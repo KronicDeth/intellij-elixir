@@ -3,13 +3,14 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
   // direct children of matchedExpression
-  extends("matched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=matchedExpression
+  extends("matched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|Qualified(Alias|MultipleAliases))")=matchedExpression
   // direct children of unmatchedExpression
-  extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|QualifiedAlias)")=unmatchedExpression
+  extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|Qualified(Alias|MultipleAliases))")=unmatchedExpression
 
   // name identifier owner calls - no argument calls are included because in a pipeline they can have effective arguments
   elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
   methods(           "((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
+    canonicalName
     functionName
     functionNameElement
     getDoBlock
@@ -179,6 +180,14 @@
     "org.elixir_lang.psi.UnaryNonNumericOperation"
   ]
   // method set by prefix operations above
+
+  // QualifiedMultipleAliases
+  implements("(un)?matchedQualifiedMultipleAliases")=[
+    "org.elixir_lang.psi.QualifiedMultipleAliases"
+  ]
+  methods(   "(un)?matchedQualifiedMultipleAliases")=[
+    quote
+  ]
 
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
@@ -1264,6 +1273,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedUnqualifiedNoParenthesesCall |
                       matchedBracketOperation |
                       matchedQualifiedAlias |
+                      matchedQualifiedMultipleAliases |
                       matchedQualifiedBracketOperation |
                       matchedQualifiedParenthesesCall |
                       matchedQualifiedNoArgumentsCall |
@@ -1811,6 +1821,20 @@ matchedQualifiedAlias ::= matchedExpression dotInfixOperator alias
                               setName
                             ]
                           }
+
+/*
+ * Qualified Multiple Alias
+ *
+ * See https://github.com/elixir-lang/elixir/pull/3666
+ */
+matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleAliases
+
+// same rules as tuple, but quoting is different, so separate rule.
+multipleAliases ::= OPENING_CURLY EOL*
+                    containerArguments? EOL*
+                    CLOSING_CURLY
+                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+
 
 /*
  * Qualified Identifier Bracket Operation
@@ -2516,6 +2540,13 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
                             }
 
 /*
+ * Qualified Multiple Alias
+ *
+ * See https://github.com/elixir-lang/elixir/pull/3666
+ */
+unmatchedQualifiedMultipleAliases ::= unmatchedExpression dotInfixOperator multipleAliases
+
+/*
  * Qualified Identifier Bracket Operation
  */
 
@@ -2666,6 +2697,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedUnqualifiedNoParenthesesCall |
                         unmatchedBracketOperation |
                         unmatchedQualifiedAlias |
+                        unmatchedQualifiedMultipleAliases |
                         unmatchedQualifiedBracketOperation |
                         unmatchedQualifiedParenthesesCall |
                         unmatchedQualifiedNoArgumentsCall |

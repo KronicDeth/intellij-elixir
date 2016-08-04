@@ -1,17 +1,19 @@
 package org.elixir_lang.sdk;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class ElixirSdkRelease {
+public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
   /*
    * CONSTANTS
    */
 
   public static final ElixirSdkRelease V_1_0_4 = new ElixirSdkRelease("1", "0", "4", null, null);
+  public static final ElixirSdkRelease V_1_2 = new ElixirSdkRelease("1", "2", null, null, null);
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself
@@ -19,13 +21,80 @@ public final class ElixirSdkRelease {
   );
 
   /*
+   *
    * Static Methods
+   *
+   */
+
+  /*
+   * Public Static Methods
    */
 
   @Nullable
   public static ElixirSdkRelease fromString(@Nullable String versionString){
     Matcher m = versionString != null ? VERSION_PATTERN.matcher(versionString) : null;
     return m != null && m.matches() ? new ElixirSdkRelease(m.group(1), m.group(2), m.group(3), m.group(4), m.group(5)) : null;
+  }
+
+  /*
+   * Private Static Methods
+   */
+
+  @Contract(pure = true)
+  private static int compareMaybeFormattedDecimals(@Nullable String mine, @Nullable String others) {
+    int comparison;
+
+    if (mine == null && others == null) {
+      comparison = 0;
+    } else if (mine == null && others != null) {
+      comparison = -1;
+    } else if (mine != null && others == null) {
+      comparison = 1;
+    } else {
+      try {
+        int myInt = Integer.parseInt(mine);
+
+        try {
+          int othersInt = Integer.parseInt(others);
+
+          if (myInt > othersInt) {
+            comparison = 1;
+          } else if (myInt < othersInt) {
+            comparison = -1;
+          } else {
+            comparison = 0;
+          }
+        } catch (NumberFormatException numberFormatException) {
+          comparison = mine.compareTo(others);
+        }
+      } catch (NumberFormatException numberFormatException) {
+        comparison = mine.compareTo(others);
+      }
+    }
+
+    return comparison;
+  }
+
+  /**
+   * @see <a href="https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L203-L206">Version.to_compare</a>
+   */
+  @Contract(pure = true)
+  private static int comparePre(@Nullable String mine, @Nullable String others) {
+    int comparison;
+
+    if (mine == null && others == null) {
+      comparison = 0;
+    } else if (mine == null && others != null) {
+      // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L203
+      comparison = 1;
+    } else if (mine != null && others == null) {
+      // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L204
+      comparison = -1;
+    } else {
+      comparison = mine.compareTo(others);
+    }
+
+    return comparison;
   }
 
   /*
@@ -66,6 +135,25 @@ public final class ElixirSdkRelease {
   /*
    * Instance Methods
    */
+
+  @Override
+  public int compareTo(@NotNull ElixirSdkRelease other) {
+    int comparison = compareMaybeFormattedDecimals(major, other.major);
+
+    if (comparison == 0) {
+      comparison = compareMaybeFormattedDecimals(minor, other.minor);
+
+      if (comparison == 0) {
+        comparison = compareMaybeFormattedDecimals(patch, other.patch);
+
+        if (comparison == 0) {
+          comparison = comparePre(pre, other.pre);
+        }
+      }
+    }
+
+    return comparison;
+  }
 
   @Override
   public String toString() {

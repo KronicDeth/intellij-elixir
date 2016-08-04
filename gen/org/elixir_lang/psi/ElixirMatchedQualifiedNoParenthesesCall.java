@@ -27,6 +27,9 @@ public interface ElixirMatchedQualifiedNoParenthesesCall extends ElixirMatchedEx
   ElixirRelativeIdentifier getRelativeIdentifier();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   PsiElement functionNameElement();

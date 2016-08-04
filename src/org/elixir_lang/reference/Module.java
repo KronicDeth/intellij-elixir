@@ -16,9 +16,130 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.elixir_lang.Module.concat;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 
 public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPolyVariantReference {
+    /*
+     *
+     * Static Methods
+     *
+     */
+
+    /*
+     * Private Static Methods
+     */
+
+    /**
+     * The full name of the qualifiable alias, with any multiple aliases expanded
+     */
+    @Nullable
+    private String resolvableName(@NotNull QualifiableAlias qualifiableAlias) {
+        String resolvableName = qualifiableAlias.fullyQualifiedName();
+        List<String> tail = null;
+
+        if (resolvableName != null) {
+            tail = new ArrayList<String>();
+            tail.add(resolvableName);
+        }
+
+        return resolvableNameUp(qualifiableAlias.getParent(), tail);
+    }
+
+    @Nullable
+    private List<String> resolvableNameDown(@NotNull QualifiableAlias qualifier) {
+        String resolvableName = qualifier.getName();
+        List<String> nameList = null;
+
+        if (resolvableName != null) {
+            nameList = new ArrayList<String>();
+            nameList.add(resolvableName);
+        }
+
+        return nameList;
+    }
+
+    @Nullable
+    private List<String> resolvableNameDown(@NotNull PsiElement qualifier) {
+        List<String> nameList = null;
+
+        if (qualifier instanceof ElixirAccessExpression) {
+            nameList = resolvableNameDown(qualifier.getChildren());
+        } else if (qualifier instanceof QualifiableAlias) {
+            nameList = resolvableNameDown((QualifiableAlias) qualifier);
+        }
+
+        return nameList;
+    }
+
+    @Nullable
+    private List<String> resolvableNameDown(@NotNull PsiElement[] qualifiers) {
+        List<String> nameList = null;
+
+        for (PsiElement qualifier : qualifiers) {
+            List<String> qualifierNameList = resolvableNameDown(qualifier);
+
+            if (qualifierNameList != null) {
+                if (nameList == null) {
+                    nameList = new ArrayList<String>(qualifierNameList.size());
+                }
+
+                nameList.addAll(qualifierNameList);
+            }
+        }
+
+        return nameList;
+    }
+
+    @Nullable
+    private String resolvableNameUp(@Nullable PsiElement ancestor, @Nullable List<String> tail) {
+        String resolvableName = null;
+
+        if (ancestor instanceof ElixirAccessExpression ||
+                ancestor instanceof ElixirMultipleAliases) {
+            resolvableName = resolvableNameUp(ancestor.getParent(), tail);
+        } else if (ancestor instanceof QualifiedMultipleAliases) {
+            resolvableName = resolvableNameUp((QualifiedMultipleAliases) ancestor, tail);
+        } else if (tail != null) {
+            resolvableName = concat(tail);
+        }
+
+        return resolvableName;
+    }
+
+    @Nullable
+    private String resolvableNameUp(@NotNull QualifiedMultipleAliases ancestor, @Nullable List<String> tail) {
+        PsiElement[] children = ancestor.getChildren();
+        int operatorIndex = org.elixir_lang.psi.operation.Normalized.operatorIndex(children);
+
+        PsiElement qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
+        List<String> qualifierNameList = null;
+
+        if (qualifier != null) {
+            qualifierNameList = resolvableNameDown(qualifier);
+        }
+
+        List<String> nameList;
+
+        if (qualifierNameList != null) {
+            nameList = qualifierNameList;
+
+            if (tail != null) {
+                qualifierNameList.addAll(tail);
+            }
+        } else {
+            nameList = tail;
+        }
+
+        String resolvableName = null;
+
+        if (nameList != null) {
+            resolvableName = concat(nameList);
+        }
+
+        return resolvableName;
+    }
+
     /*
      * Constructors
      */
@@ -41,7 +162,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
-        final String name = myElement.getName();
+        final String name = resolvableName(myElement);
 
         if (name != null) {
             results.addAll(multiResolveUpFromElement(myElement, name));

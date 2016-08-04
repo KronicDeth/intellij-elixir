@@ -3,6 +3,7 @@ package org.elixir_lang.psi.stub.type;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.NamedStubBase;
+import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,20 @@ public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentif
 
     @Override
     public void indexStub(@NotNull final S stub, @NotNull final IndexSink sink) {
-        sink.occurrence(AllName.KEY, stub.getName());
+        String name = stub.getName();
+
+        if (name != null) {
+            sink.occurrence(AllName.KEY, name);
+        }
+
+        if (stub instanceof org.elixir_lang.psi.stub.call.Stub) {
+            org.elixir_lang.psi.stub.call.Stub callStub = (org.elixir_lang.psi.stub.call.Stub) stub;
+            String canonicalName = callStub.canonicalName();
+
+            if (canonicalName != null) {
+                sink.occurrence(AllName.KEY, canonicalName);
+            }
+        }
     }
 
     @NotNull

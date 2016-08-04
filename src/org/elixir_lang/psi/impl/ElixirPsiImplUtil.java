@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.tree.Factory;
@@ -61,6 +62,7 @@ import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -91,6 +93,7 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom FALSE = new OtpErlangAtom("false");
     public static final OtpErlangAtom FN = new OtpErlangAtom("fn");
     public static final OtpErlangAtom MINUS = new OtpErlangAtom("-");
+    public static final OtpErlangAtom MULTIPLE_ALIASES = new OtpErlangAtom("{}");
     public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
     public static final OtpErlangAtom PLUS = new OtpErlangAtom("+");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
@@ -292,6 +295,50 @@ public class ElixirPsiImplUtil {
                 blockMetadata,
                 quotedArray
         );
+    }
+
+    @Nullable
+    public static String canonicalName(@NotNull StubBased stubBased) {
+        String canonicalName;
+
+        if (isModular(stubBased)) {
+            String canonicalNameSuffix = null;
+
+            if (Implementation.is(stubBased)) {
+                String protocolName = Implementation.protocolName(stubBased);
+                PsiElement forNameElement = Implementation.forNameElement(stubBased);
+                String forName = null;
+
+                if (forNameElement != null) {
+                    forName = forNameElement.getText();
+                }
+
+                canonicalNameSuffix = StringUtil.notNullize(protocolName, "?") +
+                        "." +
+                        StringUtil.notNullize(forName, "?");
+            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
+                canonicalNameSuffix = org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(
+                        stubBased
+                );
+            }
+
+            Call enclosing = enclosingModularMacroCall(stubBased);
+
+            if (enclosing instanceof StubBased) {
+                StubBased enclosingStubBased = (StubBased) enclosing;
+                String canonicalNamePrefix = enclosingStubBased.canonicalName();
+
+                canonicalName = StringUtil.notNullize(canonicalNamePrefix, "?") +
+                        "." +
+                        StringUtil.notNullize(canonicalNameSuffix, "?");
+            } else {
+                canonicalName = StringUtil.notNullize(canonicalNameSuffix, "?");
+            }
+        } else {
+            canonicalName = stubBased.getName();
+        }
+
+        return canonicalName;
     }
 
     // @return -1 if codePoint cannot be parsed.
@@ -3377,6 +3424,21 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static OtpErlangObject quote(@NotNull final ElixirMultipleAliases multipleAliases) {
+        PsiElement[] children = multipleAliases.getChildren();
+        OtpErlangObject[] quotedChildren = new OtpErlangObject[children.length];
+
+        int i = 0;
+        for (PsiElement child : children) {
+            Quotable quotableChild = (Quotable) child;
+            quotedChildren[i++] = quotableChild.quote();
+        }
+
+        return quotedFunctionArguments(quotedChildren);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static OtpErlangObject quote(@NotNull final ElixirNoParenthesesManyStrictNoParenthesesExpression noParenthesesManyStrictNoParenthesesExpression) {
         PsiElement[] children = noParenthesesManyStrictNoParenthesesExpression.getChildren();
 
@@ -3625,6 +3687,38 @@ if (quoted == null) {
                 ALIASES,
                 qualifiedAliasMetdata,
                 mergedArguments
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static OtpErlangObject quote(@NotNull final QualifiedMultipleAliases qualifiedMultipleAliases) {
+        PsiElement[] children = qualifiedMultipleAliases.getChildren();
+
+        assert children.length == 3;
+
+        Quotable multipleAliases = (Quotable) children[2];
+        OtpErlangObject quotedMultipleAliases = multipleAliases.quote();
+
+        Quotable expression = (Quotable) children[0];
+        OtpErlangObject quotedExpression = expression.quote();
+
+        OtpErlangList metadata = metadata((Operator) children[1]);
+
+        // See https://github.com/lexmag/elixir/blob/8c57c9110301c1ee02d84b574c59feff00e14ba3/lib/elixir/src/elixir_parser.yrl#L644
+        OtpErlangObject head = quotedFunctionCall(
+                ".",
+                metadata,
+                quotedExpression,
+                MULTIPLE_ALIASES
+        );
+
+        return new OtpErlangTuple(
+                new OtpErlangObject[] {
+                        head,
+                        metadata,
+                        quotedMultipleAliases
+                }
         );
     }
 

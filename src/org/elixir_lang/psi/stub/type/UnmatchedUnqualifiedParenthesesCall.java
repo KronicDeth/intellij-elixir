@@ -36,7 +36,8 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 psi.resolvedFunctionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
-                psi.getName()
+                psi.getName(),
+                psi.canonicalName()
         );
     }
 
@@ -50,6 +51,7 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 dataStream.readName(),
                 dataStream.readInt(),
                 dataStream.readBoolean(),
+                dataStream.readName(),
                 dataStream.readName()
         );
     }

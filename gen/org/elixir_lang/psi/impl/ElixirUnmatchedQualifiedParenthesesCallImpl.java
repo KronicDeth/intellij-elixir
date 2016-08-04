@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class ElixirUnmatchedQualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<UnmatchedQualifiedParenthesesCall> implements ElixirUnmatchedQualifiedParenthesesCall {
 
-  public ElixirUnmatchedQualifiedParenthesesCallImpl(ASTNode node) {
-    super(node);
-  }
-
   public ElixirUnmatchedQualifiedParenthesesCallImpl(UnmatchedQualifiedParenthesesCall stub, IStubElementType nodeType) {
     super(stub, nodeType);
+  }
+
+  public ElixirUnmatchedQualifiedParenthesesCallImpl(ASTNode node) {
+    super(node);
   }
 
   public void accept(@NotNull ElixirVisitor visitor) {
@@ -63,6 +63,11 @@ public class ElixirUnmatchedQualifiedParenthesesCallImpl extends NamedStubbedPsi
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
+  }
+
+  @Nullable
+  public String canonicalName() {
+    return ElixirPsiImplUtil.canonicalName(this);
   }
 
   @Nullable

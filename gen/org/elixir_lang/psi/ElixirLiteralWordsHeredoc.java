@@ -22,13 +22,13 @@ public interface ElixirLiteralWordsHeredoc extends WordsFragmented, SigilHeredoc
   ElixirSigilModifiers getSigilModifiers();
 
   @NotNull
-  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull
-  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull
-  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode child);
+  List<Integer> addHexadecimalEscapeSequenceCodePoints(List<Integer> codePointList, ASTNode node);
 
   IElementType getFragmentType();
 

@@ -10,7 +10,7 @@ Elixir File(0,15)
       ElixirSigilModifiersImpl(SIGIL_MODIFIERS)(7,7)
         <empty list>
   PsiElement(.)('.')(7,8)
-  PsiErrorElement:'(', <relative identifier>, Alias, '\\n or \\r\\n' expected, got '~'(8,9)
+  PsiErrorElement:'(', <relative identifier>, Alias, '\\n, \\r\\n' or '{' expected, got '~'(8,9)
     PsiElement(~)('~')(8,9)
   PsiElement(s)('s')(9,10)
   PsiElement(String Sigil Promoter ({, [, <, ", /, (, |, '))('{')(10,11)

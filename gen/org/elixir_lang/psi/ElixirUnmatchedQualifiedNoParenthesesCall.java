@@ -30,6 +30,9 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   ElixirUnmatchedExpression getUnmatchedExpression();
 
   @Nullable
+  String canonicalName();
+
+  @Nullable
   String functionName();
 
   PsiElement functionNameElement();

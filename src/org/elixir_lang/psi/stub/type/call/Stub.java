@@ -42,6 +42,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         dataStream.writeInt(stub.resolvedFinalArity());
         dataStream.writeBoolean(stub.hasDoBlockOrKeyword());
         dataStream.writeName(stub.getName());
+        dataStream.writeName(stub.canonicalName());
     }
 
     @Override
