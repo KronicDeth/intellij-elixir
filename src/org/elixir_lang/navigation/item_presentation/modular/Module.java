@@ -1,6 +1,5 @@
 package org.elixir_lang.navigation.item_presentation.modular;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import org.elixir_lang.icons.ElixirIcons;
@@ -100,13 +99,13 @@ public class Module implements ItemPresentation, Parent {
     }
 
     /**
-     * Question mark icon
+     * The module icon.
      *
      * @param unused Used to mean if open/close icons for tree renderer. No longer in use. The parameter is only there for API compatibility reason.
      */
     @Override
     @NotNull
     public Icon getIcon(boolean unused) {
-        return AllIcons.General.QuestionDialog;
+        return ElixirIcons.MODULE;
     }
 }
