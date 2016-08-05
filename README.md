@@ -32,6 +32,11 @@
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
     - [Quick Fixes](#quick-fixes)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
+    - [Code Folding](#code-folding)
+      - [Controls](#controls)
+        - [Collapsing](#collapsing)
+        - [Expanding](#expanding)
+      - [Regions](#regions)
     - [Commenter](#commenter)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
@@ -1205,6 +1210,39 @@ with Alt+Enter. (Will vary based on keymap.)
     "Remove spaces between function name and parentheses".  Hit Enter to accept and remove the space.
   </figcaption>
 </figure>
+
+### Code Folding
+
+You can collaspe (fold) pre-defined regions of your Elixir code to make it easier to quickly scroll through files or hide details you don't care about right now.
+
+#### Controls
+
+##### Collapsing
+
+1. Position cursor between lines with with downward facing - arrow and upward facing - arrow.
+2. Cmd+-
+
+##### Expanding
+
+1. Position cursor on the collapsed line with the square +
+2. Cmd++
+
+#### Regions
+
+| Expanded                          | Collapsed                                  | Folded By Default? |
+|-----------------------------------|--------------------------------------------|--------------------|
+| `do end`                          | `do: ...`                                  | No                 |
+| `->` and right operand            | `-> ...`                                   | No                 |
+| `@doc VALUE `                     | `@doc "..."`                               | No                 |
+| `@moduledoc VALUE`                | `@moduledoc "..."`                         | No                 |
+| `@typedoc VALUE`                  | `@typedoc "..."`                           | No                 |
+| alias ALIAS1<br> alias ALIAS1     | `alias ...`                                | Yes                |
+| import ALIAS1<br> import ALIAS2   | `import ...`                               | Yes                |
+| require ALIAS1<br> require ALIAS2 | `require ...`                              | Yes                |
+| use ALIAS1<br> use ALIAS2         | `use ALIAS1`                               | Yes                |
+| `@for`                            | `FOR` in `defimpl PROTOCOL, for: FOR`      | Yes                |
+| `@protocol`                       | `PROTOCOL` in `defimpl PROTOCOL, for: FOR` | Yes                |
+| @MODULE_ATTRIBUTE                 | VALUE in `@MODULE_ATTRIBUTE VALUE`         | Yes                |
 
 ### Commenter
 
