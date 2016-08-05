@@ -99,6 +99,13 @@
 * [#348](https://github.com/KronicDeth/intellij-elixir/pull/348) - [@KronicDeth](https://github.com/KronicDeth)
   * Regenerate `gen` folder using Grammar Kit 1.4.1 and fix some bugs (including [JetBrains/Grammar-Kit#126](https://github.com/JetBrains/Grammar-Kit/issues/126)) manually.
 * [#349](https://github.com/KronicDeth/intellij-elixir/pull/349) - Have both `QualifiedBracketOperation` and `UnqualifiedBracketOperation` extend `BracketOperation`, so that `BracketOperation` can be used to match both when the qualification does not matter. - [@KronicDeth](https://github.com/KronicDeth)
+* [#364](https://github.com/KronicDeth/intellij-elixir/pull/364) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regenerate parser with GrammarKit 1.4.2
+  * `ElixirSdkRelease` is now `Comparable`, so version checks can be done for tests to restrict them to Elixir 1.2+ for multiple alias support.
+  * Resolve Multiple Aliases with unqualified Alias in tuples.
+  * `canonicalName` borrows from the idea of `PsiReference#canonicalText`: an element can have both a Name (from `getName`), which is the literal name in the code, which can be renamed, and a Canonical Name, which is the name to refer to the element without need for imports or aliases.  For this change, `defimpl`, `defmodule`, and `defprotocol` will show their full module Alias for their Canonical Name.
+    
+    This change addresses the use case of Go To Declaration that should resolved to a nested `defmodule`.
   
 ### Bug Fixes
 * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -117,7 +124,10 @@
   * Strip spaces from front of file path in `mix` output, which allows file looks to work correctly.
   * Ensure file reference highlight doesn't include the leading and trailing characters by fix off-by-one errors.
 * [#358](https://github.com/KronicDeth/intellij-elixir/pull/358) - Determine whether to check left, right, or both by doing isAncestor checks for all operands, not just the normalized operand.  The normalized operand is still used for `PsiScopeProcessor#execute` since `#execute` is not expected to handle error elements. - [@KronicDeth](https://github.com/KronicDeth)
-
+* [#364](https://github.com/KronicDeth/intellij-elixir/pull/364) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add `A.{B, C}` to grammar with quoting to check consistence with Elixir 1.2.  Ports [elixir-lang/elixir#3666](https://github.com/elixir-lang/elixir/pull/3666).
+  * Use `fullyQualifiedName` instead of `getName` for `resolvableName` because `fullyQualifiedName` is needed so that qualified aliases inside of the `{ }` of a multiple alias will not have a name as `getName` is `null` for those qualified aliases because the name from `getName` has to be a literal name that can be renamed and qualified names can't be renamed.
+  
 ## v4.0.0
 
 ### Enhancements

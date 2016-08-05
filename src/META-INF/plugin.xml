@@ -50,6 +50,25 @@
               <code>BracketOperation</code>, so that <code>BracketOperation</code> can be used to match both when the
               qualification does not matter.
             </li>
+            <li>Regenerate parser with GrammarKit 1.4.2</li>
+            <li>
+              <code>ElixirSdkRelease</code> is now <code>Comparable</code>, so version checks can be done for tests to
+              restrict them to Elixir 1.2+ for multiple alias support.
+            </li>
+            <li>Resolve Multiple Aliases with unqualified Alias in tuples.</li>
+            <li>
+              <p>
+                <code>canonicalName</code> borrows from the idea of <code>PsiReference#canonicalText</code>: an element
+                can have both a Name (from <code>getName</code>), which is the literal name in the code, which can be
+                renamed, and a Canonical Name, which is the name to refer to the element without need for imports or
+                aliases.  For this change, <code>defimpl</code>, <code>defmodule</code>, and <code>defprotocol</code>
+                will show their full module Alias for their Canonical Name.
+              </p>
+              <p>
+                This change addresses the use case of Go To Declaration that should resolved to a nested
+                <code>defmodule</code>.
+              </p>
+            </li>
           </ul>
         </li>
         <li>
@@ -108,6 +127,17 @@
               Determine whether to check left, right, or both by doing isAncestor checks for all operands, not just the
               normalized operand.  The normalized operand is still used for <code>PsiScopeProcessor#execute</code> since
               <code>#execute</code> is not expected to handle error elements.
+            </li>
+            <li>
+              Add <code>A.{B, C}</code> to grammar with quoting to check consistence with Elixir 1.2.  Ports
+              <a href="https://github.com/elixir-lang/elixir/pull/3666">elixir-lang/elixir#3666</a>.
+            </li>
+            <li>
+              Use <code>fullyQualifiedName</code> instead of <code>getName</code> for <code>resolvableName</code>
+              because <code>fullyQualifiedName</code> is needed so that qualified aliases inside of the
+              <code>{ }</code> of a multiple alias will not have a name as <code>getName</code> is <code>null</code> for
+              those qualified aliases because the name from <code>getName</code> has to be a literal name that can be
+              renamed and qualified names can't be renamed.
             </li>
           </ul>
         </li>
