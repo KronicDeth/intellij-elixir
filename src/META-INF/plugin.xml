@@ -139,6 +139,10 @@
               those qualified aliases because the name from <code>getName</code> has to be a literal name that can be
               renamed and qualified names can't be renamed.
             </li>
+            <li>
+              The <code>Module</code> icon got the same icon as <code>Unknown</code> when creating <code>Unknown</code>
+              somehow, I assume due to find-replace.
+            </li>
           </ul>
         </li>
       </ul>

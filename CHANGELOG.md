@@ -127,6 +127,7 @@
 * [#364](https://github.com/KronicDeth/intellij-elixir/pull/364) - [@KronicDeth](https://github.com/KronicDeth)
   * Add `A.{B, C}` to grammar with quoting to check consistence with Elixir 1.2.  Ports [elixir-lang/elixir#3666](https://github.com/elixir-lang/elixir/pull/3666).
   * Use `fullyQualifiedName` instead of `getName` for `resolvableName` because `fullyQualifiedName` is needed so that qualified aliases inside of the `{ }` of a multiple alias will not have a name as `getName` is `null` for those qualified aliases because the name from `getName` has to be a literal name that can be renamed and qualified names can't be renamed.
+* [#365](https://github.com/KronicDeth/intellij-elixir/pull/365) - The `Module` icon got the same icon as `Unknown` when creating `Unknown` somehow, I assume due to find-replace. - [@KronicDeth](https://github.com/KronicDeth)
   
 ## v4.0.0
 
