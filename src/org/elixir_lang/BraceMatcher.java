@@ -2,9 +2,12 @@ package org.elixir_lang;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
+import org.elixir_lang.psi.ElixirDoBlock;
 import org.elixir_lang.psi.ElixirTypes;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +41,23 @@ public class BraceMatcher implements PairedBraceMatcher {
      */
     @Override
     public int getCodeConstructStart(PsiFile file, int openingBraceOffset) {
-        return 0;
+        int offset = openingBraceOffset;
+
+        PsiElement element = file.findElementAt(openingBraceOffset);
+
+        if (element != null) {
+            PsiElement parent = element.getParent();
+
+            if (parent instanceof ElixirDoBlock) {
+                PsiElement grandParent = parent.getParent();
+
+                if (grandParent instanceof Call) {
+                    offset = grandParent.getTextOffset();
+                }
+            }
+        }
+
+        return offset;
     }
 
     /**
