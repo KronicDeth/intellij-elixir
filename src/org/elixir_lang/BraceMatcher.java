@@ -18,12 +18,26 @@ public class BraceMatcher implements PairedBraceMatcher {
      */
 
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
-            new BracePair(ElixirTypes.DO,                  ElixirTypes.END,                 true),
-            new BracePair(ElixirTypes.FN,                  ElixirTypes.END,                 true),
-            new BracePair(ElixirTypes.OPENING_BIT,         ElixirTypes.CLOSING_BIT,         false),
-            new BracePair(ElixirTypes.OPENING_BRACKET,     ElixirTypes.CLOSING_BRACKET,     false),
-            new BracePair(ElixirTypes.OPENING_CURLY,       ElixirTypes.CLOSING_CURLY,       false),
-            new BracePair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS, false)
+            new BracePair(ElixirTypes.DO,                               ElixirTypes.END,                                true),
+            new BracePair(ElixirTypes.FN,                               ElixirTypes.END,                                true),
+            new BracePair(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,       ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,       false),
+            new BracePair(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, false),
+            new BracePair(ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,         ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,         false),
+            new BracePair(ElixirTypes.CHAR_LIST_PROMOTER,               ElixirTypes.CHAR_LIST_PROMOTER,                 false),
+            new BracePair(ElixirTypes.REGEX_HEREDOC_PROMOTER,           ElixirTypes.REGEX_HEREDOC_TERMINATOR,           false),
+            new BracePair(ElixirTypes.REGEX_PROMOTER,                   ElixirTypes.REGEX_TERMINATOR,                   false),
+            new BracePair(ElixirTypes.SIGIL_HEREDOC_PROMOTER,           ElixirTypes.SIGIL_HEREDOC_TERMINATOR,           false),
+            new BracePair(ElixirTypes.SIGIL_PROMOTER,                   ElixirTypes.SIGIL_TERMINATOR,                   false),
+            new BracePair(ElixirTypes.STRING_HEREDOC_PROMOTER,          ElixirTypes.STRING_HEREDOC_TERMINATOR,          false),
+            new BracePair(ElixirTypes.STRING_SIGIL_HEREDOC_PROMOTER,    ElixirTypes.STRING_SIGIL_HEREDOC_TERMINATOR,    false),
+            new BracePair(ElixirTypes.STRING_SIGIL_PROMOTER,            ElixirTypes.STRING_SIGIL_TERMINATOR,            false),
+            new BracePair(ElixirTypes.STRING_PROMOTER,                  ElixirTypes.STRING_TERMINATOR,                  false),
+            new BracePair(ElixirTypes.WORDS_HEREDOC_PROMOTER,           ElixirTypes.WORDS_HEREDOC_TERMINATOR,           false),
+            new BracePair(ElixirTypes.WORDS_PROMOTER,                   ElixirTypes.WORDS_TERMINATOR,                   false),
+            new BracePair(ElixirTypes.OPENING_BIT,                      ElixirTypes.CLOSING_BIT,                        false),
+            new BracePair(ElixirTypes.OPENING_BRACKET,                  ElixirTypes.CLOSING_BRACKET,                    false),
+            new BracePair(ElixirTypes.OPENING_CURLY,                    ElixirTypes.CLOSING_CURLY,                      false),
+            new BracePair(ElixirTypes.OPENING_PARENTHESIS,              ElixirTypes.CLOSING_PARENTHESIS,                false)
     };
 
     /*
