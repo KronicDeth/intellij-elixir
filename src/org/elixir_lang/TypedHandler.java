@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.highlighter.EditorHighlighter;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
@@ -28,12 +29,13 @@ public class TypedHandler extends TypedHandlerDelegate {
             if (charTyped == ' ') {
                 int caret = editor.getCaretModel().getOffset();
 
-                // "fn<space><caret>"
+                // "(do|fn)<space><caret>"
                 if (caret > 2) {
                     final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
                     HighlighterIterator iterator = highlighter.createIterator(caret - 3);
+                    IElementType tokenType = iterator.getTokenType();
 
-                    if (iterator.getTokenType() == ElixirTypes.FN) {
+                    if (tokenType == ElixirTypes.DO || tokenType == ElixirTypes.FN) {
                         editor.getDocument().insertString(caret, " end");
                         result = Result.STOP;
                     }

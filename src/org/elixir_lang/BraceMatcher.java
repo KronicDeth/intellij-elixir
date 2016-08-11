@@ -22,8 +22,8 @@ public class BraceMatcher implements PairedBraceMatcher {
             new BracePair(ElixirTypes.OPENING_BRACKET,     ElixirTypes.CLOSING_BRACKET,     false),
             new BracePair(ElixirTypes.OPENING_CURLY,       ElixirTypes.CLOSING_CURLY,       false),
             new BracePair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS, false),
-            new BracePair(ElixirTypes.FN,                  ElixirTypes.END,                 true),
-            new BracePair(ElixirTypes.DO,                  ElixirTypes.END,                 true)
+            new BracePair(ElixirTypes.DO,                  ElixirTypes.END,                 true),
+            new BracePair(ElixirTypes.FN,                  ElixirTypes.END,                 true)
     };
 
     /*
