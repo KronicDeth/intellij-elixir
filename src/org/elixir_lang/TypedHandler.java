@@ -8,11 +8,28 @@ import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class TypedHandler extends TypedHandlerDelegate {
+    /*
+     * CONSTANTS
+     */
+
+    private static final TokenSet SIGIL_PROMOTERS = TokenSet.create(
+            ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,
+            ElixirTypes.REGEX_PROMOTER,
+            ElixirTypes.SIGIL_PROMOTER,
+            ElixirTypes.STRING_SIGIL_PROMOTER,
+            ElixirTypes.WORDS_PROMOTER
+    );
+
+    /*
+     * Instance Methods
+     */
+
     /**
      * Called after the specified character typed by the user has been inserted in the editor.
      *
@@ -42,7 +59,18 @@ public class TypedHandler extends TypedHandlerDelegate {
             } else if (charTyped == '<') {
                 int caret = editor.getCaretModel().getOffset();
 
-                if (caret > 1) { // "<<"
+                if (caret > 2) { // "~<sigil_name><"
+                    final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
+                    HighlighterIterator iterator = highlighter.createIterator(caret - 1);
+                    IElementType tokenType = iterator.getTokenType();
+
+                    if (SIGIL_PROMOTERS.contains(tokenType)) {
+                        editor.getDocument().insertString(caret, ">");
+                        result = Result.STOP;
+                    }
+                }
+
+                if (result == Result.CONTINUE && caret > 1) { // "<<"
                     final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
                     HighlighterIterator iterator = highlighter.createIterator(caret - 2);
 
