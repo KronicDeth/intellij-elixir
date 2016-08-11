@@ -1440,6 +1440,7 @@
     <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
     <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
+    <typedHandler implementation="org.elixir_lang.TypedHandler"/>
   </extensions>
 
   <application-components>
