@@ -29,14 +29,25 @@ public class TypedHandler extends TypedHandlerDelegate {
             if (charTyped == ' ') {
                 int caret = editor.getCaretModel().getOffset();
 
-                // "(do|fn)<space><caret>"
-                if (caret > 2) {
+                if (caret > 2) { // "(do|fn)<space><caret>"
                     final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
                     HighlighterIterator iterator = highlighter.createIterator(caret - 3);
                     IElementType tokenType = iterator.getTokenType();
 
                     if (tokenType == ElixirTypes.DO || tokenType == ElixirTypes.FN) {
                         editor.getDocument().insertString(caret, " end");
+                        result = Result.STOP;
+                    }
+                }
+            } else if (charTyped == '<') {
+                int caret = editor.getCaretModel().getOffset();
+
+                if (caret > 1) { // "<<"
+                    final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
+                    HighlighterIterator iterator = highlighter.createIterator(caret - 2);
+
+                    if (iterator.getTokenType() == ElixirTypes.OPENING_BIT) {
+                        editor.getDocument().insertString(caret, ">>");
                         result = Result.STOP;
                     }
                 }

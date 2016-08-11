@@ -18,12 +18,12 @@ public class BraceMatcher implements PairedBraceMatcher {
      */
 
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
+            new BracePair(ElixirTypes.DO,                  ElixirTypes.END,                 true),
+            new BracePair(ElixirTypes.FN,                  ElixirTypes.END,                 true),
             new BracePair(ElixirTypes.OPENING_BIT,         ElixirTypes.CLOSING_BIT,         false),
             new BracePair(ElixirTypes.OPENING_BRACKET,     ElixirTypes.CLOSING_BRACKET,     false),
             new BracePair(ElixirTypes.OPENING_CURLY,       ElixirTypes.CLOSING_CURLY,       false),
-            new BracePair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS, false),
-            new BracePair(ElixirTypes.DO,                  ElixirTypes.END,                 true),
-            new BracePair(ElixirTypes.FN,                  ElixirTypes.END,                 true)
+            new BracePair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS, false)
     };
 
     /*
