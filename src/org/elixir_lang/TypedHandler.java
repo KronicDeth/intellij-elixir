@@ -79,6 +79,19 @@ public class TypedHandler extends TypedHandlerDelegate {
                         result = Result.STOP;
                     }
                 }
+            } else if (charTyped == '/' || charTyped == '|') {
+                int caret = editor.getCaretModel().getOffset();
+
+                if (caret > 2) { // "~<sigil_name>(/|\|)"
+                    final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
+                    HighlighterIterator iterator = highlighter.createIterator(caret - 1);
+                    IElementType tokenType = iterator.getTokenType();
+
+                    if (SIGIL_PROMOTERS.contains(tokenType)) {
+                        editor.getDocument().insertString(caret, String.valueOf(charTyped));
+                        result = Result.STOP;
+                    }
+                }
             }
         }
 
