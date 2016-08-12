@@ -1411,11 +1411,13 @@
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
     <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
+    <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.BraceMatcher"/>
     <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
     <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.psi.FoldingBuilder"/>
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
+    <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>
     <lang.syntaxHighlighterFactory key="Elixir" implementationClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
     <localInspection displayName="Ambiguous nested calls" enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.NoParenthesesManyStrict" language="Elixir"
@@ -1438,6 +1440,7 @@
     <renamePsiElementProcessor implementation="org.elixir_lang.refactoring.variable.rename.Processor"/>
 
     <stubIndex implementation="org.elixir_lang.psi.stub.index.AllName"/>
+    <typedHandler implementation="org.elixir_lang.TypedHandler"/>
   </extensions>
 
   <application-components>

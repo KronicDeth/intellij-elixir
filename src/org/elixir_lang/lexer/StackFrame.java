@@ -17,19 +17,19 @@ public class StackFrame {
      * Static
      */
 
-    public static final Map<String, String> terminatorByPromoter = new HashMap<String, String>();
+    public static final Map<String, String> TERMINATOR_BY_PROMOTER = new HashMap<String, String>();
 
     static {
-        terminatorByPromoter.put("'", "'");
-        terminatorByPromoter.put("'''", "'''");
-        terminatorByPromoter.put("(", ")");
-        terminatorByPromoter.put("/", "/");
-        terminatorByPromoter.put("<", ">");
-        terminatorByPromoter.put("[", "]");
-        terminatorByPromoter.put("\"", "\"");
-        terminatorByPromoter.put("\"\"\"", "\"\"\"");
-        terminatorByPromoter.put("{", "}");
-        terminatorByPromoter.put("|", "|");
+        TERMINATOR_BY_PROMOTER.put("'", "'");
+        TERMINATOR_BY_PROMOTER.put("'''", "'''");
+        TERMINATOR_BY_PROMOTER.put("(", ")");
+        TERMINATOR_BY_PROMOTER.put("/", "/");
+        TERMINATOR_BY_PROMOTER.put("<", ">");
+        TERMINATOR_BY_PROMOTER.put("[", "]");
+        TERMINATOR_BY_PROMOTER.put("\"", "\"");
+        TERMINATOR_BY_PROMOTER.put("\"\"\"", "\"\"\"");
+        TERMINATOR_BY_PROMOTER.put("{", "}");
+        TERMINATOR_BY_PROMOTER.put("|", "|");
     }
 
     /*
@@ -204,11 +204,11 @@ public class StackFrame {
 
     public String getTerminator() {
         String promoter = getPromoter();
-        String terminator = terminatorByPromoter.get(promoter);
+        String terminator = TERMINATOR_BY_PROMOTER.get(promoter);
 
         // unregistered promoters are their own terminators
         if (terminator == null) {
-            terminatorByPromoter.put(promoter, promoter);
+            TERMINATOR_BY_PROMOTER.put(promoter, promoter);
             terminator = promoter;
         }
 
