@@ -116,6 +116,9 @@
 
 ### Bug Fixes
 * [#372](https://github.com/KronicDeth/intellij-elixir/pull/372) - Check parent for `isVariable(ElixirMapUpdateArguments)` - [@KronicDeth](https://github.com/KronicDeth)
+* [#374](https://github.com/KronicDeth/intellij-elixir/pull/374) - [@KronicDeth](https://github.com/KronicDeth)
+  * IntelliJ 15.0.4 is no longer available from JetBrains, so if the cache is not available, the builds don't work, so use 15.0.6, which is available in 15.0.4's place as the test version for 15.X.
+  * IntelliJ 2016.2 is no longer available from JetBrains, so if the cache is not available, the builds don't work, so use 2016.2, which is available in 2016.1's places at the test version for 2016.X.
 
 ## v4.1.0
 

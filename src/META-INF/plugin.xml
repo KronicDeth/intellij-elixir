@@ -73,6 +73,14 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Check parent for <code>isVariable(ElixirMapUpdateArguments)</code></li>
+            <li>
+              IntelliJ 15.0.4 is no longer available from JetBrains, so if the cache is not available, the builds don't
+              work, so use 15.0.6, which is available in 15.0.4's place as the test version for 15.X.
+            </li>
+            <li>
+              IntelliJ 2016.2 is no longer available from JetBrains, so if the cache is not available, the builds don't
+              work, so use 2016.2, which is available in 2016.1's places at the test version for 2016.X.
+            </li>
           </ul>
         </li>
       </ul>
