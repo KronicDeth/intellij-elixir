@@ -3,17 +3,19 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v4.1.0](#v410)
+  - [v4.2.0](#v420)
     - [Enhancements](#enhancements)
+  - [v4.1.0](#v410)
+    - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes)
   - [v4.0.0](#v400)
-    - [Enhancements](#enhancements-1)
+    - [Enhancements](#enhancements-2)
     - [Bug Fixes](#bug-fixes-1)
     - [Incompatible Changes](#incompatible-changes)
   - [v3.0.1](#v301)
     - [Bug Fixes](#bug-fixes-2)
   - [v3.0.0](#v300)
-    - [Enhancements](#enhancements-2)
+    - [Enhancements](#enhancements-3)
     - [Bug Fixes](#bug-fixes-3)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v2.2.0](#v220)
@@ -23,62 +25,94 @@
     - [Enhancement](#enhancement-1)
     - [Bug Fixes](#bug-fixes-5)
   - [v2.0.0](#v200)
-    - [Enhancements](#enhancements-3)
+    - [Enhancements](#enhancements-4)
     - [Bug Fixes](#bug-fixes-6)
     - [Incompatible Changes](#incompatible-changes-2)
   - [v1.2.1](#v121)
-    - [Enhancements](#enhancements-4)
+    - [Enhancements](#enhancements-5)
     - [Bug Fixes](#bug-fixes-7)
   - [v1.2.0](#v120)
-    - [Enhancements](#enhancements-5)
+    - [Enhancements](#enhancements-6)
     - [Bug Fixes](#bug-fixes-8)
   - [v1.1.0](#v110)
-    - [Enhancements](#enhancements-6)
-  - [v1.0.0](#v100)
     - [Enhancements](#enhancements-7)
+  - [v1.0.0](#v100)
+    - [Enhancements](#enhancements-8)
     - [Bug Fixes](#bug-fixes-9)
     - [Incompatible Fixes](#incompatible-fixes)
   - [v0.3.5](#v035)
-    - [Enhancements](#enhancements-8)
+    - [Enhancements](#enhancements-9)
     - [Bug Fixes](#bug-fixes-10)
   - [v0.3.4](#v034)
-    - [Enhancements](#enhancements-9)
-  - [v0.3.3](#v033)
     - [Enhancements](#enhancements-10)
+  - [v0.3.3](#v033)
+    - [Enhancements](#enhancements-11)
   - [v0.3.2](#v032)
     - [Bug Fixes](#bug-fixes-11)
   - [v0.3.1](#v031)
-    - [Enhancements](#enhancements-11)
-  - [v0.3.0](#v030)
     - [Enhancements](#enhancements-12)
+  - [v0.3.0](#v030)
+    - [Enhancements](#enhancements-13)
     - [Incompatible Changes](#incompatible-changes-3)
   - [v0.2.1](#v021)
-    - [Enhancements](#enhancements-13)
+    - [Enhancements](#enhancements-14)
     - [Bug Fixes](#bug-fixes-12)
   - [v0.2.0](#v020)
-    - [Enhancements](#enhancements-14)
+    - [Enhancements](#enhancements-15)
     - [Incompatible Changes](#incompatible-changes-4)
   - [v0.1.4](#v014)
-    - [Enhancements](#enhancements-15)
+    - [Enhancements](#enhancements-16)
     - [Bug Fixes](#bug-fixes-13)
   - [v0.1.3](#v013)
     - [Bug Fixes](#bug-fixes-14)
   - [v0.1.2](#v012)
-    - [Enhancements](#enhancements-16)
+    - [Enhancements](#enhancements-17)
   - [v0.1.1](#v011)
     - [Bug Fixes](#bug-fixes-15)
   - [v0.1.0](#v010)
-    - [Enhancements](#enhancements-17)
+    - [Enhancements](#enhancements-18)
     - [Bug Fixes](#bug-fixes-16)
   - [v0.0.3](#v003)
-    - [Enhancements](#enhancements-18)
-  - [v0.0.2](#v002)
     - [Enhancements](#enhancements-19)
+  - [v0.0.2](#v002)
+    - [Enhancements](#enhancements-20)
     - [Bug Fixes](#bug-fixes-17)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v4.2.0
+
+### Enhancements
+* [#371](https://github.com/KronicDeth/intellij-elixir/pull/371) - [@KronicDeth](https://github.com/KronicDeth)
+  * `BraceMatcher`
+    * Matches the following pairs:
+      * `do` to `end`
+      * `fn` to `end`
+      * `"""` to `"""`
+      *  `'''` to `'''`
+      * `<<` to `>>`
+      * `<` to `>`
+      * `[` to `]`
+      * `{` to `}`
+      * `(` to `)`
+    * Completes the following pairs:
+      * `[` with `]`
+      * `{` with `}`
+      * `(` with `)`
+  * `QuoteHandler` completes standard quotes (that start with `"` or `'`)
+    * `'` with `'`
+    * `"` with `"`
+    * `'''` with `'''`
+    * `"""` with `"""`
+  * `TypedHandler` completes the non-standard quotes and braces
+    * `do` with ` end`
+    * `fn` with ` end`
+    * ` `<<` with `>>`
+    * `<` with `>`  (for promoters)
+    * `/` with `/`  (for promoters)
+    * `|` with `|` (for promoters)
 
 ## v4.1.0
 

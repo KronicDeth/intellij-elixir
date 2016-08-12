@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.1.0</version>
+  <version>4.2.0-dev</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,67 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.2.0-dev</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>
+                <code>BraceMatcher</code>
+              </p>
+              <ul>
+                <li>
+                  <p>Matches the following pairs:</p>
+                  <ul>
+                    <li><code>do</code> to <code>end</code></li>
+                    <li><code>fn</code> to <code>end</code></li>
+                    <li><code>"""</code> to <code>"""</code></li>
+                    <li> <code>'''</code> to <code>'''</code></li>
+                    <li><code>&lt;&lt;</code> to <code>&gt;&gt;</code></li>
+                    <li><code>&lt;</code> to <code>&gt;</code></li>
+                    <li><code>[</code> to <code>]</code></li>
+                    <li><code>{</code> to <code>}</code></li>
+                    <li><code>(</code> to <code>)</code></li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Completes the following pairs:</p>
+                  <ul>
+                    <li><code>[</code> with <code>]</code></li>
+                    <li><code>{</code> with <code>}</code></li>
+                    <li><code>(</code> with <code>)</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                <code>QuoteHandler</code> completes standard quotes (that start with <code>"</code> or <code>'</code>)
+              </p>
+              <ul>
+                <li><code>'</code> with <code>'</code></li>
+                <li><code>"</code> with <code>"</code></li>
+                <li><code>'''</code> with <code>'''</code></li>
+                <li><code>"""</code> with <code>"""</code></li>
+              </ul>
+            </li>
+            <li>
+              <p>
+                <code>TypedHandler</code> completes the non-standard quotes and braces
+              </p>
+              <ul>
+                <li><code>do</code> with <code> end</code></li>
+                <li><code>fn</code> with <code> end</code></li>
+                <li><code>&lt;&lt;</code> with <code>&gt;&gt;</code></li>
+                <li><code>&lt;</code> with <code>&gt;</code>  (for promoters)</li>
+                <li><code>/</code> with <code>/</code>  (for promoters)</li>
+                <li><code>|</code> with <code>|</code> (for promoters)</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.1.0</h1>
       <ul>
         <li>
