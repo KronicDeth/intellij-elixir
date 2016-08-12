@@ -114,6 +114,9 @@
     * `/` with `/`  (for promoters)
     * `|` with `|` (for promoters)
 
+### Bug Fixes
+* [#372](https://github.com/KronicDeth/intellij-elixir/pull/372) - Check parent for `isVariable(ElixirMapUpdateArguments)` - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v4.1.0
 
 ### Enhancements

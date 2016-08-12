@@ -69,6 +69,12 @@
             </li>
           </ul>
         </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Check parent for <code>isVariable(ElixirMapUpdateArguments)</code></li>
+          </ul>
+        </li>
       </ul>
       <h1>v4.1.0</h1>
       <ul>
