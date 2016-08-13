@@ -38,6 +38,9 @@
         - [Expanding](#expanding)
       - [Regions](#regions)
     - [Commenter](#commenter)
+    - [Delimiters](#delimiters)
+      - [Auto-inserting](#auto-inserting)
+      - [Matching](#matching)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
       - [Individual File](#individual-file)
@@ -1257,6 +1260,50 @@ Using the menus
   a. Code > Comment with Line Comment 
   b. On OSX the key binding is normally `Cmd+/`.  
 
+### Delimiters
+
+#### Auto-inserting
+
+The right-delimiter will be automatically inserted when the left
+delimiter is typed.  In some cases, to prevent false positives, the
+the delimiter is only completed if when used for sigils.
+
+| Preceded By     | Left  | Right  |
+|-----------------|-------|--------|
+|                 | `do ` | ` end` |
+|                 | `fn ` | ` end` |
+|                 | `[`   | `]`    |
+|                 | `{`   | `}`    |
+|                 | `(`   | `)`    |
+|                 | `'`   | `'`    |
+|                 | `'''` | ` '''` |
+|                 | `"`   | `"`    |
+|                 | `"""` | ` """` |
+|                 | `<<`  | `>>`   |
+| `~<sigil-name>` | `<`   | `>`    |
+| `~<sigil-name>` | `/`   | `/`    |
+| `~<sigil-name>` | `|`   | `|`    |
+
+#### Matching
+
+All delimiters that are auto-inserted are also matched for highlighting
+
+| Left  | Right |
+|-------|-------|
+| `do ` | `end` |
+| `fn ` | `end` |
+| `[`   | `]`   |
+| `{`   | `}`   |
+| `(`   | `)`   |
+| `'`   | `'`   |
+| `'''` | `'''` |
+| `"`   | `"`   |
+| `"""` | `"""` |
+| `<<`  | `>>`  |
+| `<`   | `>`   |
+| `/`   | `/`   |
+| `|`   | `|`   |
+
 ### Building/Compiling
 
 #### Settings
@@ -1311,6 +1358,19 @@ Live Templates can be customized in Preferences > Editor > Live Templates > Elix
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td>
+        <code>@doc</code>
+      </td>
+      <td>
+<pre><code>
+@doc """
+ONE
+"""
+END
+</code></pre>      
+      </td>
+    </tr> 
     <tr>
       <td>
         <code>case</code>
