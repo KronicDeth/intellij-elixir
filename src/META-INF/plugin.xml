@@ -97,6 +97,12 @@
               will show in the lookup as soon as <code>@d</code> is typed, but you have to select it from the list then
               before tabbing to accept.
             </li>
+            <li>
+              Look at end of <code>do</code> instead of start for <code>end</code> completion to stop ignoring the
+              <code>:</code> in <code>do: </code>, when <code>caret - 3</code> would land on the <code>o</code>, now all
+              tests are meant to land on the <code>o</code>, so <code>do: </code> won't complete with <code>end</code>
+              incorrectly anymore.
+            </li>
           </ul>
         </li>
       </ul>
