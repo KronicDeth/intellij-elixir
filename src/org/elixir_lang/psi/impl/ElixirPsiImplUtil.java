@@ -1887,7 +1887,21 @@ public class ElixirPsiImplUtil {
             if (grandParent instanceof ElixirStab) {
                 PsiElement greatGrandParent = grandParent.getParent();
 
-                if (greatGrandParent instanceof ElixirDoBlock) {
+                if (greatGrandParent instanceof ElixirBlockItem) {
+                    PsiElement greatGreatGrandParent = greatGrandParent.getParent();
+
+                    if (greatGreatGrandParent instanceof ElixirBlockList) {
+                        PsiElement greatGreatGreatGrandParent = greatGreatGrandParent.getParent();
+
+                        if (greatGreatGreatGrandParent instanceof ElixirDoBlock) {
+                            PsiElement greatGreatGreatGreatGrandParent = greatGreatGreatGrandParent.getParent();
+
+                            if (greatGreatGreatGreatGrandParent instanceof Call) {
+                                enclosingMacroCall = (Call) greatGreatGreatGreatGrandParent;
+                            }
+                        }
+                    }
+                } else if (greatGrandParent instanceof ElixirDoBlock) {
                     PsiElement greatGreatGrandParent = greatGrandParent.getParent();
 
                     if (greatGreatGrandParent instanceof Call) {
