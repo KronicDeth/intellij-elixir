@@ -103,6 +103,9 @@
               tests are meant to land on the <code>o</code>, so <code>do: </code> won't complete with <code>end</code>
               incorrectly anymore.
             </li>
+            <li>
+              Ignore <code>ElixirVariable</code> in <code>highlightTypesAndTypeParameterUsages</code>
+            </li>
           </ul>
         </li>
       </ul>
