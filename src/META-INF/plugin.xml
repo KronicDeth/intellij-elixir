@@ -88,6 +88,15 @@
                 <code>Phoenix.Endpoint.server/0</code>
               </a>
             </li>
+            <li>
+              A lot of ppl use the doc template after already typing <code>@</code>, but the doc template starts with
+              <code>@</code>, so it ends up inserting <code>@@doc ...</code>. The <code>@doc</code> template is the same
+              code, but since the name starts with <code>@</code>, it doesn't insert a second <code>@</code>.
+              Unfortunately, the template search code doesn't prompt when just typing <code>@</code>, so you end up
+              having to type <code>@doc</code> before only one template is selected. The <code>@doc</code> template
+              will show in the lookup as soon as <code>@d</code> is typed, but you have to select it from the list then
+              before tabbing to accept.
+            </li>
           </ul>
         </li>
       </ul>
