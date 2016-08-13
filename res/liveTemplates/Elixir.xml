@@ -1,4 +1,9 @@
 <templateSet group="Elixir">
+  <template name="@doc" value="@doc &quot;&quot;&quot;&#10;$1$&#10;&quot;&quot;&quot;&#10;$END$" description="@doc &quot;&quot;&quot; ... &quot;&quot;&quot;" toReformat="true" toShortenFQNames="true" >
+    <context>
+      <option name="ELIXIR_CODE" value="true" />
+    </context>
+  </template>
   <template name="def" value="def $NAME$ do&#10;  $END$&#10;end" description="def name do end" toReformat="true" toShortenFQNames="true" >
     <variable name="NAME" expression="" defaultValue="" alwaysStopAt="true" />
     <context>
