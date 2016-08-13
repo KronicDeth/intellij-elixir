@@ -48,7 +48,7 @@ public class TypedHandler extends TypedHandlerDelegate {
 
                 if (caret > 2) { // "(do|fn)<space><caret>"
                     final EditorHighlighter highlighter = ((EditorEx)editor).getHighlighter();
-                    HighlighterIterator iterator = highlighter.createIterator(caret - 3);
+                    HighlighterIterator iterator = highlighter.createIterator(caret - 2);
                     IElementType tokenType = iterator.getTokenType();
 
                     if (tokenType == ElixirTypes.DO || tokenType == ElixirTypes.FN) {
