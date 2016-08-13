@@ -833,7 +833,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 /* happens when :: is typed in `@spec` above function clause that uses `do:` */
                 psiElement instanceof ElixirNoParenthesesKeywords ||
                 psiElement instanceof ElixirStringLine ||
-                psiElement instanceof ElixirUnaryNumericOperation) {
+                psiElement instanceof ElixirUnaryNumericOperation ||
+                psiElement instanceof ElixirVariable) {
             // leave normal highlighting
         }  else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
