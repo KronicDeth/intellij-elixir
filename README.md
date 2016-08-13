@@ -1313,6 +1313,19 @@ Live Templates can be customized in Preferences > Editor > Live Templates > Elix
   <tbody>
     <tr>
       <td>
+        <code>@doc</code>
+      </td>
+      <td>
+<pre><code>
+@doc """
+ONE
+"""
+END
+</code></pre>      
+      </td>
+    </tr> 
+    <tr>
+      <td>
         <code>case</code>
       </td>
       <td>
