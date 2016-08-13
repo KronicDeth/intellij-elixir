@@ -38,6 +38,9 @@
         - [Expanding](#expanding)
       - [Regions](#regions)
     - [Commenter](#commenter)
+    - [Delimiters](#delimiters)
+      - [Auto-inserting](#auto-inserting)
+      - [Matching](#matching)
     - [Building/Compiling](#buildingcompiling)
       - [Settings](#settings)
       - [Individual File](#individual-file)
@@ -1256,6 +1259,50 @@ Using the menus
 2. Comment (or Uncomment) with one of the following:
   a. Code > Comment with Line Comment 
   b. On OSX the key binding is normally `Cmd+/`.  
+
+### Delimiters
+
+#### Auto-inserting
+
+The right-delimiter will be automatically inserted when the left
+delimiter is typed.  In some cases, to prevent false positives, the
+the delimiter is only completed if when used for sigils.
+
+| Preceded By     | Left  | Right  |
+|-----------------|-------|--------|
+|                 | `do ` | ` end` |
+|                 | `fn ` | ` end` |
+|                 | `[`   | `]`    |
+|                 | `{`   | `}`    |
+|                 | `(`   | `)`    |
+|                 | `'`   | `'`    |
+|                 | `'''` | ` '''` |
+|                 | `"`   | `"`    |
+|                 | `"""` | ` """` |
+|                 | `<<`  | `>>`   |
+| `~<sigil-name>` | `<`   | `>`    |
+| `~<sigil-name>` | `/`   | `/`    |
+| `~<sigil-name>` | `|`   | `|`    |
+
+#### Matching
+
+All delimiters that are auto-inserted are also matched for highlighting
+
+| Left  | Right |
+|-------|-------|
+| `do ` | `end` |
+| `fn ` | `end` |
+| `[`   | `]`   |
+| `{`   | `}`   |
+| `(`   | `)`   |
+| `'`   | `'`   |
+| `'''` | `'''` |
+| `"`   | `"`   |
+| `"""` | `"""` |
+| `<<`  | `>>`  |
+| `<`   | `>`   |
+| `/`   | `/`   |
+| `|`   | `|`   |
 
 ### Building/Compiling
 
