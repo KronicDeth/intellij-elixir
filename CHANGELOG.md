@@ -119,6 +119,7 @@
 * [#374](https://github.com/KronicDeth/intellij-elixir/pull/374) - [@KronicDeth](https://github.com/KronicDeth)
   * IntelliJ 15.0.4 is no longer available from JetBrains, so if the cache is not available, the builds don't work, so use 15.0.6, which is available in 15.0.4's place as the test version for 15.X.
   * IntelliJ 2016.2 is no longer available from JetBrains, so if the cache is not available, the builds don't work, so use 2016.2, which is available in 2016.1's places at the test version for 2016.X.
+# [#378](https://github.com/KronicDeth/intellij-elixir/pull/378) - `enclosingMacroCall` could climb out the stab after a `do`, but not the `else` in an `if`, which is used for defined functions conditionally in [`Phoenix.Endpoint.server/0`](https://github.com/phoenixframework/phoenix/blob/v1.2.0/lib/phoenix/endpoint.ex#L542-L548) - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.1.0
 

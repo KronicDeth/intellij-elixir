@@ -81,6 +81,13 @@
               IntelliJ 2016.2 is no longer available from JetBrains, so if the cache is not available, the builds don't
               work, so use 2016.2, which is available in 2016.1's places at the test version for 2016.X.
             </li>
+            <li>
+              <code>enclosingMacroCall</code> could climb out the stab after a <code>do</code>, but not the
+              <code>else</code> in an <code>if</code>, which is used for defined functions conditionally in
+              <a href="https://github.com/phoenixframework/phoenix/blob/v1.2.0/lib/phoenix/endpoint.ex#L542-L548">
+                <code>Phoenix.Endpoint.server/0</code>
+              </a>
+            </li>
           </ul>
         </li>
       </ul>
