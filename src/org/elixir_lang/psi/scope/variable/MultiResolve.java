@@ -31,12 +31,6 @@ public class MultiResolve extends Variable {
      */
 
     private static final Key<PsiElement> LAST_BINDING_KEY = new Key<PsiElement>("LAST_BINDING_KEY");
-    public static final Condition<ResolveResult> HAS_VALID_RESULT_CONDITION = new Condition<ResolveResult>() {
-        @Override
-        public boolean value(ResolveResult resolveResult) {
-            return resolveResult.isValidResult();
-        }
-    };
 
     /*
      *
@@ -152,7 +146,7 @@ public class MultiResolve extends Variable {
     protected boolean executeOnVariable(@NotNull PsiNamedElement match, @NotNull ResolveState state) {
         addToResolveResultListIfMatchingName(match, state);
 
-        return keepProcessing();
+        return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
     }
 
     /*
@@ -242,34 +236,5 @@ public class MultiResolve extends Variable {
                 addToResolveResultList(match, state, false);
             }
         }
-    }
-
-    /**
-     * Whether the {@link #resolveResultList} has any {@link ResolveResult} where {@link ResolveResult#isValidResult()}
-     * is {@code true}.
-     *
-     * @return {@code false} if {@link #resolveResultList} is {@code null}; otherwise, {@code true} if the
-     * {@link #resolveResultList} has any {@link ResolveResult} where {@link ResolveResult#isValidResult()} is
-     * {@code true}.
-     */
-    private boolean hasValidResult() {
-        boolean hasValidResult = false;
-
-        if (resolveResultList != null) {
-            hasValidResult = ContainerUtil.exists(resolveResultList, HAS_VALID_RESULT_CONDITION);
-        }
-
-        return hasValidResult;
-    }
-
-    /**
-     * Keep trying to resolve the reference if {@code resolveResultList} does not have a valid result or the code is
-     * incomplete.
-     *
-     * @return {@code false} if {@link #hasValidResult()} or {@link #incompleteCode} is {@code false}, so only one
-     * valid result is allowed.
-     */
-    private boolean keepProcessing() {
-        return incompleteCode || !hasValidResult();
     }
 }

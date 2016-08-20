@@ -1571,9 +1571,10 @@ public class ElixirPsiImplUtil {
         boolean keepProcessing = processor.execute(psiElement, state);
 
         if (keepProcessing) {
+            @Nullable
             PsiElement child = psiElement.getFirstChild();
 
-            while (child != lastParent) {
+            while (child != null && child != lastParent) {
                 if (!child.processDeclarations(processor, state, lastParent, place)) {
                     keepProcessing = false;
 
