@@ -1,5 +1,6 @@
 package org.elixir_lang.psi;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewLongNameLocation;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.call.name.Function.ALIAS;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 /**
@@ -111,7 +113,15 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeModuleName;
 
             if (location == UsageViewShortNameLocation.INSTANCE) {
-                elementDescription = resolvableName(qualifiableAlias);
+                if (isAliasCallAs(qualifiableAlias)) {
+                    String resolvableName = resolvableName(qualifiableAlias);
+
+                    if (resolvableName != null) {
+                        elementDescription = "as: " + resolvableName;
+                    }
+                } else {
+                    elementDescription = resolvableName(qualifiableAlias);
+                }
             }
         }
 
@@ -206,8 +216,39 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
                 element instanceof QualifiableAlias ||
                 element instanceof QualifiedMultipleAliases) {
             isAliasCallArgument = isAliasCallArgument(element.getParent());
+        } else if (element instanceof QuotableKeywordPair) {
+            isAliasCallArgument = isAliasCallAs((QuotableKeywordPair) element);
         }
 
         return isAliasCallArgument;
+    }
+
+    private boolean isAliasCallAs(@NotNull QuotableKeywordPair element) {
+        boolean isAliasCallArgument = false;
+
+        if (hasKeywordKey(element, "as")) {
+            PsiElement parent = element.getParent();
+
+            if (parent instanceof QuotableKeywordList) {
+                PsiElement grandParent = parent.getParent();
+
+                isAliasCallArgument = isAliasCallArgument(grandParent);
+            }
+        }
+
+        return isAliasCallArgument;
+    }
+
+    private boolean isAliasCallAs(@NotNull PsiElement element) {
+        boolean isAliasCallAs = false;
+
+        if (element instanceof ElixirAccessExpression ||
+                element instanceof QualifiableAlias) {
+            isAliasCallAs = isAliasCallAs(element.getParent());
+        } else if (element instanceof QuotableKeywordPair) {
+            isAliasCallAs = isAliasCallAs((QuotableKeywordPair) element);
+        }
+
+        return isAliasCallAs;
     }
 }
