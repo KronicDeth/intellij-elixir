@@ -16,11 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.elixir_lang.psi.scope.variable.MultiResolve.HAS_VALID_RESULT_CONDITION;
+import static org.elixir_lang.psi.scope.MultiResolve.HAS_VALID_RESULT_CONDITION;
 
 /**
  * Created by limhoff on 12/30/15.

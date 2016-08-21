@@ -9,6 +9,16 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class Module {
+    /*
+     * Constants
+     */
+
+    private static final String SEPARATOR = ".";
+
+    /*
+     * Public Static Methods
+     */
+
     /**
      * Emulates Module.concat/1
      * @return
@@ -16,19 +26,22 @@ public class Module {
     @Contract(pure = true)
     @NotNull
     public static String concat(@NotNull String... aliases) {
-        return StringUtil.join(aliases, ".");
+        return StringUtil.join(aliases, SEPARATOR);
     }
 
     @Contract(pure = true)
     @NotNull
     public static String concat(@NotNull Collection<String> aliases) {
-        return StringUtil.join(aliases, ".");
+        return StringUtil.join(aliases, SEPARATOR);
     }
 
-    public static String[] reverse(@NotNull String... forward) {
-        String[] reversed = Arrays.copyOf(forward, 0);
-        ArrayUtils.reverse(reversed);
-
-        return reversed;
+    /**
+     * Emulates Module.split/1
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static java.util.List<String> split(@NotNull String name) {
+        return StringUtil.split(name, SEPARATOR);
     }
+
 }

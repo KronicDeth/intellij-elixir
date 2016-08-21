@@ -1,5 +1,6 @@
 package org.elixir_lang.psi;
 
+import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewLongNameLocation;
@@ -14,6 +15,11 @@ import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static org.elixir_lang.psi.call.name.Function.ALIAS;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.hasKeywordKey;
+import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 /**
  * Dual to {@link org.elixir_lang.FindUsagesProvider}, where instead of each location being a separate method, they
@@ -103,8 +109,29 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
                                          @NotNull ElementDescriptionLocation location) {
         String elementDescription = null;
 
+        if (maybeModuleName instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeModuleName;
+
+            if (location == UsageViewShortNameLocation.INSTANCE) {
+                if (isAliasCallAs(qualifiableAlias)) {
+                    String resolvableName = resolvableName(qualifiableAlias);
+
+                    if (resolvableName != null) {
+                        elementDescription = "as: " + resolvableName;
+                    }
+                } else {
+                    elementDescription = resolvableName(qualifiableAlias);
+                }
+            }
+        }
+
         if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "module";
+            if (isAliasCallArgument(maybeModuleName)) {
+                elementDescription = "alias";
+            } else {
+                elementDescription = "module";
+            }
+
         }
 
         return elementDescription;
@@ -172,5 +199,56 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
         }
 
         return elementDescription;
+    }
+
+    private boolean isAliasCallArgument(@NotNull Call element) {
+        return element.isCalling(KERNEL, ALIAS);
+    }
+
+    private boolean isAliasCallArgument(@NotNull PsiElement element) {
+        boolean isAliasCallArgument = false;
+
+        if (element instanceof Call) {
+            isAliasCallArgument = isAliasCallArgument((Call) element);
+        } else if (element instanceof Arguments ||
+                element instanceof ElixirAccessExpression ||
+                element instanceof ElixirMultipleAliases ||
+                element instanceof QualifiableAlias ||
+                element instanceof QualifiedMultipleAliases) {
+            isAliasCallArgument = isAliasCallArgument(element.getParent());
+        } else if (element instanceof QuotableKeywordPair) {
+            isAliasCallArgument = isAliasCallAs((QuotableKeywordPair) element);
+        }
+
+        return isAliasCallArgument;
+    }
+
+    private boolean isAliasCallAs(@NotNull QuotableKeywordPair element) {
+        boolean isAliasCallArgument = false;
+
+        if (hasKeywordKey(element, "as")) {
+            PsiElement parent = element.getParent();
+
+            if (parent instanceof QuotableKeywordList) {
+                PsiElement grandParent = parent.getParent();
+
+                isAliasCallArgument = isAliasCallArgument(grandParent);
+            }
+        }
+
+        return isAliasCallArgument;
+    }
+
+    private boolean isAliasCallAs(@NotNull PsiElement element) {
+        boolean isAliasCallAs = false;
+
+        if (element instanceof ElixirAccessExpression ||
+                element instanceof QualifiableAlias) {
+            isAliasCallAs = isAliasCallAs(element.getParent());
+        } else if (element instanceof QuotableKeywordPair) {
+            isAliasCallAs = isAliasCallAs((QuotableKeywordPair) element);
+        }
+
+        return isAliasCallAs;
     }
 }
