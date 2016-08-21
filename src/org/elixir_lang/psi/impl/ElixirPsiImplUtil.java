@@ -1404,7 +1404,9 @@ public class ElixirPsiImplUtil {
 
         // need to check if call is place because lastParent is set to place at start of treeWalkUp
         if (!call.isEquivalentTo(lastParent) || call.isEquivalentTo(place)) {
-            if (CallDefinitionClause.is(call) || // call parameters
+            if (call.isCalling(KERNEL, ALIAS)) {
+                keepProcessing = processor.execute(call, state);
+            } else if (CallDefinitionClause.is(call) || // call parameters
                     Delegation.is(call) || // delegation call parameters
                     Module.is(call) || // module Alias
                     call.isCalling(KERNEL, DESTRUCTURE) || // left operand
