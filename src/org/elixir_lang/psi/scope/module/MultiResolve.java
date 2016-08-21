@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.elixir_lang.Module.split;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
 public class MultiResolve extends Module {
@@ -88,8 +89,16 @@ public class MultiResolve extends Module {
 
         if (aliasedName.equals(name)) {
             validResult = true;
-        } else if (incompleteCode && aliasedName.startsWith(name)) {
-            validResult = false;
+        } else {
+            List<String> namePartList = split(name);
+            String firstNamePart = namePartList.get(0);
+
+            // alias Foo.SSH, then SSH.Key is name
+            if (aliasedName.equals(firstNamePart)) {
+                validResult = true;
+            } else if (incompleteCode && aliasedName.startsWith(name)) {
+                validResult = false;
+            }
         }
 
         if (validResult != null) {
