@@ -23,6 +23,9 @@ import java.util.List;
 import static com.intellij.lang.parser.GeneratedParserUtilBase.DUMMY_BLOCK;
 import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
+import static org.elixir_lang.psi.operation.infix.Normalized.leftOperand;
+import static org.elixir_lang.psi.operation.infix.Normalized.rightOperand;
 
 public abstract class Variable implements PsiScopeProcessor {
     /*
@@ -74,6 +77,8 @@ public abstract class Variable implements PsiScopeProcessor {
             keepProcessing = execute((ElixirMapOperation) element, state);
         } else if (element instanceof ElixirMatchedWhenOperation) {
             keepProcessing = execute((ElixirMatchedWhenOperation) element, state);
+        } else if (element instanceof ElixirStabOperation) {
+            keepProcessing = execute((ElixirStabOperation) element, state);
         } else if (element instanceof ElixirStabNoParenthesesSignature) {
             keepProcessing = execute((ElixirStabNoParenthesesSignature) element, state);
         } else if (element instanceof ElixirStabParenthesesSignature) {
@@ -387,6 +392,28 @@ public abstract class Variable implements PsiScopeProcessor {
 
     private boolean execute(@NotNull ElixirStabNoParenthesesSignature match, @NotNull ResolveState state) {
         return execute(match.getNoParenthesesArguments(), state);
+    }
+
+    private boolean execute(@NotNull ElixirStabOperation match, @NotNull ResolveState state) {
+        boolean keepProcessing = true;
+
+        PsiElement[] children = match.getChildren();
+        int operatorIndex = operatorIndex(children);
+        PsiElement leftOperand = leftOperand(children, operatorIndex);
+
+        if (leftOperand != null) {
+            keepProcessing = execute(leftOperand, state);
+        }
+
+        if (keepProcessing) {
+            PsiElement rightOperand = rightOperand(children, operatorIndex);
+
+            if (rightOperand != null) {
+                keepProcessing = execute(rightOperand, state);
+            }
+        }
+
+        return keepProcessing;
     }
 
     private boolean execute(@NotNull ElixirStabParenthesesSignature match, @NotNull ResolveState state) {

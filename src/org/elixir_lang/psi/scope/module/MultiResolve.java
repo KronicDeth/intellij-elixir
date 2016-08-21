@@ -78,26 +78,22 @@ public class MultiResolve extends Module {
      * Decides whether {@code match} matches the criteria being searched for.  All other {@link #execute} methods
      * eventually end here.
      *
-     * @param match
-     * @param state
      * @return {@code true} to keep processing; {@code false} to stop processing.
      */
     @Override
-    protected boolean executeOnModular(@NotNull PsiNamedElement match, @NotNull ResolveState state) {
-        String matchName = match.getName();
+    protected boolean executeOnAliasedName(@NotNull PsiNamedElement match,
+                                           @NotNull String aliasedName,
+                                           @NotNull ResolveState state) {
+        Boolean validResult = null;
 
-        if (matchName != null) {
-            Boolean validResult = null;
+        if (aliasedName.equals(name)) {
+            validResult = true;
+        } else if (incompleteCode && aliasedName.startsWith(name)) {
+            validResult = false;
+        }
 
-            if (matchName.equals(name)) {
-                validResult = true;
-            } else if (incompleteCode && matchName.startsWith(name)) {
-                validResult = false;
-            }
-
-            if (validResult != null) {
-                addToResolveResultList(match, validResult);
-            }
+        if (validResult != null) {
+            addToResolveResultList(match, validResult);
         }
 
         return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);

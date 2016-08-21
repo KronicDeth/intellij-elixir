@@ -15,6 +15,10 @@ import org.elixir_lang.structure_view.element.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.call.name.Function.ALIAS;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
+
 /**
  * Dual to {@link org.elixir_lang.FindUsagesProvider}, where instead of each location being a separate method, they
  * are all one method, which means the same code can be used to detect the type of an element and then group all the
@@ -103,8 +107,21 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
                                          @NotNull ElementDescriptionLocation location) {
         String elementDescription = null;
 
+        if (maybeModuleName instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeModuleName;
+
+            if (location == UsageViewShortNameLocation.INSTANCE) {
+                elementDescription = resolvableName(qualifiableAlias);
+            }
+        }
+
         if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "module";
+            if (isAliasCallArgument(maybeModuleName)) {
+                elementDescription = "alias";
+            } else {
+                elementDescription = "module";
+            }
+
         }
 
         return elementDescription;
@@ -172,5 +189,25 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
         }
 
         return elementDescription;
+    }
+
+    private boolean isAliasCallArgument(@NotNull Call element) {
+        return element.isCalling(KERNEL, ALIAS);
+    }
+
+    private boolean isAliasCallArgument(@NotNull PsiElement element) {
+        boolean isAliasCallArgument = false;
+
+        if (element instanceof Call) {
+            isAliasCallArgument = isAliasCallArgument((Call) element);
+        } else if (element instanceof Arguments ||
+                element instanceof ElixirAccessExpression ||
+                element instanceof ElixirMultipleAliases ||
+                element instanceof QualifiableAlias ||
+                element instanceof QualifiedMultipleAliases) {
+            isAliasCallArgument = isAliasCallArgument(element.getParent());
+        }
+
+        return isAliasCallArgument;
     }
 }
