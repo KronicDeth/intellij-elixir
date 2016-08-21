@@ -16,14 +16,15 @@ public class Function {
     public static final String DEFPROTOCOL = "defprotocol";
     public static final String DEFSTRUCT = "defstruct";
     public static final String DESTRUCTURE = "destructure";
+    public static final String FOR = "for";
     public static final String IF = "if";
     public static final String IMPORT = "import";
-    public static final String FOR = "for";
     public static final String QUOTE = Quote.FUNCTION;
     public static final String RECEIVE = "receive";
     public static final String REQUIRE = "require";
     public static final String UNLESS = "unless";
-    public static final String USE = "use";
     public static final String UNQUOTE = "unquote";
+    public static final String USE = "use";
     public static final String VAR_BANG = "var!";
+    public static final String __MODULE__ = "__MODULE__";
 }

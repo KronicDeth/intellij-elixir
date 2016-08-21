@@ -92,7 +92,9 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
         while(true) {
             enclosingMacroCall = enclosingMacroCall(enclosedCall);
 
-            if (enclosingMacroCall != null && enclosingMacroCall.isCallingMacro(KERNEL, FOR, 2)) {
+            if (enclosingMacroCall != null &&
+                    (enclosingMacroCall.isCalling(KERNEL, ALIAS) ||
+                            enclosingMacroCall.isCallingMacro(KERNEL, FOR, 2))) {
                 enclosedCall = enclosingMacroCall;
             } else {
                 break;

@@ -144,7 +144,7 @@ public class Kernel implements Annotator, DumbAware {
                             "__CALLER__",
                             "__DIR__",
                             "__ENV__",
-                            "__MODULE__",
+                            __MODULE__,
                             "__aliases__",
                             "__block__",
                             ALIAS,

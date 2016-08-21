@@ -5,6 +5,8 @@ import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirMultipleAliases;
 import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.QualifiedMultipleAliases;
+import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.StubBased;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.elixir_lang.Module.concat;
+import static org.elixir_lang.psi.call.name.Function.__MODULE__;
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 
 public class ResolvableName {
     /*
@@ -39,6 +44,28 @@ public class ResolvableName {
      */
 
     @Nullable
+    private static List<String> down(@NotNull Call qualifier) {
+        List<String> nameList = null;
+
+        if (qualifier.isCalling(KERNEL, __MODULE__, 0)) {
+            Call enclosingCall = enclosingModularMacroCall(qualifier);
+
+            if (enclosingCall != null && enclosingCall instanceof StubBased) {
+                StubBased enclosingStubBasedCall = (StubBased) enclosingCall;
+                String canonicalName = enclosingStubBasedCall.canonicalName();
+
+                if (canonicalName != null) {
+                    nameList = new ArrayList<String>();
+                    nameList.add(canonicalName);
+                }
+            }
+        }
+
+        return nameList;
+    }
+
+
+    @Nullable
     private static List<String> down(@NotNull QualifiableAlias qualifier) {
         String resolvableName = qualifier.getName();
         List<String> nameList = null;
@@ -55,7 +82,9 @@ public class ResolvableName {
     private static List<String> down(@NotNull PsiElement qualifier) {
         List<String> nameList = null;
 
-        if (qualifier instanceof ElixirAccessExpression) {
+        if (qualifier instanceof Call) {
+            nameList = down((Call) qualifier);
+        } else if (qualifier instanceof ElixirAccessExpression) {
             nameList = down(qualifier.getChildren());
         } else if (qualifier instanceof QualifiableAlias) {
             nameList = down((QualifiableAlias) qualifier);

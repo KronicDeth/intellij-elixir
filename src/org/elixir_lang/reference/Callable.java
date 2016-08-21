@@ -254,7 +254,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parent instanceof ElixirMapUpdateArguments ||
                     parent instanceof ElixirQuoteStringBody ||
                     parent instanceof PsiFile ||
-                    parent instanceof QualifiedAlias)) {
+                    parent instanceof QualifiedAlias ||
+                    parent instanceof QualifiedMultipleAliases)) {
                 Logger.error(Callable.class, "Don't know how to check if parameter", parent);
             }
         }
@@ -336,7 +337,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         } else {
             if (!(ancestor instanceof AtNonNumericOperation ||
                     ancestor instanceof BracketOperation ||
-                    ancestor instanceof PsiFile)) {
+                    ancestor instanceof PsiFile ||
+                    ancestor instanceof QualifiedMultipleAliases)) {
                 Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
             }
         }
