@@ -6,7 +6,6 @@ import org.elixir_lang.psi.scope.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.elixir_lang.Module.split;

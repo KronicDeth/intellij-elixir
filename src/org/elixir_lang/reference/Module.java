@@ -9,6 +9,7 @@ import com.intellij.psi.stubs.StubIndex;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.scope.module.MultiResolve;
+import org.elixir_lang.psi.scope.module.Variants;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.reference.module.ResolvableName;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +113,16 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<LookupElement>();
-        return variants.toArray();
+        List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
+
+        Object[] variants;
+
+        if (lookupElementList == null) {
+            variants = new Object[0];
+        } else {
+            variants = lookupElementList.toArray(new Object[lookupElementList.size()]);
+        }
+
+        return variants;
     }
 }
