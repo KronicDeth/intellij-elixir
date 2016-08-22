@@ -1,6 +1,7 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -9,6 +10,7 @@ import com.intellij.psi.stubs.StubIndex;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.scope.module.MultiResolve;
+import org.elixir_lang.psi.scope.module.Variants;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.reference.module.ResolvableName;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.elixir_lang.Module.concat;
+import static org.elixir_lang.psi.call.name.Function.__MODULE__;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
@@ -112,7 +115,28 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<LookupElement> variants = new ArrayList<LookupElement>();
-        return variants.toArray();
+        List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
+
+        if (lookupElementList == null) {
+            lookupElementList = new ArrayList<LookupElement>();
+        }
+
+        Collection<String> projectModuleCollection  = StubIndex.getInstance().getAllKeys(
+                AllName.KEY,
+                myElement.getProject()
+        );
+
+        for (String projectModule : projectModuleCollection) {
+            lookupElementList.add(
+                    LookupElementBuilder.create(projectModule)
+            );
+        }
+
+        lookupElementList.add(
+                // not really module, but it acts like one, so include it here for completion
+                LookupElementBuilder.create(__MODULE__)
+        );
+
+        return lookupElementList.toArray(new Object[lookupElementList.size()]);
     }
 }
