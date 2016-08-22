@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.2.0</version>
+  <version>4.3.0-dev</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,49 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.3.0-dev</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>
+                Resolve aliased modules to their <code>alias</code> call, from the alias call, you can Go To Declaration
+                for the module itself.
+              </p>
+              <ul>
+                <li>
+                  <p>Code structure</p>
+                  <ul>
+                    <li>
+                      Module resolution uses the OpenAPI convention of <code>treeWalkUp</code> now instead of custom
+                      code.
+                    </li>
+                    <li>Resolvable names has been extracted to its own class</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Resolution use cases</p>
+                  <ul>
+                    <li><code>Suffix</code> resolves to <code>alias Prefix.Suffix</code></li>
+                    <li><code>Suffix.Nested</code> resolves to <code>alias Prefix.Suffix</code></li>
+                    <li><code>As</code> resolves to <code>alias Prefix.Suffix, as: As</code></li>
+                    <li><code>NestedSuffix</code> resolves to <code>alias __MODULE__.NestedSuffix</code></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <p>Completion for module aliases</p>
+              <ul>
+                <li>From in-file aliases</li>
+                <li><code>__MODULE__</code>
+                <li>In project modules (using index already used for Go To Declaration)</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.2.0</h1>
       <ul>
         <li>

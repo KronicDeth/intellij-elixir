@@ -82,6 +82,23 @@
 
 # Changelog
 
+## v4.3.0
+
+### Enhancements
+* [#387](https://github.com/KronicDeth/intellij-elixir/pull/387) - Resolve aliased modules to their `alias` call, from the alias call, you can Go To Declaration for the module itself. - [@KronicDeth](https://github.com/KronicDeth)
+  * Code structure
+    * Module resolution uses the OpenAPI convention of `treeWalkUp` now instead of custom code.
+    * Resolvable names has been extracted to its own class
+  * Resolution use cases
+    * `Suffix` resolves to `alias Prefix.Suffix`
+    * `Suffix.Nested` resolves to `alias Prefix.Suffix`
+    * `As` resolves `to `alias Prefix.Suffix, as: As`
+    * `NestedSuffix` resolves to `alias __MODULE__.NestedSuffix`
+* [#389](https://github.com/KronicDeth/intellij-elixir/pull/389) - Completion for module aliases - [@KronicDeth](https://github.com/KronicDeth)
+    * From in-file aliases
+    * `__MODULE__`
+    * In project modules (using index already used for Go To Declaration)
+
 ## v4.2.0
 
 ### Enhancements
