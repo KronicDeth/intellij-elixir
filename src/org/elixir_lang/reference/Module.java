@@ -1,6 +1,7 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -115,14 +116,22 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     public Object[] getVariants() {
         List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
 
-        Object[] variants;
-
         if (lookupElementList == null) {
-            variants = new Object[0];
-        } else {
-            variants = lookupElementList.toArray(new Object[lookupElementList.size()]);
+            lookupElementList = new ArrayList<LookupElement>();
         }
 
-        return variants;
+
+        Collection<String> projectModuleCollection  = StubIndex.getInstance().getAllKeys(
+                AllName.KEY,
+                myElement.getProject()
+        );
+
+        for (String projectModule : projectModuleCollection) {
+            lookupElementList.add(
+                    LookupElementBuilder.create(projectModule)
+            );
+        }
+
+        return lookupElementList.toArray(new Object[lookupElementList.size()]);
     }
 }
