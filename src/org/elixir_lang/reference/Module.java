@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.elixir_lang.Module.concat;
+import static org.elixir_lang.psi.call.name.Function.__MODULE__;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
@@ -120,7 +121,6 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
             lookupElementList = new ArrayList<LookupElement>();
         }
 
-
         Collection<String> projectModuleCollection  = StubIndex.getInstance().getAllKeys(
                 AllName.KEY,
                 myElement.getProject()
@@ -131,6 +131,11 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
                     LookupElementBuilder.create(projectModule)
             );
         }
+
+        lookupElementList.add(
+                // not really module, but it acts like one, so include it here for completion
+                LookupElementBuilder.create(__MODULE__)
+        );
 
         return lookupElementList.toArray(new Object[lookupElementList.size()]);
     }
