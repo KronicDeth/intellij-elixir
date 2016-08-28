@@ -16,6 +16,8 @@ import org.elixir_lang.psi.stub.MatchedUnqualifiedParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedParenthesesCall> implements ElixirMatchedUnqualifiedParenthesesCall {
 
   public ElixirMatchedUnqualifiedParenthesesCallImpl(MatchedUnqualifiedParenthesesCall stub, IStubElementType nodeType) {
@@ -50,6 +52,11 @@ public class ElixirMatchedUnqualifiedParenthesesCallImpl extends NamedStubbedPsi
   @Nullable
   public String canonicalName() {
     return ElixirPsiImplUtil.canonicalName(this);
+  }
+
+  @Nullable
+  public Collection<String> canonicalNameCollection() {
+    return ElixirPsiImplUtil.canonicalNameCollection(this);
   }
 
   @Nullable

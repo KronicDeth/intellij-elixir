@@ -12,6 +12,7 @@ import org.elixir_lang.psi.stub.MatchedDotCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<MatchedDotCall>, MatchedCall, StubBasedPsiElement<MatchedDotCall> {
@@ -27,6 +28,9 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
 
   @Nullable
   String canonicalName();
+
+  @Nullable
+  Collection<String> canonicalNameCollection();
 
   @Nullable
   String functionName();

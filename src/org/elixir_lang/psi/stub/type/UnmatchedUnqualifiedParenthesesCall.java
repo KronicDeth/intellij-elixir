@@ -2,12 +2,15 @@ package org.elixir_lang.psi.stub.type;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedParenthesesCall;
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedParenthesesCallImpl;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall, ElixirUnmatchedUnqualifiedParenthesesCall> {
     /*
@@ -37,13 +40,16 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 psi.getName(),
-                psi.canonicalName()
+                psi.canonicalNameCollection()
         );
     }
 
     @NotNull
     @Override
-    public org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
+    public org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall deserialize(
+            @NotNull StubInputStream dataStream,
+            StubElement parentStub
+    ) throws IOException {
         return new org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall(
                 parentStub,
                 this,
@@ -52,7 +58,7 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 dataStream.readInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
-                dataStream.readName()
+                readNameCollection(dataStream)
         );
     }
 }

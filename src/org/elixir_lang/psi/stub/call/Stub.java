@@ -9,13 +9,40 @@ import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 // I normally wouldn't add the redundant StubBased prefix, but it makes generating from Elixir.bnf work
 public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStubBase<T> {
+    private static Collection<String> collectionStringRefToCollectionString(
+            Collection<StringRef> canonicalNameCollection
+    ) {
+        Collection<String> stringCollection = new ArrayList<String>(canonicalNameCollection.size());
+
+        for (StringRef canonicalName : canonicalNameCollection) {
+            stringCollection.add(StringRef.toString(canonicalName));
+        }
+
+        return stringCollection;
+    }
+
+    private static Collection<StringRef> collectionStringToCollectionStringRef(
+            Collection<String> canonicalNameCollection
+    ) {
+        Collection<StringRef> stringRefCollection = new ArrayList<StringRef>(canonicalNameCollection.size());
+
+        for (String canonicalName : canonicalNameCollection) {
+            stringRefCollection.add(StringRef.fromString(canonicalName));
+        }
+
+        return stringRefCollection;
+    }
+
     /*
      * Fields
      */
 
-    private final StringRef canonicalName;
+    private final Collection<StringRef> canonicalNameCollection;
     private final boolean hasDoBlockOrKeyword;
     private final int resolvedFinalArity;
     private final StringRef resolvedFunctionName;
@@ -33,7 +60,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
                 @NotNull String name,
-                @NotNull String canonicalName) {
+                @NotNull Collection<String> canonicalNameCollection) {
         this(
                 parent,
                 elementType,
@@ -42,7 +69,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 StringRef.fromString(name),
-                StringRef.fromString(canonicalName)
+                collectionStringToCollectionStringRef(canonicalNameCollection)
         );
     }
 
@@ -53,9 +80,9 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
                 @NotNull StringRef name,
-                @NotNull StringRef canonicalName) {
+                @NotNull Collection<StringRef> canonicalNameCollection) {
         super(parent, elementType, name);
-        this.canonicalName = canonicalName;
+        this.canonicalNameCollection = canonicalNameCollection;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
         this.resolvedFinalArity = resolvedFinalArity;
         this.resolvedFunctionName = resolvedFunctionName;
@@ -67,13 +94,13 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      */
 
     /**
-     * The name does not depend on aliases or nested modules
+     * These names do not depend on aliases or nested modules.
      *
-     * @return the canonical text of the reference.
+     * @return the canonical texts of the reference
      * @see PsiReference#getCanonicalText()
      */
-    public String canonicalName() {
-        return StringRef.toString(canonicalName);
+    public Collection<String> canonicalNameCollection() {
+        return collectionStringRefToCollectionString(canonicalNameCollection);
     }
 
     /**

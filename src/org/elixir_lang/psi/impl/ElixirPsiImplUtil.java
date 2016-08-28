@@ -64,6 +64,7 @@ import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
+import static org.elixir_lang.structure_view.element.modular.Implementation.forNameCollection;
 
 /**
  * Created by luke.imhoff on 12/29/14.
@@ -340,6 +341,79 @@ public class ElixirPsiImplUtil {
         }
 
         return canonicalName;
+    }
+
+    @Nullable
+    public static Collection<String> canonicalNameCollection(@NotNull StubBased stubBased) {
+        Collection<String> canonicalNameCollection;
+
+        if (isModular(stubBased)) {
+            Collection<String> canonicalNameSuffixCollection;
+
+            if (Implementation.is(stubBased)) {
+                String maybeProtocolName = Implementation.protocolName(stubBased);
+                PsiElement forNameElement = Implementation.forNameElement(stubBased);
+                Collection<String> maybeForNameCollection = null;
+
+                if (forNameElement != null) {
+                    maybeForNameCollection = forNameCollection(forNameElement);
+                }
+
+                String protocolName = StringUtil.notNullize(maybeProtocolName, "?");
+
+                if (maybeForNameCollection == null) {
+                    canonicalNameSuffixCollection = Collections.singletonList(protocolName + ".?");
+                } else {
+                    canonicalNameSuffixCollection = new ArrayList<String>(maybeForNameCollection.size());
+
+                    for (@Nullable String maybeForName : maybeForNameCollection) {
+                        String canonicalName = protocolName + "." + StringUtil.notNullize(maybeForName, "?");
+                        canonicalNameSuffixCollection.add(canonicalName);
+                    }
+                }
+            } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
+                canonicalNameSuffixCollection = Collections.singletonList(
+                        org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(stubBased)
+                );
+            } else {
+                canonicalNameSuffixCollection = Collections.singletonList("?");
+            }
+
+            Call enclosing = enclosingModularMacroCall(stubBased);
+
+            if (enclosing instanceof StubBased) {
+                StubBased enclosingStubBased = (StubBased) enclosing;
+                Collection<String> canonicalNamePrefixCollection = enclosingStubBased.canonicalNameCollection();
+
+                if (canonicalNamePrefixCollection == null) {
+                    canonicalNamePrefixCollection = Collections.singletonList("?");
+                }
+
+                canonicalNameCollection = new ArrayList<String>(
+                        canonicalNamePrefixCollection.size() * canonicalNameSuffixCollection.size()
+                );
+
+                for (String canonicalNamePrefix : canonicalNamePrefixCollection) {
+                    for (String canonicalNameSuffix : canonicalNameSuffixCollection) {
+                        canonicalNameCollection.add(
+                                canonicalNamePrefix + "." + canonicalNameSuffix
+                        );
+                    }
+                }
+            } else {
+                canonicalNameCollection = canonicalNameSuffixCollection;
+            }
+        } else {
+            String canonicalName = stubBased.getName();
+
+            if (canonicalName != null) {
+                canonicalNameCollection = Collections.singletonList(canonicalName);
+            } else {
+                canonicalNameCollection = null;
+            }
+        }
+
+        return canonicalNameCollection;
     }
 
     // @return -1 if codePoint cannot be parsed.

@@ -5,10 +5,7 @@ import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.usageView.UsageViewTypeLocation;
-import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.ElixirList;
-import org.elixir_lang.psi.QualifiableAlias;
-import org.elixir_lang.psi.QuotableKeywordList;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
@@ -54,9 +51,8 @@ public class Implementation extends Module {
         return forNameCollection(forNameElement.getChildren());
     }
 
-
     @Nullable
-    private static Collection<String> forNameCollection(@NotNull PsiElement forNameElement) {
+    public static Collection<String> forNameCollection(@NotNull PsiElement forNameElement) {
         Collection<String> forNameCollection;
 
         if (forNameElement instanceof ElixirAccessExpression) {
@@ -113,9 +109,8 @@ public class Implementation extends Module {
         return forNameCollection;
     }
 
-
     @Nullable
-    private static Collection<String> forNameCollection(@Nullable Modular enclosingModular, @NotNull Call call) {
+    public static Collection<String> forNameCollection(@Nullable Modular enclosingModular, @NotNull Call call) {
         PsiElement forNameElement = forNameElement(call);
         Collection<String> forNameCollection = null;
 
@@ -146,6 +141,31 @@ public class Implementation extends Module {
         return forNameElement;
     }
 
+    /**
+     * The name of the {@link #navigationItem}.
+     *
+     * @return the {@link NamedElement#getName()} if {@link #navigationItem} is a {@link NamedElement}; otherwise,
+     *   {@code null}.
+     */
+    @Nullable
+    @Override
+    public String getName() {
+        String name = null;
+
+        if (forNameOverride != null) {
+            String protocolName = protocolName(navigationItem);
+
+            if (protocolName != null) {
+                name = protocolName + "." + forNameOverride;
+            }
+        } else if (navigationItem instanceof NamedElement) {
+            NamedElement namedElement = (NamedElement) navigationItem;
+            name = namedElement.getName();
+        }
+
+        return name;
+    }
+
     public static boolean is(Call call) {
         return call.isCallingMacro(KERNEL, DEFIMPL, 2) ||
                 call.isCallingMacro(KERNEL, DEFIMPL, 3);
@@ -167,7 +187,6 @@ public class Implementation extends Module {
         // TODO Use CachedValueManager
         return name;
     }
-
 
     @Nullable
     public static Collection<String> nameCollection(@Nullable Modular enclosingModular, @NotNull Call call) {
@@ -243,6 +262,13 @@ public class Implementation extends Module {
     }
 
     /*
+     * Fields
+     */
+
+    @Nullable
+    private final String forNameOverride;
+
+    /*
      * Constructors
      */
 
@@ -252,6 +278,22 @@ public class Implementation extends Module {
 
     public Implementation(@Nullable Modular parent, @NotNull Call call) {
         super(parent, call);
+        this.forNameOverride = null;
+    }
+
+    /**
+     * Implementation that presents as having a single {@code forName} when the {@code defimpl} has a list as the
+     * keyword argument of {@code for:}.
+     *
+     * @param parent enclosing modular
+     * @param call the {@code defimpl} call
+     * @param forNameOverride The forName to use when the {@code call} has a list for its {@code for:} value.  Needed so
+     *                        that rendered named in the presentation uses {@code forName} for
+     *                        {@link org.elixir_lang.navigation.GotoSymbolContributor}'s lookup menu
+     */
+    public Implementation(@Nullable Modular parent, @NotNull Call call, @NotNull String forNameOverride) {
+        super(parent, call);
+        this.forNameOverride = forNameOverride;
     }
 
     /*
@@ -259,13 +301,13 @@ public class Implementation extends Module {
      */
 
     /**
-     * The name of the module the protocol is for.
+     * The name of the module the protocol is for as derived from the PSI tree
      *
      * @return the {@link #parent} fully-qualified name if no `:for` keyword argument is given; otherwise, the
      *   `:for` keyword argument.
      */
     @NotNull
-    public String forName() {
+    private String derivedForName() {
         String forName;
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 
@@ -287,6 +329,25 @@ public class Implementation extends Module {
             forName = parentPresentation.getLocatedPresentableText();
         } else {
             forName = "?";
+        }
+
+        return forName;
+    }
+
+    /**
+     * The name of the module the protocol is for.
+     *
+     * @return the {@link #forNameOverride}; the {@link #parent} fully-qualified name if no `:for` keyword argument is
+     *   given; otherwise, the `:for` keyword argument.
+     */
+    @NotNull
+    private String forName() {
+        String forName;
+
+        if (forNameOverride != null) {
+            forName = forNameOverride;
+        } else {
+            forName = derivedForName();
         }
 
         return forName;

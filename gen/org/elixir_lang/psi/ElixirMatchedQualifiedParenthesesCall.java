@@ -12,6 +12,8 @@ import org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpression, MatchedCall, QualifiedParenthesesCall<MatchedQualifiedParenthesesCall>, StubBasedPsiElement<MatchedQualifiedParenthesesCall> {
 
   @NotNull
@@ -28,6 +30,9 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
 
   @Nullable
   String canonicalName();
+
+  @Nullable
+  Collection<String> canonicalNameCollection();
 
   @Nullable
   String functionName();

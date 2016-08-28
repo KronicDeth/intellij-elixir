@@ -8,6 +8,8 @@ import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentifierOwner> extends Element<S, T> {
     public Named(@NonNls @NotNull String debugName) {
         super(debugName);
@@ -23,9 +25,9 @@ public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentif
 
         if (stub instanceof org.elixir_lang.psi.stub.call.Stub) {
             org.elixir_lang.psi.stub.call.Stub callStub = (org.elixir_lang.psi.stub.call.Stub) stub;
-            String canonicalName = callStub.canonicalName();
+            Collection<String> canonicalNameCollection = callStub.canonicalNameCollection();
 
-            if (canonicalName != null) {
+            for (String canonicalName : canonicalNameCollection) {
                 sink.occurrence(AllName.KEY, canonicalName);
             }
         }
