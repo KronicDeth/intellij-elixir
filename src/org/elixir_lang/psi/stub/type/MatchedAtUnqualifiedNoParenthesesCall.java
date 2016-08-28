@@ -38,7 +38,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                StringUtil.notNullize(psi.canonicalName(), "?")
+                psi.canonicalNameCollection()
         );
     }
 
@@ -53,7 +53,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 dataStream.readInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
-                dataStream.readName()
+                readNameCollection(dataStream)
         );
     }
 }

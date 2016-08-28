@@ -12,6 +12,7 @@ import org.elixir_lang.psi.stub.UnmatchedDotCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCall<UnmatchedDotCall>, StubBasedPsiElement<UnmatchedDotCall> {
@@ -30,6 +31,9 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
 
   @Nullable
   String canonicalName();
+
+  @Nullable
+  Collection<String> canonicalNameCollection();
 
   @Nullable
   String functionName();

@@ -12,6 +12,8 @@ import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpression, MatchedCall, QualifiedNoArgumentsCall<MatchedQualifiedNoArgumentsCall>, StubBasedPsiElement<MatchedQualifiedNoArgumentsCall> {
 
   @NotNull
@@ -25,6 +27,9 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
 
   @Nullable
   String canonicalName();
+
+  @Nullable
+  Collection<String> canonicalNameCollection();
 
   @Nullable
   String functionName();

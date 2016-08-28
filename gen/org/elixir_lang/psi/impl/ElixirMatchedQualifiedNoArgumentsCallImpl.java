@@ -16,6 +16,8 @@ import org.elixir_lang.psi.stub.MatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class ElixirMatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<MatchedQualifiedNoArgumentsCall> implements ElixirMatchedQualifiedNoArgumentsCall {
 
   public ElixirMatchedQualifiedNoArgumentsCallImpl(MatchedQualifiedNoArgumentsCall stub, IStubElementType nodeType) {
@@ -56,6 +58,11 @@ public class ElixirMatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiEl
   @Nullable
   public String canonicalName() {
     return ElixirPsiImplUtil.canonicalName(this);
+  }
+
+  @Nullable
+  public Collection<String> canonicalNameCollection() {
+    return ElixirPsiImplUtil.canonicalNameCollection(this);
   }
 
   @Nullable

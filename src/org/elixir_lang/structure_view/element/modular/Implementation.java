@@ -3,15 +3,18 @@ package org.elixir_lang.structure_view.element.modular;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.usageView.UsageViewTypeLocation;
-import org.elixir_lang.psi.ElixirAccessExpression;
-import org.elixir_lang.psi.QualifiableAlias;
-import org.elixir_lang.psi.QuotableKeywordList;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
 import static org.elixir_lang.psi.call.name.Function.FOR;
@@ -39,18 +42,86 @@ public class Implementation extends Module {
     }
 
     @Nullable
-    public static String forName(@Nullable Modular enclosingModular, @NotNull Call call) {
-        PsiElement forNameElement = forNameElement(call);
-        String forName = null;
+    private static Collection<String> forNameCollection(@NotNull ElixirAccessExpression forNameElement) {
+        return forNameCollection(forNameElement.getChildren());
+    }
 
-        if (forNameElement != null) {
-            forName = forNameElement.getText();
-        } else if (enclosingModular != null) {
-            org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) enclosingModular.getPresentation();
-            forName = parentPresentation.getLocatedPresentableText();
+    @Nullable
+    private static Collection<String> forNameCollection(@NotNull ElixirList forNameElement) {
+        return forNameCollection(forNameElement.getChildren());
+    }
+
+    @Nullable
+    public static Collection<String> forNameCollection(@NotNull PsiElement forNameElement) {
+        Collection<String> forNameCollection;
+
+        if (forNameElement instanceof ElixirAccessExpression) {
+            forNameCollection = forNameCollection((ElixirAccessExpression) forNameElement);
+        } else if (forNameElement instanceof ElixirList) {
+            forNameCollection = forNameCollection((ElixirList) forNameElement);
+        } else if (forNameElement instanceof QualifiableAlias) {
+            forNameCollection = forNameCollection((QualifiableAlias) forNameElement);
+        } else if (forNameElement instanceof PsiNamedElement) {
+            forNameCollection = forNameCollection((PsiNamedElement) forNameElement);
+        } else {
+            forNameCollection = Collections.singletonList(forNameElement.getText());
         }
 
-        return forName;
+        return forNameCollection;
+    }
+
+    @Nullable
+    private static Collection<String> forNameCollection(@NotNull PsiElement[] children) {
+        Collection<String> forNameCollection = new ArrayList<String>(children.length);
+
+        for (PsiElement child : children) {
+            Collection<String> childForNameCollection = forNameCollection(child);
+
+            if (childForNameCollection != null) {
+                forNameCollection.addAll(childForNameCollection);
+            }
+        }
+
+        return forNameCollection;
+    }
+
+    @Nullable
+    private static Collection<String> forNameCollection(@NotNull PsiNamedElement forNameElement) {
+        String forName = forNameElement.getName();
+        Collection<String> forNameCollection = null;
+
+        if (forName != null) {
+            forNameCollection = Collections.singletonList(forName);
+        }
+
+        return forNameCollection;
+    }
+
+    @Nullable
+    private static Collection<String> forNameCollection(@NotNull QualifiableAlias forNameElement) {
+        Collection<String> forNameCollection = null;
+        String forName = forNameElement.getName();
+
+        if (forName != null) {
+            forNameCollection = Collections.singletonList(forName);
+        }
+
+        return forNameCollection;
+    }
+
+    @Nullable
+    public static Collection<String> forNameCollection(@Nullable Modular enclosingModular, @NotNull Call call) {
+        PsiElement forNameElement = forNameElement(call);
+        Collection<String> forNameCollection = null;
+
+        if (forNameElement != null) {
+            forNameCollection = forNameCollection(forNameElement);
+        } else if (enclosingModular != null) {
+            org.elixir_lang.navigation.item_presentation.Parent parentPresentation = (org.elixir_lang.navigation.item_presentation.Parent) enclosingModular.getPresentation();
+            forNameCollection = Collections.singletonList(parentPresentation.getLocatedPresentableText());
+        }
+
+        return forNameCollection;
     }
 
     @Nullable
@@ -70,28 +141,68 @@ public class Implementation extends Module {
         return forNameElement;
     }
 
+    /**
+     * The name of the {@link #navigationItem}.
+     *
+     * @return the {@link NamedElement#getName()} if {@link #navigationItem} is a {@link NamedElement}; otherwise,
+     *   {@code null}.
+     */
+    @Nullable
+    @Override
+    public String getName() {
+        String name = null;
+
+        if (forNameOverride != null) {
+            String protocolName = protocolName(navigationItem);
+
+            if (protocolName != null) {
+                name = protocolName + "." + forNameOverride;
+            }
+        } else if (navigationItem instanceof NamedElement) {
+            NamedElement namedElement = (NamedElement) navigationItem;
+            name = namedElement.getName();
+        }
+
+        return name;
+    }
+
     public static boolean is(Call call) {
         return call.isCallingMacro(KERNEL, DEFIMPL, 2) ||
                 call.isCallingMacro(KERNEL, DEFIMPL, 3);
     }
 
-    public static String name(@NotNull Call call) {
-        // TODO Use CachedValueManager
-        return name(CallDefinitionClause.enclosingModular(call), call);
-    }
-
-
+    /**
+     * @return {@code null} if protocol or module for the implementation cannot be derived or if the for argument is a
+     *   list.
+     */
     @Nullable
-    public static String name(@Nullable Modular enclosingModular, @NotNull Call call) {
-        String protocolName = protocolName(call);
-        String forName = forName(enclosingModular, call);
+    public static String name(@NotNull Call call) {
+        Collection<String> nameCollection = nameCollection(CallDefinitionClause.enclosingModular(call), call);
         String name = null;
 
-        if (protocolName != null && forName != null) {
-          name = protocolName + "." + forName;
+        if (nameCollection != null && nameCollection.size() == 1) {
+            name = nameCollection.iterator().next();
         }
 
+        // TODO Use CachedValueManager
         return name;
+    }
+
+    @Nullable
+    public static Collection<String> nameCollection(@Nullable Modular enclosingModular, @NotNull Call call) {
+        String protocolName = protocolName(call);
+        Collection<String> forNameCollection = forNameCollection(enclosingModular, call);
+        Collection<String> nameCollection = null;
+
+        if (protocolName != null && forNameCollection != null) {
+            nameCollection = new ArrayList<String>();
+
+            for (String forName : forNameCollection) {
+                nameCollection.add(protocolName + "." + forName);
+            }
+        }
+
+        return nameCollection;
     }
 
     @Nullable
@@ -151,6 +262,13 @@ public class Implementation extends Module {
     }
 
     /*
+     * Fields
+     */
+
+    @Nullable
+    private final String forNameOverride;
+
+    /*
      * Constructors
      */
 
@@ -160,6 +278,22 @@ public class Implementation extends Module {
 
     public Implementation(@Nullable Modular parent, @NotNull Call call) {
         super(parent, call);
+        this.forNameOverride = null;
+    }
+
+    /**
+     * Implementation that presents as having a single {@code forName} when the {@code defimpl} has a list as the
+     * keyword argument of {@code for:}.
+     *
+     * @param parent enclosing modular
+     * @param call the {@code defimpl} call
+     * @param forNameOverride The forName to use when the {@code call} has a list for its {@code for:} value.  Needed so
+     *                        that rendered named in the presentation uses {@code forName} for
+     *                        {@link org.elixir_lang.navigation.GotoSymbolContributor}'s lookup menu
+     */
+    public Implementation(@Nullable Modular parent, @NotNull Call call, @NotNull String forNameOverride) {
+        super(parent, call);
+        this.forNameOverride = forNameOverride;
     }
 
     /*
@@ -167,13 +301,13 @@ public class Implementation extends Module {
      */
 
     /**
-     * The name of the module the protocol is for.
+     * The name of the module the protocol is for as derived from the PSI tree
      *
      * @return the {@link #parent} fully-qualified name if no `:for` keyword argument is given; otherwise, the
      *   `:for` keyword argument.
      */
     @NotNull
-    public String forName() {
+    private String derivedForName() {
         String forName;
         PsiElement[] finalArguments = ElixirPsiImplUtil.finalArguments(navigationItem);
 
@@ -195,6 +329,25 @@ public class Implementation extends Module {
             forName = parentPresentation.getLocatedPresentableText();
         } else {
             forName = "?";
+        }
+
+        return forName;
+    }
+
+    /**
+     * The name of the module the protocol is for.
+     *
+     * @return the {@link #forNameOverride}; the {@link #parent} fully-qualified name if no `:for` keyword argument is
+     *   given; otherwise, the `:for` keyword argument.
+     */
+    @NotNull
+    private String forName() {
+        String forName;
+
+        if (forNameOverride != null) {
+            forName = forNameOverride;
+        } else {
+            forName = derivedForName();
         }
 
         return forName;

@@ -9,6 +9,7 @@ import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall, ElixirUnmatchedUnqualifiedNoParenthesesCall> {
     /*
@@ -30,6 +31,7 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
 
     @Override
     public org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall createStub(@NotNull ElixirUnmatchedUnqualifiedNoParenthesesCall psi, StubElement parentStub) {
+        Collection<String> canonicalNameCollection = psi.canonicalNameCollection();
         return new org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall(
                 parentStub,
                 this,
@@ -38,7 +40,7 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                StringUtil.notNullize(psi.canonicalName(), "?")
+                psi.canonicalNameCollection()
         );
     }
 
@@ -53,7 +55,7 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 dataStream.readInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
-                dataStream.readName()
+                readNameCollection(dataStream)
         );
     }
 }

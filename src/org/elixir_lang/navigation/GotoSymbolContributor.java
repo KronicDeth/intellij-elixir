@@ -184,8 +184,23 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
                 } else if (Implementation.is(call)) {
                     Modular modular = enclosingModularByCall.putNew(call);
 
-                    Implementation implementation = new Implementation(modular, call);
-                    items.add(implementation);
+                    Collection<String> forNameCollection = Implementation.forNameCollection(modular, call);
+
+                    if (forNameCollection != null) {
+                        for (String forName : forNameCollection) {
+                            Implementation forNameOverriddenImplementation = new Implementation(modular, call, forName);
+                            String implementationName = forNameOverriddenImplementation.getName();
+
+                            if (implementationName != null && implementationName.contains(name)) {
+                                items.add(forNameOverriddenImplementation);
+                            }
+                        }
+                    }
+
+                    if (forNameCollection == null || forNameCollection.size() < 2) {
+                        Implementation implementation = new Implementation(modular, call);
+                        items.add(implementation);
+                    }
                 } else if (Module.is(call)) {
                     Modular modular = enclosingModularByCall.putNew(call);
 

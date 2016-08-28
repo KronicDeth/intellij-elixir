@@ -8,6 +8,8 @@ import org.elixir_lang.psi.stub.call.Stub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnqualifiedNoArgumentsCall> {
     public UnmatchedUnqualifiedNoArgumentsCall(
             StubElement parent,
@@ -17,7 +19,7 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull StringRef name,
-            @NotNull StringRef canonicalName
+            @NotNull Collection<StringRef> canonicalNameCollection
     ) {
         super(
                 parent,
@@ -27,7 +29,7 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalName);
+                canonicalNameCollection);
     }
 
     public UnmatchedUnqualifiedNoArgumentsCall(
@@ -38,7 +40,7 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull String canonicalName
+            @NotNull Collection<String> canonicalNameCollection
     ) {
         super(parent,
                 elementType,
@@ -47,6 +49,6 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<ElixirUnmatchedUnq
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalName);
+                canonicalNameCollection);
     }
 }

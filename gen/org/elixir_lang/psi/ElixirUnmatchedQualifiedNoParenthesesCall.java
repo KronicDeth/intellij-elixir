@@ -12,6 +12,8 @@ import org.elixir_lang.psi.stub.UnmatchedQualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatchedExpression, QualifiedNoParenthesesCall<UnmatchedQualifiedNoParenthesesCall>, StubBasedPsiElement<UnmatchedQualifiedNoParenthesesCall> {
 
   @Nullable
@@ -31,6 +33,9 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
 
   @Nullable
   String canonicalName();
+
+  @Nullable
+  Collection<String> canonicalNameCollection();
 
   @Nullable
   String functionName();
