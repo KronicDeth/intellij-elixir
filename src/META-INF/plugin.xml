@@ -49,6 +49,33 @@
                 <li>In project modules (using index already used for Go To Declaration)</li>
               </ul>
             </li>
+            <li>
+              In addition to <code>StubBased#canonicalName</code>, there now also <code>StubBased#canonicalNames</code>,
+              for when a call defines multiple canonical names, as is the case for
+              <code>defimpl &lt;PROTOCOL&gt;, for: [&lt;TYPE&gt;, ...]</code>.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              <p>
+                <code>defimpl &lt;PROTOCOL&gt;, for: [&lt;TYPE&gt;, ...]</code> generates multiple canonical names,
+                which are stored in the stub index.
+              </p>
+              <ul>
+                <li>
+                  When retrieved from the <code>AllName</code> index, the <code>defimpl</code>'s Implementation will
+                  render as if only the <code>defimpl &lt;PROTOCOL&gt;, for: &lt;TYPE&gt;</code> was used for the
+                  <code>&lt;TYPE&gt;</code> matching the lookup name in the Goto Symbol dialog.  For example, if you
+                  search for <code>Tuple</code>, <code>JSX.Encoder.Tuple</code> will match for
+                  <a href="https://github.com/talentdeficit/exjsx/blob/master/lib/jsx.ex#L152-L155">
+                    <code>defimpl JSX.Encoder, for: for: [Tuple, PID, Port, Reference, Function, Any]</code>
+                  </a>.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>
