@@ -59,6 +59,9 @@
               <code>AllName</code> index, if any nested modules are found for the unaliased name, then those nested
               names are aliased and also shown for completion.
             </li>
+            <li>
+              <code>resolvableName</code> allows nested modules under multiple aliases to be completed
+            </li>
           </ul>
         </li>
         <li>
