@@ -3,20 +3,14 @@ package org.elixir_lang.psi.scope.module;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
-import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +24,7 @@ public class Variants extends Module {
      * Public Static Methods
      */
 
-    @Nullable
+    @NotNull
     public static List<LookupElement> lookupElementList(@NotNull PsiElement entrance) {
         Variants variants = new Variants();
         treeWalkUp(
@@ -39,8 +33,15 @@ public class Variants extends Module {
                 entrance.getContainingFile(),
                 ResolveState.initial().put(ENTRANCE, entrance)
         );
+        List<LookupElement> lookupElementList = variants.getLookupElementList();
 
-        return variants.getLookupElementList();
+        if (lookupElementList == null) {
+            lookupElementList = new ArrayList<LookupElement>();
+        }
+
+        variants.addProjectNamesTo(lookupElementList, entrance.getProject());
+
+        return lookupElementList;
     }
 
     /*
@@ -80,24 +81,18 @@ public class Variants extends Module {
         final String unaliasedName = match.getName();
 
         if (unaliasedName != null) {
-            List<String> unaliasedNestedNames = ContainerUtil.findAll(nameCollection(match.getProject()), new Condition<String>() {
-                @Override
-                public boolean value(String indexedName) {
-                    return indexedName.startsWith(unaliasedName) && indexedName.length() > unaliasedName.length();
-                }
-            });
-            List<String> aliasedNestedNames = ContainerUtil.map(unaliasedNestedNames, new Function<String, String>() {
-                @Override
-                public String fun(String unaliasedNestedName) {
-                    return unaliasedNestedName.replaceFirst(unaliasedName, aliasedName);
-                }
-            });
-            List<LookupElement> aliasedNesteNameLookElements = ContainerUtil.map(aliasedNestedNames, new Function<String, LookupElement>() {
-                @Override
-                public LookupElement fun(String aliasedNestedName) {
-                    return LookupElementBuilder.create(aliasedNestedName);
-                }
-            });
+            List<String> unaliasedNestedNames = ContainerUtil.findAll(
+                    nameCollection(match.getProject()),
+                    ProperStartsWith.properStartsWith(unaliasedName)
+            );
+            List<String> aliasedNestedNames = ContainerUtil.map(
+                    unaliasedNestedNames,
+                    new ReplaceFirst(unaliasedName, aliasedName)
+            );
+            List<LookupElement> aliasedNesteNameLookElements = ContainerUtil.map(
+                    aliasedNestedNames,
+                    CreateLookupElement.INSTANCE
+            );
             lookupElementList.addAll(aliasedNesteNameLookElements);
         }
 
@@ -108,6 +103,14 @@ public class Variants extends Module {
      * Private Instance Methods
      */
 
+    private void addProjectNamesTo(List<LookupElement> lookupElementList, Project project) {
+        Collection<String> projectNameCollection = nameCollection(project);
+
+        lookupElementList.addAll(
+                ContainerUtil.map(projectNameCollection, CreateLookupElement.INSTANCE)
+        );
+    }
+
     private List<LookupElement> getLookupElementList() {
         return lookupElementList;
     }
@@ -116,6 +119,7 @@ public class Variants extends Module {
      * Caches {@code StubIndex.getAllKeys(AllName.KEY, project)}
      * @return
      */
+
     private Collection<String> nameCollection(Project project) {
         if (project != this.project || nameCollection == null) {
             nameCollection = StubIndex.getInstance().getAllKeys(AllName.KEY, project);
