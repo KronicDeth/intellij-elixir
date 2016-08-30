@@ -54,6 +54,11 @@
               for when a call defines multiple canonical names, as is the case for
               <code>defimpl &lt;PROTOCOL&gt;, for: [&lt;TYPE&gt;, ...]</code>.
             </li>
+            <li>
+              When a aliased name is added to the module list for completion, it's unaliased name is searched for in the
+              <code>AllName</code> index, if any nested modules are found for the unaliased name, then those nested
+              names are aliased and also shown for completion.
+            </li>
           </ul>
         </li>
         <li>

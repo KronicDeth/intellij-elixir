@@ -103,6 +103,7 @@
     * `__MODULE__`
     * In project modules (using index already used for Go To Declaration)
 * [#393](https://github.com/KronicDeth/intellij-elixir/pull/393) - In addition to `StubBased#canonicalName`, there now also `StubBased#canonicalNames`, for when a call defines multiple canonical names, as is the case for `defimpl <PROTOCOL>, for: [<TYPE>, ...]`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#397](https://github.com/KronicDeth/intellij-elixir/pull/397) - When a aliased name is added to the module list for completion, it's unaliased name is searched for in the `AllName` index, if any nested modules are found for the unaliased name, then those nested names are aliased and also shown for completion. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#393](https://github.com/KronicDeth/intellij-elixir/pull/393) - [@KronicDeth](https://github.com/KronicDeth)
