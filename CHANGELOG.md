@@ -110,6 +110,9 @@
 * [#393](https://github.com/KronicDeth/intellij-elixir/pull/393) - [@KronicDeth](https://github.com/KronicDeth)
   * `defimpl <PROTOCOL>, for: [<TYPE>, ...]` generates multiple canonical names, which are stored in the stub index.
     * When retrieved from the `AllName` index, the `defimpl`'s Implementation will render as if only the `defimpl <PROTOCOL>, for: <TYPE>` was used for the `<TYPE>` matching the lookup name in the Goto Symbol dialog.  For example, if you search for `Tuple`, `JSX.Encoder.Tuple` will match for [`defimpl JSX.Encoder, for: for: [Tuple, PID, Port, Reference, Function, Any]`](https://github.com/talentdeficit/exjsx/blob/master/lib/jsx.ex#L152-L155).
+* [#400](https://github.com/KronicDeth/intellij-elixir/pull/400) - [@KronicDeth](https://github.com/KronicDeth)
+  * Look outside Enum.map for enclosing macro call because `Ecto` defines the clauses of `__schema__(:type, ...)` using `Enum.map`, but `enclosingMacroCall` only knews to jump over enclosing macros like `for`, so a special case was added for anonymous function given to `Enum.map`.
+  * Fix if-else-ordering bug where `Call` appeared before operations (which are usually `Call`s) like `Match`.
 
 ## v4.2.0
 

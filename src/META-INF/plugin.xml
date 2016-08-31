@@ -84,6 +84,16 @@
                 </li>
               </ul>
             </li>
+            <li>
+              Look outside <code>Enum.map</code> for enclosing macro call because <code>Ecto</code> defines the clauses
+              of <code>__schema__(:type, ...)</code> using <code>Enum.map</code>, but <code>enclosingMacroCall</code>
+              only knew to jump over enclosing macros like <code>for</code>, so a special case was added for anonymous
+              function given to <code>Enum.map</code>.
+            </li>
+            <li>
+              Fix if-else-ordering bug where <code>Call</code> appeared before operations (which are usually
+              <code>Call</code>s) like <code>Match</code>.
+            </li>
           </ul>
         </li>
       </ul>
