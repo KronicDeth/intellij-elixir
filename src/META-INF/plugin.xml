@@ -62,6 +62,12 @@
             <li>
               <code>resolvableName</code> allows nested modules under multiple aliases to be completed
             </li>
+            <li>
+              By user request, the folding will be off-by-default now, but can be re-enabled, like the old behavior by
+              checking the checkbox in Preferences &gt; Editor &gt; General &gt; Code Folding &gt;
+              Elixir Module directive (<code>alias</code>, <code>import</code>, <code>require</code> or
+              <code>use</code>) groups.
+            </li>
           </ul>
         </li>
         <li>
