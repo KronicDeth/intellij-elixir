@@ -405,7 +405,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                                                 Set<String> typeParameterNameSet,
                                                                 AnnotationHolder annotationHolder,
                                                                 TextAttributesKey typeTextAttributesKey) {
-        if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
+        if (psiElement instanceof ElixirAccessExpression ||
+                psiElement instanceof ElixirList ||
+                psiElement instanceof ElixirTuple) {
+            highlightTypesAndTypeTypeParameterDeclarations(
+                    psiElement.getChildren(),
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
             highlightTypesAndTypeTypeParameterDeclarations(
                     (ElixirUnmatchedUnqualifiedNoArgumentsCall) psiElement,
                     typeParameterNameSet,
@@ -413,7 +422,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else {
-            error("Cannot highlight types and type parameter declarations", psiElement);
+            if (!(psiElement instanceof ElixirAtomKeyword)) {
+                error("Cannot highlight types and type parameter declarations", psiElement);
+            }
         }
     }
 
@@ -1171,13 +1182,48 @@ public class ModuleAttribute implements Annotator, DumbAware {
         return nameSet;
     }
 
-    private Set<String> typeTypeParameterNameSet(
-            ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall
-    ) {
-        Set<String> typeParameterNameSet = new HashSet<String>();
+    private Set<String> typeTypeParameterNameSet(@NotNull ElixirTuple tuple) {
+        Set<String> typeParameterNameSet = null;
 
-        typeParameterNameSet.addAll(typeTypeParameterNameSet(matchedUnqualifiedParenthesesCall.primaryArguments()));
-        typeParameterNameSet.addAll(typeTypeParameterNameSet(matchedUnqualifiedParenthesesCall.secondaryArguments()));
+        PsiElement[] children = tuple.getChildren();
+
+        if (children.length == 3) {
+            PsiElement firstChild = children[0];
+
+            if (firstChild instanceof UnqualifiedNoArgumentsCall) {
+                PsiElement secondChild = children[1];
+
+                if (secondChild instanceof ElixirAccessExpression) {
+                    PsiElement[] secondChildChildren = secondChild.getChildren();
+
+                    if (secondChildChildren.length == 1) {
+                        PsiElement secondChildChild = secondChildChildren[0];
+
+                        if (secondChildChild instanceof ElixirList) {
+                            PsiElement thirdChild = children[2];
+
+                            if (thirdChild instanceof ElixirAccessExpression) {
+                                PsiElement[] thirdChildChildren = thirdChild.getChildren();
+
+                                if (thirdChildChildren.length == 1) {
+                                    PsiElement thirdChildChild = thirdChildChildren[0];
+
+                                    if (thirdChildChild instanceof ElixirAtomKeyword &&
+                                            thirdChildChild.getText().equals("nil")) {
+                                        typeParameterNameSet = Collections.singleton(firstChild.getText());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (typeParameterNameSet == null) {
+            error("Cannot extract type type parameter name set", tuple);
+            typeParameterNameSet = Collections.emptySet();
+        }
 
         return typeParameterNameSet;
     }
@@ -1185,7 +1231,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
     private Set<String> typeTypeParameterNameSet(PsiElement psiElement) {
         Set<String> typeParameterNameSet;
 
-        if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
+        if (psiElement instanceof ElixirAccessExpression) {
+            typeParameterNameSet = typeTypeParameterNameSet(psiElement.getChildren());
+        } else if (psiElement instanceof ElixirTuple) {
+            typeParameterNameSet = typeTypeParameterNameSet((ElixirTuple) psiElement);
+        } else if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
             typeParameterNameSet = Collections.singleton(psiElement.getText());
         } else {
             error("Cannot extract type type parameter name set", psiElement);
