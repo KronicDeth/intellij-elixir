@@ -1,4 +1,4 @@
-package org.elixir_lang.psi;
+package org.elixir_lang.folding;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilderEx;
@@ -11,6 +11,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.psi.operation.infix.Normalized;
@@ -24,7 +25,7 @@ import static org.elixir_lang.psi.call.name.Function.*;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
-public class FoldingBuilder extends FoldingBuilderEx {
+public class Builder extends FoldingBuilderEx {
     /*
      * CONSTANTS
      */
