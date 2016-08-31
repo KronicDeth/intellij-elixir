@@ -1608,6 +1608,9 @@
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
 
     <!-- folding -->
+    <applicationService serviceInterface="org.elixir_lang.folding.ElixirFoldingSettings"
+                        serviceImplementation="org.elixir_lang.folding.ElixirFoldingSettings"/>
+    <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
     <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>

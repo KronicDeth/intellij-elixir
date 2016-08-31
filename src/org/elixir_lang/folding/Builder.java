@@ -358,6 +358,29 @@ public class Builder extends FoldingBuilderEx {
     public boolean isCollapsedByDefault(@NotNull ASTNode node) {
         PsiElement element = node.getPsi();
 
-        return element instanceof AtNonNumericOperation || element instanceof ElixirStabBody;
+        boolean isCollapsedByDefault = false;
+
+        if (element instanceof AtNonNumericOperation) {
+            isCollapsedByDefault = true;
+        } else {
+            PsiElement[] children = element.getChildren();
+
+            for (PsiElement child : children) {
+                if (child instanceof Call) {
+                    Call call = (Call) child;
+
+                    for (String resolvedFunctionName : RESOLVED_FUNCTION_NAMES) {
+                        if (call.isCalling(KERNEL, resolvedFunctionName)) {
+                            isCollapsedByDefault = ElixirFoldingSettings
+                                    .getInstance()
+                                    .isCollapseElixirModuleDirectiveGroups();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return isCollapsedByDefault;
     }
 }
