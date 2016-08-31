@@ -1958,13 +1958,7 @@ public class ElixirPsiImplUtil {
         Call enclosingMacroCall = null;
         PsiElement parent = element.getParent();
 
-        if (parent instanceof Call) {
-            Call parentCall = (Call) parent;
-
-            if (parentCall.isCalling(KERNEL, ALIAS)) {
-                enclosingMacroCall = parentCall;
-            }
-        } else if (parent instanceof ElixirStabBody) {
+        if (parent instanceof ElixirStabBody) {
             PsiElement grandParent = parent.getParent();
 
             if (grandParent instanceof ElixirStab) {
@@ -1997,12 +1991,48 @@ public class ElixirPsiImplUtil {
                         enclosingMacroCall = enclosingMacroCall(greatGreatGrandParent);
                     }
                 }
+            } else if (grandParent instanceof ElixirStabOperation) {
+                PsiElement stabOperationParent = grandParent.getParent();
+
+                if (stabOperationParent instanceof ElixirStab) {
+                    PsiElement stabParent = stabOperationParent.getParent();
+
+                    if (stabParent instanceof ElixirAnonymousFunction) {
+                        PsiElement anonymousFunctionParent = stabParent.getParent();
+
+                        if (anonymousFunctionParent instanceof ElixirAccessExpression) {
+                            PsiElement accessExpressionParent = anonymousFunctionParent.getParent();
+
+                            if (accessExpressionParent instanceof Arguments) {
+                                PsiElement argumentsParent = accessExpressionParent.getParent();
+
+                                if (argumentsParent instanceof ElixirMatchedParenthesesArguments) {
+                                    PsiElement matchedParenthesesArgumentsParent = argumentsParent.getParent();
+
+                                    if (matchedParenthesesArgumentsParent instanceof Call) {
+                                        Call matchedParenthesesArgumentsParentCall = (Call) matchedParenthesesArgumentsParent;
+
+                                        if (matchedParenthesesArgumentsParentCall.isCalling("Enum", "map")) {
+                                            enclosingMacroCall = enclosingMacroCall(matchedParenthesesArgumentsParentCall);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         } else if (parent instanceof Arguments ||
                 parent instanceof Match ||
                 parent instanceof QualifiedAlias ||
                 parent instanceof QualifiedMultipleAliases) {
             enclosingMacroCall = enclosingMacroCall(parent);
+        } else if (parent instanceof Call) {
+            Call parentCall = (Call) parent;
+
+            if (parentCall.isCalling(KERNEL, ALIAS)) {
+                enclosingMacroCall = parentCall;
+            }
         } else if (parent instanceof QuotableKeywordPair) {
             QuotableKeywordPair parentKeywordPair = (QuotableKeywordPair) parent;
 
