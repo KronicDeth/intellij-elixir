@@ -94,6 +94,10 @@
               Fix if-else-ordering bug where <code>Call</code> appeared before operations (which are usually
               <code>Call</code>s) like <code>Match</code>.
             </li>
+            <li>
+              In <code>@type unquote({name, nil, []}) :: foo</code>, <code>name</code> will be highlighted as a type
+              parameter even though it is not strictly the name that will appear as a type parameter.
+            </li>
           </ul>
         </li>
       </ul>

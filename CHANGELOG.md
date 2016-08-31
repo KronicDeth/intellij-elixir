@@ -113,6 +113,7 @@
 * [#400](https://github.com/KronicDeth/intellij-elixir/pull/400) - [@KronicDeth](https://github.com/KronicDeth)
   * Look outside Enum.map for enclosing macro call because `Ecto` defines the clauses of `__schema__(:type, ...)` using `Enum.map`, but `enclosingMacroCall` only knews to jump over enclosing macros like `for`, so a special case was added for anonymous function given to `Enum.map`.
   * Fix if-else-ordering bug where `Call` appeared before operations (which are usually `Call`s) like `Match`.
+* [#401](https://github.com/KronicDeth/intellij-elixir/pull/401) - In `@type unquote({name, nil, []}) :: foo`, `name` will be highlighted as a type parameter even though it is not strictly the name that will appear as a type parameter. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.2.0
 
