@@ -122,7 +122,13 @@ public class MultiResolve extends Module {
                                            @NotNull String aliasedName,
                                            @NotNull ResolveState state) {
         if (aliasedName.equals(name)) {
+            List<String> namePartList = split(name);
+
+            // adds `Foo.SSH` in `alias Foo.SSH`
             addToResolveResultList(match, true);
+
+            // adds `defmodule Foo.SSH` for `alias Foo.SSH`
+            addUnaliasedNamedElementsToResolveResultList(match, namePartList);
         } else {
             List<String> namePartList = split(name);
             String firstNamePart = namePartList.get(0);
@@ -131,12 +137,7 @@ public class MultiResolve extends Module {
             if (aliasedName.equals(firstNamePart)) {
                 addToResolveResultList(match, true);
 
-                String unaliasedName = unaliasedName(match, namePartList);
-                Collection<NamedElement> namedElementCollection = indexedNamedElements(match, unaliasedName);
-
-                for (PsiElement element : namedElementCollection) {
-                    addToResolveResultList(element, true);
-                }
+                addUnaliasedNamedElementsToResolveResultList(match, namePartList);
             } else if (incompleteCode && aliasedName.startsWith(name)) {
                 addToResolveResultList(match, false);
             }
@@ -153,5 +154,14 @@ public class MultiResolve extends Module {
         resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
                 resolveResultList, new PsiElementResolveResult(element, validResult)
         );
+    }
+
+    private void addUnaliasedNamedElementsToResolveResultList(@NotNull PsiNamedElement match, List<String> namePartList) {
+        String unaliasedName = unaliasedName(match, namePartList);
+        Collection<NamedElement> namedElementCollection = indexedNamedElements(match, unaliasedName);
+
+        for (PsiElement element : namedElementCollection) {
+            addToResolveResultList(element, true);
+        }
     }
 }
