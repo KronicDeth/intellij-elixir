@@ -1,13 +1,23 @@
 package org.elixir_lang.psi.scope.module;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
+import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.scope.Module;
+import org.elixir_lang.psi.stub.index.AllName;
+import org.elixir_lang.reference.module.ResolvableName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import static org.elixir_lang.Module.concat;
 import static org.elixir_lang.Module.split;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
@@ -27,6 +37,19 @@ public class MultiResolve extends Module {
      * Private Static Methods
      */
 
+    @NotNull
+    private static Collection<NamedElement> indexedNamedElements(@NotNull PsiNamedElement match,
+                                                                 @NotNull String unaliasedName) {
+        Project project = match.getProject();
+        return StubIndex.getElements(
+                AllName.KEY,
+                unaliasedName,
+                project,
+                GlobalSearchScope.allScope(project),
+                NamedElement.class
+        );
+    }
+
     @Nullable
     private static List<ResolveResult> resolveResultList(@NotNull String name,
                                                          boolean incompleteCode,
@@ -40,6 +63,20 @@ public class MultiResolve extends Module {
                 state.put(ENTRANCE, entrance)
         );
         return multiResolve.getResolveResultList();
+    }
+
+    @NotNull
+    private static String unaliasedName(@NotNull PsiNamedElement match, @NotNull List<String> namePartList) {
+        String matchUnaliasedName = ResolvableName.resolvableName(match);
+
+        List<String> unaliasedNamePartList = new ArrayList<String>(namePartList.size());
+        unaliasedNamePartList.add(matchUnaliasedName);
+
+        for (int i = 1; i < namePartList.size(); i++) {
+            unaliasedNamePartList.add(namePartList.get(i));
+        }
+
+        return concat(unaliasedNamePartList);
     }
 
     /*
@@ -84,24 +121,25 @@ public class MultiResolve extends Module {
     protected boolean executeOnAliasedName(@NotNull PsiNamedElement match,
                                            @NotNull String aliasedName,
                                            @NotNull ResolveState state) {
-        Boolean validResult = null;
-
         if (aliasedName.equals(name)) {
-            validResult = true;
+            addToResolveResultList(match, true);
         } else {
             List<String> namePartList = split(name);
             String firstNamePart = namePartList.get(0);
 
             // alias Foo.SSH, then SSH.Key is name
             if (aliasedName.equals(firstNamePart)) {
-                validResult = true;
-            } else if (incompleteCode && aliasedName.startsWith(name)) {
-                validResult = false;
-            }
-        }
+                addToResolveResultList(match, true);
 
-        if (validResult != null) {
-            addToResolveResultList(match, validResult);
+                String unaliasedName = unaliasedName(match, namePartList);
+                Collection<NamedElement> namedElementCollection = indexedNamedElements(match, unaliasedName);
+
+                for (PsiElement element : namedElementCollection) {
+                    addToResolveResultList(element, true);
+                }
+            } else if (incompleteCode && aliasedName.startsWith(name)) {
+                addToResolveResultList(match, false);
+            }
         }
 
         return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);

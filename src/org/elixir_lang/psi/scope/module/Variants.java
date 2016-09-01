@@ -80,15 +80,7 @@ public class Variants extends Module {
                 )
         );
 
-        final String unaliasedName;
-
-        if (match instanceof QualifiableAlias) {
-            QualifiableAlias matchQualfiableAlias = (QualifiableAlias) match;
-
-            unaliasedName = ResolvableName.resolvableName(matchQualfiableAlias);
-        } else {
-            unaliasedName = match.getName();
-        }
+        String unaliasedName = ResolvableName.resolvableName(match);
 
         if (unaliasedName != null) {
             List<String> unaliasedNestedNames = ContainerUtil.findAll(
