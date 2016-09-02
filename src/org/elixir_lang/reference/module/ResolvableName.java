@@ -1,7 +1,6 @@
 package org.elixir_lang.reference.module;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
 import org.elixir_lang.psi.ElixirAccessExpression;
 import org.elixir_lang.psi.ElixirMultipleAliases;
 import org.elixir_lang.psi.QualifiableAlias;
@@ -23,19 +22,6 @@ public class ResolvableName {
     /*
      * Public Static Methods
      */
-
-    @Nullable
-    public static String resolvableName(@NotNull PsiNamedElement namedElement) {
-        String resolvableName;
-
-        if (namedElement instanceof QualifiableAlias) {
-            resolvableName = resolvableName((QualifiableAlias) namedElement);
-        } else {
-            resolvableName = namedElement.getName();
-        }
-
-        return resolvableName;
-    }
 
     /**
      * The full name of the qualifiable alias, with any multiple aliases expanded

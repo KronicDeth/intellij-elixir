@@ -6,10 +6,9 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.NamedElement;
-import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.reference.module.ResolvableName;
+import org.elixir_lang.reference.module.UnaliasedName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,7 +66,7 @@ public class MultiResolve extends Module {
 
     @NotNull
     private static String unaliasedName(@NotNull PsiNamedElement match, @NotNull List<String> namePartList) {
-        String matchUnaliasedName = ResolvableName.resolvableName(match);
+        String matchUnaliasedName = UnaliasedName.unaliasedName(match);
 
         List<String> unaliasedNamePartList = new ArrayList<String>(namePartList.size());
         unaliasedNamePartList.add(matchUnaliasedName);

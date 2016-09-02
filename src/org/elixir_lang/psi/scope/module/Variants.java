@@ -8,10 +8,9 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.reference.module.ResolvableName;
+import org.elixir_lang.reference.module.UnaliasedName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class Variants extends Module {
                 )
         );
 
-        String unaliasedName = ResolvableName.resolvableName(match);
+        String unaliasedName = UnaliasedName.unaliasedName(match);
 
         if (unaliasedName != null) {
             List<String> unaliasedNestedNames = ContainerUtil.findAll(
