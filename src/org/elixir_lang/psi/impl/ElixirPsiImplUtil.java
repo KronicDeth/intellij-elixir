@@ -2590,8 +2590,8 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static String getName(@NotNull ElixirMatchedQualifiedAlias matchedQualifiedAlias) {
-        return matchedQualifiedAlias.getText();
+    public static String getName(@NotNull QualifiedAlias qualifiedAlias) {
+        return qualifiedAlias.getText();
     }
 
     @Contract(pure = true)

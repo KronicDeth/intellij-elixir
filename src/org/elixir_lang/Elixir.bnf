@@ -2531,6 +2531,7 @@ unmatchedQualifiedAlias ::= unmatchedExpression dotInfixOperator alias
                               implements = "org.elixir_lang.psi.QualifiedAlias"
                               methods = [
                                 fullyQualifiedName
+                                getName
                                 getNameIdentifier
                                 getReference
                                 isModuleName

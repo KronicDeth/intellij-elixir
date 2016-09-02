@@ -23,6 +23,9 @@ public interface ElixirUnmatchedQualifiedAlias extends ElixirUnmatchedExpression
   @Nullable
   String fullyQualifiedName();
 
+  @NotNull
+  String getName();
+
   @Nullable
   PsiElement getNameIdentifier();
 

@@ -51,6 +51,11 @@ public class ElixirUnmatchedQualifiedAliasImpl extends ElixirUnmatchedExpression
     return ElixirPsiImplUtil.fullyQualifiedName(this);
   }
 
+  @NotNull
+  public String getName() {
+    return ElixirPsiImplUtil.getName(this);
+  }
+
   @Nullable
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);

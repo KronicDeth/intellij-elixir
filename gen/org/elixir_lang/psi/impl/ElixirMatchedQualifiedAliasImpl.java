@@ -53,7 +53,7 @@ public class ElixirMatchedQualifiedAliasImpl extends ElixirMatchedExpressionImpl
 
   @NotNull
   public String getName() {
-    return ElixirPsiImplUtil.getName(this);
+    return ElixirPsiImplUtil.getName((QualifiedAlias) this);
   }
 
   @Nullable
