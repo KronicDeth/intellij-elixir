@@ -106,6 +106,9 @@
 * [#397](https://github.com/KronicDeth/intellij-elixir/pull/397) - When a aliased name is added to the module list for completion, it's unaliased name is searched for in the `AllName` index, if any nested modules are found for the unaliased name, then those nested names are aliased and also shown for completion. - [@KronicDeth](https://github.com/KronicDeth)
 * [#399](https://github.com/KronicDeth/intellij-elixir/pull/399) - `resolvableName` allows nested modules under multiple aliases to be completed. - [@KronicDeth](https://github.com/KronicDeth)
 * [#403](https://github.com/KronicDeth/intellij-elixir/pull/403) - By user request, the folding will be off-by-default now, but can be re-enabled, like the old behavior by checking the checkbox in Preferences > Editor > General > Code Folding > Elixir Module directive (`alias`, `import`, `require` or `use`) groups. - [@KronicDeth](https://github.com/KronicDeth)
+* [#405](https://github.com/KronicDeth/intellij-elixir/pull/405) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve `as:` aliased name to both `alias` and `defmodule`
+  * Complete modules nested under `as:` aliased name.
 
 ### Bug Fixes
 * [#393](https://github.com/KronicDeth/intellij-elixir/pull/393) - [@KronicDeth](https://github.com/KronicDeth)
@@ -115,6 +118,10 @@
   * Look outside Enum.map for enclosing macro call because `Ecto` defines the clauses of `__schema__(:type, ...)` using `Enum.map`, but `enclosingMacroCall` only knews to jump over enclosing macros like `for`, so a special case was added for anonymous function given to `Enum.map`.
   * Fix if-else-ordering bug where `Call` appeared before operations (which are usually `Call`s) like `Match`.
 * [#401](https://github.com/KronicDeth/intellij-elixir/pull/401) - In `@type unquote({name, nil, []}) :: foo`, `name` will be highlighted as a type parameter even though it is not strictly the name that will appear as a type parameter. - [@KronicDeth](https://github.com/KronicDeth)
+* [#405](https://github.com/KronicDeth/intellij-elixir/pull/405) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolve alias nested under aliased modules to both the `alias` and `defmodule`, as resolving to only the `alias` loses the nested name, so it wasn't possible to jump to the nested name's `defmodule`.
+  * Resolve aliased name to both the `alias` and the `defmodule`, so you can skip jumping to the `alias` before jumping to the `defmodule`.
+
 
 ## v4.2.0
 

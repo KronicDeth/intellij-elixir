@@ -68,6 +68,12 @@
               Elixir Module directive (<code>alias</code>, <code>import</code>, <code>require</code> or
               <code>use</code>) groups.
             </li>
+            <li>
+              Resolve <code>as:</code> aliased name to both <code>alias</code> and <code>defmodule</code>
+            </li>
+            <li>
+              Complete modules nested under <code>as:</code> aliased name.
+            </li>
           </ul>
         </li>
         <li>
@@ -103,6 +109,15 @@
             <li>
               In <code>@type unquote({name, nil, []}) :: foo</code>, <code>name</code> will be highlighted as a type
               parameter even though it is not strictly the name that will appear as a type parameter.
+            </li>
+            <li>
+              Resolve alias nested under aliased modules to both the <code>alias</code> and <code>defmodule</code>, as
+              resolving to only the <code>alias</code> loses the nested name, so it wasn't possible to jump to the
+              nested name's <code>defmodule</code>.
+            </li>
+            <li>
+              Resolve aliased name to both the <code>alias</code> and the <code>defmodule</code>, so you can skip
+              jumping to the <code>alias</code> before jumping to the <code>defmodule</code>.
             </li>
           </ul>
         </li>
