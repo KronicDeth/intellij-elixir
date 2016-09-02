@@ -52,6 +52,7 @@
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
+      - [Alias](#alias)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
@@ -1681,9 +1682,26 @@ Parameter and variable usages can be completed whenever typing an identifier.  T
 Go To Declaration is a feature of JetBrains IDEs that allows you to jump from the usage of a symbol, such as a Module
 Alias, to its declaration, such as the `defmodule` call.
 
+#### Alias
+
+1. Place the cursor over an Alias with an aliased name setup by `alias`
+  a. `Suffix` if `alias Prefix.Suffix` called
+  b. `MultipleAliasA` if `alias Prefix.{MultipleAliasA, MultipleAliasB}` called
+  c. `As` if `alias Prefix.Suffix, as: As`
+2. Activate the Go To Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+3. A Go To Declaration lookup menu will appear, allowing you to jump either the `alias` that setup the aliased name or jumping directly to `defmodule` of the unaliased name.  Select which declaration you want
+  a. Use arrow keys to select and hit `Enter`
+  b. `Click`
+
 #### Module
 
-1. Place the cursor over an Alias
+1. Place the cursor over a fully-qualified Alias
+  a. `A.B` in `A.B.func()`
+  b. `A.B` in `alias A.B`
+  c. `B` in `alias A.{B, C}`
 2. Activate the Go To Declaration action with one of the following:
   a. `Cmd+B`
   b. Select Navigate &gt; Declaration from the menu.
