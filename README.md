@@ -49,6 +49,7 @@
     - [Run Configurations](#run-configurations)
       - [Mix Tasks](#mix-tasks)
     - [Completion](#completion)
+      - [Aliases and Modules](#aliases-and-modules)
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
@@ -1669,6 +1670,25 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 ### Completion
 
+#### Aliases and Modules
+
+When you start typing an Alias, completion will look in three locations:
+
+1. `alias` aliased names in the current file
+  a. `Suffix` for `alias Prefix.Suffix`
+  b. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
+  c. `As` for `alias Prefix.Suffix, as: As`
+2. Indexed module names (as available from [Go To Symbol](#go-to-symbol))
+  a. `Prefix.Suffix` from `defmodule Prefix.Suffix`
+  b. `MyProtocol` from `defprotocol MyProtocol`
+  c. `MyProtocol.MyStruct`
+    i. `defimpl MyProtocol, for: MyStruct` 
+    ii. `defimpl MyProtocol` nested under `defmodule MyStruct`
+3. Nested modules under aliased names
+  a. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
+  b. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
+  c. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
+  
 #### Module Attributes
 
 Module attributes declared earlier in the file can be completed whenever you type `@` and some letter.  If you want to see all module attributes, you can type `@a`, wait for the completions to appear, then delete the `@` to remove the filtering to `a`.
