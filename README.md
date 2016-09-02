@@ -49,9 +49,11 @@
     - [Run Configurations](#run-configurations)
       - [Mix Tasks](#mix-tasks)
     - [Completion](#completion)
+      - [Aliases and Modules](#aliases-and-modules)
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
+      - [Alias](#alias)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
@@ -1668,6 +1670,25 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 ### Completion
 
+#### Aliases and Modules
+
+When you start typing an Alias, completion will look in three locations:
+
+1. `alias` aliased names in the current file
+  a. `Suffix` for `alias Prefix.Suffix`
+  b. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
+  c. `As` for `alias Prefix.Suffix, as: As`
+2. Indexed module names (as available from [Go To Symbol](#go-to-symbol))
+  a. `Prefix.Suffix` from `defmodule Prefix.Suffix`
+  b. `MyProtocol` from `defprotocol MyProtocol`
+  c. `MyProtocol.MyStruct`
+    i. `defimpl MyProtocol, for: MyStruct` 
+    ii. `defimpl MyProtocol` nested under `defmodule MyStruct`
+3. Nested modules under aliased names
+  a. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
+  b. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
+  c. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
+  
 #### Module Attributes
 
 Module attributes declared earlier in the file can be completed whenever you type `@` and some letter.  If you want to see all module attributes, you can type `@a`, wait for the completions to appear, then delete the `@` to remove the filtering to `a`.
@@ -1681,9 +1702,26 @@ Parameter and variable usages can be completed whenever typing an identifier.  T
 Go To Declaration is a feature of JetBrains IDEs that allows you to jump from the usage of a symbol, such as a Module
 Alias, to its declaration, such as the `defmodule` call.
 
+#### Alias
+
+1. Place the cursor over an Alias with an aliased name setup by `alias`
+  a. `Suffix` if `alias Prefix.Suffix` called
+  b. `MultipleAliasA` if `alias Prefix.{MultipleAliasA, MultipleAliasB}` called
+  c. `As` if `alias Prefix.Suffix, as: As`
+2. Activate the Go To Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+3. A Go To Declaration lookup menu will appear, allowing you to jump either the `alias` that setup the aliased name or jumping directly to `defmodule` of the unaliased name.  Select which declaration you want
+  a. Use arrow keys to select and hit `Enter`
+  b. `Click`
+
 #### Module
 
-1. Place the cursor over an Alias
+1. Place the cursor over a fully-qualified Alias
+  a. `A.B` in `A.B.func()`
+  b. `A.B` in `alias A.B`
+  c. `B` in `alias A.{B, C}`
 2. Activate the Go To Declaration action with one of the following:
   a. `Cmd+B`
   b. Select Navigate &gt; Declaration from the menu.
