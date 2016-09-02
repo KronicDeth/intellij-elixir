@@ -121,7 +121,8 @@
 * [#405](https://github.com/KronicDeth/intellij-elixir/pull/405) - [@KronicDeth](https://github.com/KronicDeth)
   * Resolve alias nested under aliased modules to both the `alias` and `defmodule`, as resolving to only the `alias` loses the nested name, so it wasn't possible to jump to the nested name's `defmodule`.
   * Resolve aliased name to both the `alias` and the `defmodule`, so you can skip jumping to the `alias` before jumping to the `defmodule`.
-
+* [#406](https://github.com/KronicDeth/intellij-elixir/pull/406) - [@KronicDeth](https://github.com/KronicDeth)
+  * The generated `ElixirParser` uses the `GeneratedParserUtilBase` from `com.intellij.lang.parser`, but since that version is a synced copy, it is a snapshot of `GeneratedParserUtilBase` from the version of GrammarKit that was current when the IDE was released.  To ensure the generated parser works on all the IDEs, I copy `GeneratedParserUtilBase` from `org.intellij.grammar.parser` into `org.elixir_lang.grammar.parser` and then use that version in `ElixirParser`.  This ensures neither the IDE's version nor the version in any installed GrammarKit plugin is used.
 
 ## v4.2.0
 

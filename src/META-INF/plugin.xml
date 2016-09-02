@@ -119,6 +119,14 @@
               Resolve aliased name to both the <code>alias</code> and the <code>defmodule</code>, so you can skip
               jumping to the <code>alias</code> before jumping to the <code>defmodule</code>.
             </li>
+            <li>
+              The generated `ElixirParser` uses the `GeneratedParserUtilBase` from `com.intellij.lang.parser`, but since
+              that version is a synced copy, it is a snapshot of `GeneratedParserUtilBase` from the version of
+              GrammarKit that was current when the IDE was released.  To ensure the generated parser works on all the
+              IDEs, copy `GeneratedParserUtilBase` from `org.intellij.grammar.parser` into
+              `org.elixir_lang.grammar.parser` and then use that version in `ElixirParser`.  This ensures neither the
+              IDE's version nor the version in any installed GrammarKit plugin is used.
+            </li>
           </ul>
         </li>
       </ul>
