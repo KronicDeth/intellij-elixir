@@ -5,6 +5,6 @@ import com.intellij.openapi.util.Conditions;
 
 class ProperStartsWith {
     static Condition<String> properStartsWith(String prefix) {
-        return Conditions.or2(new StartsWith(prefix), new Longer(prefix.length()));
+        return Conditions.and(new StartsWith(prefix), new Longer(prefix.length()));
     }
 }
