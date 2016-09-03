@@ -28,7 +28,9 @@ public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentif
             Collection<String> canonicalNameCollection = callStub.canonicalNameCollection();
 
             for (String canonicalName : canonicalNameCollection) {
-                sink.occurrence(AllName.KEY, canonicalName);
+                if (!canonicalName.equals(name)) {
+                    sink.occurrence(AllName.KEY, canonicalName);
+                }
             }
         }
     }
