@@ -6,8 +6,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.containers.ContainerUtil;
+import com.intellij.util.containers.HashSet;
+import org.apache.xmlbeans.impl.xb.xsdschema.All;
+import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.reference.module.UnaliasedName;
@@ -16,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.intellij.psi.util.PsiTreeUtil.treeWalkUp;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
@@ -40,7 +45,7 @@ public class Variants extends Module {
             lookupElementList = new ArrayList<LookupElement>();
         }
 
-        variants.addProjectNamesTo(lookupElementList, entrance.getProject());
+        variants.addProjectNameElementsTo(lookupElementList, entrance.getProject());
 
         return lookupElementList;
     }
@@ -49,8 +54,6 @@ public class Variants extends Module {
      * Fields
      */
 
-    private Collection<String> nameCollection = null;
-    private Project project = null;
     private List<LookupElement> lookupElementList = null;
 
     /*
@@ -82,19 +85,40 @@ public class Variants extends Module {
         String unaliasedName = UnaliasedName.unaliasedName(match);
 
         if (unaliasedName != null) {
+            Project project = match.getProject();
+
+            Collection<String> indexedNameCollection = StubIndex
+                    .getInstance()
+                    .getAllKeys(AllName.KEY, project);
             List<String> unaliasedNestedNames = ContainerUtil.findAll(
-                    nameCollection(match.getProject()),
+                    indexedNameCollection,
                     ProperStartsWith.properStartsWith(unaliasedName)
             );
-            List<String> aliasedNestedNames = ContainerUtil.map(
-                    unaliasedNestedNames,
-                    new ReplaceFirst(unaliasedName, aliasedName)
-            );
-            List<LookupElement> aliasedNesteNameLookElements = ContainerUtil.map(
-                    aliasedNestedNames,
-                    CreateLookupElement.INSTANCE
-            );
-            lookupElementList.addAll(aliasedNesteNameLookElements);
+
+            GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+
+            for (String unaliasedNestedName : unaliasedNestedNames) {
+                Collection<NamedElement> unaliasedNestedNamedElementCollection = StubIndex.getElements(
+                        AllName.KEY,
+                        unaliasedNestedName,
+                        project,
+                        scope,
+                        NamedElement.class
+                );
+
+                if (unaliasedNestedNamedElementCollection.size() > 0) {
+                    String aliasedNestedName = unaliasedNestedName.replaceFirst(unaliasedName, aliasedName);
+
+                    for (NamedElement unaliasedNestedNamedElement : unaliasedNestedNamedElementCollection) {
+                        lookupElementList.add(
+                                LookupElementBuilder.createWithSmartPointer(
+                                        aliasedNestedName,
+                                        unaliasedNestedNamedElement
+                                )
+                        );
+                    }
+                }
+            }
         }
 
         return true;
@@ -104,28 +128,33 @@ public class Variants extends Module {
      * Private Instance Methods
      */
 
-    private void addProjectNamesTo(List<LookupElement> lookupElementList, Project project) {
-        Collection<String> projectNameCollection = nameCollection(project);
+    private void addProjectNameElementsTo(List<LookupElement> lookupElementList, Project project) {
+        /* getAllKeys is not the actual keys in the actual project.  They need to be checked.
+           See https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions */
+        Collection<String> indexedNameCollection = StubIndex.getInstance().getAllKeys(AllName.KEY, project);
+        GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
-        lookupElementList.addAll(
-                ContainerUtil.map(projectNameCollection, CreateLookupElement.INSTANCE)
-        );
+        for (String indexedName : indexedNameCollection) {
+            Collection<NamedElement> indexedNameNamedElementCollection = StubIndex.getElements(
+                    AllName.KEY,
+                    indexedName,
+                    project,
+                    scope,
+                    NamedElement.class
+            );
+
+            for (NamedElement indexedNameNamedElement : indexedNameNamedElementCollection) {
+                lookupElementList.add(
+                        LookupElementBuilder.createWithSmartPointer(
+                                indexedName,
+                                indexedNameNamedElement
+                        )
+                );
+            }
+        }
     }
 
     private List<LookupElement> getLookupElementList() {
         return lookupElementList;
-    }
-
-    /**
-     * Caches {@code StubIndex.getAllKeys(AllName.KEY, project)}
-     * @return
-     */
-
-    private Collection<String> nameCollection(Project project) {
-        if (project != this.project || nameCollection == null) {
-            nameCollection = StubIndex.getInstance().getAllKeys(AllName.KEY, project);
-        }
-
-        return nameCollection;
     }
 }
