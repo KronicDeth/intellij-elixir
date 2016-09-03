@@ -95,27 +95,29 @@ public class Variants extends Module {
                     ProperStartsWith.properStartsWith(unaliasedName)
             );
 
-            GlobalSearchScope scope = GlobalSearchScope.allScope(project);
+            if (unaliasedNestedNames.size() > 0) {
+                GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
-            for (String unaliasedNestedName : unaliasedNestedNames) {
-                Collection<NamedElement> unaliasedNestedNamedElementCollection = StubIndex.getElements(
-                        AllName.KEY,
-                        unaliasedNestedName,
-                        project,
-                        scope,
-                        NamedElement.class
-                );
+                for (String unaliasedNestedName : unaliasedNestedNames) {
+                    Collection<NamedElement> unaliasedNestedNamedElementCollection = StubIndex.getElements(
+                            AllName.KEY,
+                            unaliasedNestedName,
+                            project,
+                            scope,
+                            NamedElement.class
+                    );
 
-                if (unaliasedNestedNamedElementCollection.size() > 0) {
-                    String aliasedNestedName = unaliasedNestedName.replaceFirst(unaliasedName, aliasedName);
+                    if (unaliasedNestedNamedElementCollection.size() > 0) {
+                        String aliasedNestedName = unaliasedNestedName.replaceFirst(unaliasedName, aliasedName);
 
-                    for (NamedElement unaliasedNestedNamedElement : unaliasedNestedNamedElementCollection) {
-                        lookupElementList.add(
-                                LookupElementBuilder.createWithSmartPointer(
-                                        aliasedNestedName,
-                                        unaliasedNestedNamedElement
-                                )
-                        );
+                        for (NamedElement unaliasedNestedNamedElement : unaliasedNestedNamedElementCollection) {
+                            lookupElementList.add(
+                                    LookupElementBuilder.createWithSmartPointer(
+                                            aliasedNestedName,
+                                            unaliasedNestedNamedElement
+                                    )
+                            );
+                        }
                     }
                 }
             }
