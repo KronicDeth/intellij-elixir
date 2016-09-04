@@ -9,8 +9,6 @@ import com.intellij.psi.ResolveState;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.containers.HashSet;
-import org.apache.xmlbeans.impl.xb.xsdschema.All;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
@@ -20,9 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static com.intellij.psi.util.PsiTreeUtil.treeWalkUp;
+import static org.elixir_lang.Module.concat;
+import static org.elixir_lang.Module.split;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
 public class Variants extends Module {
@@ -92,7 +91,7 @@ public class Variants extends Module {
                     .getAllKeys(AllName.KEY, project);
             List<String> unaliasedNestedNames = ContainerUtil.findAll(
                     indexedNameCollection,
-                    ProperStartsWith.properStartsWith(unaliasedName)
+                    new org.elixir_lang.Module.IsNestedUnder(unaliasedName)
             );
 
             if (unaliasedNestedNames.size() > 0) {
@@ -108,7 +107,18 @@ public class Variants extends Module {
                     );
 
                     if (unaliasedNestedNamedElementCollection.size() > 0) {
-                        String aliasedNestedName = unaliasedNestedName.replaceFirst(unaliasedName, aliasedName);
+                        List<String> unaliasedNestedNamePartList = split(unaliasedNestedName);
+                        List<String> unaliasedNamePartList = split(unaliasedName);
+                        List<String> aliasedNamePartList = split(aliasedName);
+                        List<String> aliasedNestedNamePartList = new ArrayList<String>();
+
+                        aliasedNestedNamePartList.addAll(aliasedNamePartList);
+
+                        for (int i = unaliasedNamePartList.size(); i < unaliasedNestedNamePartList.size(); i++) {
+                            aliasedNestedNamePartList.add(unaliasedNestedNamePartList.get(i));
+                        }
+
+                        String aliasedNestedName = concat(aliasedNestedNamePartList);
 
                         for (NamedElement unaliasedNestedNamedElement : unaliasedNestedNamedElementCollection) {
                             lookupElementList.add(
