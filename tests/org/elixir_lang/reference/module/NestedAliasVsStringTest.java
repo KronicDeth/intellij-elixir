@@ -46,12 +46,6 @@ public class NestedAliasVsStringTest extends LightCodeInsightFixtureTestCase {
      * Protected Instance Methods
      */
 
-     @Override
-    protected void setUp() throws Exception {
-        VfsRootAccess.SHOULD_PERFORM_ACCESS_CHECK = false; // TODO: a workaround for v15
-        super.setUp();
-    }
-
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/reference/module/nested_alias_vs_string";

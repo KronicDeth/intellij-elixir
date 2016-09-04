@@ -67,12 +67,6 @@ public class MultipleAliasTest extends LightCodeInsightFixtureTestCase {
      * Protected Instance Methods
      */
 
-     @Override
-    protected void setUp() throws Exception {
-        VfsRootAccess.SHOULD_PERFORM_ACCESS_CHECK = false; // TODO: a workaround for v15
-        super.setUp();
-    }
-
     @Override
     protected String getTestDataPath() {
         return "testData/org/elixir_lang/reference/module/multiple_alias";
