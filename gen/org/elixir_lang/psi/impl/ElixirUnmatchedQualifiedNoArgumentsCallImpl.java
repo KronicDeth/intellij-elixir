@@ -16,7 +16,7 @@ import org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.Set;
 
 public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsiElementBase<UnmatchedQualifiedNoArgumentsCall> implements ElixirUnmatchedQualifiedNoArgumentsCall {
 
@@ -67,8 +67,8 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsi
   }
 
   @Nullable
-  public Collection<String> canonicalNameCollection() {
-    return ElixirPsiImplUtil.canonicalNameCollection(this);
+  public Set<String> canonicalNameSet() {
+    return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
   @Nullable

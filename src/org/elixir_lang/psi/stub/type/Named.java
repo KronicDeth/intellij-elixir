@@ -3,12 +3,11 @@ package org.elixir_lang.psi.stub.type;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.NamedStubBase;
-import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
+import java.util.Set;
 
 public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentifierOwner> extends Element<S, T> {
     public Named(@NonNls @NotNull String debugName) {
@@ -25,9 +24,9 @@ public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentif
 
         if (stub instanceof org.elixir_lang.psi.stub.call.Stub) {
             org.elixir_lang.psi.stub.call.Stub callStub = (org.elixir_lang.psi.stub.call.Stub) stub;
-            Collection<String> canonicalNameCollection = callStub.canonicalNameCollection();
+            Set<String> canonicalNameSet = callStub.canonicalNameSet();
 
-            for (String canonicalName : canonicalNameCollection) {
+            for (String canonicalName : canonicalNameSet) {
                 if (!canonicalName.equals(name)) {
                     sink.occurrence(AllName.KEY, canonicalName);
                 }

@@ -4,6 +4,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.NamedStubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.util.containers.SmartHashSet;
 import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
@@ -11,38 +12,35 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 // I normally wouldn't add the redundant StubBased prefix, but it makes generating from Elixir.bnf work
 public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStubBase<T> {
-    private static Collection<String> collectionStringRefToCollectionString(
-            Collection<StringRef> canonicalNameCollection
-    ) {
-        Collection<String> stringCollection = new ArrayList<String>(canonicalNameCollection.size());
+    private static Set<String> setStringRefToSetString(Set<StringRef> stringRefSet) {
+        Set<String> stringSet = new SmartHashSet<String>(stringRefSet.size());
 
-        for (StringRef canonicalName : canonicalNameCollection) {
-            stringCollection.add(StringRef.toString(canonicalName));
+        for (StringRef stringRef : stringRefSet) {
+            stringSet.add(StringRef.toString(stringRef));
         }
 
-        return stringCollection;
+        return stringSet;
     }
 
-    private static Collection<StringRef> collectionStringToCollectionStringRef(
-            Collection<String> canonicalNameCollection
-    ) {
-        Collection<StringRef> stringRefCollection = new ArrayList<StringRef>(canonicalNameCollection.size());
+    private static Set<StringRef> setStringToSetStringRef(Set<String> stringSet) {
+        Set<StringRef> stringRefSet = new SmartHashSet<StringRef>(stringSet.size());
 
-        for (String canonicalName : canonicalNameCollection) {
-            stringRefCollection.add(StringRef.fromString(canonicalName));
+        for (String string : stringSet) {
+            stringRefSet.add(StringRef.fromString(string));
         }
 
-        return stringRefCollection;
+        return stringRefSet;
     }
 
     /*
      * Fields
      */
 
-    private final Collection<StringRef> canonicalNameCollection;
+    private final Set<StringRef> canonicalNameSet;
     private final boolean hasDoBlockOrKeyword;
     private final int resolvedFinalArity;
     private final StringRef resolvedFunctionName;
@@ -60,7 +58,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
                 @NotNull String name,
-                @NotNull Collection<String> canonicalNameCollection) {
+                @NotNull Set<String> canonicalNameSet) {
         this(
                 parent,
                 elementType,
@@ -69,7 +67,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 StringRef.fromString(name),
-                collectionStringToCollectionStringRef(canonicalNameCollection)
+                setStringToSetStringRef(canonicalNameSet)
         );
     }
 
@@ -80,9 +78,9 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
                 int resolvedFinalArity,
                 boolean hasDoBlockOrKeyword,
                 @NotNull StringRef name,
-                @NotNull Collection<StringRef> canonicalNameCollection) {
+                @NotNull Set<StringRef> canonicalNameSet) {
         super(parent, elementType, name);
-        this.canonicalNameCollection = canonicalNameCollection;
+        this.canonicalNameSet = canonicalNameSet;
         this.hasDoBlockOrKeyword = hasDoBlockOrKeyword;
         this.resolvedFinalArity = resolvedFinalArity;
         this.resolvedFunctionName = resolvedFunctionName;
@@ -99,8 +97,8 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      * @return the canonical texts of the reference
      * @see PsiReference#getCanonicalText()
      */
-    public Collection<String> canonicalNameCollection() {
-        return collectionStringRefToCollectionString(canonicalNameCollection);
+    public Set<String> canonicalNameSet() {
+        return setStringRefToSetString(canonicalNameSet);
     }
 
     /**

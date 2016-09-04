@@ -11,7 +11,7 @@
   elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
   methods(           "((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
     canonicalName
-    canonicalNameCollection
+    canonicalNameSet
     functionName
     functionNameElement
     getDoBlock

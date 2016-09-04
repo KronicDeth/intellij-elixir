@@ -20,6 +20,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewUtil;
+import com.intellij.util.containers.SmartHashSet;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.ElixirLanguage;
@@ -343,12 +344,12 @@ public class ElixirPsiImplUtil {
         return canonicalName;
     }
 
-    @Nullable
-    public static Collection<String> canonicalNameCollection(@NotNull StubBased stubBased) {
-        Collection<String> canonicalNameCollection;
+    @NotNull
+    public static Set<String> canonicalNameSet(@NotNull StubBased stubBased) {
+        Set<String> canonicalNameSet;
 
         if (isModular(stubBased)) {
-            Collection<String> canonicalNameSuffixCollection;
+            Set<String> canonicalNameSuffixSet;
 
             if (Implementation.is(stubBased)) {
                 String maybeProtocolName = Implementation.protocolName(stubBased);
@@ -362,58 +363,58 @@ public class ElixirPsiImplUtil {
                 String protocolName = StringUtil.notNullize(maybeProtocolName, "?");
 
                 if (maybeForNameCollection == null) {
-                    canonicalNameSuffixCollection = Collections.singletonList(protocolName + ".?");
+                    canonicalNameSuffixSet = Collections.singleton(protocolName + ".?");
                 } else {
-                    canonicalNameSuffixCollection = new ArrayList<String>(maybeForNameCollection.size());
+                    canonicalNameSuffixSet = new SmartHashSet<String>(maybeForNameCollection.size());
 
                     for (@Nullable String maybeForName : maybeForNameCollection) {
                         String canonicalName = protocolName + "." + StringUtil.notNullize(maybeForName, "?");
-                        canonicalNameSuffixCollection.add(canonicalName);
+                        canonicalNameSuffixSet.add(canonicalName);
                     }
                 }
             } else if (Module.is(stubBased) || Protocol.is(stubBased)) {
-                canonicalNameSuffixCollection = Collections.singletonList(
+                canonicalNameSuffixSet = Collections.singleton(
                         org.elixir_lang.navigation.item_presentation.modular.Module.presentableText(stubBased)
                 );
             } else {
-                canonicalNameSuffixCollection = Collections.singletonList("?");
+                canonicalNameSuffixSet = Collections.singleton("?");
             }
 
             Call enclosing = enclosingModularMacroCall(stubBased);
 
             if (enclosing instanceof StubBased) {
                 StubBased enclosingStubBased = (StubBased) enclosing;
-                Collection<String> canonicalNamePrefixCollection = enclosingStubBased.canonicalNameCollection();
+                Set<String> canonicalNamePrefixSet = enclosingStubBased.canonicalNameSet();
 
-                if (canonicalNamePrefixCollection == null) {
-                    canonicalNamePrefixCollection = Collections.singletonList("?");
+                if (canonicalNamePrefixSet == null) {
+                    canonicalNamePrefixSet = Collections.singleton("?");
                 }
 
-                canonicalNameCollection = new ArrayList<String>(
-                        canonicalNamePrefixCollection.size() * canonicalNameSuffixCollection.size()
+                canonicalNameSet = new SmartHashSet<String>(
+                        canonicalNamePrefixSet.size() * canonicalNameSuffixSet.size()
                 );
 
-                for (String canonicalNamePrefix : canonicalNamePrefixCollection) {
-                    for (String canonicalNameSuffix : canonicalNameSuffixCollection) {
-                        canonicalNameCollection.add(
+                for (String canonicalNamePrefix : canonicalNamePrefixSet) {
+                    for (String canonicalNameSuffix : canonicalNameSuffixSet) {
+                        canonicalNameSet.add(
                                 canonicalNamePrefix + "." + canonicalNameSuffix
                         );
                     }
                 }
             } else {
-                canonicalNameCollection = canonicalNameSuffixCollection;
+                canonicalNameSet = canonicalNameSuffixSet;
             }
         } else {
             String canonicalName = stubBased.getName();
 
             if (canonicalName != null) {
-                canonicalNameCollection = Collections.singletonList(canonicalName);
+                canonicalNameSet = Collections.singleton(canonicalName);
             } else {
-                canonicalNameCollection = null;
+                canonicalNameSet = null;
             }
         }
 
-        return canonicalNameCollection;
+        return canonicalNameSet;
     }
 
     // @return -1 if codePoint cannot be parsed.

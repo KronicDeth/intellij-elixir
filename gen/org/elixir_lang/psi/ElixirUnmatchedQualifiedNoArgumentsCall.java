@@ -12,7 +12,7 @@ import org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatchedExpression, QualifiedNoArgumentsCall<UnmatchedQualifiedNoArgumentsCall>, StubBasedPsiElement<UnmatchedQualifiedNoArgumentsCall> {
 
@@ -32,7 +32,7 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   String canonicalName();
 
   @Nullable
-  Collection<String> canonicalNameCollection();
+  Set<String> canonicalNameSet();
 
   @Nullable
   String functionName();

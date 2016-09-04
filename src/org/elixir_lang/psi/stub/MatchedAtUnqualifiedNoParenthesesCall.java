@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Set;
 
 public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtUnqualifiedNoParenthesesCall> {
     public MatchedAtUnqualifiedNoParenthesesCall(
@@ -19,7 +20,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull StringRef name,
-            @NotNull Collection<StringRef> canonicalNameCollection
+            @NotNull Set<StringRef> canonicalNameSet
     ) {
         super(parent,
                 elementType,
@@ -28,7 +29,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameCollection);
+                canonicalNameSet);
     }
 
     public MatchedAtUnqualifiedNoParenthesesCall(
@@ -39,7 +40,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
             int resolvedFinalArity,
             boolean hasDoBlockOrKeyword,
             @NotNull String name,
-            @NotNull Collection<String> canonicalNameCollection
+            @NotNull Set<String> canonicalNameSet
     ) {
         super(
                 parent,
@@ -49,7 +50,7 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
                 resolvedFinalArity,
                 hasDoBlockOrKeyword,
                 name,
-                canonicalNameCollection
+                canonicalNameSet
         );
     }
 }

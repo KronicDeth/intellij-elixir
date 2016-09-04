@@ -16,8 +16,8 @@ import org.elixir_lang.psi.stub.UnmatchedDotCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<UnmatchedDotCall> implements ElixirUnmatchedDotCall {
 
@@ -68,8 +68,8 @@ public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<Unmat
   }
 
   @Nullable
-  public Collection<String> canonicalNameCollection() {
-    return ElixirPsiImplUtil.canonicalNameCollection(this);
+  public Set<String> canonicalNameSet() {
+    return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
   @Nullable

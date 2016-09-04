@@ -38,7 +38,7 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),
-                psi.canonicalNameCollection()
+                psi.canonicalNameSet()
         );
     }
 
@@ -53,7 +53,7 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 dataStream.readInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
-                readNameCollection(dataStream)
+                readNameSet(dataStream)
         );
     }
 }

@@ -31,7 +31,10 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
     }
 
     @Override
-    public org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall createStub(@NotNull ElixirUnmatchedUnqualifiedParenthesesCall psi, StubElement parentStub) {
+    public org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall createStub(
+            @NotNull ElixirUnmatchedUnqualifiedParenthesesCall psi,
+            StubElement parentStub
+    ) {
         return new org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall(
                 parentStub,
                 this,
@@ -40,7 +43,7 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 psi.getName(),
-                psi.canonicalNameCollection()
+                psi.canonicalNameSet()
         );
     }
 
@@ -58,7 +61,7 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
                 dataStream.readInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
-                readNameCollection(dataStream)
+                readNameSet(dataStream)
         );
     }
 }
