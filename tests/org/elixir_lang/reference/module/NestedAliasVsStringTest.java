@@ -1,12 +1,14 @@
 package org.elixir_lang.reference.module;
 
 import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.lookup.LookupEx;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.QualifiedAlias;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,12 +22,23 @@ public class NestedAliasVsStringTest extends LightCodeInsightFixtureTestCase {
      */
 
     public void testCompletion() {
-        myFixture.configureByFiles("completion.ex", "nested.ex", "nested_suffix.ex");
-        myFixture.complete(CompletionType.BASIC, 1);
-        List<String> strings = myFixture.getLookupElementStrings();
+        List<String> completionVariants = myFixture.getCompletionVariants(
+                "completion.ex",
+                "nested.ex",
+                "nested_suffix.ex",
+                "nested_under.ex"
+        );
         assertFalse(
                 "Lookup contains string suffixed module name.  Nesting substitution is not breaking on '.'",
-                strings.contains("Prefix.Suffix.NestedSuffix")
+                completionVariants.contains("ABCDSuffix")
+        );
+        assertTrue(
+                "Completion on `alias as:` does not complete as: aliased name",
+                completionVariants.contains("ABCD")
+        );
+        assertTrue(
+                "Completion on `alias as:` does not complete module nested under as: aliased name",
+                completionVariants.contains("ABCD.Nested")
         );
     }
 

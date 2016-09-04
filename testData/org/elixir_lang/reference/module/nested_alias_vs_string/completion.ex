@@ -1,5 +1,5 @@
 defmodule Prefix.Suffix do
-  alias Prefix.Suffix.Nested, as: PSN
+  alias Prefix.Suffix.Nested, as: ABCD
 
-  PSN<caret>
+  A<caret>
 end

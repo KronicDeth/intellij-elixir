@@ -1,20 +1,12 @@
 package org.elixir_lang.reference.module;
 
-import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.psi.stubs.StubIndex;
-import com.intellij.testFramework.LightProjectDescriptor;
-import com.intellij.testFramework.fixtures.DefaultLightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
-import org.elixir_lang.module.ElixirModuleType;
 import org.elixir_lang.psi.ElixirAlias;
-import org.elixir_lang.psi.stub.index.AllName;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class AsTest extends LightPlatformCodeInsightFixtureTestCase {
@@ -23,23 +15,24 @@ public class AsTest extends LightPlatformCodeInsightFixtureTestCase {
      */
 
     public void testCompletion() {
-        myFixture.configureByFiles("completion.ex", "suffix.ex");
-        myFixture.complete(CompletionType.BASIC, 1);
-        List<String> strings = myFixture.getLookupElementStrings();
-        assertNotNull(strings);
-        assertTrue(
-                strings.containsAll(
-                        Arrays.asList(
-                                // aliased name
-                                "AsAlias"
-                        )
-                )
+        List<String> completionVariants = myFixture.getCompletionVariants(
+                "completion.ex",
+                "suffix1.ex",
+                "suffix2.ex"
         );
-        assertEquals(1, strings.size());
+        assertTrue(
+                "AsA was not completed to AsAlias1",
+                completionVariants.contains("AsAlias1")
+        );
+        assertTrue(
+                "AsA was not completed to AsAlias2",
+                completionVariants.contains("AsAlias2")
+        );
+        assertEquals(2, completionVariants.size());
     }
 
     public void testReference() {
-        myFixture.configureByFiles("reference.ex", "suffix.ex");
+        myFixture.configureByFiles("reference.ex", "suffix1.ex");
         PsiElement alias = myFixture
                 .getFile()
                 .findElementAt(myFixture.getCaretOffset())
@@ -58,11 +51,11 @@ public class AsTest extends LightPlatformCodeInsightFixtureTestCase {
 
         // alias
         assertEquals(
-                "alias Prefix.Suffix, as: As",
+                "alias Prefix.Suffix1, as: As",
                 resolveResults[0].getElement().getParent().getParent().getParent().getParent().getParent().getText()
         );
         // defmodule
-        assertEquals("defmodule Prefix.Suffix do\nend", resolveResults[1].getElement().getText());
+        assertEquals("defmodule Prefix.Suffix1 do\nend", resolveResults[1].getElement().getText());
     }
 
     /*

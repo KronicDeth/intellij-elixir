@@ -1,5 +1,5 @@
 defmodule Prefix.Usage do
-  alias Prefix.Suffix, as: As
+  alias Prefix.Suffix1, as: As
 
   As<caret>
 
