@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Set;
 
 public interface StubBased<Stub extends org.elixir_lang.psi.stub.call.Stub> extends Named, StubBasedPsiElement<Stub> {
     /**
@@ -14,8 +15,8 @@ public interface StubBased<Stub extends org.elixir_lang.psi.stub.call.Stub> exte
     String canonicalName();
 
     /**
-     * @return empty collection if no canonical names
+     * @return empty set if no canonical names
      */
     @NotNull
-    Collection<String> canonicalNameCollection();
+    Set<String> canonicalNameSet();
 }

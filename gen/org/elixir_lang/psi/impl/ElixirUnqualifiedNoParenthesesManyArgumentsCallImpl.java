@@ -16,8 +16,8 @@ import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedStubbedPsiElementBase<UnqualifiedNoParenthesesManyArgumentsCall> implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
 
@@ -80,8 +80,8 @@ public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedSt
   }
 
   @Nullable
-  public Collection<String> canonicalNameCollection() {
-    return ElixirPsiImplUtil.canonicalNameCollection(this);
+  public Set<String> canonicalNameSet() {
+    return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
   @Nullable

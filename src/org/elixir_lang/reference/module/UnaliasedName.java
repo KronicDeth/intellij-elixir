@@ -80,9 +80,9 @@ public class UnaliasedName {
                 element instanceof QuotableKeywordList) {
             unaliasedName = up(element.getParent(), entrance);
         } else if (element instanceof ElixirMultipleAliases) {
-            unaliasedName = down(entrance);
+            unaliasedName = ResolvableName.resolvableName(entrance);
         } else if (element instanceof QuotableKeywordPair) {
-            unaliasedName =up((QuotableKeywordPair) element, entrance);
+            unaliasedName = up((QuotableKeywordPair) element, entrance);
         }
 
         return unaliasedName;

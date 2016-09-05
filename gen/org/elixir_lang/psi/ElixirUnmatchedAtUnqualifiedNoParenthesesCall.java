@@ -13,7 +13,7 @@ import org.elixir_lang.psi.stub.UnmatchedAtUnqualifiedNoParenthesesCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnmatchedExpression, AtUnqualifiedNoParenthesesCall<UnmatchedAtUnqualifiedNoParenthesesCall>, StubBasedPsiElement<UnmatchedAtUnqualifiedNoParenthesesCall> {
 
@@ -30,7 +30,7 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   String canonicalName();
 
   @Nullable
-  Collection<String> canonicalNameCollection();
+  Set<String> canonicalNameSet();
 
   @Nullable
   String functionName();

@@ -15,8 +15,8 @@ import org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElement, StubBased<UnqualifiedNoParenthesesManyArgumentsCall>, NoParentheses, Unqualified, Quotable, StubBasedPsiElement<UnqualifiedNoParenthesesManyArgumentsCall> {
 
@@ -42,7 +42,7 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
   String canonicalName();
 
   @Nullable
-  Collection<String> canonicalNameCollection();
+  Set<String> canonicalNameSet();
 
   @Nullable
   String functionName();

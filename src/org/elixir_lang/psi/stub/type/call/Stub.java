@@ -1,9 +1,9 @@
 package org.elixir_lang.psi.stub.type.call;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.containers.SmartHashSet;
 import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
@@ -14,8 +14,8 @@ import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         Psi extends org.elixir_lang.psi.call.StubBased> extends org.elixir_lang.psi.stub.type.Named<Stub, Psi> {
@@ -32,24 +32,24 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
      * Protected Static Methods
      */
 
-    protected static Collection<StringRef> readNameCollection(@NotNull StubInputStream dataStream) throws IOException {
-        int nameCollectionSize = dataStream.readInt();
+    protected static Set<StringRef> readNameSet(@NotNull StubInputStream dataStream) throws IOException {
+        int nameSetSize = dataStream.readInt();
 
-        Collection<StringRef> canonicalNameCollection = new ArrayList<StringRef>(nameCollectionSize);
+        Set<StringRef> nameSet = new SmartHashSet<StringRef>(nameSetSize);
 
-        for (int i = 0; i < nameCollectionSize; i++) {
-            canonicalNameCollection.add(dataStream.readName());
+        for (int i = 0; i < nameSetSize; i++) {
+            nameSet.add(dataStream.readName());
         }
 
-        return canonicalNameCollection;
+        return nameSet;
     }
 
     /*
      * Private Static Methods
      */
 
-    private static void writeNameCollection(@NotNull StubOutputStream dataStream,
-                                            @NotNull Collection<String> nameCollection) throws IOException {
+    private static void writeNameSet(@NotNull StubOutputStream dataStream,
+                                     @NotNull Collection<String> nameCollection) throws IOException {
         dataStream.writeInt(nameCollection.size());
 
         for (String name : nameCollection) {
@@ -77,7 +77,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         dataStream.writeInt(stub.resolvedFinalArity());
         dataStream.writeBoolean(stub.hasDoBlockOrKeyword());
         dataStream.writeName(stub.getName());
-        writeNameCollection(dataStream, stub.canonicalNameCollection());
+        writeNameSet(dataStream, stub.canonicalNameSet());
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         if (call instanceof StubBased) {
             StubBased stubBased = (StubBased) call;
 
-            hasCanonicalNames = stubBased.canonicalNameCollection().size() > 0;
+            hasCanonicalNames = stubBased.canonicalNameSet().size() > 0;
         }
 
         return hasCanonicalNames;
