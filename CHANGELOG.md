@@ -109,6 +109,11 @@
 * [#405](https://github.com/KronicDeth/intellij-elixir/pull/405) - [@KronicDeth](https://github.com/KronicDeth)
   * Resolve `as:` aliased name to both `alias` and `defmodule`
   * Complete modules nested under `as:` aliased name.
+* [#409](https://github.com/KronicDeth/intellij-elixir/pull/409) - [@KronicDeth](https://github.com/KronicDeth)
+  * Completion and reference tests for aliases:
+    * `alias Prefix.Suffix`
+    * `alias Prefix.Suffix, as: As`
+    * `alias Prefix.{MultipleAliasA, MultipleAliasB}`
 
 ### Bug Fixes
 * [#393](https://github.com/KronicDeth/intellij-elixir/pull/393) - [@KronicDeth](https://github.com/KronicDeth)
@@ -123,6 +128,12 @@
   * Resolve aliased name to both the `alias` and the `defmodule`, so you can skip jumping to the `alias` before jumping to the `defmodule`.
 * [#406](https://github.com/KronicDeth/intellij-elixir/pull/406) - [@KronicDeth](https://github.com/KronicDeth)
   * The generated `ElixirParser` uses the `GeneratedParserUtilBase` from `com.intellij.lang.parser`, but since that version is a synced copy, it is a snapshot of `GeneratedParserUtilBase` from the version of GrammarKit that was current when the IDE was released.  To ensure the generated parser works on all the IDEs, I copy `GeneratedParserUtilBase` from `org.intellij.grammar.parser` into `org.elixir_lang.grammar.parser` and then use that version in `ElixirParser`.  This ensures neither the IDE's version nor the version in any installed GrammarKit plugin is used.
+* [#409](https://github.com/KronicDeth/intellij-elixir/pull/409) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check that index name maps to an actual project element before returning it for completion as the names from `StubIndex.getInstance.getAllKeys(...)` is a superset of actual keys in the actual project [according to Peter Gromov of JetBrains](https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions).
+  * Don't index `canonicalName` if it matches the literal name, as the duplicate name leads to duplicate entries in the completion lookup.
+    * `canonicalNameCollection` was renamed to `canonicalNameSet` (with type changing from `Collection<String>` to `Set<String>` to match) to emphasize that the canonical names should be unique, but `canonicalNameSet` itself should still include duplicates of name for those places where only canonical names are used.
+  * Use `resolvableName` for the `unaliasedName` for `MultipleAliases` Aliases, so that they complete correctly for nested modules.
+  * Completion for nested modules will no longer complete with string suffixes (i.e. `SSHView`) and only complete nested Aliases (i.e. `SSH.Key`).
 
 ## v4.2.0
 

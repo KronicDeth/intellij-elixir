@@ -74,6 +74,14 @@
             <li>
               Complete modules nested under <code>as:</code> aliased name.
             </li>
+            <li>
+              <p>Completion and reference tests for aliases:</p>
+              <ul>
+                <li><code>alias Prefix.Suffix</code>.</li>
+                <li><code>alias Prefix.Suffix, as: As</code></li>
+                <li><code>alias Prefix.{MultipleAliasA, MultipleAliasB}</code></li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
@@ -126,6 +134,31 @@
               IDEs, copy `GeneratedParserUtilBase` from `org.intellij.grammar.parser` into
               `org.elixir_lang.grammar.parser` and then use that version in `ElixirParser`.  This ensures neither the
               IDE's version nor the version in any installed GrammarKit plugin is used.
+            </li>
+            <li>
+              Check that index name maps to an actual project element before returning it for completion as the names
+              from <code>StubIndex.getInstance.getAllKeys(...)</code> is a superset of actual keys in the actual project
+              <a href="https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions">
+                according to Peter Gromov of JetBrains
+              </a>
+            </li>
+            <li>
+              Don't index <code>canonicalName</code> if it matches the literal name, as the duplicate name leads to
+              duplicate entries in the completion lookup.
+            </li>
+            <li>
+              <code>canonicalNameCollection</code> was renamed to <code>canonicalNameSet</code> (with type changing from
+              <code>Collection&lt;String&gt;</code> to <code>Set&lt;String&gt;</code> to match) to emphasize that the
+              canonical names should be unique, but <code>canonicalNameSet</code> itself should still include duplicates
+              of name for those places where only canonical names are used.
+            </li>
+            <li>
+              Use <code>resolvableName</code> for the <code>unaliasedName</code> for <code>MultipleAliases</code>
+              Aliases, so that they complete correctly for nested modules.
+            </li>
+            <li>
+              Completion for nested modules will no longer complete with string suffixes (i.e. <code>SSHView</code>) and
+              only complete nested Aliases (i.e. <code>SSH.Key</code>).
             </li>
           </ul>
         </li>
