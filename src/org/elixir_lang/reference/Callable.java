@@ -234,6 +234,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirNoParenthesesKeywordPair ||
                 parent instanceof ElixirNoParenthesesKeywords ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
+                /* handles `(conn, %{})` in `def (conn, %{})`, which can occur in def templates.
+                   See https://github.com/KronicDeth/intellij-elixir/issues/367#issuecomment-244214975 */
+                parent instanceof ElixirNoParenthesesStrict ||
                 parent instanceof ElixirParenthesesArguments ||
                 parent instanceof ElixirParentheticalStab ||
                 parent instanceof ElixirStab ||
@@ -256,7 +259,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     parent instanceof PsiFile ||
                     parent instanceof QualifiedAlias ||
                     parent instanceof QualifiedMultipleAliases)) {
-                Logger.error(Callable.class, "Don't know how to check if parameter", parent);
+                error("Don't know how to check if parameter", parent);
             }
         }
 
@@ -339,7 +342,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     ancestor instanceof BracketOperation ||
                     ancestor instanceof PsiFile ||
                     ancestor instanceof QualifiedMultipleAliases)) {
-                Logger.error(Callable.class, "Don't know how to check if variable", ancestor);
+                error("Don't know how to check if variable", ancestor);
             }
         }
 
@@ -462,6 +465,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         );
 
         return lookupElementList;
+    }
+
+    private static void error(@NotNull String message, @NotNull PsiElement element) {
+        Logger.error(Callable.class, message + " (when element class is " + element.getClass().getName() + ")", element);
     }
 
     /**
@@ -679,7 +686,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                so it has no use scope */
             useScope = LocalSearchScope.EMPTY;
         } else {
-            Logger.error(Callable.class, "Don't know how to find variable use scope for ", ancestor);
+            error("Don't know how to find variable use scope", ancestor);
         }
 
         return useScope;
@@ -693,7 +700,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             if (!(element instanceof ElixirStabBody ||
                     element instanceof ElixirEndOfExpression ||
                     element instanceof PsiWhiteSpace)) {
-                Logger.error(Callable.class, "Don't know how to find variables in ", element);
+                error("Don't know how to find variables", element);
             }
         }
 
