@@ -234,6 +234,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirNoParenthesesKeywordPair ||
                 parent instanceof ElixirNoParenthesesKeywords ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
+                /* handles `(conn, %{})` in `def (conn, %{})`, which can occur in def templates.
+                   See https://github.com/KronicDeth/intellij-elixir/issues/367#issuecomment-244214975 */
+                parent instanceof ElixirNoParenthesesStrict ||
                 parent instanceof ElixirParenthesesArguments ||
                 parent instanceof ElixirParentheticalStab ||
                 parent instanceof ElixirStab ||
