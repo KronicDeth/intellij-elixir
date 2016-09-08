@@ -9,6 +9,32 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.4.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Regression test using <code>typespec_test.exs</code> that triggered
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/413">#413</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Return empty <code>Set</code> instead of <code>null</code> from <code>canonicalNameSet</code>
+            </li>
+            <li>
+              Highlight types in <code>ElixirMapUpdateArguments</code> even though they are an
+              <a href="https://github.com/elixir-lang/elixir/blob/dadf98fbff2966f24bf5b0313822a90b90f7016a/lib/elixir/test/elixir/kernel/typespec_test.exs#L314-L320">
+                invalid typespec example from elixir-lang/elixir tests
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.3.0</h1>
       <ul>
         <li>
