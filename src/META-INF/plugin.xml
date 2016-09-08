@@ -441,9 +441,11 @@
             <li>
               <p>
                 Resolve <code>_</code> to only itself, no matter how many are used to reflect that it is non-binding,
-                while <code>_<name></code>  will resolve to <code>_<name></code> as it does bind.
+                while <code>_&lt;name&gt;</code>  will resolve to <code>_&lt;name&gt;</code> as it does bind.
               </p>
-              <li>Add Ignored Variable to Color Settings Page</li>
+              <ul>
+                <li>Add Ignored Variable to Color Settings Page</li>
+              </ul>
             </li>
             <li>
               Reimplement module attribute renaming so that variable renaming can be implemented using a different
@@ -651,7 +653,7 @@
               <code>Keyword</code> wins.
             </li>
             <li>Annotate <code>QualifiableAlias</code> as <code>Alias</code>.</li>
-            <li>Highlight keyword list and map keywords (<code><key>:</code>) as <code>Atom</code>.</li>
+            <li>Highlight keyword list and map keywords (<code>&lt;key&gt;:</code>) as <code>Atom</code>.</li>
             <li>Add <code>with</code> to highlighted special forms</li>
             <li>
               Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique
@@ -999,7 +1001,7 @@
                     </li>
                     <li>
                       Show Used - injects structure from <code>use Alias</code> call's <code>__using__</code>'s
-                      <code>quote<code> into the call site Structure
+                      <code>quote</code> into the call site Structure
                     </li>
                   </ul>
                 </li>
@@ -1035,7 +1037,7 @@
                       sites.
                     </li>
                     <li>Use <code>use Alias</code> show <code>use</code> calls.</li>
-                  <ul>
+                  </ul>
                 </li>
               </ul>
             </li>
@@ -1090,7 +1092,7 @@
               <ul>
                 <li>Kernel Functions</li>
                 <li>Kernel Macros</li>
-                </li>Kernel.SpecialForms Macros</li>
+                <li>Kernel.SpecialForms Macros</li>
               </ul>
             </li>
             <li>Test against Elixir v1.1.1</li>
@@ -1193,7 +1195,7 @@
           </ul>
         </li>
         <li>
-          <p>Bug Fixes</p
+          <p>Bug Fixes</p>
           <ul>
             <li>
               Fix <code>IllegalStateException</code> for file delete and rename by giving <code>ElixirFile</code>s
@@ -1292,7 +1294,7 @@
                     <li>
                       <code>Elixir GenEvent</code>
                     </li>
-                  <ul>
+                  </ul>
                 </li>
                 <li>
                   <code>Project > Elixir</code> creates a new Elixir project with an empty <code>lib</code> directory
@@ -1383,7 +1385,7 @@
         <li>
           <p>Bug Fixes</p>
           <ul>
-            <li>Lex full atom instead of just identifier-like operator prefix (<code>:in<nospace>dex</code> before vs <code>:index</code> after)</li>
+            <li>Lex full atom instead of just identifier-like operator prefix (<code>:in&lt;nospace&gt;dex</code> before vs <code>:index</code> after)</li>
             <li><code>!</code> and <code>not</code> are properly wrapped in <code>__block__</code>s when in stab bodies</li>
           </ul>
         </li>
