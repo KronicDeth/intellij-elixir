@@ -697,6 +697,22 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
     }
 
+    private void highlightTypesAndTypeParameterUsages(@NotNull ElixirMapUpdateArguments mapUpdateArguments,
+                                                      Set<String> typeParameterNameSet,
+                                                      @NotNull AnnotationHolder annotationHolder,
+                                                      @NotNull TextAttributesKey typeTextAttributesKey) {
+        for (PsiElement child : mapUpdateArguments.getChildren()) {
+            if (!(child instanceof Operator)) {
+                highlightTypesAndTypeParameterUsages(
+                        child,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                );
+            }
+        }
+    }
+
     private void highlightTypesAndTypeParameterUsages(
             ElixirStabOperation stabOperation,
             Set<String> typeParameterNameSet,
@@ -850,6 +866,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }  else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
                     (ElixirMapOperation) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof ElixirMapUpdateArguments) {
+            highlightTypesAndTypeParameterUsages(
+                    (ElixirMapUpdateArguments) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey

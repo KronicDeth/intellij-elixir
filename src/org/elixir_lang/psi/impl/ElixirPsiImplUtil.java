@@ -410,7 +410,7 @@ public class ElixirPsiImplUtil {
             if (canonicalName != null) {
                 canonicalNameSet = Collections.singleton(canonicalName);
             } else {
-                canonicalNameSet = null;
+                canonicalNameSet = Collections.emptySet();
             }
         }
 
