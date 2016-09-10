@@ -504,12 +504,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 PsiElement rightOperand = infix.rightOperand();
 
-                highlightTypesAndTypeParameterUsages(
-                        rightOperand,
-                        Collections.EMPTY_SET,
-                        annotationHolder,
-                        ElixirSyntaxHighlighter.TYPE
-                );
+                if (rightOperand != null) {
+                    highlightTypesAndTypeParameterUsages(
+                            rightOperand,
+                            Collections.EMPTY_SET,
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
             } else if (grandChild instanceof ElixirMatchedWhenOperation) {
                 ElixirMatchedWhenOperation matchedWhenOperation = (ElixirMatchedWhenOperation) grandChild;
                 Set<String> typeParameterNameSet = specificationTypeParameterNameSet(matchedWhenOperation.rightOperand());
