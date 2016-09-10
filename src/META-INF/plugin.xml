@@ -32,6 +32,10 @@
                 invalid typespec example from elixir-lang/elixir tests
               </a>
             </li>
+            <li>
+              Check if <code>rightOperand</code> is <code>null</code> when highlighting types for <code>Type</code>,
+              which can occur when typing <code>:</code> for an atom after the <code>::</code> for a <code>Type</code>.
+            </li>
           </ul>
         </li>
       </ul>
@@ -154,11 +158,11 @@
               jumping to the <code>alias</code> before jumping to the <code>defmodule</code>.
             </li>
             <li>
-              The generated `ElixirParser` uses the `GeneratedParserUtilBase` from `com.intellij.lang.parser`, but since
-              that version is a synced copy, it is a snapshot of `GeneratedParserUtilBase` from the version of
+              The generated <code>ElixirParser</code> uses the <code>GeneratedParserUtilBase</code> from <code>com.intellij.lang.parser</code>, but since
+              that version is a synced copy, it is a snapshot of <code>GeneratedParserUtilBase</code> from the version of
               GrammarKit that was current when the IDE was released.  To ensure the generated parser works on all the
-              IDEs, copy `GeneratedParserUtilBase` from `org.intellij.grammar.parser` into
-              `org.elixir_lang.grammar.parser` and then use that version in `ElixirParser`.  This ensures neither the
+              IDEs, copy <code>GeneratedParserUtilBase</code> from <code>org.intellij.grammar.parser</code> into
+              <code>org.elixir_lang.grammar.parser</code> and then use that version in <code>ElixirParser</code>.  This ensures neither the
               IDE's version nor the version in any installed GrammarKit plugin is used.
             </li>
             <li>

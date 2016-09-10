@@ -95,6 +95,7 @@
 * [#419](https://github.com/KronicDeth/intellij-elixir/pull/419) - [@KronicDeth](https://github.com/KronicDeth)
   * Return empty `Set` instead of `null` from `canonicalNameSet`
   * Highlight types in `ElixirMapUpdateArguments` even though they are an [invalid typespec example from elixir-lang/elixir tests](https://github.com/elixir-lang/elixir/blob/dadf98fbff2966f24bf5b0313822a90b90f7016a/lib/elixir/test/elixir/kernel/typespec_test.exs#L314-L320)
+* [#424](https://github.com/KronicDeth/intellij-elixir/pull/424) - Check if `rightOperand` is `null` when highlighting types for `Type`, which can occur when typing `:` for an atom after the `::` for a `Type` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 
