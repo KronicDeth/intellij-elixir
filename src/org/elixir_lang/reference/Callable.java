@@ -222,6 +222,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirAssociations ||
                 parent instanceof ElixirAssociationsBase ||
                 parent instanceof ElixirBitString ||
+                parent instanceof ElixirBracketArguments ||
                 parent instanceof ElixirContainerAssociationOperation ||
                 parent instanceof ElixirKeywordPair ||
                 parent instanceof ElixirKeywords ||
@@ -309,6 +310,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirBitString ||
                 ancestor instanceof ElixirBlockItem ||
                 ancestor instanceof ElixirBlockList ||
+                ancestor instanceof ElixirBracketArguments ||
                 ancestor instanceof ElixirContainerAssociationOperation ||
                 ancestor instanceof ElixirDoBlock ||
                 ancestor instanceof ElixirKeywordPair ||
