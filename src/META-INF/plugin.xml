@@ -18,6 +18,10 @@
               Regression test using <code>typespec_test.exs</code> that triggered
               <a href="https://github.com/KronicDeth/intellij-elixir/issues/413">#413</a>
             </li>
+            <li>
+              Regression test that checks the correct <code>import</code> is used for
+              <code>GeneratedParserUtilBase</code> in <code>ElixirParser</code>
+            </li>
           </ul>
         </li>
         <li>
@@ -35,6 +39,10 @@
             <li>
               Check if <code>rightOperand</code> is <code>null</code> when highlighting types for <code>Type</code>,
               which can occur when typing <code>:</code> for an atom after the <code>::</code> for a <code>Type</code>.
+            </li>
+            <li>
+              Use <code>GeneratedParserUtilBase</code> synced to GrammarKit version as was done originally in
+              <a href="https://github.com/KronicDeth/intellij-elixir/pull/406">#406</a>
             </li>
           </ul>
         </li>
