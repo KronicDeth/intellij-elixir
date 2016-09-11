@@ -44,6 +44,9 @@
               Use <code>GeneratedParserUtilBase</code> synced to GrammarKit version as was done originally in
               <a href="https://github.com/KronicDeth/intellij-elixir/pull/406">#406</a>
             </li>
+            <li>
+              Check parent of <code>BracketArguments</code> for <code>isParameter</code> and <code>isVariable</code>.
+            </li>
           </ul>
         </li>
       </ul>

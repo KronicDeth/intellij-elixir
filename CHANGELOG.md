@@ -98,6 +98,7 @@
   * Highlight types in `ElixirMapUpdateArguments` even though they are an [invalid typespec example from elixir-lang/elixir tests](https://github.com/elixir-lang/elixir/blob/dadf98fbff2966f24bf5b0313822a90b90f7016a/lib/elixir/test/elixir/kernel/typespec_test.exs#L314-L320)
 * [#424](https://github.com/KronicDeth/intellij-elixir/pull/424) - Check if `rightOperand` is `null` when highlighting types for `Type`, which can occur when typing `:` for an atom after the `::` for a `Type` - [@KronicDeth](https://github.com/KronicDeth)
 * [#425](https://github.com/KronicDeth/intellij-elixir/pull/425) - Use `GeneratedParserUtilBase` synced to GrammarKit version as was done originally in [#406](https://github.com/KronicDeth/intellij-elixir/pull/406) - [@KronicDeth](https://github.com/KronicDeth)
+* [#426](https://github.com/KronicDeth/intellij-elixir/pull/426) - Check parent of `BracketArguments` for `isParameter` and `isVariable`- [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 
