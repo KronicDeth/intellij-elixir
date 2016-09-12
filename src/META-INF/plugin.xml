@@ -47,6 +47,11 @@
             <li>
               Check parent of <code>BracketArguments</code> for <code>isParameter</code> and <code>isVariable</code>.
             </li>
+            <li>
+              Instead of asserting that a <code>QualifiableAlias</code> has 3 children, which may not be true on error
+              recovery, use the <code>Normalized</code> static methods that are used elsewhere to handle error recovery
+              around Infix operations as the <code>.</code> in <code>QualifiableAlias</code>es is a pseudo-Infix.
+            </li>
           </ul>
         </li>
       </ul>

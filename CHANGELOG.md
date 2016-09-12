@@ -99,6 +99,7 @@
 * [#424](https://github.com/KronicDeth/intellij-elixir/pull/424) - Check if `rightOperand` is `null` when highlighting types for `Type`, which can occur when typing `:` for an atom after the `::` for a `Type` - [@KronicDeth](https://github.com/KronicDeth)
 * [#425](https://github.com/KronicDeth/intellij-elixir/pull/425) - Use `GeneratedParserUtilBase` synced to GrammarKit version as was done originally in [#406](https://github.com/KronicDeth/intellij-elixir/pull/406) - [@KronicDeth](https://github.com/KronicDeth)
 * [#426](https://github.com/KronicDeth/intellij-elixir/pull/426) - Check parent of `BracketArguments` for `isParameter` and `isVariable`- [@KronicDeth](https://github.com/KronicDeth)
+* [#428](https://github.com/KronicDeth/intellij-elixir/pull/428) - Instead of asserting that a `QualifiableAlias` has 3 children, which may not be true on error recovery, use the `Normalized` static methods that are used elsewhere to handle error recovery around Infix operations as the `.` in `QualifiableAlias`es is a pseudo-Infix - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 
