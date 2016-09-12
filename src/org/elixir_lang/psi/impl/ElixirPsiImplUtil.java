@@ -34,8 +34,8 @@ import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.infix.Position;
-import org.elixir_lang.psi.operation.infix.Triple;
+import org.elixir_lang.psi.operation.Normalized;
+import org.elixir_lang.psi.operation.infix.*;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
@@ -2128,10 +2128,9 @@ public class ElixirPsiImplUtil {
     public static String fullyQualifiedName(@NotNull final QualifiableAlias qualifiableAlias) {
         String fullyQualifiedName = null;
         PsiElement[] children = qualifiableAlias.getChildren();
+        int operatorIndex = Normalized.operatorIndex(children);
+        Quotable qualifier = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(children, operatorIndex);
 
-        assert children.length == 3;
-
-        PsiElement qualifier = children[0];
         String qualifierName = null;
 
         if (qualifier instanceof Call) {
@@ -2164,9 +2163,16 @@ public class ElixirPsiImplUtil {
         }
 
         if (qualifierName != null) {
-            ElixirAlias alias = (ElixirAlias) children[2];
+            Quotable rightOperand = org.elixir_lang.psi.operation.infix.Normalized.rightOperand(
+                    children,
+                    operatorIndex
+            );
 
-            fullyQualifiedName = qualifierName + "." + alias.getName();
+            if (rightOperand instanceof ElixirAlias) {
+                ElixirAlias relativeAlias = (ElixirAlias) rightOperand;
+
+                fullyQualifiedName = qualifierName + "." + relativeAlias.getName();
+            }
         }
 
         return fullyQualifiedName;
