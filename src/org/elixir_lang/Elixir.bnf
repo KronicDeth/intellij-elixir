@@ -1834,7 +1834,13 @@ matchedQualifiedMultipleAliases ::= matchedExpression dotInfixOperator multipleA
 multipleAliases ::= OPENING_CURLY EOL*
                     containerArguments? EOL*
                     CLOSING_CURLY
-                    { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+                    {
+                      implements = "org.elixir_lang.psi.Quotable"
+                      methods = [
+                        processDeclarations
+                        quote
+                      ]
+                    }
 
 
 /*

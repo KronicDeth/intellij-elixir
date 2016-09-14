@@ -25,7 +25,7 @@ public interface ElixirMatchedUnqualifiedParenthesesCall extends ElixirMatchedEx
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable

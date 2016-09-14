@@ -21,17 +21,6 @@ public abstract class Module implements PsiScopeProcessor {
      * Public Instance Methods
      */
 
-    @Override
-    public boolean execute(@NotNull PsiElement match, @NotNull ResolveState state) {
-        boolean keepProcessing = true;
-
-        if (match instanceof Named) {
-            keepProcessing = execute((Named) match, state);
-        }
-
-        return keepProcessing;
-    }
-
     @Nullable
     @Override
     public <T> T getHint(@NotNull Key<T> hintKey) {
@@ -55,6 +44,22 @@ public abstract class Module implements PsiScopeProcessor {
     protected abstract boolean executeOnAliasedName(@NotNull final PsiNamedElement match,
                                                     @NotNull String aliasedName,
                                                     @NotNull ResolveState state);
+
+    /*
+     * Protected Instance Methods
+     */
+
+    protected boolean execute(@NotNull Named match, @NotNull ResolveState state) {
+        boolean keepProcessing = true;
+
+        if (isModular(match)) {
+            keepProcessing = executeOnMaybeAliasedName(match, match.getName(), state);
+        } else if (match.isCalling(KERNEL, ALIAS)) {
+            keepProcessing = executeOnAliasCall(match, state);
+        }
+
+        return keepProcessing;
+    }
 
     /*
      * Private Instance Methods
@@ -92,19 +97,6 @@ public abstract class Module implements PsiScopeProcessor {
         }
 
         return aliasedName;
-    }
-
-
-    private boolean execute(@NotNull Named match, @NotNull ResolveState state) {
-        boolean keepProcessing = true;
-
-        if (isModular(match)) {
-            keepProcessing = executeOnMaybeAliasedName(match, match.getName(), state);
-        } else if (match.isCalling(KERNEL, ALIAS)) {
-            keepProcessing = executeOnAliasCall(match, state);
-        }
-
-        return keepProcessing;
     }
 
     private boolean executeOnAliasCall(@NotNull Named aliasCall, @NotNull ResolveState state) {

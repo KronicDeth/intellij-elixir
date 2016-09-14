@@ -32,7 +32,7 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable

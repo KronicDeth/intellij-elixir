@@ -55,7 +55,7 @@ public class ElixirMatchedAtUnqualifiedNoParenthesesCallImpl extends NamedStubbe
     return ElixirPsiImplUtil.canonicalName(this);
   }
 
-  @Nullable
+  @NotNull
   public Set<String> canonicalNameSet() {
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }

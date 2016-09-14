@@ -41,7 +41,7 @@ public interface ElixirUnqualifiedNoParenthesesManyArgumentsCall extends PsiElem
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable

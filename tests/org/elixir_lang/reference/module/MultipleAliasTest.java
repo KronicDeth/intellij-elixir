@@ -36,6 +36,21 @@ public class MultipleAliasTest extends LightCodeInsightFixtureTestCase {
         assertEquals(2, strings.size());
     }
 
+    public void testCompletionInSideCurlies() {
+        myFixture.configureByFiles("completion_inside_curlies.ex", "multiple_alias_aye.ex", "multiple_alias_bee.ex");
+        myFixture.complete(CompletionType.BASIC, 1);
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertTrue(
+                strings.containsAll(
+                        Arrays.asList(
+                                "MultipleAliasAye",
+                                "MultipleAliasBee"
+                        )
+                )
+        );
+        assertEquals(2, strings.size());
+    }
+
     public void testReference() {
         myFixture.configureByFiles("reference.ex", "multiple_alias_aye.ex", "multiple_alias_bee.ex");
         PsiElement alias = myFixture

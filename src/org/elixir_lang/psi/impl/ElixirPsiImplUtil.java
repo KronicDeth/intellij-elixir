@@ -1521,6 +1521,20 @@ public class ElixirPsiImplUtil {
         );
     }
 
+    public static boolean processDeclarations(@NotNull final ElixirMultipleAliases multipleAliases,
+                                              @NotNull PsiScopeProcessor processor,
+                                              @NotNull ResolveState state,
+                                              PsiElement lastParent,
+                                              @NotNull PsiElement entrance) {
+        return processDeclarationsRecursively(
+                multipleAliases,
+                processor,
+                state,
+                lastParent,
+                entrance
+        );
+    }
+
     public static boolean processDeclarations(@NotNull final ElixirStabBody scope,
                                               @NotNull PsiScopeProcessor processor,
                                               @NotNull ResolveState state,
