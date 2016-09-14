@@ -22,6 +22,18 @@
               Regression test that checks the correct <code>import</code> is used for
               <code>GeneratedParserUtilBase</code> in <code>ElixirParser</code>
             </li>
+            <li>
+              <p>
+                <a href="https://www.youtube.com/watch?v=aOiJHZuudzg">Completion of multiple aliases inside curly braces</a>
+              </p>
+              <ul>
+                <li>
+                  Override <code>ElixirMultipleAliases#processDeclarations</code>, so that <code>treeWalkUp</code> can
+                  stop at <code>ElixirMultipleAliases</code> when determining how to do Alias completion.  If a multiple
+                  alias is encountered, then de-prefixed names should be returned.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
@@ -51,6 +63,10 @@
               Instead of asserting that a <code>QualifiableAlias</code> has 3 children, which may not be true on error
               recovery, use the <code>Normalized</code> static methods that are used elsewhere to handle error recovery
               around Infix operations as the <code>.</code> in <code>QualifiableAlias</code>es is a pseudo-Infix.
+            </li>
+            <li>
+              Add missing <code>@Nullable</code> to <code>@NotNull</code> change when parser wasn't regenerated when
+              <code>canonicalNameSet</code> was changed to <code>@NotNull</code> in the interface.
             </li>
           </ul>
         </li>
