@@ -29,7 +29,7 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable

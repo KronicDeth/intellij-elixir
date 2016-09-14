@@ -58,7 +58,7 @@ public class ElixirUnmatchedUnqualifiedNoArgumentsCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.canonicalName(this);
   }
 
-  @Nullable
+  @NotNull
   public Set<String> canonicalNameSet() {
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }

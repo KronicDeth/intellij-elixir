@@ -23,7 +23,7 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable

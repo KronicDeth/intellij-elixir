@@ -29,7 +29,7 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
   @Nullable
   String canonicalName();
 
-  @Nullable
+  @NotNull
   Set<String> canonicalNameSet();
 
   @Nullable
