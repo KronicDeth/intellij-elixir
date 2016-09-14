@@ -3,17 +3,21 @@ package org.elixir_lang.psi.scope.module;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.call.Named;
+import org.elixir_lang.psi.operation.Normalized;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.reference.module.UnaliasedName;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,16 +48,134 @@ public class Variants extends Module {
             lookupElementList = new ArrayList<LookupElement>();
         }
 
-        variants.addProjectNameElementsTo(lookupElementList, entrance.getProject());
+        variants.addProjectNameElementsTo(lookupElementList, entrance);
 
         return lookupElementList;
+    }
+
+    /*
+     * Private Static Methods
+     */
+
+    @NotNull
+    private static Collection<String> filterIndexedNameCollection(@NotNull Collection<String> indexedNameCollection,
+                                                                  @Nullable final String prefix) {
+        Collection<String> filteredIndexNameCollection = indexedNameCollection;
+
+        if (prefix != null) {
+            filteredIndexNameCollection = ContainerUtil.filter(
+                    indexedNameCollection,
+                    new Condition<String>() {
+                        @Override
+                        public boolean value(@Nullable String indexedName) {
+                            boolean value = false;
+
+                            if (indexedName != null) {
+                                value = indexedName.startsWith(prefix);
+                            }
+
+                            return value;
+                        }
+                    }
+            );
+        }
+
+        return filteredIndexNameCollection;
+    }
+
+    @Nullable
+    private static String indexedNamePrefix(@Nullable ElixirMultipleAliases multipleAliases) {
+        String prefix = null;
+
+        if (multipleAliases != null) {
+            QualifiedMultipleAliases parent = (QualifiedMultipleAliases) multipleAliases.getParent();
+            PsiElement[] children = parent.getChildren();
+            int operatorIndex = Normalized.operatorIndex(children);
+            Quotable qualifierQuotable = org.elixir_lang.psi.operation.infix.Normalized.leftOperand(
+                    children,
+                    operatorIndex
+            );
+
+            prefix = qualifierToIndexNamePrefix(qualifierQuotable);
+        }
+
+        return prefix;
+    }
+
+    @NotNull
+    private static String lookupName(@NotNull String indexedName, @Nullable String prefix) {
+        String lookupName = indexedName;
+
+        if (prefix != null) {
+            if (indexedName.startsWith(prefix)) {
+                lookupName = indexedName.substring(prefix.length());
+            }
+        }
+
+        return lookupName;
+    }
+
+    @Nullable
+    private static String qualifierToIndexNamePrefix(@NotNull ElixirAccessExpression qualifier) {
+        PsiElement[] children = qualifier.getChildren();
+        String prefix = null;
+
+        if (children.length == 1) {
+            prefix = qualifierToIndexNamePrefix(children[0]);
+        }
+
+        return prefix;
+    }
+
+    @Nullable
+    private static String qualifierToIndexNamePrefix(@NotNull PsiElement qualifier) {
+        String prefix = null;
+
+        if (qualifier instanceof ElixirAccessExpression) {
+            prefix = qualifierToIndexNamePrefix((ElixirAccessExpression) qualifier);
+        } else if (qualifier instanceof QualifiableAlias) {
+            prefix = qualifierToIndexNamePrefix((QualifiableAlias) qualifier);
+        }
+
+        return prefix;
+    }
+
+
+    @Nullable
+    private static String qualifierToIndexNamePrefix(@NotNull QualifiableAlias qualifier) {
+        String qualifierFullyQualifiedName = qualifier.fullyQualifiedName();
+        String prefix = null;
+
+        if (qualifierFullyQualifiedName != null) {
+            prefix = qualifierFullyQualifiedName + ".";
+        }
+
+        return prefix;
     }
 
     /*
      * Fields
      */
 
+    private ElixirMultipleAliases multipleAliases = null;
     private List<LookupElement> lookupElementList = null;
+
+    /*
+     * Public Instance Methods
+     */
+
+    @Override
+    public boolean execute(@NotNull PsiElement match, @NotNull ResolveState state) {
+        boolean keepProcessing = true;
+
+        if (match instanceof ElixirMultipleAliases) {
+            keepProcessing = execute((ElixirMultipleAliases) match, state);
+        } else if (match instanceof Named) {
+            keepProcessing = execute((Named) match, state);
+        }
+
+        return keepProcessing;
+    }
 
     /*
      * Protected Instance Methods
@@ -140,13 +262,20 @@ public class Variants extends Module {
      * Private Instance Methods
      */
 
-    private void addProjectNameElementsTo(List<LookupElement> lookupElementList, Project project) {
+    private void addProjectNameElementsTo(List<LookupElement> lookupElementList, PsiElement entrance) {
+        Project project = entrance.getProject();
         /* getAllKeys is not the actual keys in the actual project.  They need to be checked.
            See https://intellij-support.jetbrains.com/hc/en-us/community/posts/207930789-StubIndex-persisting-between-test-runs-leading-to-incorrect-completions */
         Collection<String> indexedNameCollection = StubIndex.getInstance().getAllKeys(AllName.KEY, project);
         GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
-        for (String indexedName : indexedNameCollection) {
+        String prefix = indexedNamePrefix(multipleAliases);
+        Collection<String> filteredIndexedNameCollection = filterIndexedNameCollection(
+                indexedNameCollection,
+                prefix
+        );
+
+        for (String indexedName : filteredIndexedNameCollection) {
             Collection<NamedElement> indexedNameNamedElementCollection = StubIndex.getElements(
                     AllName.KEY,
                     indexedName,
@@ -155,15 +284,24 @@ public class Variants extends Module {
                     NamedElement.class
             );
 
+            String lookupName = lookupName(indexedName, prefix);
+
             for (NamedElement indexedNameNamedElement : indexedNameNamedElementCollection) {
                 lookupElementList.add(
                         LookupElementBuilder.createWithSmartPointer(
-                                indexedName,
+                                lookupName,
                                 indexedNameNamedElement
                         )
                 );
             }
         }
+    }
+
+    private boolean execute(@NotNull ElixirMultipleAliases match,
+                            @NotNull @SuppressWarnings("unused") ResolveState state) {
+        multipleAliases = match;
+
+        return false;
     }
 
     private List<LookupElement> getLookupElementList() {

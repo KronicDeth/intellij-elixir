@@ -6,6 +6,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.scope.Module;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.elixir_lang.reference.module.UnaliasedName;
@@ -100,6 +101,17 @@ public class MultiResolve extends Module {
     /*
      * Public Instance Methods
      */
+
+    @Override
+    public boolean execute(@NotNull PsiElement match, @NotNull ResolveState state) {
+        boolean keepProcessing = true;
+
+        if (match instanceof Named) {
+            keepProcessing = execute((Named) match, state);
+        }
+
+        return keepProcessing;
+    }
 
     @Nullable
     public List<ResolveResult> getResolveResultList() {
