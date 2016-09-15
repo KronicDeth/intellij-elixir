@@ -37,6 +37,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/429">#429</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/422">#422</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -73,6 +76,9 @@
             </li>
             <li>
               Search above block items and block lists for calls to check use scope
+            </li>
+            <li>
+              Check parent <code>isVariable</code> for <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code>
             </li>
           </ul>
         </li>

@@ -95,6 +95,7 @@
   * [Completion of multiple aliases inside curly braces](https://www.youtube.com/watch?v=aOiJHZuudzg)
     * Override `ElixirMultipleAliases#processDeclarations`, so that `treeWalkUp` can stop at `ElixirMultipleAliases` when determining how to do Alias completion.  If a multiple alias is encountered, then de-prefixed names should be returned.
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Regression test for [#429](https://github.com/KronicDeth/intellij-elixir/issues/429) - [@KronicDeth](https://github.com/KronicDeth)
+* [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Regression test for [#422](https://github.com/KronicDeth/intellij-elixir/issues/422) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#419](https://github.com/KronicDeth/intellij-elixir/pull/419) - [@KronicDeth](https://github.com/KronicDeth)
@@ -106,6 +107,7 @@
 * [#428](https://github.com/KronicDeth/intellij-elixir/pull/428) - Instead of asserting that a `QualifiableAlias` has 3 children, which may not be true on error recovery, use the `Normalized` static methods that are used elsewhere to handle error recovery around Infix operations as the `.` in `QualifiableAlias`es is a pseudo-Infix - [@KronicDeth](https://github.com/KronicDeth)
 * [#432](https://github.com/KronicDeth/intellij-elixir/pull/432) - Add missing `@Nullable` to `@NotNull` change when parser wasn't regenerated when `canonicalNameSet` was changed to `@NotNull` in the interface. - [@KronicDeth](https://github.com/KronicDeth)
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Search above block items and block lists for calls to check use scope - [@KronicDeth](https://github.com/KronicDeth)
+* [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Check parent `isVariable` for `ElixirNoParenthesesManyStrictNoParenthesesExpression` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 
