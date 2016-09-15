@@ -327,6 +327,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirNoParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesKeywordPair ||
                 ancestor instanceof ElixirNoParenthesesKeywords ||
+                /* ElixirNoParenthesesManyStrictNoParenthesesExpression indicates a syntax error, but it can also occur
+                   during typing, so try searching above the syntax error to resolve whether a variable */
+                ancestor instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                 ancestor instanceof ElixirParenthesesArguments ||
                 ancestor instanceof ElixirParentheticalStab ||
                 ancestor instanceof ElixirStab ||
