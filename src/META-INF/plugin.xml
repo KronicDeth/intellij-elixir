@@ -34,6 +34,9 @@
                 </li>
               </ul>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/429">#429</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -67,6 +70,9 @@
             <li>
               Add missing <code>@Nullable</code> to <code>@NotNull</code> change when parser wasn't regenerated when
               <code>canonicalNameSet</code> was changed to <code>@NotNull</code> in the interface.
+            </li>
+            <li>
+              Search above block items and block lists for calls to check use scope
             </li>
           </ul>
         </li>
