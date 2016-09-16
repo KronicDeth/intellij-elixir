@@ -16,6 +16,14 @@ public class ModuleAttributeTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkHighlighting(false, false, true);
     }
 
+    /**
+     * See https://github.com/KronicDeth/intellij-elixir/issues/438
+     */
+    public void testIssue438() {
+        myFixture.configureByFiles("missing_type_operator.ex");
+        myFixture.checkHighlighting(false, false, true);
+    }
+
     /*
      * Protected Instance Methods
      */

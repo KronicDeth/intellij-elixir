@@ -378,7 +378,34 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             ElixirSyntaxHighlighter.TYPE
                     );
                 }
+            } else if (grandChild instanceof UnqualifiedNoParenthesesCall) {
+                /* Pretend that `::` separates the functionNameElement from the arguments, so that
+                   ```
+                   @type coefficient non_neg_integer | :qNaN | :sNaN | :inf
+                   ```
+                   is retreated like
+                   ```
+                   @type coefficient :: non_neg_integer | :qNaN | :sNaN | :inf
+                   ```
+                 */
+                UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall = (UnqualifiedNoParenthesesCall) grandChild;
 
+                PsiElement functionNameElement = unqualifiedNoParenthesesCall.functionNameElement();
+
+                if (functionNameElement != null) {
+                    highlight(
+                            functionNameElement.getTextRange(),
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
+
+                highlightTypesAndTypeParameterUsages(
+                        unqualifiedNoParenthesesCall.getNoParenthesesOneArgument(),
+                        Collections.<String>emptySet(),
+                        annotationHolder,
+                        ElixirSyntaxHighlighter.TYPE
+                );
             } else {
                 cannotHighlightTypes(grandChild);
             }
