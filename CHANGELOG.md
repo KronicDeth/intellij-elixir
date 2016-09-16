@@ -96,6 +96,7 @@
     * Override `ElixirMultipleAliases#processDeclarations`, so that `treeWalkUp` can stop at `ElixirMultipleAliases` when determining how to do Alias completion.  If a multiple alias is encountered, then de-prefixed names should be returned.
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Regression test for [#429](https://github.com/KronicDeth/intellij-elixir/issues/429) - [@KronicDeth](https://github.com/KronicDeth)
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Regression test for [#422](https://github.com/KronicDeth/intellij-elixir/issues/422) - [@KronicDeth](https://github.com/KronicDeth)
+* [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Regression test for [#438](https://github.com/KronicDeth/intellij-elixir/issues/438) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#419](https://github.com/KronicDeth/intellij-elixir/pull/419) - [@KronicDeth](https://github.com/KronicDeth)
@@ -108,6 +109,7 @@
 * [#432](https://github.com/KronicDeth/intellij-elixir/pull/432) - Add missing `@Nullable` to `@NotNull` change when parser wasn't regenerated when `canonicalNameSet` was changed to `@NotNull` in the interface. - [@KronicDeth](https://github.com/KronicDeth)
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Search above block items and block lists for calls to check use scope - [@KronicDeth](https://github.com/KronicDeth)
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Check parent `isVariable` for `ElixirNoParenthesesManyStrictNoParenthesesExpression` - [@KronicDeth](https://github.com/KronicDeth)
+* [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Highlight `@type` without `::` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 

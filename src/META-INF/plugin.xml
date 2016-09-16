@@ -40,6 +40,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/422">#422</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/438">#438</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -79,6 +82,9 @@
             </li>
             <li>
               Check parent <code>isVariable</code> for <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code>
+            </li>
+            <li>
+              Highlight <code>@type</code> without <code>::</code>
             </li>
           </ul>
         </li>
