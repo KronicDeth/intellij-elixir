@@ -545,9 +545,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         if (CallDefinitionClause.is(call) || Delegation.is(call) || call.hasDoBlockOrKeyword()) {
             isParameter = true;
         } else {
-            PsiElement parent = call.getParent();
-
-            isParameter = parent != null && !(parent instanceof PsiFile) && isParameter(parent);
+            // use generic handling, so that parent is checked
+            isParameter = isParameter((PsiElement) call);
         }
 
         return isParameter;
