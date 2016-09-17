@@ -46,6 +46,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/431">#431</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/436">#436</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -92,6 +95,14 @@
             <li>
               <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> indicates an ambiguous no parentheses
               nesting, but the highlighting should not error and do a best effort instead.
+            </li>
+            <li>
+              <code>isParameter(Call)</code> called <code>isParameter</code> on its parent if it wasn't a call
+              definition clause, delegation or macro, but <code>isParameter(PsiElement)</code> immediately calls
+              <code>getParent()</code> and does all the <code>instanceof</code> tests on the parent.  So, instead of
+              <code>isParameter(Call)</code> calling <code>isParameter(PsiElement)</code> on its parent, it should just
+              call it on itself, this way the check for <code>ElixirInterpolation</code> will not be skipped and there's
+              no need to handle <code>ElixirInterpolatedString</code>.
             </li>
           </ul>
         </li>

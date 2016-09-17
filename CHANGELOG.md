@@ -98,6 +98,7 @@
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Regression test for [#422](https://github.com/KronicDeth/intellij-elixir/issues/422) - [@KronicDeth](https://github.com/KronicDeth)
 * [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Regression test for [#438](https://github.com/KronicDeth/intellij-elixir/issues/438) - [@KronicDeth](https://github.com/KronicDeth)
 * [#440](https://github.com/KronicDeth/intellij-elixir/pull/440) - Regression test for [#431](https://github.com/KronicDeth/intellij-elixir/issues/431) - [@KronicDeth](https://github.com/KronicDeth)
+* [#441](https://github.com/KronicDeth/intellij-elixir/pull/441) - Regression test for [#436](https://github.com/KronicDeth/intellij-elixir/issues/436) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#419](https://github.com/KronicDeth/intellij-elixir/pull/419) - [@KronicDeth](https://github.com/KronicDeth)
@@ -112,6 +113,7 @@
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Check parent `isVariable` for `ElixirNoParenthesesManyStrictNoParenthesesExpression` - [@KronicDeth](https://github.com/KronicDeth)
 * [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Highlight `@type` without `::` - [@KronicDeth](https://github.com/KronicDeth)
 * [#440](https://github.com/KronicDeth/intellij-elixir/pull/440) - `ElixirNoParenthesesManyStrictNoParenthesesExpression` indicates an ambiguous no parentheses nesting, but the highlighting should not error and do a best effort instead. - [@KronicDeth](https://github.com/KronicDeth)
+* [#441](https://github.com/KronicDeth/intellij-elixir/pull/441) - `isParameter(Call)` called `isParameter` on its parent if it wasn't a call definition clause, delegation or macro, but `isParameter(PsiElement)` immediately calls `getParent()` and does all the `instanceof` tests on the parent.  So, instead of `isParameter(Call)` calling `isParameter(PsiElement)` on its parent, it should just call it on itself, this way the check for `ElixirInterpolation` will not be skipped and there's no need to handle `ElixirInterpolatedString`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 
