@@ -97,6 +97,7 @@
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Regression test for [#429](https://github.com/KronicDeth/intellij-elixir/issues/429) - [@KronicDeth](https://github.com/KronicDeth)
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Regression test for [#422](https://github.com/KronicDeth/intellij-elixir/issues/422) - [@KronicDeth](https://github.com/KronicDeth)
 * [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Regression test for [#438](https://github.com/KronicDeth/intellij-elixir/issues/438) - [@KronicDeth](https://github.com/KronicDeth)
+* [#440](https://github.com/KronicDeth/intellij-elixir/pull/440) - Regression test for [#431](https://github.com/KronicDeth/intellij-elixir/issues/431) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#419](https://github.com/KronicDeth/intellij-elixir/pull/419) - [@KronicDeth](https://github.com/KronicDeth)
@@ -110,6 +111,7 @@
 * [#434](https://github.com/KronicDeth/intellij-elixir/pull/434) - Search above block items and block lists for calls to check use scope - [@KronicDeth](https://github.com/KronicDeth)
 * [#435](https://github.com/KronicDeth/intellij-elixir/pull/435) - Check parent `isVariable` for `ElixirNoParenthesesManyStrictNoParenthesesExpression` - [@KronicDeth](https://github.com/KronicDeth)
 * [#439](https://github.com/KronicDeth/intellij-elixir/pull/439) - Highlight `@type` without `::` - [@KronicDeth](https://github.com/KronicDeth)
+* [#440](https://github.com/KronicDeth/intellij-elixir/pull/440) - `ElixirNoParenthesesManyStrictNoParenthesesExpression` indicates an ambiguous no parentheses nesting, but the highlighting should not error and do a best effort instead. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.3.0
 

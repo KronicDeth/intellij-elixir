@@ -43,6 +43,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/438">#438</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/431">#431</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -85,6 +88,10 @@
             </li>
             <li>
               Highlight <code>@type</code> without <code>::</code>
+            </li>
+            <li>
+              <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> indicates an ambiguous no parentheses
+              nesting, but the highlighting should not error and do a best effort instead.
             </li>
           </ul>
         </li>
