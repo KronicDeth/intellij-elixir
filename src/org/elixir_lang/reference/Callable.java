@@ -234,6 +234,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 parent instanceof ElixirNoParenthesesArguments ||
                 parent instanceof ElixirNoParenthesesKeywordPair ||
                 parent instanceof ElixirNoParenthesesKeywords ||
+                /* ElixirNoParenthesesManyStrictNoParenthesesExpression indicates a syntax error where no parentheses
+                   calls are nested, so it's invalid, but try to still resolve parameters to have highlighting */
+                parent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                 parent instanceof ElixirNoParenthesesOneArgument ||
                 /* handles `(conn, %{})` in `def (conn, %{})`, which can occur in def templates.
                    See https://github.com/KronicDeth/intellij-elixir/issues/367#issuecomment-244214975 */
