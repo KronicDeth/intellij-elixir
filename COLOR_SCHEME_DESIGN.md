@@ -1,3 +1,23 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Color Scheme Design](#color-scheme-design)
+  - [Categories](#categories)
+    - [Atom](#atom)
+    - [Braces and Operators](#braces-and-operators)
+      - [Map and Structs](#map-and-structs)
+    - [Calls](#calls)
+    - [Direct Inheritors of Language Defaults](#direct-inheritors-of-language-defaults)
+    - [Documentation](#documentation)
+    - [Number](#number)
+    - [Predefined](#predefined)
+    - [Textual](#textual)
+    - [Type-like](#type-like)
+      - [Variables](#variables)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Color Scheme Design
 
 The color design for `additionalTextAttributes` needs to be similar to color Palettes for Preferences > Editor > Colors & Fonts > Language Defaults, but more obvious, contrasting colors should be chosen when Language Defaults use no attributes or shared attributes for multiple Text Attribute Keys.  This is to ensure that different parts of the language are easier to distinguish visually and so that user stop reporting that IntelliJ Elixir doesn't have syntax highlighting, as was the case before using `additionalTextAttributes`.
