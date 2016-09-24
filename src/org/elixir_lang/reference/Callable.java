@@ -3,7 +3,6 @@ package org.elixir_lang.reference;
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.LocalSearchScope;
@@ -12,17 +11,15 @@ import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.containers.ContainerUtil;
+import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.call.name.*;
 import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.scope.variable.MultiResolve;
 import org.elixir_lang.psi.scope.variable.Variants;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,12 +57,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
      * Private CONSTANTS
      */
 
-    private static final Condition<ResolveResult> HAS_VALID_RESULT_CONDITION = new Condition<ResolveResult>() {
-        @Override
-        public boolean value(ResolveResult resolveResult) {
-            return resolveResult.isValidResult();
-        }
-    };
     private static final Set<String> BIT_STRING_ENDIANNESS = Sets.newHashSet(
             "big",
             "little",
@@ -152,7 +143,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return elementDescription;
     }
 
-    public static String ignoredElementDescription(Call call, ElementDescriptionLocation location) {
+    public static String ignoredElementDescription(@SuppressWarnings("unused") Call call,
+                                                   ElementDescriptionLocation location) {
         String elementDescription = null;
 
         if (location == UsageViewTypeLocation.INSTANCE) {
@@ -163,6 +155,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     @Contract(pure = true)
+    @SuppressWarnings("unchecked")
     public static boolean isBitStreamSegmentOption(@NotNull PsiElement element) {
         boolean isBitStreamSegmentOption = false;
 
@@ -181,16 +174,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return isBitStreamSegmentOption;
-    }
-
-    /**
-     * Checks if call is a ignored, a parameter, a parameter with default or a variable, in that order.
-     * @param call that may be a variablic
-     * @return if {@link #isIgnored(Call)}, {@link #isParameter(Call)}, {@link #isParameterWithDefault(Call)} or
-     *   {@link #isVariable(Call)} is true
-     */
-    public static boolean isVariablic(@NotNull Call call) {
-        return isIgnored(call) || isParameter(call) || isParameterWithDefault(call) || isVariable(call);
     }
 
     @Contract(pure = true)
@@ -212,62 +195,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
 
     @Contract(pure = true)
     public static boolean isParameter(@NotNull PsiElement ancestor) {
-        PsiElement parent = ancestor.getParent();
-        boolean isParameter = false;
-
-        if (parent instanceof Call) {
-            isParameter = isParameter((Call) parent);
-        } else if (parent instanceof AtNonNumericOperation ||
-                parent instanceof ElixirAccessExpression ||
-                parent instanceof ElixirAssociations ||
-                parent instanceof ElixirAssociationsBase ||
-                parent instanceof ElixirBitString ||
-                parent instanceof ElixirBracketArguments ||
-                parent instanceof ElixirContainerAssociationOperation ||
-                parent instanceof ElixirKeywordPair ||
-                parent instanceof ElixirKeywords ||
-                parent instanceof ElixirList ||
-                parent instanceof ElixirMapArguments ||
-                parent instanceof ElixirMapConstructionArguments ||
-                parent instanceof ElixirMapOperation ||
-                parent instanceof ElixirMatchedParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesArguments ||
-                parent instanceof ElixirNoParenthesesKeywordPair ||
-                parent instanceof ElixirNoParenthesesKeywords ||
-                /* ElixirNoParenthesesManyStrictNoParenthesesExpression indicates a syntax error where no parentheses
-                   calls are nested, so it's invalid, but try to still resolve parameters to have highlighting */
-                parent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
-                parent instanceof ElixirNoParenthesesOneArgument ||
-                /* handles `(conn, %{})` in `def (conn, %{})`, which can occur in def templates.
-                   See https://github.com/KronicDeth/intellij-elixir/issues/367#issuecomment-244214975 */
-                parent instanceof ElixirNoParenthesesStrict ||
-                parent instanceof ElixirParenthesesArguments ||
-                parent instanceof ElixirParentheticalStab ||
-                parent instanceof ElixirStab ||
-                parent instanceof ElixirStabNoParenthesesSignature ||
-                parent instanceof ElixirStabBody ||
-                parent instanceof ElixirStabOperation ||
-                parent instanceof ElixirStabParenthesesSignature ||
-                parent instanceof ElixirStructOperation ||
-                parent instanceof ElixirTuple) {
-            isParameter = isParameter(parent);
-        } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
-            isParameter = true;
-        } else {
-            if (!(parent instanceof BracketOperation ||
-                    parent instanceof ElixirBlockItem ||
-                    parent instanceof ElixirDoBlock ||
-                    parent instanceof ElixirInterpolation ||
-                    parent instanceof ElixirMapUpdateArguments ||
-                    parent instanceof ElixirQuoteStringBody ||
-                    parent instanceof PsiFile ||
-                    parent instanceof QualifiedAlias ||
-                    parent instanceof QualifiedMultipleAliases)) {
-                error("Don't know how to check if parameter", parent);
-            }
-        }
-
-        return isParameter;
+        return Parameter.type(ancestor) != null;
     }
 
     public static boolean isParameterWithDefault(@NotNull PsiElement element) {
@@ -282,8 +210,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             if (operatorText.equals(DEFAULT_OPERATOR)) {
                 PsiElement defaulted = parentOperation.leftOperand();
 
-                if (defaulted.isEquivalentTo(element)) {
-                    isParameterWithDefault = isParameter((Call) parentOperation);
+                if (defaulted != null && defaulted.isEquivalentTo(element)) {
+                    isParameterWithDefault = isParameter(parentOperation);
                 }
             }
         }
@@ -369,7 +297,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return elementDescription;
     }
 
-    public static String parameterWithDefaultElementDescription(Call call, ElementDescriptionLocation location) {
+    public static String parameterWithDefaultElementDescription(@SuppressWarnings("unused") Call call,
+                                                                ElementDescriptionLocation location) {
         String elementDescription = null;
 
         if (location == UsageViewTypeLocation.INSTANCE) {
@@ -398,46 +327,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     /*
      * Private Static Methods
      */
-
-    @Nullable
-    private static List<ResolveResult> add(@Nullable List<ResolveResult> resolveResultList,
-                                           @NotNull String name,
-                                           boolean incompleteCode,
-                                           @NotNull PsiNamedElement match) {
-        String matchName = match.getName();
-
-        if (matchName != null) {
-            if (matchName.equals(name)) {
-                resolveResultList = add(resolveResultList, new PsiElementResolveResult(match, true));
-            } else if (incompleteCode && matchName.startsWith(name)) {
-                resolveResultList = add(resolveResultList, new PsiElementResolveResult(match, false));
-            }
-        }
-
-        return resolveResultList;
-    }
-
-    /**
-     * Adds {@code resolveResult} to {@code resolveResultList} if it exists; otherwise, create new
-     * {@code List<ResolveList>}, add {@code resolveResult} to it.  Return the modified or new
-     * {@code List<ResolveResult>}.
-     *
-     * @param resolveResultList The current accumulated {@link ResolveResult}s, or {@code null} if no results have been
-     *                          found yet.
-     * @param resolveResult     The element to add to {@code resolveResultList}
-     * @return {@code resolveResult} if it is not {@code null}; otherwise, a new {@code List<ResolveResult>}.
-     */
-    @NotNull
-    private static List<ResolveResult> add(@Nullable List<ResolveResult> resolveResultList,
-                                           @NotNull ResolveResult resolveResult) {
-        if (resolveResultList == null) {
-            resolveResultList = new ArrayList<ResolveResult>();
-        }
-
-        resolveResultList.add(resolveResult);
-
-        return resolveResultList;
-    }
 
     /**
      * Adds {@code namedElement} to {@code lookupElementList} in a {@link LookupElement} using
@@ -480,26 +369,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     /**
-     * Whether the {@code resolveResultList} has any {@link ResolveResult} where {@link ResolveResult#isValidResult()}
-     * is {@code true}.
-     *
-     * @param resolveResultList
-     * @return {@code false} if {@code resolveResultList} is {@code null}; otherwise, {@code true} if the
-     * {@code resolveResultList} has any {@link ResolveResult} where {@link ResolveResult#isValidResult()} is
-     * {@code true}.
-     */
-    @Contract(pure = true)
-    private static boolean hasValidResult(@Nullable List<ResolveResult> resolveResultList) {
-        boolean hasValidResult = false;
-
-        if (resolveResultList != null) {
-            hasValidResult = ContainerUtil.exists(resolveResultList, HAS_VALID_RESULT_CONDITION);
-        }
-
-        return hasValidResult;
-    }
-
-    /**
      * Searches downward from {@code ancestor}, only returning true if {@code element} is a type, unit, size or
      * modifier.
      *
@@ -537,19 +406,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return is;
-    }
-
-    private static boolean isParameter(@NotNull Call call) {
-        boolean isParameter;
-
-        if (CallDefinitionClause.is(call) || Delegation.is(call) || call.hasDoBlockOrKeyword()) {
-            isParameter = true;
-        } else {
-            // use generic handling, so that parent is checked
-            isParameter = isParameter((PsiElement) call);
-        }
-
-        return isParameter;
     }
 
     @Contract(pure = true)
@@ -624,6 +480,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         PsiElement parent = match.getParent();
 
         if (parent instanceof ElixirStabBody) {
+            @SuppressWarnings("unchecked")
             PsiElement ancestor = PsiTreeUtil.getContextOfType(
                     parent,
                     ElixirAnonymousFunction.class,
@@ -716,22 +573,12 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return lookupElementList;
     }
 
-    @Nullable
-    private static List<LookupElement> variablesInPreviousSiblings(@NotNull PsiElement lastSibling,
-                                                                   @Nullable List<LookupElement> lookupElementList) {
-        for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
-            lookupElementList = variablesInElement(sibling, lookupElementList);
-        }
-
-        return lookupElementList;
-    }
-
     /*
      * Constructors
      */
 
     public Callable(@NotNull Call call) {
-        super(call, TextRange.create(0, call.getTextLength()));
+        super(call);
     }
 
     @Override
@@ -786,19 +633,35 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> resolveResultList = null;
+        String name = myElement.getName();
 
-        /* to differentiate from UnqualifiedParenthesesCalls with no arguments in the parentheses that would have a
-           final arity of 0 too */
-        if (myElement instanceof UnqualifiedNoArgumentsCall) {
-            // ensure that a pipe isn't making a no argument call really a 1-arity call
+        if (name != null) {
             int resolvedFinalArity = myElement.resolvedFinalArity();
+            List<ResolveResult> variableResolveList = null;
 
             if (resolvedFinalArity == 0) {
-                String name = myElement.getName();
+                variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
+                        name,
+                        incompleteCode,
+                        myElement
+                );
+            }
 
-                if (name != null) {
-                    resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
-                }
+            List<ResolveResult> callDefinitionClauseResolveResultList =
+                    org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResultList(
+                            name,
+                            resolvedFinalArity,
+                            incompleteCode,
+                            myElement
+                    );
+
+            if (variableResolveList != null && callDefinitionClauseResolveResultList != null) {
+                resolveResultList = new ArrayList<ResolveResult>(variableResolveList);
+                resolveResultList.addAll(callDefinitionClauseResolveResultList);
+            } else if (variableResolveList != null) {
+                resolveResultList = variableResolveList;
+            } else if (callDefinitionClauseResolveResultList != null) {
+                resolveResultList = callDefinitionClauseResolveResultList;
             }
         }
 
@@ -823,5 +686,38 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
         return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
+    }
+
+    /*
+     * Protected Instance Methods
+     */
+
+    @Override
+    protected TextRange calculateDefaultRangeInElement() {
+        TextRange defaultRangeInElement = null;
+        TextRange myElementRangeInDocument = myElement.getTextRange();
+        int myElementStartOffset = myElementRangeInDocument.getStartOffset();
+
+        if (myElement instanceof Named) {
+            Named named = (Named) myElement;
+            PsiElement nameIdentifier = named.getNameIdentifier();
+
+            if (nameIdentifier != null) {
+                TextRange nameIdentifierRangeInDocument = nameIdentifier.getTextRange();
+                defaultRangeInElement = new TextRange(
+                        nameIdentifierRangeInDocument.getStartOffset() - myElementStartOffset,
+                        nameIdentifierRangeInDocument.getEndOffset() - myElementStartOffset
+                );
+            }
+        }
+
+        if (defaultRangeInElement == null) {
+            defaultRangeInElement = new TextRange(
+                    0,
+                    myElementRangeInDocument.getEndOffset() - myElementStartOffset
+            );
+        }
+
+        return defaultRangeInElement;
     }
 }

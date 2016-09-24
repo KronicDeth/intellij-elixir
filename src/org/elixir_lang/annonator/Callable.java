@@ -58,9 +58,10 @@ public class Callable implements Annotator, DumbAware {
 
                         if (reference != null) {
                             PsiElement resolved = reference.resolve();
+                            TextRange rangeInCall = reference.getRangeInElement();
 
                             if (resolved != null) {
-                                highlight(call, resolved, holder);
+                                highlight(call, rangeInCall, resolved, holder);
                             }
                         } else if (isBitStreamSegmentOption(call)) {
                             String name = call.getName();
@@ -79,22 +80,49 @@ public class Callable implements Annotator, DumbAware {
      */
 
     private void highlight(@NotNull Call referrer,
+                           @NotNull TextRange rangeInReferrer,
                            @NotNull PsiElement resolved,
                            @NotNull AnnotationHolder annotationHolder) {
-        TextAttributesKey textAttributesKey = null;
+        TextAttributesKey referrerTextAttributesKey = null;
+        TextAttributesKey resolvedTextAttributesKey = null;
 
         if (org.elixir_lang.reference.Callable.isIgnored(resolved)) {
-            textAttributesKey = ElixirSyntaxHighlighter.IGNORED_VARIABLE;
-        } else if (org.elixir_lang.reference.Callable.isParameter(resolved) ||
-                org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
-            textAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
-        } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
-            textAttributesKey = ElixirSyntaxHighlighter.VARIABLE;
+            referrerTextAttributesKey = ElixirSyntaxHighlighter.IGNORED_VARIABLE;
+            resolvedTextAttributesKey = ElixirSyntaxHighlighter.IGNORED_VARIABLE;
+        } else {
+            Parameter.Type parameterType = Parameter.type(resolved);
+
+            if (parameterType != null) {
+                switch (parameterType) {
+                    case FUNCTION_NAME:
+                        referrerTextAttributesKey = ElixirSyntaxHighlighter.FUNCTION_CALL;
+                        resolvedTextAttributesKey = ElixirSyntaxHighlighter.FUNCTION_DECLARATION;
+                        break;
+
+                    case MACRO_NAME:
+                        referrerTextAttributesKey = ElixirSyntaxHighlighter.MACRO_CALL;
+                        resolvedTextAttributesKey = ElixirSyntaxHighlighter.MACRO_DECLARATION;
+                        break;
+
+                    case VARIABLE:
+                        referrerTextAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
+                        resolvedTextAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
+                }
+            } else if (org.elixir_lang.reference.Callable.isParameterWithDefault(resolved)) {
+                referrerTextAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
+                resolvedTextAttributesKey = ElixirSyntaxHighlighter.PARAMETER;
+            } else if (org.elixir_lang.reference.Callable.isVariable(resolved)) {
+                referrerTextAttributesKey = ElixirSyntaxHighlighter.VARIABLE;
+                resolvedTextAttributesKey = ElixirSyntaxHighlighter.VARIABLE;
+            }
         }
 
-        if (textAttributesKey != null) {
-            highlight(referrer, annotationHolder, textAttributesKey);
-            highlight(resolved, annotationHolder, textAttributesKey);
+        if (referrerTextAttributesKey != null) {
+            highlight(referrer, rangeInReferrer, annotationHolder, referrerTextAttributesKey);
+        }
+
+        if (resolvedTextAttributesKey != null) {
+            highlight(resolved, annotationHolder, resolvedTextAttributesKey);
         }
     }
 
@@ -102,6 +130,21 @@ public class Callable implements Annotator, DumbAware {
                            @NotNull AnnotationHolder annotationHolder,
                            @NotNull final TextAttributesKey textAttributesKey) {
         highlight(element.getTextRange(), annotationHolder, textAttributesKey);
+    }
+
+    private void highlight(@NotNull final PsiElement element,
+                          @NotNull TextRange rangeInElement,
+                          @NotNull AnnotationHolder annotationHolder,
+                          @NotNull final TextAttributesKey textAttributesKey) {
+        TextRange elementRangeInDocument = element.getTextRange();
+        int startOffset = elementRangeInDocument.getStartOffset();
+
+        TextRange rangeInElementInDocument = new TextRange(
+                startOffset + rangeInElement.getStartOffset(),
+                startOffset + rangeInElement.getEndOffset()
+        );
+
+        highlight(rangeInElementInDocument, annotationHolder, textAttributesKey);
     }
 
     /**
