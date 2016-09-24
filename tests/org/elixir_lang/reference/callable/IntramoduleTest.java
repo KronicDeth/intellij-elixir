@@ -82,6 +82,31 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testParenthesesRecursiveReference() {
+        myFixture.configureByFiles("parentheses_recursive.ex");
+        PsiElement parenthesesCall = myFixture
+                .getFile()
+                .findElementAt(myFixture.getCaretOffset())
+                .getParent()
+                .getParent()
+                .getParent();
+
+        assertInstanceOf(parenthesesCall.getFirstChild(), ElixirIdentifier.class);
+
+        PsiReference reference = parenthesesCall.getReference();
+
+        assertNotNull("`referenced` has no reference", reference);
+
+        PsiElement resolved = reference.resolve();
+
+        assertNotNull("`referenced` not resolved", resolved);
+        assertEquals(
+                "ambiguous reference does not resolve to recursive function declaration",
+                "def referenced do\n    referenced()\n\n    a = 1\n  end",
+                resolved.getParent().getParent().getParent().getText()
+        );
+    }
+
     /*
      * Protected Instance Methods
      */
