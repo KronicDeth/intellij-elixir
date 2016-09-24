@@ -66,7 +66,7 @@ public class MultiResolve implements PsiScopeProcessor {
      * Constructors
      */
 
-    public MultiResolve(@NotNull String name, int resolvedFinalArity, boolean incompleteCode) {
+    private MultiResolve(@NotNull String name, int resolvedFinalArity, boolean incompleteCode) {
         this.incompleteCode = incompleteCode;
         this.name = name;
         this.resolvedFinalArity = resolvedFinalArity;
@@ -129,9 +129,7 @@ public class MultiResolve implements PsiScopeProcessor {
         }
     }
 
-    private boolean execute(@NotNull Call element, @NotNull ResolveState state) {
-        boolean keepProcessing = true;
-
+    private boolean execute(@NotNull Call element, @NotNull @SuppressWarnings("unused") ResolveState state) {
         if (CallDefinitionClause.is(element)) {
             Pair<String, IntRange> nameArityRange = nameArityRange(element);
 
@@ -156,15 +154,13 @@ public class MultiResolve implements PsiScopeProcessor {
 
             if (childCalls != null) {
                 for (Call childCall : childCalls) {
-                    keepProcessing = execute(childCall, state);
-
-                    if (!keepProcessing) {
+                    if(!execute(childCall, state)) {
                         break;
                     }
                 }
             }
         }
 
-        return keepProcessing;
+        return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
     }
 }
