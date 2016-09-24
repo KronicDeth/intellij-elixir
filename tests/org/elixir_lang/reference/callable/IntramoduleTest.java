@@ -107,6 +107,31 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testParenthesesSingleCorrectArityReference() {
+        myFixture.configureByFiles("parentheses_single_correct_arity.ex");
+        PsiElement parenthesesCall = myFixture
+                .getFile()
+                .findElementAt(myFixture.getCaretOffset())
+                .getParent()
+                .getParent()
+                .getParent();
+
+        assertInstanceOf(parenthesesCall.getFirstChild(), ElixirIdentifier.class);
+
+        PsiReference reference = parenthesesCall.getReference();
+
+        assertNotNull("`referenced` has no reference", reference);
+
+        PsiElement resolved = reference.resolve();
+
+        assertNotNull("`referenced` not resolved", resolved);
+        assertEquals(
+                "parentheses 1-arity reference does not resolve to single 1-arity function declaration",
+                "def referenced(_) do\n  end",
+                resolved.getParent().getParent().getParent().getText()
+        );
+    }
+
     /*
      * Protected Instance Methods
      */
