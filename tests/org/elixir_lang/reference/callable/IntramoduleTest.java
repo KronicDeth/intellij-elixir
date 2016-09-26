@@ -1,9 +1,7 @@
 package org.elixir_lang.reference.callable;
 
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.ResolveResult;
+import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.*;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 
@@ -133,20 +131,44 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         assertEquals("Did not resolve to both clauses", 2, resolveResults.length);
 
         ResolveResult firstResolveResult = resolveResults[0];
+        PsiElement firstResolved = firstResolveResult.getElement();
 
         assertEquals(
                 "first ResolveResult is not the true clause",
                 "def referenced(true) do\n  end",
-                firstResolveResult.getElement().getParent().getParent().getParent().getText()
+                firstResolved.getParent().getParent().getParent().getText()
         );
 
+        assertInstanceOf(firstResolved, NavigatablePsiElement.class);
+
+        NavigatablePsiElement navigatableFirstResolved = (NavigatablePsiElement) firstResolved;
+
+        ItemPresentation firstPresentation = navigatableFirstResolved.getPresentation();
+
+        assertNotNull("first ResolveResult element has no presentation", firstPresentation);
+
+        assertEquals("A", firstPresentation.getLocationString());
+        assertEquals("referenced(true)", firstPresentation.getPresentableText());
+
         ResolveResult secondResolveResult = resolveResults[1];
+        PsiElement secondResolved = secondResolveResult.getElement();
 
         assertEquals(
                 "second ResolveResult is not the false clause",
                 "def referenced(false) do\n  end",
-                secondResolveResult.getElement().getParent().getParent().getParent().getText()
+                secondResolved.getParent().getParent().getParent().getText()
         );
+
+        assertInstanceOf(secondResolved, NavigatablePsiElement.class);
+
+        NavigatablePsiElement navigatableSecondResolved = (NavigatablePsiElement) secondResolved;
+
+        ItemPresentation secondPresentation = navigatableSecondResolved.getPresentation();
+
+        assertNotNull("second ResolveResult element has no presentation", secondPresentation);
+
+        assertEquals("A", secondPresentation.getLocationString());
+        assertEquals("referenced(false)", secondPresentation.getPresentableText());
     }
 
     public void testParenthesesSingleCorrectArityReference() {
