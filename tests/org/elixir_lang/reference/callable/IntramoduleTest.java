@@ -5,6 +5,8 @@ import com.intellij.psi.*;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 
+import static org.junit.Assert.assertNotEquals;
+
 public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
     /*
      * Tests
@@ -80,6 +82,35 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
                 "def referenced do\n    referenced\n\n    a = 1\n  end",
                 resolved.getParent().getParent().getParent().getText()
         );
+    }
+
+    public void testFunctionNameMultipleSameArity() {
+        myFixture.configureByFiles("function_name_multiple_same_arity.ex");
+        PsiElement parenthesesCall = myFixture
+                .getFile()
+                .findElementAt(myFixture.getCaretOffset())
+                .getParent()
+                .getParent()
+                .getParent();
+
+        assertInstanceOf(parenthesesCall.getFirstChild(), ElixirIdentifier.class);
+
+        PsiReference reference = parenthesesCall.getReference();
+
+        assertNotNull("`referenced` has no reference", reference);
+
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
+
+        PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+
+        ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+
+        assertNotEquals("Resolved to both clauses instead of selected clause", 2, resolveResults.length);
+        assertEquals("Resolves to nothing so find usage can be used instead", 0, resolveResults.length);
+
+        PsiElement resolved = reference.resolve();
+
+        assertNull("Reference resolve", resolved);
     }
 
     public void testParenthesesRecursiveReference() {

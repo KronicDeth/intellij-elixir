@@ -120,30 +120,41 @@ public class MultiResolve implements PsiScopeProcessor {
      * Private Instance Methods
      */
 
-    private void addToResolveResultList(@NotNull Call call, boolean validResult) {
+    private boolean addToResolveResultList(@NotNull Call call, boolean validResult, ResolveState state) {
+        boolean keepProcessing = true;
+
         if (call instanceof  Named) {
             Named named = (Named) call;
             PsiElement nameIdentifier = named.getNameIdentifier();
 
             if (nameIdentifier != null) {
+                /* call definition clause needs to not have a self-reference, so that OpenAPI uses Find Usages
+                   instead */
+                if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
+                    keepProcessing = false;
+                } else {
                 /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a
                    List<ResolveResult> can still work */
-                if (resolvedSet == null || !resolvedSet.contains(nameIdentifier)) {
-                    resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
-                            resolveResultList, new PsiElementResolveResult(nameIdentifier, validResult)
-                    );
+                    if (resolvedSet == null || !resolvedSet.contains(nameIdentifier)) {
+                        resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
+                                resolveResultList, new PsiElementResolveResult(nameIdentifier, validResult)
+                        );
 
-                    if (resolvedSet == null) {
-                        resolvedSet = new THashSet<PsiElement>();
+                        if (resolvedSet == null) {
+                            resolvedSet = new THashSet<PsiElement>();
+                        }
+
+                        resolvedSet.add(nameIdentifier);
+
                     }
-
-                    resolvedSet.add(nameIdentifier);
                 }
             }
         }
+
+        return keepProcessing;
     }
 
-    private boolean execute(@NotNull Call element, @NotNull @SuppressWarnings("unused") ResolveState state) {
+    private boolean execute(@NotNull Call element, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
         if (CallDefinitionClause.is(element)) {
@@ -156,13 +167,12 @@ public class MultiResolve implements PsiScopeProcessor {
                     IntRange arityRange = nameArityRange.second;
 
                     if (arityRange.containsInteger(resolvedFinalArity)) {
-
-                        addToResolveResultList(element, true);
+                        keepProcessing = addToResolveResultList(element, true, state);
                     } else if (incompleteCode) {
-                        addToResolveResultList(element, false);
+                        keepProcessing = addToResolveResultList(element, false, state);
                     }
                 } else if (incompleteCode && name.startsWith(this.name)) {
-                    addToResolveResultList(element, false);
+                    keepProcessing = addToResolveResultList(element, false, state);
                 }
 
                 // Don't check MultiResolve.keepProcessing in case recursive call of function with multiple clauses
