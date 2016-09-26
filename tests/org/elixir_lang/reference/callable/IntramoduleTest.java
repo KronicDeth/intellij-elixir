@@ -1,7 +1,9 @@
 package org.elixir_lang.reference.callable;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.ResolveResult;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.ElixirIdentifier;
 
@@ -104,6 +106,46 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
                 "ambiguous reference does not resolve to recursive function declaration",
                 "def referenced do\n    referenced()\n\n    a = 1\n  end",
                 resolved.getParent().getParent().getParent().getText()
+        );
+    }
+
+    public void testParenthesesMultipleCorrectArityReference() {
+        myFixture.configureByFiles("parentheses_multiple_correct_arity.ex");
+        PsiElement parenthesesCall = myFixture
+                .getFile()
+                .findElementAt(myFixture.getCaretOffset())
+                .getParent()
+                .getParent()
+                .getParent();
+
+        assertInstanceOf(parenthesesCall.getFirstChild(), ElixirIdentifier.class);
+
+        PsiReference reference = parenthesesCall.getReference();
+
+        assertNotNull("`referenced` has no reference", reference);
+
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
+
+        PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+
+        ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+
+        assertEquals("Did not resolve to both clauses", 2, resolveResults.length);
+
+        ResolveResult firstResolveResult = resolveResults[0];
+
+        assertEquals(
+                "first ResolveResult is not the true clause",
+                "def referenced(true) do\n  end",
+                firstResolveResult.getElement().getParent().getParent().getParent().getText()
+        );
+
+        ResolveResult secondResolveResult = resolveResults[1];
+
+        assertEquals(
+                "second ResolveResult is not the false clause",
+                "def referenced(false) do\n  end",
+                secondResolveResult.getElement().getParent().getParent().getParent().getText()
         );
     }
 
