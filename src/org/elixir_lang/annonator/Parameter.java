@@ -1,7 +1,9 @@
 package org.elixir_lang.annonator;
 
+import com.intellij.psi.NavigatablePsiElement;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
@@ -13,20 +15,117 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Parameter {
-    public static enum Type {
+    public enum Type {
         FUNCTION_NAME,
         MACRO_NAME,
-        VARIABLE
+        VARIABLE;
+    }
+
+    /*
+     * Public Static Methods
+     */
+
+    /**
+     * A new {@link Parameter} with {@link #parameterized} filled in if {@code parameter}'s {@link #entrance} is a
+     * parameter element.
+     *
+     * @return a new {@link Parameter} with {@link #parameterized} filled in if {@link #entrance} is a valida parameter
+     *   element.
+     */
+    @Contract(pure = true)
+    @NotNull
+    public static Parameter putParameterized(final @NotNull Parameter parameter) {
+        return putParameterized(parameter, parameter.entrance);
+    }
+
+    /*
+     * Private Static Methods
+     */
+
+    @Contract(pure = true)
+    @NotNull
+    private static <T> T notNullize(@Nullable T nullable, @NotNull T defaultValue) {
+        T notNull;
+
+        if (nullable == null) {
+            notNull = defaultValue;
+        } else {
+            notNull = nullable;
+        }
+
+        return notNull;
+    }
+
+    private static void error(@NotNull String message, @NotNull PsiElement element) {
+        Logger.error(Parameter.class, message + " (when element class is " + element.getClass().getName() + ")", element);
     }
 
     @Contract(pure = true)
-    @Nullable
-    public static Type type(@NotNull PsiElement ancestor) {
+    @NotNull
+    private static Parameter putParameterized(@NotNull final Parameter parameter, final @NotNull Call ancestor) {
+        Parameter parameterizedParameter;
+
+        if (CallDefinitionClause.isFunction(ancestor) || Delegation.is(ancestor)) {
+            parameterizedParameter = new Parameter(
+                    parameter.defaultValue,
+                    parameter.entrance,
+                    notNullize(parameter.parameterized, ancestor),
+                    notNullize(parameter.type, Type.FUNCTION_NAME)
+            );
+        } else if (CallDefinitionClause.isMacro(ancestor)) {
+            parameterizedParameter = new Parameter(
+                    parameter.defaultValue,
+                    parameter.entrance,
+                    notNullize(parameter.parameterized, ancestor),
+                    notNullize(parameter.type, Type.MACRO_NAME)
+            );
+        } else if (ancestor.hasDoBlockOrKeyword()) {
+            parameterizedParameter = new Parameter(
+                    parameter.defaultValue,
+                    parameter.entrance,
+                    ancestor,
+                    notNullize(parameter.type, Type.VARIABLE)
+            );
+        } else {
+            PsiElement element = ancestor.functionNameElement();
+            Parameter updatedParameter = parameter;
+
+            if (!PsiTreeUtil.isAncestor(element, parameter.entrance, false)) {
+                updatedParameter = new Parameter(
+                        parameter.defaultValue,
+                        parameter.entrance,
+                        ancestor,
+                        notNullize(parameter.type, Type.VARIABLE)
+                );
+            }
+
+            // use generic handling so that parent is checked
+            parameterizedParameter = putParameterized(updatedParameter, (PsiElement) ancestor);
+        }
+
+        return parameterizedParameter;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static Parameter putParameterized(@NotNull final Parameter parameter,
+                                              @NotNull final ElixirAnonymousFunction ancestor) {
+        return new Parameter(
+                parameter.defaultValue,
+                parameter.entrance,
+                ancestor,
+                notNullize(parameter.type, Type.VARIABLE)
+        );
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    private static Parameter putParameterized(@NotNull final Parameter parameter, @NotNull final PsiElement ancestor) {
+        Parameter parameterizedParameter;
         PsiElement parent = ancestor.getParent();
-        Type type = null;
 
         if (parent instanceof Call) {
-            type = type((Call) parent);
+            parameterizedParameter = putParameterized(parameter, (Call) parent);
         } else if (parent instanceof AtNonNumericOperation ||
                 parent instanceof ElixirAccessExpression ||
                 parent instanceof ElixirAssociations ||
@@ -60,11 +159,12 @@ public class Parameter {
                 parent instanceof ElixirStabParenthesesSignature ||
                 parent instanceof ElixirStructOperation ||
                 parent instanceof ElixirTuple) {
-            type = type(parent);
-        } else if (parent instanceof ElixirAnonymousFunction || parent instanceof InMatch) {
-            type = Type.VARIABLE;
-        } else {
-            if (!(parent instanceof BracketOperation ||
+            parameterizedParameter = putParameterized(parameter, parent);
+        } else if (parent instanceof ElixirAnonymousFunction) {
+            parameterizedParameter = putParameterized(parameter, (ElixirAnonymousFunction) parent);
+        } else if (parent instanceof InMatch) {
+            parameterizedParameter = putParameterized(parameter, (InMatch) parent);
+        } else if (parent instanceof BracketOperation ||
                     parent instanceof ElixirBlockItem ||
                     parent instanceof ElixirDoBlock ||
                     parent instanceof ElixirInterpolation ||
@@ -72,36 +172,79 @@ public class Parameter {
                     parent instanceof ElixirQuoteStringBody ||
                     parent instanceof PsiFile ||
                     parent instanceof QualifiedAlias ||
-                    parent instanceof QualifiedMultipleAliases)) {
-                error("Don't know how to check if parameter", parent);
-            }
+                    parent instanceof QualifiedMultipleAliases) {
+            parameterizedParameter = new Parameter(parameter.entrance);
+        } else {
+            error("Don't know how to check if parameter", parent);
+            parameterizedParameter = new Parameter(parameter.entrance);
         }
 
-        return type;
+        return parameterizedParameter;
     }
 
     /*
-     * Private Static Methods
+     * Fields
      */
 
-    private static void error(@NotNull String message, @NotNull PsiElement element) {
-        Logger.error(Parameter.class, message + " (when element class is " + element.getClass().getName() + ")", element);
+    @Nullable
+    public final PsiElement defaultValue;
+    @NotNull
+    public final PsiElement entrance;
+    @Nullable
+    public final NavigatablePsiElement parameterized;
+    @Nullable
+    public final Type type;
+
+    /*
+     * Constructors
+     */
+
+    public Parameter(@NotNull PsiElement entrance) {
+        this.defaultValue = null;
+        this.entrance = entrance;
+        this.parameterized = null;
+        this.type = null;
     }
 
-    private static Type type(@NotNull Call call) {
-        Type type;
+    private Parameter(@Nullable PsiElement defaultValue,
+                      @NotNull PsiElement entrance,
+                      @Nullable NavigatablePsiElement parameterized,
+                      @Nullable Type type) {
+        this.defaultValue = defaultValue;
+        this.entrance = entrance;
+        this.parameterized = parameterized;
+        this.type = type;
+    }
 
-        if (CallDefinitionClause.isFunction(call) || Delegation.is(call)) {
-            type = Type.FUNCTION_NAME;
-        } else if (CallDefinitionClause.isMacro(call)) {
-            type = Type.MACRO_NAME;
-        } else if (call.hasDoBlockOrKeyword()) {
-            type = Type.VARIABLE;
+    /*
+     * Public Instance Methods
+     */
+
+    /**
+     * Whether {@link #entrance} represents a parameter to a {@link #parameterized} element
+     * @return {@true true} if {@link #parameterized} is not {@code null}
+     */
+    @Contract(pure = true)
+    boolean isValid() {
+        return parameterized == null;
+    }
+
+    /**
+     * A Parameter that is not a parameter to anything.
+     *
+     * @param parameter The original {@link Parameter} that may or may not be parameterized
+     * @return an invalid parameter
+     */
+    @NotNull
+    public Parameter not(final @NotNull Parameter parameter) {
+        Parameter not;
+
+        if (parameter.defaultValue == null && parameter.parameterized == null) {
+            not = parameter;
         } else {
-            // use generic handling, so that parent is checked
-            type = type((PsiElement) call);
+            not = new Parameter(parameter.entrance);
         }
 
-        return type;
+        return not;
     }
 }

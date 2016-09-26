@@ -435,7 +435,13 @@ private noParenthesesManyArgumentsStrict ::= noParenthesesManyArguments |
 
 // A rule instead of a token so that there is a PsiElement to return from getNameIdentifier
 identifier ::= IDENTIFIER_TOKEN
-               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
+               {
+                 implements = "org.elixir_lang.psi.Quotable"
+                 methods = [
+                   getPresentation
+                   quote
+                 ]
+               }
 
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L124-L125
 unqualifiedNoParenthesesManyArgumentsCall ::= identifier !KEYWORD_PAIR_COLON

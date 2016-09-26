@@ -67,7 +67,8 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
     private String getElementDescription(@NotNull ElixirIdentifier identifier, @NotNull ElementDescriptionLocation location) {
         String elementDescription = null;
 
-        Parameter.Type type = Parameter.type(identifier);
+        Parameter parameter = new Parameter(identifier);
+        Parameter.Type type = Parameter.putParameterized(parameter).type;
 
         if (type == Parameter.Type.FUNCTION_NAME) {
             if (location == UsageViewShortNameLocation.INSTANCE) {

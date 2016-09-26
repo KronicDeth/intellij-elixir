@@ -195,7 +195,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
 
     @Contract(pure = true)
     public static boolean isParameter(@NotNull PsiElement ancestor) {
-        return Parameter.type(ancestor) != null;
+        Parameter parameter = new Parameter(ancestor);
+        return Parameter.putParameterized(parameter).type != null;
     }
 
     public static boolean isParameterWithDefault(@NotNull PsiElement element) {

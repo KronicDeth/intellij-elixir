@@ -4,10 +4,12 @@ package org.elixir_lang.psi.impl;
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElementVisitor;
 import org.elixir_lang.psi.ElixirIdentifier;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements ElixirIdentifier {
 
@@ -22,6 +24,11 @@ public class ElixirIdentifierImpl extends ASTWrapperPsiElement implements Elixir
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof ElixirVisitor) accept((ElixirVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Nullable
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @NotNull
