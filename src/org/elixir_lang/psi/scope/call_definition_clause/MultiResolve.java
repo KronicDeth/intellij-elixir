@@ -8,6 +8,7 @@ import com.intellij.psi.ResolveResult;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import gnu.trove.THashSet;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.Named;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
@@ -59,6 +61,8 @@ public class MultiResolve implements PsiScopeProcessor {
     @NotNull
     private final String name;
     private final int resolvedFinalArity;
+    @Nullable
+    private Set<PsiElement> resolvedSet = null;
     @Nullable
     private List<ResolveResult> resolveResultList = null;
 
@@ -122,14 +126,26 @@ public class MultiResolve implements PsiScopeProcessor {
             PsiElement nameIdentifier = named.getNameIdentifier();
 
             if (nameIdentifier != null) {
-                resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
-                        resolveResultList, new PsiElementResolveResult(nameIdentifier, validResult)
-                );
+                /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a
+                   List<ResolveResult> can still work */
+                if (resolvedSet == null || !resolvedSet.contains(nameIdentifier)) {
+                    resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
+                            resolveResultList, new PsiElementResolveResult(nameIdentifier, validResult)
+                    );
+
+                    if (resolvedSet == null) {
+                        resolvedSet = new THashSet<PsiElement>();
+                    }
+
+                    resolvedSet.add(nameIdentifier);
+                }
             }
         }
     }
 
     private boolean execute(@NotNull Call element, @NotNull @SuppressWarnings("unused") ResolveState state) {
+        boolean keepProcessing = true;
+
         if (CallDefinitionClause.is(element)) {
             Pair<String, IntRange> nameArityRange = nameArityRange(element);
 
@@ -148,6 +164,8 @@ public class MultiResolve implements PsiScopeProcessor {
                 } else if (incompleteCode && name.startsWith(this.name)) {
                     addToResolveResultList(element, false);
                 }
+
+                // Don't check MultiResolve.keepProcessing in case recursive call of function with multiple clauses
             }
         } else if (Module.is(element)) {
             Call[] childCalls = macroChildCalls(element);
@@ -159,8 +177,11 @@ public class MultiResolve implements PsiScopeProcessor {
                     }
                 }
             }
+
+            // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
+            keepProcessing = org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
         }
 
-        return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
+        return keepProcessing;
     }
 }
