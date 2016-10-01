@@ -329,42 +329,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
      * Private Static Methods
      */
 
-    /**
-     * Adds {@code namedElement} to {@code lookupElementList} in a {@link LookupElement} using
-     * {@link com.intellij.codeInsight.lookup.LookupElementBuilder#createWithSmartPointer(String, PsiElement)} if
-     * {@code lookupElementList} exists; otherwise, create new {@code List<LookupElement>}, and then add
-     * {@code namedElement}.
-     *
-     * @param lookupElementList The current accumulated {@link LookupElement}s for the {@link PsiElement}s that match
-     *                          the type of {@link #myElement}.  So, if it is an {@link UnqualifiedNoArgumentsCall},
-     *                          then this is a list of potential variables.
-     * @param namedElement an element that matches the criteria for {@link #getVariants()}
-     * @return the modified {@code lookupElementList} if it was not {@code null}; otherwise, a new
-     *   {@code List<LookupElement>}
-     */
-    @NotNull
-    private static List<LookupElement> add(@Nullable List<LookupElement> lookupElementList,
-                                           @NotNull PsiNamedElement namedElement) {
-        if (lookupElementList == null) {
-            lookupElementList = new ArrayList<LookupElement>();
-        }
-
-        String lookupString = namedElement.getName();
-
-        if (lookupString == null) {
-            lookupString = namedElement.getText();
-        }
-
-        lookupElementList.add(
-                LookupElementBuilder.createWithSmartPointer(
-                        lookupString,
-                        namedElement
-                )
-        );
-
-        return lookupElementList;
-    }
-
     private static void error(@NotNull String message, @NotNull PsiElement element) {
         Logger.error(Callable.class, message + " (when element class is " + element.getClass().getName() + ")", element);
     }
@@ -573,21 +537,6 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         }
 
         return useScope;
-    }
-
-    private static List<LookupElement> variablesInElement(@NotNull PsiElement element,
-                                                          @Nullable List<LookupElement> lookupElementList) {
-        if (element instanceof UnqualifiedNoArgumentsCall) {
-            lookupElementList = add(lookupElementList, (UnqualifiedNoArgumentsCall) element);
-        } else {
-            if (!(element instanceof ElixirStabBody ||
-                    element instanceof ElixirEndOfExpression ||
-                    element instanceof PsiWhiteSpace)) {
-                error("Don't know how to find variables", element);
-            }
-        }
-
-        return lookupElementList;
     }
 
     /*
