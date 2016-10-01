@@ -440,6 +440,22 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return isVariable;
     }
 
+    @Nullable
+    private static <T> List<T> merge(@Nullable List<T> maybeFirst, @Nullable List<T> maybeSecond) {
+        List<T> merged = null;
+
+        if (maybeFirst != null && maybeSecond != null) {
+            merged = new ArrayList<T>(maybeFirst);
+            merged.addAll(maybeSecond);
+        } else if (maybeFirst != null) {
+            merged = maybeFirst;
+        } else if (maybeSecond != null) {
+            merged = maybeSecond;
+        }
+
+        return merged;
+    }
+
     @NotNull
     private static LocalSearchScope variableUseScope(@NotNull Call call) {
         LocalSearchScope useScope = null;
@@ -609,7 +625,16 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<LookupElement> lookupElementList = Variants.lookupElementList(myElement);
+        List<LookupElement> variableLookupElementList = null;
+
+        if (myElement instanceof UnqualifiedNoArgumentsCall) {
+            variableLookupElementList = Variants.lookupElementList(myElement);
+        }
+
+        List<LookupElement> callDefinitionClauseLookupElementList =
+                org.elixir_lang.psi.scope.call_definition_clause.Variants.lookupElementList(myElement);
+
+        List<LookupElement> lookupElementList = merge(variableLookupElementList, callDefinitionClauseLookupElementList);
 
         Object[] variants;
 
@@ -656,14 +681,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                             myElement
                     );
 
-            if (variableResolveList != null && callDefinitionClauseResolveResultList != null) {
-                resolveResultList = new ArrayList<ResolveResult>(variableResolveList);
-                resolveResultList.addAll(callDefinitionClauseResolveResultList);
-            } else if (variableResolveList != null) {
-                resolveResultList = variableResolveList;
-            } else if (callDefinitionClauseResolveResultList != null) {
-                resolveResultList = callDefinitionClauseResolveResultList;
-            }
+            resolveResultList = merge(variableResolveList, callDefinitionClauseResolveResultList);
         }
 
         ResolveResult[] resolveResults;
