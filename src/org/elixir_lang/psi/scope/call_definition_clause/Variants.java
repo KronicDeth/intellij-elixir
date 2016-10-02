@@ -96,11 +96,15 @@ public class Variants extends CallDefinitionClause {
                         lookupElementByPsiElement = new THashMap<PsiElement, LookupElement>();
                     }
 
+                    String name = nameIdentifier.getText();
+
                     lookupElementByPsiElement.put(
                             nameIdentifier,
                             LookupElementBuilder.createWithSmartPointer(
-                                    nameIdentifier.getText(),
+                                    name,
                                     nameIdentifier
+                            ).withRenderer(
+                                    new org.elixir_lang.codeInsight.lookup.element_renderer.CallDefinitionClause(name)
                             )
                     );
                 }
@@ -127,7 +131,14 @@ public class Variants extends CallDefinitionClause {
 
             for (NamedElement indexedNameNamedElement : indexedNameNamedElementCollection) {
                 lookupElementList.add(
-                        LookupElementBuilder.createWithSmartPointer(indexedName, indexedNameNamedElement)
+                        LookupElementBuilder.createWithSmartPointer(
+                                indexedName,
+                                indexedNameNamedElement
+                        ).withRenderer(
+                                new org.elixir_lang.codeInsight.lookup.element_renderer.CallDefinitionClause(
+                                        indexedName
+                                )
+                        )
                 );
             }
         }
