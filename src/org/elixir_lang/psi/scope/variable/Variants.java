@@ -103,7 +103,7 @@ public class Variants extends Variable {
                         LookupElementBuilder.createWithSmartPointer(
                                 name,
                                 declaration
-                        )
+                        ).withRenderer(new org.elixir_lang.codeInsight.lookup.element_renderer.Variable(finalName))
                 );
             }
         }

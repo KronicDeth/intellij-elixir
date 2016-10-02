@@ -93,6 +93,7 @@ public interface ElixirIcons {
     Icon MODULE = PlatformIcons.PACKAGE_ICON;
     Icon OVERRIDABLE = AllIcons.General.OverridenMethod;
     Icon OVERRIDE = AllIcons.General.OverridingMethod;
+    Icon PARAMETER = AllIcons.Nodes.Parameter;
     Icon PROTOCOL = RowIconFactory.create(PlatformIcons.ANONYMOUS_CLASS_ICON, AllIcons.General.OverridenMethod);
     Icon STRUCTURE = AllIcons.Toolwindows.ToolWindowStructure;
     // same icon as intellij-erlang to match their look and feel
@@ -103,6 +104,8 @@ public interface ElixirIcons {
 
     // it is the unknown that is only a question mark
     Icon UNKNOWN = AllIcons.RunConfigurations.Unknown;
+
+    Icon VARIABLE = AllIcons.Nodes.Variable;
 
     Icon ELIXIR_APPLICATION = IconLoader.getIcon("/icons/elixir-Application-16.png");
     Icon ELIXIR_SUPERVISOR = IconLoader.getIcon("/icons/elixir-Supervisor-16.png");
