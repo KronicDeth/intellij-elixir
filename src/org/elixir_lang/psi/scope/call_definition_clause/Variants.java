@@ -1,14 +1,19 @@
 package org.elixir_lang.psi.scope.call_definition_clause;
 
+import com.intellij.codeInsight.completion.InsertHandler;
+import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
 import gnu.trove.THashMap;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.Named;
@@ -23,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 public class Variants extends CallDefinitionClause {
     /*
@@ -134,6 +140,24 @@ public class Variants extends CallDefinitionClause {
                         LookupElementBuilder.createWithSmartPointer(
                                 indexedName,
                                 indexedNameNamedElement
+                        ).withInsertHandler(
+                                new InsertHandler<LookupElement>() {
+                                    @Override
+                                    public void handleInsert(@NotNull InsertionContext context,
+                                                             @NotNull LookupElement item) {
+                                        int tailOffset = context.getTailOffset();
+                                        String currentTail = context.getDocument().getText(
+                                                new TextRange(tailOffset, tailOffset + 1)
+                                        );
+                                        char firstChar = currentTail.charAt(0);
+
+                                        if (firstChar != ' ' && firstChar != '(' && firstChar != '[') {
+                                            context.getDocument().insertString(tailOffset, "()");
+                                            // + 1 to put between the `(`  and `)`
+                                            context.getEditor().getCaretModel().moveToOffset(tailOffset + 1);
+                                        }
+                                    }
+                                }
                         ).withRenderer(
                                 new org.elixir_lang.codeInsight.lookup.element_renderer.CallDefinitionClause(
                                         indexedName
