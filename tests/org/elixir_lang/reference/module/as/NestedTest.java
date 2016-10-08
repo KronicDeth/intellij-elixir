@@ -1,16 +1,14 @@
 package org.elixir_lang.reference.module.as;
 
 import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
-import com.intellij.psi.stubs.StubIndex;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import org.elixir_lang.psi.ElixirAlias;
 import org.elixir_lang.psi.QualifiedAlias;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class NestedTest extends LightPlatformCodeInsightFixtureTestCase {
@@ -22,15 +20,13 @@ public class NestedTest extends LightPlatformCodeInsightFixtureTestCase {
         myFixture.configureByFiles("completion.ex", "suffix.ex", "nested.ex");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
-        assertTrue(
-                strings.containsAll(
-                        Arrays.asList(
-                                // nested aliased name
-                                "As.Nested"
-                        )
-                )
-        );
-        assertEquals(1, strings.size());
+        assertNull("Completion lookup shown", strings);
+        PsiElement autoInsertedLeafElement = myFixture.getFile().findElementAt(myFixture.getCaretOffset() - 1);
+        assertNotNull(autoInsertedLeafElement);
+        assertInstanceOf(autoInsertedLeafElement, LeafPsiElement.class);
+        PsiElement autoInsertedCompositeElement = autoInsertedLeafElement.getParent();
+        assertInstanceOf(autoInsertedCompositeElement, ElixirAlias.class);
+        assertEquals(autoInsertedCompositeElement.getText(), "Nested");
     }
 
     public void testReference() {
