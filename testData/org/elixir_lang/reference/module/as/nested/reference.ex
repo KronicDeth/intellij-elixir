@@ -1,4 +1,4 @@
-defmodule Prefix.Usage do
+defmodule Prefix.Reference do
   alias Prefix.Suffix, as: As
 
   As.Nested<caret>
