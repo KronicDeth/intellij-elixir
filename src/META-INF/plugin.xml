@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.4.0</version>
+  <version>4.5.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,41 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.5.0</h1>
+      <li>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Go To Declaration for functions and macros (only those defined in parseable-Elixir source.  References
+              to Erlang functions or only those available in <code>.beam</code> file, such as the standard library will
+              not resolve.)
+            </li>
+            <li>
+              <p>
+                Completion for functions and macros (only those defined in parseable-Elixir source.  Erlang functions
+                and Elixir function only in compiled <code>.beam</code> file, such as the standard library will not
+                complete.)
+              </p>
+              <ul>
+                <li>
+                  Completion uses the same presentation as Structure View, so the you can tell whether the name is a
+                  function/macro, whether it is public/private, and the Module where it is defined.
+                </li>
+                <li>
+                  Completed functions/macro insert <code>()</code> after the name in preparation for Elixir 1.4 where it
+                  is an error to have bare function calls.  It also makes it more obvious that you inserted a function
+                  and not a variable.
+                </li>
+                <li>
+                  Completion works for all functions when a bare identifier is used.  For a qualified identifier, only
+                  functions/macros under than Module are shown.
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.4.0</h1>
       <ul>
         <li>
