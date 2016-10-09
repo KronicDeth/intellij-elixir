@@ -87,6 +87,9 @@ public class CallDefinitionHead implements ItemPresentation {
     @NotNull
     @Override
     public String getPresentableText() {
-        return psiElement.getText();
+        return psiElement.getText()
+                .replaceAll("\\s+", " ")
+                .replaceAll("([\\[(]) ?", "$1")
+                .replaceAll(" ?(\\]|\\))", "$1");
     }
 }

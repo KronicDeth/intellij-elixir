@@ -29,7 +29,8 @@ public class ElixirVisitor extends PsiElementVisitor {
   }
 
   public void visitAnonymousFunction(@NotNull ElixirAnonymousFunction o) {
-    visitQuotable(o);
+    visitNavigatablePsiElement(o);
+    // visitQuotable(o);
   }
 
   public void visitArrowInfixOperator(@NotNull ElixirArrowInfixOperator o) {

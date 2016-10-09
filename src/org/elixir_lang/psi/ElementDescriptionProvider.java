@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
+import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.reference.Callable;
 import org.elixir_lang.structure_view.element.*;
@@ -47,11 +48,12 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
 
         if (element instanceof Call) {
             elementDescription = getElementDescription((Call) element, location);
+        } else if (element instanceof ElixirIdentifier) {
+            elementDescription = getElementDescription((ElixirIdentifier) element, location);
         } else if (element instanceof ElixirKeywordKey) {
             elementDescription = getElementDescription((ElixirKeywordKey) element, location);
         } else if (element instanceof MaybeModuleName) {
             elementDescription = getElementDescription((MaybeModuleName) element, location);
-
         }
 
         return elementDescription;
@@ -60,6 +62,30 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
     /*
      * Private Instance Methods
      */
+
+    @Nullable
+    private String getElementDescription(@NotNull ElixirIdentifier identifier, @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        Parameter parameter = new Parameter(identifier);
+        Parameter.Type type = Parameter.putParameterized(parameter).type;
+
+        if (type == Parameter.Type.FUNCTION_NAME) {
+            if (location == UsageViewShortNameLocation.INSTANCE) {
+                elementDescription = identifier.getText();
+            } else if (location == UsageViewTypeLocation.INSTANCE) {
+                elementDescription = "function";
+            }
+        } else if (type == Parameter.Type.MACRO_NAME) {
+            if (location == UsageViewShortNameLocation.INSTANCE) {
+                elementDescription = identifier.getText();
+            } else if (location == UsageViewTypeLocation.INSTANCE) {
+                elementDescription = "macro";
+            }
+        }
+
+        return elementDescription;
+    }
 
     @Nullable
     private String getElementDescription(@NotNull ElixirKeywordKey keywordKey,

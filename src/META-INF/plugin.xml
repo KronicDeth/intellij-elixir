@@ -1762,6 +1762,8 @@
     <annotator implementationClass="org.elixir_lang.annonator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
 
+    <completion.contributor implementationClass="org.elixir_lang.codeInsight.completion.contributor.CallDefinitionClause" language="Elixir"/>
+
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
     <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>

@@ -25,7 +25,9 @@ import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
+import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.Quote;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
@@ -35,15 +37,13 @@ import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.operation.Normalized;
+import org.elixir_lang.psi.operation.Type;
 import org.elixir_lang.psi.operation.infix.*;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.reference.Callable;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
-import org.elixir_lang.structure_view.element.Callback;
-import org.elixir_lang.structure_view.element.Delegation;
+import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -2772,6 +2772,26 @@ public class ElixirPsiImplUtil {
                 return call.getIcon(0);
             }
         };
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static ItemPresentation getPresentation(@NotNull final ElixirIdentifier identifier) {
+        Parameter parameter = new Parameter(identifier);
+        Parameter parameterizedParameter = Parameter.putParameterized(parameter);
+        ItemPresentation itemPresentation = null;
+
+        if ((parameterizedParameter.type == Parameter.Type.FUNCTION_NAME ||
+                parameterizedParameter.type == Parameter.Type.MACRO_NAME) &&
+                parameterizedParameter.parameterized != null) {
+            final NavigatablePsiElement parameterized = parameterizedParameter.parameterized;
+
+            if (parameterized instanceof Call) {
+                itemPresentation = new CallDefinitionClause((Call) parameterized).getPresentation();
+            }
+        }
+
+        return itemPresentation;
     }
 
     @Nullable

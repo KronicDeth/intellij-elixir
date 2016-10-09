@@ -210,8 +210,8 @@ public abstract class Variable implements PsiScopeProcessor {
     private boolean execute(@NotNull final Call match, @NotNull ResolveState state) {
         boolean keepProcessing = true;
 
-        if (CallDefinitionClause.is(match)) {
-            PsiElement head = CallDefinitionClause.head(match);
+        if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(match)) {
+            PsiElement head = org.elixir_lang.structure_view.element.CallDefinitionClause.head(match);
 
             if (head != null) {
                 PsiElement stripped = CallDefinitionHead.strip(head);

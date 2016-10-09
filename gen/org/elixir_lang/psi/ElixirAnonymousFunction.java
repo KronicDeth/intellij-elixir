@@ -2,11 +2,12 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.NavigatablePsiElement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirAnonymousFunction extends Quotable {
+public interface ElixirAnonymousFunction extends NavigatablePsiElement, Quotable {
 
   @NotNull
   List<ElixirEndOfExpression> getEndOfExpressionList();

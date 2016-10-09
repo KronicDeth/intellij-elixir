@@ -98,6 +98,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             DefaultLanguageHighlighterColors.FUNCTION_CALL
     );
 
+    public static final TextAttributesKey FUNCTION_DECLARATION = createTextAttributesKey(
+            "ELIXIR_FUNCTION_DECLARATION",
+            DefaultLanguageHighlighterColors.FUNCTION_DECLARATION
+    );
+
     public static final TextAttributesKey IDENTIFIER = createTextAttributesKey(
             "ELIXIR_IDENTIFIER",
             DefaultLanguageHighlighterColors.IDENTIFIER
@@ -116,6 +121,11 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey MACRO_CALL = createTextAttributesKey(
             "ELIXIR_MACRO_CALL",
             FUNCTION_CALL
+    );
+
+    public static final TextAttributesKey MACRO_DECLARATION = createTextAttributesKey(
+            "ELIXIR_MACRO_DECLARATION",
+            FUNCTION_DECLARATION
     );
 
     public static final TextAttributesKey MAP = createTextAttributesKey(
