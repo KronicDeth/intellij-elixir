@@ -9,8 +9,27 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.6.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/453">#453</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Return <code>emptySet</code> when <code>lookupElementByPsiElement</code> is <code>null</code>.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.5.0</h1>
-      <li>
+      <ul>
         <li>
           <p>Enhancements</p>
           <ul>
