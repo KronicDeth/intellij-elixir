@@ -1423,12 +1423,8 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiElement[] primaryArguments(@NotNull final Prefix prefix) {
-        PsiElement[] children = prefix.getChildren();
-
-        assert children.length == 2;
-
         return new PsiElement[]{
-                children[1]
+            prefix.operand()
         };
     }
 
