@@ -17,10 +17,7 @@ import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.ENTRANCE;
 
@@ -49,6 +46,7 @@ public class Variants extends CallDefinitionClause {
      * Fields
      */
 
+    @Nullable
     private Map<PsiElement, LookupElement> lookupElementByPsiElement = null;
 
     /*
@@ -140,7 +138,16 @@ public class Variants extends CallDefinitionClause {
         }
     }
 
+    @NotNull
     private Collection<LookupElement> getLookupElementCollection() {
-        return lookupElementByPsiElement.values();
+        Collection<LookupElement> lookupElementCollection;
+
+        if (lookupElementByPsiElement != null) {
+            lookupElementCollection = lookupElementByPsiElement.values();
+        } else {
+            lookupElementCollection = Collections.emptySet();
+        }
+
+        return lookupElementCollection;
     }
 }
