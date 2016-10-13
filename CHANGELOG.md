@@ -98,9 +98,14 @@
 
 ### Enhancements
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Regression test for [#453](https://github.com/KronicDeth/intellij-elixir/issues/453) - [@KronicDeth](https://github.com/KronicDeth)
+* [#455](https://github.com/KronicDeth/intellij-elixir/pull/454) - Regression test for [#446](https://github.com/KronicDeth/intellij-elixir/issues/446) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#455](https://github.com/KronicDeth/intellij-elixir/pull/454) - [@KronicDeth](https://github.com/KronicDeth)
+  * Don't do a naked `assert` that there are 2 children because this can fail during error recovery on the operand, instead use the `prefix.Normalized.operand()` through `prefix.operand()`.
+                                                                   
+    **WARNING: This changes the `@NotNull` array so that its sole element changes from `@NotNull` to `@Nullable`.  It may trigger new bugs.**
 
 
 

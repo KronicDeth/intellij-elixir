@@ -17,6 +17,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/453">#453</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/446">#446</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -24,6 +27,14 @@
           <ul>
             <li>
               Return <code>emptySet</code> when <code>lookupElementByPsiElement</code> is <code>null</code>.
+            </li>
+            <li>
+              Don't do a naked <code>assert</code> that there are 2 children because this can fail during error recovery
+              on the operand, instead use the <code>prefix.Normalized.operand()</code> through
+              <code>prefix.operand()</code>.
+
+              <strong>WARNING: This changes the <code>@NotNull</code> array so that its sole element changes from
+              <code>@NotNull</code> to <code>@Nullable</code>.  It may trigger new bugs.</strong>
             </li>
           </ul>
         </li>
