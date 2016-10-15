@@ -23,6 +23,9 @@
             <li>
               Show element class in all error reports
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/465">#465</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -43,6 +46,9 @@
               Use shipped <code>GeneratedParserUtilBase.DUMMY_BLOCK</code> because the <code>DUMMY_BLOCK</code>
               <strong>MUST</strong> match the <code>GeneratedParserUtilBase</code> to detect dummy blocks inserted for
               error handling.
+            </li>
+            <li>
+              Skip over <code>ElixirNoParenthesesStrict</code> for <code>isVariable</code>
             </li>
           </ul>
         </li>
