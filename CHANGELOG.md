@@ -106,8 +106,7 @@
   * Don't do a naked `assert` that there are 2 children because this can fail during error recovery on the operand, instead use the `prefix.Normalized.operand()` through `prefix.operand()`.
                                                                    
     **WARNING: This changes the `@NotNull` array so that its sole element changes from `@NotNull` to `@Nullable`.  It may trigger new bugs.**
-
-
+* [#461](https://github.com/KronicDeth/intellij-elixir/pull/461) - Use shipped `GeneratedParserUtilBase.DUMMY_BLOCK` because the `DUMMY_BLOCK` *MUST* match the `GeneratedParserUtilBase` to detect dummy blocks inserted for error handling. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 

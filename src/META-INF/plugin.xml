@@ -36,6 +36,11 @@
               <strong>WARNING: This changes the <code>@NotNull</code> array so that its sole element changes from
               <code>@NotNull</code> to <code>@Nullable</code>.  It may trigger new bugs.</strong>
             </li>
+            <li>
+              Use shipped <code>GeneratedParserUtilBase.DUMMY_BLOCK</code> because the <code>DUMMY_BLOCK</code>
+              <strong>MUST</strong> match the <code>GeneratedParserUtilBase</code> to detect dummy blocks inserted for
+              error handling.
+            </li>
           </ul>
         </li>
       </ul>
