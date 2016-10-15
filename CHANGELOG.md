@@ -99,6 +99,7 @@
 ### Enhancements
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Regression test for [#453](https://github.com/KronicDeth/intellij-elixir/issues/453) - [@KronicDeth](https://github.com/KronicDeth)
 * [#455](https://github.com/KronicDeth/intellij-elixir/pull/454) - Regression test for [#446](https://github.com/KronicDeth/intellij-elixir/issues/446) - [@KronicDeth](https://github.com/KronicDeth)
+* [#464](https://github.com/KronicDeth/intellij-elixir/pull/464) - Show element class in all error reports - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)

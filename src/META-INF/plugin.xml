@@ -20,6 +20,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/446">#446</a>
             </li>
+            <li>
+              Show element class in all error reports
+            </li>
           </ul>
         </li>
         <li>
