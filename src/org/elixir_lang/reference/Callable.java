@@ -330,7 +330,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
      */
 
     private static void error(@NotNull String message, @NotNull PsiElement element) {
-        Logger.error(Callable.class, message + " (when element class is " + element.getClass().getName() + ")", element);
+        Logger.error(Callable.class, message, element);
     }
 
     /**

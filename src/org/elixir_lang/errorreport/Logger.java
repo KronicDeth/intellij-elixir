@@ -9,7 +9,6 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class Logger {
@@ -58,6 +57,18 @@ public class Logger {
      * Private Static Methods
      */
 
+    @NotNull
+    private static String className(@NotNull PsiElement element) {
+        return "\n" +
+                "### Element Class Name\n" +
+                '\n' +
+                "```\n" +
+                element.getClass().getName() +
+                '\n' +
+                "```\n";
+    }
+
+    @NotNull
     private static String excerpt(@NotNull PsiFile containingFile, @NotNull PsiElement element) {
         StringBuilder excerptBuilder = new StringBuilder();
         excerptBuilder.append('\n');
@@ -91,6 +102,7 @@ public class Logger {
                                           @NotNull PsiFile containingFile,
                                           @NotNull PsiElement element) {
         return userMessage + "\n" +
-                excerpt(containingFile, element);
+                excerpt(containingFile, element) + "\n" +
+                className(element);
     }
 }
