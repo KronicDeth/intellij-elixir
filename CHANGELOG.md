@@ -101,6 +101,7 @@
 * [#455](https://github.com/KronicDeth/intellij-elixir/pull/454) - Regression test for [#446](https://github.com/KronicDeth/intellij-elixir/issues/446) - [@KronicDeth](https://github.com/KronicDeth)
 * [#464](https://github.com/KronicDeth/intellij-elixir/pull/464) - Show element class in all error reports - [@KronicDeth](https://github.com/KronicDeth)
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Regression test for [#456](https://github.com/KronicDeth/intellij-elixir/issues/456) - [@KronicDeth](https://github.com/KronicDeth)
+* [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Regression test for [#458](https://github.com/KronicDeth/intellij-elixir/issues/458) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -110,6 +111,7 @@
     **WARNING: This changes the `@NotNull` array so that its sole element changes from `@NotNull` to `@Nullable`.  It may trigger new bugs.**
 * [#461](https://github.com/KronicDeth/intellij-elixir/pull/461) - Use shipped `GeneratedParserUtilBase.DUMMY_BLOCK` because the `DUMMY_BLOCK` *MUST* match the `GeneratedParserUtilBase` to detect dummy blocks inserted for error handling. - [@KronicDeth](https://github.com/KronicDeth)
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Skip over `ElixirNoParenthesesStrict` for `isVariable` - [@KronicDeth](https://github.com/KronicDeth)
+* [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Allow newlines before `do` in `doBlock` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 
