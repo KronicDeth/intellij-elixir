@@ -11,7 +11,7 @@ Elixir File(0,127)
   UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL(71,85)
     ElixirIdentifierImpl(IDENTIFIER)(71,85)
       PsiElement(identifier)('first_argument')(71,85)
-  PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <+, ->, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^>, <=>, <in>, <no parentheses one argument>, <when>, <zero-width-call>, <|>, <||, |||, or>, '[' or do expected, got ','(85,86)
+  PsiErrorElement:<!=, ==, =~, !==, ===>, <&&, &&&, and>, <*, />, <++, --, .., <>>, <+, ->, <.>, <::>, <<, >, <=, >=>, <<-, \\>, <<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^>, <=>, <do block>, <in>, <no parentheses one argument>, <when>, <zero-width-call>, <|>, <||, |||, or> or '[' expected, got ','(85,86)
     PsiElement(,)(',')(85,86)
   ElixirEndOfExpressionImpl(END_OF_EXPRESSION)(86,87)
     PsiErrorElement:<end of expression> expected, got '
