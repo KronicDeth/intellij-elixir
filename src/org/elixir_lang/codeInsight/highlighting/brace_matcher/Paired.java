@@ -17,8 +17,10 @@ class Paired implements PairedBraceMatcher {
      * CONSTANTS
      */
 
+    static final BracePair DO_END = new BracePair(ElixirTypes.DO, ElixirTypes.END, true);
+
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
-            new BracePair(ElixirTypes.DO,                               ElixirTypes.END,                                true),
+            DO_END,
             new BracePair(ElixirTypes.FN,                               ElixirTypes.END,                                true),
             new BracePair(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,       ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,       false),
             new BracePair(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, false),
@@ -39,6 +41,7 @@ class Paired implements PairedBraceMatcher {
             new BracePair(ElixirTypes.OPENING_CURLY,                    ElixirTypes.CLOSING_CURLY,                      false),
             new BracePair(ElixirTypes.OPENING_PARENTHESIS,              ElixirTypes.CLOSING_PARENTHESIS,                false)
     };
+    public final static PairedBraceMatcher INSTANCE = new Paired();
 
     /*
      * Instance Methods
