@@ -29,6 +29,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/458">#458</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/443">#443</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -55,6 +58,9 @@
             </li>
             <li>
              Allow newlines before <code>do</code> in <code>doBlock</code>
+            </li>
+            <li>
+              Don't match <code>do</code> or <code>fn</code> to <code>end</code> when used as a keyword key.
             </li>
           </ul>
         </li>

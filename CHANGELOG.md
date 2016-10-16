@@ -102,6 +102,7 @@
 * [#464](https://github.com/KronicDeth/intellij-elixir/pull/464) - Show element class in all error reports - [@KronicDeth](https://github.com/KronicDeth)
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Regression test for [#456](https://github.com/KronicDeth/intellij-elixir/issues/456) - [@KronicDeth](https://github.com/KronicDeth)
 * [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Regression test for [#458](https://github.com/KronicDeth/intellij-elixir/issues/458) - [@KronicDeth](https://github.com/KronicDeth)
+* [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Regression tests for [#443](https://github.com/KronicDeth/intellij-elixir/issues/443) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -112,6 +113,7 @@
 * [#461](https://github.com/KronicDeth/intellij-elixir/pull/461) - Use shipped `GeneratedParserUtilBase.DUMMY_BLOCK` because the `DUMMY_BLOCK` *MUST* match the `GeneratedParserUtilBase` to detect dummy blocks inserted for error handling. - [@KronicDeth](https://github.com/KronicDeth)
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Skip over `ElixirNoParenthesesStrict` for `isVariable` - [@KronicDeth](https://github.com/KronicDeth)
 * [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Allow newlines before `do` in `doBlock` - [@KronicDeth](https://github.com/KronicDeth)
+* [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Don't match `do` or `fn` to `end` when used as a keyword key. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 
