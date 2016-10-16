@@ -10,6 +10,7 @@ import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.codeInsight.highlighting.brace_matcher.Paired.DO_END;
+import static org.elixir_lang.codeInsight.highlighting.brace_matcher.Paired.FN_END;
 
 public class NonTrivial extends PairedBraceMatcherAdapter {
   public NonTrivial() {
@@ -21,7 +22,7 @@ public class NonTrivial extends PairedBraceMatcherAdapter {
   public BracePair findPair(boolean left, HighlighterIterator iterator, CharSequence fileText, FileType fileType) {
     BracePair pair = super.findPair(left, iterator, fileText, fileType);
 
-    if (pair == DO_END) {
+    if (pair == DO_END || pair == FN_END) {
       iterator.advance();
       IElementType tokenType = iterator.getTokenType();
 

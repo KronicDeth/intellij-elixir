@@ -18,10 +18,11 @@ class Paired implements PairedBraceMatcher {
      */
 
     static final BracePair DO_END = new BracePair(ElixirTypes.DO, ElixirTypes.END, true);
+    static final BracePair FN_END = new BracePair(ElixirTypes.FN, ElixirTypes.END, true);
 
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
             DO_END,
-            new BracePair(ElixirTypes.FN,                               ElixirTypes.END,                                true),
+            FN_END,
             new BracePair(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,       ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,       false),
             new BracePair(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, false),
             new BracePair(ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,         ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,         false),
