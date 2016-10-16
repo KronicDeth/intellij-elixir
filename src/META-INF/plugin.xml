@@ -1852,7 +1852,7 @@
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
     <elementDescriptionProvider implementation="org.elixir_lang.psi.ElementDescriptionProvider"/>
     <gotoSymbolContributor implementation="org.elixir_lang.navigation.GotoSymbolContributor"/>
-    <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.BraceMatcher"/>
+    <lang.braceMatcher language="Elixir" implementationClass="org.elixir_lang.codeInsight.highlighting.brace_matcher.Paired"/>
     <lang.commenter language="Elixir" implementationClass="org.elixir_lang.ElixirCommenter"/>
     <lang.findUsagesProvider language="Elixir" implementationClass="org.elixir_lang.FindUsagesProvider"/>
 

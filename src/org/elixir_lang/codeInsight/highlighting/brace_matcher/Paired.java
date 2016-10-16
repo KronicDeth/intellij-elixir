@@ -1,4 +1,4 @@
-package org.elixir_lang;
+package org.elixir_lang.codeInsight.highlighting.brace_matcher;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BraceMatcher implements PairedBraceMatcher {
+class Paired implements PairedBraceMatcher {
     /*
      * CONSTANTS
      */
