@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.completion.provider;
+package org.elixir_lang.code_insight.completion.provider;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
@@ -53,7 +53,7 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
                             }
 
                             lookupElementList.add(
-                                    org.elixir_lang.codeInsight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                                    org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
                                             nameArityRange.first,
                                             childCall
                                     )

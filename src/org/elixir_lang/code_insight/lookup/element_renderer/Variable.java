@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.lookup.element_renderer;
+package org.elixir_lang.code_insight.lookup.element_renderer;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;

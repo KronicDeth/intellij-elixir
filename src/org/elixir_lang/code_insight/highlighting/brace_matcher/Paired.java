@@ -1,4 +1,4 @@
-package org.elixir_lang;
+package org.elixir_lang.code_insight.highlighting.brace_matcher;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
@@ -12,14 +12,17 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BraceMatcher implements PairedBraceMatcher {
+class Paired implements PairedBraceMatcher {
     /*
      * CONSTANTS
      */
 
+    static final BracePair DO_END = new BracePair(ElixirTypes.DO, ElixirTypes.END, true);
+    static final BracePair FN_END = new BracePair(ElixirTypes.FN, ElixirTypes.END, true);
+
     private final static BracePair[] BRACE_PAIRS = new BracePair[]{
-            new BracePair(ElixirTypes.DO,                               ElixirTypes.END,                                true),
-            new BracePair(ElixirTypes.FN,                               ElixirTypes.END,                                true),
+            DO_END,
+            FN_END,
             new BracePair(ElixirTypes.CHAR_LIST_HEREDOC_PROMOTER,       ElixirTypes.CHAR_LIST_HEREDOC_TERMINATOR,       false),
             new BracePair(ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_PROMOTER, ElixirTypes.CHAR_LIST_SIGIL_HEREDOC_TERMINATOR, false),
             new BracePair(ElixirTypes.CHAR_LIST_SIGIL_PROMOTER,         ElixirTypes.CHAR_LIST_SIGIL_TERMINATOR,         false),
@@ -39,6 +42,7 @@ public class BraceMatcher implements PairedBraceMatcher {
             new BracePair(ElixirTypes.OPENING_CURLY,                    ElixirTypes.CLOSING_CURLY,                      false),
             new BracePair(ElixirTypes.OPENING_PARENTHESIS,              ElixirTypes.CLOSING_PARENTHESIS,                false)
     };
+    public final static PairedBraceMatcher INSTANCE = new Paired();
 
     /*
      * Instance Methods

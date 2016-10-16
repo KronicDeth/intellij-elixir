@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.completion.insert_handler;
+package org.elixir_lang.code_insight.completion.insert_handler;
 
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.completion.InsertionContext;
@@ -12,7 +12,7 @@ public class CallDefinitionClause implements InsertHandler<LookupElement> {
      */
 
     public static final InsertHandler<LookupElement> INSTANCE =
-            new org.elixir_lang.codeInsight.completion.insert_handler.CallDefinitionClause();
+            new CallDefinitionClause();
 
     /*
      * Public Instance Methods

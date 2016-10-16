@@ -102,7 +102,7 @@ public class Variants extends CallDefinitionClause {
                                     name,
                                     nameIdentifier
                             ).withRenderer(
-                                    new org.elixir_lang.codeInsight.lookup.element_renderer.CallDefinitionClause(name)
+                                    new org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(name)
                             )
                     );
                 }
@@ -129,7 +129,7 @@ public class Variants extends CallDefinitionClause {
 
             for (NamedElement indexedNameNamedElement : indexedNameNamedElementCollection) {
                 lookupElementList.add(
-                        org.elixir_lang.codeInsight.lookup.element.CallDefinitionClause.createWithSmartPointer(
+                        org.elixir_lang.code_insight.lookup.element.CallDefinitionClause.createWithSmartPointer(
                                 indexedName,
                                 indexedNameNamedElement
                         )
