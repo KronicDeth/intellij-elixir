@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.lookup.element;
+package org.elixir_lang.code_insight.lookup.element;
 
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
@@ -12,9 +12,9 @@ public class CallDefinitionClause {
                 name,
                 element
         ).withInsertHandler(
-                org.elixir_lang.codeInsight.completion.insert_handler.CallDefinitionClause.INSTANCE
+                org.elixir_lang.code_insight.completion.insert_handler.CallDefinitionClause.INSTANCE
         ).withRenderer(
-                new org.elixir_lang.codeInsight.lookup.element_renderer.CallDefinitionClause(
+                new org.elixir_lang.code_insight.lookup.element_renderer.CallDefinitionClause(
                         name
                 )
         );

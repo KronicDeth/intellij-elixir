@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.highlighting.brace_matcher;
+package org.elixir_lang.code_insight.highlighting.brace_matcher;
 
 import com.intellij.codeInsight.highlighting.BraceMatchingUtil;
 import com.intellij.openapi.editor.Editor;
@@ -37,7 +37,7 @@ public class Issue443 extends LightPlatformCodeInsightFixtureTestCase {
 
     @Override
     protected String getTestDataPath() {
-        return "testData/org/elixir_lang/codeInsight/highlighting/brace_matcher/issue_443";
+        return "testData/org/elixir_lang/code_insight/highlighting/brace_matcher/issue_443";
     }
 
     /*

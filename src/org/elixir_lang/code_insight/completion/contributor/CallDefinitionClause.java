@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.completion.contributor;
+package org.elixir_lang.code_insight.completion.contributor;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
@@ -12,7 +12,7 @@ public class CallDefinitionClause extends CompletionContributor {
         extend(
                 CompletionType.BASIC,
                 psiElement().inFile(instanceOf(ElixirFile.class)).afterLeaf("."),
-                new org.elixir_lang.codeInsight.completion.provider.CallDefinitionClause()
+                new org.elixir_lang.code_insight.completion.provider.CallDefinitionClause()
         );
     }
 }

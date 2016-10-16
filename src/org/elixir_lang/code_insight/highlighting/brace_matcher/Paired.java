@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.highlighting.brace_matcher;
+package org.elixir_lang.code_insight.highlighting.brace_matcher;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;

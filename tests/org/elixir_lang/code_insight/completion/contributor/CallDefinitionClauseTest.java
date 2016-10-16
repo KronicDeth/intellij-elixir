@@ -1,4 +1,4 @@
-package org.elixir_lang.codeInsight.completion.contributor;
+package org.elixir_lang.code_insight.completion.contributor;
 
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
@@ -71,7 +71,7 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
 
     @Override
     protected String getTestDataPath() {
-        return "testData/org/elixir_lang/codeInsight/completion/contributor/call_definition_clause";
+        return "testData/org/elixir_lang/code_insight/completion/contributor/call_definition_clause";
     }
 
     /*
