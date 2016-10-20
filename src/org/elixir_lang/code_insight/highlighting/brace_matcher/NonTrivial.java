@@ -21,10 +21,13 @@ public class NonTrivial extends PairedBraceMatcherAdapter {
 
     if (pair == Paired.DO_END || pair == Paired.FN_END) {
       iterator.advance();
-      IElementType tokenType = iterator.getTokenType();
 
-      if (tokenType == ElixirTypes.KEYWORD_PAIR_COLON) {
-        pair = null;
+      if (!iterator.atEnd()) {
+        IElementType tokenType = iterator.getTokenType();
+
+        if (tokenType == ElixirTypes.KEYWORD_PAIR_COLON) {
+          pair = null;
+        }
       }
 
       iterator.retreat();
