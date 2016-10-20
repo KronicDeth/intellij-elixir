@@ -103,6 +103,7 @@
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Regression test for [#456](https://github.com/KronicDeth/intellij-elixir/issues/456) - [@KronicDeth](https://github.com/KronicDeth)
 * [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Regression test for [#458](https://github.com/KronicDeth/intellij-elixir/issues/458) - [@KronicDeth](https://github.com/KronicDeth)
 * [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Regression tests for [#443](https://github.com/KronicDeth/intellij-elixir/issues/443) - [@KronicDeth](https://github.com/KronicDeth)
+* [#474](https://github.com/KronicDeth/intellij-elixir/pull/474) - Regression test for [#462](https://github.com/KronicDeth/intellij-elixir/issues/462) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -114,6 +115,9 @@
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Skip over `ElixirNoParenthesesStrict` for `isVariable` - [@KronicDeth](https://github.com/KronicDeth)
 * [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Allow newlines before `do` in `doBlock` - [@KronicDeth](https://github.com/KronicDeth)
 * [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Don't match `do` or `fn` to `end` when used as a keyword key. - [@KronicDeth](https://github.com/KronicDeth)
+* [#474](https://github.com/KronicDeth/intellij-elixir/pull/474) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if `iterator.atEnd()` before calling `iterator.getTokenType()` to avoid `IndexOutOfBounds` exception.
+  * Don't add current call definition clause being written to completion 
 
 ## v4.5.0
 

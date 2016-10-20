@@ -32,6 +32,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/443">#443</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/462">#462</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -61,6 +64,13 @@
             </li>
             <li>
               Don't match <code>do</code> or <code>fn</code> to <code>end</code> when used as a keyword key.
+            </li>
+            <li>
+              Check if <code>iterator.atEnd()</code> before calling <code>iterator.getTokenType()</code> to avoid
+              <code>IndexOutOfBounds</code> exception
+            </li>
+            <li>
+              Don't add current call definition clause being written to completion
             </li>
           </ul>
         </li>
