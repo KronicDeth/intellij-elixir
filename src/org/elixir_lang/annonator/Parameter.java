@@ -19,6 +19,10 @@ public class Parameter {
         FUNCTION_NAME,
         MACRO_NAME,
         VARIABLE;
+
+        public static boolean isCallDefinitionClauseName(Type type) {
+            return type == FUNCTION_NAME || type == MACRO_NAME;
+        }
     }
 
     /*
@@ -221,8 +225,18 @@ public class Parameter {
      */
 
     /**
+     * Whether the {@link #type} is call definition clause name
+     *
+     * @return {@code true} if {@link #type} is {@link Type#FUNCTION_NAME} or {@link Type#MACRO_NAME}.
+     */
+    @Contract(pure = true)
+    public boolean isCallDefinitionClauseName() {
+        return Type.isCallDefinitionClauseName(type);
+    }
+
+    /**
      * Whether {@link #entrance} represents a parameter to a {@link #parameterized} element
-     * @return {@true true} if {@link #parameterized} is not {@code null}
+     * @return {@code true} if {@link #parameterized} is not {@code null}
      */
     @Contract(pure = true)
     boolean isValid() {
