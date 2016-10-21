@@ -104,6 +104,7 @@
 * [#466](https://github.com/KronicDeth/intellij-elixir/pull/466) - Regression test for [#458](https://github.com/KronicDeth/intellij-elixir/issues/458) - [@KronicDeth](https://github.com/KronicDeth)
 * [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Regression tests for [#443](https://github.com/KronicDeth/intellij-elixir/issues/443) - [@KronicDeth](https://github.com/KronicDeth)
 * [#474](https://github.com/KronicDeth/intellij-elixir/pull/474) - Regression test for [#462](https://github.com/KronicDeth/intellij-elixir/issues/462) - [@KronicDeth](https://github.com/KronicDeth)
+* [#476](https://github.com/KronicDeth/intellij-elixir/pull/476) - Regression test for [#468](https://github.com/KronicDeth/intellij-elixir/issues/468) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -118,6 +119,7 @@
 * [#474](https://github.com/KronicDeth/intellij-elixir/pull/474) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if `iterator.atEnd()` before calling `iterator.getTokenType()` to avoid `IndexOutOfBounds` exception.
   * Don't add current call definition clause being written to completion 
+* [#476](https://github.com/KronicDeth/intellij-elixir/pull/476) - `When#leftOperand` will return `null` (because it's normalized) if there are left-hand error elements, but when stripping guards we want best-effort to match human expectations, so don't use normalized `null`, but use left, non-error element if it is unique. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 
