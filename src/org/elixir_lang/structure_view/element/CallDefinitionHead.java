@@ -4,6 +4,7 @@ import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
 import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.*;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.openapi.util.Pair.pair;
+import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 
 public class CallDefinitionHead extends Element<Call> implements Presentable, Visible {
     /*
@@ -144,7 +146,28 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
         if (head instanceof ElixirMatchedWhenOperation) {
             ElixirMatchedWhenOperation whenOperation = (ElixirMatchedWhenOperation) head;
 
-            stripped = whenOperation.leftOperand();
+            PsiElement[] children = whenOperation.getChildren();
+
+            int operatorIndex = operatorIndex(children);
+            int onlyNonErrorIndex = -1;
+
+            for (int i = 0; i < operatorIndex; i++) {
+                if (!(children[i] instanceof PsiErrorElement)) {
+                    if (onlyNonErrorIndex == -1) {
+                        // first
+                        onlyNonErrorIndex = i;
+                    } else {
+                        // more than one
+                        onlyNonErrorIndex = -1;
+
+                        break;
+                    }
+                }
+            }
+
+            if (onlyNonErrorIndex != -1) {
+                stripped = stripGuard(children[onlyNonErrorIndex]);
+            }
         }
 
         return stripped;
