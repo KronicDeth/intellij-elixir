@@ -4,6 +4,7 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +49,18 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
                 String presentableText = structureViewPresentation.getPresentableText();
 
                 if (presentableText != null) {
-                    presentation.appendTailText(presentableText.substring(name.length()), true);
+                    int nameLength = name.length();
+                    int presentableTextLength = presentableText.length();
+
+                    if (nameLength <= presentableTextLength) {
+                        presentation.appendTailText(presentableText.substring(nameLength), true);
+                    } else {
+                        Logger.error(
+                                CallDefinitionClause.class,
+                                "name (`" + name + "`) is longer than the presentable test (`" + presentableText + "`)",
+                                psiElement
+                        );
+                    }
                 }
 
                 String locationString = structureViewPresentation.getLocationString();
