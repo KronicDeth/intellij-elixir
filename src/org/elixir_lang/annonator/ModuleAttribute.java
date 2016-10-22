@@ -412,6 +412,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
+    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull String message) {
+        annotationHolder.createErrorAnnotation(element, message);
+    }
+
     private void highlightTypesAndTypeTypeParameterDeclarations(ElixirUnmatchedUnqualifiedNoArgumentsCall psiElement,
                                                                 Set<String> typeParameterNameSet,
                                                                 AnnotationHolder annotationHolder,
@@ -940,6 +944,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof InterpolatedString) {
+            highlightTypeError(psiElement, annotationHolder, "Strings aren't allowed in types");
         } else if (psiElement instanceof When) {
             /* NOTE: MUST be before `Infix` as `When` is a subinterface of
               `Infix` */
