@@ -977,6 +977,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof QualifiedNoParenthesesCall) {
+            highlightTypesAndTypeParameterUsages(
+                    (QualifiedNoParenthesesCall) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
         } else if (psiElement instanceof UnqualifiedNoParenthesesCall) {
             highlightTypesAndTypeParameterUsages(
                     (UnqualifiedNoParenthesesCall) psiElement,
@@ -1044,6 +1051,31 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
         highlightTypesAndTypeParameterUsages(
                 qualifiedNoArgumentsCall.getRelativeIdentifier(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+    }
+
+    private void highlightTypesAndTypeParameterUsages(
+            QualifiedNoParenthesesCall qualifiedNoParenthesesCall,
+            Set<String> typeParameterNameSet,
+            AnnotationHolder annotationHolder,
+            TextAttributesKey textAttributesKey) {
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.getFirstChild(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.getRelativeIdentifier(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.primaryArguments(),
                 typeParameterNameSet,
                 annotationHolder,
                 textAttributesKey
