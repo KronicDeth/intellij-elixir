@@ -412,6 +412,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
+    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull String message) {
+        annotationHolder.createErrorAnnotation(element, message);
+    }
+
     private void highlightTypesAndTypeTypeParameterDeclarations(ElixirUnmatchedUnqualifiedNoArgumentsCall psiElement,
                                                                 Set<String> typeParameterNameSet,
                                                                 AnnotationHolder annotationHolder,
@@ -940,6 +944,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof InterpolatedString) {
+            highlightTypeError(psiElement, annotationHolder, "Strings aren't allowed in types");
         } else if (psiElement instanceof When) {
             /* NOTE: MUST be before `Infix` as `When` is a subinterface of
               `Infix` */
@@ -973,6 +979,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
         } else if (psiElement instanceof QualifiedNoArgumentsCall) {
             highlightTypesAndTypeParameterUsages(
                     (QualifiedNoArgumentsCall) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof QualifiedNoParenthesesCall) {
+            highlightTypesAndTypeParameterUsages(
+                    (QualifiedNoParenthesesCall) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
@@ -1044,6 +1057,31 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
         highlightTypesAndTypeParameterUsages(
                 qualifiedNoArgumentsCall.getRelativeIdentifier(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+    }
+
+    private void highlightTypesAndTypeParameterUsages(
+            QualifiedNoParenthesesCall qualifiedNoParenthesesCall,
+            Set<String> typeParameterNameSet,
+            AnnotationHolder annotationHolder,
+            TextAttributesKey textAttributesKey) {
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.getFirstChild(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.getRelativeIdentifier(),
+                typeParameterNameSet,
+                annotationHolder,
+                textAttributesKey
+        );
+        highlightTypesAndTypeParameterUsages(
+                qualifiedNoParenthesesCall.primaryArguments(),
                 typeParameterNameSet,
                 annotationHolder,
                 textAttributesKey
