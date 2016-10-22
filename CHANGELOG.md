@@ -124,6 +124,7 @@
   * Don't add current call definition clause being written to completion 
 * [#476](https://github.com/KronicDeth/intellij-elixir/pull/476) - `When#leftOperand` will return `null` (because it's normalized) if there are left-hand error elements, but when stripping guards we want best-effort to match human expectations, so don't use normalized `null`, but use left, non-error element if it is unique. - [@KronicDeth](https://github.com/KronicDeth)
 * [#477](https://github.com/KronicDeth/intellij-elixir/pull/477) - Highlight types in `QualifiedNoParenthesesCall` - [@KronicDeth](https://github.com/KronicDeth)
+* [#478](https://github.com/KronicDeth/intellij-elixir/pull/478) - Still not obvious why `name` for a `CallDefinitionClause` lookup renderer can be longer than `presentableText`, so still log an error, but with `Logger.error`, so we get `name`, `presentableText`, and the original `element`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 

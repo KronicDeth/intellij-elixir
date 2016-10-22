@@ -89,6 +89,11 @@
             <li>
               Highlight types in <code>QualifiedNoParenthesesCall</code>
             </li>
+            <li>
+              Still not obvious why <code>name</code> for a <code>CallDefinitionClause</code> lookup renderer can be
+              longer than <code>presentableText</code>, so still log an error, but with <code>Logger.error</code>, so we
+              get <code>name</code>, <code>presentableText</code>, and the original <code>element</code>.
+            </li>
           </ul>
         </li>
       </ul>
