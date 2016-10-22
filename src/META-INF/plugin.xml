@@ -38,6 +38,12 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/468">#468</a>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/469">#469</a>
+            </li>
+            <li>
+              Highlight Strings and String Heredocs as errors in types.
+            </li>
           </ul>
         </li>
         <li>
@@ -79,6 +85,9 @@
               <code>When#leftOperand</code> will return <code>null</code> (because it's normalized) if there are
               left-hand error elements, but when stripping guards we want best-effort to match human expectations, so
               don't use normalized <code>null</code>, but use left, non-error element if it is unique.
+            </li>
+            <li>
+              Highlight types in <code>QualifiedNoParenthesesCall</code>
             </li>
           </ul>
         </li>
