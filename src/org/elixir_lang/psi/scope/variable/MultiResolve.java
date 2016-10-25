@@ -208,7 +208,10 @@ public class MultiResolve extends Variable {
                                             name,
                                             incompleteCode,
                                             expression,
-                                            ResolveState.initial().put(LAST_BINDING_KEY, element)
+                                            ResolveState
+                                                    .initial()
+                                                    .put(ENTRANCE, matchAncestor)
+                                                    .put(LAST_BINDING_KEY, element)
                                     );
 
                                     if (preboundResolveResultList != null && preboundResolveResultList.size() > 0) {
