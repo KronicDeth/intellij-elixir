@@ -81,12 +81,19 @@ public class MultiResolve extends Variable {
                                                         @NotNull PsiElement entrance,
                                                         @NotNull ResolveState resolveState) {
         MultiResolve multiResolve = new MultiResolve(name, incompleteCode);
+        ResolveState treeWalkUpResolveState = resolveState;
+
+        if (treeWalkUpResolveState.get(ENTRANCE) == null) {
+            treeWalkUpResolveState = treeWalkUpResolveState.put(ENTRANCE, entrance);
+        }
+
         PsiTreeUtil.treeWalkUp(
                 multiResolve,
                 entrance,
                 entrance.getContainingFile(),
-                resolveState.put(ENTRANCE, entrance)
+                treeWalkUpResolveState
         );
+
         return multiResolve.getResolveResultList();
     }
 
