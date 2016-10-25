@@ -81,12 +81,19 @@ public class MultiResolve extends Variable {
                                                         @NotNull PsiElement entrance,
                                                         @NotNull ResolveState resolveState) {
         MultiResolve multiResolve = new MultiResolve(name, incompleteCode);
+        ResolveState treeWalkUpResolveState = resolveState;
+
+        if (treeWalkUpResolveState.get(ENTRANCE) == null) {
+            treeWalkUpResolveState = treeWalkUpResolveState.put(ENTRANCE, entrance);
+        }
+
         PsiTreeUtil.treeWalkUp(
                 multiResolve,
                 entrance,
                 entrance.getContainingFile(),
-                resolveState.put(ENTRANCE, entrance)
+                treeWalkUpResolveState
         );
+
         return multiResolve.getResolveResultList();
     }
 
@@ -109,7 +116,8 @@ public class MultiResolve extends Variable {
 
         do {
             expression = expression.getParent();
-        } while (expression instanceof ElixirDoBlock ||
+        } while (expression instanceof Arguments ||
+                expression instanceof ElixirDoBlock ||
                 expression instanceof ElixirStab ||
                 expression instanceof ElixirStabBody);
 
@@ -200,7 +208,10 @@ public class MultiResolve extends Variable {
                                             name,
                                             incompleteCode,
                                             expression,
-                                            ResolveState.initial().put(LAST_BINDING_KEY, element)
+                                            ResolveState
+                                                    .initial()
+                                                    .put(ENTRANCE, matchAncestor)
+                                                    .put(LAST_BINDING_KEY, element)
                                     );
 
                                     if (preboundResolveResultList != null && preboundResolveResultList.size() > 0) {
