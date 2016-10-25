@@ -109,7 +109,8 @@ public class MultiResolve extends Variable {
 
         do {
             expression = expression.getParent();
-        } while (expression instanceof ElixirDoBlock ||
+        } while (expression instanceof Arguments ||
+                expression instanceof ElixirDoBlock ||
                 expression instanceof ElixirStab ||
                 expression instanceof ElixirStabBody);
 
