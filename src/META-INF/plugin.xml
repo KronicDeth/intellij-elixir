@@ -44,6 +44,9 @@
             <li>
               Highlight Strings and String Heredocs as errors in types.
             </li>
+            <li>
+              Regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/470">#470</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -93,6 +96,24 @@
               Still not obvious why <code>name</code> for a <code>CallDefinitionClause</code> lookup renderer can be
               longer than <code>presentableText</code>, so still log an error, but with <code>Logger.error</code>, so we
               get <code>name</code>, <code>presentableText</code>, and the original <code>element</code>.
+            </li>
+            <li>
+              Skip <code>Arguments</code> elements in <code>previousParentExpresion</code> to eliminate an unnecessary
+              level of processing declarations since calls will enter their arguments.
+            </li>
+            <li>
+              Only put new <code>ENTRANCE</code> in <code>ResolveState</code> in
+              <code>variable.MultiResolve.resolveResultList</code>, so that caller can override the default value.
+            </li>
+            <li>
+              Set <code>ENTRANCE</code> to <code>matchAncestor</code> instead of previous expression to eliminate the
+              looping that occurred when a variable was unbound (or a function) because the check for <code>with</code>
+              (and <code>for</code>) was expecting the <code>ENTRANCE</code> to be the previous child expression instead
+              of the <code>with</code> clause as a whole (or the <code>Arguments</code> element as had been the case
+              before
+              <a href="https://github.com/KronicDeth/intellij-elixir/commit/6fcc19bd1748004756da2c8a541fa8b94ede1f71">
+                6fcc19b
+              </a>.
             </li>
           </ul>
         </li>

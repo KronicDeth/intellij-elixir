@@ -108,6 +108,7 @@
 * [#477](https://github.com/KronicDeth/intellij-elixir/pull/477) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for [#469](https://github.com/KronicDeth/intellij-elixir/issues/469)
   * Highlight Strings and String Heredocs as errors in types.
+* [#479](https://github.com/KronicDeth/intellij-elixir/pull/479) - Regression tests for [#470](https://github.com/KronicDeth/intellij-elixir/issues/470) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -125,6 +126,10 @@
 * [#476](https://github.com/KronicDeth/intellij-elixir/pull/476) - `When#leftOperand` will return `null` (because it's normalized) if there are left-hand error elements, but when stripping guards we want best-effort to match human expectations, so don't use normalized `null`, but use left, non-error element if it is unique. - [@KronicDeth](https://github.com/KronicDeth)
 * [#477](https://github.com/KronicDeth/intellij-elixir/pull/477) - Highlight types in `QualifiedNoParenthesesCall` - [@KronicDeth](https://github.com/KronicDeth)
 * [#478](https://github.com/KronicDeth/intellij-elixir/pull/478) - Still not obvious why `name` for a `CallDefinitionClause` lookup renderer can be longer than `presentableText`, so still log an error, but with `Logger.error`, so we get `name`, `presentableText`, and the original `element`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#479](https://github.com/KronicDeth/intellij-elixir/pull/479) - [@KronicDeth](https://github.com/KronicDeth)
+  * Skip `Arguments` elements in `previousParentExpresion` to eliminate an unnecessary level of processing declarations since calls will enter their arguments.
+  * Only put new `ENTRANCE` in `ResolveState` in `variable.MultiResolve.resolveResultList`, so that caller can override the default value.
+  * Set `ENTRANCE` to `matchAncestor` instead of previous expression to eliminate the looping that occurred when a variable was unbound (or a function) because the check for `with` (and `for`) was expecting the `ENTRANCE` to be the previous child expression instead of the `with` clause as a whole (or the `Arguments` element as had been the case before [6fcc19b](https://github.com/KronicDeth/intellij-elixir/commit/6fcc19bd1748004756da2c8a541fa8b94ede1f71)).
 
 ## v4.5.0
 
