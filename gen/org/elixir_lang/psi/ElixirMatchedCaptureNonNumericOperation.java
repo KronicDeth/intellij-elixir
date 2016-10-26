@@ -33,13 +33,13 @@ public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedEx
 
   boolean hasDoBlockOrKeyword();
 
-  boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @Nullable
   String moduleName();
@@ -70,9 +70,6 @@ public interface ElixirMatchedCaptureNonNumericOperation extends ElixirMatchedEx
 
   @NotNull
   IntRange resolvedFinalArityRange();
-
-  @NotNull
-  String resolvedFunctionName();
 
   @NotNull
   String resolvedModuleName();

@@ -34,7 +34,7 @@ public class MatchedQualifiedParenthesesCall extends Stub<org.elixir_lang.psi.st
                 parentStub,
                 this,
                 psi.resolvedModuleName(),
-                psi.resolvedFunctionName(),
+                psi.functionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),

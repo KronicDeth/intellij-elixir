@@ -30,7 +30,6 @@
     quote
     resolvedFinalArity
     resolvedFinalArityRange
-    resolvedFunctionName
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -71,7 +70,6 @@
     quote
     resolvedFinalArity
     resolvedFinalArityRange
-    resolvedFunctionName
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity
@@ -157,7 +155,6 @@
     secondaryArity
     resolvedFinalArity
     resolvedFinalArityRange
-    resolvedFunctionName
     resolvedModuleName
     resolvedPrimaryArity
     resolvedSecondaryArity

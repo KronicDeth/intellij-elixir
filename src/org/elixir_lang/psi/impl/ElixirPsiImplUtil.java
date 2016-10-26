@@ -799,41 +799,41 @@ public class ElixirPsiImplUtil {
     }
 
     /**
-     * Whether the {@code call} is calling the given `resolvedFunctionName` in the `resolvedModuleName` with any arity
+     * Whether the {@code call} is calling the given `functionName` in the `resolvedModuleName` with any arity
      * @param call the call element
      * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param functionName the expected {@link Call#functionName()}
      * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#resolvedFunctionName()} that equals
-     *   {@code resolvedFunctionName}; otherwise, {@code false}.
+     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#functionName()} that equals
+     *   {@code functionName}; otherwise, {@code false}.
      */
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
-                                    @NotNull final String resolvedFunctionName) {
+                                    @NotNull final String functionName) {
         String callResolvedModuleName = call.resolvedModuleName();
-        String callResolvedFunctionName = call.resolvedFunctionName();
+        String callFunctionName = call.functionName();
 
         return callResolvedModuleName != null && callResolvedModuleName.equals(resolvedModuleName) &&
-                callResolvedFunctionName != null && callResolvedFunctionName.equals(resolvedFunctionName);
+                callFunctionName != null && callFunctionName.equals(functionName);
     }
 
     /**
-     * Whether the {@code call} is calling the given `resolvedFunctionName` in the `resolvedModuleName` with the
+     * Whether the {@code call} is calling the given `functionName` in the `resolvedModuleName` with the
      * `resolvedFinalArity`
      *
      * @param call the call element
      * @param resolvedModuleName  the expected {@link Call#resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param functionName the expected {@link Call#functionName()}
      * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
      * @return {@code true} if the {@code call} has non-{@code null} {@link Call#resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#resolvedFunctionName()} that equals
-     *   {@code resolvedFunctionName} and the {@link Call#resolvedFinalArity()}; otherwise, {@code false}.
+     *   {@code resolvedModuleName} and has non-{@code null} {@link Call#functionName()} that equals
+     *   {@code functionName} and the {@link Call#resolvedFinalArity()}; otherwise, {@code false}.
      */
     public static boolean isCalling(@NotNull final Call call,
                                     @NotNull final String resolvedModuleName,
-                                    @NotNull final String resolvedFunctionName,
+                                    @NotNull final String functionName,
                                     final int resolvedFinalArity) {
-        return call.isCalling(resolvedModuleName, resolvedFunctionName) &&
+        return call.isCalling(resolvedModuleName, functionName) &&
                 call.resolvedFinalArity() == resolvedFinalArity;
     }
 
@@ -846,13 +846,13 @@ public class ElixirPsiImplUtil {
      *
      * @param call the call element
      * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param functionName the expected {@link Call#functionName()}
      * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
      */
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
-                                         @NotNull final String resolvedFunctionName) {
-        return call.isCalling(resolvedModuleName, resolvedFunctionName) && call.hasDoBlockOrKeyword();
+                                         @NotNull final String functionName) {
+        return call.isCalling(resolvedModuleName, functionName) && call.hasDoBlockOrKeyword();
     }
 
     /**
@@ -864,16 +864,16 @@ public class ElixirPsiImplUtil {
      *
      * @param call the call element
      * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param functionName the expected {@link Call#functionName()}
      * @param resolvedFinalArity the expected {@link Call#resolvedFinalArity()}
      * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
      */
     @Contract(pure = true)
     public static boolean isCallingMacro(@NotNull final Call call,
                                          @NotNull final String resolvedModuleName,
-                                         @NotNull final  String resolvedFunctionName,
+                                         @NotNull final  String functionName,
                                          final int resolvedFinalArity) {
-        return call.isCalling(resolvedModuleName, resolvedFunctionName, resolvedFinalArity) &&
+        return call.isCalling(resolvedModuleName, functionName, resolvedFinalArity) &&
                 call.hasDoBlockOrKeyword();
     }
 

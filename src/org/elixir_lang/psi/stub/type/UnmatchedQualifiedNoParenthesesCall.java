@@ -34,7 +34,7 @@ public class UnmatchedQualifiedNoParenthesesCall extends Stub<org.elixir_lang.ps
                 parentStub,
                 this,
                 psi.resolvedModuleName(),
-                psi.resolvedFunctionName(),
+                psi.functionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),

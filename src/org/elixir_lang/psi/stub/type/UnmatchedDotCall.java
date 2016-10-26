@@ -34,7 +34,7 @@ public class UnmatchedDotCall extends Stub<org.elixir_lang.psi.stub.UnmatchedDot
                 parentStub,
                 this,
                 psi.resolvedModuleName(),
-                psi.resolvedFunctionName(),
+                psi.functionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),

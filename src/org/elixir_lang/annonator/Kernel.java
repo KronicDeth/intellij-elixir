@@ -27,7 +27,7 @@ public class Kernel implements Annotator, DumbAware {
      * CONSTANTS
      */
 
-    private static final Set<String> RESOLVED_FUNCTION_NAME_SET = new HashSet<String>(
+    private static final Set<String> FUNCTION_NAME_SET = new HashSet<String>(
             Arrays.asList(
                     new String[] {
                             "abs",
@@ -90,7 +90,7 @@ public class Kernel implements Annotator, DumbAware {
             )
     );
 
-    private static final Set<String> RESOLVED_MACRO_NAME_SET = new HashSet<String>(
+    private static final Set<String> MACRO_NAME_SET = new HashSet<String>(
             Arrays.asList(
                     new String[] {
                             "@",
@@ -138,7 +138,7 @@ public class Kernel implements Annotator, DumbAware {
             )
     );
 
-    private static final Set<String> RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET = new HashSet<String>(
+    private static final Set<String> SPECIAL_FORMS_MACRO_NAME_SET = new HashSet<String>(
             Arrays.asList(
                     new String[]{
                             "__CALLER__",
@@ -204,11 +204,11 @@ public class Kernel implements Annotator, DumbAware {
                         PsiElement functionNameElement = call.functionNameElement();
 
                         if (functionNameElement != null) {
-                            String resolvedFunctionName = call.resolvedFunctionName();
+                            String functionName = call.functionName();
 
                             // a function can't take a `do` block
                             if (call.getDoBlock() == null) {
-                                if (RESOLVED_FUNCTION_NAME_SET.contains(resolvedFunctionName)) {
+                                if (FUNCTION_NAME_SET.contains(functionName)) {
                                     highlight(
                                             functionNameElement,
                                             holder,
@@ -218,8 +218,8 @@ public class Kernel implements Annotator, DumbAware {
                                 }
                             }
 
-                            if (RESOLVED_MACRO_NAME_SET.contains(resolvedFunctionName) ||
-                                    RESOLVED_SPECIAL_FORMS_MACRO_NAME_SET.contains(resolvedFunctionName)) {
+                            if (MACRO_NAME_SET.contains(functionName) ||
+                                    SPECIAL_FORMS_MACRO_NAME_SET.contains(functionName)) {
                                 highlight(
                                         functionNameElement,
                                         holder,

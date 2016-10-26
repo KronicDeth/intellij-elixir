@@ -42,29 +42,29 @@ public interface Call extends NavigatablePsiElement {
     boolean hasDoBlockOrKeyword();
 
     /**
-     * Whether this call is calling the given `resolvedFunctionName` in the `resolvedModuleName` with any arity
+     * Whether this call is calling the given `functionName` in the `resolvedModuleName` with any arity
      *
      * @param resolvedModuleName the expected {@link #resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link #resolvedFunctionName()}
+     * @param functionName the expected {@link #functionName()}
      * @return {@code true} if this call has non-{@code null} {@link #resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link #resolvedFunctionName()} that equals
-     *   {@code resolvedFunctionName}; otherwise, {@code false}.
+     *   {@code resolvedModuleName} and has non-{@code null} {@link #functionName()} that equals
+     *   {@code functionName}; otherwise, {@code false}.
      */
-    boolean isCalling(@NotNull final String resolvedModuleName, @NotNull final String resolvedFunctionName);
+    boolean isCalling(@NotNull final String resolvedModuleName, @NotNull final String functionName);
 
     /**
-     * Whether this call is calling the given `resolvedFunctionName` in the `resolvedModuleName` with the
+     * Whether this call is calling the given `functionName` in the `resolvedModuleName` with the
      * `resolvedArity`
      *
      * @param resolvedModuleName  the expected {@link #resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link #resolvedFunctionName()}
+     * @param functionName the expected {@link #functionName()}
      * @param resolvedFinalArity the expected {@link #resolvedFinalArity()}
      * @return {@code true} if this call has non-{@code null} {@link #resolvedModuleName()} that equals
-     *   {@code resolvedModuleName} and has non-{@code null} {@link #resolvedFunctionName()} that equals
-     *   {@code resolvedFunctionName} and the {@link #resolvedFinalArity}; otherwise, {@code false}.
+     *   {@code resolvedModuleName} and has non-{@code null} {@link #functionName()} that equals
+     *   {@code functionName} and the {@link #resolvedFinalArity}; otherwise, {@code false}.
      */
     boolean isCalling(@NotNull final String resolvedModuleName,
-                      @NotNull final String resolvedFunctionName,
+                      @NotNull final String functionName,
                       final int resolvedFinalArity);
 
     /**
@@ -75,11 +75,11 @@ public interface Call extends NavigatablePsiElement {
      * forms since Erlang/Elixir doesn't support variable arity functions otherwise.)
      *
      * @param resolvedModuleName the expected {@link Call#resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link Call#resolvedFunctionName()}
+     * @param functionName the expected {@link Call#functionName()}
      * @return {@code true} if all arguments match and {@link Call#getDoBlock()} is not {@code null}; {@code false}.
      */
     boolean isCallingMacro(@NotNull final String resolvedModuleName,
-                           @NotNull final String resolvedFunctionName);
+                           @NotNull final String functionName);
 
     /**
      * Whether {@code call} is of the named macro.
@@ -89,12 +89,12 @@ public interface Call extends NavigatablePsiElement {
      * {@link #isCalling(String, String, int)} should be used instead.
      *
      * @param resolvedModuleName the expected {@link #resolvedModuleName()}
-     * @param resolvedFunctionName the expected {@link #resolvedFunctionName()}
+     * @param functionName the expected {@link #functionName()}
      * @param resolvedFinalArity the expected {@link #resolvedFinalArity()}
      * @return {@code true} if all arguments match and {@link #getDoBlock()} is not {@code null}; {@code false}.
      */
     boolean isCallingMacro(@NotNull final String resolvedModuleName,
-                           @NotNull final  String resolvedFunctionName,
+                           @NotNull final  String functionName,
                            final int resolvedFinalArity);
 
     /**
@@ -147,12 +147,6 @@ public interface Call extends NavigatablePsiElement {
      */
     @Nullable
     Integer secondaryArity();
-
-    /**
-     * @return name of the function/macro after taking into account any imports
-     */
-    @Nullable
-    String resolvedFunctionName();
 
     /**
      * @return name of the qualifying module after taking into account any aliases
