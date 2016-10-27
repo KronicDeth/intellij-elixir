@@ -2,7 +2,6 @@ package org.elixir_lang.reference;
 
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.LocalSearchScope;

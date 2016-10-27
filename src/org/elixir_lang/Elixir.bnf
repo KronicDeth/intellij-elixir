@@ -8,8 +8,8 @@
   extends("unmatched(AccessExpression|.*Operation|((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)Call|Qualified(Alias|MultipleAliases))")=unmatchedExpression
 
   // name identifier owner calls - no argument calls are included because in a pipeline they can have effective arguments
-  elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
-  methods(           "((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)||unqualifiedNoParenthesesManyArguments)Call")=[
+  elementTypeFactory("((un)?matched((((At)?Unq)|Q)ualified(No)?(Argument|Parenthese)s|Dot)|unqualifiedNoParenthesesManyArguments)Call")="org.elixir_lang.ElementTypeFactory.factory"
+  methods(           "((un)?matched((At)?Unqualified(No)?(Argument|Parenthese)s|Dot)|unqualifiedNoParenthesesManyArguments)Call")=[
     canonicalName
     canonicalNameSet
     functionName
@@ -27,6 +27,37 @@
     primaryArguments
     primaryArity
     processDeclarations
+    quote
+    resolvedFinalArity
+    resolvedFinalArityRange
+    resolvedModuleName
+    resolvedPrimaryArity
+    resolvedSecondaryArity
+    secondaryArguments
+    secondaryArity
+    setName
+  ]
+
+  // qualified calls that need to implement #qualifier()
+  methods("(un)?matchedQualified(No)?(Argument|Parenthese)sCall")=[
+    canonicalName
+    canonicalNameSet
+    functionName
+    functionNameElement
+    getDoBlock
+    hasDoBlockOrKeyword
+    getName
+    getNameIdentifier
+    getReference
+    getStub
+    getUseScope
+    isCalling
+    isCallingMacro
+    moduleName
+    primaryArguments
+    primaryArity
+    processDeclarations
+    qualifier
     quote
     resolvedFinalArity
     resolvedFinalArityRange
@@ -178,6 +209,15 @@
     "org.elixir_lang.psi.UnaryNonNumericOperation"
   ]
   // method set by prefix operations above
+
+  // QualifiedBracketOperation
+  implements("(un)?matchedQualifiedBracketOperation")=[
+    "org.elixir_lang.psi.QualifiedBracketOperation"
+  ]
+  methods(   "(un)?matchedQualifiedBracketOperation")=[
+    qualifier
+    quote
+  ]
 
   // QualifiedMultipleAliases
   implements("(un)?matchedQualifiedMultipleAliases")=[
@@ -1851,7 +1891,6 @@ multipleAliases ::= OPENING_CURLY EOL*
  */
 
 matchedQualifiedBracketOperation ::= matchedExpression dotInfixOperator relativeIdentifier CALL bracketArguments
-                                     { implements = "org.elixir_lang.psi.QualifiedBracketOperation" methods = [quote] }
 
 /*
  * Qualified Parentheses Call
@@ -2570,7 +2609,6 @@ unmatchedQualifiedMultipleAliases ::= unmatchedExpression dotInfixOperator multi
  */
 
 unmatchedQualifiedBracketOperation ::= unmatchedExpression dotInfixOperator relativeIdentifier CALL bracketArguments
-                                       { implements = "org.elixir_lang.psi.QualifiedBracketOperation" methods = [quote] }
 
 /*
  * Qualified Parentheses Call

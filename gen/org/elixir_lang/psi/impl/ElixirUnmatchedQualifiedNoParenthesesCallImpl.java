@@ -140,6 +140,11 @@ public class ElixirUnmatchedQualifiedNoParenthesesCallImpl extends NamedStubbedP
   }
 
   @NotNull
+  public PsiElement qualifier() {
+    return ElixirPsiImplUtil.qualifier(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }

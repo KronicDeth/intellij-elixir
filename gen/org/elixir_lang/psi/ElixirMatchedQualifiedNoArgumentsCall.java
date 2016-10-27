@@ -69,6 +69,9 @@ public interface ElixirMatchedQualifiedNoArgumentsCall extends ElixirMatchedExpr
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
+  PsiElement qualifier();
+
+  @NotNull
   OtpErlangObject quote();
 
   @NotNull

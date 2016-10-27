@@ -2188,6 +2188,83 @@ public class ElixirPsiImplUtil {
         return fullyQualifiedName;
     }
 
+    @NotNull
+    public static PsiElement fullyResolveQualifier(@NotNull QualifiableAlias element,
+                                                   @Nullable PsiReference startingReference) {
+        PsiElement fullyResolved;
+        PsiElement currentResolved = element;
+        PsiReference reference = startingReference;
+
+        do {
+            if (reference == null) {
+                reference = currentResolved.getReference();
+            }
+
+            if (reference != null) {
+                if (reference instanceof PsiPolyVariantReference) {
+                    PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+                    ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+                    int resolveResultCount = resolveResults.length;
+
+                    if (resolveResultCount == 0) {
+                        fullyResolved = currentResolved;
+
+                        break;
+                    } else if (resolveResultCount == 1) {
+                        ResolveResult resolveResult = resolveResults[0];
+
+                        PsiElement nextResolved = resolveResult.getElement();
+
+                        if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                            fullyResolved = currentResolved;
+                            break;
+                        } else {
+                            currentResolved = nextResolved;
+                        }
+                    } else {
+                        PsiElement nextResolved = null;
+
+                        for (ResolveResult resolveResult : resolveResults) {
+                            PsiElement resolveResultElement = resolveResult.getElement();
+
+                            if (resolveResultElement != null &&
+                                    resolveResultElement instanceof Call &&
+                                    isModular((Call) resolveResultElement)) {
+                                nextResolved = resolveResultElement;
+
+                                break;
+                            }
+                        }
+
+                        if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                            fullyResolved = currentResolved;
+                            break;
+                        } else {
+                            currentResolved = nextResolved;
+                        }
+                    }
+                } else {
+                    PsiElement nextResolved = reference.resolve();
+
+                    if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                        fullyResolved = currentResolved;
+                        break;
+                    } else {
+                        currentResolved = nextResolved;
+                    }
+                }
+            } else {
+                fullyResolved = currentResolved;
+
+                break;
+            }
+
+            reference = null;
+        } while (true);
+
+        return fullyResolved;
+    }
+
     @Contract(pure = true)
     @Nullable
     public static String functionName(@NotNull final Call call) {
@@ -2909,6 +2986,61 @@ public class ElixirPsiImplUtil {
         }
 
         return has;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement qualifier(@NotNull final Qualified qualified) {
+        return qualified.getFirstChild();
+    }
+
+    /**
+     * @param qualifier qualifier for a {@link Call} to a function
+     * @return {@link Call} for the {@code defmodule}, {@code defimpl}, or {@code defprotocol} that defines
+     *   {@code qualifier} after it is resolved through any {@code alias}es.
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Call qualifierToModular(@NotNull final PsiElement qualifier) {
+        PsiElement maybeQualifiableAlias = qualifier;
+
+        if (qualifier instanceof ElixirAccessExpression) {
+            PsiElement[] accessExpressionChildren = qualifier.getChildren();
+
+            if (accessExpressionChildren.length > 0) {
+                maybeQualifiableAlias = accessExpressionChildren[0];
+            }
+        }
+
+        Call modular = null;
+
+        if (maybeQualifiableAlias instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
+            /* need to construct reference directly as qualified aliases don't return a
+               reference except for the outermost */
+            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            modular = qualifierToModular(qualifiableAlias, reference);
+        }
+
+        return modular;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Call qualifierToModular(@NotNull QualifiableAlias qualifier,
+                                          @NotNull PsiReference startingReference) {
+        PsiElement fullyResolvedQualifier = fullyResolveQualifier(qualifier, startingReference);
+        Call modular = null;
+
+        if (fullyResolvedQualifier instanceof Call) {
+           Call fullyResolvedQualifierCall = (Call) fullyResolvedQualifier;
+
+           if (isModular(fullyResolvedQualifierCall)) {
+               modular = fullyResolvedQualifierCall;
+           }
+        }
+
+        return modular;
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
@@ -4809,6 +4941,46 @@ if (quoted == null) {
         }
 
         return resolvedFunctionName;
+    }
+
+    /**
+     * @param call may be either a variable, parameter, or function call
+     * @return
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Call callToModular(@NotNull final Call call) {
+        return callToModular(call, call.resolvedFinalArity());
+    }
+
+    /**
+     *
+     * @param call may be eithe a variable, parameter, or function
+     * @param resolvedFinalArity the {@link Call#resolvedFinalArity()}
+     * @return
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Call callToModular(@NotNull final Call call, final int resolvedFinalArity) {
+        Call modular = null;
+
+        if (resolvedFinalArity == 0) {
+            /* Ambiguous whether a 0-arity is a call definition clause or variable */
+        } else {
+            /* Ambiguous whether call definition clause is local, imported, or qualified */
+
+            if (call instanceof org.elixir_lang.psi.call.qualification.Qualified) {
+                /* Qualified, so resolve qualifier to module */
+
+                org.elixir_lang.psi.call.qualification.Qualified qualified =
+                        (org.elixir_lang.psi.call.qualification.Qualified) call;
+
+                PsiElement qualifier = qualified.qualifier();
+                modular = qualifierToModular(qualifier);
+            }
+        }
+
+        return modular;
     }
 
     /**
