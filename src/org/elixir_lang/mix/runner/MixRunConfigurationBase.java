@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationBase.java
  */
-abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<ElixirModuleBasedConfiguration>
+public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<ElixirModuleBasedConfiguration>
         implements CommonProgramRunConfigurationParameters,
         RunConfigurationWithSuppressedDefaultRunAction,
         RunConfigurationWithSuppressedDefaultDebugAction {
@@ -64,7 +64,7 @@ abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<ElixirMo
    * Constructors
    */
 
-  MixRunConfigurationBase(@NotNull String name, @NotNull Project project, @NotNull ConfigurationFactory configurationFactory){
+  protected MixRunConfigurationBase(@NotNull String name, @NotNull Project project, @NotNull ConfigurationFactory configurationFactory){
     super(name, new ElixirModuleBasedConfiguration(project), configurationFactory);
   }
 

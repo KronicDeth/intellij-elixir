@@ -99,6 +99,7 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
   @Override
   public void apply() throws ConfigurationException {
     myMixSettings.setMixPath(myMixConfigurationForm.getPath());
+    myMixSettings.setSupportsFormatterOption(myMixConfigurationForm.getSupportsFormatterOption());
 
     if(ElixirSystemUtil.isSmallIde()){
       ElixirSdkForSmallIdes.setUpOrUpdateSdk(myProject, mySdkPathSelector.getText());

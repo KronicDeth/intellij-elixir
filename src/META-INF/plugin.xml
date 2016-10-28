@@ -1951,6 +1951,9 @@
     <projectService serviceImplementation="org.elixir_lang.mix.settings.MixSettings" />
     <programRunner implementation="org.elixir_lang.mix.runner.MixRunner" />
     <configurationType implementation="org.elixir_lang.mix.runner.MixRunConfigurationType" />
+    <programRunner implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunner" />
+    <configurationType implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunConfigurationType" />
+    <runConfigurationProducer implementation="org.elixir_lang.mix.runner.exunit.MixExUnitRunConfigurationProducer" />
 
     <colorSettingsPage implementation="org.elixir_lang.ElixirColorSettingsPage"/>
     <fileTypeFactory implementation="org.elixir_lang.ElixirFileTypeFactory"/>
