@@ -67,22 +67,7 @@ final class MixExUnitRunningState extends CommandLineState{
     MixSettings mixSettings = MixSettings.getInstance(project);
 
     // Copy Elixir modules to temp dir
-    String elixirModulesFilePath;
-    try {
-      File elixirModulesDir = createElixirModulesDirectory();
-      ElixirModules.putFormatterTo(elixirModulesDir);
-
-      // Support for the --formatter option was recently added to Mix. Older versions of Elixir will need to use the
-      // custom task we've included in order to support this option
-      if (!mixSettings.getSupportsFormatterOption()) {
-        ElixirModules.putMixTaskTo(elixirModulesDir);
-      }
-
-      elixirModulesFilePath = new File(elixirModulesDir.getCanonicalPath(), "*.ex").toString();
-    } catch(IOException e) {
-      throw new ExecutionException(e);
-    }
-
+    String elixirModulesFilePath = populateElixirModulesDirectory(!mixSettings.getSupportsFormatterOption());
     String sdkPath = ElixirSdkType.getSdkPath(project);
 
     String elixirPath = sdkPath != null ? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
@@ -105,4 +90,23 @@ final class MixExUnitRunningState extends CommandLineState{
     if (!(split.size() == 1 && split.get(0).equals(""))) commandLine.addParameters(split);
     return commandLine;
   }
+
+  @NotNull
+  private static String populateElixirModulesDirectory(boolean useCustomMixTask) throws ExecutionException {
+    try {
+      File elixirModulesDir = createElixirModulesDirectory();
+      ElixirModules.putFormatterTo(elixirModulesDir);
+
+      // Support for the --formatter option was recently added to Mix. Older versions of Elixir will need to use the
+      // custom task we've included in order to support this option
+      if (useCustomMixTask) {
+        ElixirModules.putMixTaskTo(elixirModulesDir);
+      }
+
+      return new File(elixirModulesDir.getCanonicalPath(), "*.ex").toString();
+    } catch(IOException e) {
+      throw new ExecutionException(e);
+    }
+  }
+
 }
