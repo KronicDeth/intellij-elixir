@@ -10,9 +10,6 @@ public final class MixExUnitRunConfigurationEditorForm extends SettingsEditor<Mi
   private JPanel myComponent;
   private JTextField mixTestArgs;
 
-  public MixExUnitRunConfigurationEditorForm(){
-  }
-
   @Override
   protected void resetEditorFrom(@NotNull MixExUnitRunConfiguration configuration) {
     mixTestArgs.setText(configuration.getMixTestArgs());
@@ -32,9 +29,5 @@ public final class MixExUnitRunConfigurationEditorForm extends SettingsEditor<Mi
   @Override
   protected void disposeEditor() {
     myComponent.setVisible(false);
-  }
-
-  private void createUIComponents() {
-    // TODO: place custom component creation code here
   }
 }

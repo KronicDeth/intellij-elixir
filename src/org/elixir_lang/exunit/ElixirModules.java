@@ -9,11 +9,11 @@ import java.io.*;
 import java.net.URL;
 
 public class ElixirModules {
-  private ElixirModules() {
-  }
-
   public static final String FORMATTER_FILE_NAME = "team_city_ex_unit_formatter.ex";
   public static final String MIX_TASK_FILE_NAME = "test_with_formatter.ex";
+
+  private ElixirModules() {
+  }
 
   private static File putFile(@NotNull String fileName, @NotNull File directory) throws IOException {
     URL moduleUrl = ResourceUtil.getResource(ElixirModules.class, "/exunit", fileName);
@@ -21,12 +21,15 @@ public class ElixirModules {
       throw new IOException("Failed to locate Elixir module " + fileName);
     }
 
-    try (BufferedInputStream inputStream = new BufferedInputStream(URLUtil.openStream(moduleUrl))) {
-      File file = new File(directory, fileName);
-      try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file))) {
-        FileUtil.copy(inputStream, outputStream);
-        return file;
-      }
+    BufferedInputStream inputStream = new BufferedInputStream(URLUtil.openStream(moduleUrl));
+    File file = new File(directory, fileName);
+    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
+    try {
+      FileUtil.copy(inputStream, outputStream);
+      return file;
+    } finally {
+      inputStream.close();
+      outputStream.close();
     }
   }
 
