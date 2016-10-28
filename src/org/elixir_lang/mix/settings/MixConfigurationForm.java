@@ -18,6 +18,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
+import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.elixir_lang.sdk.ElixirSystemUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -140,7 +141,8 @@ public class MixConfigurationForm {
 
           // Support for the --formatter option may be added in a 1.3.x release, but I'm being conservative for now
           // and assuming it won't be released until 1.4
-          supportsFormatterOptionCheckBox.setSelected(compareVersions(versionString, "1.4") >= 0);
+          ElixirSdkRelease elixirSdkRelease = ElixirSdkRelease.fromString(versionString);
+          supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) >= 0);
           valid = true;
 
           break;
@@ -187,23 +189,5 @@ public class MixConfigurationForm {
     });
 
     myLinkContainer.add(link, BorderLayout.NORTH);
-  }
-
-  private static int compareVersions(String version1, String version2){
-
-    String[] levels1 = version1.split("\\.");
-    String[] levels2 = version2.split("\\.");
-
-    int length = Math.max(levels1.length, levels2.length);
-    for (int i = 0; i < length; i++){
-      Integer v1 = i < levels1.length ? Integer.parseInt(levels1[i]) : 0;
-      Integer v2 = i < levels2.length ? Integer.parseInt(levels2[i]) : 0;
-      int compare = v1.compareTo(v2);
-      if (compare != 0){
-        return compare;
-      }
-    }
-
-    return 0;
   }
 }
