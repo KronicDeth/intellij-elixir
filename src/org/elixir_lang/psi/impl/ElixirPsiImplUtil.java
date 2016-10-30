@@ -1091,6 +1091,26 @@ public class ElixirPsiImplUtil {
         return childCalls;
     }
 
+    /**
+     * Finds modular ({@code defmodule}, {@code defimpl}, or {@code defprotocol}) for the qualifier of
+     * {@code maybeQualifiedCall}.
+     *
+     * @param maybeQualifiedCall a call that may be qualified
+     * @return {@code null} if {@code maybeQualifiedCall} is not qualified OR if the modular cannot be resolved, such
+     *   as when the qualifying Alias is invalid or is an unparsed module like {@code Kernel} or {@code Enum}.
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Call maybeQualifiedCallToModular(@NotNull final Call maybeQualifiedCall) {
+        Call modular = null;
+
+        if (maybeQualifiedCall instanceof org.elixir_lang.psi.call.qualification.Qualified) {
+            modular = qualifiedToModular((org.elixir_lang.psi.call.qualification.Qualified) maybeQualifiedCall);
+        }
+
+        return modular;
+    }
+
     public static OtpErlangList metadata(ASTNode node) {
         OtpErlangObject[] keywordListElements = {
                 lineNumberKeywordTuple(node)
@@ -4944,46 +4964,6 @@ if (quoted == null) {
     }
 
     /**
-     * @param call may be either a variable, parameter, or function call
-     * @return
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call callToModular(@NotNull final Call call) {
-        return callToModular(call, call.resolvedFinalArity());
-    }
-
-    /**
-     *
-     * @param call may be eithe a variable, parameter, or function
-     * @param resolvedFinalArity the {@link Call#resolvedFinalArity()}
-     * @return
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call callToModular(@NotNull final Call call, final int resolvedFinalArity) {
-        Call modular = null;
-
-        if (resolvedFinalArity == 0) {
-            /* Ambiguous whether a 0-arity is a call definition clause or variable */
-        } else {
-            /* Ambiguous whether call definition clause is local, imported, or qualified */
-
-            if (call instanceof org.elixir_lang.psi.call.qualification.Qualified) {
-                /* Qualified, so resolve qualifier to module */
-
-                org.elixir_lang.psi.call.qualification.Qualified qualified =
-                        (org.elixir_lang.psi.call.qualification.Qualified) call;
-
-                PsiElement qualifier = qualified.qualifier();
-                modular = qualifierToModular(qualifier);
-            }
-        }
-
-        return modular;
-    }
-
-    /**
      * Similar to {@link moduleName}, but takes into account `alias`es and `import`s.
      *
      * @param element
@@ -5378,6 +5358,20 @@ if (quoted == null) {
         addMergedFragments(mergedNodes, fragmentType, fragmentStringBuilder, manager);
 
         return mergedNodes;
+    }
+
+    /**
+     * Finds modular ({@code defmodule}, {@code defimpl}, or {@code defprotocol}) for the qualifier of
+     * {@code qualified}.
+     *
+     * @param qualified a qualified expression
+     * @return {@code null} if the modular cannot be resolved, such as when the qualifying Alias is invalid or is an
+     *   unparsed module like {@code Kernel} or {@code Enum} OR if the qualified isn't an Alias.
+     */
+    @Contract(pure = true)
+    @Nullable
+    private static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
+        return qualifierToModular(qualified.qualifier());
     }
 
     @NotNull

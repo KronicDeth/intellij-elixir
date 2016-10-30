@@ -610,7 +610,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> resolveResultList = null;
         int resolvedFinalArity = myElement.resolvedFinalArity();
-        Call modular = callToModular(myElement, resolvedFinalArity);
+        Call modular = maybeQualifiedCallToModular(myElement);
         ResolveResult[] resolveResults;
 
         if (modular != null) {
