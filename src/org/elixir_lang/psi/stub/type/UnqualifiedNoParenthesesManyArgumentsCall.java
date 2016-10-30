@@ -34,7 +34,7 @@ public class UnqualifiedNoParenthesesManyArgumentsCall extends Stub<org.elixir_l
                 parentStub,
                 this,
                 psi.resolvedModuleName(),
-                psi.resolvedFunctionName(),
+                psi.functionName(),
                 psi.resolvedFinalArity(),
                 psi.hasDoBlockOrKeyword(),
                 StringUtil.notNullize(psi.getName(), "?"),

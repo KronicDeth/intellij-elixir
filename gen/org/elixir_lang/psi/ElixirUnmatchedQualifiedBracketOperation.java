@@ -2,6 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 public interface ElixirUnmatchedQualifiedBracketOperation extends ElixirUnmatchedExpression, QualifiedBracketOperation {
@@ -17,6 +18,9 @@ public interface ElixirUnmatchedQualifiedBracketOperation extends ElixirUnmatche
 
   @NotNull
   ElixirUnmatchedExpression getUnmatchedExpression();
+
+  @NotNull
+  PsiElement qualifier();
 
   @NotNull
   OtpErlangObject quote();

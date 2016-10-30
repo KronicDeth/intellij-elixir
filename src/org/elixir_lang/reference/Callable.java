@@ -2,7 +2,6 @@ package org.elixir_lang.reference;
 
 import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.LocalSearchScope;
@@ -16,7 +15,7 @@ import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.Named;
-import org.elixir_lang.psi.call.name.*;
+import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.operation.*;
 import org.elixir_lang.psi.scope.variable.Variants;
@@ -610,37 +609,58 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         List<ResolveResult> resolveResultList = null;
-        String name = myElement.getName();
+        int resolvedFinalArity = myElement.resolvedFinalArity();
+        Call modular = maybeQualifiedCallToModular(myElement);
+        ResolveResult[] resolveResults;
 
-        if (name != null) {
-            int resolvedFinalArity = myElement.resolvedFinalArity();
-            List<ResolveResult> variableResolveList = null;
+        if (modular != null) {
+            final List<ResolveResult> finalResolveResultList = new ArrayList<ResolveResult>();
 
-            if (resolvedFinalArity == 0) {
-                variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                        name,
-                        incompleteCode,
-                        myElement
-                );
-            }
+            Modular.forEachCallDefinitionClauseNameIdentifier(
+                    modular,
+                    myElement.functionName(),
+                    resolvedFinalArity,
+                    new com.intellij.util.Function<PsiElement, Object>() {
+                        @Override
+                        public Object fun(PsiElement nameIdentifier) {
+                            finalResolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
 
-            List<ResolveResult> callDefinitionClauseResolveResultList =
-                    org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResultList(
+                            return null;
+                        }
+                    }
+            );
+
+            resolveResults = finalResolveResultList.toArray(new ResolveResult[finalResolveResultList.size()]);
+        } else {
+            String name = myElement.getName();
+
+            if (name != null) {
+                List<ResolveResult> variableResolveList = null;
+
+                if (resolvedFinalArity == 0) {
+                    variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
                             name,
-                            resolvedFinalArity,
                             incompleteCode,
                             myElement
                     );
+                }
 
-            resolveResultList = merge(variableResolveList, callDefinitionClauseResolveResultList);
-        }
+                List<ResolveResult> callDefinitionClauseResolveResultList =
+                        org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResultList(
+                                name,
+                                resolvedFinalArity,
+                                incompleteCode,
+                                myElement
+                        );
 
-        ResolveResult[] resolveResults;
+                resolveResultList = merge(variableResolveList, callDefinitionClauseResolveResultList);
+            }
 
-        if (resolveResultList == null) {
-            resolveResults = new ResolveResult[0];
-        } else {
-            resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
+            if (resolveResultList == null) {
+                resolveResults = new ResolveResult[0];
+            } else {
+                resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
+            }
         }
 
         return resolveResults;

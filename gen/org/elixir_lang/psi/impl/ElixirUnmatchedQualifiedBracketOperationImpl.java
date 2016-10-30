@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
@@ -45,6 +46,11 @@ public class ElixirUnmatchedQualifiedBracketOperationImpl extends ElixirUnmatche
   @NotNull
   public ElixirUnmatchedExpression getUnmatchedExpression() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirUnmatchedExpression.class));
+  }
+
+  @NotNull
+  public PsiElement qualifier() {
+    return ElixirPsiImplUtil.qualifier(this);
   }
 
   @NotNull

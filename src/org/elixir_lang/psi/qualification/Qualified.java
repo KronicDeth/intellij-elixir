@@ -11,5 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public interface Qualified extends PsiElement {
     @Contract(pure = true)
     @NotNull
+    PsiElement qualifier();
+
+    @Contract(pure = true)
+    @NotNull
     ElixirRelativeIdentifier getRelativeIdentifier();
 }

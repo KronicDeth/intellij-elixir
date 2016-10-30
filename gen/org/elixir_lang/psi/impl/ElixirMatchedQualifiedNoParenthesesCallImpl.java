@@ -103,20 +103,20 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends NamedStubbedPsi
     return ElixirPsiImplUtil.getReference(this);
   }
 
-  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName) {
-    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName);
+  public boolean isCalling(String resolvedModuleName, String functionName) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
-    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  public boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCalling(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName) {
-    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName);
+  public boolean isCallingMacro(String resolvedModuleName, String functionName) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName);
   }
 
-  public boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity) {
-    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, resolvedFunctionName, resolvedFinalArity);
+  public boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity) {
+    return ElixirPsiImplUtil.isCallingMacro(this, resolvedModuleName, functionName, resolvedFinalArity);
   }
 
   @NotNull
@@ -139,6 +139,11 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends NamedStubbedPsi
   }
 
   @NotNull
+  public PsiElement qualifier() {
+    return ElixirPsiImplUtil.qualifier(this);
+  }
+
+  @NotNull
   public OtpErlangObject quote() {
     return ElixirPsiImplUtil.quote(this);
   }
@@ -151,11 +156,6 @@ public class ElixirMatchedQualifiedNoParenthesesCallImpl extends NamedStubbedPsi
   @NotNull
   public IntRange resolvedFinalArityRange() {
     return ElixirPsiImplUtil.resolvedFinalArityRange(this);
-  }
-
-  @NotNull
-  public String resolvedFunctionName() {
-    return ElixirPsiImplUtil.resolvedFunctionName(this);
   }
 
   @NotNull

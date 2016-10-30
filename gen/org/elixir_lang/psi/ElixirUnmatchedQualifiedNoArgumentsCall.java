@@ -49,13 +49,13 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   @Nullable
   PsiReference getReference();
 
-  boolean isCalling(String resolvedModuleName, String resolvedFunctionName);
+  boolean isCalling(String resolvedModuleName, String functionName);
 
-  boolean isCalling(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+  boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
-  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName);
+  boolean isCallingMacro(String resolvedModuleName, String functionName);
 
-  boolean isCallingMacro(String resolvedModuleName, String resolvedFunctionName, int resolvedFinalArity);
+  boolean isCallingMacro(String resolvedModuleName, String functionName, int resolvedFinalArity);
 
   @NotNull
   String moduleName();
@@ -69,6 +69,9 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
   boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, PsiElement lastParent, PsiElement place);
 
   @NotNull
+  PsiElement qualifier();
+
+  @NotNull
   OtpErlangObject quote();
 
   @NotNull
@@ -76,9 +79,6 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   @NotNull
   IntRange resolvedFinalArityRange();
-
-  @NotNull
-  String resolvedFunctionName();
 
   @NotNull
   String resolvedModuleName();
