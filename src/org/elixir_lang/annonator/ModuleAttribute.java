@@ -883,7 +883,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof ElixirAlias ||
+        } else if (psiElement instanceof BracketOperation ||
+                psiElement instanceof ElixirAlias ||
                 psiElement instanceof ElixirAtom ||
                 psiElement instanceof ElixirAtomKeyword ||
                 psiElement instanceof ElixirBitString ||
