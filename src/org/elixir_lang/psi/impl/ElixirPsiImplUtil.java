@@ -2043,7 +2043,8 @@ public class ElixirPsiImplUtil {
                                     if (matchedParenthesesArgumentsParent instanceof Call) {
                                         Call matchedParenthesesArgumentsParentCall = (Call) matchedParenthesesArgumentsParent;
 
-                                        if (matchedParenthesesArgumentsParentCall.isCalling("Enum", "map")) {
+                                        if (matchedParenthesesArgumentsParentCall.isCalling("Enum", "map") ||
+                                                matchedParenthesesArgumentsParentCall.isCalling("Enum", "each")) {
                                             enclosingMacroCall = enclosingMacroCall(matchedParenthesesArgumentsParentCall);
                                         }
                                     }
