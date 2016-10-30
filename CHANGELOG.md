@@ -116,6 +116,9 @@
    * Add regression tests for [#463](https://github.com/KronicDeth/intellij-elixir/issues/463).
 * [#484](https://github.com/KronicDeth/intellij-elixir/pull/484) - Regression test for [#471](https://github.com/KronicDeth/intellij-elixir/issues/471) - [@KronicDeth](https://github.com/KronicDeth)
 * [#485](https://github.com/KronicDeth/intellij-elixir/pull/485) - Regression test for [#472](https://github.com/KronicDeth/intellij-elixir/pull/472) - [@KronicDeth](https://github.com/KronicDeth)
+* [#486](https://github.com/KronicDeth/intellij-elixir/pull/486) - [@KronicDeth](https://github.com/KronicDeth)
+  * Extract `Arrow` interface for `*ArrowOperation`s.
+  * Regression tests for [#480](https://github.com/KronicDeth/intellij-elixir/issues/480)
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -142,6 +145,7 @@
   * Remove `Call#resolvedFunctionName`  because `import` can't rename functions.
 * [#484](https://github.com/KronicDeth/intellij-elixir/pull/484) - Don't type-highlight `BracketOperation`s as they occur when putting maps or structs in front of lists. - [@KronicDeth](https://github.com/KronicDeth)
 * [#485](https://github.com/KronicDeth/intellij-elixir/pull/485) - Treat `Enum.each` the same as `Enum.map` around `def` - [@KronicDeth](https://github.com/KronicDeth)
+* [#486](https://github.com/KronicDeth/intellij-elixir/pull/486) - Increase `resolvedFinalArity` by `1` for piping. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.5.0
 

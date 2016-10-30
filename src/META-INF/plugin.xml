@@ -68,6 +68,12 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/pull/472">#472</a>
             </li>
+            <li>
+              Extract <code>Arrow</code> interface for <code>*ArrowOperation</code>s.
+            </li>
+            <li>
+              Regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/480">#480</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -148,6 +154,9 @@
             </li>
             <li>
               Treat <code>Enum.each</code> the same as <code>Enum.map</code> around <code>def</code>
+            </li>
+            <li>
+              Increase <code>resolvedFinalArity</code> by <code>1</code> for piping.
             </li>
           </ul>
         </li>
