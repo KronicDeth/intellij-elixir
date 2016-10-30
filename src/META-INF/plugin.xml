@@ -62,6 +62,9 @@
             <li>
               Add regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/463">#463</a>.
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/471">#471</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -135,6 +138,10 @@
             </li>
             <li>
               Remove <code>Call#resolvedFunctionName</code>  because <code>import</code> can't rename functions.
+            </li>
+            <li>
+              Don't type-highlight <code>BracketOperation</code>s as they occur when putting maps or structs in front of
+              lists.
             </li>
           </ul>
         </li>
