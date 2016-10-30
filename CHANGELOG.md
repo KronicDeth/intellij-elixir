@@ -109,6 +109,11 @@
   * Regression test for [#469](https://github.com/KronicDeth/intellij-elixir/issues/469)
   * Highlight Strings and String Heredocs as errors in types.
 * [#479](https://github.com/KronicDeth/intellij-elixir/pull/479) - Regression tests for [#470](https://github.com/KronicDeth/intellij-elixir/issues/470) - [@KronicDeth](https://github.com/KronicDeth)
+* [#483](https://github.com/KronicDeth/intellij-elixir/pull/483) - [@KronicDeth](https://github.com/KronicDeth)
+   * Add `Qualified#qualifier` by extracting it from `CallDefinitionClause` `CompletionProvider`.
+   * Add `Modular` class with `#forEachCallDefinitionClauseNameIdentifier` to enumerate all the identifiers that could be linked to in a modular.
+   * Add `ElixirPsiImplUtil#maybeQualifiedCallToModular` by extracting `resolveFully` from `CallDefinitionClause` `CompletionProvider`
+   * Add regression tests for [#463](https://github.com/KronicDeth/intellij-elixir/issues/463).
 
 ### Bug Fixes
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -130,6 +135,9 @@
   * Skip `Arguments` elements in `previousParentExpresion` to eliminate an unnecessary level of processing declarations since calls will enter their arguments.
   * Only put new `ENTRANCE` in `ResolveState` in `variable.MultiResolve.resolveResultList`, so that caller can override the default value.
   * Set `ENTRANCE` to `matchAncestor` instead of previous expression to eliminate the looping that occurred when a variable was unbound (or a function) because the check for `with` (and `for`) was expecting the `ENTRANCE` to be the previous child expression instead of the `with` clause as a whole (or the `Arguments` element as had been the case before [6fcc19b](https://github.com/KronicDeth/intellij-elixir/commit/6fcc19bd1748004756da2c8a541fa8b94ede1f71)).
+* [#483](https://github.com/KronicDeth/intellij-elixir/pull/483) - [@KronicDeth](https://github.com/KronicDeth)
+  * Resolves functions qualified by Aliases that are either direct Module references or one-step aliases.
+  * Remove `Call#resolvedFunctionName`  because `import` can't rename functions.
 
 ## v4.5.0
 

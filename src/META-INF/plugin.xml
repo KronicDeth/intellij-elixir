@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.5.0</version>
+  <version>4.6.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -46,6 +46,21 @@
             </li>
             <li>
               Regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/470">#470</a>
+            </li>
+            <li>
+              Add <code>Qualified#qualifier</code> by extracting it from <code>CallDefinitionClause</code>
+              <code>CompletionProvider</code>.
+            </li>
+            <li>
+              Add <code>Modular</code> class with <code>#forEachCallDefinitionClauseNameIdentifier</code> to enumerate
+              all the identifiers that could be linked to in a modular.
+            </li>
+            <li>
+              Add <code>ElixirPsiImplUtil#maybeQualifiedCallToModular</code> by extracting
+              <code>resolveFully</code> from <code>CallDefinitionClause</code> <code>CompletionProvider</code>
+            </li>
+            <li>
+              Add regression tests for <a href="https://github.com/KronicDeth/intellij-elixir/issues/463">#463</a>.
             </li>
           </ul>
         </li>
@@ -114,6 +129,12 @@
               <a href="https://github.com/KronicDeth/intellij-elixir/commit/6fcc19bd1748004756da2c8a541fa8b94ede1f71">
                 6fcc19b
               </a>.
+            </li>
+            <li>
+              Resolves functions qualified by Aliases that are either direct Module references or one-step aliases.
+            </li>
+            <li>
+              Remove <code>Call#resolvedFunctionName</code>  because <code>import</code> can't rename functions.
             </li>
           </ul>
         </li>
