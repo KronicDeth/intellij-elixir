@@ -463,7 +463,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedArrowOperation(@NotNull ElixirMatchedArrowOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitArrow(o);
   }
 
   public void visitMatchedAtNonNumericOperation(@NotNull ElixirMatchedAtNonNumericOperation o) {
@@ -816,7 +816,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnmatchedArrowOperation(@NotNull ElixirUnmatchedArrowOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitArrow(o);
   }
 
   public void visitUnmatchedAtNonNumericOperation(@NotNull ElixirUnmatchedAtNonNumericOperation o) {
