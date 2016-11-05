@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.openapi.util.Pair.pair;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 
 public class CallDefinitionHead extends Element<Call> implements Presentable, Visible {
@@ -200,39 +201,31 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
      */
     @NotNull
     public static PsiElement stripOuterParentheses(PsiElement head) {
-        PsiElement stripped = head;
+        PsiElement stripped = stripAccessExpression(head);
 
-        if (head instanceof ElixirAccessExpression) {
-            PsiElement[] headChildren = head.getChildren();
+        if (stripped instanceof ElixirParentheticalStab) {
+            ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) stripped;
 
-            if (headChildren.length == 1) {
-                PsiElement headChild = headChildren[0];
+            PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
 
-                if (headChild instanceof ElixirParentheticalStab) {
-                    ElixirParentheticalStab parentheticalStab = (ElixirParentheticalStab) headChild;
+            if (parentheticalStabChildren.length == 1) {
+                PsiElement parentheticalStabChild = parentheticalStabChildren[0];
 
-                    PsiElement[] parentheticalStabChildren = parentheticalStab.getChildren();
+                if (parentheticalStabChild instanceof ElixirStab) {
+                    ElixirStab stab = (ElixirStab) parentheticalStabChild;
 
-                    if (parentheticalStabChildren.length == 1) {
-                        PsiElement parentheticalStabChild = parentheticalStabChildren[0];
+                    PsiElement[] stabChildren = stab.getChildren();
 
-                        if (parentheticalStabChild instanceof ElixirStab) {
-                            ElixirStab stab = (ElixirStab) parentheticalStabChild;
+                    if (stabChildren.length == 1) {
+                        PsiElement stabChild = stabChildren[0];
 
-                            PsiElement[] stabChildren = stab.getChildren();
+                        if (stabChild instanceof ElixirStabBody) {
+                            ElixirStabBody stabBody = (ElixirStabBody) stabChild;
 
-                            if (stabChildren.length == 1) {
-                                PsiElement stabChild = stabChildren[0];
+                            PsiElement[] stabBodyChildren = stabBody.getChildren();
 
-                                if (stabChild instanceof ElixirStabBody) {
-                                    ElixirStabBody stabBody = (ElixirStabBody) stabChild;
-
-                                    PsiElement[] stabBodyChildren = stabBody.getChildren();
-
-                                    if (stabBodyChildren.length == 1) {
-                                        stripped = stabBodyChildren[0];
-                                    }
-                                }
+                            if (stabBodyChildren.length == 1) {
+                                stripped = stabBodyChildren[0];
                             }
                         }
                     }

@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.DEFDELEGATE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 
 public class Delegation extends Element<Call>  {
     /*
@@ -47,19 +48,13 @@ public class Delegation extends Element<Call>  {
         PsiElement firstFinalArgument = finalArguments[0];
 
         if (firstFinalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
+            PsiElement accessExpressionChild = stripAccessExpression(firstFinalArgument);
 
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+            if (accessExpressionChild instanceof ElixirList) {
+                ElixirList list = (ElixirList) accessExpressionChild;
 
-            if (accessExpressionChildren.length == 1) {
-                PsiElement accessExpressionChild = accessExpressionChildren[0];
-
-                if (accessExpressionChild instanceof ElixirList) {
-                    ElixirList list = (ElixirList) accessExpressionChild;
-
-                    Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
-                    callDefinitionHeadCallList = filterCallDefinitionHeadCallList(listCalls);
-                }
+                Call[] listCalls = PsiTreeUtil.getChildrenOfType(list, Call.class);
+                callDefinitionHeadCallList = filterCallDefinitionHeadCallList(listCalls);
             }
         } else if (firstFinalArgument instanceof Call) {
             Call call = (Call) firstFinalArgument;

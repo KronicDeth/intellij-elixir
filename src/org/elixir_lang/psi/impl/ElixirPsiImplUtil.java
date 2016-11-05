@@ -691,22 +691,17 @@ public class ElixirPsiImplUtil {
                 if (potentialKeywords instanceof QuotableKeywordList) {
                     keywordArguments = (QuotableKeywordList) potentialKeywords;
                 } else if (potentialKeywords instanceof ElixirAccessExpression) {
-                    ElixirAccessExpression accessExpression = (ElixirAccessExpression) potentialKeywords;
-                    PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+                    PsiElement accessExpressionChild = stripAccessExpression(potentialKeywords);
 
-                    if (accessExpressionChildren.length == 1) {
-                        PsiElement accessExpressionChild = accessExpressionChildren[0];
+                    if (accessExpressionChild instanceof ElixirList) {
+                        ElixirList list = (ElixirList) accessExpressionChild;
+                        PsiElement[] listChildren = list.getChildren();
 
-                        if (accessExpressionChild instanceof ElixirList) {
-                            ElixirList list = (ElixirList) accessExpressionChild;
-                            PsiElement[] listChildren = list.getChildren();
+                        if (listChildren.length == 1) {
+                            PsiElement listChild = listChildren[0];
 
-                            if (listChildren.length == 1) {
-                                PsiElement listChild = listChildren[0];
-
-                                if (listChild instanceof QuotableKeywordList) {
-                                    keywordArguments = (QuotableKeywordList) listChild;
-                                }
+                            if (listChild instanceof QuotableKeywordList) {
+                                keywordArguments = (QuotableKeywordList) listChild;
                             }
                         }
                     }
@@ -2219,16 +2214,12 @@ public class ElixirPsiImplUtil {
 
             qualifierName = qualifiableQualifier.fullyQualifiedName();
         } else if (qualifier instanceof ElixirAccessExpression) {
-            PsiElement[] qualifierChildren = qualifier.getChildren();
+            PsiElement qualifierChild = stripAccessExpression(qualifier);
 
-            if (qualifierChildren.length == 1) {
-                PsiElement qualifierChild = qualifierChildren[0];
+            if (qualifierChild instanceof ElixirAlias) {
+                ElixirAlias childAlias = (ElixirAlias) qualifierChild;
 
-                if (qualifierChild instanceof ElixirAlias) {
-                    ElixirAlias childAlias = (ElixirAlias) qualifierChild;
-
-                    qualifierName = childAlias.getName();
-                }
+                qualifierName = childAlias.getName();
             }
         }
 
@@ -2249,10 +2240,10 @@ public class ElixirPsiImplUtil {
     }
 
     @NotNull
-    public static PsiElement fullyResolveQualifier(@NotNull QualifiableAlias element,
-                                                   @Nullable PsiReference startingReference) {
+    public static PsiElement fullyResolveAlias(@NotNull QualifiableAlias alias,
+                                               @Nullable PsiReference startingReference) {
         PsiElement fullyResolved;
-        PsiElement currentResolved = element;
+        PsiElement currentResolved = alias;
         PsiReference reference = startingReference;
 
         do {
@@ -3052,55 +3043,6 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static PsiElement qualifier(@NotNull final Qualified qualified) {
         return qualified.getFirstChild();
-    }
-
-    /**
-     * @param qualifier qualifier for a {@link Call} to a function
-     * @return {@link Call} for the {@code defmodule}, {@code defimpl}, or {@code defprotocol} that defines
-     *   {@code qualifier} after it is resolved through any {@code alias}es.
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call qualifierToModular(@NotNull final PsiElement qualifier) {
-        PsiElement maybeQualifiableAlias = qualifier;
-
-        if (qualifier instanceof ElixirAccessExpression) {
-            PsiElement[] accessExpressionChildren = qualifier.getChildren();
-
-            if (accessExpressionChildren.length > 0) {
-                maybeQualifiableAlias = accessExpressionChildren[0];
-            }
-        }
-
-        Call modular = null;
-
-        if (maybeQualifiableAlias instanceof QualifiableAlias) {
-            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
-            /* need to construct reference directly as qualified aliases don't return a
-               reference except for the outermost */
-            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias);
-            modular = qualifierToModular(qualifiableAlias, reference);
-        }
-
-        return modular;
-    }
-
-    @Contract(pure = true)
-    @Nullable
-    public static Call qualifierToModular(@NotNull QualifiableAlias qualifier,
-                                          @NotNull PsiReference startingReference) {
-        PsiElement fullyResolvedQualifier = fullyResolveQualifier(qualifier, startingReference);
-        Call modular = null;
-
-        if (fullyResolvedQualifier instanceof Call) {
-           Call fullyResolvedQualifierCall = (Call) fullyResolvedQualifier;
-
-           if (isModular(fullyResolvedQualifierCall)) {
-               modular = fullyResolvedQualifierCall;
-           }
-        }
-
-        return modular;
     }
 
     public static List<QuotableKeywordPair> quotableKeywordPairList(ElixirKeywords keywords) {
@@ -5297,6 +5239,31 @@ if (quoted == null) {
         return chars.charAt(0);
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement stripAccessExpression(@NotNull PsiElement maybeWrapped) {
+        PsiElement unwrapped = maybeWrapped;
+
+        if (maybeWrapped instanceof ElixirAccessExpression) {
+            unwrapped = stripOnlyChildParent(maybeWrapped);
+        }
+
+        return unwrapped;
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static PsiElement stripOnlyChildParent(@NotNull PsiElement parent) {
+        PsiElement unwrapped = parent;
+        PsiElement[] children = parent.getChildren();
+
+        if (children.length == 1) {
+            unwrapped = children[0];
+        }
+
+        return unwrapped;
+    }
+
     public static char terminator(@NotNull SigilLine sigilLine) {
         ASTNode node = sigilLine.getNode();
         ASTNode[] childNodes = node.getChildren(null);
@@ -5417,7 +5384,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     private static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return qualifierToModular(qualified.qualifier());
+        return maybeAliasToModular(qualified.qualifier());
     }
 
     @NotNull
@@ -5539,6 +5506,48 @@ if (quoted == null) {
     @NotNull
     public static List<Integer> addHexadecimalEscapeSequenceCodePoints(@NotNull @SuppressWarnings("unused") Sigil parent, @Nullable List<Integer> codePointList, @NotNull ASTNode child) {
         return addChildTextCodePoints(codePointList, child);
+    }
+
+    /**
+     * @return {@link Call} for the {@code defmodule}, {@code defimpl}, or {@code defprotocol} that defines
+     *   {@code maybeAlias} after it is resolved through any {@code alias}es.
+     */
+    @Contract(pure = true)
+    @Nullable
+    public static Call maybeAliasToModular(@NotNull final PsiElement maybeAlias) {
+        PsiElement maybeQualifiableAlias = maybeAlias;
+
+        maybeQualifiableAlias = stripAccessExpression(maybeAlias);
+
+        Call modular = null;
+
+        if (maybeQualifiableAlias instanceof QualifiableAlias) {
+            QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
+            /* need to construct reference directly as qualified aliases don't return a
+               reference except for the outermost */
+            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            modular = aliasToModular(qualifiableAlias, reference);
+        }
+
+        return modular;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static Call aliasToModular(@NotNull QualifiableAlias alias,
+                                      @NotNull PsiReference startingReference) {
+        PsiElement fullyResolvedAlias = fullyResolveAlias(alias, startingReference);
+        Call modular = null;
+
+        if (fullyResolvedAlias instanceof Call) {
+           Call fullyResolvedAliasCall = (Call) fullyResolvedAlias;
+
+           if (isModular(fullyResolvedAliasCall)) {
+               modular = fullyResolvedAliasCall;
+           }
+        }
+
+        return modular;
     }
 
     @NotNull

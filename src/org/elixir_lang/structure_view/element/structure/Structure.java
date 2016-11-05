@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.elixir_lang.psi.call.name.Function.DEFSTRUCT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 
 public class Structure extends Element<Call> {
     /*
@@ -77,32 +78,22 @@ public class Structure extends Element<Call> {
         if (finalArgument instanceof QuotableKeywordList) {
             addDefaultValueByField(childList, (QuotableKeywordList) finalArgument);
         } else if (finalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) finalArgument;
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+            PsiElement accessExpressionChild = stripAccessExpression(finalArgument);
 
-            if (accessExpressionChildren.length == 1) {
-                PsiElement accessExpressionChild = accessExpressionChildren[0];
+            if (accessExpressionChild instanceof ElixirList) {
+                ElixirList list = (ElixirList) accessExpressionChild;
+                PsiElement[] listChildren = list.getChildren();
 
-                if (accessExpressionChild instanceof ElixirList) {
-                    ElixirList list = (ElixirList) accessExpressionChild;
-                    PsiElement[] listChildren = list.getChildren();
+                for (PsiElement listChild : listChildren) {
+                    if (listChild instanceof QuotableKeywordList) {
+                        addDefaultValueByField(childList, (QuotableKeywordList) listChild);
+                    } else if (listChild instanceof ElixirAccessExpression) {
+                        PsiElement listChildAccessExpressionChild = stripAccessExpression(listChild);
 
-                    for (PsiElement listChild : listChildren) {
-                        if (listChild instanceof QuotableKeywordList) {
-                            addDefaultValueByField(childList, (QuotableKeywordList) listChild);
-                        } else if (listChild instanceof ElixirAccessExpression) {
-                            ElixirAccessExpression listChildAccessExpression = (ElixirAccessExpression) listChild;
-                            PsiElement[] listChildAccessExpressionChildren = listChildAccessExpression.getChildren();
-
-                            if (listChildAccessExpressionChildren.length == 1) {
-                                PsiElement listChildAccessExpressionChild = listChildAccessExpressionChildren[0];
-
-                                if (listChildAccessExpressionChild instanceof ElixirAtom) {
-                                    childList.add(
-                                            new Field(this, (ElixirAtom) listChildAccessExpressionChild)
-                                    );
-                                }
-                            }
+                        if (listChildAccessExpressionChild instanceof ElixirAtom) {
+                            childList.add(
+                                    new Field(this, (ElixirAtom) listChildAccessExpressionChild)
+                            );
                         }
                     }
                 }

@@ -289,27 +289,23 @@ public abstract class Variable implements PsiScopeProcessor {
             PsiElement bindQuoted = ElixirPsiImplUtil.keywordArgument(match, "bind_quoted");
 
             if (bindQuoted instanceof ElixirAccessExpression) {
-                PsiElement[] children = bindQuoted.getChildren();
+                PsiElement child = stripAccessExpression(bindQuoted);
 
-                if (children.length == 1) {
-                    PsiElement child = children[0];
+                if (child instanceof ElixirList) {
+                    ElixirList list = (ElixirList) child;
 
-                    if (child instanceof ElixirList) {
-                        ElixirList list = (ElixirList) child;
+                    PsiElement[] listChildren = list.getChildren();
 
-                        PsiElement[] listChildren = list.getChildren();
+                    if (listChildren.length == 1) {
+                        PsiElement listChild = listChildren[0];
 
-                        if (listChildren.length == 1) {
-                            PsiElement listChild = listChildren[0];
+                        if (listChild instanceof ElixirKeywords) {
+                            ElixirKeywords bindQuotedKeywords = (ElixirKeywords) listChild;
 
-                            if (listChild instanceof ElixirKeywords) {
-                                ElixirKeywords bindQuotedKeywords = (ElixirKeywords) listChild;
+                            List<ElixirKeywordPair> keywordPairList = bindQuotedKeywords.getKeywordPairList();
 
-                                List<ElixirKeywordPair> keywordPairList = bindQuotedKeywords.getKeywordPairList();
-
-                                for (ElixirKeywordPair keywordPair : keywordPairList) {
-                                    keepProcessing = executeOnVariable(keywordPair.getKeywordKey(), state);
-                                }
+                            for (ElixirKeywordPair keywordPair : keywordPairList) {
+                                keepProcessing = executeOnVariable(keywordPair.getKeywordKey(), state);
                             }
                         }
                     }

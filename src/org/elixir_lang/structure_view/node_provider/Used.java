@@ -26,6 +26,7 @@ import javax.swing.*;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.structure_view.element.modular.Module.addClausesToCallDefinition;
 
 public class Used implements FileStructureNodeProvider<TreeElement>, ActionShortcutProvider {
@@ -96,118 +97,112 @@ public class Used implements FileStructureNodeProvider<TreeElement>, ActionShort
                 PsiElement firstFinalArgument = finalArguments[0];
 
                 if (firstFinalArgument instanceof ElixirAccessExpression) {
-                    ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
+                    PsiElement accessExpressionChild = stripAccessExpression(firstFinalArgument);
 
-                    PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+                    if (accessExpressionChild instanceof QualifiableAlias) {
+                        PsiReference reference = accessExpressionChild.getReference();
 
-                    if (accessExpressionChildren.length == 1) {
-                        PsiElement accessExpressionChild = accessExpressionChildren[0];
+                        if (reference != null) {
+                            PsiElement ancestor = reference.resolve();
 
-                        if (accessExpressionChild instanceof QualifiableAlias) {
-                            PsiReference reference = accessExpressionChild.getReference();
+                            while (ancestor != null && !(ancestor instanceof PsiFile)) {
+                                if (ancestor instanceof Call) {
+                                    Call call = (Call) ancestor;
 
-                            if (reference != null) {
-                                PsiElement ancestor = reference.resolve();
+                                    if (Module.is(call)) {
+                                        Module module = new Module(call);
+                                        Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(call);
 
-                                while (ancestor != null && !(ancestor instanceof PsiFile)) {
-                                    if (ancestor instanceof Call) {
-                                        Call call = (Call) ancestor;
+                                        if (childCalls != null) {
+                                            Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(childCalls.length);
 
-                                        if (Module.is(call)) {
-                                            Module module = new Module(call);
-                                            Call[] childCalls = ElixirPsiImplUtil.macroChildCalls(call);
-
-                                            if (childCalls != null) {
-                                                Map<Pair<String, Integer>, CallDefinition> macroByNameArity = new HashMap<Pair<String, Integer>, CallDefinition>(childCalls.length);
-
-                                                for (Call childCall : childCalls) {
+                                            for (Call childCall : childCalls) {
                                                     /* portion of {@link org.elixir_lang.structure_view.element.enclosingModular.Module#childCallTreeElements}
                                                        dealing with macros, restricted to __using__/1 */
-                                                    if (CallDefinitionClause.isMacro(childCall)) {
-                                                        Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);
+                                                if (CallDefinitionClause.isMacro(childCall)) {
+                                                    Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(childCall);
 
-                                                        if (nameArityRange != null) {
-                                                            String name = nameArityRange.first;
-                                                            IntRange arityRange = nameArityRange.second;
+                                                    if (nameArityRange != null) {
+                                                        String name = nameArityRange.first;
+                                                        IntRange arityRange = nameArityRange.second;
 
-                                                            if (name.equals(USING) && arityRange.containsInteger(1)) {
-                                                                addClausesToCallDefinition(
-                                                                        childCall,
-                                                                        name,
-                                                                        arityRange,
-                                                                        macroByNameArity,
-                                                                        module,
-                                                                        Timed.Time.COMPILE,
-                                                                        new Inserter<CallDefinition>() {
-                                                                            @Override
-                                                                            public void insert(CallDefinition element) {
-                                                                            }
+                                                        if (name.equals(USING) && arityRange.containsInteger(1)) {
+                                                            addClausesToCallDefinition(
+                                                                    childCall,
+                                                                    name,
+                                                                    arityRange,
+                                                                    macroByNameArity,
+                                                                    module,
+                                                                    Timed.Time.COMPILE,
+                                                                    new Inserter<CallDefinition>() {
+                                                                        @Override
+                                                                        public void insert(CallDefinition element) {
                                                                         }
-                                                                );
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                if (macroByNameArity.size() > 0) {
-                                                    PsiElement[] usingArguments;
-                                                    CallDefinition macro;
-                                                    CallDefinitionClause matchingClause = null;
-
-                                                    if (finalArguments.length > 1) {
-                                                        usingArguments = Arrays.copyOfRange(finalArguments, 1, finalArguments.length);
-                                                        Pair<String, Integer> nameArity = pair(USING, usingArguments.length);
-                                                        macro = macroByNameArity.get(nameArity);
-
-                                                        if (macro != null) {
-                                                            matchingClause = macro.matchingClause(usingArguments);
-                                                        }
-                                                    } else {
-                                                        /* `use <ALIAS>` will calls `__using__/1` even though there is
-                                                           no additional argument, but it obviously can't select a clause. */
-                                                        Pair<String, Integer> nameArity = pair(USING, 1);
-                                                        macro = macroByNameArity.get(nameArity);
-                                                        List<CallDefinitionClause> macroClauseList = macro.clauseList();
-
-                                                        if (macroClauseList.size() == 1) {
-                                                            matchingClause = macroClauseList.get(0);
-                                                        } else {
-                                                            // TODO match default argument clause/head to non-default argument clause that would be executed.
-                                                        }
-                                                    }
-
-                                                    if (matchingClause != null) {
-                                                        TreeElement[] callDefinitionClauseChildren = matchingClause.getChildren();
-                                                        int length = callDefinitionClauseChildren.length;
-
-                                                        if (length > 0) {
-                                                            TreeElement lastCallDefinitionClauseChild = callDefinitionClauseChildren[length - 1];
-
-                                                            if (lastCallDefinitionClauseChild instanceof Quote) {
-                                                                Quote quote = (Quote) lastCallDefinitionClauseChild;
-                                                                Quote injectedQuote = quote.used(use);
-                                                                TreeElement[] injectedQuoteChildren = injectedQuote.getChildren();
-                                                                nodes = new ArrayList<TreeElement>(injectedQuoteChildren.length);
-
-                                                                for (TreeElement injectedQuoteChild : injectedQuoteChildren) {
-                                                                    if (!(injectedQuoteChild instanceof Overridable)) {
-                                                                        nodes.add(injectedQuoteChild);
                                                                     }
-                                                                }
-
-                                                                break;
-                                                            }
+                                                            );
                                                         }
                                                     }
                                                 }
                                             }
-                                        } else {
-                                            break;
-                                        }
-                                    }
 
-                                    ancestor = ancestor.getParent();
+                                            if (macroByNameArity.size() > 0) {
+                                                PsiElement[] usingArguments;
+                                                CallDefinition macro;
+                                                CallDefinitionClause matchingClause = null;
+
+                                                if (finalArguments.length > 1) {
+                                                    usingArguments = Arrays.copyOfRange(finalArguments, 1, finalArguments.length);
+                                                    Pair<String, Integer> nameArity = pair(USING, usingArguments.length);
+                                                    macro = macroByNameArity.get(nameArity);
+
+                                                    if (macro != null) {
+                                                        matchingClause = macro.matchingClause(usingArguments);
+                                                    }
+                                                } else {
+                                                        /* `use <ALIAS>` will calls `__using__/1` even though there is
+                                                           no additional argument, but it obviously can't select a clause. */
+                                                    Pair<String, Integer> nameArity = pair(USING, 1);
+                                                    macro = macroByNameArity.get(nameArity);
+                                                    List<CallDefinitionClause> macroClauseList = macro.clauseList();
+
+                                                    if (macroClauseList.size() == 1) {
+                                                        matchingClause = macroClauseList.get(0);
+                                                    } else {
+                                                        // TODO match default argument clause/head to non-default argument clause that would be executed.
+                                                    }
+                                                }
+
+                                                if (matchingClause != null) {
+                                                    TreeElement[] callDefinitionClauseChildren = matchingClause.getChildren();
+                                                    int length = callDefinitionClauseChildren.length;
+
+                                                    if (length > 0) {
+                                                        TreeElement lastCallDefinitionClauseChild = callDefinitionClauseChildren[length - 1];
+
+                                                        if (lastCallDefinitionClauseChild instanceof Quote) {
+                                                            Quote quote = (Quote) lastCallDefinitionClauseChild;
+                                                            Quote injectedQuote = quote.used(use);
+                                                            TreeElement[] injectedQuoteChildren = injectedQuote.getChildren();
+                                                            nodes = new ArrayList<TreeElement>(injectedQuoteChildren.length);
+
+                                                            for (TreeElement injectedQuoteChild : injectedQuoteChildren) {
+                                                                if (!(injectedQuoteChild instanceof Overridable)) {
+                                                                    nodes.add(injectedQuoteChild);
+                                                                }
+                                                            }
+
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        break;
+                                    }
                                 }
+
+                                ancestor = ancestor.getParent();
                             }
                         }
                     }

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 
 /**
@@ -1282,30 +1283,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
             PsiElement firstChild = children[0];
 
             if (firstChild instanceof UnqualifiedNoArgumentsCall) {
-                PsiElement secondChild = children[1];
+                PsiElement strippedSecondChild = stripAccessExpression(children[1]);
 
-                if (secondChild instanceof ElixirAccessExpression) {
-                    PsiElement[] secondChildChildren = secondChild.getChildren();
+                if (strippedSecondChild instanceof ElixirList) {
+                    PsiElement strippedThirdChild = stripAccessExpression(children[2]);
 
-                    if (secondChildChildren.length == 1) {
-                        PsiElement secondChildChild = secondChildChildren[0];
-
-                        if (secondChildChild instanceof ElixirList) {
-                            PsiElement thirdChild = children[2];
-
-                            if (thirdChild instanceof ElixirAccessExpression) {
-                                PsiElement[] thirdChildChildren = thirdChild.getChildren();
-
-                                if (thirdChildChildren.length == 1) {
-                                    PsiElement thirdChildChild = thirdChildChildren[0];
-
-                                    if (thirdChildChild instanceof ElixirAtomKeyword &&
-                                            thirdChildChild.getText().equals("nil")) {
-                                        typeParameterNameSet = Collections.singleton(firstChild.getText());
-                                    }
-                                }
-                            }
-                        }
+                    if (strippedThirdChild instanceof ElixirAtomKeyword &&
+                            strippedThirdChild.getText().equals("nil")) {
+                        typeParameterNameSet = Collections.singleton(firstChild.getText());
                     }
                 }
             }
