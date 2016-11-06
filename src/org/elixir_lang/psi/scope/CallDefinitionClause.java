@@ -15,6 +15,12 @@ import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
 
 public abstract class CallDefinitionClause implements PsiScopeProcessor {
     /*
+     * CONSTANTS
+     */
+
+    protected static final Key<Call> IMPORT_CALL = new Key<Call>("IMPORT_CALL");
+
+    /*
      * Public Instance Methods
      */
 
@@ -72,12 +78,14 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
         if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(element)) {
             keepProcessing = executeOnCallDefinitionClause(element, state);
         } else if (Import.is(element)) {
+            final ResolveState importState = state.put(IMPORT_CALL, element);
+
             Import.callDefinitionClauseCallWhile(
                     element,
                     new Function<Call,Boolean>() {
                         @Override
                         public Boolean fun(Call callDefinitionClause) {
-                            return executeOnCallDefinitionClause(callDefinitionClause, state);
+                            return executeOnCallDefinitionClause(callDefinitionClause, importState);
                         }
                     }
             );
