@@ -3,6 +3,7 @@ package org.elixir_lang.psi.impl;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
@@ -91,6 +92,11 @@ public class ElixirUnmatchedQualifiedNoArgumentsCallImpl extends NamedStubbedPsi
 
   public PsiElement getNameIdentifier() {
     return ElixirPsiImplUtil.getNameIdentifier(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return ElixirPsiImplUtil.getPresentation(this);
   }
 
   @Nullable

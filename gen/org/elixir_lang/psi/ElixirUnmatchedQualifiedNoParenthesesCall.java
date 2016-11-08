@@ -2,6 +2,7 @@
 package org.elixir_lang.psi;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.ResolveState;
@@ -48,6 +49,9 @@ public interface ElixirUnmatchedQualifiedNoParenthesesCall extends ElixirUnmatch
   String getName();
 
   PsiElement getNameIdentifier();
+
+  @NotNull
+  ItemPresentation getPresentation();
 
   @Nullable
   PsiReference getReference();
