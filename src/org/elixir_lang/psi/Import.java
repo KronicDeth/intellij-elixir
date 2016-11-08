@@ -1,7 +1,10 @@
 package org.elixir_lang.psi;
 
 import com.intellij.ide.scratch.ScratchFileServiceImpl;
+import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
+import com.intellij.usageView.UsageViewNodeTextLocation;
+import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.Function;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.Contract;
@@ -64,6 +67,18 @@ public class Import {
         }
     }
 
+    @Nullable
+    public static String elementDescription(@NotNull Call call, @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = "import";
+        } else if (location == UsageViewNodeTextLocation.INSTANCE) {
+            elementDescription = call.getText();
+        }
+
+        return elementDescription;
+    }
 
     /**
      * Whether {@code call} is an {@code import Module} or {@code import Module, opts} call
@@ -137,5 +152,4 @@ public class Import {
 
         return filter;
     }
-
 }
