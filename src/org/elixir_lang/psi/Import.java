@@ -1,21 +1,31 @@
 package org.elixir_lang.psi;
 
-import com.intellij.ide.scratch.ScratchFileServiceImpl;
+import com.ericsson.otp.erlang.OtpErlangAtom;
+import com.ericsson.otp.erlang.OtpErlangLong;
+import com.ericsson.otp.erlang.OtpErlangObject;
+import com.ericsson.otp.erlang.OtpErlangRangeException;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewNodeTextLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.Function;
+import gnu.trove.THashMap;
+import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import static org.elixir_lang.psi.call.name.Function.IMPORT;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.finalArguments;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.fullyResolveAlias;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.maybeAliasToModular;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
+import static org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange;
 
 /**
  * An {@code import} call
@@ -101,6 +111,53 @@ public class Import {
      * Private Static Methods
      */
 
+    @NotNull
+    private static Map<String, List<Integer>> aritiesByNameFromNameByArityKeywordList(@NotNull final ElixirList list) {
+        Map<String, List<Integer>> aritiesByName = new THashMap<String, List<Integer>>();
+
+        PsiElement[] children = list.getChildren();
+
+        if (children.length >= 1) {
+            PsiElement lastChild = children[children.length - 1];
+
+            if (lastChild instanceof QuotableKeywordList) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) lastChild;
+
+                for (QuotableKeywordPair quotableKeywordPair : quotableKeywordList.quotableKeywordPairList()) {
+                    String name = keywordKeyToName(quotableKeywordPair.getKeywordKey());
+                    Integer arity = keywordValueToArity(quotableKeywordPair.getKeywordValue());
+
+                    if (name != null && arity != null) {
+                        List<Integer> arities = aritiesByName.get(name);
+
+                        if (arities == null) {
+                            arities = new ArrayList<Integer>();
+                        }
+
+                        arities.add(arity);
+
+                        aritiesByName.put(name, arities);
+                    }
+                }
+            }
+        }
+
+        return aritiesByName;
+    }
+
+    @NotNull
+    private static Map<String, List<Integer>> aritiesByNameFromNameByArityKeywordList(PsiElement element) {
+        Map<String, List<Integer>> aritiesByName = new THashMap<String, List<Integer>>();
+
+        PsiElement stripped = stripAccessExpression(element);
+
+        if (stripped instanceof ElixirList) {
+            aritiesByName = aritiesByNameFromNameByArityKeywordList((ElixirList) stripped);
+        }
+
+        return aritiesByName;
+    }
+
     /**
      * A {@link Function} that returns {@code true} for call definition clauses that are imported by {@code importCall}
      *
@@ -111,11 +168,88 @@ public class Import {
         PsiElement[] finalArguments = finalArguments(importCall);
         Function<Call, Boolean> filter = TRUE;
 
-        if (finalArguments != null && finalArguments.length > 2) {
-            filter = optionsCallDefinitionClauseCallFilter(finalArguments[0]);
+        if (finalArguments != null && finalArguments.length >= 2) {
+            filter = optionsCallDefinitionClauseCallFilter(finalArguments[1]);
         }
 
         return filter;
+    }
+
+    @NotNull
+    private static Function<Call, Boolean> exceptCallDefinitionClauseCallFilter(PsiElement element) {
+        final Function<Call, Boolean> only = onlyCallDefinitionClauseCallFilter(element);
+        return new Function<Call, Boolean>() {
+            @Override
+            public Boolean fun(Call call) {
+                return !only.fun(call);
+            }
+        };
+    }
+
+    @Nullable
+    private static String keywordKeyToName(@NotNull final Quotable keywordKey) {
+        OtpErlangObject quotedKeywordKey = keywordKey.quote();
+        String name = null;
+
+        if (quotedKeywordKey instanceof OtpErlangAtom) {
+            OtpErlangAtom keywordKeyAtom = (OtpErlangAtom) quotedKeywordKey;
+
+            name = keywordKeyAtom.atomValue();
+        }
+
+        return name;
+    }
+
+    @Nullable
+    private static Integer keywordValueToArity(@NotNull final Quotable keywordValue) {
+        OtpErlangObject quotedKeywordValue = keywordValue.quote();
+        Integer arity = null;
+
+        if (quotedKeywordValue instanceof OtpErlangLong) {
+            OtpErlangLong quotedKeywordValueLong = (OtpErlangLong) quotedKeywordValue;
+
+            try {
+                arity = quotedKeywordValueLong.intValue();
+            } catch (OtpErlangRangeException e) {
+                Logger.error(Import.class, "Arity in OtpErlangLong could not be downcast to an int", keywordValue);
+            }
+        }
+
+        return arity;
+    }
+
+    @NotNull
+    private static Function<Call, Boolean> onlyCallDefinitionClauseCallFilter(PsiElement element) {
+        final Map<String, List<Integer>> aritiesByName = aritiesByNameFromNameByArityKeywordList(element);
+
+        return new Function<Call, Boolean>() {
+            @Override
+            public Boolean fun(Call call) {
+                Pair<String, IntRange> callNameArityRange = nameArityRange(call);
+                boolean include = false;
+
+                if (callNameArityRange != null) {
+                    String callName = callNameArityRange.first;
+
+                    if (callName != null) {
+                        List<Integer> arities = aritiesByName.get(callName);
+
+                        if (arities != null) {
+                            IntRange callArityRange = callNameArityRange.second;
+
+                            for (int arity : arities) {
+                                if (callArityRange.containsInteger(arity)) {
+                                    include = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return include;
+            }
+        };
     }
 
     /**
@@ -136,7 +270,6 @@ public class Import {
         return modular;
     }
 
-
     /**
      * A {@link Function} that returns {@code true} for call definition clauses that are imported by {@code importCall}
      *
@@ -146,8 +279,16 @@ public class Import {
     private static Function<Call, Boolean> optionsCallDefinitionClauseCallFilter(@Nullable PsiElement options) {
         Function<Call, Boolean> filter = TRUE;
 
-        if (options != null) {
-            assert options != null;
+        if (options != null && options instanceof QuotableKeywordList) {
+            QuotableKeywordList keywordList = (QuotableKeywordList) options;
+
+            for (QuotableKeywordPair quotableKeywordPair : keywordList.quotableKeywordPairList()) {
+                if (hasKeywordKey(quotableKeywordPair, "except")) {
+                    filter = exceptCallDefinitionClauseCallFilter(quotableKeywordPair.getKeywordValue());
+                } else if (hasKeywordKey(quotableKeywordPair, "only")) {
+                    filter = onlyCallDefinitionClauseCallFilter(quotableKeywordPair.getKeywordValue());
+                }
+            }
         }
 
         return filter;

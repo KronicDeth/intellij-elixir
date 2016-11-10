@@ -37,13 +37,56 @@ public class ImportTest extends LightPlatformCodeInsightFixtureTestCase {
 
         assertEquals(2, resolveResults.length);
     }
+    public void testImportModuleExceptNameArity() {
+        myFixture.configureByFiles("import_module_except_name_arity.ex", "imported.ex");
+        PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
 
-    public void testImportModuleOnlyNameArity() {
+        assertNotNull(elementAtCaret);
 
+        PsiElement maybeCall = elementAtCaret.getParent().getParent();
+
+        assertInstanceOf(maybeCall, Call.class);
+
+        Call call = (Call) maybeCall;
+        assertEquals("imported", call.functionName());
+        assertEquals(0, call.resolvedFinalArity());
+
+        PsiReference reference = call.getReference();
+
+        assertNotNull(reference);
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
+
+        PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+
+        ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+
+        assertEquals(2, resolveResults.length);
     }
 
-    public void testImportModuleExceptNameArity() {
+    public void testImportModuleOnlyNameArity() {
+        myFixture.configureByFiles("import_module_only_name_arity.ex", "imported.ex");
+        PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
 
+        assertNotNull(elementAtCaret);
+
+        PsiElement maybeCall = elementAtCaret.getParent().getParent();
+
+        assertInstanceOf(maybeCall, Call.class);
+
+        Call call = (Call) maybeCall;
+        assertEquals("imported", call.functionName());
+        assertEquals(0, call.resolvedFinalArity());
+
+        PsiReference reference = call.getReference();
+
+        assertNotNull(reference);
+        assertInstanceOf(reference, PsiPolyVariantReference.class);
+
+        PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+
+        ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+
+        assertEquals(2, resolveResults.length);
     }
 
     /*
