@@ -24,10 +24,8 @@ public class Modular {
 
         if (childCalls != null) {
             for (Call childCall : childCalls) {
-                if (CallDefinitionClause.is(childCall)) {
-                    if (!function.fun(childCall)) {
-                        break;
-                    }
+                if (CallDefinitionClause.is(childCall) && !function.fun(childCall)) {
+                    break;
                 }
             }
         }
@@ -52,10 +50,8 @@ public class Modular {
                             Named named = (Named) call;
                             PsiElement nameIdentifier = named.getNameIdentifier();
 
-                            if (nameIdentifier != null) {
-                                if (!function.fun(nameIdentifier)) {
-                                    keepProcessing = false;
-                                }
+                            if (nameIdentifier != null && !function.fun(nameIdentifier)) {
+                                keepProcessing = false;
                             }
                         }
 
@@ -88,10 +84,9 @@ public class Modular {
                                 if (name != null && name.equals(functionName)) {
                                     IntRange arityRange = nameArityRange.second;
 
-                                    if (arityRange.containsInteger(resolvedFinalArity)) {
-                                        if (!function.fun(callDefinitionClauseCall)) {
-                                            keepProcessing = false;
-                                        }
+                                    if (arityRange.containsInteger(resolvedFinalArity) &&
+                                            !function.fun(callDefinitionClauseCall)) {
+                                        keepProcessing = false;
                                     }
                                 }
                             }
