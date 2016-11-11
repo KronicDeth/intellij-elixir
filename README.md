@@ -1683,19 +1683,19 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 When you start typing an Alias, completion will look in three locations:
 
 1. `alias` aliased names in the current file
-  a. `Suffix` for `alias Prefix.Suffix`
-  b. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
-  c. `As` for `alias Prefix.Suffix, as: As`
+    1. `Suffix` for `alias Prefix.Suffix`
+    2. `MultipleAliasA` or `MultipleAliasB` for `alias Prefix.{MultipleAliasA, MultipleAliasB}`
+    3. `As` for `alias Prefix.Suffix, as: As`
 2. Indexed module names (as available from [Go To Symbol](#go-to-symbol))
-  a. `Prefix.Suffix` from `defmodule Prefix.Suffix`
-  b. `MyProtocol` from `defprotocol MyProtocol`
-  c. `MyProtocol.MyStruct`
-    i. `defimpl MyProtocol, for: MyStruct` 
-    ii. `defimpl MyProtocol` nested under `defmodule MyStruct`
+    1. `Prefix.Suffix` from `defmodule Prefix.Suffix`
+    2. `MyProtocol` from `defprotocol MyProtocol`
+    3. `MyProtocol.MyStruct`
+        1. `defimpl MyProtocol, for: MyStruct` 
+        2. `defimpl MyProtocol` nested under `defmodule MyStruct`
 3. Nested modules under aliased names
-  a. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
-  b. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
-  c. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
+    1. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
+    2. `MultipleAliasA.Nested` for `alias Prefix.{MultipleAliasA, MultipleAliasB}` where `Prefix.MultipleAliasA.Nested` `alias Prefix.{MultipleAliasA, MultipleAliasB}` is an indexed module, implementation or protocol name.
+    3. `As.Nested` for `alias Prefix.Suffix, as: As` where `Prefix.Suffix.Nested` is an indexed module, implementation, or protocol name.
 
 ##### Aliases inside `{ }`
 
@@ -1731,16 +1731,16 @@ Alias, to its declaration, such as the `defmodule` call.
 #### Alias
 
 1. Place the cursor over an Alias with an aliased name setup by `alias`
-  a. `Suffix` if `alias Prefix.Suffix` called
-  b. `MultipleAliasA` if `alias Prefix.{MultipleAliasA, MultipleAliasB}` called
-  c. `As` if `alias Prefix.Suffix, as: As`
+    1. `Suffix` if `alias Prefix.Suffix` called
+    2. `MultipleAliasA` if `alias Prefix.{MultipleAliasA, MultipleAliasB}` called
+    3. `As` if `alias Prefix.Suffix, as: As`
 2. Activate the Go To Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 3. A Go To Declaration lookup menu will appear, allowing you to jump either the `alias` that setup the aliased name or jumping directly to `defmodule` of the unaliased name.  Select which declaration you want
-  a. Use arrow keys to select and hit `Enter`
-  b. `Click`
+    1. Use arrow keys to select and hit `Enter`
+    2. `Click`
 
 #### Function or Macro
 
@@ -1750,50 +1750,50 @@ You'll know if function or macro usage is resolved and Go To Declaration will wo
 
 1. Place the cursor over name of the function or macro call.
 2. Activate the Go to Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 3. A Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
-  a. Use arrow keys to select and hit `Enter`
-  b. `Click`
+    1. Use arrow keys to select and hit `Enter`
+    2. `Click`
 
 ##### Local Functions or Macros 
 
 1. Place the cursor over name of the function or macro call.
 2. Activate the Go to Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
-3. 
-  a. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
-  b. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
-    i. Use arrow keys to select and hit `Enter`
-    ii. `Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
+3. Whether a lookup a Go To Declaration lookup menu appears depends on the number of clauses in the function or macro definition: 
+    1. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
+    2. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
+        1. Use arrow keys to select and hit `Enter`
+        2. `Click`
 
 ##### Remote Functions or Macros 
 
 1. Place the cursor over name of the function or macro call that is qualified by an Alias.
 2. Activate the Go to Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 3. 
-  a. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
-  b. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
-    i. Use arrow keys to select and hit `Enter`
-    ii. `Click`
+    1. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
+    2. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
+        1. Use arrow keys to select and hit `Enter`
+        2. `Click`
 
 
 #### Module
 
 1. Place the cursor over a fully-qualified Alias
-  a. `A.B` in `A.B.func()`
-  b. `A.B` in `alias A.B`
-  c. `B` in `alias A.{B, C}`
+    1. `A.B` in `A.B.func()`
+    2. `A.B` in `alias A.B`
+    3. `B` in `alias A.{B, C}`
 2. Activate the Go To Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 
 If you hold `Cmd` and hover over the Alias before clicking, the target declaration will be shown.
 
@@ -1803,9 +1803,9 @@ If you hold `Cmd` and hover over the Alias before clicking, the target declarati
 
 1. Place the cursor over a `@module_attribute`
 2. Activate the Go To Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 
 If you hold `Cmd` and hover over the `@module_attribute` before clicking, the target declaration will be shown.
 
@@ -1813,9 +1813,9 @@ If you hold `Cmd` and hover over the `@module_attribute` before clicking, the ta
 
 1. Place the cursor over a parameter or variable usage
 2. Active the Go To Declaration action with one of the following:
-  a. `Cmd+B`
-  b. Select Navigate &gt; Declaration from the menu.
-  c. `Cmd+Click`
+    1. `Cmd+B`
+    2. Select Navigate &gt; Declaration from the menu.
+    3. `Cmd+Click`
 
 If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color. 
 
@@ -1853,21 +1853,21 @@ in a `defmodule`, is used, including in strings and comments.
 
 1. Place cursor over the `@module_attribute` part of the declaration `@module_attribute value`.
 2. Activate the Find Usage action with one of the following:
-  a.
-    i. Right-click the module attribute
-    ii. Select "Find Usages" from the context menu
-  b. Select Edit &gt; Find &gt; Find Usages from the menu
-  c. `Alt+F7`
+    1.
+        1. Right-click the module attribute
+        2. Select "Find Usages" from the context menu
+    2. Select Edit &gt; Find &gt; Find Usages from the menu
+    3. `Alt+F7`
 
 #### Parameters and Variables
 
 1. Place cursor over the parameter or variable declaration.
 2. Active the Find Usage action with one of the following:
-   a.
-    i. Right-click the Alias
-    ii. Select "Find Usages" from the context menu
-  b. Select Edit &gt; Find &gt; Find Usages from the menu
-  c. `Alt+F7`
+    1.
+        1. Right-click the Alias
+        2. Select "Find Usages" from the context menu
+    2. Select Edit &gt; Find &gt; Find Usages from the menu
+    3. `Alt+F7`
 
 ### Refactor
 
@@ -1877,22 +1877,22 @@ in a `defmodule`, is used, including in strings and comments.
 
 1. Place the cursor over the `@module_attribute` usage or declaration.
 2. Active the Rename Refactoring action with one of the following:
-  a.
-    i. Right-click the module attribute
-    ii. Select Refactoring from the context menu
-    iii. Select "Rename..." from the Refactoring submenu
-  b. `Shift+F6`
+    1.
+        1. Right-click the module attribute
+        2. Select Refactoring from the context menu
+        3. Select "Rename..." from the Refactoring submenu
+    2. `Shift+F6`
 3. Edit the name inline and have the declaration and usages update.
 
 ##### Parameters and Variables
 
 1. Place the cursor over the parameter or variable usage or declaration
 2. Active the Rename Refactoring action with one of the following:
-  a.
-    i. Right-click the module attribute
-    ii. Select Refactoring from the context menu
-    iii. Select "Rename..." from the Refactoring submenu
-  b. `Shift+F6`
+    1.
+        1. Right-click the module attribute
+        2. Select Refactoring from the context menu
+        3. Select "Rename..." from the Refactoring submenu
+    2. `Shift+F6`
 3. Edit the name inline and have the declaration and usages update.
 
 ### Structure
