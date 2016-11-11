@@ -179,6 +179,8 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             elementDescription = org.elixir_lang.structure_view.element.Exception.elementDescription(call, location);
         } else if (Implementation.is(call)) {
             elementDescription = Implementation.elementDescription(call, location);
+        } else if (Import.is(call)) {
+            elementDescription = Import.elementDescription(call, location);
         } else if (Module.is(call)) {
             elementDescription = Module.elementDescription(call, location);
         } else if (Overridable.is(call)) {

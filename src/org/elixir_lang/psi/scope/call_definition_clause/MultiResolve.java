@@ -104,17 +104,12 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
                 } else {
                 /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a
                    List<ResolveResult> can still work */
-                    if (resolvedSet == null || !resolvedSet.contains(nameIdentifier)) {
-                        resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
-                                resolveResultList, new PsiElementResolveResult(nameIdentifier, validResult)
-                        );
+                    addNewToResolveResultList(nameIdentifier, validResult);
 
-                        if (resolvedSet == null) {
-                            resolvedSet = new THashSet<PsiElement>();
-                        }
+                    Call importCall = state.get(IMPORT_CALL);
 
-                        resolvedSet.add(nameIdentifier);
-
+                    if (importCall != null) {
+                        addNewToResolveResultList(importCall, validResult);
                     }
                 }
             }
@@ -152,5 +147,23 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
     @Override
     protected boolean keepProcessing() {
         return org.elixir_lang.psi.scope.MultiResolve.keepProcessing(incompleteCode, resolveResultList);
+    }
+
+    /*
+     * Private Instance Methods
+     */
+
+    private void addNewToResolveResultList(@NotNull PsiElement element, boolean validResult) {
+        if (resolvedSet == null || !resolvedSet.contains(element)) {
+            resolveResultList = org.elixir_lang.psi.scope.MultiResolve.addToResolveResultList(
+                    resolveResultList, new PsiElementResolveResult(element, validResult)
+            );
+
+            if (resolvedSet == null) {
+                resolvedSet = new THashSet<PsiElement>();
+            }
+
+            resolvedSet.add(element);
+        }
     }
 }

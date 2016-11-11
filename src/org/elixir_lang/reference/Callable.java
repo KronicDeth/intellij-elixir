@@ -620,12 +620,12 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                     modular,
                     myElement.functionName(),
                     resolvedFinalArity,
-                    new com.intellij.util.Function<PsiElement, Object>() {
+                    new com.intellij.util.Function<PsiElement, Boolean>() {
                         @Override
-                        public Object fun(PsiElement nameIdentifier) {
+                        public Boolean fun(PsiElement nameIdentifier) {
                             finalResolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
 
-                            return null;
+                            return true;
                         }
                     }
             );

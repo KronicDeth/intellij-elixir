@@ -18,30 +18,44 @@ public class Modular {
      * Public Static Methods
      */
 
-    public static <Result> void forEachCallDefinitionClauseNameIdentifier(
+    public static void callDefinitionClauseCallWhile(@NotNull final Call modular,
+                                                     @NotNull Function<Call, Boolean> function) {
+        Call[] childCalls = macroChildCalls(modular);
+
+        if (childCalls != null) {
+            for (Call childCall : childCalls) {
+                if (CallDefinitionClause.is(childCall) && !function.fun(childCall)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void forEachCallDefinitionClauseNameIdentifier(
             @NotNull Call modular,
             @Nullable final String functionName,
             final int resolvedFinalArity,
-            @NotNull final Function<PsiElement, Result> function
+            @NotNull final Function<PsiElement, Boolean> function
     ) {
-        forEachCallDefinitionClauseCall(
+        callDefinitionClauseCallWhile(
                 modular,
                 functionName,
                 resolvedFinalArity,
-                new Function<Call, Object>() {
+                new Function<Call, Boolean>() {
                     @Override
-                    public Object fun(Call call) {
+                    public Boolean fun(Call call) {
+                        boolean keepProcessing = true;
+
                         if (call instanceof Named) {
                             Named named = (Named) call;
                             PsiElement nameIdentifier = named.getNameIdentifier();
 
-                            if (nameIdentifier != null) {
-                                function.fun(nameIdentifier);
+                            if (nameIdentifier != null && !function.fun(nameIdentifier)) {
+                                keepProcessing = false;
                             }
                         }
 
-
-                        return null;
+                        return keepProcessing;
                     }
                 }
         );
@@ -51,33 +65,18 @@ public class Modular {
      * Private Static Methods
      */
 
-    /**
-     * @param modular
-     */
-    private static <Result> void forEachCallDefinitionClauseCall(@NotNull final Call modular,
-                                                                 @NotNull Function<Call, Result> function) {
-        Call[] childCalls = macroChildCalls(modular);
-
-        if (childCalls != null) {
-            for (Call childCall : childCalls) {
-                if (CallDefinitionClause.is(childCall)) {
-                    function.fun(childCall);
-                }
-            }
-        }
-    }
-
-    private static <Result> void forEachCallDefinitionClauseCall(@NotNull Call modular,
-                                                                 @Nullable final String functionName,
-                                                                 final int resolvedFinalArity,
-                                                                 @NotNull final Function<Call, Result> function) {
+    private static void callDefinitionClauseCallWhile(@NotNull Call modular,
+                                                               @Nullable final String functionName,
+                                                               final int resolvedFinalArity,
+                                                               @NotNull final Function<Call, Boolean> function) {
         if (functionName != null) {
-            forEachCallDefinitionClauseCall(
+            callDefinitionClauseCallWhile(
                     modular,
-                    new Function<Call, Object>() {
+                    new Function<Call, Boolean>() {
                         @Override
-                        public Object fun(@NotNull Call callDefinitionClauseCall) {
+                        public Boolean fun(@NotNull Call callDefinitionClauseCall) {
                             Pair<String, IntRange> nameArityRange = nameArityRange(callDefinitionClauseCall);
+                            boolean keepProcessing = true;
 
                             if (nameArityRange != null) {
                                 String name = nameArityRange.first;
@@ -85,13 +84,14 @@ public class Modular {
                                 if (name != null && name.equals(functionName)) {
                                     IntRange arityRange = nameArityRange.second;
 
-                                    if (arityRange.containsInteger(resolvedFinalArity)) {
-                                        function.fun(callDefinitionClauseCall);
+                                    if (arityRange.containsInteger(resolvedFinalArity) &&
+                                            !function.fun(callDefinitionClauseCall)) {
+                                        keepProcessing = false;
                                     }
                                 }
                             }
 
-                            return null;
+                            return keepProcessing;
                         }
                     }
             );

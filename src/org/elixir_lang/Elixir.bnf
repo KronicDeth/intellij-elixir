@@ -18,6 +18,7 @@
     hasDoBlockOrKeyword
     getName
     getNameIdentifier
+    getPresentation
     getReference
     getStub
     getUseScope
@@ -48,6 +49,7 @@
     hasDoBlockOrKeyword
     getName
     getNameIdentifier
+    getPresentation
     getReference
     getStub
     getUseScope

@@ -4,6 +4,8 @@ import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.util.Function;
+import org.elixir_lang.psi.Import;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +14,12 @@ import org.jetbrains.annotations.Nullable;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
 
 public abstract class CallDefinitionClause implements PsiScopeProcessor {
+    /*
+     * CONSTANTS
+     */
+
+    protected static final Key<Call> IMPORT_CALL = new Key<Call>("IMPORT_CALL");
+
     /*
      * Public Instance Methods
      */
@@ -64,11 +72,23 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
      * Private Instance Methods
      */
 
-    private boolean execute(@NotNull Call element, @NotNull ResolveState state) {
+    protected boolean execute(@NotNull Call element, @NotNull final ResolveState state) {
         boolean keepProcessing = true;
 
         if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(element)) {
             keepProcessing = executeOnCallDefinitionClause(element, state);
+        } else if (Import.is(element)) {
+            final ResolveState importState = state.put(IMPORT_CALL, element);
+
+            Import.callDefinitionClauseCallWhile(
+                    element,
+                    new Function<Call,Boolean>() {
+                        @Override
+                        public Boolean fun(Call callDefinitionClause) {
+                            return executeOnCallDefinitionClause(callDefinitionClause, importState);
+                        }
+                    }
+            );
         } else if (Module.is(element)) {
             Call[] childCalls = macroChildCalls(element);
 

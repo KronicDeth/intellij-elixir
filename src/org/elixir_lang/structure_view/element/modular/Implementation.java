@@ -19,6 +19,7 @@ import java.util.Collections;
 import static org.elixir_lang.psi.call.name.Function.DEFIMPL;
 import static org.elixir_lang.psi.call.name.Function.FOR;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 
 public class Implementation extends Module {
     /*
@@ -226,15 +227,10 @@ public class Implementation extends Module {
             PsiElement firstFinalArgument = finalArguments[0];
 
             if (firstFinalArgument instanceof ElixirAccessExpression) {
-                ElixirAccessExpression accessExpression = (ElixirAccessExpression) firstFinalArgument;
-                PsiElement[] accessExpressionChildren = accessExpression.getChildren();
+                PsiElement accessExpressionChild = stripAccessExpression(firstFinalArgument);
 
-                if (accessExpressionChildren.length == 1) {
-                    PsiElement accessExpressionChild = accessExpressionChildren[0];
-
-                    if (accessExpressionChild instanceof QualifiableAlias) {
-                        protocolNameElement = (QualifiableAlias) accessExpressionChild;
-                    }
+                if (accessExpressionChild instanceof QualifiableAlias) {
+                    protocolNameElement = (QualifiableAlias) accessExpressionChild;
                 }
             } else if (firstFinalArgument instanceof QualifiableAlias) {
                 protocolNameElement = (QualifiableAlias) firstFinalArgument;

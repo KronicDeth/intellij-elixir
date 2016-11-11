@@ -26,6 +26,7 @@ import java.util.Map;
 
 import static org.elixir_lang.psi.call.name.Function.DEFEXCEPTION;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 
 /**
  * A `defexception` with its fields and the callbacks `exception/1` and `message/1` if overridden.
@@ -112,12 +113,7 @@ public class Exception extends Element<Call> {
         Map<PsiElement, PsiElement> defaultValueElementByKeyElement = new HashMap<PsiElement, PsiElement>(finalArguments.length);
 
         if (finalArgument instanceof ElixirAccessExpression) {
-            ElixirAccessExpression accessExpression = (ElixirAccessExpression) finalArgument;
-            PsiElement[] accessExpressionChildren = accessExpression.getChildren();
-
-            assert accessExpressionChildren.length == 1;
-
-            PsiElement accessExpressionChild = accessExpressionChildren[0];
+            PsiElement accessExpressionChild = stripAccessExpression(finalArgument);
 
             assert accessExpressionChild instanceof ElixirList;
 
