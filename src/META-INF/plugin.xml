@@ -158,6 +158,35 @@
             <li>
               Increase <code>resolvedFinalArity</code> by <code>1</code> for piping.
             </li>
+            <li>
+              <p>Go To Declaration resolves through <code>import</code></p>
+              <ul>
+                <li>
+                  <p>for <code>import MyModule</code></p>
+                  <ul>
+                    <li>the <code>import</code> statement</li>
+                    <li>the call definition clause in the imported Module.</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>for <code>import MyModule, only: [name: arity]</code></p>
+                  <ul>
+                    <li>the <code>import</code> statement</li>
+                    <li>the call definition clause in the imported Module.</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>
+                    for <code>import MyModule, except: [name: arity]</code> <em>if</em> reference is <em>not</em>
+                    <code>name/arity</code>.
+                  </p>
+                  <ul>
+                    <li>the <code>import</code> statement</li>
+                    <li>the call definition clause in the imported Module</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
       </ul>

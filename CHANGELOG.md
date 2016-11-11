@@ -146,6 +146,17 @@
 * [#484](https://github.com/KronicDeth/intellij-elixir/pull/484) - Don't type-highlight `BracketOperation`s as they occur when putting maps or structs in front of lists. - [@KronicDeth](https://github.com/KronicDeth)
 * [#485](https://github.com/KronicDeth/intellij-elixir/pull/485) - Treat `Enum.each` the same as `Enum.map` around `def` - [@KronicDeth](https://github.com/KronicDeth)
 * [#486](https://github.com/KronicDeth/intellij-elixir/pull/486) - Increase `resolvedFinalArity` by `1` for piping. - [@KronicDeth](https://github.com/KronicDeth)
+* [#498](https://github.com/KronicDeth/intellij-elixir/pull/498) - [@KronicDeth](https://github.com/KronicDeth)
+  * Go To Declaration resolves through `import`
+    * for `import MyModule` 
+      * the `import` statement
+      * the call definition clause in the imported Module. 
+    * for `import MyModule, only: [name: arity]`
+      * the `import` statement
+      * the call definition clause in the imported Module. 
+    * for `import MyModule, except: [name: arity]` _if_ reference is _not_ `name/arity`.
+      * the `import` statement
+      * the call definition clause in the imported Module. 
 
 ## v4.5.0
 
