@@ -51,6 +51,9 @@
     - [Completion](#completion)
       - [Aliases and Modules](#aliases-and-modules)
         - [Aliases inside `{ }`](#aliases-inside--)
+      - [Function and Macro Calls](#function-and-macro-calls)
+        - [Qualified](#qualified)
+        - [Unqualified](#unqualified)
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
@@ -1693,6 +1696,20 @@ When you start typing an Alias, completion will look in three locations:
 ##### Aliases inside `{ }`
 
 When you start typing inside `{ }` for `alias Prefix.{}` or `import Prefix.{}`, completion will look for nested modules under `Prefix` and then remove the `Prefix.`, so completion will look like `Suffix`.
+
+#### Function and Macro Calls
+
+Completion uses the same presentation as [Structure](#structure), so you can tell whether the name is function/macro ([Time](#time)), whether it is public/private ([Visibility](#visibility)) and the Module where it is defined.  Between the icons and the Modules is the name itself, which is highlighted in **bold**, the parameters for the call definition follow, so that you can preview the patterns required for the different clauses.
+
+![Function and Macro Calls Completion](/screenshots/Function%20and%20Macro%20Calls%20Completion.png?raw=true "Function and Macro Calls Completion")
+
+##### Qualified
+
+Qualified functions and macro calls will complete using those functions and macros defined in the qualifying Module (`defmodule`), Implementation (`defimpl`) or Protocol (`defprotocol`).  Completion starts as shown as `.` is typed after a qualifying Alias.
+
+##### Unqualified
+
+Function and macro calls that are unqualified are completed from the index of all function and macro definitions, both public and private. (The index contains only those Elixir functions and macro defined in parsable source, such as those in the project or its dependencies.  Erlang functions and Elixir functions only in compiled `.beam` files, such as the standard library will not complete.)  Private function and macros are shown, so you can choose them and then make the chosen function or macro public if it is a remote call.
 
 #### Module Attributes
 
