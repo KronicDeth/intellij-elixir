@@ -58,6 +58,10 @@
       - [Parameters and Variables](#parameters-and-variables)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
+      - [Function or Macro](#function-or-macro)
+        - [Imported Functions or Macros](#imported-functions-or-macros)
+        - [Local Functions or Macros](#local-functions-or-macros)
+        - [Remote Functions or Macros](#remote-functions-or-macros)
       - [Module](#module)
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
@@ -1737,6 +1741,48 @@ Alias, to its declaration, such as the `defmodule` call.
 3. A Go To Declaration lookup menu will appear, allowing you to jump either the `alias` that setup the aliased name or jumping directly to `defmodule` of the unaliased name.  Select which declaration you want
   a. Use arrow keys to select and hit `Enter`
   b. `Click`
+
+#### Function or Macro
+
+You'll know if function or macro usage is resolved and Go To Declaration will work if the call is annotated, which in the default themes will show up as *italics*.
+
+##### Imported Functions or Macros 
+
+1. Place the cursor over name of the function or macro call.
+2. Activate the Go to Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+3. A Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
+  a. Use arrow keys to select and hit `Enter`
+  b. `Click`
+
+##### Local Functions or Macros 
+
+1. Place the cursor over name of the function or macro call.
+2. Activate the Go to Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+3. 
+  a. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
+  b. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
+    i. Use arrow keys to select and hit `Enter`
+    ii. `Click`
+
+##### Remote Functions or Macros 
+
+1. Place the cursor over name of the function or macro call that is qualified by an Alias.
+2. Activate the Go to Declaration action with one of the following:
+  a. `Cmd+B`
+  b. Select Navigate &gt; Declaration from the menu.
+  c. `Cmd+Click`
+3. 
+  a. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
+  b. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
+    i. Use arrow keys to select and hit `Enter`
+    ii. `Click`
+
 
 #### Module
 
