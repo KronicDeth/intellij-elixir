@@ -142,7 +142,11 @@ public class MixConfigurationForm {
           // Support for the --formatter option may be added in a 1.3.x release, but I'm being conservative for now
           // and assuming it won't be released until 1.4
           ElixirSdkRelease elixirSdkRelease = ElixirSdkRelease.fromString(versionString);
-          supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) >= 0);
+
+          if (elixirSdkRelease != null) {
+            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) >= 0);
+          }
+
           valid = true;
 
           break;

@@ -48,9 +48,9 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
     if (mine == null && others == null) {
       comparison = 0;
-    } else if (mine == null && others != null) {
+    } else if (mine == null) {
       comparison = -1;
-    } else if (mine != null && others == null) {
+    } else if (others == null) {
       comparison = 1;
     } else {
       try {
@@ -86,10 +86,10 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
     if (mine == null && others == null) {
       comparison = 0;
-    } else if (mine == null && others != null) {
+    } else if (mine == null) {
       // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L203
       comparison = 1;
-    } else if (mine != null && others == null) {
+    } else if (others == null) {
       // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L204
       comparison = -1;
     } else {

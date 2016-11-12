@@ -20,12 +20,11 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
   protected final boolean setupConfigurationFromContext(MixExUnitRunConfiguration runConfig, ConfigurationContext context, Ref<PsiElement> ref) {
     PsiElement location = ref.get();
     return location != null && location.isValid() &&
-      setupConfigurationFromContextImpl(runConfig, context, location);
+      setupConfigurationFromContextImpl(runConfig, location);
   }
 
-  protected boolean setupConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
-                                                      @NotNull ConfigurationContext context,
-                                                      @NotNull PsiElement psiElement) {
+  private boolean setupConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
+                                                    @NotNull PsiElement psiElement) {
     if (psiElement instanceof PsiDirectory) {
       PsiDirectory dir = (PsiDirectory) psiElement;
       configuration.setName(configurationName(dir));
@@ -47,12 +46,11 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
   public final boolean isConfigurationFromContext(MixExUnitRunConfiguration runConfig, ConfigurationContext context) {
     PsiElement location = context.getPsiLocation();
     return location != null && location.isValid() &&
-      isConfigurationFromContextImpl(runConfig, context, location);
+      isConfigurationFromContextImpl(runConfig, location);
   }
 
-  public boolean isConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
-                                                @NotNull ConfigurationContext context,
-                                                @NotNull PsiElement psiElement) {
+  private boolean isConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
+                                                 @NotNull PsiElement psiElement) {
     PsiFile containingFile = psiElement.getContainingFile();
     VirtualFile vFile = containingFile != null ? containingFile.getVirtualFile() : null;
     if (vFile == null) return false;
@@ -67,13 +65,22 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     Project project = containingFile.getProject();
     PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
     Document document = psiDocumentManager.getDocument(containingFile);
-    int textOffset = psiElement.getTextOffset();
-    int lineNumber = document.getLineNumber(textOffset);
-    if (lineNumber == 0) {
-      return -1;
-    } else {
-      return lineNumber + 1;
+    int documentLineNumber = 0;
+
+    if (document != null) {
+      int textOffset = psiElement.getTextOffset();
+      documentLineNumber = document.getLineNumber(textOffset);
     }
+
+    int lineNumber;
+
+    if (documentLineNumber == 0) {
+      lineNumber = -1;
+    } else {
+      lineNumber = documentLineNumber + 1;
+    }
+
+    return lineNumber;
   }
 
   private String configurationName(PsiFileSystemItem file) {

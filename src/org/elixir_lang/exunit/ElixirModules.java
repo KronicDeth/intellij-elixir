@@ -9,8 +9,8 @@ import java.io.*;
 import java.net.URL;
 
 public class ElixirModules {
-  public static final String FORMATTER_FILE_NAME = "team_city_ex_unit_formatter.ex";
-  public static final String MIX_TASK_FILE_NAME = "test_with_formatter.ex";
+  private static final String FORMATTER_FILE_NAME = "team_city_ex_unit_formatter.ex";
+  private static final String MIX_TASK_FILE_NAME = "test_with_formatter.ex";
 
   private ElixirModules() {
   }

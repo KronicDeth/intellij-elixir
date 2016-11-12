@@ -17,7 +17,7 @@ public class MixSettingsState {
     supportsFormatterOption = false;
   }
 
-  public MixSettingsState(MixSettingsState state){
+  MixSettingsState(MixSettingsState state){
     myMixPath = state.myMixPath;
     supportsFormatterOption = state.supportsFormatterOption;
   }

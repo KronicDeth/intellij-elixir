@@ -36,7 +36,7 @@ import static org.elixir_lang.mix.runner.MixRunningStateUtil.getWorkingDirectory
 final class MixExUnitRunningState extends CommandLineState{
   private final MixExUnitRunConfiguration myConfiguration;
 
-  protected MixExUnitRunningState(@NotNull ExecutionEnvironment environment, MixExUnitRunConfiguration configuration) {
+  MixExUnitRunningState(@NotNull ExecutionEnvironment environment, MixExUnitRunConfiguration configuration) {
     super(environment);
     myConfiguration = configuration;
   }
@@ -55,7 +55,7 @@ final class MixExUnitRunningState extends CommandLineState{
   @NotNull
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
-    GeneralCommandLine commandLine = getMixExunitCommandLine(myConfiguration);
+    GeneralCommandLine commandLine = getMixExUnitCommandLine(myConfiguration);
     return MixRunningStateUtil.runMix(myConfiguration.getProject(), commandLine);
   }
 
@@ -102,7 +102,7 @@ final class MixExUnitRunningState extends CommandLineState{
   }
 
   @NotNull
-  public static GeneralCommandLine getMixExunitCommandLine(@NotNull MixExUnitRunConfiguration configuration) throws ExecutionException {
+  private static GeneralCommandLine getMixExUnitCommandLine(@NotNull MixExUnitRunConfiguration configuration) throws ExecutionException {
     Project project = configuration.getProject();
     MixSettings mixSettings = MixSettings.getInstance(project);
 
