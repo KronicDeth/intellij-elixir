@@ -1,0 +1,214 @@
+plugins {
+  id 'org.jetbrains.intellij' version "0.1.10"
+  id 'de.undercouch.download' version "3.1.2"
+}
+
+version = "${version}.$buildNumber"
+
+ext {
+  quoterPath = "${rootDir}/cache/intellij_elixir-0.1.1"
+  quoterExe = "${quoterPath}/rel/intellij_elixir/bin/intellij_elixir"
+  elixirPath = "${rootDir}/cache/elixir-${elixirVersion}"
+}
+
+allprojects {
+  apply plugin: 'java'
+  sourceCompatibility = javaVersion
+  targetCompatibility = javaVersion
+  tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
+  sourceSets {
+    main {
+      java.srcDirs 'src', 'gen'
+      resources.srcDirs 'resources', 'plugin/resources'
+    }
+    test {
+      java.srcDir 'tests'
+    }
+  }
+
+  apply plugin: 'org.jetbrains.intellij'
+  intellij {
+    pluginName 'intellij-elixir'
+    version ideaVersion
+    downloadSources Boolean.valueOf(sources)
+    updateSinceUntilBuild = false
+
+    publish {
+      username publishUsername
+      password publishPassword
+      channel publishChannel
+    }
+  }
+
+  def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
+
+  test {
+    environment "ELIXIR_LANG_ELIXIR_PATH", elixirPath
+    environment "ELIXIR_EBIN_DIRECTORY", "${elixirPath}/lib/elixir/ebin/"
+    environment "ELIXIR_VERSION", elixirVersion
+    useJUnit {
+      exclude compilationPackages
+    }
+    testLogging {
+      exceptionFormat = 'full'
+    }
+  }
+
+  task testCompilation(type: Test, group: 'Verification', dependsOn: [classes, testClasses]) {
+    useJUnit {
+      include compilationPackages
+    }
+    testLogging {
+      exceptionFormat = 'full'
+    }
+  }
+}
+
+repositories {
+  jcenter()
+  flatDir {
+    dirs 'libs'
+  }
+}
+
+dependencies {
+  compile project('jps-builder')
+  compile project('jps-shared')
+  compile group: 'org.erlang.otp', name: 'jinterface', version: '1.6.1'
+  compile group: 'commons-io', name: 'commons-io', version: '2.5'
+  compile name: 'erlang'
+
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
+  testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
+}
+
+project(':jps-builder') {
+  dependencies {
+    compile project(':jps-shared')
+  }
+
+  intellij {
+    type 'JPS'
+  }
+}
+
+project(':jps-shared') {
+  intellij {
+    type 'JPS'
+  }
+}
+
+apply plugin: 'idea'
+idea {
+  project {
+    jdkName = javaVersion
+    languageLevel = javaVersion
+  }
+  module {
+    generatedSourceDirs += file('gen')
+  }
+}
+
+task downloadIntellijErlang {
+  doLast {
+    download {
+      src "https://github.com/ignatov/intellij-erlang/releases/download/%23${intellijErlangRelease}/Erlang.${intellijErlangRelease}.zip"
+      dest "${rootDir}/cache/Erlang.${intellijErlangRelease}.zip"
+      overwrite false
+    }
+
+    copy {
+      from zipTree("${rootDir}/cache/Erlang.${intellijErlangRelease}.zip")
+      into "${rootDir}/cache/"
+      include 'Erlang/lib/erlang.jar'
+    }
+
+    copy {
+      from "${rootDir}/cache/Erlang/lib/erlang.jar"
+      into 'libs/'
+    }
+  }
+}
+
+task getElixir {
+  doLast {
+    def folder = new File(elixirPath)
+
+    if (!folder.isDirectory() || folder.list().size() == 0) {
+      download {
+        src "https://github.com/elixir-lang/elixir/archive/v${elixirVersion}.zip"
+        dest "${rootDir}/cache/Elixir.${elixirVersion}.zip"
+        overwrite false
+      }
+    }
+
+    def binFolder = new File("${elixirPath}/bin")
+    if (!binFolder.isDirectory() || folder.list().size() == 0) {
+      copy {
+        from zipTree("${rootDir}/cache/Elixir.${elixirVersion}.zip")
+        into "${rootDir}/cache/"
+      }
+
+      exec {
+        workingDir elixirPath
+        commandLine "make"
+      }
+    }
+  }
+}
+
+task getQuoter {
+  doLast {
+    download {
+      src "https://github.com/KronicDeth/intellij_elixir/archive/v${quoterVersion}.zip"
+      dest "${quoterPath}.zip"
+      overwrite false
+    }
+
+    def folder = new File(quoterPath)
+    if (!folder.isDirectory() || folder.list().size() == 0) {
+      copy {
+        from zipTree("${quoterPath}.zip")
+        into "${rootDir}/cache/"
+      }
+
+      exec {
+        workingDir quoterPath
+        executable "mix"
+        args "deps.get"
+      }
+
+      exec {
+        workingDir quoterPath
+        executable "mix"
+        args "release"
+      }
+    }
+  }
+}
+
+compileJava {
+  dependsOn downloadIntellijErlang
+}
+
+compileTestJava {
+  dependsOn getElixir
+  dependsOn getQuoter
+}
+
+task runQuoter(type: Exec, dependsOn: getQuoter) {
+  executable quoterExe
+  args "start"
+}
+
+task stopQuoter(type: Exec, dependsOn: getQuoter) {
+  executable quoterExe
+  args "stop"
+}
+
+test {
+  dependsOn runQuoter
+  finalizedBy stopQuoter
+}
+

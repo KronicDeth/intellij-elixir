@@ -20,3 +20,10 @@ idea-flex.skeleton
 src/org/elixir_lang/ElixirFlexLexer.java~
 # OS X thumbnail store
 .DS_Store
+
+# Gradle-related
+.gradle
+/build
+jps-builder/build
+jps-shared/build
+libs/

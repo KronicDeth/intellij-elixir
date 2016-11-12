@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="elixir.jar">
-    <output-path>$PROJECT_DIR$/bin</output-path>
-    <root id="archive" name="elixir.jar">
-      <element id="module-output" name="intellij-elixir" />
-    </root>
-  </artifact>
-</component>

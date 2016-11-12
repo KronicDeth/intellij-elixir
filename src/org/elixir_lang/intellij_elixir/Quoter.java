@@ -27,7 +27,7 @@ public class Quoter {
     /* remote name is Elixir.IntellijElixir.Quoter because all aliases in Elixir look like atoms prefixed with
        with Elixir. from erlang's perspective. */
     public static final String REMOTE_NAME = "Elixir.IntellijElixir.Quoter";
-    public static final int TIMEOUT_IN_MILLISECONDS = 200;
+    public static final int TIMEOUT_IN_MILLISECONDS = 1000;
 
     public static void assertMessageReceived(OtpErlangObject message) {
         assertNotNull(
