@@ -27,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.getWorkingDirectory;
@@ -45,7 +47,7 @@ final class MixExUnitRunningState extends CommandLineState{
     ProcessHandler processHandler = startProcess();
 
     TestConsoleProperties properties = new SMTRunnerConsoleProperties(myConfiguration, "ExUnit", executor);
-    ConsoleView console = SMTestRunnerConnectionUtil.createAndAttachConsole("ExUnit", processHandler, properties);
+    ConsoleView console = createAndAttachConsole("ExUnit", processHandler, properties);
     ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), console);
     return new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
   }
@@ -55,6 +57,44 @@ final class MixExUnitRunningState extends CommandLineState{
   protected ProcessHandler startProcess() throws ExecutionException {
     GeneralCommandLine commandLine = getMixExunitCommandLine(myConfiguration);
     return MixRunningStateUtil.runMix(myConfiguration.getProject(), commandLine);
+  }
+
+  /**
+   * Unifies the interface for {@code SMTestRunnerConnectionUtil.createAndAttachConsole} between 141 and later releases
+   */
+  private ConsoleView createAndAttachConsole(@NotNull String testFrameworkName,
+                                             @NotNull ProcessHandler processHandler,
+                                             @NotNull TestConsoleProperties consoleProperties) throws ExecutionException {
+    Class<SMTestRunnerConnectionUtil> klass = SMTestRunnerConnectionUtil.class;
+    ConsoleView consoleView = null;
+
+    try {
+      Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class);
+
+      try {
+        consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    } catch (NoSuchMethodException noSuchCreateAndAttachConsole3Method) {
+      try {
+        Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class, ExecutionEnvironment.class);
+
+        try {
+          consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties, getEnvironment());
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+        } catch (InvocationTargetException e) {
+          e.printStackTrace();
+        }
+      } catch (NoSuchMethodException noSuchCreateAndAttachConsole4Method) {
+        noSuchCreateAndAttachConsole4Method.printStackTrace();
+      }
+    }
+
+    return consoleView;
   }
 
   private static File createElixirModulesDirectory() throws IOException {
