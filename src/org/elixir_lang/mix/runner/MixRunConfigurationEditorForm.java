@@ -1,6 +1,7 @@
 package org.elixir_lang.mix.runner;
 
 import com.intellij.application.options.ModulesComboBox;
+import com.intellij.execution.ui.CommonProgramParametersPanel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -19,10 +20,10 @@ import java.awt.event.ActionListener;
  */
 final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigurationBase>{
   private JPanel myComponent;
-  private JTextField myCommandText;
   private JCheckBox myRunInModuleChekcBox;
   private JCheckBox mySkipDependenciesCheckBox;
   private ModulesComboBox myModulesComboBox;
+  private CommonProgramParametersPanel commonProgramParametersPanel;
 
   MixRunConfigurationEditorForm(){
     myRunInModuleChekcBox.addActionListener(new ActionListener() {
@@ -38,7 +39,6 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
 
   @Override
   protected void resetEditorFrom(@NotNull MixRunConfigurationBase configuration) {
-    myCommandText.setText(configuration.getCommand());
     mySkipDependenciesCheckBox.setSelected(configuration.isSkipDependencies());
     Module module = null;
     if(!ElixirSystemUtil.isSmallIde()){
@@ -52,14 +52,17 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
     }else{
       setRunInModuleSelected(false);
     }
+
+    commonProgramParametersPanel.reset(configuration);
   }
 
   @Override
   protected void applyEditorTo(@NotNull MixRunConfigurationBase mixRunConfiguration) throws ConfigurationException {
-    mixRunConfiguration.setCommand(myCommandText.getText());
-    mixRunConfiguration.setSkipDependencies(mySkipDependenciesCheckBox.isSelected());
     Module selectedModule = myRunInModuleChekcBox.isSelected() ? myModulesComboBox.getSelectedModule() : null;
     mixRunConfiguration.setModule(selectedModule);
+
+    mixRunConfiguration.setSkipDependencies(mySkipDependenciesCheckBox.isSelected());
+    commonProgramParametersPanel.applyTo(mixRunConfiguration);
   }
 
   @NotNull

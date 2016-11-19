@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 /**
  * Created by zyuyou on 15/7/8.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningStateUtil.java
@@ -39,6 +41,8 @@ public class MixRunningStateUtil {
 
     GeneralCommandLine commandLine = new GeneralCommandLine();
 
+    commandLine.withEnvironment(configuration.getEnvs());
+
     commandLine.withWorkDirectory(getWorkingDirectory(configuration));
 
     String mixPath = mixSettings.getMixPath();
@@ -50,11 +54,16 @@ public class MixRunningStateUtil {
       commandLine.addParameter(mixPath);
     }
 
-    List<String> split = ContainerUtil.list(configuration.getCommand().split("\\s+"));
-    if(configuration.isSkipDependencies() && !split.contains("--no-deps-check")){
-      commandLine.addParameter("--no-deps-check");
+    String programParameters = configuration.getProgramParameters();
+
+    if (programParameters != null) {
+      List<String> split = ContainerUtil.list(programParameters.split("\\s+"));
+      if (configuration.isSkipDependencies() && !split.contains("--no-deps-check")) {
+        commandLine.addParameter("--no-deps-check");
+      }
+      commandLine.addParameters(split);
     }
-    commandLine.addParameters(split);
+
     return commandLine;
   }
 
@@ -84,13 +93,24 @@ public class MixRunningStateUtil {
 
   @NotNull
   public static String getWorkingDirectory(@NotNull MixRunConfigurationBase configuration){
-    Module module = configuration.getConfigurationModule().getModule();
-    if(module != null){
-      VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
-      if(contentRoots.length >= 1){
-        return contentRoots[0].getPath();
+    String workingDirectory = configuration.getWorkingDirectory();
+
+    if (isBlank(workingDirectory)) {
+      Module module = configuration.getConfigurationModule().getModule();
+
+      if (module != null) {
+        VirtualFile[] contentRoots = ModuleRootManager.getInstance(module).getContentRoots();
+
+        if (contentRoots.length >= 1) {
+          workingDirectory = contentRoots[0].getPath();
+        }
+      }
+
+      if (isBlank(workingDirectory)) {
+        workingDirectory = ObjectUtils.assertNotNull(configuration.getProject().getBasePath());
       }
     }
-    return ObjectUtils.assertNotNull(configuration.getProject().getBasePath());
+
+    return workingDirectory;
   }
 }
