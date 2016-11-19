@@ -1,6 +1,7 @@
 package org.elixir_lang.mix.runner;
 
 import com.intellij.application.options.ModulesComboBox;
+import com.intellij.execution.ui.CommonProgramParametersPanel;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -19,26 +20,25 @@ import java.awt.event.ActionListener;
  */
 final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigurationBase>{
   private JPanel myComponent;
-  private JTextField myCommandText;
-  private JCheckBox myRunInModuleChekcBox;
+  private JCheckBox myRunInModuleCheckBox;
   private JCheckBox mySkipDependenciesCheckBox;
   private ModulesComboBox myModulesComboBox;
+  private CommonProgramParametersPanel commonProgramParametersPanel;
 
   MixRunConfigurationEditorForm(){
-    myRunInModuleChekcBox.addActionListener(new ActionListener() {
+    myRunInModuleCheckBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        myModulesComboBox.setEnabled(myRunInModuleChekcBox.isSelected());
+        myModulesComboBox.setEnabled(myRunInModuleCheckBox.isSelected());
       }
     });
 
     myModulesComboBox.setVisible(!ElixirSystemUtil.isSmallIde());
-    myRunInModuleChekcBox.setVisible(!ElixirSystemUtil.isSmallIde());
+    myRunInModuleCheckBox.setVisible(!ElixirSystemUtil.isSmallIde());
   }
 
   @Override
   protected void resetEditorFrom(@NotNull MixRunConfigurationBase configuration) {
-    myCommandText.setText(configuration.getCommand());
     mySkipDependenciesCheckBox.setSelected(configuration.isSkipDependencies());
     Module module = null;
     if(!ElixirSystemUtil.isSmallIde()){
@@ -52,14 +52,17 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
     }else{
       setRunInModuleSelected(false);
     }
+
+    commonProgramParametersPanel.reset(configuration);
   }
 
   @Override
   protected void applyEditorTo(@NotNull MixRunConfigurationBase mixRunConfiguration) throws ConfigurationException {
-    mixRunConfiguration.setCommand(myCommandText.getText());
-    mixRunConfiguration.setSkipDependencies(mySkipDependenciesCheckBox.isSelected());
-    Module selectedModule = myRunInModuleChekcBox.isSelected() ? myModulesComboBox.getSelectedModule() : null;
+    Module selectedModule = myRunInModuleCheckBox.isSelected() ? myModulesComboBox.getSelectedModule() : null;
     mixRunConfiguration.setModule(selectedModule);
+
+    mixRunConfiguration.setSkipDependencies(mySkipDependenciesCheckBox.isSelected());
+    commonProgramParametersPanel.applyTo(mixRunConfiguration);
   }
 
   @NotNull
@@ -75,12 +78,12 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
 
   private void setRunInModuleSelected(boolean b){
     if(b){
-      if(!myRunInModuleChekcBox.isSelected()){
-        myRunInModuleChekcBox.doClick();
+      if(!myRunInModuleCheckBox.isSelected()){
+        myRunInModuleCheckBox.doClick();
       }
     }else{
-      if(myRunInModuleChekcBox.isSelected()){
-        myRunInModuleChekcBox.doClick();
+      if(myRunInModuleCheckBox.isSelected()){
+        myRunInModuleCheckBox.doClick();
       }
     }
   }
