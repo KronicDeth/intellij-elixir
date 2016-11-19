@@ -19,12 +19,14 @@ import com.intellij.util.xmlb.Accessor;
 import com.intellij.util.xmlb.SerializationFilter;
 import com.intellij.util.xmlb.XmlSerializer;
 import org.elixir_lang.runconfig.ElixirModuleBasedConfiguration;
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -121,6 +123,24 @@ abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<ElixirMo
     super.readExternal(element);
     XmlSerializer.deserializeInto(this, element);
     EnvironmentVariablesComponent.readExternal(element, getEnvs());
+
+    /*
+     * Reading <= 4.6.0 format
+     */
+
+    List<Element> options = element.getChildren("option");
+
+    for (Element option : options) {
+      Attribute nameAttribute = option.getAttribute("name");
+
+      if (nameAttribute.getValue().equals("command")) {
+        Attribute valueAttribute = option.getAttribute("value");
+
+        setProgramParameters(valueAttribute.getValue()) ;
+
+        break;
+      }
+    }
   }
 
   @Override
