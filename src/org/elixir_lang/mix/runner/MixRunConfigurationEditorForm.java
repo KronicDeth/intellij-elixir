@@ -20,21 +20,21 @@ import java.awt.event.ActionListener;
  */
 final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigurationBase>{
   private JPanel myComponent;
-  private JCheckBox myRunInModuleChekcBox;
+  private JCheckBox myRunInModuleCheckBox;
   private JCheckBox mySkipDependenciesCheckBox;
   private ModulesComboBox myModulesComboBox;
   private CommonProgramParametersPanel commonProgramParametersPanel;
 
   MixRunConfigurationEditorForm(){
-    myRunInModuleChekcBox.addActionListener(new ActionListener() {
+    myRunInModuleCheckBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        myModulesComboBox.setEnabled(myRunInModuleChekcBox.isSelected());
+        myModulesComboBox.setEnabled(myRunInModuleCheckBox.isSelected());
       }
     });
 
     myModulesComboBox.setVisible(!ElixirSystemUtil.isSmallIde());
-    myRunInModuleChekcBox.setVisible(!ElixirSystemUtil.isSmallIde());
+    myRunInModuleCheckBox.setVisible(!ElixirSystemUtil.isSmallIde());
   }
 
   @Override
@@ -58,7 +58,7 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
 
   @Override
   protected void applyEditorTo(@NotNull MixRunConfigurationBase mixRunConfiguration) throws ConfigurationException {
-    Module selectedModule = myRunInModuleChekcBox.isSelected() ? myModulesComboBox.getSelectedModule() : null;
+    Module selectedModule = myRunInModuleCheckBox.isSelected() ? myModulesComboBox.getSelectedModule() : null;
     mixRunConfiguration.setModule(selectedModule);
 
     mixRunConfiguration.setSkipDependencies(mySkipDependenciesCheckBox.isSelected());
@@ -78,12 +78,12 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
 
   private void setRunInModuleSelected(boolean b){
     if(b){
-      if(!myRunInModuleChekcBox.isSelected()){
-        myRunInModuleChekcBox.doClick();
+      if(!myRunInModuleCheckBox.isSelected()){
+        myRunInModuleCheckBox.doClick();
       }
     }else{
-      if(myRunInModuleChekcBox.isSelected()){
-        myRunInModuleChekcBox.doClick();
+      if(myRunInModuleCheckBox.isSelected()){
+        myRunInModuleCheckBox.doClick();
       }
     }
   }
