@@ -12,6 +12,8 @@ import org.elixir_lang.psi.ElixirFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+
 public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<MixExUnitRunConfiguration> {
   public MixExUnitRunConfigurationProducer() {
     super(MixExUnitRunConfigurationType.getInstance());
@@ -27,19 +29,26 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
   private boolean setupConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
                                                     @NotNull PsiElement psiElement) {
     if (psiElement instanceof PsiDirectory) {
-      configuration.setWorkingDirectory(workingDirectory(psiElement));
+      String basePath = psiElement.getProject().getBasePath();
+      String workingDirectory = workingDirectory(psiElement, basePath);
+
+      configuration.setWorkingDirectory(workingDirectory);
+
       PsiDirectory dir = (PsiDirectory) psiElement;
-      configuration.setName(configurationName(dir));
+      configuration.setName(configurationName(dir, workingDirectory, basePath));
       configuration.setProgramParameters(dir.getVirtualFile().getPath());
       return true;
     } else {
       PsiFile containingFile = psiElement.getContainingFile();
       if (!(containingFile instanceof ElixirFile || containingFile instanceof PsiDirectory)) return false;
 
-      configuration.setWorkingDirectory(workingDirectory(psiElement));
+      String basePath = psiElement.getProject().getBasePath();
+      String workingDirectory = workingDirectory(psiElement, basePath);
+
+      configuration.setWorkingDirectory(workingDirectory);
 
       int lineNumber = lineNumber(psiElement);
-      configuration.setName(configurationName(containingFile, lineNumber));
+      configuration.setName(configurationName(containingFile, lineNumber, workingDirectory, basePath));
       configuration.setProgramParameters(programParameters(containingFile, lineNumber));
 
       return true;
@@ -60,8 +69,16 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     if (vFile == null) return false;
 
     int lineNumber = lineNumber(psiElement);
-    return StringUtil.equals(configuration.getName(), configurationName(containingFile, lineNumber)) &&
-        StringUtil.equals(configuration.getProgramParameters(), programParameters(containingFile, lineNumber));
+    return StringUtil.equals(
+            configuration.getName(),
+            configurationName(
+                    containingFile,
+                    lineNumber,
+                    configuration.getWorkingDirectory(),
+                    psiElement.getProject().getBasePath()
+            )
+    ) &&
+            StringUtil.equals(configuration.getProgramParameters(), programParameters(containingFile, lineNumber));
   }
 
   private int lineNumber(@NotNull PsiElement psiElement) {
@@ -87,15 +104,41 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     return lineNumber;
   }
 
-  private String configurationName(PsiFileSystemItem file) {
-    return "Mix ExUnit " + file.getName();
+  private String configurationName(PsiFileSystemItem file,
+                                   @Nullable String workingDirectory,
+                                   @Nullable String basePath) {
+    String filePath = file.getVirtualFile().getPath();
+    String suffix = null;
+
+    if (workingDirectory != null) {
+      String prefix = workingDirectory + File.separator;
+
+      if (filePath.startsWith(prefix)) {
+        suffix = filePath.substring(prefix.length());
+      }
+
+      if (basePath != null && !workingDirectory.equals(basePath) && workingDirectory.startsWith(basePath)) {
+        String otpAppName = new File(workingDirectory).getName();
+
+        suffix = otpAppName + " " + suffix;
+      }
+    }
+
+    if (suffix == null) {
+      suffix = file.getName();
+    }
+
+    return "Mix ExUnit " + suffix;
   }
 
-  private String configurationName(PsiFileSystemItem file, int lineNumber) {
+  private String configurationName(PsiFileSystemItem file,
+                                   int lineNumber,
+                                   @Nullable String workingDirectory,
+                                   @Nullable String basePath) {
     if (lineNumber == -1) {
-      return configurationName(file);
+      return configurationName(file, workingDirectory, basePath);
     } else {
-      return configurationName(file) + ":" + lineNumber;
+      return configurationName(file, workingDirectory, basePath) + ":" + lineNumber;
     }
   }
 
@@ -109,7 +152,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
   }
 
   @Nullable
-  private static String workingDirectory(@NotNull PsiDirectory directory) {
+  private static String workingDirectory(@NotNull PsiDirectory directory, @Nullable String basePath) {
     String workingDirectory;
 
     if (directory.findFile("mix.exs") != null) {
@@ -118,9 +161,9 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
       PsiDirectory parent = directory.getParent();
 
       if (parent != null) {
-        workingDirectory = workingDirectory(parent);
+        workingDirectory = workingDirectory(parent, basePath);
       } else {
-        workingDirectory = directory.getProject().getBasePath();
+        workingDirectory = basePath;
       }
     }
 
@@ -128,22 +171,22 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
   }
 
   @Nullable
-  private static String workingDirectory(@NotNull PsiElement element) {
+  private static String workingDirectory(@NotNull PsiElement element, @Nullable String basePath) {
     String workingDirectory;
 
     if (element instanceof PsiDirectory) {
-      workingDirectory = workingDirectory((PsiDirectory) element);
+      workingDirectory = workingDirectory((PsiDirectory) element, basePath);
     } else if (element instanceof PsiFile) {
-      workingDirectory = workingDirectory((PsiFile) element);
+      workingDirectory = workingDirectory((PsiFile) element, basePath);
     } else {
-      workingDirectory = workingDirectory(element.getContainingFile());
+      workingDirectory = workingDirectory(element.getContainingFile(), basePath);
     }
 
     return workingDirectory;
   }
 
   @Nullable
-  private static String workingDirectory(@NotNull PsiFile file) {
-    return workingDirectory(file.getContainingDirectory());
+  private static String workingDirectory(@NotNull PsiFile file, @Nullable String basePath) {
+    return workingDirectory(file.getContainingDirectory(), basePath);
   }
 }
