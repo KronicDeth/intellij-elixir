@@ -27,9 +27,6 @@ public class MixRunningStateUtil {
 
   static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
 
-  public MixRunningStateUtil() {
-  }
-
   @NotNull
   public static GeneralCommandLine withEnvironment(@NotNull GeneralCommandLine commandLine,
                                                    @NotNull MixRunConfigurationBase configuration) {
