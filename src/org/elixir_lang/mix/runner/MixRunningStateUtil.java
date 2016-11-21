@@ -92,7 +92,7 @@ public class MixRunningStateUtil {
       return new OSProcessHandler(commandLine.createProcess(), commandLine.getCommandLineString());
     }catch (ExecutionException e){
       String message = e.getMessage();
-      boolean isEmpty = message.equals("Executable is not specified");
+      boolean isEmpty = "Executable is not specified".equals(message);
       boolean notCorrect = message.startsWith("Cannot run program");
       if(isEmpty || notCorrect){
         Notifications.Bus.notify(
