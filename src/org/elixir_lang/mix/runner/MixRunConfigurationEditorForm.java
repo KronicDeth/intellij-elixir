@@ -18,14 +18,14 @@ import java.awt.event.ActionListener;
  *
  * @link https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationEditorForm.java
  */
-final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigurationBase>{
+public final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigurationBase>{
   private JPanel myComponent;
   private JCheckBox myRunInModuleCheckBox;
   private JCheckBox mySkipDependenciesCheckBox;
   private ModulesComboBox myModulesComboBox;
   private CommonProgramParametersPanel commonProgramParametersPanel;
 
-  MixRunConfigurationEditorForm(){
+  public MixRunConfigurationEditorForm(){
     myRunInModuleCheckBox.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -39,21 +39,25 @@ final class MixRunConfigurationEditorForm extends SettingsEditor<MixRunConfigura
 
   @Override
   protected void resetEditorFrom(@NotNull MixRunConfigurationBase configuration) {
-    mySkipDependenciesCheckBox.setSelected(configuration.isSkipDependencies());
-    Module module = null;
-    if(!ElixirSystemUtil.isSmallIde()){
-      myModulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
-      module = configuration.getConfigurationModule().getModule();
-    }
+      reset(configuration);
+  }
 
-    if(module != null){
-      setRunInModuleSelected(true);
-      myModulesComboBox.setSelectedModule(module);
-    }else{
-      setRunInModuleSelected(false);
-    }
+  public void reset(@NotNull MixRunConfigurationBase configuration) {
+      mySkipDependenciesCheckBox.setSelected(configuration.isSkipDependencies());
+      Module module = null;
+      if(!ElixirSystemUtil.isSmallIde()){
+        myModulesComboBox.fillModules(configuration.getProject(), ElixirModuleType.getInstance());
+        module = configuration.getConfigurationModule().getModule();
+      }
 
-    commonProgramParametersPanel.reset(configuration);
+      if(module != null){
+        setRunInModuleSelected(true);
+        myModulesComboBox.setSelectedModule(module);
+      }else{
+        setRunInModuleSelected(false);
+      }
+
+      commonProgramParametersPanel.reset(configuration);
   }
 
   @Override

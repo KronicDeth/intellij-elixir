@@ -9,23 +9,9 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
-
-  @NotNull
-  private String mixTestArgs = "";
-
-  @NotNull
-  String getMixTestArgs() {
-    return mixTestArgs;
-  }
-
-  void setMixTestArgs(@NotNull String mixTestArgs) {
-    this.mixTestArgs = mixTestArgs;
-  }
-
-  MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
+  public MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
     super(name, project, MixExUnitRunConfigurationFactory.getInstance());
   }
 
@@ -35,9 +21,10 @@ final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
     return new MixExUnitRunConfigurationEditorForm();
   }
 
-  @Nullable
+  @NotNull
   @Override
-  public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) throws ExecutionException {
+  public RunProfileState getState(@NotNull Executor executor,
+                                  @NotNull ExecutionEnvironment environment) throws ExecutionException {
     return new MixExUnitRunningState(environment, this);
   }
 }

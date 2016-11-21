@@ -16,10 +16,8 @@ import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
-import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.sdk.ElixirSdkType;
@@ -29,9 +27,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import static org.elixir_lang.mix.runner.MixRunningStateUtil.getWorkingDirectory;
+import static org.elixir_lang.mix.runner.MixRunningStateUtil.addNewSkipDependencies;
+import static org.elixir_lang.mix.runner.MixRunningStateUtil.addProgramParameters;
 
 final class MixExUnitRunningState extends CommandLineState{
   private final MixExUnitRunConfiguration myConfiguration;
@@ -55,7 +56,7 @@ final class MixExUnitRunningState extends CommandLineState{
   @NotNull
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
-    GeneralCommandLine commandLine = getMixExUnitCommandLine(myConfiguration);
+    GeneralCommandLine commandLine = commandLine(myConfiguration);
     return MixRunningStateUtil.runMix(myConfiguration.getProject(), commandLine);
   }
 
@@ -101,21 +102,20 @@ final class MixExUnitRunningState extends CommandLineState{
     return FileUtil.createTempDirectory("intellij_elixir_modules", null);
   }
 
+  private static String elixirPath(@NotNull Project project) {
+    String sdkPath = ElixirSdkType.getSdkPath(project);
+
+    return MixRunningStateUtil.elixirPath(sdkPath);
+  }
+
   @NotNull
-  private static GeneralCommandLine getMixExUnitCommandLine(@NotNull MixExUnitRunConfiguration configuration) throws ExecutionException {
+  private static GeneralCommandLine commandLine(@NotNull MixExUnitRunConfiguration configuration) throws ExecutionException {
+    GeneralCommandLine commandLine = MixRunningStateUtil.getBaseMixCommandLine(configuration);
+
     Project project = configuration.getProject();
     MixSettings mixSettings = MixSettings.getInstance(project);
 
-    // Copy Elixir modules to temp dir
-    String elixirModulesFilePath = populateElixirModulesDirectory(!mixSettings.getSupportsFormatterOption());
-    String sdkPath = ElixirSdkType.getSdkPath(project);
-
-    String elixirPath = sdkPath != null ? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
-        JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
-
-    GeneralCommandLine commandLine = new GeneralCommandLine();
-
-    commandLine.withWorkDirectory(getWorkingDirectory(configuration));
+    String elixirPath = elixirPath(project);
 
     // Because we pass additional options to `elixir`, we can't use `mix.bat`. We assume there's a `mix` script in the
     // same directory if the user specified the .bat file in the "Elixir External Tools" config
@@ -124,29 +124,46 @@ final class MixExUnitRunningState extends CommandLineState{
     String task = mixSettings.getSupportsFormatterOption() ? "test" : "test_with_formatter";
 
     commandLine.setExePath(elixirPath);
-    commandLine.addParameters("-r", elixirModulesFilePath, mixPath, task, "--formatter", "TeamCityExUnitFormatter");
 
-    List<String> split = ContainerUtil.list(configuration.getMixTestArgs().split("\\s+"));
-    if (!(split.size() == 1 && split.get(0).equals(""))) commandLine.addParameters(split);
+    // Copy Elixir modules to temp dir
+    List<File> elixirModuleFileList = populateElixirModulesDirectory(!mixSettings.getSupportsFormatterOption());
+    commandLine = addRequireParameters(commandLine, elixirModuleFileList);
+
+    commandLine.addParameters(mixPath, task, "--formatter", "TeamCityExUnitFormatter");
+
+    commandLine = addProgramParameters(commandLine, configuration);
+
+    return addNewSkipDependencies(commandLine, configuration);
+  }
+
+  @NotNull
+  private static GeneralCommandLine addRequireParameters(@NotNull GeneralCommandLine commandLine,
+                                                         @NotNull Collection<File> elixirModuleFileCollection) {
+    for (File elixirModuleFile : elixirModuleFileCollection) {
+      commandLine.addParameters("-r", String.valueOf(elixirModuleFile));
+    }
+
     return commandLine;
   }
 
   @NotNull
-  private static String populateElixirModulesDirectory(boolean useCustomMixTask) throws ExecutionException {
+  private static List<File> populateElixirModulesDirectory(boolean useCustomMixTask) throws ExecutionException {
+    List<File> elixirModuleFileList = new ArrayList<File>();
+
     try {
       File elixirModulesDir = createElixirModulesDirectory();
-      ElixirModules.putFormatterTo(elixirModulesDir);
+
+      elixirModuleFileList.add(ElixirModules.putFormatterTo(elixirModulesDir));
 
       // Support for the --formatter option was recently added to Mix. Older versions of Elixir will need to use the
       // custom task we've included in order to support this option
       if (useCustomMixTask) {
-        ElixirModules.putMixTaskTo(elixirModulesDir);
+        elixirModuleFileList.add(ElixirModules.putMixTaskTo(elixirModulesDir));
       }
-
-      return new File(elixirModulesDir.getCanonicalPath(), "*.ex").toString();
     } catch(IOException e) {
       throw new ExecutionException(e);
     }
-  }
 
+    return elixirModuleFileList;
+  }
 }

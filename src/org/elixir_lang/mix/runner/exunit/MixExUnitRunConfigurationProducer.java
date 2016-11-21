@@ -28,7 +28,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     if (psiElement instanceof PsiDirectory) {
       PsiDirectory dir = (PsiDirectory) psiElement;
       configuration.setName(configurationName(dir));
-      configuration.setMixTestArgs(dir.getVirtualFile().getPath());
+      configuration.setProgramParameters(dir.getVirtualFile().getPath());
       return true;
     } else {
       PsiFile containingFile = psiElement.getContainingFile();
@@ -36,7 +36,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
 
       int lineNumber = lineNumber(psiElement);
       configuration.setName(configurationName(containingFile, lineNumber));
-      configuration.setMixTestArgs(mixTestArgs(containingFile, lineNumber));
+      configuration.setProgramParameters(programParameters(containingFile, lineNumber));
 
       return true;
     }
@@ -57,7 +57,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
 
     int lineNumber = lineNumber(psiElement);
     return StringUtil.equals(configuration.getName(), configurationName(containingFile, lineNumber)) &&
-        StringUtil.equals(configuration.getMixTestArgs(), mixTestArgs(containingFile, lineNumber));
+        StringUtil.equals(configuration.getProgramParameters(), programParameters(containingFile, lineNumber));
   }
 
   private int lineNumber(@NotNull PsiElement psiElement) {
@@ -95,7 +95,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     }
   }
 
-  private String mixTestArgs(PsiFileSystemItem file, int lineNumber) {
+  private String programParameters(PsiFileSystemItem file, int lineNumber) {
     String path = file.getVirtualFile().getPath();
     if (lineNumber == -1) {
       return path;

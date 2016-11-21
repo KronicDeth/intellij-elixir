@@ -2,6 +2,7 @@ package org.elixir_lang.mix.runner;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -11,14 +12,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ObjectUtils;
-import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.mix.settings.MixSettings;
-import org.elixir_lang.sdk.ElixirSdkType;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -27,44 +24,69 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningStateUtil.java
  */
 public class MixRunningStateUtil {
+
+  static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
+
   public MixRunningStateUtil() {
   }
 
   @NotNull
-  public static GeneralCommandLine getMixCommandLine(@NotNull MixRunConfigurationBase configuration) throws ExecutionException{
-    Project project = configuration.getProject();
+  public static GeneralCommandLine withEnvironment(@NotNull GeneralCommandLine commandLine,
+                                                   @NotNull MixRunConfigurationBase configuration) {
+    return commandLine.withEnvironment(configuration.getEnvs());
+  }
+
+  @NotNull
+  public static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
+                                                     @NotNull MixRunConfigurationBase configuration) {
+    return commandLine.withWorkDirectory(getWorkingDirectory(configuration));
+  }
+
+  @NotNull
+  public static String mixPath(@NotNull Project project) {
     MixSettings mixSettings = MixSettings.getInstance(project);
-    String sdkPath = ElixirSdkType.getSdkPath(project);
+    return mixSettings.getMixPath();
+  }
 
-    String elixirPath = sdkPath != null? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath():
-        JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
+  @NotNull
+  public static GeneralCommandLine addNewSkipDependencies(@NotNull GeneralCommandLine commandLine,
+                                                          @NotNull MixRunConfigurationBase configuration) {
+    if (configuration.isSkipDependencies()) {
+      ParametersList parametersList = commandLine.getParametersList();
 
-    GeneralCommandLine commandLine = new GeneralCommandLine();
-
-    commandLine.withEnvironment(configuration.getEnvs());
-
-    commandLine.withWorkDirectory(getWorkingDirectory(configuration));
-
-    String mixPath = mixSettings.getMixPath();
-
-    if (mixPath.endsWith(".bat")) {
-      commandLine.setExePath(mixPath);
-    } else {
-      commandLine.setExePath(elixirPath);
-      commandLine.addParameter(mixPath);
-    }
-
-    String programParameters = configuration.getProgramParameters();
-
-    if (programParameters != null) {
-      List<String> split = ContainerUtil.list(programParameters.split("\\s+"));
-      if (configuration.isSkipDependencies() && !split.contains("--no-deps-check")) {
-        commandLine.addParameter("--no-deps-check");
+      if (!parametersList.hasParameter(SKIP_DEPENDENCIES_PARAMETER)) {
+        parametersList.add(SKIP_DEPENDENCIES_PARAMETER);
       }
-      commandLine.addParameters(split);
     }
 
     return commandLine;
+  }
+
+  @NotNull
+  public static GeneralCommandLine addProgramParameters(@NotNull GeneralCommandLine commandLine,
+                                                        @NotNull MixRunConfigurationBase configuration) {
+    String programParameters = configuration.getProgramParameters();
+
+    if (programParameters != null) {
+      for (String programParameter : programParameters.split("\\s+")) {
+        commandLine.addParameter(programParameter);
+      }
+    }
+
+    return commandLine;
+  }
+
+  @NotNull
+  public static GeneralCommandLine getBaseMixCommandLine(@NotNull MixRunConfigurationBase configuration) {
+    GeneralCommandLine commandLine = withEnvironment(new GeneralCommandLine(), configuration);
+
+    return withWorkDirectory(commandLine, configuration);
+  }
+
+  @NotNull
+  public static String elixirPath(String sdkPath) {
+    return sdkPath != null ? JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
+            JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
   }
 
   @NotNull
