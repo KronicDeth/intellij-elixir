@@ -25,22 +25,22 @@ import static org.apache.commons.lang.StringUtils.isBlank;
  */
 public class MixRunningStateUtil {
 
-  static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
+  private static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
 
   @NotNull
-  public static GeneralCommandLine withEnvironment(@NotNull GeneralCommandLine commandLine,
-                                                   @NotNull MixRunConfigurationBase configuration) {
+  private static GeneralCommandLine withEnvironment(@NotNull GeneralCommandLine commandLine,
+                                                    @NotNull MixRunConfigurationBase configuration) {
     return commandLine.withEnvironment(configuration.getEnvs());
   }
 
   @NotNull
-  public static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
-                                                     @NotNull MixRunConfigurationBase configuration) {
+  private static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
+                                                      @NotNull MixRunConfigurationBase configuration) {
     return commandLine.withWorkDirectory(getWorkingDirectory(configuration));
   }
 
   @NotNull
-  public static String mixPath(@NotNull Project project) {
+  static String mixPath(@NotNull Project project) {
     MixSettings mixSettings = MixSettings.getInstance(project);
     return mixSettings.getMixPath();
   }
@@ -111,7 +111,7 @@ public class MixRunningStateUtil {
   }
 
   @NotNull
-  public static String getWorkingDirectory(@NotNull MixRunConfigurationBase configuration){
+  private static String getWorkingDirectory(@NotNull MixRunConfigurationBase configuration){
     String workingDirectory = configuration.getWorkingDirectory();
 
     if (isBlank(workingDirectory)) {
