@@ -71,6 +71,6 @@ final class MixRunningState extends CommandLineState {
     @Override
     protected ProcessHandler startProcess() throws ExecutionException {
         GeneralCommandLine commandLine = commandLine(myConfiguration);
-        return MixRunningStateUtil.runMix(myConfiguration.getProject(), commandLine);
+        return runMix(myConfiguration.getProject(), commandLine);
     }
 }
