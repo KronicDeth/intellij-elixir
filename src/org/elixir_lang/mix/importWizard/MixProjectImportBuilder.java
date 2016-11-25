@@ -241,7 +241,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
             indicator.checkCanceled();
             if(file.isDirectory()){
               indicator.setText2(file.getPath());
-              if(isBuildOrConfigOrTestsDirectory(projectRoot.getPath(), file.getPath())) return false;
+              if(isBuildOrConfigOrDepsOrTestsDirectory(projectRoot.getPath(), file.getPath())) return false;
             }
 
             ContainerUtil.addAllNotNull(importedOtpApps, createImportedOtpApp(file));
@@ -281,9 +281,10 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
   /**
    * private methos
    * */
-  private static boolean isBuildOrConfigOrTestsDirectory(String projectRootPath, String path){
+  private static boolean isBuildOrConfigOrDepsOrTestsDirectory(String projectRootPath, String path){
     return (projectRootPath + "/_build").equals(path)
         || (projectRootPath + "/config").equals(path)
+        || (projectRootPath + "/deps").equals(path)
         || (projectRootPath + "/tests").equals(path);
   }
 
@@ -332,7 +333,7 @@ public class MixProjectImportBuilder extends ProjectImportBuilder<ImportedOtpApp
       public boolean visitFile(@NotNull VirtualFile file) {
         indicator.checkCanceled();
         if(file.isDirectory()){
-          if(isBuildOrConfigOrTestsDirectory(root.getPath(), file.getPath())) return false;
+          if(isBuildOrConfigOrDepsOrTestsDirectory(root.getPath(), file.getPath())) return false;
           indicator.setText2(file.getPath());
         }else if(file.getName().equalsIgnoreCase("mix.exs")){
           foundMixExs.add(file);

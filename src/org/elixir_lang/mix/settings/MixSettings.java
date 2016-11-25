@@ -49,6 +49,14 @@ public class MixSettings implements PersistentStateComponent<MixSettingsState>{
     myMixSettingsState.myMixPath = mixPath;
   }
 
+  public void setSupportsFormatterOption(boolean supportsFormatterOption) {
+    myMixSettingsState.supportsFormatterOption = supportsFormatterOption;
+  }
+
+  public boolean getSupportsFormatterOption() {
+    return myMixSettingsState.supportsFormatterOption;
+  }
+
   @Override
   public String toString() {
     return "MixSettings(state='" + myMixSettingsState.toString() + "')";

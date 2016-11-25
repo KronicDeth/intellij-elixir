@@ -10,13 +10,16 @@ public class MixSettingsState {
   @Tag("mixPath")
   @NotNull
   public String myMixPath;
+  public boolean supportsFormatterOption;
 
   public MixSettingsState(){
     myMixPath = "";
+    supportsFormatterOption = false;
   }
 
-  public MixSettingsState(MixSettingsState state){
+  MixSettingsState(MixSettingsState state){
     myMixPath = state.myMixPath;
+    supportsFormatterOption = state.supportsFormatterOption;
   }
 
   @Override

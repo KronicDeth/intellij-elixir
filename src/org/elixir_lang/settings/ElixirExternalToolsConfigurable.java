@@ -41,8 +41,8 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
     myProject = project;
     myMixSettings = MixSettings.getInstance(project);
     mySdkPathSelector.addBrowseFolderListener("Select Elixir SDK path", "", null,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle("Elixir SDK root"));
-    
+        FileChooserDescriptorFactory.createSingleFolderDescriptor().withTitle("Elixir SDK Root"));
+
     if(StringUtil.isEmpty(myMixSettings.getMixPath())){
       VirtualFile baseDir = project.getBaseDir();
       if(baseDir != null){
@@ -99,6 +99,7 @@ public class ElixirExternalToolsConfigurable implements SearchableConfigurable, 
   @Override
   public void apply() throws ConfigurationException {
     myMixSettings.setMixPath(myMixConfigurationForm.getPath());
+    myMixSettings.setSupportsFormatterOption(myMixConfigurationForm.getSupportsFormatterOption());
 
     if(ElixirSystemUtil.isSmallIde()){
       ElixirSdkForSmallIdes.setUpOrUpdateSdk(myProject, mySdkPathSelector.getText());

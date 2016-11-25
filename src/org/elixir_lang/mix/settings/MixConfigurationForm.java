@@ -18,6 +18,7 @@ import com.intellij.util.containers.ContainerUtil;
 import com.intellij.util.download.DownloadableFileDescription;
 import com.intellij.util.download.DownloadableFileService;
 import com.intellij.util.download.FileDownloader;
+import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.elixir_lang.sdk.ElixirSystemUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,6 +66,7 @@ public class MixConfigurationForm {
   private JTextField myMixVersionText;
   private JPanel myLinkContainer;
   private TextFieldWithBrowseButton myMixPathSelector;
+  private JCheckBox supportsFormatterOptionCheckBox;
 
   private boolean myMixPathValid;
 
@@ -91,6 +93,8 @@ public class MixConfigurationForm {
   public String getPath(){
     return myMixPathSelector.getText();
   }
+
+  public boolean getSupportsFormatterOption() { return supportsFormatterOptionCheckBox.isSelected(); }
 
   public boolean isPathValid(){
     return myMixPathValid;
@@ -133,6 +137,16 @@ public class MixConfigurationForm {
 
         if (transformedStdout != null) {
           myMixVersionText.setText(transformedStdout);
+          String versionString = transformedStdout.replaceAll("^[^0-9]*", "");
+
+          // Support for the --formatter option may be added in a 1.3.x release, but I'm being conservative for now
+          // and assuming it won't be released until 1.4
+          ElixirSdkRelease elixirSdkRelease = ElixirSdkRelease.fromString(versionString);
+
+          if (elixirSdkRelease != null) {
+            supportsFormatterOptionCheckBox.setSelected(elixirSdkRelease.compareTo(ElixirSdkRelease.V_1_4) >= 0);
+          }
+
           valid = true;
 
           break;

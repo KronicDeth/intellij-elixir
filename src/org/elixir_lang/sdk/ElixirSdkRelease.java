@@ -14,6 +14,8 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
   public static final ElixirSdkRelease V_1_0_4 = new ElixirSdkRelease("1", "0", "4", null, null);
   public static final ElixirSdkRelease V_1_2 = new ElixirSdkRelease("1", "2", null, null, null);
+  public static final ElixirSdkRelease V_1_4 = new ElixirSdkRelease("1", "4", null, null, null);
+
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself
@@ -46,9 +48,9 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
     if (mine == null && others == null) {
       comparison = 0;
-    } else if (mine == null && others != null) {
+    } else if (mine == null) {
       comparison = -1;
-    } else if (mine != null && others == null) {
+    } else if (others == null) {
       comparison = 1;
     } else {
       try {
@@ -84,10 +86,10 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
     if (mine == null && others == null) {
       comparison = 0;
-    } else if (mine == null && others != null) {
+    } else if (mine == null) {
       // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L203
       comparison = 1;
-    } else if (mine != null && others == null) {
+    } else if (others == null) {
       // https://github.com/elixir-lang/elixir/blob/27c350da06ee4df5a4710507abe443ffba5b07dd/lib/elixir/lib/version.ex#L204
       comparison = -1;
     } else {
