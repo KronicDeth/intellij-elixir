@@ -2,6 +2,7 @@ package org.elixir_lang.mix.runner.exunit;
 
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
+import com.intellij.ide.projectView.impl.ProjectRootsUtil;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
@@ -42,31 +43,42 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
 
   private boolean setupConfigurationFromContextImpl(@NotNull MixExUnitRunConfiguration configuration,
                                                     @NotNull PsiElement psiElement) {
+    boolean contextApplicable = false;
+
     if (psiElement instanceof PsiDirectory) {
-      String basePath = psiElement.getProject().getBasePath();
-      String workingDirectory = workingDirectory(psiElement, basePath);
+      PsiDirectory psiDirectory = (PsiDirectory) psiElement;
 
-      configuration.setWorkingDirectory(workingDirectory);
+      if (ProjectRootsUtil.isInTestSource(psiDirectory.getVirtualFile(),  psiDirectory.getProject())) {
+        String basePath = psiElement.getProject().getBasePath();
+        String workingDirectory = workingDirectory(psiElement, basePath);
 
-      PsiDirectory dir = (PsiDirectory) psiElement;
-      configuration.setName(configurationName(dir, workingDirectory, basePath));
-      configuration.setProgramParameters(programParameters(dir, workingDirectory));
-      return true;
+        configuration.setWorkingDirectory(workingDirectory);
+
+        PsiDirectory dir = (PsiDirectory) psiElement;
+        configuration.setName(configurationName(dir, workingDirectory, basePath));
+        configuration.setProgramParameters(programParameters(dir, workingDirectory));
+
+        contextApplicable = true;
+      }
     } else {
       PsiFile containingFile = psiElement.getContainingFile();
       if (!(containingFile instanceof ElixirFile || containingFile instanceof PsiDirectory)) return false;
 
-      String basePath = psiElement.getProject().getBasePath();
-      String workingDirectory = workingDirectory(psiElement, basePath);
+      if (ProjectRootsUtil.isInTestSource(containingFile)) {
+        String basePath = psiElement.getProject().getBasePath();
+        String workingDirectory = workingDirectory(psiElement, basePath);
 
-      configuration.setWorkingDirectory(workingDirectory);
+        configuration.setWorkingDirectory(workingDirectory);
 
-      int lineNumber = lineNumber(psiElement);
-      configuration.setName(configurationName(containingFile, lineNumber, workingDirectory, basePath));
-      configuration.setProgramParameters(programParameters(containingFile, lineNumber, workingDirectory));
+        int lineNumber = lineNumber(psiElement);
+        configuration.setName(configurationName(containingFile, lineNumber, workingDirectory, basePath));
+        configuration.setProgramParameters(programParameters(containingFile, lineNumber, workingDirectory));
 
-      return true;
+        contextApplicable = true;
+      }
     }
+
+    return contextApplicable;
   }
 
   @Override
