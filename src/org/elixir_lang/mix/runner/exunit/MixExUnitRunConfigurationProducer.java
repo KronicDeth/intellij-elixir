@@ -15,9 +15,23 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<MixExUnitRunConfiguration> {
+  /*
+   * CONSTANTS
+   */
+
+  private static int UNKNOWN_LINE = -1;
+
+  /*
+   * Constructors
+   */
+
   public MixExUnitRunConfigurationProducer() {
     super(MixExUnitRunConfigurationType.getInstance());
   }
+
+  /*
+   * Instance Methods
+   */
 
   @Override
   protected final boolean setupConfigurationFromContext(MixExUnitRunConfiguration runConfig, ConfigurationContext context, Ref<PsiElement> ref) {
@@ -36,7 +50,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
 
       PsiDirectory dir = (PsiDirectory) psiElement;
       configuration.setName(configurationName(dir, workingDirectory, basePath));
-      configuration.setProgramParameters(dir.getVirtualFile().getPath());
+      configuration.setProgramParameters(programParameters(dir, workingDirectory));
       return true;
     } else {
       PsiFile containingFile = psiElement.getContainingFile();
@@ -49,7 +63,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
 
       int lineNumber = lineNumber(psiElement);
       configuration.setName(configurationName(containingFile, lineNumber, workingDirectory, basePath));
-      configuration.setProgramParameters(programParameters(containingFile, lineNumber));
+      configuration.setProgramParameters(programParameters(containingFile, lineNumber, workingDirectory));
 
       return true;
     }
@@ -69,16 +83,21 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     if (vFile == null) return false;
 
     int lineNumber = lineNumber(psiElement);
+    String workingDirectory = configuration.getWorkingDirectory();
+
     return StringUtil.equals(
             configuration.getName(),
             configurationName(
                     containingFile,
                     lineNumber,
-                    configuration.getWorkingDirectory(),
+                    workingDirectory,
                     psiElement.getProject().getBasePath()
             )
     ) &&
-            StringUtil.equals(configuration.getProgramParameters(), programParameters(containingFile, lineNumber));
+            StringUtil.equals(
+                    configuration.getProgramParameters(),
+                    programParameters(containingFile, lineNumber, workingDirectory)
+            );
   }
 
   private int lineNumber(@NotNull PsiElement psiElement) {
@@ -96,7 +115,7 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     int lineNumber;
 
     if (documentLineNumber == 0) {
-      lineNumber = -1;
+      lineNumber = UNKNOWN_LINE;
     } else {
       lineNumber = documentLineNumber + 1;
     }
@@ -135,20 +154,40 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
                                    int lineNumber,
                                    @Nullable String workingDirectory,
                                    @Nullable String basePath) {
-    if (lineNumber == -1) {
+    if (lineNumber == UNKNOWN_LINE) {
       return configurationName(file, workingDirectory, basePath);
     } else {
       return configurationName(file, workingDirectory, basePath) + ":" + lineNumber;
     }
   }
 
-  private String programParameters(PsiFileSystemItem file, int lineNumber) {
-    String path = file.getVirtualFile().getPath();
-    if (lineNumber == -1) {
-      return path;
-    } else {
-      return path + ":" + lineNumber;
+  @NotNull
+  private String programParameters(@NotNull PsiFileSystemItem item, @Nullable String workingDirectory) {
+    return programParameters(item, UNKNOWN_LINE, workingDirectory);
+  }
+
+  @NotNull
+  private String programParameters(@NotNull PsiFileSystemItem item,
+                                   int lineNumber,
+                                   @Nullable String workingDirectory) {
+    String path = item.getVirtualFile().getPath();
+    String relativePath = path;
+
+    if (workingDirectory != null) {
+      String prefix = workingDirectory + File.separator;
+
+      if (path.startsWith(prefix)) {
+        relativePath = path.substring(prefix.length());
+      }
     }
+
+    String programParameters = relativePath;
+
+    if (lineNumber != UNKNOWN_LINE) {
+      programParameters += ":" + lineNumber;
+    }
+
+    return programParameters;
   }
 
   @Nullable
