@@ -4,12 +4,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.index.AllName;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.Quote;
+import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
+import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,20 +20,50 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.enclosingMacroCall;
-
 public class TestFinder implements com.intellij.testIntegration.TestFinder {
     @Nullable
-    @Override
-    public Call findSourceElement(@NotNull PsiElement from) {
-        Call enclosingMacroCall = enclosingMacroCall(from);
+    private static Call parentCallSourceElement(@NotNull PsiElement from) {
+        Call parentCall = PsiTreeUtil.getParentOfType(from, Call.class);
         Call sourceElement = null;
 
-        if (enclosingMacroCall != null && CallDefinitionClause.is(enclosingMacroCall)) {
-            sourceElement = CallDefinitionClause.enclosingModularMacroCall(enclosingMacroCall);
+        if (parentCall != null) {
+            sourceElement = sourceElement(parentCall);
         }
 
         return sourceElement;
+    }
+
+    @Nullable
+    private static Call sourceElement(@NotNull Call from) {
+        Call sourceElement;
+
+        if (Implementation.is(from) || Module.is(from) || Protocol.is(from) || Quote.is(from)) {
+            sourceElement = from;
+        } else {
+            sourceElement = parentCallSourceElement(from);
+        }
+
+        return sourceElement;
+    }
+
+    @Nullable
+    private static Call sourceElement(@NotNull PsiElement from) {
+        Call sourceElement;
+
+        if (from instanceof Call) {
+            sourceElement = sourceElement((Call) from);
+        } else {
+            sourceElement = parentCallSourceElement(from);
+        }
+
+        return sourceElement;
+    }
+
+
+    @Nullable
+    @Override
+    public Call findSourceElement(@NotNull PsiElement from) {
+        return sourceElement(from);
     }
 
     @NotNull
@@ -39,7 +72,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
         Call sourceElement = findSourceElement(element);
         Collection<PsiElement> testCollection = new ArrayList<PsiElement>();
 
-        if (sourceElement != null && sourceElement instanceof StubBased){
+        if (sourceElement != null && sourceElement instanceof StubBased) {
             StubBased sourceStubBased = (StubBased) sourceElement;
             Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
