@@ -15,6 +15,13 @@
           <p>Enhancements</p>
           <ul>
             <li>
+              Use the <code>CommonProgramParametersPanel</code> to get the working directory and environment variables
+              the same way the JUnit form does.  Replace the custom "Command" input with the "Program arguments" input
+              built into the <code>CommonProgramParametersPanel</code>. <code>CommonProgramParametersPanel</code>
+              expects to store the "Program Arguments" in a "ProgramParameters" field, so old run configurations will
+              lose their "Command" option value and it will be migrated to the new "ProgramParameters".
+            </li>
+            <li>
               <p>Create / Run Mix ExUnit Run Configurations</p>
               <ul>
                 <li>Run Configuration from Directory</li>
@@ -30,6 +37,12 @@
                 <li>Environment variables</li>
               </ul>
             </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Fix typo: <code>myRunInModuleChekcBox</code> => <code>myRunInModuleCheckBox</code></li>
           </ul>
         </li>
       </ul>
