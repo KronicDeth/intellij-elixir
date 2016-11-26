@@ -110,6 +110,10 @@
     * Program Arguments
     * Working directory
     * Environment variables
+* [#531](https://github.com/KronicDeth/intellij-elixir/pull/531) - [@KronicDeth](https://github.com/KronicDeth) 
+  * `enclosingMacroCall` returns enclosing macro call when parent is `ElixirDoBlock`, so that `end` element goes to the macro call.
+  * `Navigate > Test` will go to the Module that has the same canonical name as the current `defimpl`, `defmodule`, `defprotocol` , or `quote` with a `Test` suffix added
+  * `Navigate > Test Subject` will go to the `defimpl`, `defmodule`, `defprotocol`, or `quote` that has the same canonical name as the current Module with the `Test` suffix removed.
 
 ### Bug Fixes
 * [#523](https://github.com/KronicDeth/intellij-elixir/pull/523) - Fix typo: `myRunInModuleChekcBox` => `myRunInModuleCheckBox` - [@KronicDeth](https://github.com/KronicDeth)

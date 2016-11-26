@@ -37,6 +37,20 @@
                 <li>Environment variables</li>
               </ul>
             </li>
+            <li>
+              <code>enclosingMacroCall</code> returns enclosing macro call when parent is <code>ElixirDoBlock</code>, so
+              that <code>end</code> element goes to the macro call.
+            </li>
+            <li>
+              <code>Navigate > Test</code> will go to the Module that has the same canonical name as the current
+              <code>defimpl</code>, <code>defmodule</code>, <code>defprotocol</code> , or <code>quote</code> with a
+              <code>Test</code> suffix added
+            </li>
+            <li>
+              <code>Navigate &gt; Test Subject</code> will go to the <code>defimpl</code>, <code>defmodule</code>,
+              <code>defprotocol</code>, or <code>quote</code> that has the same canonical name as the current Module
+              with the <code>Test</code> suffix removed.
+            </li>
           </ul>
         </li>
         <li>
