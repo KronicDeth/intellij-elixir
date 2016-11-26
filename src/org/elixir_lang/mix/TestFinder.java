@@ -1,10 +1,12 @@
 package org.elixir_lang.mix;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Condition;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Function;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
@@ -21,6 +23,56 @@ import java.util.Collection;
 import java.util.Set;
 
 public class TestFinder implements com.intellij.testIntegration.TestFinder {
+    private static final String TEST_SUFFIX = "Test";
+
+    @NotNull
+    private static Collection<PsiElement> corresponding(@NotNull PsiElement element,
+                                                        @NotNull Function<String, String> correspondingName,
+                                                        @NotNull Condition<Call> correspondingCallCondition) {
+        Call sourceElement = sourceElement(element);
+        Collection<PsiElement> correspondingCollection = new ArrayList<PsiElement>();
+
+        if (sourceElement != null && sourceElement instanceof StubBased) {
+            StubBased sourceStubBased = (StubBased) sourceElement;
+            @SuppressWarnings("unchecked") Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
+
+            if (!canonicalNameSet.isEmpty()) {
+                Project project = element.getProject();
+                GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+
+                for (String canonicalName : canonicalNameSet) {
+                    String correspondingCanonicalName = correspondingName.fun(canonicalName);
+
+                    if (correspondingCanonicalName != null) {
+                        Collection<NamedElement> correspondingElements = StubIndex.getElements(
+                                AllName.KEY,
+                                correspondingCanonicalName,
+                                project,
+                                scope,
+                                NamedElement.class
+                        );
+
+                        for (NamedElement correspondingElement : correspondingElements) {
+                            if (correspondingElement instanceof Call) {
+                                Call correspondingCall = (Call) correspondingElement;
+
+                                if (correspondingCallCondition.value(correspondingCall)) {
+                                    correspondingCollection.add(correspondingCall);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return correspondingCollection;
+    }
+
+    private static boolean isModular(@NotNull Call call) {
+        return Implementation.is(call) || Module.is(call) || Protocol.is(call) || Quote.is(call);
+    }
+
     @Nullable
     private static Call parentCallSourceElement(@NotNull PsiElement from) {
         Call parentCall = PsiTreeUtil.getParentOfType(from, Call.class);
@@ -37,7 +89,7 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     private static Call sourceElement(@NotNull Call from) {
         Call sourceElement;
 
-        if (Implementation.is(from) || Module.is(from) || Protocol.is(from) || Quote.is(from)) {
+        if (isModular(from)) {
             sourceElement = from;
         } else {
             sourceElement = parentCallSourceElement(from);
@@ -59,7 +111,6 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
         return sourceElement;
     }
 
-
     @Nullable
     @Override
     public Call findSourceElement(@NotNull PsiElement from) {
@@ -69,63 +120,58 @@ public class TestFinder implements com.intellij.testIntegration.TestFinder {
     @NotNull
     @Override
     public Collection<PsiElement> findTestsForClass(@NotNull PsiElement element) {
-        Call sourceElement = findSourceElement(element);
-        Collection<PsiElement> testCollection = new ArrayList<PsiElement>();
-
-        if (sourceElement != null && sourceElement instanceof StubBased) {
-            StubBased sourceStubBased = (StubBased) sourceElement;
-            Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
-
-            if (!canonicalNameSet.isEmpty()) {
-                Project project = element.getProject();
-                GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
-
-
-                for (String canonicalName : canonicalNameSet) {
-                    String testCanonicalName = canonicalName + "Test";
-
-                    Collection<NamedElement> testElements = StubIndex.getElements(
-                            AllName.KEY,
-                            testCanonicalName,
-                            project,
-                            scope,
-                            NamedElement.class
-                    );
-
-                    for (NamedElement testElement : testElements) {
-                        if (testElement instanceof Call) {
-                            Call testCall = (Call) testElement;
-
-                            if (Module.is(testCall)) {
-                                testCollection.add(testCall);
-                            }
-                        }
+        return corresponding(
+                element,
+                new Function<String, String>() {
+                    @Override
+                    public String fun(@NotNull String canonicalName) {
+                        return canonicalName + TEST_SUFFIX;
+                    }
+                },
+                new Condition<Call>() {
+                    @Override
+                    public boolean value(Call call) {
+                        return Module.is(call);
                     }
                 }
-            }
-        }
-
-        return testCollection;
+        );
     }
 
     @NotNull
     @Override
     public Collection<PsiElement> findClassesForTest(@NotNull PsiElement element) {
-        return null;
+        return corresponding(
+                element,
+                new Function<String, String>() {
+                    @Override
+                    public String fun(String canonicalName) {
+                        String correspondingCanonicalName = null;
+
+                        if (canonicalName.endsWith(TEST_SUFFIX)) {
+                            correspondingCanonicalName =
+                                    canonicalName.substring(0, canonicalName.length() - TEST_SUFFIX.length());
+                        }
+
+                        return correspondingCanonicalName;
+                    }
+                },
+                new Condition<Call>() {
+                    @Override
+                    public boolean value(Call call) {
+                        return isModular(call);
+                    }
+                }
+        );
     }
 
     @Override
     public boolean isTest(@NotNull PsiElement element) {
-//        PsiFile containingFile = findSourceElement(element);
-//
-//        if (!(containingFile instanceof ErlangFile)) return false;
-//        return ErlangPsiImplUtil.isEunitTestFile((ErlangFile) containingFile);
         Call sourceElement = findSourceElement(element);
         boolean isTest = false;
 
         if (sourceElement != null && sourceElement instanceof StubBased) {
             StubBased sourceStubBased = (StubBased) sourceElement;
-            Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
+            @SuppressWarnings("unchecked") Set<String> canonicalNameSet = sourceStubBased.canonicalNameSet();
 
             if (!canonicalNameSet.isEmpty()) {
                 for (String canonicalName : canonicalNameSet) {
