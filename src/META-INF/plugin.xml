@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.6.0</version>
+  <version>4.7.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,30 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.7.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>Create / Run Mix ExUnit Run Configurations</p>
+              <ul>
+                <li>Run Configuration from Directory</li>
+                <li>Run Configuration from File</li>
+                <li>Run Configuration from LIne</li>
+              </ul>
+            </li>
+            <li>
+              <p>Run Configurations support Common Program Parameters</p>
+              <ul>
+                <li>Program Arguments</li>
+                <li>Working directory</li>
+                <li>Environment variables</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.6.0</h1>
       <ul>
         <li>

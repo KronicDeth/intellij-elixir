@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
+  - [v4.7.0](#v470)
   - [v4.6.0](#v460)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
@@ -93,6 +94,17 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v4.7.0
+* [#482](https://github.com/KronicDeth/intellij-elixir/pull/482) - [@JakeBecker](https://github.com/JakeBecker), [@KronicDeth](https://github.com/KronicDeth)
+  * Create / Run Mix ExUnit Run Configurations
+    * Run Configuration from Directory
+    * Run Configuration from File
+    * Run Configuration from LIne
+  * Run Configurations support Common Program Parameters
+    * Program Arguments
+    * Working directory
+    * Environment variables
 
 ## v4.6.0
 
