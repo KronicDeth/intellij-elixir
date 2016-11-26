@@ -32,18 +32,14 @@ public class CallDefinitionClauseTest extends LightPlatformCodeInsightFixtureTes
         assertEquals(name, lookupElementPresentation.getItemText());
     }
 
-    public void testIssue457LongerName() {
-        LookupElement lookupElement = lookupElement("fooo");
+    public void testIssue457LongerNameIssue503() {
+        String name = "fooo";
+        LookupElement lookupElement = lookupElement(name);
         LookupElementPresentation lookupElementPresentation = new LookupElementPresentation();
-        boolean assertionErrorThrown = false;
 
-        try {
-            lookupElement.renderElement(lookupElementPresentation);
-        } catch (AssertionError e) {
-            assertionErrorThrown = true;
-        }
+        lookupElement.renderElement(lookupElementPresentation);
 
-        assertTrue(assertionErrorThrown);
+        assertEquals(name, lookupElementPresentation.getItemText());
     }
 
     /*
