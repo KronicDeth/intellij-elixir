@@ -2023,7 +2023,13 @@ public class ElixirPsiImplUtil {
         Call enclosingMacroCall = null;
         PsiElement parent = element.getParent();
 
-        if (parent instanceof ElixirStabBody) {
+        if (parent instanceof ElixirDoBlock) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof Call) {
+                enclosingMacroCall = (Call) grandParent;
+            }
+        } else if (parent instanceof ElixirStabBody) {
             PsiElement grandParent = parent.getParent();
 
             if (grandParent instanceof ElixirStab) {
