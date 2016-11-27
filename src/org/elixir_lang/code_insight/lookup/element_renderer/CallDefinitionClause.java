@@ -54,12 +54,6 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
 
                     if (nameLength <= presentableTextLength) {
                         presentation.appendTailText(presentableText.substring(nameLength), true);
-                    } else {
-                        Logger.error(
-                                CallDefinitionClause.class,
-                                "name (`" + name + "`) is longer than the presentable test (`" + presentableText + "`)",
-                                psiElement
-                        );
                     }
                 }
 
