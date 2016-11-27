@@ -6,10 +6,14 @@ import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.Collections;
 
 public class Logger {
     /*
@@ -43,12 +47,28 @@ public class Logger {
                              @NotNull String userMessage,
                              @NotNull PsiElement element) {
         PsiFile containingFile = element.getContainingFile();
+        String fullUserMessage = fullUserMessage(userMessage, containingFile, element);
+        String details = Joiner.on("\n").join(new Throwable().getStackTrace());
+
+        Collection<Attachment> attachmentCollection;
+
+        VirtualFile virtualFile = containingFile.getVirtualFile();
+
+        if (virtualFile != null) {
+            attachmentCollection = Collections.singletonList(
+                    AttachmentFactory.createAttachment(virtualFile)
+            );
+        } else {
+            attachmentCollection = Collections.emptyList();
+        }
 
         logger.error(
                 LogMessageEx.createEvent(
-                        fullUserMessage(userMessage, containingFile, element),
-                        Joiner.on("\n").join(new Throwable().getStackTrace()),
-                        AttachmentFactory.createAttachment(containingFile.getVirtualFile())
+                        fullUserMessage,
+                        details,
+                        fullUserMessage,
+                        null,
+                        attachmentCollection
                 )
         );
     }
