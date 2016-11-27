@@ -70,6 +70,10 @@
               added on a line above a pre-existing tuple, such as when typing a new qualified call.
             </li>
             <li>Add space between variable and match in lookup element presentation</li>
+            <li>
+              Check <code>VirtualFile</code> is not null before creating attachment because <code>PsiFile</code> can
+              lack a <code>VirtualFile</code> if the <code>PsiFile</code> only exists in memory.
+            </li>
           </ul>
         </li>
       </ul>
