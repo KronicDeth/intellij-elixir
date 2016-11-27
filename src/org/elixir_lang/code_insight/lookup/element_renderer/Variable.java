@@ -53,6 +53,10 @@ public class Variable extends com.intellij.codeInsight.lookup.LookupElementRende
         presentation.setIcon(icon(psiElement));
         presentation.setItemTextForeground(color(psiElement));
 
+        /* Add a space between variable name and match.
+           See https://github.com/KronicDeth/intellij-elixir/issues/506 */
+        presentation.appendTailText(" ", false);
+
         TextRange psiElementTextRange = psiElement.getTextRange();
         PsiElement enclosingMatch = enclosingMatch(psiElement);
         TextRange enclosingMatchTextRange = enclosingMatch.getTextRange();
