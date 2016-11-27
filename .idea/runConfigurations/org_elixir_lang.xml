@@ -17,7 +17,7 @@
       <value defaultName="moduleWithDependencies" />
     </option>
     <envs>
-      <env name="ELIXIR_LANG_ELIXIR_PATH" value="$PROJECT_DIR$/../../elixir-lang/elixir" />
+      <env name="ELIXIR_LANG_ELIXIR_PATH" value="/Users/limhoff/git/elixir-lang/elixir" />
     </envs>
     <patterns />
     <RunnerSettings RunnerId="Debug">
@@ -28,9 +28,6 @@
     <RunnerSettings RunnerId="Run" />
     <ConfigurationWrapper RunnerId="Debug" />
     <ConfigurationWrapper RunnerId="Run" />
-    <method>
-      <option name="Make" enabled="true" />
-      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_intellij_elixir" />
-    </method>
+    <method />
   </configuration>
 </component>

@@ -69,6 +69,7 @@
               <code>ElixirMultipleAliases</code> can be hit in <code>isVariable</code> when <code>MyAlias.</code> is
               added on a line above a pre-existing tuple, such as when typing a new qualified call.
             </li>
+            <li>Add space between variable and match in lookup element presentation</li>
           </ul>
         </li>
       </ul>
