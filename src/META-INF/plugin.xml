@@ -51,6 +51,9 @@
               <code>defprotocol</code>, or <code>quote</code> that has the same canonical name as the current Module
               with the <code>Test</code> suffix removed.
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/500">#500</a>.
+            </li>
           </ul>
         </li>
         <li>
@@ -60,6 +63,11 @@
             <li>
               Don't log error when name length exceeds presentable text length because it appears to be common for
               normal users and not a development environment artifact.
+            </li>
+            <li>
+              Check parent of <code>ElixirMultipleAliases</code> for <code>isVariable</code> because
+              <code>ElixirMultipleAliases</code> can be hit in <code>isVariable</code> when <code>MyAlias.</code> is
+              added on a line above a pre-existing tuple, such as when typing a new qualified call.
             </li>
           </ul>
         </li>

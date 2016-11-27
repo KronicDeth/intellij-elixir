@@ -114,10 +114,12 @@
   * `enclosingMacroCall` returns enclosing macro call when parent is `ElixirDoBlock`, so that `end` element goes to the macro call.
   * `Navigate > Test` will go to the Module that has the same canonical name as the current `defimpl`, `defmodule`, `defprotocol` , or `quote` with a `Test` suffix added
   * `Navigate > Test Subject` will go to the `defimpl`, `defmodule`, `defprotocol`, or `quote` that has the same canonical name as the current Module with the `Test` suffix removed.
+* [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Regression test for #500 - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#523](https://github.com/KronicDeth/intellij-elixir/pull/523) - Fix typo: `myRunInModuleChekcBox` => `myRunInModuleCheckBox` - [@KronicDeth](https://github.com/KronicDeth)
 * [#532](https://github.com/KronicDeth/intellij-elixir/pull/532) - Don't log error when name length exceeds presentable text length because it appears to be common for normal users and not a development environment artifact. - [@KronicDeth](https://github.com/KronicDeth)
+* [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Check parent of `ElixirMultipleAliases` for `isVariable` because `ElixirMultipleAliases` can be hit in `isVariable` when `MyAlias.` is added on a line above a pre-existing tuple, such as when typing a new qualified call. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.6.0
 
