@@ -74,6 +74,11 @@
               Check <code>VirtualFile</code> is not null before creating attachment because <code>PsiFile</code> can
               lack a <code>VirtualFile</code> if the <code>PsiFile</code> only exists in memory.
             </li>
+            <li>
+              Convert <code>CallDefinitionClause(Call)</code> to <code>CallDefinitionClause.fromCall(Call)</code>, so
+              that <code>null</code> can be returned when <code>CallDefinitionClause.enclosingModular(Call)</code>
+              returns <code>null</code>.
+            </li>
           </ul>
         </li>
       </ul>

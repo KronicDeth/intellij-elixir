@@ -122,6 +122,7 @@
 * [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Check parent of `ElixirMultipleAliases` for `isVariable` because `ElixirMultipleAliases` can be hit in `isVariable` when `MyAlias.` is added on a line above a pre-existing tuple, such as when typing a new qualified call. - [@KronicDeth](https://github.com/KronicDeth)
 * [#534](https://github.com/KronicDeth/intellij-elixir/pull/534) - Add space between variable and match in lookup element presentation - [@KronicDeth](https://github.com/KronicDeth)
 * [#535](https://github.com/KronicDeth/intellij-elixir/pull/535) - Check `VirtualFile` is not null before creating attachment because `PsiFile` can lack a `VirtualFile` if the `PsiFile` only exists in memory. - [@KronicDeth](https://github.com/KronicDeth) 
+* [#537](https://github.com/KronicDeth/intellij-elixir/pull/537) - Convert `CallDefinitionClause(Call)` to `CallDefinitionClause.fromCall(Call)`, so that `null` can be returned when `CallDefinitionClause.enclosingModular(Call)` returns `null`. - [@KronicDeth](https://github.com/KronicDeth) 
 
 ## v4.6.0
 
