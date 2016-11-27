@@ -7,6 +7,7 @@ import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
 import org.apache.commons.lang.math.IntRange;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -121,20 +122,32 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
             modular = new Protocol(grandScope, enclosingMacroCall);
         } else if (Quote.is(enclosingMacroCall)) {
             Call quoteEnclosingMacroCall = enclosingMacroCall(enclosingMacroCall);
-            Quote quote;
+            Quote quote = null;
 
             if (quoteEnclosingMacroCall == null) {
                 quote = new Quote(enclosingMacroCall);
             } else if (CallDefinitionClause.is(quoteEnclosingMacroCall)) {
-                quote = new Quote(
-                        new CallDefinitionClause(quoteEnclosingMacroCall),
-                        enclosingMacroCall
-                );
+                CallDefinitionClause callDefinitionClause = CallDefinitionClause.fromCall(quoteEnclosingMacroCall);
+
+                if (callDefinitionClause == null) {
+                    Logger.error(
+                            CallDefinitionClause.class,
+                            "Cannot construct CallDefinitionClause from quote's enclosing macro call",
+                            quoteEnclosingMacroCall
+                    );
+                } else {
+                    quote = new Quote(
+                            callDefinitionClause,
+                            enclosingMacroCall
+                    );
+                }
             } else {
                 quote = new Quote(modular(quoteEnclosingMacroCall), enclosingMacroCall);
             }
 
-            modular = quote.modular();
+            if (quote != null) {
+                modular = quote.modular();
+            }
         } else if (Unknown.is(enclosingMacroCall)) {
             Modular grandScope = enclosingModular(enclosingMacroCall);
             modular = new Unknown(grandScope, enclosingMacroCall);
@@ -299,8 +312,16 @@ public class CallDefinitionClause extends Element<Call> implements Presentable, 
      *
      * @param call a def(macro)?p? call
      */
-    public CallDefinitionClause(Call call) {
-        this(new CallDefinition(call), call);
+    @Nullable
+    public static CallDefinitionClause fromCall(Call call) {
+        CallDefinition callDefinition = CallDefinition.fromCall(call);
+        CallDefinitionClause callDefinitionClause = null;
+
+        if (callDefinition != null) {
+            callDefinitionClause = new CallDefinitionClause(callDefinition, call);
+        }
+
+        return callDefinitionClause;
     }
 
     /**

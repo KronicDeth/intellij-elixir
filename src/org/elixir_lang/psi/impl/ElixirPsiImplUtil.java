@@ -2917,7 +2917,11 @@ public class ElixirPsiImplUtil {
             final NavigatablePsiElement parameterized = parameterizedParameter.parameterized;
 
             if (parameterized instanceof Call) {
-                itemPresentation = new CallDefinitionClause((Call) parameterized).getPresentation();
+                CallDefinitionClause callDefinitionClause = CallDefinitionClause.fromCall((Call) parameterized);
+
+                if (callDefinitionClause != null) {
+                    itemPresentation = callDefinitionClause.getPresentation();
+                }
             }
         }
 

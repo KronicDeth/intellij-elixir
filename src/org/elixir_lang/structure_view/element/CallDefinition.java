@@ -115,19 +115,29 @@ public class CallDefinition implements StructureViewTreeElement, Timed, Visible,
     /**
      * @param call a def(macro)?p? call
      */
-    public CallDefinition(@NotNull Call call) {
-        Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
+    @Nullable
+    public static CallDefinition fromCall(@NotNull Call call) {
+        Modular modular = CallDefinitionClause.enclosingModular(call);
 
-        assert nameArityRange != null;
+        CallDefinition callDefinition = null;
 
-        /* arity is assumed to be max arity in the rane because that's how {@code h} and ExDoc treat functions with
-           defaults. */
-        this.arity = nameArityRange.second.getMaximumInteger();
-        this.modular = CallDefinitionClause.enclosingModular(call);
-        this.name = nameArityRange.first;
-        this.time = CallDefinitionClause.time(call);
+        if (modular != null) {
+            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
+
+            if (nameArityRange != null) {
+
+                String name = nameArityRange.first;
+                /* arity is assumed to be max arity in the range because that's how {@code h} and ExDoc treat functions
+                   with defaults. */
+                int arity = nameArityRange.second.getMaximumInteger();
+
+                Time time = CallDefinitionClause.time(call);
+                callDefinition = new CallDefinition(modular, time, name, arity);
+            }
+        }
+
+        return callDefinition;
     }
-
 
     public CallDefinition(@NotNull Modular modular, @NotNull Time time, @NotNull String name, int arity) {
         this.arity = arity;
