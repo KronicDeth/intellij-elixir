@@ -42,25 +42,28 @@ public class CallDefinitionClause extends com.intellij.codeInsight.lookup.Lookup
 
             if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(call)) {
                 org.elixir_lang.structure_view.element.CallDefinitionClause structureView =
-                        new org.elixir_lang.structure_view.element.CallDefinitionClause(call);
-                ItemPresentation structureViewPresentation = structureView.getPresentation();
+                        org.elixir_lang.structure_view.element.CallDefinitionClause.fromCall(call);
 
-                presentation.setIcon(structureViewPresentation.getIcon(true));
-                String presentableText = structureViewPresentation.getPresentableText();
+                if (structureView != null) {
+                    ItemPresentation structureViewPresentation = structureView.getPresentation();
 
-                if (presentableText != null) {
-                    int nameLength = name.length();
-                    int presentableTextLength = presentableText.length();
+                    presentation.setIcon(structureViewPresentation.getIcon(true));
+                    String presentableText = structureViewPresentation.getPresentableText();
 
-                    if (nameLength <= presentableTextLength) {
-                        presentation.appendTailText(presentableText.substring(nameLength), true);
+                    if (presentableText != null) {
+                        int nameLength = name.length();
+                        int presentableTextLength = presentableText.length();
+
+                        if (nameLength <= presentableTextLength) {
+                            presentation.appendTailText(presentableText.substring(nameLength), true);
+                        }
                     }
-                }
 
-                String locationString = structureViewPresentation.getLocationString();
+                    String locationString = structureViewPresentation.getLocationString();
 
-                if (locationString != null) {
-                    presentation.appendTailText(" (" + locationString + ")", false);
+                    if (locationString != null) {
+                        presentation.appendTailText(" (" + locationString + ")", false);
+                    }
                 }
             }
         }
