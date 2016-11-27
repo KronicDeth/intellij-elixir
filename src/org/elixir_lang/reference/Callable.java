@@ -254,6 +254,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 /* parenthesesArguments can be used in @spec other type declarations, so may not be variable until
                    ancestor call is checked */
                 ancestor instanceof ElixirMatchedParenthesesArguments ||
+                /* Happens when tuple is after `MyAlias.` when add qualified call above line with pre-existing tuple */
+                ancestor instanceof ElixirMultipleAliases ||
                 ancestor instanceof ElixirNoParenthesesOneArgument ||
                 ancestor instanceof ElixirNoParenthesesArguments ||
                 ancestor instanceof ElixirNoParenthesesKeywordPair ||
