@@ -117,6 +117,7 @@
 
 ### Bug Fixes
 * [#523](https://github.com/KronicDeth/intellij-elixir/pull/523) - Fix typo: `myRunInModuleChekcBox` => `myRunInModuleCheckBox` - [@KronicDeth](https://github.com/KronicDeth)
+* [#532](https://github.com/KronicDeth/intellij-elixir/pull/532) - Don't log error when name length exceeds presentable text length because it appears to be common for normal users and not a development environment artifact. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.6.0
 

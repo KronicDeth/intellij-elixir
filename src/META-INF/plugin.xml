@@ -57,6 +57,10 @@
           <p>Bug Fixes</p>
           <ul>
             <li>Fix typo: <code>myRunInModuleChekcBox</code> => <code>myRunInModuleCheckBox</code></li>
+            <li>
+              Don't log error when name length exceeds presentable text length because it appears to be common for
+              normal users and not a development environment artifact.
+            </li>
           </ul>
         </li>
       </ul>
