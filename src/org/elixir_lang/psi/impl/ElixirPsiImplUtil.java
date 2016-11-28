@@ -2958,7 +2958,7 @@ public class ElixirPsiImplUtil {
         PsiReference reference = null;
 
         if (isOutermostQualifiableAlias(qualifiableAlias)) {
-            reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            reference = new org.elixir_lang.reference.Module(qualifiableAlias, qualifiableAlias.getContainingFile());
         }
 
         return reference;
@@ -5374,7 +5374,7 @@ if (quoted == null) {
     @Contract(pure = true)
     @Nullable
     public static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
-        return maybeAliasToModular(qualified.qualifier());
+        return maybeAliasToModular(qualified.qualifier(), qualified.getContainingFile());
     }
 
     @NotNull
@@ -5504,10 +5504,8 @@ if (quoted == null) {
      */
     @Contract(pure = true)
     @Nullable
-    public static Call maybeAliasToModular(@NotNull final PsiElement maybeAlias) {
-        PsiElement maybeQualifiableAlias = maybeAlias;
-
-        maybeQualifiableAlias = stripAccessExpression(maybeAlias);
+    public static Call maybeAliasToModular(@NotNull final PsiElement maybeAlias, @NotNull PsiElement maxScope) {
+        PsiElement maybeQualifiableAlias = stripAccessExpression(maybeAlias);
 
         Call modular = null;
 
@@ -5515,7 +5513,7 @@ if (quoted == null) {
             QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
             /* need to construct reference directly as qualified aliases don't return a
                reference except for the outermost */
-            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias);
+            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
             modular = aliasToModular(qualifiableAlias, reference);
         }
 
@@ -5524,8 +5522,8 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @Nullable
-    public static Call aliasToModular(@NotNull QualifiableAlias alias,
-                                      @NotNull PsiReference startingReference) {
+    private static Call aliasToModular(@NotNull QualifiableAlias alias,
+                                       @NotNull PsiReference startingReference) {
         PsiElement fullyResolvedAlias = fullyResolveAlias(alias, startingReference);
         Call modular = null;
 
