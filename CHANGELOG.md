@@ -123,6 +123,10 @@
 * [#534](https://github.com/KronicDeth/intellij-elixir/pull/534) - Add space between variable and match in lookup element presentation - [@KronicDeth](https://github.com/KronicDeth)
 * [#535](https://github.com/KronicDeth/intellij-elixir/pull/535) - Check `VirtualFile` is not null before creating attachment because `PsiFile` can lack a `VirtualFile` if the `PsiFile` only exists in memory. - [@KronicDeth](https://github.com/KronicDeth) 
 * [#537](https://github.com/KronicDeth/intellij-elixir/pull/537) - Convert `CallDefinitionClause(Call)` to `CallDefinitionClause.fromCall(Call)`, so that `null` can be returned when `CallDefinitionClause.enclosingModular(Call)` returns `null`. - [@KronicDeth](https://github.com/KronicDeth) 
+* [#539](https://github.com/KronicDeth/intellij-elixir/pull/539) - [@KronicDeth](https://github.com/KronicDeth)
+  * Use `functionName` instead of `getName` when multiresolving unqualified functions because `getName` will return the Alias when called on `defmodule`.
+  * `maybeQualifiedCallToModular` returned `null` BOTH (1) if the call was unqualified OR (2) if the call was qualified, but its modular could not be resolved, so qualified calls to `.beam`-only modules, like `File.read!` returned `null` because `File` could not be resolved to a modular.  Remove `maybeqQualifiedToModular` and call `qualifiedToModular` when `myElement` is qualified.  If the modular is `null`, then return an empty `ResolveResult[]` instead of looking for unqualified matches.
+  * Pass `maxScope` to `Module` reference.  `maxScope` is generally the containing file for the element, but when using `Module` to resolve `import`s, it is the `import` call's parent element, so that the resolve doesn't ricochet between the `defmodule` and its child, the `import` call until `StackOverflowError`.
 
 ## v4.6.0
 

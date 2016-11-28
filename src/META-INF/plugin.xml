@@ -79,6 +79,25 @@
               that <code>null</code> can be returned when <code>CallDefinitionClause.enclosingModular(Call)</code>
               returns <code>null</code>.
             </li>
+            <li>
+              Use <code>functionName</code> instead of <code>getName</code> when multiresolving unqualified functions
+              because <code>getName</code> will return the Alias when called on <code>defmodule</code>.
+            </li>
+            <li>
+              <code>maybeQualifiedCallToModular</code> returned <code>null</code> BOTH (1) if the call was unqualified
+              OR (2) if the call was qualified, but its modular could not be resolved, so qualified calls to
+              <code>.beam</code>-only modules, like <code>File.read!</code> returned <code>null</code> because
+              <code>File</code> could not be resolved to a modular.  Remove <code>maybeqQualifiedToModular</code> and
+              call <code>qualifiedToModular</code> when <code>myElement</code> is qualified.  If the modular is
+              <code>null</code>, then return an empty <code>ResolveResult[]</code> instead of looking for unqualified
+              matches.
+            </li>
+            <li>
+              Pass <code>maxScope</code> to <code>Module</code> reference.  <code>maxScope</code> is generally the
+              containing file for the element, but when using <code>Module</code> to resolve <code>import</code>s, it is
+              the <code>import</code> call's parent element, so that the resolve doesn't ricochet between the
+              <code>defmodule</code> and its child, the <code>import</code> call until <code>StackOverflowError</code>.
+            </li>
           </ul>
         </li>
       </ul>
