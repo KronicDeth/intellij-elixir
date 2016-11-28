@@ -20,22 +20,16 @@ import java.util.List;
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPolyVariantReference {
-    /*
-     *
-     * Static Methods
-     *
-     */
-
-    /*
-     * Private Static Methods
-     */
+    @NotNull
+    private PsiElement maxScope;
 
     /*
      * Constructors
      */
 
-    public Module(@NotNull QualifiableAlias qualifiableAlias) {
+    public Module(@NotNull QualifiableAlias qualifiableAlias, @NotNull PsiElement maxScope) {
         super(qualifiableAlias, TextRange.create(0, qualifiableAlias.getTextLength()));
+        this.maxScope = maxScope;
     }
 
     /*
@@ -55,7 +49,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
         final String name = resolvableName(myElement);
 
         if (name != null) {
-            resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement);
+            resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement, maxScope);
 
             if (resolveResultList == null || resolveResultList.isEmpty()) {
                 resolveResultList = multiResolveProject(

@@ -610,41 +610,47 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> resolveResultList = null;
+        final List<ResolveResult> resolveResultList = new ArrayList<ResolveResult>();
         int resolvedFinalArity = myElement.resolvedFinalArity();
-        Call modular = maybeQualifiedCallToModular(myElement);
-        ResolveResult[] resolveResults;
 
-        if (modular != null) {
-            final List<ResolveResult> finalResolveResultList = new ArrayList<ResolveResult>();
+        if (myElement instanceof org.elixir_lang.psi.call.qualification.Qualified) {
+            Call modular = qualifiedToModular((org.elixir_lang.psi.call.qualification.Qualified) myElement);
 
-            Modular.forEachCallDefinitionClauseNameIdentifier(
-                    modular,
-                    myElement.functionName(),
-                    resolvedFinalArity,
-                    new com.intellij.util.Function<PsiElement, Boolean>() {
-                        @Override
-                        public Boolean fun(PsiElement nameIdentifier) {
-                            finalResolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
+            /* If modular cannot be found then it means that either the qualifier has a typo or its part of
+               .beam-only Module.  Since .beam-only Modules aren't resolvable at this time, assume typo and mark all
+                ResolveResults with `validResult` `false.  Finally, it could also be a variable. */
+            if (modular != null) {
+                Modular.forEachCallDefinitionClauseNameIdentifier(
+                        modular,
+                        myElement.functionName(),
+                        resolvedFinalArity,
+                        new com.intellij.util.Function<PsiElement, Boolean>() {
+                            @Override
+                            public Boolean fun(PsiElement nameIdentifier) {
+                                resolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
 
-                            return true;
+                                return true;
+                            }
                         }
-                    }
-            );
-
-            resolveResults = finalResolveResultList.toArray(new ResolveResult[finalResolveResultList.size()]);
+                );
+            }
         } else {
-            String name = myElement.getName();
+            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
+               not `defmodule` */
+            String name = myElement.functionName();
 
             if (name != null) {
-                List<ResolveResult> variableResolveList = null;
-
                 if (resolvedFinalArity == 0) {
-                    variableResolveList = org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                            name,
-                            incompleteCode,
-                            myElement
-                    );
+                    List<ResolveResult> variableResolveList =
+                            org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
+                                    name,
+                                    incompleteCode,
+                                    myElement
+                            );
+
+                    if (variableResolveList != null) {
+                        resolveResultList.addAll(variableResolveList);
+                    }
                 }
 
                 List<ResolveResult> callDefinitionClauseResolveResultList =
@@ -655,17 +661,14 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                                 myElement
                         );
 
-                resolveResultList = merge(variableResolveList, callDefinitionClauseResolveResultList);
+                if (callDefinitionClauseResolveResultList != null) {
+                    resolveResultList.addAll(callDefinitionClauseResolveResultList);
+                }
             }
 
-            if (resolveResultList == null) {
-                resolveResults = new ResolveResult[0];
-            } else {
-                resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
-            }
         }
 
-        return resolveResults;
+        return resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
     }
 
     /**

@@ -29,8 +29,9 @@ public class MultiResolve extends Module {
     @Nullable
     public static List<ResolveResult> resolveResultList(@NotNull String name,
                                                         boolean incompleteCode,
-                                                        @NotNull PsiElement entrance) {
-      return resolveResultList(name, incompleteCode, entrance, ResolveState.initial());
+                                                        @NotNull PsiElement entrance,
+                                                        @NotNull PsiElement maxScope) {
+      return resolveResultList(name, incompleteCode, entrance, maxScope, ResolveState.initial());
     }
 
     /*
@@ -54,12 +55,13 @@ public class MultiResolve extends Module {
     private static List<ResolveResult> resolveResultList(@NotNull String name,
                                                          boolean incompleteCode,
                                                          @NotNull PsiElement entrance,
+                                                         @NotNull PsiElement maxScope,
                                                          @NotNull ResolveState state) {
         MultiResolve multiResolve = new MultiResolve(name, incompleteCode);
         PsiTreeUtil.treeWalkUp(
                 multiResolve,
                 entrance,
-                entrance.getContainingFile(),
+                maxScope,
                 state.put(ENTRANCE, entrance)
         );
         return multiResolve.getResolveResultList();

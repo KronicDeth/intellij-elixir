@@ -95,7 +95,7 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
                     org.elixir_lang.psi.qualification.Qualified qualifiedGrandParent = (org.elixir_lang.psi.qualification.Qualified) grandParent;
                     PsiElement qualifier = qualifiedGrandParent.qualifier();
 
-                    Call modular = ElixirPsiImplUtil.maybeAliasToModular(qualifier);
+                    Call modular = ElixirPsiImplUtil.maybeAliasToModular(qualifier, qualifier.getContainingFile());
 
                     if (modular != null) {
                         resultSet.withPrefixMatcher("").addAllElements(
