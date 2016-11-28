@@ -633,8 +633,11 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             );
 
             resolveResults = finalResolveResultList.toArray(new ResolveResult[finalResolveResultList.size()]);
-        } else {
-            String name = myElement.getName();
+        }
+        else {
+            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
+               not `defmodule` */
+            String name = myElement.functionName();
 
             if (name != null) {
                 List<ResolveResult> variableResolveList = null;
