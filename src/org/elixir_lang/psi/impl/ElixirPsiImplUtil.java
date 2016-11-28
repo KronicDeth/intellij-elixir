@@ -1125,26 +1125,6 @@ public class ElixirPsiImplUtil {
         return childCalls;
     }
 
-    /**
-     * Finds modular ({@code defmodule}, {@code defimpl}, or {@code defprotocol}) for the qualifier of
-     * {@code maybeQualifiedCall}.
-     *
-     * @param maybeQualifiedCall a call that may be qualified
-     * @return {@code null} if {@code maybeQualifiedCall} is not qualified OR if the modular cannot be resolved, such
-     *   as when the qualifying Alias is invalid or is an unparsed module like {@code Kernel} or {@code Enum}.
-     */
-    @Contract(pure = true)
-    @Nullable
-    public static Call maybeQualifiedCallToModular(@NotNull final Call maybeQualifiedCall) {
-        Call modular = null;
-
-        if (maybeQualifiedCall instanceof org.elixir_lang.psi.call.qualification.Qualified) {
-            modular = qualifiedToModular((org.elixir_lang.psi.call.qualification.Qualified) maybeQualifiedCall);
-        }
-
-        return modular;
-    }
-
     public static OtpErlangList metadata(ASTNode node) {
         OtpErlangObject[] keywordListElements = {
                 lineNumberKeywordTuple(node)
@@ -5393,7 +5373,7 @@ if (quoted == null) {
      */
     @Contract(pure = true)
     @Nullable
-    private static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
+    public static Call qualifiedToModular(@NotNull final org.elixir_lang.psi.call.qualification.Qualified qualified) {
         return maybeAliasToModular(qualified.qualifier());
     }
 
