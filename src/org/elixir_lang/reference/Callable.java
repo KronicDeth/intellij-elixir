@@ -531,8 +531,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             useScope = variableUseScope((Match) ancestor);
         } else if (ancestor instanceof Call) {
             useScope = variableUseScope((Call) ancestor);
-        } else if (ancestor instanceof ElixirInterpolation) {
-            /* no variable can be declared inside an interpolation, so this is a variable usage missing a declaration,
+        } else if (ancestor instanceof ElixirMapUpdateArguments || ancestor instanceof ElixirInterpolation) {
+            /* no variable can be declared inside these classes, so this is a variable usage missing a declaration,
                so it has no use scope */
             useScope = LocalSearchScope.EMPTY;
         } else {
