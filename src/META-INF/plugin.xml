@@ -54,6 +54,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/500">#500</a>.
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/517">#517</a>.
+            </li>
           </ul>
         </li>
         <li>
@@ -97,6 +100,10 @@
               containing file for the element, but when using <code>Module</code> to resolve <code>import</code>s, it is
               the <code>import</code> call's parent element, so that the resolve doesn't ricochet between the
               <code>defmodule</code> and its child, the <code>import</code> call until <code>StackOverflowError</code>.
+            </li>
+            <li>
+              A variable cannot be declared in update arguments, so return <code>LocalSearchScope.EMPTY</code>, the same
+              as interpolation.
             </li>
           </ul>
         </li>

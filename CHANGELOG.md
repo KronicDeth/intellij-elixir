@@ -115,6 +115,7 @@
   * `Navigate > Test` will go to the Module that has the same canonical name as the current `defimpl`, `defmodule`, `defprotocol` , or `quote` with a `Test` suffix added
   * `Navigate > Test Subject` will go to the `defimpl`, `defmodule`, `defprotocol`, or `quote` that has the same canonical name as the current Module with the `Test` suffix removed.
 * [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Regression test for #500 - [@KronicDeth](https://github.com/KronicDeth)
+* [#545](https://github.com/KronicDeth/intellij-elixir/pull/545) - Regression test for #517 - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#523](https://github.com/KronicDeth/intellij-elixir/pull/523) - Fix typo: `myRunInModuleChekcBox` => `myRunInModuleCheckBox` - [@KronicDeth](https://github.com/KronicDeth)
@@ -127,6 +128,7 @@
   * Use `functionName` instead of `getName` when multiresolving unqualified functions because `getName` will return the Alias when called on `defmodule`.
   * `maybeQualifiedCallToModular` returned `null` BOTH (1) if the call was unqualified OR (2) if the call was qualified, but its modular could not be resolved, so qualified calls to `.beam`-only modules, like `File.read!` returned `null` because `File` could not be resolved to a modular.  Remove `maybeqQualifiedToModular` and call `qualifiedToModular` when `myElement` is qualified.  If the modular is `null`, then return an empty `ResolveResult[]` instead of looking for unqualified matches.
   * Pass `maxScope` to `Module` reference.  `maxScope` is generally the containing file for the element, but when using `Module` to resolve `import`s, it is the `import` call's parent element, so that the resolve doesn't ricochet between the `defmodule` and its child, the `import` call until `StackOverflowError`.
+* [#545](https://github.com/KronicDeth/intellij-elixir/pull/545) - A variable cannot be declared in update arguments, so return `LocalSearchScope.EMPTY`, the same as interpolation. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.6.0
 
