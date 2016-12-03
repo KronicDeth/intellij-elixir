@@ -70,10 +70,10 @@ public class ElixirSystemUtil {
 
   @NotNull
   public static ProcessOutput getProcessOutput(int timeout,
-                                               @NotNull String workDir,
+                                               @Nullable String workDir,
                                                @NotNull String exePath,
                                                @NotNull String... arguments) throws ExecutionException{
-    if(!new File(workDir).isDirectory() || !new File(exePath).canExecute()){
+    if(workDir == null || !new File(workDir).isDirectory() || !new File(exePath).canExecute()){
       return new ProcessOutput();
     }
 
