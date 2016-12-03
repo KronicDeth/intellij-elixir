@@ -57,6 +57,9 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/517">#517</a>.
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/521">#521</a>.
+            </li>
           </ul>
         </li>
         <li>
@@ -104,6 +107,11 @@
             <li>
               A variable cannot be declared in update arguments, so return <code>LocalSearchScope.EMPTY</code>, the same
               as interpolation.
+            </li>
+            <li>
+              <code>ElixirSystemUtil.getProcessOutput</code> already allowed for an empty, invalid
+              <code>ProcessOutput</code> when the <code>workDir</code> wasn't a directory, so allow it to also be
+              <code>null</code> and return the empty <code>ProcessOutput</code>.
             </li>
           </ul>
         </li>
