@@ -367,6 +367,36 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 } else {
                     cannotHighlightTypes(matchedUnqualifiedParenthesesCall);
                 }
+            } else if (grandChild instanceof QuotableKeywordList) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) grandChild;
+                List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
+
+                // occurs when user does `my_type: definition` instead of `my_type :: definition`
+                if (quotableKeywordPairList.size() == 1) {
+                    QuotableKeywordPair quotableKeywordPair = quotableKeywordPairList.get(0);
+
+                    Quotable quotableKeywordKey = quotableKeywordPair.getKeywordKey();
+
+                    if (quotableKeywordKey instanceof ElixirKeywordKey) {
+                        ElixirKeywordKey keywordKey = (ElixirKeywordKey) quotableKeywordKey;
+
+                        highlight(
+                                keywordKey.getTextRange(),
+                                annotationHolder,
+                                ElixirSyntaxHighlighter.TYPE
+                        );
+                    }
+
+                    Quotable quotableKeywordValue = quotableKeywordPair.getKeywordValue();
+
+                    highlightTypesAndTypeParameterUsages(
+                            quotableKeywordValue,
+                            Collections.<String>emptySet(),
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
+                // Otherwise, allow the normal, non-type highlighting
             } else if (grandChild instanceof UnqualifiedNoArgumentsCall) {
                 // assume it's a type name that is being typed
                 Call grandChildCall = (Call) grandChild;
