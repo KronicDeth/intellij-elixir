@@ -2,9 +2,6 @@ package org.elixir_lang.inspection;
 
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 
-/**
- * Created by luke.imhoff on 12/5/14.
- */
 public class KeywordPairColonInsteadOfTypeOperatorTestCase extends LightCodeInsightFixtureTestCase {
     public void testIssue525() {
         myFixture.configureByFiles("issue_525.ex");

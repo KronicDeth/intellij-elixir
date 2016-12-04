@@ -2123,6 +2123,10 @@
                      enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.KeywordPairColonInsteadOfTypeOperator"
                      language="Elixir" level="ERROR" shortName="KeywordPairColonInsteadOfTypeOperator"/>
+    <localInspection displayName="Match operator (=) used in type spec instead of type operator (:)"
+                     enabledByDefault="true" groupName="Elixir"
+                     implementationClass="org.elixir_lang.inspection.MatchOperatorInsteadOfTypeOperator"
+                     language="Elixir" level="ERROR" shortName="MatchOperatorInsteadOfTypeOperator"/>
 
     <!-- module attribute refactoring -->
     <renameHandler implementation="org.elixir_lang.refactoring.module_attribute.rename.Handler"/>

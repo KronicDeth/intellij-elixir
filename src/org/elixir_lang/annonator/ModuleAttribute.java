@@ -270,8 +270,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof Match /* Match is invalid.  It will be marked by MatchInsteadOfTypeOperator
-                                               inspection as an error */
+            if (grandChild instanceof Match /* Match is invalid.  It will be marked by
+                                               MatchOperatorInsteadOfTypeOperator inspection as an error */
                     || grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
