@@ -270,9 +270,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof Match) {
-                // TODO LocalInspectionTool with quick fix to "Use `::`, not `=`, to separate types declarations from their definitions"
-            } else if (grandChild instanceof Type) {
+            if (grandChild instanceof Match /* Match is invalid.  It will be marked by MatchInsteadOfTypeOperator
+                                               inspection as an error */
+                    || grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
                 Set<String> typeParameterNameSet = Collections.emptySet();
