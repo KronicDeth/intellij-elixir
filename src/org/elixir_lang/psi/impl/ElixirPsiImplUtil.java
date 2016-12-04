@@ -560,7 +560,11 @@ public class ElixirPsiImplUtil {
     public static UseScopeSelector useScopeSelector(@NotNull PsiElement element) {
         UseScopeSelector useScopeSelector = UseScopeSelector.PARENT;
 
-        if (element instanceof ElixirAnonymousFunction) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            /* Module Attribute declarations can't declare variables, so this is a variable usage without declaration,
+               so limit to SELF */
+            useScopeSelector = UseScopeSelector.SELF;
+        } else if (element instanceof ElixirAnonymousFunction) {
             useScopeSelector = UseScopeSelector.SELF;
         } else if (element instanceof Call) {
             Call call = (Call) element;
