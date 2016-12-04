@@ -29,6 +29,7 @@ import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 
@@ -80,13 +81,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
                         TextRange textRange = atIdentifier.getTextRange();
 
-                        ASTNode node = atIdentifier.getNode();
-                        ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
-
-                        assert identifierNodes.length == 1;
-
-                        ASTNode identifierNode = identifierNodes[0];
-                        String identifier = identifierNode.getText();
+                        String identifier = identifierName(atIdentifier);
 
                         if (isCallbackName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
