@@ -117,6 +117,11 @@
 * [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Regression test for #500 - [@KronicDeth](https://github.com/KronicDeth)
 * [#545](https://github.com/KronicDeth/intellij-elixir/pull/545) - Regression test for #517 - [@KronicDeth](https://github.com/KronicDeth)
 * [#548](https://github.com/KronicDeth/intellij-elixir/pull/548) - Regression test for #521 - [@KronicDeth](https://github.com/KronicDeth)
+* [#549](https://github.com/KronicDeth/intellij-elixir/pull/549) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regression test for #525
+  * If `:` is used instead of `::` for a type specification, mark it as an error with a Quick Fix to convert `:` to ` ::`.
+  * Highlight `=` operands the same as `::` operands in type specifications.
+  * If `=` is used instead of `::` in a type specification, mark it as an error with a Quick Fix to convert `=` to `::`.
 
 ### Bug Fixes
 * [#523](https://github.com/KronicDeth/intellij-elixir/pull/523) - Fix typo: `myRunInModuleChekcBox` => `myRunInModuleCheckBox` - [@KronicDeth](https://github.com/KronicDeth)
@@ -131,6 +136,9 @@
   * Pass `maxScope` to `Module` reference.  `maxScope` is generally the containing file for the element, but when using `Module` to resolve `import`s, it is the `import` call's parent element, so that the resolve doesn't ricochet between the `defmodule` and its child, the `import` call until `StackOverflowError`.
 * [#545](https://github.com/KronicDeth/intellij-elixir/pull/545) - A variable cannot be declared in update arguments, so return `LocalSearchScope.EMPTY`, the same as interpolation. - [@KronicDeth](https://github.com/KronicDeth)
 * [#548](https://github.com/KronicDeth/intellij-elixir/pull/548) - `ElixirSystemUtil.getProcessOutput` already allowed for an empty, invalid `ProcessOutput` when the `workDir` wasn't a directory, so allow it to also be `null` and return the empty `ProcessOutput`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#549](https://github.com/KronicDeth/intellij-elixir/pull/549) - [@KronicDeth](https://github.com/KronicDeth)
+  * If a single keyword pair is used for a type spec, treat `:` as a type for `::`
+  * Limit variable use scope for variables "declared" in module attributes to the module attribute because the variable can't be declared there and it is really a variable usage without declaration.
 
 ## v4.6.0
 

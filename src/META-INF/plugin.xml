@@ -60,6 +60,16 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/521">#521</a>.
             </li>
+            <li>Regression test for #525</li>
+            <li>
+              If <code>:</code> is used instead of <code>::</code> for a type specification, mark it as an error with
+              a Quick Fix to convert <code>:</code> to <code> ::</code>.
+            </li>
+            <li>Highlight <code>=</code> operands the same as <code>::</code> operands in type specifications.</li>
+            <li>
+              If <code>=</code> is used instead of <code>::</code> in a type specification, mark it as an error with a
+              Quick Fix to convert <code>=</code> to <code>::</code>.
+            </li>
           </ul>
         </li>
         <li>
@@ -112,6 +122,13 @@
               <code>ElixirSystemUtil.getProcessOutput</code> already allowed for an empty, invalid
               <code>ProcessOutput</code> when the <code>workDir</code> wasn't a directory, so allow it to also be
               <code>null</code> and return the empty <code>ProcessOutput</code>.
+            </li>
+            <li>
+              If a single keyword pair is used for a type spec, treat <code>:</code> as a type for <code>::</code>
+            </li>
+            <li>
+              Limit variable use scope for variables "declared" in module attributes to the module attribute because the
+              variable can't be declared there and it is really a variable usage without declaration.
             </li>
           </ul>
         </li>
