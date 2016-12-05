@@ -560,7 +560,11 @@ public class ElixirPsiImplUtil {
     public static UseScopeSelector useScopeSelector(@NotNull PsiElement element) {
         UseScopeSelector useScopeSelector = UseScopeSelector.PARENT;
 
-        if (element instanceof ElixirAnonymousFunction) {
+        if (element instanceof AtUnqualifiedNoParenthesesCall) {
+            /* Module Attribute declarations can't declare variables, so this is a variable usage without declaration,
+               so limit to SELF */
+            useScopeSelector = UseScopeSelector.SELF;
+        } else if (element instanceof ElixirAnonymousFunction) {
             useScopeSelector = UseScopeSelector.SELF;
         } else if (element instanceof Call) {
             Call call = (Call) element;
@@ -669,6 +673,17 @@ public class ElixirPsiImplUtil {
         FileViewProvider fileViewProvider = containingFile.getViewProvider();
 
         return fileViewProvider.getDocument();
+    }
+
+    @NotNull
+    public static String identifierName(ElixirAtIdentifier atIdentifier) {
+        ASTNode node = atIdentifier.getNode();
+        ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
+
+        assert identifierNodes.length == 1;
+
+        ASTNode identifierNode = identifierNodes[0];
+        return identifierNode.getText();
     }
 
     /**

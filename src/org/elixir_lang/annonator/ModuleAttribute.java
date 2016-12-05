@@ -29,6 +29,7 @@ import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.reference.ModuleAttribute.*;
 
@@ -80,13 +81,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         ElixirAtIdentifier atIdentifier = atUnqualifiedNoParenthesesCall.getAtIdentifier();
                         TextRange textRange = atIdentifier.getTextRange();
 
-                        ASTNode node = atIdentifier.getNode();
-                        ASTNode[] identifierNodes = node.getChildren(ElixirPsiImplUtil.IDENTIFIER_TOKEN_SET);
-
-                        assert identifierNodes.length == 1;
-
-                        ASTNode identifierNode = identifierNodes[0];
-                        String identifier = identifierNode.getText();
+                        String identifier = identifierName(atIdentifier);
 
                         if (isCallbackName(identifier)) {
                             highlight(textRange, holder, ElixirSyntaxHighlighter.MODULE_ATTRIBUTE);
@@ -275,9 +270,9 @@ public class ModuleAttribute implements Annotator, DumbAware {
         if (grandChildren.length == 1) {
             PsiElement grandChild = grandChildren[0];
 
-            if (grandChild instanceof Match) {
-                // TODO LocalInspectionTool with quick fix to "Use `::`, not `=`, to separate types declarations from their definitions"
-            } else if (grandChild instanceof Type) {
+            if (grandChild instanceof Match /* Match is invalid.  It will be marked by
+                                               MatchOperatorInsteadOfTypeOperator inspection as an error */
+                    || grandChild instanceof Type) {
                 Infix infix = (Infix) grandChild;
                 PsiElement leftOperand = infix.leftOperand();
                 Set<String> typeParameterNameSet = Collections.emptySet();
@@ -367,6 +362,36 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 } else {
                     cannotHighlightTypes(matchedUnqualifiedParenthesesCall);
                 }
+            } else if (grandChild instanceof QuotableKeywordList) {
+                QuotableKeywordList quotableKeywordList = (QuotableKeywordList) grandChild;
+                List<QuotableKeywordPair> quotableKeywordPairList = quotableKeywordList.quotableKeywordPairList();
+
+                // occurs when user does `my_type: definition` instead of `my_type :: definition`
+                if (quotableKeywordPairList.size() == 1) {
+                    QuotableKeywordPair quotableKeywordPair = quotableKeywordPairList.get(0);
+
+                    Quotable quotableKeywordKey = quotableKeywordPair.getKeywordKey();
+
+                    if (quotableKeywordKey instanceof ElixirKeywordKey) {
+                        ElixirKeywordKey keywordKey = (ElixirKeywordKey) quotableKeywordKey;
+
+                        highlight(
+                                keywordKey.getTextRange(),
+                                annotationHolder,
+                                ElixirSyntaxHighlighter.TYPE
+                        );
+                    }
+
+                    Quotable quotableKeywordValue = quotableKeywordPair.getKeywordValue();
+
+                    highlightTypesAndTypeParameterUsages(
+                            quotableKeywordValue,
+                            Collections.<String>emptySet(),
+                            annotationHolder,
+                            ElixirSyntaxHighlighter.TYPE
+                    );
+                }
+                // Otherwise, allow the normal, non-type highlighting
             } else if (grandChild instanceof UnqualifiedNoArgumentsCall) {
                 // assume it's a type name that is being typed
                 Call grandChildCall = (Call) grandChild;
