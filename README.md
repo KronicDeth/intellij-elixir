@@ -29,8 +29,12 @@
         - [Empty Parentheses](#empty-parentheses)
         - [Keywords in Parentheses](#keywords-in-parentheses)
         - [Positional arguments in Parentheses](#positional-arguments-in-parentheses)
+      - [Keyword pair colon (`:`) used in type spec instead of type operator (`::`)](#keyword-pair-colon--used-in-type-spec-instead-of-type-operator-)
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
+      - [Match operator (`=`) used in type spec instead of type operator (`::`)](#match-operator--used-in-type-spec-instead-of-type-operator-)
     - [Quick Fixes](#quick-fixes)
+      - [Convert `:` to ` ::` in type specs](#convert--to---in-type-specs)
+      - [Convert `=` to ` ::` in type specs](#convert--to---in-type-specs)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
     - [Code Folding](#code-folding)
       - [Controls](#controls)
@@ -1156,6 +1160,20 @@ function(first_positional, second_positional)
   </figcaption>
 </figure>
 
+#### Keyword pair colon (`:`) used in type spec instead of type operator (`::`)
+
+Type specifications separate the name from the definition using `::`.
+
+```elixir
+@type name: definition
+```
+
+Replace the `:` with ` ::`
+ 
+```elixir
+@type name :: definition
+```
+
 #### Keywords appear before the end of list.
 
 ```elixir
@@ -1214,9 +1232,31 @@ one.(
   </figcaption>
 </figure>
 
+#### Match operator (`=`) used in type spec instead of type operator (`::`)
+
+Type specifications separate the name from the definition using `::`.
+
+```elixir
+@type name = definition
+```
+
+Replace the `=` with ` ::`
+ 
+```elixir
+@type name :: definition
+```
+
 ### Quick Fixes
 
 Quick Fixes are actions IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
+
+#### Convert `:` to ` ::` in type specs
+
+If a type specification uses a single `:` instead of `::`, then hit Alt+Enter on the `:` to change it to ` ::` and fix the type spec.
+
+#### Convert `=` to ` ::` in type specs
+
+If a type specification uses `=` instead of `::`, then hit Alt+Enter on the `=` to change it to `::` and fix the type spec.
 
 #### Remove space in front of ambiguous parentheses
 
