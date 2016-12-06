@@ -1758,7 +1758,7 @@ The context menu must know that the the directory, file, or line you are right-c
   2. Right-click the `test` directory.
   3. Hover over "Mark Directory As &gt;"
     * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
-      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Unmark%20asTest%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Unmark%20as%20Test%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
     * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
       ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
 
