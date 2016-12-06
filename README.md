@@ -29,8 +29,12 @@
         - [Empty Parentheses](#empty-parentheses)
         - [Keywords in Parentheses](#keywords-in-parentheses)
         - [Positional arguments in Parentheses](#positional-arguments-in-parentheses)
+      - [Keyword pair colon (`:`) used in type spec instead of type operator (`::`)](#keyword-pair-colon--used-in-type-spec-instead-of-type-operator-)
       - [Keywords appear before the end of list.](#keywords-appear-before-the-end-of-list)
+      - [Match operator (`=`) used in type spec instead of type operator (`::`)](#match-operator--used-in-type-spec-instead-of-type-operator-)
     - [Quick Fixes](#quick-fixes)
+      - [Convert `:` to ` ::` in type specs](#convert--to---in-type-specs)
+      - [Convert `=` to ` ::` in type specs](#convert--to---in-type-specs)
       - [Remove space in front of ambiguous parentheses](#remove-space-in-front-of-ambiguous-parentheses)
     - [Code Folding](#code-folding)
       - [Controls](#controls)
@@ -48,6 +52,12 @@
     - [Live Templates](#live-templates)
     - [Run Configurations](#run-configurations)
       - [Mix Tasks](#mix-tasks)
+      - [`mix test`](#mix-test)
+        - [Creating `mix test` Run Configurations Manually](#creating-mix-test-run-configurations-manually)
+        - [Creating `mix test` Run Configurations from context](#creating-mix-test-run-configurations-from-context)
+          - [Creating/Running `mix test` Run Configurations from directory](#creatingrunning-mix-test-run-configurations-from-directory)
+          - [Creating/Running `mix test` Run Configurations from file](#creatingrunning-mix-test-run-configurations-from-file)
+          - [Creating/Running `mix test` Run Configurations from line](#creatingrunning-mix-test-run-configurations-from-line)
     - [Completion](#completion)
       - [Aliases and Modules](#aliases-and-modules)
         - [Aliases inside `{ }`](#aliases-inside--)
@@ -66,6 +76,8 @@
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
     - [Go To Symbol](#go-to-symbol)
+    - [Go To Test](#go-to-test)
+    - [Go To Test Subject](#go-to-test-subject)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
@@ -1148,6 +1160,20 @@ function(first_positional, second_positional)
   </figcaption>
 </figure>
 
+#### Keyword pair colon (`:`) used in type spec instead of type operator (`::`)
+
+Type specifications separate the name from the definition using `::`.
+
+```elixir
+@type name: definition
+```
+
+Replace the `:` with ` ::`
+ 
+```elixir
+@type name :: definition
+```
+
 #### Keywords appear before the end of list.
 
 ```elixir
@@ -1206,9 +1232,31 @@ one.(
   </figcaption>
 </figure>
 
+#### Match operator (`=`) used in type spec instead of type operator (`::`)
+
+Type specifications separate the name from the definition using `::`.
+
+```elixir
+@type name = definition
+```
+
+Replace the `=` with ` ::`
+ 
+```elixir
+@type name :: definition
+```
+
 ### Quick Fixes
 
 Quick Fixes are actions IntelliJ can take to change your code to correct errors (accessed with Alt+Enter by default).
+
+#### Convert `:` to ` ::` in type specs
+
+If a type specification uses a single `:` instead of `::`, then hit Alt+Enter on the `:` to change it to ` ::` and fix the type spec.
+
+#### Convert `=` to ` ::` in type specs
+
+If a type specification uses `=` instead of `::`, then hit Alt+Enter on the `=` to change it to `::` and fix the type spec.
 
 #### Remove space in front of ambiguous parentheses
 
@@ -1666,15 +1714,97 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 2. Click +
 3. Select "Elixir Mix"
    ![Add New Elixir Mix](/screenshots/features/run_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
-4. Fill in the "Name" for the Run Configuration
-5. Fill in the command (`mix` task) to run
-   ![Edit Elixir Mix Run Configuration](/screenshots/features/run_configurations/mix_tasks/Edit.png?raw=true "Edit Elixir Mix Run Configuration")
-6. Click "OK" to save the Run Configuration and close the dialog
-7. Click the Run arrow in the Toolbar to run the `mix` task
+4. Fill in the "Program arguments" starting with the name of the `mix` task followed by any arguments to that task
+5. Fill in the "Working directory"
+  * Type the absolute path to the directory.  
+  * Select the path using directory picker by clicking the `...` button
+6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+7. Click "OK" to save the Run Configuration and close the dialog
+8. Click the Run arrow in the Toolbar to run the `mix` task
    ![Run](/screenshots/features/run_configurations/mix_tasks/Toolbar%20Run%20Button.png?raw=true "Run Elixir Mix Run Configuration")
-8. The Run pane will open, showing the results of the `mix` task.
+9. The Run pane will open, showing the results of the `mix` task.
     * If there is an error with a FILE:LINE stack frame, it will be a clickable link that will take you to that location
       ![Error link](/screenshots/features/run_configurations/mix_tasks/Error%20Link.png?raw=true "Clickable Error Link")
+
+#### `mix test`
+
+The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix test`, so that you get the standard graphical tree of Test Results
+
+##### Creating `mix test` Run Configurations Manually 
+
+1. Run > Edit Configurations...
+   ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
+2. Click +
+3. Select "Elixir Mix ExUnit"
+   ![Add New Elixir Mix ExUnit](/screenshots/features/run_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
+4. Fill in the "Program arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
+5. Fill in the "Working directory"
+  * Type the absolute path to the directory.  
+  * Select the path using directory picker by clicking the `...` button
+6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
+7. Click "OK" to save the Run Configuration and close the dialog
+8. Click the RUn arrow in the Toolbar to run the `mix test` task
+9. The Run pane will open showing the Test Results
+   ![Test Results](/screenshots/features/run_configurations/mix_test/Test%20Results.png?raw=true "Full Green Test Results")
+   
+While you can create `Elixir Mix ExUnit` run configurations manually using the `Run > Edit Configurations...` menu, it is probably more convenient to use the context menu.
+
+##### Creating `mix test` Run Configurations from context
+
+The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root. 
+
+1. In the Project pane, ensure your OTP application's `test` directory is marked as a Test Sources Root
+  1. Check if the `test` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
+  2. Right-click the `test` directory.
+  3. Hover over "Mark Directory As &gt;"
+    * If "Unmark as Test Sources Root" is shown, then the directory is already configured correctly, and create from context will work.
+      ![Mark Directory As &gt; Unmark as Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Unmark%20asTest%20Sources%20Root.png?raw=true "Unmark Directory as Test Sources Root")
+    * If "Test Sources Root" is shown, then the directory need to be configured by clicking that entry
+      ![Mark Directory As &gt; Test Sources Root](/screenshots/features/run_configurations/mix_test/mark_directory_as/Test%20Sources%20Root.png?raw=true "Mark Directory as Test Sources Root")
+
+###### Creating/Running `mix test` Run Configurations from directory
+
+1. Right-click the directory in the Project pane
+2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
+  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/directory/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking directory")
+  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Select the directory in the Project pane.
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
+
+###### Creating/Running `mix test` Run Configurations from file
+
+1. Right-click the file in the Project pane
+2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
+  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Select the directory in the Project pane.
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
+
+Finally, you can use the editor tabs
+
+1. Right-click the editor tab for the test file you want to run
+  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/file/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking file editor tab")
+2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
+  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+
+###### Creating/Running `mix test` Run Configurations from line
+
+If you want to be able to run a single test, you can create a Run Configuration for a line in that test
+
+1. Right-click a line in the test file
+  ![Run Mix ExUnit](/screenshots/features/run_configurations/mix_test/context/line/Run%20Mix%20ExUnit.png?raw=true "Run Mix ExUnit from right-clicking line in editor")
+2. Click "Run Mix ExUnit", which will both create the Run Configuration and Run it.
+  * If you want to only create the Run Configuration, select "Create Mix ExUnit" instead
+
+Alternatively, you can use keyboard shortcuts
+
+1. Place the cursor on the line you want to test 
+2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
 
 ### Completion
 
@@ -1831,6 +1961,24 @@ Go To Symbol is a way to search for any of the following by name:
 * Protocols (`defprotocol`)
 
 You can bring up Go To Symbol with the keyboard shortcut (⌥⌘O on OSX) or using the menus (Navigate > Symbol...).
+
+### Go To Test
+
+Go to Test allows you to jump from the a Source Module to its corresponding Test Module
+
+1. Have the cursor in the body of a Module
+2. Active the Go To Test action with one of the following:
+    1. `Shift+Cmd+T`
+    2. Select Navigate &gt Test from the menu.
+
+### Go To Test Subject
+
+Go to Test Subject allows you to jump from the a Test Module to its corresponding Source Module
+
+1. Have the cursor in the body of a Test Module
+2. Active the Go To Test Subject action with one of the following:
+    1. `Shift+Cmd+T`
+    2. Select Navigate &gt Test Subject from the menu.
 
 ### Find Usage
 
