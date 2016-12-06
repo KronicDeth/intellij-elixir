@@ -72,6 +72,8 @@
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
     - [Go To Symbol](#go-to-symbol)
+    - [Go To Test](#go-to-test)
+    - [Go To Test Subject](#go-to-test-subject)
     - [Find Usage](#find-usage)
       - [Module](#module-1)
       - [Module Attribute](#module-attribute-1)
@@ -1919,6 +1921,24 @@ Go To Symbol is a way to search for any of the following by name:
 * Protocols (`defprotocol`)
 
 You can bring up Go To Symbol with the keyboard shortcut (⌥⌘O on OSX) or using the menus (Navigate > Symbol...).
+
+### Go To Test
+
+Go to Test allows you to jump from the a Source Module to its corresponding Test Module
+
+1. Have the cursor in the body of a Module
+2. Active the Go To Test action with one of the following:
+    1. `Shift+Cmd+T`
+    2. Select Navigate &gt Test from the menu.
+
+### Go To Test Subject
+
+Go to Test Subject allows you to jump from the a Test Module to its corresponding Source Module
+
+1. Have the cursor in the body of a Test Module
+2. Active the Go To Test Subject action with one of the following:
+    1. `Shift+Cmd+T`
+    2. Select Navigate &gt Test Subject from the menu.
 
 ### Find Usage
 
