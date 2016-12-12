@@ -4,6 +4,7 @@ import com.ericsson.otp.erlang.OtpErlangDecodeException;
 import gnu.trove.THashMap;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Chunk;
+import org.elixir_lang.beam.chunk.Exports;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
+import static org.elixir_lang.beam.chunk.Chunk.TypeID.EXPT;
 import static org.elixir_lang.beam.chunk.Chunk.length;
 import static org.elixir_lang.beam.chunk.Chunk.typeID;
 
@@ -101,5 +103,18 @@ public class Beam {
     @Nullable
     private Chunk chunk(@NotNull Chunk.TypeID typeID) {
         return chunk(typeID.toString());
+    }
+
+    @Nullable
+    public Exports exports() {
+        Exports exports = null;
+
+        Chunk chunk = chunk(EXPT);
+
+        if (chunk != null) {
+            exports = Exports.from(chunk);
+        }
+
+        return exports;
     }
 }

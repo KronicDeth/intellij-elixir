@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.chunk;
 
+import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,13 +38,16 @@ public class Atoms {
 
         if (chunk.typeID.equals(ATOM.toString()) && chunk.data.length >= 4) {
             int offset = 0;
-            long atomCount = unsignedInt(chunk.data, offset);
+            Pair<Long, Integer> atomCountByteCount = unsignedInt(chunk.data, offset);
+            long atomCount = atomCountByteCount.first;
+            offset += atomCountByteCount.second;
+
             List<String> atomList = new ArrayList<String>();
-            offset += 4;
 
             for (long i = 0; i < atomCount; i++) {
-                int atomLength = unsignedByte(chunk.data[offset]);
-                offset += 1;
+                Pair<Integer, Integer> atomLengthByteCount = unsignedByte(chunk.data[offset]);
+                int atomLength = atomLengthByteCount.first;
+                offset += atomLengthByteCount.second;
 
                 String entry = new String(chunk.data, offset, atomLength);
                 offset += atomLength;
@@ -59,6 +63,23 @@ public class Atoms {
     /*
      * Instance Methods
      */
+
+    /**
+     *
+     * @param index 1-based index.  1 is reserved for {#link moduleName}
+     * @return atom if
+     */
+    @Nullable
+    public String get(int index) {
+        String atom = null;
+
+        if (index >= 1) {
+            // index is 1-based, so subtract 1 to get 0-based
+            atom = atomList.get(index - 1);
+        }
+
+        return atom;
+    }
 
     @Nullable
     public String moduleName() {

@@ -1,11 +1,14 @@
 package org.elixir_lang.beam.chunk;
 
+import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+
+import static com.intellij.openapi.util.Pair.pair;
 
 /**
  * Chunk of a `.beam` file.  Same chunk format as base IFF
@@ -63,33 +66,42 @@ public class Chunk {
 
         dataInputStream.readFully(bytes);
 
-        return unsignedInt(bytes);
+        return unsignedInt(bytes).first;
     }
 
-    static int unsignedByte(byte signedByte) {
-        return signedByte & 0xFF;
+    @NotNull
+    @Contract(pure = true)
+    @SuppressWarnings("PMD.DefaultPackage")
+    static Pair<Integer, Integer> unsignedByte(byte signedByte) {
+        return pair(signedByte & 0xFF, 1);
     }
 
-    static long unsignedInt(@NotNull byte[] bytes) {
+    @NotNull
+    @Contract(pure = true)
+    @SuppressWarnings("PMD.DefaultPackage")
+    static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes) {
         return unsignedInt(bytes, 0);
     }
 
+    @NotNull
     @Contract(pure = true)
-    static long unsignedInt(@NotNull byte[] bytes, int offset) {
+    @SuppressWarnings("PMD.DefaultPackage")
+    static Pair<Long, Integer> unsignedInt(@NotNull byte[] bytes, int offset) {
         assert bytes.length >= offset + 4;
 
         long unsignedInt = 0;
 
         for (int i = 0; i < 4; i++) {
-            int unsignedByte = unsignedByte(bytes[offset + i]);
+            int unsignedByte = unsignedByte(bytes[offset + i]).first;
             unsignedInt += unsignedByte << 8 * (4 - 1 - i);
         }
 
-        return unsignedInt;
+        return pair(unsignedInt, 4);
     }
 
     public enum TypeID {
-        ATOM("Atom");
+        ATOM("Atom"),
+        EXPT("ExpT");
 
         private final String typeID;
 

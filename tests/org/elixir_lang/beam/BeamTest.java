@@ -1,36 +1,31 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
+import com.intellij.openapi.util.Pair;
+import gnu.trove.THashSet;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.chunk.exports.Export;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.util.Map;
+import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BeamTest {
     @NotNull
+    @SuppressWarnings("NullableProblems")
     private String ebinDirectory;
 
     @Test
     public void elixirModule() throws IOException, OtpErlangDecodeException {
-        assertModuleName("Elixir.Kernel", "Elixir.Kernel");
-    }
-
-    @Test
-    public void erlangModule() throws IOException, OtpErlangDecodeException {
-        assertModuleName("elixir_interpolation", "elixir_interpolation");
-    }
-
-    private void assertModuleName(@NotNull String baseName, @NotNull String moduleName) throws IOException, OtpErlangDecodeException {
-                DataInputStream dataInputStream = new DataInputStream(
-                new BufferedInputStream(
-                        new FileInputStream(ebinDirectory + baseName + ".beam")
-                )
-        );
-        Beam beam = Beam.from(dataInputStream);
+        Beam beam = beam("Elixir.Kernel");
 
         assertNotNull(beam);
 
@@ -38,7 +33,79 @@ public class BeamTest {
 
         assertNotNull(atoms);
 
-        assertEquals(atoms.moduleName(), moduleName);
+        assertEquals("Elixir.Kernel", atoms.moduleName());
+
+        Exports exports = beam.exports();
+
+        assertNotNull(exports);
+
+        Pair<Map<String, Map<Integer, Export>>, Set<Export>> exportByArityByNameNamelessExportSet =
+                exports.exportByArityByName(atoms);
+
+        assertNotNull(exportByArityByNameNamelessExportSet);
+
+        Set<Export> namelessExportSet = exportByArityByNameNamelessExportSet.second;
+
+        assertTrue("There are nameless exports", namelessExportSet.isEmpty());
+
+        Map<String, Map<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+
+        // a name with multiple arities
+        Map<Integer, Export> exportByArity = exportByArityByName.get("node");
+
+        assertNotNull(exportByArity);
+
+        Set<Integer> expectedAritySet = new THashSet<Integer>();
+        expectedAritySet.add(0);
+        expectedAritySet.add(1);
+
+        assertEquals("node arities do not match", expectedAritySet, exportByArity.keySet());
+    }
+
+    @Test
+    public void erlangModule() throws IOException, OtpErlangDecodeException {
+        Beam beam = beam("elixir_interpolation");
+
+        assertNotNull(beam);
+
+        Atoms atoms = beam.atoms();
+
+        assertNotNull(atoms);
+
+        assertEquals("elixir_interpolation", atoms.moduleName());
+
+        Exports exports = beam.exports();
+
+        assertNotNull(exports);
+
+        Pair<Map<String, Map<Integer, Export>>, Set<Export>> exportByArityByNameNamelessExportSet =
+                exports.exportByArityByName(atoms);
+
+        assertNotNull(exportByArityByNameNamelessExportSet);
+
+        Set<Export> namelessExportSet = exportByArityByNameNamelessExportSet.second;
+
+        assertTrue("There are nameless exports", namelessExportSet.isEmpty());
+
+        Map<String, Map<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+
+        Map<Integer, Export> exportByArity = exportByArityByName.get("extract");
+
+        assertNotNull(exportByArity);
+
+        Export export = exportByArity.get(6);
+
+        assertNotNull(export);
+    }
+
+    private Beam beam(@NotNull String baseName) throws IOException, OtpErlangDecodeException {
+        DataInputStream dataInputStream = new DataInputStream(
+                new BufferedInputStream(
+                        new FileInputStream(ebinDirectory + baseName + ".beam")
+                )
+        );
+
+        return Beam.from(dataInputStream);
     }
 
     @Before
