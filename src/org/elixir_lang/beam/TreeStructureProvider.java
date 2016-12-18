@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.project_view_node.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,35 +60,7 @@ public class TreeStructureProvider implements com.intellij.ide.projectView.TreeS
                                 String moduleName = atoms.moduleName();
 
                                 if (moduleName != null) {
-                                    final String presentableText;
-
-                                    if (moduleName.startsWith("Elixir.")) {
-                                        presentableText = stripElixirPrefix(moduleName);
-                                    } else {
-                                        /* assume it is an Erlang module name and should be treated as an atom instead
-                                           an alias */
-                                        presentableText = ":" + moduleName;
-                                    }
-
-                                    modifiedChildren.add(
-                                            new ProjectViewNode<String>(project, moduleName, settings) {
-                                                @Override
-                                                public boolean contains(@NotNull VirtualFile file) {
-                                                    return false;
-                                                }
-
-                                                @NotNull
-                                                @Override
-                                                public Collection<? extends AbstractTreeNode> getChildren() {
-                                                    return Collections.emptyList();
-                                                }
-
-                                                @Override
-                                                protected void update(PresentationData presentation) {
-                                                    presentation.setPresentableText(presentableText);
-                                                }
-                                            }
-                                    );
+                                    modifiedChildren.add(new Module(project, moduleName, settings));
                                 }
                             }
                         }
