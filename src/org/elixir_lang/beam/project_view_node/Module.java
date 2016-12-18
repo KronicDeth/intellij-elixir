@@ -5,6 +5,7 @@ import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,33 +13,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 
+import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
 import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 
 public class Module extends ProjectViewNode<String> {
     /*
-     * Static Methods
-     */
-
-    @NotNull
-    private static String presentableText(@NotNull String name) {
-        final String presentableText;
-
-        if (name.startsWith("Elixir.")) {
-            presentableText = stripElixirPrefix(name);
-        } else {
-            /* assume it is an Erlang module name and should be treated as an atom instead
-               an alias */
-            presentableText = ":" + name;
-        }
-
-        return presentableText;
-    }
-
-    /*
      * Fields
      */
 
-    String presentableText = null;
+    @Nullable
+    String locationString;
+    @NotNull
+    String presentableText;
 
     /*
      * Constructors
@@ -46,6 +32,23 @@ public class Module extends ProjectViewNode<String> {
 
     public Module(@NotNull Project project, @NotNull String name, @Nullable ViewSettings viewSettings) {
         super(project, name, viewSettings);
+
+        if (name.startsWith(ELIXIR_PREFIX)) {
+            String stripped = name.substring(ELIXIR_PREFIX.length());
+
+            String[] strings = stripped.split("\\.");
+
+            if (strings.length == 1) {
+                locationString = null;
+                presentableText = stripped;
+            } else {
+                locationString = StringUtil.join(strings, 0, strings.length - 1, ".");
+                presentableText = strings[strings.length - 1];
+            }
+        } else {
+            locationString = null;
+            presentableText = ":" + name;
+        }
     }
 
     /*
@@ -65,8 +68,8 @@ public class Module extends ProjectViewNode<String> {
 
     @Override
     protected void update(PresentationData presentation) {
-        if (presentableText == null) {
-            presentableText = presentableText(getValue());
+        if (locationString != null) {
+            presentation.setLocationString(locationString);
         }
 
         presentation.setPresentableText(presentableText);
