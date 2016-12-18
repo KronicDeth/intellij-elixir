@@ -7,20 +7,24 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.elixir_lang.icons.ElixirIcons;
+import org.intellij.erlang.icons.ErlangIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.Collections;
 
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
-import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 
 public class Module extends ProjectViewNode<String> {
     /*
      * Fields
      */
 
+    @NotNull
+    Icon icon;
     @Nullable
     String locationString;
     @NotNull
@@ -34,6 +38,8 @@ public class Module extends ProjectViewNode<String> {
         super(project, name, viewSettings);
 
         if (name.startsWith(ELIXIR_PREFIX)) {
+            icon = ElixirIcons.MODULE;
+
             String stripped = name.substring(ELIXIR_PREFIX.length());
 
             String[] strings = stripped.split("\\.");
@@ -46,6 +52,8 @@ public class Module extends ProjectViewNode<String> {
                 presentableText = strings[strings.length - 1];
             }
         } else {
+            icon = ErlangIcons.MODULE;
+
             locationString = null;
             presentableText = ":" + name;
         }
@@ -68,6 +76,8 @@ public class Module extends ProjectViewNode<String> {
 
     @Override
     protected void update(PresentationData presentation) {
+        presentation.setIcon(icon);
+
         if (locationString != null) {
             presentation.setLocationString(locationString);
         }
