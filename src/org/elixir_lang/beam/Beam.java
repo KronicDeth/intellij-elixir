@@ -1,6 +1,7 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
+import com.intellij.openapi.vfs.VirtualFile;
 import gnu.trove.THashMap;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Chunk;
@@ -76,6 +77,35 @@ public class Beam {
         }
 
         return new Beam(chunkList);
+    }
+
+    @Nullable
+    public static Beam from(@NotNull VirtualFile virtualFile) {
+        Beam beam = null;
+
+        DataInputStream dataInputStream;
+
+        try {
+            dataInputStream = new DataInputStream(virtualFile.getInputStream());
+        } catch (IOException ioException) {
+            dataInputStream = null;
+        }
+
+        if (dataInputStream != null) {
+            try {
+                beam = Beam.from(dataInputStream);
+            } catch (IOException e) {
+                beam = null;
+            } catch (OtpErlangDecodeException e) {
+                beam = null;
+            }
+        }
+
+        return beam;
+    }
+
+    public static boolean is(@NotNull VirtualFile virtualFile) {
+        return !virtualFile.isDirectory() && "beam".equals(virtualFile.getExtension());
     }
 
     /*
