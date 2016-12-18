@@ -1,6 +1,5 @@
 package org.elixir_lang.beam;
 
-import com.intellij.ide.projectView.PresentationData;
 import com.intellij.ide.projectView.ProjectViewNode;
 import com.intellij.ide.projectView.ViewSettings;
 import com.intellij.ide.util.treeView.AbstractTreeNode;
@@ -9,15 +8,11 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.project_view_node.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
-
-import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 
 public class TreeStructureProvider implements com.intellij.ide.projectView.TreeStructureProvider {
     /**
@@ -36,7 +31,6 @@ public class TreeStructureProvider implements com.intellij.ide.projectView.TreeS
     public Collection<AbstractTreeNode> modify(@NotNull AbstractTreeNode parent,
                                                @NotNull Collection<AbstractTreeNode> children,
                                                ViewSettings settings) {
-        Collection<AbstractTreeNode> modifiedChildren = children;
 
         if (parent instanceof ProjectViewNode) {
             ProjectViewNode parentProjectViewNode = (ProjectViewNode) parent;
@@ -54,22 +48,14 @@ public class TreeStructureProvider implements com.intellij.ide.projectView.TreeS
                         Beam beam = Beam.from(virtualFile);
 
                         if (beam != null) {
-                            Atoms atoms = beam.atoms();
-
-                            if (atoms != null) {
-                                String moduleName = atoms.moduleName();
-
-                                if (moduleName != null) {
-                                    modifiedChildren.add(new Module(project, moduleName, settings));
-                                }
-                            }
+                            children.add(new Module(project, beam, settings));
                         }
                     }
                 }
             }
         }
 
-        return modifiedChildren;
+        return children;
     }
 
     /**

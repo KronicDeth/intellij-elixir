@@ -1,15 +1,12 @@
 package org.elixir_lang.beam.chunk;
 
 import com.intellij.openapi.util.Pair;
-import gnu.trove.THashMap;
 import gnu.trove.THashSet;
 import org.elixir_lang.beam.chunk.exports.Export;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.EXPT;
@@ -70,9 +67,10 @@ public class Exports {
         return exports;
     }
 
-    public Pair<Map<String, Map<Integer, Export>>, Set<Export>> exportByArityByName(@NotNull Atoms atoms) {
-        Map<String, Map<Integer, Export>> exportByArityByName = new THashMap<String, Map<Integer, Export>>();
-        Set<Export> nameless = new THashSet<Export>();
+    public Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByName(@NotNull Atoms atoms) {
+        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
+                new TreeMap<String, SortedMap<Integer, Export>>();
+        SortedSet<Export> nameless = new TreeSet<Export>();
 
         for (Export export : exportCollection) {
             String name = export.name(atoms);
@@ -80,10 +78,10 @@ public class Exports {
             if (name == null) {
                 nameless.add(export);
             } else {
-                Map<Integer, Export> exportByArity = exportByArityByName.get(name);
+                SortedMap<Integer, Export> exportByArity = exportByArityByName.get(name);
 
                 if (exportByArity == null) {
-                    exportByArity = new THashMap<Integer, Export>();
+                    exportByArity = new TreeMap<Integer, Export>();
                     exportByArityByName.put(name, exportByArity);
                 }
 

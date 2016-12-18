@@ -13,6 +13,8 @@ import org.junit.Test;
 import java.io.*;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -39,7 +41,7 @@ public class BeamTest {
 
         assertNotNull(exports);
 
-        Pair<Map<String, Map<Integer, Export>>, Set<Export>> exportByArityByNameNamelessExportSet =
+        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByNameNamelessExportSet =
                 exports.exportByArityByName(atoms);
 
         assertNotNull(exportByArityByNameNamelessExportSet);
@@ -48,10 +50,10 @@ public class BeamTest {
 
         assertTrue("There are nameless exports", namelessExportSet.isEmpty());
 
-        Map<String, Map<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
 
         // a name with multiple arities
-        Map<Integer, Export> exportByArity = exportByArityByName.get("node");
+        SortedMap<Integer, Export> exportByArity = exportByArityByName.get("node");
 
         assertNotNull(exportByArity);
 
@@ -78,7 +80,7 @@ public class BeamTest {
 
         assertNotNull(exports);
 
-        Pair<Map<String, Map<Integer, Export>>, Set<Export>> exportByArityByNameNamelessExportSet =
+        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByNameNamelessExportSet =
                 exports.exportByArityByName(atoms);
 
         assertNotNull(exportByArityByNameNamelessExportSet);
@@ -87,7 +89,7 @@ public class BeamTest {
 
         assertTrue("There are nameless exports", namelessExportSet.isEmpty());
 
-        Map<String, Map<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
 
         Map<Integer, Export> exportByArity = exportByArityByName.get("extract");
 
