@@ -1,7 +1,9 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.indexing.FileContent;
 import gnu.trove.THashMap;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Chunk;
@@ -9,6 +11,7 @@ import org.elixir_lang.beam.chunk.Exports;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ import static org.elixir_lang.beam.chunk.Chunk.typeID;
  * See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
  */
 public class Beam {
+    private static final Logger LOGGER = Logger.getInstance(Beam.class);
+
     /*
      * CONSTANTS
      */
@@ -54,20 +59,58 @@ public class Beam {
      */
 
     @Nullable
-    public static Beam from(@NotNull DataInputStream dataInputStream) throws IOException, OtpErlangDecodeException {
-        if (!HEADER.equals(typeID(dataInputStream))) {
+    public static Beam from(@NotNull DataInputStream dataInputStream) {
+        String header;
+
+        try {
+            header = typeID(dataInputStream);
+        } catch (IOException ioException) {
+            LOGGER.error("Could not read header from BEAM DataInputStream", ioException);
             return null;
         }
 
-        length(dataInputStream);
+        if (!HEADER.equals(header)) {
+            return null;
+        }
 
-        if (!"BEAM".equals(typeID(dataInputStream))) {
+        try {
+            length(dataInputStream);
+        } catch (IOException ioException) {
+            LOGGER.error("Could not read length from BEAM DataInputStream", ioException);
+            return null;
+        }
+
+        String section;
+
+        try {
+            section = typeID(dataInputStream);
+        } catch (IOException ioException) {
+            LOGGER.error("Could not read section header from BEAM DataInputStream", ioException);
+            return null;
+        }
+
+
+        if (!"BEAM".equals(section)) {
+            LOGGER.error("Section header is not BEAM");
             return null;
         }
 
         List<Chunk> chunkList = new ArrayList<Chunk>();
+        int i = 1;
+
         while (true) {
-            Chunk chunk = Chunk.from(dataInputStream);
+            Chunk chunk;
+
+            try {
+                chunk = Chunk.from(dataInputStream);
+            } catch (IOException ioException) {
+                LOGGER.error(
+                        "Could not read chunk number " + i + "from BEAM DataInputStream.  " +
+                                "Returning truncated Beam object",
+                        ioException
+                );
+                break;
+            }
 
             if (chunk != null) {
                 chunkList.add(chunk);
@@ -77,6 +120,16 @@ public class Beam {
         }
 
         return new Beam(chunkList);
+    }
+
+    @Nullable
+    public static Beam from(@NotNull byte[] content) throws IOException, OtpErlangDecodeException {
+        return from(new DataInputStream(new ByteArrayInputStream(content)));
+    }
+
+    @Nullable
+    public static Beam from(@NotNull FileContent fileContent) throws IOException, OtpErlangDecodeException {
+        return from(fileContent.getContent());
     }
 
     @Nullable
@@ -92,13 +145,7 @@ public class Beam {
         }
 
         if (dataInputStream != null) {
-            try {
-                beam = Beam.from(dataInputStream);
-            } catch (IOException e) {
-                beam = null;
-            } catch (OtpErlangDecodeException e) {
-                beam = null;
-            }
+            beam = Beam.from(dataInputStream);
         }
 
         return beam;

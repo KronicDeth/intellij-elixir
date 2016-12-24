@@ -2109,7 +2109,8 @@
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
 
     <!-- `.beam` -->
-    <treeStructureProvider implementation="org.elixir_lang.beam.TreeStructureProvider"/>
+    <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
+    <fileTypeFactory implementation="org.elixir_lang.beam.FileTypeFactory"/>
 
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
