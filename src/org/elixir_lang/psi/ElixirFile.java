@@ -6,17 +6,24 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.ElixirFileType;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.structure_view.element.modular.Implementation;
+import org.elixir_lang.structure_view.element.modular.Module;
+import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by luke.imhoff on 8/2/14.
  */
-public class ElixirFile extends PsiFileBase {
+public class ElixirFile extends PsiFileBase implements ModuleOwner {
     public ElixirFile(@NotNull FileViewProvider viewProvider) {
         super(viewProvider, ElixirLanguage.INSTANCE);
     }
@@ -43,5 +50,29 @@ public class ElixirFile extends PsiFileBase {
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
         return ElixirPsiImplUtil.processDeclarationsInPreviousSibling(this, processor, state, lastParent, place);
+    }
+
+    /**
+     * @return modulars owned (declared) by this element.
+     */
+    @NotNull
+    @Override
+    public StubBased[] modulars() {
+        StubBased[] stubBaseds = PsiTreeUtil.getChildrenOfType(
+                this,
+                StubBased.class
+        );
+
+        List<StubBased> modularList = new ArrayList<StubBased>();
+
+        if (stubBaseds != null) {
+            for (StubBased stubBased : stubBaseds) {
+                if (Implementation.is(stubBased) || Module.is(stubBased) || Protocol.is(stubBased)) {
+                    modularList.add(stubBased);
+                }
+            }
+        }
+
+        return modularList.toArray(new StubBased[modularList.size()]);
     }
 }
