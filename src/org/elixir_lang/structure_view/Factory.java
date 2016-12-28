@@ -12,8 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Factory implements PsiStructureViewFactory {
     @Nullable
-    @Override
-    public StructureViewBuilder getStructureViewBuilder(@NotNull final PsiFile psiFile) {
+    public static StructureViewBuilder structureViewBuilder(@NotNull final PsiFile psiFile) {
         StructureViewBuilder structureViewBuilder = null;
 
         if (psiFile instanceof ElixirFile) {
@@ -34,5 +33,11 @@ public class Factory implements PsiStructureViewFactory {
         }
 
         return structureViewBuilder;
+    }
+
+    @Nullable
+    @Override
+    public StructureViewBuilder getStructureViewBuilder(@NotNull final PsiFile psiFile) {
+        return structureViewBuilder(psiFile);
     }
 }

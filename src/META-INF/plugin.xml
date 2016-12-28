@@ -2113,6 +2113,7 @@
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
     <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
     <fileTypeFactory implementation="org.elixir_lang.beam.FileTypeFactory"/>
+    <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
 
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
