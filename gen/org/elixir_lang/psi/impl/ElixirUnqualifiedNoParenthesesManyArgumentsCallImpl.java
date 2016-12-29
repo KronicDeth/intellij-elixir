@@ -22,8 +22,8 @@ import java.util.Set;
 
 public class ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl extends NamedStubbedPsiElementBase<UnqualifiedNoParenthesesManyArgumentsCall> implements ElixirUnqualifiedNoParenthesesManyArgumentsCall {
 
-  public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(UnqualifiedNoParenthesesManyArgumentsCall stub, IStubElementType nodeType) {
-    super(stub, nodeType);
+  public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(UnqualifiedNoParenthesesManyArgumentsCall stub, IStubElementType type) {
+    super(stub, type);
   }
 
   public ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl(ASTNode node) {

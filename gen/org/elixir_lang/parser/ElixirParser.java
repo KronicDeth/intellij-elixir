@@ -5864,7 +5864,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && consumeTokens(b, 0, IDENTIFIER_TOKEN, CALL);
+    r = r && consumeTokensSmart(b, 0, IDENTIFIER_TOKEN, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, MATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;
@@ -6377,7 +6377,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = atPrefixOperator(b, l + 1);
-    r = r && consumeTokens(b, 0, IDENTIFIER_TOKEN, CALL);
+    r = r && consumeTokensSmart(b, 0, IDENTIFIER_TOKEN, CALL);
     r = r && bracketArguments(b, l + 1);
     exit_section_(b, m, UNMATCHED_AT_UNQUALIFIED_BRACKET_OPERATION, r);
     return r;

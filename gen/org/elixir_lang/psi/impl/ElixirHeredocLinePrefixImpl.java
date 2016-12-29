@@ -26,8 +26,8 @@ public class ElixirHeredocLinePrefixImpl extends ASTWrapperPsiElement implements
   }
 
   @Nullable
-  public ASTNode excessWhitespace(IElementType fragmentType, int prefixLength) {
-    return ElixirPsiImplUtil.excessWhitespace(this, fragmentType, prefixLength);
+  public ASTNode excessWhitespace(IElementType type, int prefixLength) {
+    return ElixirPsiImplUtil.excessWhitespace(this, type, prefixLength);
   }
 
 }

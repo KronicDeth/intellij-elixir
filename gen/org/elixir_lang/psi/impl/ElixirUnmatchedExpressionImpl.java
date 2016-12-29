@@ -8,7 +8,7 @@ import org.elixir_lang.psi.ElixirUnmatchedExpression;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirUnmatchedExpressionImpl extends ASTWrapperPsiElement implements ElixirUnmatchedExpression {
+public abstract class ElixirUnmatchedExpressionImpl extends ASTWrapperPsiElement implements ElixirUnmatchedExpression {
 
   public ElixirUnmatchedExpressionImpl(ASTNode node) {
     super(node);

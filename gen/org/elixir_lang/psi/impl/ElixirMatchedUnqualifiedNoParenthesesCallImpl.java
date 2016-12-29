@@ -21,8 +21,8 @@ import java.util.Set;
 
 public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedNoParenthesesCall> implements ElixirMatchedUnqualifiedNoParenthesesCall {
 
-  public ElixirMatchedUnqualifiedNoParenthesesCallImpl(MatchedUnqualifiedNoParenthesesCall stub, IStubElementType nodeType) {
-    super(stub, nodeType);
+  public ElixirMatchedUnqualifiedNoParenthesesCallImpl(MatchedUnqualifiedNoParenthesesCall stub, IStubElementType type) {
+    super(stub, type);
   }
 
   public ElixirMatchedUnqualifiedNoParenthesesCallImpl(ASTNode node) {

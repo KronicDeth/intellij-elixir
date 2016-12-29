@@ -677,9 +677,6 @@ public interface ElixirTypes {
       else if (type == MATCHED_DOT_CALL) {
         return new ElixirMatchedDotCallImpl(node);
       }
-      else if (type == MATCHED_EXPRESSION) {
-        return new ElixirMatchedExpressionImpl(node);
-      }
       else if (type == MATCHED_IN_MATCH_OPERATION) {
         return new ElixirMatchedInMatchOperationImpl(node);
       }
@@ -895,9 +892,6 @@ public interface ElixirTypes {
       }
       else if (type == UNMATCHED_DOT_CALL) {
         return new ElixirUnmatchedDotCallImpl(node);
-      }
-      else if (type == UNMATCHED_EXPRESSION) {
-        return new ElixirUnmatchedExpressionImpl(node);
       }
       else if (type == UNMATCHED_IN_MATCH_OPERATION) {
         return new ElixirUnmatchedInMatchOperationImpl(node);
