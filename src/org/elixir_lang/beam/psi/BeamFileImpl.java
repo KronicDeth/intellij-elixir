@@ -29,8 +29,8 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.beam.Beam;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.psi.impl.ModuleElementImpl;
+import org.elixir_lang.beam.psi.impl.ModuleImpl;
 import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
-import org.elixir_lang.beam.psi.stubs.ModuleHolderFileStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ModuleOwner;
@@ -44,12 +44,14 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.intellij.reference.SoftReference.dereference;
+import static org.elixir_lang.beam.Decompiler.defmoduleArgument;
+import static org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes.MODULE;
 
 
 // See com.intellij.psi.impl.compiled.ClsFileImpl
 public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiCompiledFile, PsiFileWithStubSupport {
     private static final Logger LOGGER = Logger.getInstance(BeamFileImpl.class);
-    private static final String CAN_NOT_MODIFY_MESSAGE = "Cannot modified decompiled Beam files";
+    private static final String CAN_NOT_MODIFY_MESSAGE = "Cannot modify decompiled Beam files";
     private static final String BANNER = "# Source code recreated from a .beam file by IntelliJ Elixir\n" +
             "# Function clause bodies is not available\n";
     private static final Key<Document> MODULE_DOCUMENT_LINK_KEY = Key.create("module.document.link");
@@ -96,7 +98,8 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
                 String moduleName = atoms.moduleName();
 
                 if (moduleName != null) {
-                    moduleStub = new ModuleStubImpl(stub, moduleName);
+                    String name = defmoduleArgument(moduleName);
+                    moduleStub = new ModuleStubImpl(stub, name);
                 }
             }
         }
@@ -192,13 +195,14 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
     }
 
     public CanonicallyNamed[] modulars() {
-        return getStub().modulars();
+        return (CanonicallyNamed[]) getStub().getChildrenByType(MODULE, new ModuleImpl[1]);
     }
 
-    public ModuleHolderFileStub<?> getStub() {
-        return (ModuleHolderFileStub) getStubTree().getRoot();
+    public PsiFileStub getStub() {
+        return getStubTree().getRoot();
     }
 
+    @NotNull
     @Override
     public StubTree getStubTree() {
         ApplicationManager.getApplication().assertReadAccessAllowed();
@@ -216,7 +220,8 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
                 LOGGER.debug("No stub for BEAM file in index: " + getVirtualFile().getPresentableUrl());
             }
 
-            newStubTree = null;
+
+            newStubTree = new StubTree(new ElixirFileStubImpl(true));
         }
 
         synchronized (stubLock) {

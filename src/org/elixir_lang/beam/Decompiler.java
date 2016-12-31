@@ -112,7 +112,7 @@ public class Decompiler implements BinaryFileDecompiler {
     }
 
     @NotNull
-    private static String defmoduleArgument(String moduleName) {
+    public static String defmoduleArgument(String moduleName) {
         String defmoduleArgument;
         if (moduleName.startsWith(ELIXIR_PREFIX)) {
             defmoduleArgument = moduleName.substring(ELIXIR_PREFIX.length());

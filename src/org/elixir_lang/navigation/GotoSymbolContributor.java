@@ -4,7 +4,6 @@ import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
-import com.intellij.psi.PsiAnchor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
@@ -77,145 +76,160 @@ public class GotoSymbolContributor implements ChooseByNameContributor {
         Map<CallDefinition.Tuple, CallDefinition> callDefinitionByTuple = new HashMap<CallDefinition.Tuple, CallDefinition>();
 
         for (final NamedElement element : result) {
-            if (element instanceof Call) {
-                Call call = (Call) element;
+            // Use navigation element so that source element is used for compiled elements
+            PsiElement sourceElement = element.getNavigationElement();
 
-                if (CallDefinitionClause.is(call)) {
-                    Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
-
-                    if (nameArityRange != null) {
-                        String callName = nameArityRange.first;
-                        IntRange arityRange = nameArityRange.second;
-
-                        Timed.Time time = CallDefinitionClause.time(call);
-                        Modular modular = enclosingModularByCall.putNew(call);
-
-                        if (modular == null) {
-                            // don't throw an error if really EEX, but has wrong extension
-                            if (!element.getText().contains("<%=")) {
-                                error("Cannot find enclosing Modular", call);
-                            }
-                        } else {
-                            for (int arity = arityRange.getMinimumInteger(); arity <= arityRange.getMaximumInteger(); arity++) {
-                                CallDefinition.Tuple tuple = new CallDefinition.Tuple(modular, time, callName, arity);
-                                CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
-
-                                if (callDefinition == null) {
-                                    callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
-                                    items.add(callDefinition);
-                                    callDefinitionByTuple.put(tuple, callDefinition);
-                                }
-
-                                CallDefinitionClause callDefinitionClause = callDefinition.clause(call);
-                                items.add(callDefinitionClause);
-                            }
-                        }
-                    }
-                } else if (CallDefinitionHead.is(call)) {
-                    Call delegationCall = CallDefinitionHead.enclosingDelegationCall(call);
-
-                    if (delegationCall != null) {
-                        Modular modular = enclosingModularByCall.putNew(delegationCall);
-
-                        if (modular != null) {
-                            String callDefinitionName = call.functionName();
-
-                            if (callDefinitionName != null) {
-                                int callDefinitionArity = call.resolvedFinalArity();
-
-                                CallDefinition.Tuple tuple = new CallDefinition.Tuple(
-                                        modular,
-                                        // Delegation can't delegate macros
-                                        Timed.Time.RUN,
-                                        callDefinitionName,
-                                        callDefinitionArity
-                                );
-                                CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
-
-                                if (callDefinition == null) {
-                                    callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
-                                    items.add(callDefinition);
-                                    callDefinitionByTuple.put(tuple, callDefinition);
-                                }
-
-                                // Delegation is always public as import should be used for private
-                                Visible.Visibility visibility = Visible.Visibility.PUBLIC;
-
-                                //noinspection ConstantConditions
-                                CallDefinitionHead callDefinitionHead = new CallDefinitionHead(callDefinition, visibility, call);
-                                items.add(callDefinitionHead);
-                            } else {
-                                error("Call for CallDefinitionHead does not have function name", call);
-                            }
-                        } else {
-                            error("Cannot find enclosing Modular for Delegation call", delegationCall);
-                        }
-                    } else {
-                        error("Cannot find enclosing delegation call for CallDefinitionHead", call);
-                    }
-                } else if (CallDefinitionSpecification.is(call)) {
-                    Modular modular = enclosingModularByCall.putNew(call);
-
-                    if (modular != null) {
-                        // pseudo-named-arguments
-                        boolean callback = false;
-                        Timed.Time time = Timed.Time.RUN;
-
-                        //noinspection ConstantConditions
-                        CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
-                                modular,
-                                (AtUnqualifiedNoParenthesesCall) call,
-                                callback,
-                                time
-                        );
-                        items.add(callDefinitionSpecification);
-                    } else {
-                        error("Cannot find enclosing Modular for CallDefinitionSpecification", call);
-                    }
-                } else if (Callback.is(call)) {
-                    Modular modular = enclosingModularByCall.putNew(call);
-
-                    if (modular != null) {
-                        Callback callback = new Callback(modular, call);
-                        items.add(callback);
-                    } else {
-                        error("Cannot find enclosing Modular for Callback", call);
-                    }
-                } else if (Implementation.is(call)) {
-                    Modular modular = enclosingModularByCall.putNew(call);
-
-                    Collection<String> forNameCollection = Implementation.forNameCollection(modular, call);
-
-                    if (forNameCollection != null) {
-                        for (String forName : forNameCollection) {
-                            Implementation forNameOverriddenImplementation = new Implementation(modular, call, forName);
-                            String implementationName = forNameOverriddenImplementation.getName();
-
-                            if (implementationName != null && implementationName.contains(name)) {
-                                items.add(forNameOverriddenImplementation);
-                            }
-                        }
-                    }
-
-                    if (forNameCollection == null || forNameCollection.size() < 2) {
-                        Implementation implementation = new Implementation(modular, call);
-                        items.add(implementation);
-                    }
-                } else if (Module.is(call)) {
-                    Modular modular = enclosingModularByCall.putNew(call);
-
-                    Module module = new Module(modular, call);
-                    items.add(module);
-                } else if (Protocol.is(call)) {
-                    Modular modular = enclosingModularByCall.putNew(call);
-
-                    Protocol protocol = new Protocol(modular, call);
-                    items.add(protocol);
-                }
+            if (sourceElement instanceof Call) {
+                getItemsFromByNameFromCall(
+                        name,
+                        items,
+                        enclosingModularByCall,
+                        callDefinitionByTuple,
+                        (Call) sourceElement
+                );
             }
         }
 
         return items.toArray(new NavigationItem[items.size()]);
+    }
+
+    private void getItemsFromByNameFromCall(@NotNull String name,
+                                            @NotNull List<NavigationItem> items,
+                                            @NotNull EnclosingModularByCall enclosingModularByCall,
+                                            @NotNull Map<CallDefinition.Tuple, CallDefinition> callDefinitionByTuple,
+                                            @NotNull Call call) {
+        if (CallDefinitionClause.is(call)) {
+            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(call);
+
+            if (nameArityRange != null) {
+                String callName = nameArityRange.first;
+                IntRange arityRange = nameArityRange.second;
+
+                Timed.Time time = CallDefinitionClause.time(call);
+                Modular modular = enclosingModularByCall.putNew(call);
+
+                if (modular == null) {
+                    // don't throw an error if really EEX, but has wrong extension
+                    if (!call.getText().contains("<%=")) {
+                        error("Cannot find enclosing Modular", call);
+                    }
+                } else {
+                    for (int arity = arityRange.getMinimumInteger(); arity <= arityRange.getMaximumInteger(); arity++) {
+                        CallDefinition.Tuple tuple = new CallDefinition.Tuple(modular, time, callName, arity);
+                        CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
+
+                        if (callDefinition == null) {
+                            callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
+                            items.add(callDefinition);
+                            callDefinitionByTuple.put(tuple, callDefinition);
+                        }
+
+                        CallDefinitionClause callDefinitionClause = callDefinition.clause(call);
+                        items.add(callDefinitionClause);
+                    }
+                }
+            }
+        } else if (CallDefinitionHead.is(call)) {
+            Call delegationCall = CallDefinitionHead.enclosingDelegationCall(call);
+
+            if (delegationCall != null) {
+                Modular modular = enclosingModularByCall.putNew(delegationCall);
+
+                if (modular != null) {
+                    String callDefinitionName = call.functionName();
+
+                    if (callDefinitionName != null) {
+                        int callDefinitionArity = call.resolvedFinalArity();
+
+                        CallDefinition.Tuple tuple = new CallDefinition.Tuple(
+                                modular,
+                                // Delegation can't delegate macros
+                                Timed.Time.RUN,
+                                callDefinitionName,
+                                callDefinitionArity
+                        );
+                        CallDefinition callDefinition = callDefinitionByTuple.get(tuple);
+
+                        if (callDefinition == null) {
+                            callDefinition = new CallDefinition(tuple.modular, tuple.time, tuple.name, tuple.arity);
+                            items.add(callDefinition);
+                            callDefinitionByTuple.put(tuple, callDefinition);
+                        }
+
+                        // Delegation is always public as import should be used for private
+                        Visible.Visibility visibility = Visible.Visibility.PUBLIC;
+
+                        //noinspection ConstantConditions
+                        CallDefinitionHead callDefinitionHead = new CallDefinitionHead(callDefinition, visibility, call);
+                        items.add(callDefinitionHead);
+                    } else {
+                        error("Call for CallDefinitionHead does not have function name", call);
+                    }
+                } else {
+                    error("Cannot find enclosing Modular for Delegation call", delegationCall);
+                }
+            } else {
+                error("Cannot find enclosing delegation call for CallDefinitionHead", call);
+            }
+        } else if (CallDefinitionSpecification.is(call)) {
+            Modular modular = enclosingModularByCall.putNew(call);
+
+            if (modular != null) {
+                // pseudo-named-arguments
+                boolean callback = false;
+                Timed.Time time = Timed.Time.RUN;
+
+                //noinspection ConstantConditions
+                CallDefinitionSpecification callDefinitionSpecification = new CallDefinitionSpecification(
+                        modular,
+                        (AtUnqualifiedNoParenthesesCall) call,
+                        callback,
+                        time
+                );
+                items.add(callDefinitionSpecification);
+            } else {
+                error("Cannot find enclosing Modular for CallDefinitionSpecification", call);
+            }
+        } else if (Callback.is(call)) {
+            Modular modular = enclosingModularByCall.putNew(call);
+
+            if (modular != null) {
+                Callback callback = new Callback(modular, call);
+                items.add(callback);
+            } else {
+                error("Cannot find enclosing Modular for Callback", call);
+            }
+        } else if (Implementation.is(call)) {
+            Modular modular = enclosingModularByCall.putNew(call);
+
+            Collection<String> forNameCollection = Implementation.forNameCollection(modular, call);
+
+            if (forNameCollection != null) {
+                for (String forName : forNameCollection) {
+                    Implementation forNameOverriddenImplementation = new Implementation(modular, call, forName);
+                    String implementationName = forNameOverriddenImplementation.getName();
+
+                    if (implementationName != null && implementationName.contains(name)) {
+                        items.add(forNameOverriddenImplementation);
+                    }
+                }
+            }
+
+            if (forNameCollection == null || forNameCollection.size() < 2) {
+                Implementation implementation = new Implementation(modular, call);
+                items.add(implementation);
+            }
+        } else if (Module.is(call)) {
+            Modular modular = enclosingModularByCall.putNew(call);
+
+            Module module = new Module(modular, call);
+            items.add(module);
+        } else if (Protocol.is(call)) {
+            Modular modular = enclosingModularByCall.putNew(call);
+
+            Protocol protocol = new Protocol(modular, call);
+            items.add(protocol);
+        }
     }
 
     /**

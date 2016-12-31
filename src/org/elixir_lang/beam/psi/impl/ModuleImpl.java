@@ -6,7 +6,9 @@ import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.util.IncorrectOperationException;
 import org.elixir_lang.beam.psi.Module;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,5 +88,30 @@ public class ModuleImpl<T extends StubElement> extends ModuleElementImpl impleme
         assert stub != null;
 
         return null;
+    }
+
+    @Nullable
+    @Override
+    public PsiElement getNameIdentifier() {
+        return this;
+    }
+
+    /**
+     * Renames the element.
+     *
+     * @param name the new element name.
+     * @return the element corresponding to this element after the rename (either <code>this</code>
+     * or a different element if the rename caused the element to be replaced).
+     * @throws IncorrectOperationException if the modification is not supported or not possible for some reason.
+     */
+    @Override
+    public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+        throw new IncorrectOperationException("Cannot modify module name in Beam files");
+    }
+
+    @NotNull
+    @Override
+    public PsiElement getNavigationElement() {
+        return getMirror();
     }
 }

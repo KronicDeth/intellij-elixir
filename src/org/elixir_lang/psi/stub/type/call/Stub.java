@@ -7,6 +7,7 @@ import com.intellij.util.containers.SmartHashSet;
 import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
+import org.elixir_lang.psi.stub.call.Stubbic;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -28,11 +29,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         return Implementation.is(call) || Module.is(call) || Protocol.is(call);
     }
 
-    /*
-     * Protected Static Methods
-     */
-
-    protected static Set<StringRef> readNameSet(@NotNull StubInputStream dataStream) throws IOException {
+    public static Set<StringRef> readNameSet(@NotNull StubInputStream dataStream) throws IOException {
         int nameSetSize = dataStream.readInt();
 
         Set<StringRef> nameSet = new SmartHashSet<StringRef>(nameSetSize);
@@ -42,6 +39,16 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
         }
 
         return nameSet;
+    }
+
+    public static <T extends Stubbic> void serializeStubbic(@NotNull T stub,
+                                                            @NotNull StubOutputStream dataStream) throws IOException {
+        dataStream.writeName(stub.resolvedModuleName());
+        dataStream.writeName(stub.resolvedFunctionName());
+        dataStream.writeInt(stub.resolvedFinalArity());
+        dataStream.writeBoolean(stub.hasDoBlockOrKeyword());
+        dataStream.writeName(stub.getName());
+        writeNameSet(dataStream, stub.canonicalNameSet());
     }
 
     /*
@@ -70,14 +77,8 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
      */
 
     @Override
-    public void serialize(@NotNull Stub stub,
-                          @NotNull StubOutputStream dataStream) throws IOException {
-        dataStream.writeName(stub.resolvedModuleName());
-        dataStream.writeName(stub.resolvedFunctionName());
-        dataStream.writeInt(stub.resolvedFinalArity());
-        dataStream.writeBoolean(stub.hasDoBlockOrKeyword());
-        dataStream.writeName(stub.getName());
-        writeNameSet(dataStream, stub.canonicalNameSet());
+    public void serialize(@NotNull Stub stub, @NotNull StubOutputStream dataStream) throws IOException {
+        serializeStubbic(stub, dataStream);
     }
 
     @Override

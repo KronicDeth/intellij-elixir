@@ -29,6 +29,6 @@ public abstract class ModuleStubElementType<S extends StubElement, P extends Psi
     @NotNull
     @Override
     public String getExternalId() {
-        return "elixir." + toString();
+        return "beam." + toString();
     }
 }

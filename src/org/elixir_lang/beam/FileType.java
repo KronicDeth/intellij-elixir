@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.Icon;
 
+/**
+ * > Change the file element type [...] to a class that extends IStubFileElementType.
+ * -- http://www.jetbrains.org/intellij/sdk/docs/basics/indexing_and_psi_stubs/stub_indexes.html
+ */
 public class FileType implements com.intellij.openapi.fileTypes.FileType {
     public static final FileType INSTANCE = new FileType();
 
