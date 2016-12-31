@@ -126,11 +126,11 @@ public class Decompiler implements BinaryFileDecompiler {
     @NotNull
     private static Pair<String, String> macroArgument(@NotNull String name) {
         String argument = name;
-        String macro = DEFMACRO;
+        String macro = DEF;
 
         if (name.startsWith(MACRO_EXPORT_PREFIX)) {
             argument = name.substring(MACRO_EXPORT_PREFIX.length());
-            macro = DEF;
+            macro = DEFMACRO;
         }
 
         return pair(macro, argument);
