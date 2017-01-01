@@ -85,7 +85,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
     }
 
     public static PsiFileStub<?> buildFileStub(VirtualFile file, byte[] bytes) {
-        ElixirFileStubImpl stub = new ElixirFileStubImpl(true);
+        ElixirFileStubImpl stub = new ElixirFileStubImpl();
 
         Beam beam = null;
 
@@ -277,7 +277,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
             }
 
 
-            newStubTree = new StubTree(new ElixirFileStubImpl(true));
+            newStubTree = new StubTree(new ElixirFileStubImpl());
         }
 
         synchronized (stubLock) {

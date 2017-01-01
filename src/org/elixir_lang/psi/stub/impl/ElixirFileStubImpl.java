@@ -7,18 +7,10 @@ import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.call.CanonicallyNamed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class ElixirFileStubImpl extends PsiFileStubImpl<ElixirFile> implements ElixirFileStub {
-    private final boolean compiled;
-
-    public ElixirFileStubImpl(boolean compiled) {
-        this(null, compiled);
-    }
-
-    private ElixirFileStubImpl(@Nullable ElixirFile elixirFile, boolean compiled) {
-        super(elixirFile);
-        this.compiled = compiled;
+    public ElixirFileStubImpl() {
+        super(null);
     }
 
     @NotNull
