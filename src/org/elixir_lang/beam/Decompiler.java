@@ -124,7 +124,7 @@ public class Decompiler implements BinaryFileDecompiler {
 
     @Contract(pure = true)
     @NotNull
-    private static Pair<String, String> macroArgument(@NotNull String name) {
+    public static Pair<String, String> macroArgument(@NotNull String name) {
         String argument = name;
         String macro = DEF;
 

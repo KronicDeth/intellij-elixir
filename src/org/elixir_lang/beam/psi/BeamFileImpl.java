@@ -10,6 +10,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiFileImpl;
@@ -27,10 +28,15 @@ import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.beam.Beam;
+import org.elixir_lang.beam.Decompiler;
 import org.elixir_lang.beam.chunk.Atoms;
+import org.elixir_lang.beam.chunk.Exports;
+import org.elixir_lang.beam.chunk.exports.Export;
 import org.elixir_lang.beam.psi.impl.ModuleElementImpl;
 import org.elixir_lang.beam.psi.impl.ModuleImpl;
 import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
+import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
+import org.elixir_lang.beam.psi.stubs.CallDefinitionStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.psi.ElixirFile;
 import org.elixir_lang.psi.ModuleOwner;
@@ -42,6 +48,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import static com.intellij.reference.SoftReference.dereference;
 import static org.elixir_lang.beam.Decompiler.defmoduleArgument;
@@ -89,6 +97,17 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
             LOGGER.error(e);
         }
 
+        ModuleStub moduleStub = buildModuleStub(stub, beam);
+
+        if (moduleStub == null) {
+            stub = null;
+        }
+
+        return stub;
+    }
+
+    @Nullable
+    private static ModuleStub buildModuleStub(PsiFileStub<ElixirFile> parentStub, Beam beam) {
         ModuleStub moduleStub = null;
 
         if (beam != null) {
@@ -99,16 +118,53 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
 
                 if (moduleName != null) {
                     String name = defmoduleArgument(moduleName);
-                    moduleStub = new ModuleStubImpl(stub, name);
+                    moduleStub = new ModuleStubImpl(parentStub, name);
+
+                    buildCallDefinitions(moduleStub, beam, atoms);
                 }
             }
         }
 
-        if (moduleStub == null) {
-            stub = null;
-        }
+        return moduleStub;
+    }
 
-        return stub;
+    private static void buildCallDefinitions(@NotNull ModuleStub parentStub, @NotNull Beam beam, @NotNull Atoms atoms) {
+        Exports exports = beam.exports();
+
+        if (exports != null) {
+            Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>>
+                    exportByArityByNameNamelessExports = exports.exportByArityByName(atoms);
+
+            SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
+                    exportByArityByNameNamelessExports.first;
+
+            for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
+                    exportByArityByName.entrySet()) {
+                String name = nameExportByArity.getKey();
+                Pair<String, String> macroArgument = Decompiler.macroArgument(name);
+
+                SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
+
+                for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
+                    buildCallDefinition(parentStub, macroArgument, arityExport.getKey());
+                }
+            }
+        }
+    }
+
+    @NotNull
+    private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
+                                                          @NotNull Pair<String, String> macroArgument,
+                                                          int arity) {
+        return buildCallDefinition(parentStub, macroArgument.first, macroArgument.second, arity);
+    }
+
+    @NotNull
+    private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
+                                                          @NotNull String macro,
+                                                          @NotNull String name,
+                                                          int arity) {
+        return new CallDefinitionStubImpl(parentStub, macro, name, arity);
     }
 
     @Override

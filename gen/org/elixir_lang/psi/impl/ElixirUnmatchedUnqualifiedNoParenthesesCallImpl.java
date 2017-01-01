@@ -66,6 +66,15 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
+  public int exportedArity() {
+    return ElixirPsiImplUtil.exportedArity(this);
+  }
+
+  @Nullable
+  public String exportedName() {
+    return ElixirPsiImplUtil.exportedName(this);
+  }
+
   @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
@@ -78,6 +87,10 @@ public class ElixirUnmatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbe
 
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
+  public boolean isExported() {
+    return ElixirPsiImplUtil.isExported(this);
   }
 
   @Nullable

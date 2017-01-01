@@ -3,96 +3,80 @@ package org.elixir_lang.beam.psi.stubs;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
-import com.intellij.psi.JavaTokenType;
-import com.intellij.psi.impl.cache.RecordUtil;
-import com.intellij.psi.stubs.IndexSink;
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.stubs.StubInputStream;
-import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.psi.tree.IElementType;
-import com.intellij.util.io.StringRef;
-import org.elixir_lang.beam.psi.Module;
-import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
-import org.elixir_lang.beam.psi.impl.ModuleImpl;
-import org.elixir_lang.psi.stub.call.Stub;
-import org.elixir_lang.psi.stub.index.AllName;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.stubs.*;
+import org.elixir_lang.psi.stub.call.Stubbic;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Set;
 
-import static org.elixir_lang.beam.psi.impl.ModuleStubImpl.*;
 import static org.elixir_lang.psi.stub.type.Named.indexStubbic;
-import static org.elixir_lang.psi.stub.type.call.Stub.readNameSet;
 import static org.elixir_lang.psi.stub.type.call.Stub.serializeStubbic;
 
-public class ModuleElementType extends ModuleStubElementType<ModuleStub, Module> {
-    public ModuleElementType(@NotNull String id) {
-        super(id);
-    }
-
+/**
+ *
+ * @param <S> The stub element that {@link #serialize(StubElement, StubOutputStream)} and
+ *   {@link #indexStub(StubElement, IndexSink)} should accept.  These stubs should be created by
+ *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}.
+ * @param <P> The PSI element that should be returned by {@link #createPsi(StubElement)} in subclasses
+ */
+public abstract class ModuleElementType<S extends StubElement & Stubbic, P extends PsiElement>
+        extends ModuleStubElementType<S, P> {
+    /**
+     * @throws IllegalArgumentException stubs should never be created from {@link LighterAST} and
+     *   {@link LighterASTNode}:  Stubs should be created by
+     *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}.
+     */
     @Override
-    public Module createPsi(@NotNull ASTNode node) {
-        return new ModuleImpl(node);
-    }
-
-    @Override
-    public ModuleStub createStub(LighterAST tree, LighterASTNode node, StubElement parentStub) {
-        String name = null;
-
-        for (final LighterASTNode child : tree.getChildren(node)) {
-            final IElementType type = child.getTokenType();
-
-            if (type == JavaTokenType.IDENTIFIER) {
-                name = RecordUtil.intern(tree.getCharTable(), child);
-            }
-        }
-
-        return new ModuleStubImpl(parentStub, name);
-    }
-
-    @Override
-    public Module createPsi(@NotNull ModuleStub stub) {
-        return new ModuleImpl<ModuleStub>(stub);
+    public S createStub(LighterAST tree, LighterASTNode node, StubElement parentStub) {
+       throw new IllegalArgumentException(
+               "ModuleElementType should never create stubs from LighterAST tree as they are only create from " +
+                       "BeamFileImpl#buildFileStub and ModuleElementType#deserialize"
+       );
     }
 
     /**
-     * @param stub
-     * @param dataStream
-     * @throws IOException
+     * @param id Unique ID in {@link ModuleStubElementTypes}.  Used to lookup the subclass by {@link #getExternalId()}
+     *           when calling {{@link #deserialize(StubInputStream, Stub)}}.
+     */
+    ModuleElementType(@NotNull String id) {
+        super(id);
+    }
+
+    /**
+     * @throws IllegalArgumentException {@link PsiElement} should never be created from {@link ASTNode} because
+     *   {@link S} is for binary {@link org.elixir_lang.beam.psi.BeamFileImpl}.  Only
+     *   {{@link #createStub(PsiElement, StubElement)}} should be used to create {@link PsiElement} from {@link S}.
      */
     @Override
-    public void serialize(@NotNull ModuleStub stub, @NotNull StubOutputStream dataStream) throws IOException {
+    public P createPsi(@NotNull ASTNode node) {
+        throw new IllegalArgumentException(
+                "ModuleElementType stubs should never have psi created from ASTNodes as they are only created from " +
+                        "BeamFileImpl#buildFileStub and ModuleElementType#deserialize"
+        );
+    }
+
+    /**
+     * Serializes {@code stub} as a {@link Stubbic}.
+     *
+     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}
+     * @param dataStream stream to write {@code stub} to
+     * @throws IOException if {@code dataStream} cannot be written to
+     */
+    @Override
+    public void serialize(@NotNull S stub, @NotNull StubOutputStream dataStream) throws IOException {
         serializeStubbic(stub, dataStream);
     }
 
-    @NotNull
+    /**
+     * Indexes {@code stub} as a {@link Stubbic}.
+     *
+     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}
+     * @param sink stub index
+     */
     @Override
-    public ModuleStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        assert dataStream.readName().toString().equals(RESOLVED_MODULE_NAME);
-        assert dataStream.readName().toString().equals(RESOLVED_FUNCTION_NAME);
-        assert dataStream.readInt() == RESOLVED_FINAL_ARITY;
-        assert dataStream.readBoolean() == HAS_DO_BLOCK_OR_KEYWORD;
-
-        StringRef nameRef = dataStream.readName();
-        String name = nameRef.toString();
-
-        Set<StringRef> canonicalNameRefSet = readNameSet(dataStream);
-
-        assert canonicalNameRefSet.size() == 1;
-        assert canonicalNameRefSet.iterator().next().toString().equals(name);
-
-        return new ModuleStubImpl(parentStub, name);
-    }
-
-    @Override
-    public void indexStub(@NotNull ModuleStub stub, @NotNull IndexSink sink) {
+    public void indexStub(@NotNull S stub, @NotNull IndexSink sink) {
         indexStubbic(stub, sink);
-    }
-
-    @NotNull
-    @Override
-    public ASTNode createCompositeNode() {
-        return null;
     }
 }

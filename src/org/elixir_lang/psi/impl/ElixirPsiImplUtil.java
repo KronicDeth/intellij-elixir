@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -29,6 +30,7 @@ import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.Quote;
 import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.call.MaybeExported;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
@@ -935,6 +937,11 @@ public class ElixirPsiImplUtil {
         }
 
         return defaultArgument;
+    }
+
+    public static boolean isExported(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        return CallDefinitionClause.isPublicFunction(unqualifiedNoParenthesesCall) ||
+                CallDefinitionClause.isPublicMacro(unqualifiedNoParenthesesCall);
     }
 
     /**
@@ -2150,6 +2157,46 @@ public class ElixirPsiImplUtil {
         }
 
         return excessWhitespaceASTNode;
+    }
+
+    @Contract(pure = true)
+    public static int exportedArity(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        int arity = MaybeExported.UNEXPORTED_ARITY;
+
+        if (isExported(unqualifiedNoParenthesesCall)) {
+            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(unqualifiedNoParenthesesCall);
+
+            if (nameArityRange != null) {
+                IntRange arityRange = nameArityRange.second;
+
+                if (arityRange != null) {
+                    int minimumArity = arityRange.getMinimumInteger();
+                    int maximumArity = arityRange.getMaximumInteger();
+
+                    if (minimumArity == maximumArity) {
+                        arity = minimumArity;
+                    }
+                }
+            }
+        }
+
+        return arity;
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public static String exportedName(@NotNull final UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        String name = null;
+
+        if (isExported(unqualifiedNoParenthesesCall)) {
+            Pair<String, IntRange> nameArityRange = CallDefinitionClause.nameArityRange(unqualifiedNoParenthesesCall);
+
+            if (nameArityRange != null) {
+                name = nameArityRange.first;
+            }
+        }
+
+        return name;
     }
 
     /**
