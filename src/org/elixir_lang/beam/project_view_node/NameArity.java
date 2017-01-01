@@ -25,6 +25,39 @@ public class NameArity extends ProjectViewNode<Export> {
     private static final String MACRO_PREFIX = "MACRO-";
 
     /*
+     * Fields
+     */
+
+    @NotNull
+    private final Icon icon;
+    @NotNull
+    private final String location;
+
+    @NotNull
+    private final String presentableText;
+    /**
+     * Creates an instance of the project view node.
+     *
+     * @param project      the project containing the node.
+     * @param export       the object (for example, a PSI element) represented by the project view node
+     * @param viewSettings the settings of the project view.
+     */
+    NameArity(Project project,
+              Export export,
+              @NotNull String location,
+              @NotNull String name,
+              @Nullable Integer arity,
+              ViewSettings viewSettings) {
+        super(project, export, viewSettings);
+        this.icon = org.elixir_lang.name_arity.PresentationData.icon(false, false, false, time(name), Visible.Visibility.PUBLIC);
+        this.location = location;
+        this.presentableText = org.elixir_lang.name_arity.PresentationData.presentableText(
+                stripMacroPrefix(name),
+                arity
+        );
+    }
+
+    /*
      * Static Methods
      */
 
@@ -49,39 +82,6 @@ public class NameArity extends ProjectViewNode<Export> {
         }
 
         return time;
-    }
-
-    /*
-     * Fields
-     */
-
-    @NotNull
-    private final Icon icon;
-    @NotNull
-    private final String location;
-    @NotNull
-    private final String presentableText;
-
-    /**
-     * Creates an instance of the project view node.
-     *
-     * @param project      the project containing the node.
-     * @param export       the object (for example, a PSI element) represented by the project view node
-     * @param viewSettings the settings of the project view.
-     */
-    NameArity(Project project,
-              Export export,
-              @NotNull String location,
-              @NotNull String name,
-              @Nullable Integer arity,
-              ViewSettings viewSettings) {
-        super(project, export, viewSettings);
-        this.icon = org.elixir_lang.name_arity.PresentationData.icon(false, false, false, time(name), Visible.Visibility.PUBLIC);
-        this.location = location;
-        this.presentableText = org.elixir_lang.name_arity.PresentationData.presentableText(
-                stripMacroPrefix(name),
-                arity
-        );
     }
 
     /**
