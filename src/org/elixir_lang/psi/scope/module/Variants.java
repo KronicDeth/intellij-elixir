@@ -57,6 +57,28 @@ public class Variants extends Module {
      * Private Static Methods
      */
 
+    /**
+     * Filters to only those names that work as Alias, that is those that start with a capital letter
+     */
+    @NotNull
+    private static Collection<String> filterIndexedNameCollection(@NotNull Collection<String> indexedNameCollection) {
+        return ContainerUtil.filter(
+                indexedNameCollection,
+                new Condition<String>() {
+                    @Override
+                    public boolean value(String indexedName) {
+                        boolean value = false;
+
+                        if (indexedName != null) {
+                            value = Character.isUpperCase(indexedName.codePointAt(0));
+                        }
+
+                        return value;
+                    }
+                }
+        );
+    }
+
     @NotNull
     private static Collection<String> filterIndexedNameCollection(@NotNull Collection<String> indexedNameCollection,
                                                                   @Nullable final String prefix) {
@@ -269,28 +291,34 @@ public class Variants extends Module {
         Collection<String> indexedNameCollection = StubIndex.getInstance().getAllKeys(AllName.KEY, project);
         GlobalSearchScope scope = GlobalSearchScope.allScope(project);
 
+        Collection<String> aliasNameCollection = filterIndexedNameCollection(indexedNameCollection);
+
         String prefix = indexedNamePrefix(multipleAliases);
-        Collection<String> filteredIndexedNameCollection = filterIndexedNameCollection(
-                indexedNameCollection,
+        Collection<String> prefixedNameCollection = filterIndexedNameCollection(
+                aliasNameCollection,
                 prefix
         );
 
-        for (String indexedName : filteredIndexedNameCollection) {
-            Collection<NamedElement> indexedNameNamedElementCollection = StubIndex.getElements(
+        for (String prefixedName : prefixedNameCollection) {
+            Collection<NamedElement> prefixedNameNamedElementCollection = StubIndex.getElements(
                     AllName.KEY,
-                    indexedName,
+                    prefixedName,
                     project,
                     scope,
                     NamedElement.class
             );
 
-            String lookupName = lookupName(indexedName, prefix);
+            String lookupName = lookupName(prefixedName, prefix);
 
-            for (NamedElement indexedNameNamedElement : indexedNameNamedElementCollection) {
+            for (NamedElement prefixedNameNamedElement : prefixedNameNamedElementCollection) {
+                /* Generalizes over whether the prefixedNameNamedElement is a source element or a compiled element as
+                   the navigation element is defined to be always be a source element */
+                PsiElement navigationElement = prefixedNameNamedElement.getNavigationElement();
+
                 lookupElementList.add(
                         LookupElementBuilder.createWithSmartPointer(
                                 lookupName,
-                                indexedNameNamedElement
+                                navigationElement
                         )
                 );
             }
