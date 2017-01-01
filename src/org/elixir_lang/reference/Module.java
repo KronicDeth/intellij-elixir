@@ -161,7 +161,11 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
         );
 
         for (NamedElement namedElement : namedElementCollection) {
-            results.add(new PsiElementResolveResult(namedElement));
+            /* The NamedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
+               (either true source or decompiled) is used, which ensures it is a Call. */
+            PsiElement navigationElement = namedElement.getNavigationElement();
+
+            results.add(new PsiElementResolveResult(navigationElement));
         }
 
         return results;
