@@ -61,19 +61,6 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
         return lookupElementList;
     }
 
-    @NotNull
-    private static Iterable<LookupElement> callDefinitionClauseLookupElements(@NotNull PsiElement scope) {
-        Iterable<LookupElement> lookupElementIterable;
-
-        if (scope instanceof Call) {
-            lookupElementIterable = callDefinitionClauseLookupElements((Call) scope);
-        } else {
-            lookupElementIterable = Collections.emptyList();
-        }
-
-        return lookupElementIterable;
-    }
-
     /*
      * Protected Instance Methods
      */
@@ -83,7 +70,7 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
                                   ProcessingContext context,
                                   @NotNull CompletionResultSet resultSet) {
         PsiElement originalPosition = parameters.getOriginalPosition();
-        PsiElement originalParent = null;
+        PsiElement originalParent;
 
         if (originalPosition != null) {
             originalParent = originalPosition.getParent();
