@@ -2145,7 +2145,7 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
-    <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (:)"
+    <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
                      enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.KeywordPairColonInsteadOfTypeOperator"
                      language="Elixir" level="ERROR" shortName="KeywordPairColonInsteadOfTypeOperator"/>
