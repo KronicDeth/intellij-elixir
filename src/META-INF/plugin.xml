@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.7.0</version>
+  <version>4.8.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,46 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v4.8.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              <p>
+                Decompile <code>.beam</code> files
+              </p>
+              <ul>
+                <li>Structure view for decompiled <code>.beam</code> files</li>
+                <li>Index modules, functions, and macros exported by <code>.beam</code> files</li>
+                <li>
+                  <p>Go To Symbol for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
+                  <ul>
+                    <li>Erlang using atoms (like <code>:idna</code>)</li>
+                    <li>Elixir using Alias (like <code>Enum</code>)</li>
+                  </ul>
+                </li>
+                <li>
+                  <p>Completion for Modules defined in <code>.beam</code> files (both SDK and deps)</p>
+                  <ul>
+                    <li>Elixir using Alias (like <code>Enum</code>)</li>
+                  </ul>
+                </li>
+                <li>Completion for functions and macros exported by <code>.beam</code> files</li>
+                <li>Syntax highlighting</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Fix copy-paste errors in <code>MatchOperatorInsteadOfTypeOperator</code>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v4.7.0</h1>
       <ul>
         <li>

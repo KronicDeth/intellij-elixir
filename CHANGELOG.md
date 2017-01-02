@@ -3,99 +3,120 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v4.7.0](#v470)
+  - [v4.8.0](#v480)
     - [Enhancements](#enhancements)
     - [Bug Fixes](#bug-fixes)
-  - [v4.6.0](#v460)
+  - [v4.7.0](#v470)
     - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes-1)
-  - [v4.5.0](#v450)
+  - [v4.6.0](#v460)
     - [Enhancements](#enhancements-2)
-  - [v4.4.0](#v440)
-    - [Enhancements](#enhancements-3)
     - [Bug Fixes](#bug-fixes-2)
-  - [v4.3.0](#v430)
+  - [v4.5.0](#v450)
+    - [Enhancements](#enhancements-3)
+  - [v4.4.0](#v440)
     - [Enhancements](#enhancements-4)
     - [Bug Fixes](#bug-fixes-3)
-  - [v4.2.0](#v420)
+  - [v4.3.0](#v430)
     - [Enhancements](#enhancements-5)
     - [Bug Fixes](#bug-fixes-4)
-  - [v4.1.0](#v410)
+  - [v4.2.0](#v420)
     - [Enhancements](#enhancements-6)
     - [Bug Fixes](#bug-fixes-5)
-  - [v4.0.0](#v400)
+  - [v4.1.0](#v410)
     - [Enhancements](#enhancements-7)
     - [Bug Fixes](#bug-fixes-6)
+  - [v4.0.0](#v400)
+    - [Enhancements](#enhancements-8)
+    - [Bug Fixes](#bug-fixes-7)
     - [Incompatible Changes](#incompatible-changes)
   - [v3.0.1](#v301)
-    - [Bug Fixes](#bug-fixes-7)
-  - [v3.0.0](#v300)
-    - [Enhancements](#enhancements-8)
     - [Bug Fixes](#bug-fixes-8)
+  - [v3.0.0](#v300)
+    - [Enhancements](#enhancements-9)
+    - [Bug Fixes](#bug-fixes-9)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v2.2.0](#v220)
     - [Enhancement](#enhancement)
-    - [Bug Fixes](#bug-fixes-9)
+    - [Bug Fixes](#bug-fixes-10)
   - [v2.1.0](#v210)
     - [Enhancement](#enhancement-1)
-    - [Bug Fixes](#bug-fixes-10)
-  - [v2.0.0](#v200)
-    - [Enhancements](#enhancements-9)
     - [Bug Fixes](#bug-fixes-11)
-    - [Incompatible Changes](#incompatible-changes-2)
-  - [v1.2.1](#v121)
+  - [v2.0.0](#v200)
     - [Enhancements](#enhancements-10)
     - [Bug Fixes](#bug-fixes-12)
-  - [v1.2.0](#v120)
+    - [Incompatible Changes](#incompatible-changes-2)
+  - [v1.2.1](#v121)
     - [Enhancements](#enhancements-11)
     - [Bug Fixes](#bug-fixes-13)
-  - [v1.1.0](#v110)
+  - [v1.2.0](#v120)
     - [Enhancements](#enhancements-12)
-  - [v1.0.0](#v100)
-    - [Enhancements](#enhancements-13)
     - [Bug Fixes](#bug-fixes-14)
-    - [Incompatible Fixes](#incompatible-fixes)
-  - [v0.3.5](#v035)
+  - [v1.1.0](#v110)
+    - [Enhancements](#enhancements-13)
+  - [v1.0.0](#v100)
     - [Enhancements](#enhancements-14)
     - [Bug Fixes](#bug-fixes-15)
-  - [v0.3.4](#v034)
+    - [Incompatible Fixes](#incompatible-fixes)
+  - [v0.3.5](#v035)
     - [Enhancements](#enhancements-15)
-  - [v0.3.3](#v033)
-    - [Enhancements](#enhancements-16)
-  - [v0.3.2](#v032)
     - [Bug Fixes](#bug-fixes-16)
-  - [v0.3.1](#v031)
+  - [v0.3.4](#v034)
+    - [Enhancements](#enhancements-16)
+  - [v0.3.3](#v033)
     - [Enhancements](#enhancements-17)
-  - [v0.3.0](#v030)
+  - [v0.3.2](#v032)
+    - [Bug Fixes](#bug-fixes-17)
+  - [v0.3.1](#v031)
     - [Enhancements](#enhancements-18)
+  - [v0.3.0](#v030)
+    - [Enhancements](#enhancements-19)
     - [Incompatible Changes](#incompatible-changes-3)
   - [v0.2.1](#v021)
-    - [Enhancements](#enhancements-19)
-    - [Bug Fixes](#bug-fixes-17)
-  - [v0.2.0](#v020)
     - [Enhancements](#enhancements-20)
+    - [Bug Fixes](#bug-fixes-18)
+  - [v0.2.0](#v020)
+    - [Enhancements](#enhancements-21)
     - [Incompatible Changes](#incompatible-changes-4)
   - [v0.1.4](#v014)
-    - [Enhancements](#enhancements-21)
-    - [Bug Fixes](#bug-fixes-18)
-  - [v0.1.3](#v013)
-    - [Bug Fixes](#bug-fixes-19)
-  - [v0.1.2](#v012)
     - [Enhancements](#enhancements-22)
-  - [v0.1.1](#v011)
+    - [Bug Fixes](#bug-fixes-19)
+  - [v0.1.3](#v013)
     - [Bug Fixes](#bug-fixes-20)
-  - [v0.1.0](#v010)
+  - [v0.1.2](#v012)
     - [Enhancements](#enhancements-23)
+  - [v0.1.1](#v011)
     - [Bug Fixes](#bug-fixes-21)
-  - [v0.0.3](#v003)
+  - [v0.1.0](#v010)
     - [Enhancements](#enhancements-24)
-  - [v0.0.2](#v002)
-    - [Enhancements](#enhancements-25)
     - [Bug Fixes](#bug-fixes-22)
+  - [v0.0.3](#v003)
+    - [Enhancements](#enhancements-25)
+  - [v0.0.2](#v002)
+    - [Enhancements](#enhancements-26)
+    - [Bug Fixes](#bug-fixes-23)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v4.8.0
+
+### Enhancements
+* [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - [@KronicDeth](https://github.com/KronicDeth)
+  * Decompile `.beam` files
+    * Structure view for decompiled `.beam` files
+    * Index modules, functions, and macros exported by `.beam` files
+    * Go To Symbol for Modules defined in `.beam` files (both SDK and deps)
+      * Erlang using atoms (like `:idna`)
+      * Elixir using Alias (like `Enum`)
+    * Completion for Modules defined in `.beam` files (both SDK and deps)
+      * Elixir using Alias (like `Enum`)
+    * Completion for functions and macros exported by `.beam` files
+    * Syntax highlighting
+
+### Bug Fixes
+* [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.7.0
 
@@ -110,7 +131,7 @@
     * Program Arguments
     * Working directory
     * Environment variables
-* [#531](https://github.com/KronicDeth/intellij-elixir/pull/531) - [@KronicDeth](https://github.com/KronicDeth) 
+* [#531](https://github.com/KronicDeth/intellij-elixir/pull/531) - [@KronicDeth](https://github.com/KronicDeth)
   * `enclosingMacroCall` returns enclosing macro call when parent is `ElixirDoBlock`, so that `end` element goes to the macro call.
   * `Navigate > Test` will go to the Module that has the same canonical name as the current `defimpl`, `defmodule`, `defprotocol` , or `quote` with a `Test` suffix added
   * `Navigate > Test Subject` will go to the `defimpl`, `defmodule`, `defprotocol`, or `quote` that has the same canonical name as the current Module with the `Test` suffix removed.
@@ -128,8 +149,8 @@
 * [#532](https://github.com/KronicDeth/intellij-elixir/pull/532) - Don't log error when name length exceeds presentable text length because it appears to be common for normal users and not a development environment artifact. - [@KronicDeth](https://github.com/KronicDeth)
 * [#533](https://github.com/KronicDeth/intellij-elixir/pull/533) - Check parent of `ElixirMultipleAliases` for `isVariable` because `ElixirMultipleAliases` can be hit in `isVariable` when `MyAlias.` is added on a line above a pre-existing tuple, such as when typing a new qualified call. - [@KronicDeth](https://github.com/KronicDeth)
 * [#534](https://github.com/KronicDeth/intellij-elixir/pull/534) - Add space between variable and match in lookup element presentation - [@KronicDeth](https://github.com/KronicDeth)
-* [#535](https://github.com/KronicDeth/intellij-elixir/pull/535) - Check `VirtualFile` is not null before creating attachment because `PsiFile` can lack a `VirtualFile` if the `PsiFile` only exists in memory. - [@KronicDeth](https://github.com/KronicDeth) 
-* [#537](https://github.com/KronicDeth/intellij-elixir/pull/537) - Convert `CallDefinitionClause(Call)` to `CallDefinitionClause.fromCall(Call)`, so that `null` can be returned when `CallDefinitionClause.enclosingModular(Call)` returns `null`. - [@KronicDeth](https://github.com/KronicDeth) 
+* [#535](https://github.com/KronicDeth/intellij-elixir/pull/535) - Check `VirtualFile` is not null before creating attachment because `PsiFile` can lack a `VirtualFile` if the `PsiFile` only exists in memory. - [@KronicDeth](https://github.com/KronicDeth)
+* [#537](https://github.com/KronicDeth/intellij-elixir/pull/537) - Convert `CallDefinitionClause(Call)` to `CallDefinitionClause.fromCall(Call)`, so that `null` can be returned when `CallDefinitionClause.enclosingModular(Call)` returns `null`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#539](https://github.com/KronicDeth/intellij-elixir/pull/539) - [@KronicDeth](https://github.com/KronicDeth)
   * Use `functionName` instead of `getName` when multiresolving unqualified functions because `getName` will return the Alias when called on `defmodule`.
   * `maybeQualifiedCallToModular` returned `null` BOTH (1) if the call was unqualified OR (2) if the call was qualified, but its modular could not be resolved, so qualified calls to `.beam`-only modules, like `File.read!` returned `null` because `File` could not be resolved to a modular.  Remove `maybeqQualifiedToModular` and call `qualifiedToModular` when `myElement` is qualified.  If the modular is `null`, then return an empty `ResolveResult[]` instead of looking for unqualified matches.
@@ -170,7 +191,7 @@
 * [#454](https://github.com/KronicDeth/intellij-elixir/pull/454) - Return `emptySet` when `lookupElementByPsiElement` is `null`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#455](https://github.com/KronicDeth/intellij-elixir/pull/454) - [@KronicDeth](https://github.com/KronicDeth)
   * Don't do a naked `assert` that there are 2 children because this can fail during error recovery on the operand, instead use the `prefix.Normalized.operand()` through `prefix.operand()`.
-                                                                   
+
     **WARNING: This changes the `@NotNull` array so that its sole element changes from `@NotNull` to `@Nullable`.  It may trigger new bugs.**
 * [#461](https://github.com/KronicDeth/intellij-elixir/pull/461) - Use shipped `GeneratedParserUtilBase.DUMMY_BLOCK` because the `DUMMY_BLOCK` *MUST* match the `GeneratedParserUtilBase` to detect dummy blocks inserted for error handling. - [@KronicDeth](https://github.com/KronicDeth)
 * [#465](https://github.com/KronicDeth/intellij-elixir/pull/465) - Skip over `ElixirNoParenthesesStrict` for `isVariable` - [@KronicDeth](https://github.com/KronicDeth)
@@ -178,7 +199,7 @@
 * [#467](https://github.com/KronicDeth/intellij-elixir/pull/467) - Don't match `do` or `fn` to `end` when used as a keyword key. - [@KronicDeth](https://github.com/KronicDeth)
 * [#474](https://github.com/KronicDeth/intellij-elixir/pull/474) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if `iterator.atEnd()` before calling `iterator.getTokenType()` to avoid `IndexOutOfBounds` exception.
-  * Don't add current call definition clause being written to completion 
+  * Don't add current call definition clause being written to completion
 * [#476](https://github.com/KronicDeth/intellij-elixir/pull/476) - `When#leftOperand` will return `null` (because it's normalized) if there are left-hand error elements, but when stripping guards we want best-effort to match human expectations, so don't use normalized `null`, but use left, non-error element if it is unique. - [@KronicDeth](https://github.com/KronicDeth)
 * [#477](https://github.com/KronicDeth/intellij-elixir/pull/477) - Highlight types in `QualifiedNoParenthesesCall` - [@KronicDeth](https://github.com/KronicDeth)
 * [#478](https://github.com/KronicDeth/intellij-elixir/pull/478) - Still not obvious why `name` for a `CallDefinitionClause` lookup renderer can be longer than `presentableText`, so still log an error, but with `Logger.error`, so we get `name`, `presentableText`, and the original `element`. - [@KronicDeth](https://github.com/KronicDeth)
@@ -194,15 +215,15 @@
 * [#486](https://github.com/KronicDeth/intellij-elixir/pull/486) - Increase `resolvedFinalArity` by `1` for piping. - [@KronicDeth](https://github.com/KronicDeth)
 * [#498](https://github.com/KronicDeth/intellij-elixir/pull/498) - [@KronicDeth](https://github.com/KronicDeth)
   * Go To Declaration resolves through `import`
-    * for `import MyModule` 
+    * for `import MyModule`
       * the `import` statement
-      * the call definition clause in the imported Module. 
+      * the call definition clause in the imported Module.
     * for `import MyModule, only: [name: arity]`
       * the `import` statement
-      * the call definition clause in the imported Module. 
+      * the call definition clause in the imported Module.
     * for `import MyModule, except: [name: arity]` _if_ reference is _not_ `name/arity`.
       * the `import` statement
-      * the call definition clause in the imported Module. 
+      * the call definition clause in the imported Module.
 
 ## v4.5.0
 
@@ -212,7 +233,7 @@
   * Completion for functions and macros (only those defined in parseable-Elixir source.  Erlang functions and Elixir function only in compiled `.beam` file, such as the standard library will not complete.)
     * Completion uses the same presentation as Structure View, so the you can tell whether the name is a function/macro, whether it is public/private, and the Module where it is defined.
     * Completed functions/macro insert `()` after the name in preparation for Elixir 1.4 where it is an error to have bare function calls.  It also makes it more obvious that you inserted a function and not a variable.
-    * Completion works for all functions when a bare identifier is used.  For a qualified identifier, only functions/macros under than Module are shown. 
+    * Completion works for all functions when a bare identifier is used.  For a qualified identifier, only functions/macros under than Module are shown.
 
 ## v4.4.0
 
@@ -341,7 +362,7 @@
   * Allow `do end` blocks to fold to `do: ...`
   * Allow `->` operator and the right operand to fold to `-> ...`
   * Allow `@doc`, `@moduledoc` and `@typedoc` value to fold to `"..."`.
-  * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`. 
+  * Fold runs of adjacent `alias`, `import`, `require`, or `use` to be followed to a single `alias`, `import`, `require`, or `use` followed by `...`.
 * [#334](https://github.com/KronicDeth/intellij-elixir/pull/334) - Function separators - [@KronicDeth](https://github.com/KronicDeth)
   * Show a function separator (Preferences > Editor > General > Appearance > Show method separators) above the group of `@doc`, `@spec` and `def`, `defp`, `defmacro`, and `defmacrop` (call definition clauses) of the same name and arity range.  Arity range will be used if one of the call definition clauses uses default arguments.
 * [#337](https://github.com/KronicDeth/intellij-elixir/pull/337) - [@KronicDeth](https://github.com/KronicDeth)
@@ -358,9 +379,9 @@
   * `ElixirSdkRelease` is now `Comparable`, so version checks can be done for tests to restrict them to Elixir 1.2+ for multiple alias support.
   * Resolve Multiple Aliases with unqualified Alias in tuples.
   * `canonicalName` borrows from the idea of `PsiReference#canonicalText`: an element can have both a Name (from `getName`), which is the literal name in the code, which can be renamed, and a Canonical Name, which is the name to refer to the element without need for imports or aliases.  For this change, `defimpl`, `defmodule`, and `defprotocol` will show their full module Alias for their Canonical Name.
-    
+
     This change addresses the use case of Go To Declaration that should resolved to a nested `defmodule`.
-  
+
 ### Bug Fixes
 * [#330](https://github.com/KronicDeth/intellij-elixir/pull/330) - Check if `parameter` is `null` before `Variable#execute` call in `Variable#execute(PsiElement[], ResolveState)`. - [@KronicDeth](https://github.com/KronicDeth)
 * [#336](https://github.com/KronicDeth/intellij-elixir/pull/336) - Fix `isVariable` and `variableUseScope` for `var!(name)[...]` - [@KronicDeth](https://github.com/KronicDeth)
@@ -382,7 +403,7 @@
   * Add `A.{B, C}` to grammar with quoting to check consistence with Elixir 1.2.  Ports [elixir-lang/elixir#3666](https://github.com/elixir-lang/elixir/pull/3666).
   * Use `fullyQualifiedName` instead of `getName` for `resolvableName` because `fullyQualifiedName` is needed so that qualified aliases inside of the `{ }` of a multiple alias will not have a name as `getName` is `null` for those qualified aliases because the name from `getName` has to be a literal name that can be renamed and qualified names can't be renamed.
 * [#365](https://github.com/KronicDeth/intellij-elixir/pull/365) - The `Module` icon got the same icon as `Unknown` when creating `Unknown` somehow, I assume due to find-replace. - [@KronicDeth](https://github.com/KronicDeth)
-  
+
 ## v4.0.0
 
 ### Enhancements
@@ -407,7 +428,7 @@
   * `operation.infix.Normalized`
     * Normalizes leftOperand, operator, and rightOperand for an Infix operation that may have errors (in either operand).  If there is an error in the operand then its normalized value is `null`.
   * Keyword key type descriptions
-    * Default to `"keyword key"`. 
+    * Default to `"keyword key"`.
     * Detect `bind_quoted:` usage and call those `"quote bound variable"`.
   * Add interfaces to unify matching of `Matched` and `Unmatched` form of operations when the code cares about the operator
     * `And`
@@ -417,7 +438,7 @@
     * StabOperations
   * Treat variables and parameters as `NamedElements`, so they can be Rename Refactored.
   * Move reused Module and Function names to `org.elixir_lang.psi.name.{Module,Function}` constants.
-  * Parameter and Variable completion  
+  * Parameter and Variable completion
 * [#318](https://github.com/KronicDeth/intellij-elixir/pull/318) - Highlight keyword keys (`key:` in `key: value`) that aren't quotes (`"key": value` or `'key': value`) as Atom. - [@KronicDeth](https://github.com/KronicDeth)
 * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
   * Show annotator applied highlights in the Preferences > Editor > Colors & Fonts > Elixir.
@@ -454,7 +475,7 @@
           * `typtyp` in `@opaque typtyp :: 1..10`
           * `typ` and `typtyp` in `@callback func(typ, typtyp) :: :ok | :fail`
           * `binary` and `utf8` in `<< "hello" :: binary, c :: utf8, x = 4 * 2 >> = "hello™1"`
-      * `Type Parameters` (`type_parameter` in `@type parameterized(type_parameter) :: type_parameter`)      
+      * `Type Parameters` (`type_parameter` in `@type parameterized(type_parameter) :: type_parameter`)
     * `Numbers`
       * `Binary, Decimal, Hexadecimal, and Octal Digits` (Previously at top-level.)
       * `Decimal Exponent, Mark and Separator` (Previously at top-level)
@@ -484,7 +505,7 @@
   * Highlight atom keywords (`false`, `nil`, and `true`) as merge of `Atom` and `Keyword` text attributes.  If both only use foreground color, `Keyword` wins.
   * Annotate `QualifiableAlias` as `Alias`.
   * Highlight keyword list and map keywords (`<key>:`) as `Atom`.
-  * Add `with` to highlighted special forms  
+  * Add `with` to highlighted special forms
 * [#322](https://github.com/KronicDeth/intellij-elixir/pull/322) - Additional Text Attributes - [@KronicDeth](https://github.com/KronicDeth)
   * Default text attributes for "Darcula" and "Default" themes: almost every Text Attribute Key has a unique hue for the Foreground color.
   * Explain how to add `additionalTextAttributes` to `plugin.xml` in `CONTRIBUTING.md`
@@ -517,17 +538,17 @@
   * Fix capitalization error in example text
 * [#323](https://github.com/KronicDeth/intellij-elixir/pull/323) - Build `jps-builder` using only Java 1.6 compatible `.class`es - [@KronicDeth](https://github.com/KronicDeth)
   * In IntelliJ 14.1, all of `openapi.jar` targets Java 1.6 (with `MAJOR.MINOR` `50.0`), but in IntelliJ 2016.1, some of `openapi.jar` targets only Java 1.8 (with `MAJOR.MINOR` `52.0`), since `jps-builders` require parts of `openapi.jar` and must target Java 1.6 even for IntelliJ 2016.1, the `52.0` `.class`es needed to be ported into `org.elixir_lang.jps.builder`, so that the `52.0` version in `openapi.jar` wouldn't be attempted to be loaded.
-    
+
     This ended up being 5 classes:
-  
+
     * `ExecutionException`
     * `GeneralCommandLine`
     * `ParametersList`
     * `ParamsGroup`
     * `ProcessNotCreatedException`
-  
+
     Only `GeneralCommandLine` was used directly, all others are dependencies of it.
-    
+
 ### Incompatible Changes
 * [#320](https://github.com/KronicDeth/intellij-elixir/pull/320) - [@KronicDeth](https://github.com/KronicDeth)
   * Preferences > Editor > Colors & Fonts > Elixir restructured to group together related highlights and to match grouping used for Colors & Fonts > Language Defaults and Colors & Fonts > Java.
@@ -536,7 +557,7 @@
     * `Expression Substitution Mark` renamed to `Braces and Operators > Interpolation`.
     * The following are now nested under `Numbers` instead of being at the top-level:
       * `Binary, Decimal, Hexadecimal, and Octal Digits`
-      * `Decimal Exponent, Mark and Separator` 
+      * `Decimal Exponent, Mark and Separator`
       * `Invalid Binary, Decimal, Hexadecimal, and Octal Digits`
       * `Non-Decimal Base Prefix`
       * `Obsolete Non-Decimal Base Prefix`
@@ -546,14 +567,14 @@
   * "Numbers > Invalid Binary, Decimal, Hexadecimal, and Octal Digits" renamed to "Numbers > Digits > Invalid"
   * "Numbers > Non-Decimal Base Prefix" renamed to "Numbers > Base Prefix > Non-Decimal"
   * "Numbers > Obsolete Non-Decimal Base" renamed to "Numbers > Base Prefix > Obsolete > Non-Decimal"
-  
+
 ## v3.0.1
 
 ### Bug Fixes
 * [#287](https://github.com/KronicDeth/intellij-elixir/pull/287) - Use the error reporter logger instead of plain `assert` in `Prefix#operator`.  **NOTE: This does not address error recovery recovery since I don't have a regression test case.** - [@KronicDeth](https://github.com/KronicDeth)
 * [#283](https://github.com/KronicDeth/intellij-elixir/pull/283) - All function name elements act as `PsiNameIdentifier`s now even if they don't resolve, but that means they all need to support `FindUsagesProvider#getType`, which they don't, so use a placeholder of "unknown call type" for any `Call` that can't be matched and "unknown element" for anything else. - [@KronicDeth](https://github.com/KronicDeth)
 * [#284](https://github.com/KronicDeth/intellij-elixir/pull/284) - Enumerate all Kernel Functions, Macros, and Special Forms in the Syntax Highlighting section of the README, so that users searching for which category controls highlighting a given call can find it. - [@KronicDeth](https://github.com/KronicDeth)
-  
+
 ## v3.0.0
 
 ### Enhancements
@@ -579,15 +600,15 @@
 * [#259](https://github.com/KronicDeth/intellij-elixir/pull/260) - Add Keywords to the Preferences > Editor > Colors & Fonts > Elixir settings page, so it can be customized for just Elixir instead of having to change Preferences > Editor > Colors & Fonts > General > Keyword - [@KronicDeth](https://github.com/KronicDeth)
 * [#263](https://github.com/KronicDeth/intellij-elixir/pull/263) - Ensure compatibility from 14.0 to 2016.1 - [@KronicDeth](https://github.com/KronicDeth)
   * Use `TextAttributesKey`s that aren't deprecated in 2016.1 and work back to 14.1
-       
+
     All of `CodeInsightColors` is deprecated, so all constants from there had to be replaced.  Unfortunately, the recommended replacements don't have the same color as the original, so I used different `DefaultLanguageHighlighterColors` constants for some.
-  
+
     "Module Attribute" is now based on `DefaultLanguageHighlighterColors.CONSTANT` (which is purplish in Darcula) instead of the recommended `METADATA`, which is yellow.  Although module attributes don't have to be constant since they can be set to accumulate, often they are used as constants and not really as metadata, since they are just data then.  All the `metadata` uses of module attributes have a separate color.
-  
+
     "Specification" is now based on `DefaultLanguageHighlighterColors.FUNCTION_DECLARATION`, which maintains the golden color that `CodeInsightColors.METHOD_DECLARATION_ATTRIBUTES` had.
-  
+
     "Type" is now based on `DefaultLanguageHighlighterColors.METADATA`, which is bright yellow unlike `CodeInsightColors.ANNOTATION_ATTRIBUTE_NAME_ATTRIBUTES`, which was a bright white.
-  
+
     "Type Parameter" is now based on `DefaultLanguageHighlighterColors.PARAMETER`, which unfortunately has no attributes associated with it, but the constant name was too good a fit not to use, so if you want the old color, you'll need to customize it yourself.
   * Restore compatibility with the IntelliJ IDEA 14.0 release line
     * By using reflection to call `FileTemplateManager#getInstance` if `FileTemplateManager#getDefaultInstance` is not available
@@ -627,7 +648,7 @@
     * Exception (`defexception`) show the implicit struct and nest any callback functions, such as `exception/1` or `message/1`.
     * Overridable `defoverridable` tracks overridable functions and is used to mark CallDefinitions are overrides.
     * Quote `quote do end` models quote blocks so they can be injected `use Alias` sites.
-    * Use `use Alias` show `use` calls.    
+    * Use `use Alias` show `use` calls.
 * [#241](https://github.com/KronicDeth/intellij-elixir/pull/241) - Live Templates - [pfitz](https://github.com/pfitz)
 * [#220](https://github.com/KronicDeth/intellij-elixir/pull/220) - Added clarification to "Import Project from External Model" that `mix.bat` should be used instead of `mix` - [f-lombardo](https://github.com/f-lombardo)
 * [#244](https://github.com/KronicDeth/intellij-elixir/pull/244) - Get the Elixir version directly from `System.build_info[:version]` instead of processing the formatted output of `elixir --version` as the build info version is more stable - [KronicDeth](https://github.com/KronicDeth)
@@ -672,7 +693,7 @@
   * Rename module attributes inline (editing the name in the declaration will change the name at the usage site at the same time without a dialog).
   * The module attribute value (from the declaration site) will be folded into the usage site.  It can be reverted to the literal `@module_name` text by clicking the + to unfold.
 
-### Bug Fixes 
+### Bug Fixes
 * [#206](https://github.com/KronicDeth/intellij-elixir/pull/206) - Change "edition" to "addition" in README. - [folz](https://github.com/folz)
 * [#225](https://github.com/KronicDeth/intellij-elixir/pull/225) - Sped up reparsing when [ENTER] is hit in the middle of comment by removing the custom error handling element, adjacentExpression, and going with the default error handling provided by JetBrains' OpenAPI. - [KronicDeth](https://github.com/KronicDeth)
 * [#226](https://github.com/KronicDeth/intellij-elixir/pull/226) - Fix `mix` version detection on Windows - [KronicDeth](https://github.com/KronicDeth)
@@ -728,7 +749,7 @@
         * Fetches the the dependencies with the local version of `mix`
         * Marks `lib` directory as source
         * Marks `test` directory as test sources
-  * `Run > Elixir Mix` to setup Run Configurations to run `mix` tasks. 
+  * `Run > Elixir Mix` to setup Run Configurations to run `mix` tasks.
 
 ## v1.0.0
 
@@ -794,7 +815,7 @@
       * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
       * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
 * [#125](https://github.com/KronicDeth/intellij-elixir/pull/125) - Bracket expression (`foo[key]`) - [@KronicDeth](https://github.com/KronicDeth)
-      
+
 ## v0.3.2
 
 ### Bug Fixes
@@ -882,7 +903,7 @@
  * [#17](https://github.com/KronicDeth/intellij-elixir/pull/17): Sigil terminator escapes are recognized, so that sigils are no longer prematurely terminated. - [@KronicDeth](https://github.com/KronicDeth)
  * [#24](https://github.com/KronicDeth/intellij-elixir/pull/24): Comments do not consume EOL, so trailing comments don't cause error parsing expression on following line. - [@KronicDeth](https://github.com/KronicDeth)
  * [#36](https://github.com/KronicDeth/intellij-elixir/pull/36): Sigil modifiers now work on groups in addition to heredocs. - [@KronicDeth](https://github.com/KronicDeth)
- * [#47](https://github.com/KronicDeth/intellij-elixir/pull/47): `;` is separate from `EOL` and either or both can separate expressions, but only `EOL` can separate operators and operands for operations - [@KronicDeth](https://github.com/KronicDeth) 
+ * [#47](https://github.com/KronicDeth/intellij-elixir/pull/47): `;` is separate from `EOL` and either or both can separate expressions, but only `EOL` can separate operators and operands for operations - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v0.1.3
 
@@ -927,7 +948,7 @@
 * Single quoted strings with highlighting. ('String' in Color Settings.)
 * Double quoted strings with highlighting. ('Interpolated String' in Color Settings.)
    * Interpolation (`#{` and `}`) with highlighting. ('Expression Substitution Mark' in Color Settings.)
-   * Escape sequences for `"` and `#` with highlighting. ('Escape Sequence' in Color Settings.)   
+   * Escape sequences for `"` and `#` with highlighting. ('Escape Sequence' in Color Settings.)
 
 ## v0.0.2
 
