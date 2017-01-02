@@ -22,8 +22,8 @@ import java.util.Set;
 
 public class ElixirMatchedDotCallImpl extends NamedStubbedPsiElementBase<MatchedDotCall> implements ElixirMatchedDotCall {
 
-  public ElixirMatchedDotCallImpl(MatchedDotCall stub, IStubElementType nodeType) {
-    super(stub, nodeType);
+  public ElixirMatchedDotCallImpl(MatchedDotCall stub, IStubElementType type) {
+    super(stub, type);
   }
 
   public ElixirMatchedDotCallImpl(ASTNode node) {

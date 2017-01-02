@@ -8,7 +8,7 @@ import org.elixir_lang.psi.ElixirMatchedExpression;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
 
-public class ElixirMatchedExpressionImpl extends ASTWrapperPsiElement implements ElixirMatchedExpression {
+public abstract class ElixirMatchedExpressionImpl extends ASTWrapperPsiElement implements ElixirMatchedExpression {
 
   public ElixirMatchedExpressionImpl(ASTNode node) {
     super(node);

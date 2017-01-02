@@ -6,7 +6,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.NamedElement;
+import org.elixir_lang.psi.QualifiableAlias;
 import org.elixir_lang.psi.scope.module.MultiResolve;
 import org.elixir_lang.psi.scope.module.Variants;
 import org.elixir_lang.psi.stub.index.AllName;
@@ -75,7 +76,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
      */
 
     private List<ResolveResult> multiResolveProject(@NotNull Project project,
-                                                          @NotNull String name) {
+                                                    @NotNull String name) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
 
         Collection<NamedElement> namedElementCollection = StubIndex.getElements(
@@ -87,7 +88,11 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
         );
 
         for (NamedElement namedElement : namedElementCollection) {
-            results.add(new PsiElementResolveResult(namedElement));
+            /* The NamedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
+               (either true source or decompiled) is used, which ensures it is a Call. */
+            PsiElement navigationElement = namedElement.getNavigationElement();
+
+            results.add(new PsiElementResolveResult(navigationElement));
         }
 
         return results;

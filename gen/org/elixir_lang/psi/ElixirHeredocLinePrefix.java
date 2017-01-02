@@ -9,6 +9,6 @@ import org.jetbrains.annotations.Nullable;
 public interface ElixirHeredocLinePrefix extends PsiElement {
 
   @Nullable
-  ASTNode excessWhitespace(IElementType fragmentType, int prefixLength);
+  ASTNode excessWhitespace(IElementType type, int prefixLength);
 
 }

@@ -3,6 +3,7 @@ package org.elixir_lang.psi.stub.type;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.stubs.IndexSink;
 import com.intellij.psi.stubs.NamedStubBase;
+import org.elixir_lang.psi.stub.call.Stubbic;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -14,22 +15,31 @@ public abstract class Named<S extends NamedStubBase<T>, T extends PsiNameIdentif
         super(debugName);
     }
 
-    @Override
-    public void indexStub(@NotNull final S stub, @NotNull final IndexSink sink) {
-        String name = stub.getName();
+    public static <T extends Stubbic> void indexStubbic(@NotNull final T stubbic, @NotNull final IndexSink sink) {
+        String name = stubbic.getName();
 
         if (name != null) {
             sink.occurrence(AllName.KEY, name);
         }
 
-        if (stub instanceof org.elixir_lang.psi.stub.call.Stub) {
-            org.elixir_lang.psi.stub.call.Stub callStub = (org.elixir_lang.psi.stub.call.Stub) stub;
-            Set<String> canonicalNameSet = callStub.canonicalNameSet();
+        @SuppressWarnings("unchecked") Set<String> canonicalNameSet = stubbic.canonicalNameSet();
 
-            for (String canonicalName : canonicalNameSet) {
-                if (!canonicalName.equals(name)) {
-                    sink.occurrence(AllName.KEY, canonicalName);
-                }
+        for (String canonicalName : canonicalNameSet) {
+            if (!canonicalName.equals(name)) {
+                sink.occurrence(AllName.KEY, canonicalName);
+            }
+        }
+    }
+
+    @Override
+    public void indexStub(@NotNull final S stub, @NotNull final IndexSink sink) {
+        if (stub instanceof Stubbic) {
+            indexStubbic((Stubbic) stub, sink);
+        } else {
+            String name = stub.getName();
+
+            if (name != null) {
+                sink.occurrence(AllName.KEY, name);
             }
         }
     }

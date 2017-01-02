@@ -89,7 +89,7 @@ public class KeywordPairColonInsteadOfTypeOperator extends LocalInspectionTool {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Keyword pair colon (:) used in type spec instead of type operator (:)";
+        return "Keyword pair colon (:) used in type spec instead of type operator (::)";
     }
 
     @Nls

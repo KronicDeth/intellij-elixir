@@ -1,8 +1,7 @@
 package org.elixir_lang.navigation.item_presentation;
 
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.ui.RowIcon;
-import org.elixir_lang.icons.ElixirIcons;
+import org.elixir_lang.name_arity.PresentationData;
 import org.elixir_lang.structure_view.element.Timed;
 import org.elixir_lang.structure_view.element.Visible;
 import org.jetbrains.annotations.NotNull;
@@ -69,15 +68,7 @@ public class NameArity implements ItemPresentation {
     @NotNull
     @Override
     public String getPresentableText() {
-        StringBuilder presentableTextBuilder = new StringBuilder(name).append('/');
-
-        if (arity != null) {
-            presentableTextBuilder.append(arity);
-        } else {
-            presentableTextBuilder.append('?');
-        }
-
-        return presentableTextBuilder.toString();
+        return PresentationData.presentableText(name, arity);
     }
 
     /**
@@ -99,45 +90,7 @@ public class NameArity implements ItemPresentation {
     @NotNull
     @Override
     public Icon getIcon(boolean unused) {
-        int layers = 3;
-
-        if (callback) {
-            layers++;
-        }
-
-        if (overridable) {
-            layers++;
-        }
-
-        if (override) {
-            layers++;
-        }
-
-        RowIcon rowIcon = new RowIcon(layers);
-
-        int layer = 0;
-
-        if (callback) {
-            rowIcon.setIcon(ElixirIcons.CALLBACK, layer++);
-        }
-
-        Icon timeIcon = ElixirIcons.Time.from(time);
-        rowIcon.setIcon(timeIcon, layer++);
-
-        Icon visibilityIcon = ElixirIcons.Visibility.from(visibility);
-        rowIcon.setIcon(visibilityIcon, layer++);
-
-        rowIcon.setIcon(ElixirIcons.CALL_DEFINITION, layer++);
-
-        if (overridable) {
-            rowIcon.setIcon(ElixirIcons.OVERRIDABLE, layer++);
-        }
-
-        if (override) {
-            rowIcon.setIcon(ElixirIcons.OVERRIDE, layer);
-        }
-
-        return rowIcon;
+        return PresentationData.icon(callback, overridable, override, time, visibility);
     }
 
     public Timed.Time time() {

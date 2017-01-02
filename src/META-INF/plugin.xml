@@ -2108,6 +2108,15 @@
     <annotator implementationClass="org.elixir_lang.annonator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
 
+    <!-- `.beam` -->
+    <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
+    <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
+    <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
+    <fileTypeFactory implementation="org.elixir_lang.beam.FileTypeFactory"/>
+    <structureViewBuilder key="BEAM" factoryClass="org.elixir_lang.beam.StructureViewBuilderProvider"/>
+    <stubElementTypeHolder class="org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes"/>
+    <syntaxHighlighter key="BEAM" factoryClass="org.elixir_lang.ElixirSyntaxHighlighterFactory"/>
+
     <completion.contributor implementationClass="org.elixir_lang.code_insight.completion.contributor.CallDefinitionClause" language="Elixir"/>
 
     <codeInsight.lineMarkerProvider implementationClass="org.elixir_lang.code_insight.line_marker_provider.CallDefinition" language="Elixir"/>
@@ -2136,11 +2145,11 @@
     <localInspection displayName="Keywords Not At End" enabledByDefault="true"
                      groupName="Elixir" implementationClass="org.elixir_lang.inspection.KeywordsNotAtEnd"
                      language="Elixir" level="ERROR" shortName="KeywordsNotAtEnd"/>
-    <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (:)"
+    <localInspection displayName="Keyword pair colon (:) used in type spec instead of type operator (::)"
                      enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.KeywordPairColonInsteadOfTypeOperator"
                      language="Elixir" level="ERROR" shortName="KeywordPairColonInsteadOfTypeOperator"/>
-    <localInspection displayName="Match operator (=) used in type spec instead of type operator (:)"
+    <localInspection displayName="Match operator (=) used in type spec instead of type operator (::)"
                      enabledByDefault="true" groupName="Elixir"
                      implementationClass="org.elixir_lang.inspection.MatchOperatorInsteadOfTypeOperator"
                      language="Elixir" level="ERROR" shortName="MatchOperatorInsteadOfTypeOperator"/>

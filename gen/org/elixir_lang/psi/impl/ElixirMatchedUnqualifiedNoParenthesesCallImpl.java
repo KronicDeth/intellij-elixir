@@ -21,8 +21,8 @@ import java.util.Set;
 
 public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedPsiElementBase<MatchedUnqualifiedNoParenthesesCall> implements ElixirMatchedUnqualifiedNoParenthesesCall {
 
-  public ElixirMatchedUnqualifiedNoParenthesesCallImpl(MatchedUnqualifiedNoParenthesesCall stub, IStubElementType nodeType) {
-    super(stub, nodeType);
+  public ElixirMatchedUnqualifiedNoParenthesesCallImpl(MatchedUnqualifiedNoParenthesesCall stub, IStubElementType type) {
+    super(stub, type);
   }
 
   public ElixirMatchedUnqualifiedNoParenthesesCallImpl(ASTNode node) {
@@ -60,6 +60,15 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedP
     return ElixirPsiImplUtil.canonicalNameSet(this);
   }
 
+  public int exportedArity() {
+    return ElixirPsiImplUtil.exportedArity(this);
+  }
+
+  @Nullable
+  public String exportedName() {
+    return ElixirPsiImplUtil.exportedName(this);
+  }
+
   @Nullable
   public String functionName() {
     return ElixirPsiImplUtil.functionName(this);
@@ -77,6 +86,10 @@ public class ElixirMatchedUnqualifiedNoParenthesesCallImpl extends NamedStubbedP
 
   public boolean hasDoBlockOrKeyword() {
     return ElixirPsiImplUtil.hasDoBlockOrKeyword(this);
+  }
+
+  public boolean isExported() {
+    return ElixirPsiImplUtil.isExported(this);
   }
 
   @Nullable

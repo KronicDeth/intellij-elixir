@@ -22,8 +22,8 @@ import java.util.Set;
 
 public class ElixirUnmatchedDotCallImpl extends NamedStubbedPsiElementBase<UnmatchedDotCall> implements ElixirUnmatchedDotCall {
 
-  public ElixirUnmatchedDotCallImpl(UnmatchedDotCall stub, IStubElementType nodeType) {
-    super(stub, nodeType);
+  public ElixirUnmatchedDotCallImpl(UnmatchedDotCall stub, IStubElementType type) {
+    super(stub, type);
   }
 
   public ElixirUnmatchedDotCallImpl(ASTNode node) {

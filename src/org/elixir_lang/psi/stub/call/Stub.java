@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Set;
 
 // I normally wouldn't add the redundant StubBased prefix, but it makes generating from Elixir.bnf work
-public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStubBase<T> {
+public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStubBase<T> implements Stubbic {
     private static Set<String> setStringRefToSetString(Set<StringRef> stringRefSet) {
         Set<String> stringSet = new SmartHashSet<String>(stringRefSet.size());
 
@@ -97,6 +97,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      * @return the canonical texts of the reference
      * @see PsiReference#getCanonicalText()
      */
+    @Override
     public Set<String> canonicalNameSet() {
         return setStringRefToSetString(canonicalNameSet);
     }
@@ -107,6 +108,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      * @return {@code true} if {@link Call#getDoBlock()} is NOT {@code null} or there is a {@code "do"} keyword argument
      * @see org.elixir_lang.psi.impl.ElixirPsiImplUtil#keywordArgument(Call, String)
      */
+    @Override
     public boolean hasDoBlockOrKeyword() {
         return hasDoBlockOrKeyword;
     }
@@ -117,6 +119,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
      * @return {@link Call#resolvedSecondaryArity()} if it is not {@code null}; {@link Call#resolvedPrimaryArity()} if
      *   it is not {@code null}; otherwise, {@code 0}.
      */
+    @Override
     public Integer resolvedFinalArity() {
         return resolvedFinalArity;
     }
@@ -124,6 +127,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     /**
      * @return name of the function/macro after taking into account any imports
      */
+    @Override
     @Nullable
     public String resolvedFunctionName() {
         return StringRef.toString(resolvedFunctionName);
@@ -132,6 +136,7 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     /**
      * @return name of the qualifying module after taking into account any aliases
      */
+    @Override
     @Nullable
     public String resolvedModuleName() {
         return StringRef.toString(resolvedModuleName);

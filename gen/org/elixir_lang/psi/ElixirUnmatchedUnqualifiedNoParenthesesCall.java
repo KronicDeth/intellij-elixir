@@ -32,6 +32,11 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @NotNull
   Set<String> canonicalNameSet();
 
+  int exportedArity();
+
+  @Nullable
+  String exportedName();
+
   @Nullable
   String functionName();
 
@@ -39,6 +44,8 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   PsiElement functionNameElement();
 
   boolean hasDoBlockOrKeyword();
+
+  boolean isExported();
 
   @Nullable
   String getName();

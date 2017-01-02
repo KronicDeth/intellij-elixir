@@ -92,7 +92,7 @@ public class MatchOperatorInsteadOfTypeOperator extends LocalInspectionTool {
     @NotNull
     @Override
     public String getDisplayName() {
-        return "Keyword pair colon (:) used in type spec instead of type operator (:)";
+        return "Match operator (=) used in type spec instead of type operator (::)";
     }
 
     @Nls
@@ -105,7 +105,7 @@ public class MatchOperatorInsteadOfTypeOperator extends LocalInspectionTool {
     @NotNull
     @Override
     public String getShortName() {
-        return "KeywordPairColonInsteadOfTypeOperator";
+        return "MatchOperatorInsteadOfTypeOperator";
     }
 
     @Override

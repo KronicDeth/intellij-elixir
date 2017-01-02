@@ -1828,6 +1828,38 @@ matchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument
                                             "org.elixir_lang.psi.MatchedCall"
                                             "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall>"
                                           ]
+                                          methods = [
+                                            canonicalName
+                                            canonicalNameSet
+                                            exportedArity
+                                            exportedName
+                                            functionName
+                                            functionNameElement
+                                            getDoBlock
+                                            hasDoBlockOrKeyword
+                                            isExported
+                                            getName
+                                            getNameIdentifier
+                                            getPresentation
+                                            getReference
+                                            getStub
+                                            getUseScope
+                                            isCalling
+                                            isCallingMacro
+                                            moduleName
+                                            primaryArguments
+                                            primaryArity
+                                            processDeclarations
+                                            quote
+                                            resolvedFinalArity
+                                            resolvedFinalArityRange
+                                            resolvedModuleName
+                                            resolvedPrimaryArity
+                                            resolvedSecondaryArity
+                                            secondaryArguments
+                                            secondaryArity
+                                            setName
+                                          ]
                                           mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall>"
                                           stubClass = "org.elixir_lang.psi.stub.MatchedUnqualifiedNoParenthesesCall"
                                         }
@@ -2570,6 +2602,38 @@ unmatchedAtUnqualifiedNoParenthesesCall ::= atIdentifier noParenthesesOneArgumen
 unmatchedUnqualifiedNoParenthesesCall ::= identifier noParenthesesOneArgument doBlock?
                                           {
                                             implements = "org.elixir_lang.psi.UnqualifiedNoParenthesesCall<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
+                                            methods = [
+                                              canonicalName
+                                              canonicalNameSet
+                                              exportedArity
+                                              exportedName
+                                              functionName
+                                              functionNameElement
+                                              getDoBlock
+                                              hasDoBlockOrKeyword
+                                              isExported
+                                              getName
+                                              getNameIdentifier
+                                              getPresentation
+                                              getReference
+                                              getStub
+                                              getUseScope
+                                              isCalling
+                                              isCallingMacro
+                                              moduleName
+                                              primaryArguments
+                                              primaryArity
+                                              processDeclarations
+                                              quote
+                                              resolvedFinalArity
+                                              resolvedFinalArityRange
+                                              resolvedModuleName
+                                              resolvedPrimaryArity
+                                              resolvedSecondaryArity
+                                              secondaryArguments
+                                              secondaryArity
+                                              setName
+                                            ]
                                             mixin = "org.elixir_lang.psi.impl.NamedStubbedPsiElementBase<org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall>"
                                             stubClass="org.elixir_lang.psi.stub.UnmatchedUnqualifiedNoParenthesesCall"
                                           }

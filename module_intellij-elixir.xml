@@ -244,6 +244,7 @@
            showoutput="yes">
       <env key="ELIXIR_LANG_ELIXIR_PATH" value="${elixir.output.zip.root.dir}"/>
       <env key="INTELLIJ_ELIXIR_PATH" value="${module.intellij-elixir.basedir}"/>
+      <env key="ELIXIR_EBIN_DIRECTORY" value="${elixir.output.zip.root.dir}/lib/elixir/ebin/"/>
       <classpath>
         <path refid="classpath.test" />
         <path>

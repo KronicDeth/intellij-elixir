@@ -29,6 +29,11 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @NotNull
   Set<String> canonicalNameSet();
 
+  int exportedArity();
+
+  @Nullable
+  String exportedName();
+
   @Nullable
   String functionName();
 
@@ -39,6 +44,8 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   ElixirDoBlock getDoBlock();
 
   boolean hasDoBlockOrKeyword();
+
+  boolean isExported();
 
   @Nullable
   String getName();
