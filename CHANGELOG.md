@@ -114,9 +114,15 @@
       * Elixir using Alias (like `Enum`)
     * Completion for functions and macros exported by `.beam` files
     * Syntax highlighting
+* [#579](https://github.com/KronicDeth/intellij-elixir/pull/579) - Regression test for [#575](https://github.com/KronicDeth/intellij-elixir/pull/575) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
+* [#579](https://github.com/KronicDeth/intellij-elixir/pull/579) - [@KronicDeth](https://github.com/KronicDeth)
+  * Subtract 1 from arity in `.beam` file when decompiling to `defmacro` calls because the Erlang function for Elixir macros has one addition argument: the first argument is the `Caller` of the macro.
+  * If the name of the decompiled macro/function is an infix operator, then decompile the head as a binary operation instead of a normal prefix name as infix operators aren't valid prefix names and led to parsing errors, which was the root cause of [#575](https://github.com/KronicDeth/intellij-elixir/pull/575).
+  * Fix IntelliJ warnings in `BeamFileImpl`
+  * Remove unused `VirtualFile` argument to `BeamFileImpl#buildFileStub`.
 
 ## v4.7.0
 

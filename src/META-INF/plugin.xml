@@ -38,6 +38,9 @@
                 <li>Syntax highlighting</li>
               </ul>
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -46,6 +49,18 @@
             <li>
               Fix copy-paste errors in <code>MatchOperatorInsteadOfTypeOperator</code>
             </li>
+            <li>
+              Subtract 1 from arity in <code>.beam</code> file when decompiling to <code>defmacro</code> calls because
+              the Erlang function for Elixir macros has one addition argument: the first argument is the
+              <code>Caller</code> of the macro.
+            </li>
+            <li>
+              If the name of the decompiled macro/function is an infix operator, then decompile the head as a binary
+              operation instead of a normal prefix name as infix operators aren't valid prefix names and led to parsing
+              errors, which was the root cause of <a href="https://github.com/KronicDeth/intellij-elixir/pull/575">#575</a>.
+            </li>
+            <li>Fix IntelliJ warnings in <code>BeamFileImpl</code></li>
+            <li>Remove unused <code>VirtualFile</code> argument to <code>BeamFileImpl#buildFileStub</code>.</li>
           </ul>
         </li>
       </ul>
