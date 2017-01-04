@@ -84,7 +84,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         this.isForDecompiling = isForDecompiling;
     }
 
-    public static PsiFileStub<?> buildFileStub(VirtualFile file, byte[] bytes) {
+    public static PsiFileStub<?> buildFileStub(byte[] bytes) {
         ElixirFileStubImpl stub = new ElixirFileStubImpl();
 
         Beam beam = null;
