@@ -28,7 +28,7 @@ import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.beam.Beam;
-import org.elixir_lang.beam.Decompiler;
+import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
 import org.elixir_lang.beam.chunk.exports.Export;
@@ -84,7 +84,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         this.isForDecompiling = isForDecompiling;
     }
 
-    public static PsiFileStub<?> buildFileStub(VirtualFile file, byte[] bytes) {
+    public static PsiFileStub<?> buildFileStub(byte[] bytes) {
         ElixirFileStubImpl stub = new ElixirFileStubImpl();
 
         Beam beam = null;
@@ -140,13 +140,16 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
 
             for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
                     exportByArityByName.entrySet()) {
-                String name = nameExportByArity.getKey();
-                Pair<String, String> macroArgument = Decompiler.macroArgument(name);
+                String exportName = nameExportByArity.getKey();
 
                 SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
 
                 for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
-                    buildCallDefinition(parentStub, macroArgument, arityExport.getKey());
+                    MacroNameArity macroNameArity = new MacroNameArity(exportName, arityExport.getKey());
+
+                    if (macroNameArity.arity != null) {
+                        buildCallDefinition(parentStub, macroNameArity);
+                    }
                 }
             }
         }
@@ -154,16 +157,16 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
 
     @NotNull
     private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
-                                                          @NotNull Pair<String, String> macroArgument,
-                                                          int arity) {
-        return buildCallDefinition(parentStub, macroArgument.first, macroArgument.second, arity);
+                                                          @NotNull MacroNameArity macroNameArity) {
+        //noinspection ConstantConditions
+        return buildCallDefinition(parentStub, macroNameArity.macro, macroNameArity.name, macroNameArity.arity);
     }
 
     @NotNull
     private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
                                                           @NotNull String macro,
                                                           @NotNull String name,
-                                                          int arity) {
+                                                          @NotNull Integer arity) {
         return new CallDefinitionStubImpl(parentStub, macro, name, arity);
     }
 
@@ -250,6 +253,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         return modulars();
     }
 
+    @NotNull
     public CanonicallyNamed[] modulars() {
         return (CanonicallyNamed[]) getStub().getChildrenByType(MODULE, new ModuleImpl[1]);
     }
@@ -313,7 +317,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getFirstChild() {
-        final List<StubElement> children = getStub().getChildrenStubs();
+        @SuppressWarnings("unchecked") final List<StubElement> children = getStub().getChildrenStubs();
         PsiElement firstChild = null;
 
         if (!children.isEmpty()) {
@@ -330,7 +334,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getLastChild() {
-        final List<StubElement> children = getStub().getChildrenStubs();
+        @SuppressWarnings("unchecked") final List<StubElement> children = getStub().getChildrenStubs();
         PsiElement lastChild = null;
 
         if (!children.isEmpty()) {
@@ -347,7 +351,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getNextSibling() {
-        final PsiElement[] siblings = getParent().getChildren();
+        @SuppressWarnings("ConstantConditions") final PsiElement[] siblings = getParent().getChildren();
         final int i = ArrayUtil.indexOf(siblings, this);
         PsiElement nextSibling;
 
@@ -367,7 +371,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getPrevSibling() {
-        final PsiElement[] siblings = getParent().getChildren();
+        @SuppressWarnings("ConstantConditions") final PsiElement[] siblings = getParent().getChildren();
         final int i = ArrayUtil.indexOf(siblings, this);
         PsiElement prevSibling;
 
@@ -461,7 +465,6 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      * for processing to the specified scope processor.
      *
      * @param processor  the processor receiving the declarations.
-     * @param state
      * @param lastParent the child of this element has been processed during the previous
      *                   step of the tree up walk (declarations under this element do not need
      *                   to be processed again)

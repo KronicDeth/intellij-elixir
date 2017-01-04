@@ -25,10 +25,9 @@ public class StubBuilder implements BinaryFileStubBuilder {
     @Nullable
     @Override
     public Stub buildStubTree(FileContent fileContent) {
-        VirtualFile file = fileContent.getFile();
         byte[] content = fileContent.getContent();
 
-        PsiFileStub<?> stub = BeamFileImpl.buildFileStub(file, content);
+        PsiFileStub<?> stub = BeamFileImpl.buildFileStub(content);
 
         if (stub == null) {
             LOGGER.info("No stub built for file " + fileContent);

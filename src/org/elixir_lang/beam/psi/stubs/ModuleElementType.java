@@ -3,7 +3,6 @@ package org.elixir_lang.beam.psi.stubs;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import org.elixir_lang.psi.stub.call.Stubbic;
@@ -18,7 +17,7 @@ import static org.elixir_lang.psi.stub.type.call.Stub.serializeStubbic;
  *
  * @param <S> The stub element that {@link #serialize(StubElement, StubOutputStream)} and
  *   {@link #indexStub(StubElement, IndexSink)} should accept.  These stubs should be created by
- *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}.
+ *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[])}.
  * @param <P> The PSI element that should be returned by {@link #createPsi(StubElement)} in subclasses
  */
 public abstract class ModuleElementType<S extends StubElement & Stubbic, P extends PsiElement>
@@ -26,7 +25,7 @@ public abstract class ModuleElementType<S extends StubElement & Stubbic, P exten
     /**
      * @throws IllegalArgumentException stubs should never be created from {@link LighterAST} and
      *   {@link LighterASTNode}:  Stubs should be created by
-     *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}.
+     *   {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[])}.
      */
     @Override
     public S createStub(LighterAST tree, LighterASTNode node, StubElement parentStub) {
@@ -60,7 +59,7 @@ public abstract class ModuleElementType<S extends StubElement & Stubbic, P exten
     /**
      * Serializes {@code stub} as a {@link Stubbic}.
      *
-     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}
+     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[])}
      * @param dataStream stream to write {@code stub} to
      * @throws IOException if {@code dataStream} cannot be written to
      */
@@ -72,7 +71,7 @@ public abstract class ModuleElementType<S extends StubElement & Stubbic, P exten
     /**
      * Indexes {@code stub} as a {@link Stubbic}.
      *
-     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(VirtualFile, byte[])}
+     * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[])}
      * @param sink stub index
      */
     @Override
