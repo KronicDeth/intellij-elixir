@@ -250,6 +250,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         return modulars();
     }
 
+    @NotNull
     public CanonicallyNamed[] modulars() {
         return (CanonicallyNamed[]) getStub().getChildrenByType(MODULE, new ModuleImpl[1]);
     }
@@ -313,7 +314,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getFirstChild() {
-        final List<StubElement> children = getStub().getChildrenStubs();
+        @SuppressWarnings("unchecked") final List<StubElement> children = getStub().getChildrenStubs();
         PsiElement firstChild = null;
 
         if (!children.isEmpty()) {
@@ -330,7 +331,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getLastChild() {
-        final List<StubElement> children = getStub().getChildrenStubs();
+        @SuppressWarnings("unchecked") final List<StubElement> children = getStub().getChildrenStubs();
         PsiElement lastChild = null;
 
         if (!children.isEmpty()) {
@@ -347,7 +348,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getNextSibling() {
-        final PsiElement[] siblings = getParent().getChildren();
+        @SuppressWarnings("ConstantConditions") final PsiElement[] siblings = getParent().getChildren();
         final int i = ArrayUtil.indexOf(siblings, this);
         PsiElement nextSibling;
 
@@ -367,7 +368,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      */
     @Override
     public PsiElement getPrevSibling() {
-        final PsiElement[] siblings = getParent().getChildren();
+        @SuppressWarnings("ConstantConditions") final PsiElement[] siblings = getParent().getChildren();
         final int i = ArrayUtil.indexOf(siblings, this);
         PsiElement prevSibling;
 
@@ -461,7 +462,6 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
      * for processing to the specified scope processor.
      *
      * @param processor  the processor receiving the declarations.
-     * @param state
      * @param lastParent the child of this element has been processed during the previous
      *                   step of the tree up walk (declarations under this element do not need
      *                   to be processed again)
