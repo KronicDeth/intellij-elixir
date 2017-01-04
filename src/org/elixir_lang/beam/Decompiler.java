@@ -3,23 +3,66 @@ package org.elixir_lang.beam;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
+import gnu.trove.THashSet;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
 import org.elixir_lang.beam.chunk.exports.Export;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import static com.intellij.openapi.util.Pair.pair;
-import static org.elixir_lang.psi.call.name.Function.DEF;
-import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
 
 public class Decompiler implements BinaryFileDecompiler {
-    private static final String MACRO_EXPORT_PREFIX = "MACRO-";
+    private static final Set<String> INFIX_OPERATOR_SET;
+
+    static {
+        INFIX_OPERATOR_SET = new THashSet<String>();
+        INFIX_OPERATOR_SET.add("!=");
+        INFIX_OPERATOR_SET.add("!==");
+        INFIX_OPERATOR_SET.add("");
+        INFIX_OPERATOR_SET.add("&&");
+        INFIX_OPERATOR_SET.add("&&&");
+        INFIX_OPERATOR_SET.add("*");
+        INFIX_OPERATOR_SET.add("+");
+        INFIX_OPERATOR_SET.add("-");
+        INFIX_OPERATOR_SET.add("--");
+        INFIX_OPERATOR_SET.add("--");
+        INFIX_OPERATOR_SET.add("->");
+        INFIX_OPERATOR_SET.add("..");
+        INFIX_OPERATOR_SET.add("/");
+        INFIX_OPERATOR_SET.add("::");
+        INFIX_OPERATOR_SET.add("<");
+        INFIX_OPERATOR_SET.add("<-");
+        INFIX_OPERATOR_SET.add("<<<");
+        INFIX_OPERATOR_SET.add("<<~");
+        INFIX_OPERATOR_SET.add("<=");
+        INFIX_OPERATOR_SET.add("<>");
+        INFIX_OPERATOR_SET.add("<|>");
+        INFIX_OPERATOR_SET.add("<~");
+        INFIX_OPERATOR_SET.add("<~>");
+        INFIX_OPERATOR_SET.add("=");
+        INFIX_OPERATOR_SET.add("==");
+        INFIX_OPERATOR_SET.add("===");
+        INFIX_OPERATOR_SET.add("=>");
+        INFIX_OPERATOR_SET.add(">");
+        INFIX_OPERATOR_SET.add(">=");
+        INFIX_OPERATOR_SET.add(">>>");
+        INFIX_OPERATOR_SET.add("\\\\");
+        INFIX_OPERATOR_SET.add("^");
+        INFIX_OPERATOR_SET.add("^^^");
+        INFIX_OPERATOR_SET.add("and");
+        INFIX_OPERATOR_SET.add("or");
+        INFIX_OPERATOR_SET.add("|>");
+        INFIX_OPERATOR_SET.add("||");
+        INFIX_OPERATOR_SET.add("|||");
+        INFIX_OPERATOR_SET.add("~=");
+        INFIX_OPERATOR_SET.add("~>");
+        INFIX_OPERATOR_SET.add("~>>");
+    }
 
     @NotNull
     private static CharSequence decompiled(@Nullable Beam beam) {
@@ -71,7 +114,6 @@ public class Decompiler implements BinaryFileDecompiler {
         for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
                 exportByArityByName.entrySet()) {
             String name = nameExportByArity.getKey();
-            Pair<String, String> macroArgument = macroArgument(name);
 
             SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
 
@@ -80,23 +122,48 @@ public class Decompiler implements BinaryFileDecompiler {
                     decompiled.append("\n");
                 }
 
-                appendExport(decompiled, macroArgument, arityExport.getKey());
+                @Nullable Integer arity = arityExport.getKey();
+
+                MacroNameArity macroNameArity = new MacroNameArity(name, arity);
+                appendMacroNameArity(decompiled, macroNameArity);
 
                 first = false;
             }
         }
     }
 
-    private static void appendExport(@NotNull StringBuilder decompiled,
-                                     @NotNull Pair<String, String> macroArgument,
-                                     @Nullable Integer arity) {
+    private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
+                                             @NotNull MacroNameArity macroNameArity) {
+        String name = macroNameArity.name;
+
+        if (isInfixOperator(name)) {
+            appendInfixMacroNameArity(decompiled, macroNameArity);
+        } else {
+            appendPrefixMacroNameArity(decompiled, macroNameArity);
+        }
+    }
+
+    private static void appendInfixMacroNameArity(@NotNull StringBuilder decompiled,
+                                                  @NotNull MacroNameArity macroNameArity) {
         decompiled
                 .append("  ")
-                .append(macroArgument.first)
+                .append(macroNameArity.macro)
+                .append(" left ")
+                .append(macroNameArity.name)
+                .append(" right");
+        appendBody(decompiled);
+    }
+
+    private static void appendPrefixMacroNameArity(@NotNull StringBuilder decompiled,
+                                                   @NotNull MacroNameArity macroNameArity) {
+        decompiled
+                .append("  ")
+                .append(macroNameArity.macro)
                 .append(" ")
-                .append(macroArgument.second)
+                .append(macroNameArity.name)
                 .append("(");
 
+        @Nullable Integer arity = macroNameArity.arity;
 
         if (arity != null) {
             for (int i = 0; i < arity; i++) {
@@ -108,7 +175,15 @@ public class Decompiler implements BinaryFileDecompiler {
             }
         }
 
-        decompiled.append(") do\n").append("    # body not decompiled\n").append("  end\n");
+        decompiled.append(")");
+        appendBody(decompiled);
+    }
+
+    private static void appendBody(@NotNull StringBuilder decompiled) {
+        decompiled
+                .append(" do\n")
+                .append("    # body not decompiled\n")
+                .append("  end\n");
     }
 
     @NotNull
@@ -122,18 +197,11 @@ public class Decompiler implements BinaryFileDecompiler {
         return defmoduleArgument;
     }
 
-    @Contract(pure = true)
-    @NotNull
-    public static Pair<String, String> macroArgument(@NotNull String name) {
-        String argument = name;
-        String macro = DEF;
-
-        if (name.startsWith(MACRO_EXPORT_PREFIX)) {
-            argument = name.substring(MACRO_EXPORT_PREFIX.length());
-            macro = DEFMACRO;
-        }
-
-        return pair(macro, argument);
+    /**
+     * @param name {@link MacroNameArity#name}
+     */
+    private static boolean isInfixOperator(@NotNull String name) {
+        return INFIX_OPERATOR_SET.contains(name);
     }
 
     @NotNull

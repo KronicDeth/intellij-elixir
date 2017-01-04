@@ -28,7 +28,7 @@ import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.beam.Beam;
-import org.elixir_lang.beam.Decompiler;
+import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
 import org.elixir_lang.beam.chunk.exports.Export;
@@ -140,13 +140,16 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
 
             for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
                     exportByArityByName.entrySet()) {
-                String name = nameExportByArity.getKey();
-                Pair<String, String> macroArgument = Decompiler.macroArgument(name);
+                String exportName = nameExportByArity.getKey();
 
                 SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
 
                 for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
-                    buildCallDefinition(parentStub, macroArgument, arityExport.getKey());
+                    MacroNameArity macroNameArity = new MacroNameArity(exportName, arityExport.getKey());
+
+                    if (macroNameArity.arity != null) {
+                        buildCallDefinition(parentStub, macroNameArity);
+                    }
                 }
             }
         }
@@ -154,16 +157,16 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
 
     @NotNull
     private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
-                                                          @NotNull Pair<String, String> macroArgument,
-                                                          int arity) {
-        return buildCallDefinition(parentStub, macroArgument.first, macroArgument.second, arity);
+                                                          @NotNull MacroNameArity macroNameArity) {
+        //noinspection ConstantConditions
+        return buildCallDefinition(parentStub, macroNameArity.macro, macroNameArity.name, macroNameArity.arity);
     }
 
     @NotNull
     private static CallDefinitionStub buildCallDefinition(@NotNull ModuleStub parentStub,
                                                           @NotNull String macro,
                                                           @NotNull String name,
-                                                          int arity) {
+                                                          @NotNull Integer arity) {
         return new CallDefinitionStubImpl(parentStub, macro, name, arity);
     }
 
