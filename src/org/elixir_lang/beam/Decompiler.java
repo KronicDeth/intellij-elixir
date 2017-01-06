@@ -28,6 +28,7 @@ public class Decompiler implements BinaryFileDecompiler {
         INFIX_OPERATOR_SET.add("&&&");
         INFIX_OPERATOR_SET.add("*");
         INFIX_OPERATOR_SET.add("+");
+        INFIX_OPERATOR_SET.add("++");
         INFIX_OPERATOR_SET.add("-");
         INFIX_OPERATOR_SET.add("--");
         INFIX_OPERATOR_SET.add("--");
