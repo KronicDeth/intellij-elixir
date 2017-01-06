@@ -51,6 +51,7 @@ public class InfixOperator extends MacroNameArity {
         INFIX_OPERATOR_SET.add("^");
         INFIX_OPERATOR_SET.add("^^^");
         INFIX_OPERATOR_SET.add("and");
+        INFIX_OPERATOR_SET.add("in");
         INFIX_OPERATOR_SET.add("or");
         INFIX_OPERATOR_SET.add("|>");
         INFIX_OPERATOR_SET.add("||");
