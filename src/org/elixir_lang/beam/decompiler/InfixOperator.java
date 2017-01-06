@@ -43,6 +43,7 @@ public class InfixOperator extends MacroNameArity {
         INFIX_OPERATOR_SET.add("==");
         INFIX_OPERATOR_SET.add("===");
         INFIX_OPERATOR_SET.add("=>");
+        INFIX_OPERATOR_SET.add("=~");
         INFIX_OPERATOR_SET.add(">");
         INFIX_OPERATOR_SET.add(">=");
         INFIX_OPERATOR_SET.add(">>>");
