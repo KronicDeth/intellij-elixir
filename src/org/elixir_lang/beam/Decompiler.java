@@ -135,9 +135,10 @@ public class Decompiler implements BinaryFileDecompiler {
 
     private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
                                              @NotNull MacroNameArity macroNameArity) {
+        Integer arity = macroNameArity.arity;
         String name = macroNameArity.name;
 
-        if (isInfixOperator(name)) {
+        if (arity != null && arity == 2 && isInfixOperator(name)) {
             appendInfixMacroNameArity(decompiled, macroNameArity);
         } else {
             appendPrefixMacroNameArity(decompiled, macroNameArity);
