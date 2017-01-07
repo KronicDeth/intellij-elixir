@@ -1,20 +1,16 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
-import com.intellij.openapi.util.Pair;
-import gnu.trove.THashSet;
+import com.intellij.openapi.util.Condition;
+import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
-import org.elixir_lang.beam.chunk.exports.Export;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -41,27 +37,28 @@ public class BeamTest {
 
         assertNotNull(exports);
 
-        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByNameNamelessExportSet =
-                exports.exportByArityByName(atoms);
+        int exportCount = exports.size();
 
-        assertNotNull(exportByArityByNameNamelessExportSet);
+        assertTrue("There are no exports", exportCount > 0);
 
-        Set<Export> namelessExportSet = exportByArityByNameNamelessExportSet.second;
+        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
 
-        assertTrue("There are nameless exports", namelessExportSet.isEmpty());
+        assertEquals("There are nameless exports", exportCount, macroNameAritySortedSet.size());
 
-        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+        List<MacroNameArity> nodes = ContainerUtil.filter(
+                macroNameAritySortedSet,
+                new Condition<MacroNameArity>() {
+                    @Override
+                    public boolean value(MacroNameArity macroNameArity) {
+                        return "node".equals(macroNameArity.name);
+                    }
+                }
+        );
 
-        // a name with multiple arities
-        SortedMap<Integer, Export> exportByArity = exportByArityByName.get("node");
+        assertEquals(nodes.size(), 2);
 
-        assertNotNull(exportByArity);
-
-        Set<Integer> expectedAritySet = new THashSet<Integer>();
-        expectedAritySet.add(0);
-        expectedAritySet.add(1);
-
-        assertEquals("node arities do not match", expectedAritySet, exportByArity.keySet());
+        assertEquals(0, (int) nodes.get(0).arity);
+        assertEquals(1, (int) nodes.get(1).arity);
     }
 
     @Test
@@ -80,24 +77,27 @@ public class BeamTest {
 
         assertNotNull(exports);
 
-        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByNameNamelessExportSet =
-                exports.exportByArityByName(atoms);
+        int exportCount = exports.size();
 
-        assertNotNull(exportByArityByNameNamelessExportSet);
+        assertTrue("There are no exports", exportCount > 0);
 
-        Set<Export> namelessExportSet = exportByArityByNameNamelessExportSet.second;
+        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
 
-        assertTrue("There are nameless exports", namelessExportSet.isEmpty());
+        assertEquals("There are nameless exports", exportCount, macroNameAritySortedSet.size());
 
-        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName = exportByArityByNameNamelessExportSet.first;
+        List<MacroNameArity> extracts = ContainerUtil.filter(
+                macroNameAritySortedSet,
+                new Condition<MacroNameArity>() {
+                    @Override
+                    public boolean value(MacroNameArity macroNameArity) {
+                        return "extract".equals(macroNameArity.name);
+                    }
+                }
+        );
 
-        Map<Integer, Export> exportByArity = exportByArityByName.get("extract");
+        assertEquals(1, extracts.size());
 
-        assertNotNull(exportByArity);
-
-        Export export = exportByArity.get(6);
-
-        assertNotNull(export);
+        assertEquals(6, (int) extracts.get(0).arity);
     }
 
     private Beam beam(@NotNull String baseName) throws IOException, OtpErlangDecodeException {

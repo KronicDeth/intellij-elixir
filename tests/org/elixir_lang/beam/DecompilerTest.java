@@ -32,6 +32,9 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertEquals(
                 "# Source code recreated from a .beam file by IntelliJ Elixir\n" +
                 "defmodule Bitwise do\n" +
+                "\n" +
+                "  # Macros\n" +
+                "\n" +
                 "  defmacro left &&& right do\n" +
                 "    # body not decompiled\n" +
                 "  end\n" +
@@ -83,6 +86,8 @@ public class DecompilerTest extends LightCodeInsightTestCase {
                 "  defmacro ~~~(p0) do\n" +
                 "    # body not decompiled\n" +
                 "  end\n" +
+                "\n" +
+                "  # Functions\n" +
                 "\n" +
                 "  def __info__(p0) do\n" +
                 "    # body not decompiled\n" +

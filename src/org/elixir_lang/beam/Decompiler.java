@@ -1,67 +1,34 @@
 package org.elixir_lang.beam;
 
+import com.google.common.base.Joiner;
+import com.intellij.diagnostic.LogMessageEx;
+import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import gnu.trove.THashSet;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
 import org.elixir_lang.beam.chunk.exports.Export;
+import org.elixir_lang.beam.decompiler.Default;
+import org.elixir_lang.beam.decompiler.InfixOperator;
+import org.elixir_lang.beam.decompiler.PrefixOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 
+import static org.elixir_lang.psi.call.name.Function.DEF;
+import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
 
 public class Decompiler implements BinaryFileDecompiler {
-    private static final Set<String> INFIX_OPERATOR_SET;
+    private static final List<org.elixir_lang.beam.decompiler.MacroNameArity> MACRO_NAME_ARITY_DECOMPILER_LIST =
+            new ArrayList<org.elixir_lang.beam.decompiler.MacroNameArity>();
 
     static {
-        INFIX_OPERATOR_SET = new THashSet<String>();
-        INFIX_OPERATOR_SET.add("!=");
-        INFIX_OPERATOR_SET.add("!==");
-        INFIX_OPERATOR_SET.add("");
-        INFIX_OPERATOR_SET.add("&&");
-        INFIX_OPERATOR_SET.add("&&&");
-        INFIX_OPERATOR_SET.add("*");
-        INFIX_OPERATOR_SET.add("+");
-        INFIX_OPERATOR_SET.add("-");
-        INFIX_OPERATOR_SET.add("--");
-        INFIX_OPERATOR_SET.add("--");
-        INFIX_OPERATOR_SET.add("->");
-        INFIX_OPERATOR_SET.add("..");
-        INFIX_OPERATOR_SET.add("/");
-        INFIX_OPERATOR_SET.add("::");
-        INFIX_OPERATOR_SET.add("<");
-        INFIX_OPERATOR_SET.add("<-");
-        INFIX_OPERATOR_SET.add("<<<");
-        INFIX_OPERATOR_SET.add("<<~");
-        INFIX_OPERATOR_SET.add("<=");
-        INFIX_OPERATOR_SET.add("<>");
-        INFIX_OPERATOR_SET.add("<|>");
-        INFIX_OPERATOR_SET.add("<~");
-        INFIX_OPERATOR_SET.add("<~>");
-        INFIX_OPERATOR_SET.add("=");
-        INFIX_OPERATOR_SET.add("==");
-        INFIX_OPERATOR_SET.add("===");
-        INFIX_OPERATOR_SET.add("=>");
-        INFIX_OPERATOR_SET.add(">");
-        INFIX_OPERATOR_SET.add(">=");
-        INFIX_OPERATOR_SET.add(">>>");
-        INFIX_OPERATOR_SET.add("\\\\");
-        INFIX_OPERATOR_SET.add("^");
-        INFIX_OPERATOR_SET.add("^^^");
-        INFIX_OPERATOR_SET.add("and");
-        INFIX_OPERATOR_SET.add("or");
-        INFIX_OPERATOR_SET.add("|>");
-        INFIX_OPERATOR_SET.add("||");
-        INFIX_OPERATOR_SET.add("|||");
-        INFIX_OPERATOR_SET.add("~=");
-        INFIX_OPERATOR_SET.add("~>");
-        INFIX_OPERATOR_SET.add("~>>");
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
     }
 
     @NotNull
@@ -105,85 +72,67 @@ public class Decompiler implements BinaryFileDecompiler {
     private static void appendExports(@NotNull StringBuilder decompiled,
                                       @NotNull Exports exports,
                                       @NotNull Atoms atoms) {
-        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>>
-                exportByArityByNameNamelessExportSet = exports.exportByArityByName(atoms);
-        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
-                exportByArityByNameNamelessExportSet.first;
+        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
+        MacroNameArity lastMacroNameArity = null;
 
-        boolean first = true;
-        for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
-                exportByArityByName.entrySet()) {
-            String name = nameExportByArity.getKey();
-
-            SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
-
-            for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
-                if (!first) {
-                    decompiled.append("\n");
-                }
-
-                @Nullable Integer arity = arityExport.getKey();
-
-                MacroNameArity macroNameArity = new MacroNameArity(name, arity);
-                appendMacroNameArity(decompiled, macroNameArity);
-
-                first = false;
+        for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
+            if (lastMacroNameArity == null) {
+                appendHeader(decompiled, "Macros");
+            } else if (lastMacroNameArity.macro.equals(DEFMACRO) && macroNameArity.macro.equals(DEF)) {
+                appendHeader(decompiled, "Functions");
             }
+
+            decompiled.append("\n");
+
+            appendMacroNameArity(decompiled, macroNameArity);
+
+            lastMacroNameArity = macroNameArity;
         }
+    }
+
+    private static void appendHeader(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled
+                .append("\n")
+                .append("  # ")
+                .append(name)
+                .append("\n");
     }
 
     private static void appendMacroNameArity(@NotNull StringBuilder decompiled,
                                              @NotNull MacroNameArity macroNameArity) {
-        String name = macroNameArity.name;
+        boolean accepted = false;
 
-        if (isInfixOperator(name)) {
-            appendInfixMacroNameArity(decompiled, macroNameArity);
-        } else {
-            appendPrefixMacroNameArity(decompiled, macroNameArity);
-        }
-    }
-
-    private static void appendInfixMacroNameArity(@NotNull StringBuilder decompiled,
-                                                  @NotNull MacroNameArity macroNameArity) {
-        decompiled
-                .append("  ")
-                .append(macroNameArity.macro)
-                .append(" left ")
-                .append(macroNameArity.name)
-                .append(" right");
-        appendBody(decompiled);
-    }
-
-    private static void appendPrefixMacroNameArity(@NotNull StringBuilder decompiled,
-                                                   @NotNull MacroNameArity macroNameArity) {
-        decompiled
-                .append("  ")
-                .append(macroNameArity.macro)
-                .append(" ")
-                .append(macroNameArity.name)
-                .append("(");
-
-        @Nullable Integer arity = macroNameArity.arity;
-
-        if (arity != null) {
-            for (int i = 0; i < arity; i++) {
-                if (i != 0) {
-                    decompiled.append(", ");
-                }
-
-                decompiled.append("p").append(i);
+        for (org.elixir_lang.beam.decompiler.MacroNameArity decompiler : MACRO_NAME_ARITY_DECOMPILER_LIST) {
+            if (decompiler.accept(macroNameArity)) {
+                decompiler.append(decompiled, macroNameArity);
+                accepted = true;
+                break;
             }
         }
 
-        decompiled.append(")");
-        appendBody(decompiled);
+        if (!accepted) {
+            error(macroNameArity);
+        }
     }
 
-    private static void appendBody(@NotNull StringBuilder decompiled) {
-        decompiled
-                .append(" do\n")
-                .append("    # body not decompiled\n")
-                .append("  end\n");
+    private static void error(@NotNull MacroNameArity macroNameArity) {
+        com.intellij.openapi.diagnostic.Logger logger = com.intellij.openapi.diagnostic.Logger.getInstance(
+                Decompiler.class
+        );
+        String fullUserMessage = "No decompiler for MacroNameArity (" + macroNameArity +")";
+        logger.error(
+                LogMessageEx.createEvent(
+                        fullUserMessage,
+                        Joiner
+                                .on("\n")
+                                .join(
+                                        new Throwable().getStackTrace()
+                                ),
+                        fullUserMessage,
+                        null,
+                        Collections.<Attachment>emptyList()
+                )
+        );
     }
 
     @NotNull
@@ -195,13 +144,6 @@ public class Decompiler implements BinaryFileDecompiler {
             defmoduleArgument = ":" + moduleName;
         }
         return defmoduleArgument;
-    }
-
-    /**
-     * @param name {@link MacroNameArity#name}
-     */
-    private static boolean isInfixOperator(@NotNull String name) {
-        return INFIX_OPERATOR_SET.contains(name);
     }
 
     @NotNull
