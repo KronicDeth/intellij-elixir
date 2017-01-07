@@ -17,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static org.elixir_lang.psi.call.name.Function.DEF;
+import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
 
 public class Decompiler implements BinaryFileDecompiler {
@@ -70,31 +72,30 @@ public class Decompiler implements BinaryFileDecompiler {
     private static void appendExports(@NotNull StringBuilder decompiled,
                                       @NotNull Exports exports,
                                       @NotNull Atoms atoms) {
-        Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>>
-                exportByArityByNameNamelessExportSet = exports.exportByArityByName(atoms);
-        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
-                exportByArityByNameNamelessExportSet.first;
+        SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
+        MacroNameArity lastMacroNameArity = null;
 
-        boolean first = true;
-        for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
-                exportByArityByName.entrySet()) {
-            String name = nameExportByArity.getKey();
-
-            SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
-
-            for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
-                if (!first) {
-                    decompiled.append("\n");
-                }
-
-                @Nullable Integer arity = arityExport.getKey();
-
-                MacroNameArity macroNameArity = new MacroNameArity(name, arity);
-                appendMacroNameArity(decompiled, macroNameArity);
-
-                first = false;
+        for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
+            if (lastMacroNameArity == null) {
+                appendHeader(decompiled, "Macros");
+            } else if (lastMacroNameArity.macro.equals(DEFMACRO) && macroNameArity.macro.equals(DEF)) {
+                appendHeader(decompiled, "Functions");
             }
+
+            decompiled.append("\n");
+
+            appendMacroNameArity(decompiled, macroNameArity);
+
+            lastMacroNameArity = macroNameArity;
         }
+    }
+
+    private static void appendHeader(@NotNull StringBuilder decompiled, @NotNull String name) {
+        decompiled
+                .append("\n")
+                .append("  # ")
+                .append(name)
+                .append("\n");
     }
 
     private static void appendMacroNameArity(@NotNull StringBuilder decompiled,

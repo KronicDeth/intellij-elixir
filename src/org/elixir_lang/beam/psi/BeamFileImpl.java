@@ -132,25 +132,10 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         Exports exports = beam.exports();
 
         if (exports != null) {
-            Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>>
-                    exportByArityByNameNamelessExports = exports.exportByArityByName(atoms);
+            SortedSet<MacroNameArity> macroNameAritySortedSet = exports.macroNameAritySortedSet(atoms);
 
-            SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
-                    exportByArityByNameNamelessExports.first;
-
-            for (SortedMap.Entry<String, SortedMap<Integer, Export>> nameExportByArity :
-                    exportByArityByName.entrySet()) {
-                String exportName = nameExportByArity.getKey();
-
-                SortedMap<Integer, Export> exportByArity = nameExportByArity.getValue();
-
-                for (SortedMap.Entry<Integer, Export> arityExport : exportByArity.entrySet()) {
-                    MacroNameArity macroNameArity = new MacroNameArity(exportName, arityExport.getKey());
-
-                    if (macroNameArity.arity != null) {
-                        buildCallDefinition(parentStub, macroNameArity);
-                    }
-                }
+            for (MacroNameArity macroNameArity : macroNameAritySortedSet) {
+                buildCallDefinition(parentStub, macroNameArity);
             }
         }
     }

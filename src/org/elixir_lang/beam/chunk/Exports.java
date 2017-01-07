@@ -2,6 +2,7 @@ package org.elixir_lang.beam.chunk;
 
 import com.intellij.openapi.util.Pair;
 import gnu.trove.THashSet;
+import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.exports.Export;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,28 +68,36 @@ public class Exports {
         return exports;
     }
 
-    public Pair<SortedMap<String, SortedMap<Integer, Export>>, SortedSet<Export>> exportByArityByName(@NotNull Atoms atoms) {
-        SortedMap<String, SortedMap<Integer, Export>> exportByArityByName =
-                new TreeMap<String, SortedMap<Integer, Export>>();
-        SortedSet<Export> nameless = new TreeSet<Export>();
+    /**
+     * Set of {@link MacroNameArity} sorted as
+     * 1. {@link MacroNameArity#macro}, so that {@code defmacro} is before {@code def}
+     * 2. {@link MacroNameArity#name} is sorted alphabetically
+     * 3. {@link MacroNameArity#arity} is sorted ascending
+     *
+     * @param atoms used to look up the names of the {@link Export}s in {@link #exportCollection}.
+     * @return The sorted set will be the same size as {@link #exportCollection} unless {@link Export#name(Atoms)}
+     *   returns {@code null} for some {@link Export}s.
+     */
+    @NotNull
+    public SortedSet<MacroNameArity> macroNameAritySortedSet(@NotNull Atoms atoms) {
+        SortedSet<MacroNameArity> macroNameAritySortedSet = new TreeSet<MacroNameArity>();
 
         for (Export export : exportCollection) {
-            String name = export.name(atoms);
+            String exportName = export.name(atoms);
 
-            if (name == null) {
-                nameless.add(export);
-            } else {
-                SortedMap<Integer, Export> exportByArity = exportByArityByName.get(name);
-
-                if (exportByArity == null) {
-                    exportByArity = new TreeMap<Integer, Export>();
-                    exportByArityByName.put(name, exportByArity);
-                }
-
-                exportByArity.put((int) export.arity(), export);
+            if (exportName != null) {
+                MacroNameArity macroNameArity = new MacroNameArity(exportName, (int) export.arity());
+                macroNameAritySortedSet.add(macroNameArity);
             }
         }
 
-        return pair(exportByArityByName, nameless);
+        return macroNameAritySortedSet;
+    }
+
+    /**
+     * The number of exports
+     */
+    public int size() {
+        return exportCollection.size();
     }
 }
