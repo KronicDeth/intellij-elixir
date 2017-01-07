@@ -115,6 +115,9 @@
     * Completion for functions and macros exported by `.beam` files
     * Syntax highlighting
 * [#579](https://github.com/KronicDeth/intellij-elixir/pull/579) - Regression test for [#575](https://github.com/KronicDeth/intellij-elixir/pull/575) - [@KronicDeth](https://github.com/KronicDeth)
+* [#583](https://github.com/KronicDeth/intellij-elixir/pull/583) - [@KronicDeth](https://github.com/KronicDeth)
+  * Macros appear before functions in decompiled `.beam` files
+    * Header for macro and function sections
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -123,6 +126,10 @@
   * If the name of the decompiled macro/function is an infix operator, then decompile the head as a binary operation instead of a normal prefix name as infix operators aren't valid prefix names and led to parsing errors, which was the root cause of [#575](https://github.com/KronicDeth/intellij-elixir/pull/575).
   * Fix IntelliJ warnings in `BeamFileImpl`
   * Remove unused `VirtualFile` argument to `BeamFileImpl#buildFileStub`.
+* [#583](https://github.com/KronicDeth/intellij-elixir/pull/583) - [@KronicDeth](https://github.com/KronicDeth)
+  * Add `++`, `=~`, and `in` to `INFIX_OPERATOR_SET`.
+  * Only render infix operators if arity is `2`.
+  * Prefix operator decompilation: `+` and `-` are both binary and unary operators.  When a unary operator they need to be wrapped in parentheses, so that the call definition clause is parsed correctly.
 
 ## v4.7.0
 
