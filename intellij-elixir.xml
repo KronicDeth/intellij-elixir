@@ -120,6 +120,9 @@
       <include name="lib/gson-2.5.jar"/>
 
       <include name="lib/guava-17.0.jar"/>
+      <!-- 2016.3 -->
+      <include name="lib/guava-19.0.jar"/>
+
       <include name="lib/hamcrest-core-1.3.jar"/>
       <include name="lib/hamcrest-library-1.3.jar"/>
 

@@ -218,6 +218,8 @@
     <pathelement location="${intellij-elixir.output.dir}"/>
     <pathelement location="${intellij-elixir.testoutput.dir}"/>
     <pathelement location="${idea.cache}/lib/guava-17.0.jar"/>
+    <!-- 2016.3 -->
+    <pathelement location="${idea.cache}/lib/guava-19.0.jar"/>
   </path>
 
   <property name="test" value="tests"/>
