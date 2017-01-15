@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     private enum Parse {
@@ -625,7 +626,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/scm/path.ex", Parse.CORRECT);
     }
 
-    public void testMixShell() {
+    public void testMixShell()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/shell.ex", Parse.CORRECT);
@@ -691,7 +694,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/compile.erlang.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksCompile() {
+    public void testMixTasksCompile()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/tasks/compile.ex", Parse.CORRECT);
@@ -744,13 +749,17 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/deps.update.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksDo() {
+    public void testMixTasksDo()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/tasks/do.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksEscriptBuild() {
+    public void testMixTasksEscriptBuild()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/tasks/escript.build.ex", Parse.CORRECT);
@@ -772,7 +781,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/loadpaths.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksLocal() {
+    public void testMixTasksLocal()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/tasks/local.ex", Parse.CORRECT);
@@ -802,7 +813,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/run.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksTest() {
+    public void testMixTasksTest()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/tasks/test.ex", Parse.CORRECT);
@@ -812,7 +825,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks_server.ex", Parse.CORRECT);
     }
 
-    public void testMixUtils() {
+    public void testMixUtils()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsed("lib/mix/lib/mix/utils.ex", Parse.CORRECT);

@@ -1,5 +1,7 @@
 package org.elixir_lang.parser_definition;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Created by luke.imhoff on 8/7/14.
  */
@@ -20,7 +22,9 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation() {
+    public void testInterpolation()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         setProjectSdkFromEbinDirectory();
 
         assertParsedAndQuotedCorrectly();
