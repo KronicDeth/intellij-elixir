@@ -1,7 +1,5 @@
 package org.elixir_lang.sdk;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.process.ProcessOutput;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -9,10 +7,7 @@ import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.roots.JavadocOrderRootType;
-import com.intellij.openapi.roots.ModuleRootManager;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.roots.*;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.Version;
 import com.intellij.openapi.util.text.StringUtil;
@@ -21,7 +16,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Function;
-import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -145,24 +139,69 @@ public class ElixirSdkType extends SdkType {
     return sdk != null && sdk.getSdkType() == getInstance() ? sdk.getHomePath() : null;
   }
 
-  @Nullable
-  public static ElixirSdkRelease getRelease(@NotNull PsiElement element){
-    if(ElixirSystemUtil.isSmallIde()){
-      return getReleaseForSmallIde(element.getProject());
+  @NotNull
+  public static ElixirSdkRelease getNonNullRelease(@NotNull PsiElement element) {
+    ElixirSdkRelease nonNullRelease = getRelease(element);
+
+    if (nonNullRelease == null) {
+      nonNullRelease = ElixirSdkRelease.LATEST;
     }
 
-    Module module = ModuleUtilCore.findModuleForPsiElement(element);
-    ElixirSdkRelease byModuleSdk = getRelease(module != null ? ModuleRootManager.getInstance(module).getSdk() : null);
+    return nonNullRelease;
+  }
 
-    return byModuleSdk != null ? byModuleSdk : getRelease(element.getProject());
+  @Nullable
+  public static ElixirSdkRelease getRelease(@NotNull PsiElement element) {
+    ElixirSdkRelease release = null;
+    Project project = element.getProject();
+
+    if (ElixirSystemUtil.isSmallIde()) {
+      release = getReleaseForSmallIde(project);
+    } else {
+      /* ModuleUtilCore.findModuleForPsiElement can fail with NullPointerException if the
+         ProjectFileIndex.SERVICE.getInstance(Project) returns {@code null}, so check that the ProjectFileIndex is
+         available first */
+      if (ProjectFileIndex.SERVICE.getInstance(project) != null) {
+        Module module = ModuleUtilCore.findModuleForPsiElement(element);
+
+        if (module != null) {
+          @Nullable ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+
+          if (moduleRootManager != null) {
+            Sdk sdk = moduleRootManager.getSdk();
+
+            if (sdk != null) {
+              release = getRelease(sdk);
+            }
+          }
+        }
+      }
+
+      if (release == null) {
+        release = getRelease(project);
+      }
+    }
+
+    return release;
   }
 
   @Nullable
   public static ElixirSdkRelease getRelease(@NotNull Project project){
-    if(ElixirSystemUtil.isSmallIde()){
-      return getReleaseForSmallIde(project);
+    ElixirSdkRelease release;
+
+    if (ElixirSystemUtil.isSmallIde()) {
+      release = getReleaseForSmallIde(project);
+    } else {
+      ProjectRootManager projectRootManager = ProjectRootManager.getInstance(project);
+
+      if (projectRootManager != null) {
+        release = getRelease(projectRootManager.getProjectSdk());
+      } else {
+        release = null;
+      }
     }
-    return getRelease(ProjectRootManager.getInstance(project).getProjectSdk());
+
+    return release;
   }
 
 
@@ -172,13 +211,11 @@ public class ElixirSdkType extends SdkType {
   }
 
   @Nullable
-  private ElixirSdkRelease detectSdkVersion(@NotNull String sdkHome){
+  public ElixirSdkRelease detectSdkVersion(@NotNull String sdkHome){
     ElixirSdkRelease cachedRelease = mySdkHomeToReleaseCache.get(getVersionCacheKey(sdkHome));
     if(cachedRelease != null){
       return cachedRelease;
     }
-
-    assert !ApplicationManager.getApplication().isUnitTestMode() : "Unit tests should have their SDK versions pre-cached!";
 
     File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(sdkHome);
     if(!elixir.canExecute()){
@@ -238,8 +275,12 @@ public class ElixirSdkType extends SdkType {
     String externalDocUrl = getDefaultDocumentationUrl(getRelease(sdk));
     if (externalDocUrl != null) {
       VirtualFile fileByUrl = VirtualFileManager.getInstance().findFileByUrl(externalDocUrl);
-      sdkModificator.addRoot(fileByUrl, JavadocOrderRootType.getInstance());
+
+      if (fileByUrl != null) {
+        sdkModificator.addRoot(fileByUrl, JavadocOrderRootType.getInstance());
+      }
     }
+
     sdkModificator.commitChanges();
   }
 
