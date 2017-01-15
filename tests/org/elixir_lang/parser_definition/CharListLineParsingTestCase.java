@@ -21,6 +21,8 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testInterpolation() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsedAndQuotedCorrectly();
     }
 

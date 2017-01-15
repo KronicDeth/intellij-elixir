@@ -626,6 +626,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixShell() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/shell.ex", Parse.CORRECT);
     }
 
@@ -690,6 +692,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksCompile() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/tasks/compile.ex", Parse.CORRECT);
     }
 
@@ -741,10 +745,14 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksDo() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/tasks/do.ex", Parse.CORRECT);
     }
 
     public void testMixTasksEscriptBuild() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/tasks/escript.build.ex", Parse.CORRECT);
     }
 
@@ -765,6 +773,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksLocal() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/tasks/local.ex", Parse.CORRECT);
     }
 
@@ -793,6 +803,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksTest() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/tasks/test.ex", Parse.CORRECT);
     }
 
@@ -801,6 +813,8 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixUtils() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsed("lib/mix/lib/mix/utils.ex", Parse.CORRECT);
     }
 

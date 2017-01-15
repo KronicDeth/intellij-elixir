@@ -45,6 +45,7 @@ import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.reference.Callable;
+import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -66,6 +67,7 @@ import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
+import static org.elixir_lang.sdk.ElixirSdkType.getNonNullRelease;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 import static org.elixir_lang.structure_view.element.modular.Implementation.forNameCollection;
 
@@ -4616,9 +4618,11 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
+
+
         return quotedFunctionCall(
                 "Elixir.String",
-                "to_char_list",
+                quoteBinaryFunctionIdentifier(interpolatedCharList),
                 metadata(interpolatedCharList),
                 binary
         );
@@ -4634,6 +4638,25 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") Sigil sigil, OtpErlangTuple binary) {
         return binary;
+    }
+
+    /**
+     * Elixir 1.3 changed from `to_char_list` to `to_charlist`
+     * (https://github.com/elixir-lang/elixir/blob/v1.3/CHANGELOG.md)
+     *
+     * @return {@code "to_charlist} by default;  {@code "to_char_list"}
+     */
+    @Contract(pure = true)
+    @NotNull
+    private static String quoteBinaryFunctionIdentifier(@NotNull final InterpolatedCharList interpolatedCharList) {
+        ElixirSdkRelease release = getNonNullRelease(interpolatedCharList);
+        String functionIdentifier = "to_charlist";
+
+        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            functionIdentifier = "to_char_list";
+        }
+
+        return functionIdentifier;
     }
 
     @Contract(pure = true)
