@@ -13,6 +13,7 @@ fn (positional, key: value) when guard -> one != two end
 fn (positional, key: value) when guard -> one < two end
 fn (positional, key: value) when guard -> one + two end
 fn (positional, key: value) when guard -> one * two end
+fn (positional, key: value) when guard -> one <|> two end
 fn (positional, key: value) when guard -> one ^^^ two end
 fn (positional, key: value) when guard -> not one end
 fn (positional, key: value) when guard -> Module.function positional, key: value end

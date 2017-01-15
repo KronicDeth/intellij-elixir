@@ -129,12 +129,13 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<|>" |
                              "<~>" |
                              ">>>" |
-                             "^^^" |
                              "~>>"
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
+// https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+THREE_TOKEN_THREE_OPERATOR = "^^^"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
 
@@ -143,6 +144,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
                        {THREE_TOKEN_OR_OPERATOR} |
+                       {THREE_TOKEN_THREE_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        "..."
 
@@ -237,6 +239,8 @@ RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
 STRUCT_OPERATOR = {ONE_TOKEN_STRUCT_OPERATOR}
+// https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+THREE_OPERATOR = {THREE_TOKEN_THREE_OPERATOR}
 TUPLE_OPERATOR = {TWO_TOKEN_TUPLE_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
 TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
@@ -669,6 +673,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER_TOKEN} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
   {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TRUE; }
+  // Must be before {UNARY_OPERATOR} as "^^^" is longer than "^" in {UNARY_OPERATOR}
+  {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.THREE_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
@@ -870,6 +877,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }
+  {THREE_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.THREE_OPERATOR; }
   {TRUE}                                            { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TRUE; }
   {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);

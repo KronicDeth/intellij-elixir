@@ -56,6 +56,10 @@ public class MatchedInMatchOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedThreeOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedTwoOperation() {
         assertParsedAndQuotedCorrectly();
     }

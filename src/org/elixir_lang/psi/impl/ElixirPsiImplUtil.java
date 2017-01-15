@@ -1382,6 +1382,12 @@ public class ElixirPsiImplUtil {
 
     @Contract(pure = true)
     @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirThreeInfixOperator threeInfixOperator) {
+        return TokenSet.create(ElixirTypes.THREE_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirTwoInfixOperator twoInfixOperator) {
         return TokenSet.create(ElixirTypes.TWO_OPERATOR);
     }

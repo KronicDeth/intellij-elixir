@@ -344,7 +344,7 @@ public class ParenthesesCallTest extends Test {
                         {
                                 "^^^",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.ARROW_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.THREE_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },

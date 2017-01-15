@@ -589,6 +589,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     // visitInfix(o);
   }
 
+  public void visitMatchedThreeOperation(@NotNull ElixirMatchedThreeOperation o) {
+    visitMatchedExpression(o);
+    // visitNamed(o);
+    // visitThree(o);
+  }
+
   public void visitMatchedTwoOperation(@NotNull ElixirMatchedTwoOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
@@ -772,6 +778,10 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitQuotable(o);
   }
 
+  public void visitThreeInfixOperator(@NotNull ElixirThreeInfixOperator o) {
+    visitOperator(o);
+  }
+
   public void visitTuple(@NotNull ElixirTuple o) {
     visitQuotable(o);
   }
@@ -930,6 +940,12 @@ public class ElixirVisitor extends PsiElementVisitor {
     visitUnmatchedExpression(o);
     // visitNamed(o);
     // visitInfix(o);
+  }
+
+  public void visitUnmatchedThreeOperation(@NotNull ElixirUnmatchedThreeOperation o) {
+    visitUnmatchedExpression(o);
+    // visitNamed(o);
+    // visitThree(o);
   }
 
   public void visitUnmatchedTwoOperation(@NotNull ElixirUnmatchedTwoOperation o) {

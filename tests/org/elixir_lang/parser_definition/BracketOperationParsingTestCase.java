@@ -40,7 +40,7 @@ public class BracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testHatOperator() {
+    public void testThreeOperator() {
         assertParsedAndQuotedCorrectly();
     }
 

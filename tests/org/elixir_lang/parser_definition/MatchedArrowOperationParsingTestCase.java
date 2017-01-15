@@ -1,5 +1,9 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.sdk.ElixirSdkRelease;
+
+import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+
 /**
  * Created by luke.imhoff on 9/17/14.
  */
@@ -19,7 +23,7 @@ public class MatchedArrowOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testMatchedInOperation() {
-        if (!isTravis()) {
+        if (!isTravis() && elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_2) > 0) {
             assertParsedAndQuotedCorrectly();
         }
     }

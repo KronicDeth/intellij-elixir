@@ -85,7 +85,7 @@
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
-  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Three|Two|Type|When)Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -144,6 +144,12 @@
   implements("(un)?matchedPipeOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Pipe"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedThreeOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Three"
   ]
   // methods set by infix operations above
 
@@ -308,7 +314,7 @@
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AND_OPERATOR = "&&&, `and`, &&"
-    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^"
+    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
     ASSOCIATION_OPERATOR = "=>"
     ATOM_FRAGMENT = "A-Z, a-z, _, @, 0-9. ?, !"
     AT_OPERATOR = "@"
@@ -421,6 +427,8 @@
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
     TWO_OPERATOR = "++, --, .., <>"
+    // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+    THREE_OPERATOR = "^^^"
     TYPE_OPERATOR = "::"
     UNARY_OPERATOR = "not, ~~~, !, ^"
     UNICODE_ESCAPE_CHARACTER = "u"
@@ -1077,6 +1085,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedRelationalOperation |
                       matchedArrowOperation |
                       matchedInOperation |
+                      matchedThreeOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
@@ -1302,7 +1311,7 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                            operatorTokenSet
                            quote
                          ]
-                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^"
+                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
                        }
 // implements and methods defined by "infix operations" section above
 matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
@@ -1325,6 +1334,23 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
 // implements defined by "in operations" section above
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
+
+/*
+ * Three Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
+ */
+threeInfixOperator ::= EOL* THREE_OPERATOR EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "^^^"
+                       }
+// implements and methods defined by "infix operations" section above
+matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
 
 /*
  * Two Operation - right-associative
@@ -1453,6 +1479,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        RESCUE |
                        STAB_OPERATOR |
                        STRUCT_OPERATOR |
+                       THREE_OPERATOR |
                        // NOT TUPLE_OPERATOR because it is a special form
                        TWO_OPERATOR |
                        UNARY_OPERATOR |
@@ -2266,6 +2293,14 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
 
 /*
+ * Three Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
+ */
+// implements and methods defined by "infix operations" section above
+unmatchedThreeOperation ::= unmatchedExpression threeInfixOperator unmatchedExpression
+
+/*
  * Two Operation - right-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
@@ -2578,6 +2613,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedRelationalOperation |
                         unmatchedArrowOperation |
                         unmatchedInOperation |
+                        unmatchedThreeOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |
@@ -2792,6 +2828,7 @@ keywordKey ::= AFTER |
                RELATIONAL_OPERATOR |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
+               THREE_OPERATOR |
                TUPLE_OPERATOR |
                TWO_OPERATOR |
                UNARY_OPERATOR |

@@ -13,6 +13,7 @@ fn one != two end
 fn one < two end
 fn one + two end
 fn one * two end
+fn one <|> two end
 fn one ^^^ two end
 fn not one end
 fn Module.function positional, key: value end

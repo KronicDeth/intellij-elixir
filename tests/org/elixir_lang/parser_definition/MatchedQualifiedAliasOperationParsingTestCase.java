@@ -61,6 +61,10 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedThreeOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedTwoOperation() {
         assertParsedAndQuotedCorrectly();
     }
