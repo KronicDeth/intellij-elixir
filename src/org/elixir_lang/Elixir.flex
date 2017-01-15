@@ -549,6 +549,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
+%state GROUP_HEREDOC_LINE_ESCAPED_EOL
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
 %state HEXADECIMAL_ESCAPE_SEQUENCE
@@ -925,10 +926,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {
-  {EOL}|. {
-            yybegin(GROUP);
-            return fragmentType();
-          }
+  {EOL} {
+          yybegin(GROUP);
+          return ElixirTypes.EOL;
+        }
+  .     {
+          yybegin(GROUP);
+          return fragmentType();
+        }
 }
 
 <ESCAPE_SEQUENCE> {
@@ -984,6 +989,15 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                  return fragmentType();
                                }
                              }
+  {ESCAPE} / {EOL}           {
+                               if (isInterpolating()) {
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                               } else {
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                               }
+
+                               return ElixirTypes.ESCAPE;
+                             }
   {ESCAPE}                   {
                                if (isInterpolating()) {
                                  pushAndBegin(ESCAPE_SEQUENCE);
@@ -1029,19 +1043,40 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
-  {ESCAPE} {
-             if (isInterpolating()) {
-               pushAndBegin(ESCAPE_SEQUENCE);
-               return ElixirTypes.ESCAPE;
-             } else {
-               return fragmentType();
-             }
-           }
+  // See https://github.com/elixir-lang/elixir/pull/4341
+  {ESCAPE} / {EOL} {
+                     if (isInterpolating()) {
+                       pushAndBegin(ESCAPE_SEQUENCE);
+                       return ElixirTypes.ESCAPE;
+                     } else {
+                       yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
+                       return ElixirTypes.ESCAPE;
+                     }
+                   }
+  {ESCAPE}         {
+                     if (isInterpolating()) {
+                       pushAndBegin(ESCAPE_SEQUENCE);
+                       return ElixirTypes.ESCAPE;
+                     } else {
+                       return fragmentType();
+                     }
+                   }
+  {EOL}            {
+                     yybegin(GROUP_HEREDOC_LINE_START);
+                     return ElixirTypes.EOL;
+                   }
+  .                { return fragmentType(); }
+}
+
+// See https://github.com/elixir-lang/elixir/pull/4341
+<GROUP_HEREDOC_LINE_ESCAPED_EOL> {
   {EOL} {
-          yybegin(GROUP_HEREDOC_LINE_START);
+          /* The EOL after the escape is also needed to end the Heredoc line.  It functions as both, so arbitarily I'm
+             choosing the escaped version to be a zero-width token. */
+          yypushback(yylength());
+          yybegin(GROUP_HEREDOC_LINE_BODY);
           return ElixirTypes.EOL;
         }
-  .     { return fragmentType(); }
 }
 
 <GROUP_HEREDOC_LINE_START> {

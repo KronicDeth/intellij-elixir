@@ -29,6 +29,8 @@ public class LiteralCharListSigilLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsedAndQuotedCorrectly();
     }
 

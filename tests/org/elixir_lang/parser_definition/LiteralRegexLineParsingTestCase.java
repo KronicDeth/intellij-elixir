@@ -29,6 +29,8 @@ public class LiteralRegexLineParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsedAndQuotedCorrectly();
     }
 

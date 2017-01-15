@@ -18,6 +18,9 @@ public interface ElixirStringLine extends Atomable, InterpolatedString, Line, Qu
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull
+  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
+
+  @NotNull
   List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);
 
   @NotNull

@@ -17,6 +17,8 @@ public class LiteralStringSigilHeredocParsingTestCase extends ParsingTestCase {
     }
 
     public void testEscapeSequences() {
+        setProjectSdkFromEbinDirectory();
+
         assertParsedAndQuotedCorrectly();
     }
 

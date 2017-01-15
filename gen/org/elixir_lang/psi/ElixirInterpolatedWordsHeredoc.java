@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirInterpolatedWordsHeredoc extends WordsFragmented, SigilHeredoc {
+public interface ElixirInterpolatedWordsHeredoc extends WordsFragmented, InterpolatedSigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
@@ -23,6 +23,9 @@ public interface ElixirInterpolatedWordsHeredoc extends WordsFragmented, SigilHe
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
+
+  @NotNull
+  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
 
   @NotNull
   List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);

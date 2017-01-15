@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirLiteralRegexLine extends RegexFragmented, SigilLine {
+public interface ElixirLiteralRegexLine extends RegexFragmented, LiteralSigilLine {
 
   @NotNull
   ElixirLiteralRegexBody getLiteralRegexBody();
@@ -19,6 +19,9 @@ public interface ElixirLiteralRegexLine extends RegexFragmented, SigilLine {
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
+
+  @NotNull
+  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
 
   @NotNull
   List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);

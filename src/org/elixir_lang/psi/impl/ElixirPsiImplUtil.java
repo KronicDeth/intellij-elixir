@@ -5450,17 +5450,25 @@ if (quoted == null) {
         }
 
         Body body = line.getBody();
-        Collections.addAll(heredocDescendantNodes, childNodes(body));
+        ElixirSdkRelease release = getNonNullRelease(line);
+        ASTNode[] childNodes = childNodes(body);
 
-        ASTNode eolNode = Factory.createSingleLeafElement(
-                fragmentType,
-                "\n",
-                0,
-                1,
-                null,
-                line.getManager()
-        );
-        heredocDescendantNodes.add(eolNode);
+        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0 &&
+                childNodes.length >= 1 &&
+                childNodes[childNodes.length - 1].getElementType().equals(ElixirTypes.ESCAPED_EOL)) {
+            heredocDescendantNodes.addAll(Arrays.asList(childNodes).subList(0, childNodes.length - 1));
+        } else {
+            Collections.addAll(heredocDescendantNodes, childNodes);
+            ASTNode eolNode = Factory.createSingleLeafElement(
+                    fragmentType,
+                    "\n",
+                    0,
+                    1,
+                    null,
+                    line.getManager()
+            );
+            heredocDescendantNodes.add(eolNode);
+        }
     }
 
     @Contract(pure = true)
@@ -5537,6 +5545,27 @@ if (quoted == null) {
         }
 
         return addStringCodePoints(codePointList, childText);
+    }
+
+    @NotNull
+    public static List<Integer> addEscapedEOL(@NotNull Parent parent,
+                                              @Nullable List<Integer> maybeCodePointList,
+                                              @NotNull @SuppressWarnings("unused") ASTNode child) {
+        List<Integer> codePointList = ensureCodePointList(maybeCodePointList);
+
+        ElixirSdkRelease release = getNonNullRelease(parent);
+
+        if (release.compareTo(ElixirSdkRelease.V_1_3) >= 0) {
+            if (parent instanceof LiteralSigilHeredoc) {
+                codePointList = addStringCodePoints(codePointList, "\\");
+            } else if (parent instanceof LiteralSigilLine) {
+                for (Integer codePoint : codePoints("\\\n")) {
+                    codePointList.add(codePoint);
+                }
+            }
+        }
+
+        return codePointList;
     }
 
     @NotNull
@@ -5641,7 +5670,7 @@ if (quoted == null) {
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_EOL) {
-                    continue;
+                    codePointList = parent.addEscapedEOL(codePointList, child);
                 } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
                     codePointList = addChildTextCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {
