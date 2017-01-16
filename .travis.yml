@@ -45,19 +45,19 @@ matrix:
       otp_release: 18.3
 
     - elixir: 1.4.0
-      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
       otp_release: 19.2
     - elixir: 1.3.4
-      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
       otp_release: 19.2
     - elixir: 1.2.6
-      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
       otp_release: 18.3
     - elixir: 1.1.1
-      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
       otp_release: 18.3
 before_install:
