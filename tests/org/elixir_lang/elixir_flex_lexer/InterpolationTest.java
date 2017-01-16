@@ -84,7 +84,7 @@ public class InterpolationTest extends TokenTest {
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
                         { "::", ElixirTypes.TYPE_OPERATOR, INITIAL_STATE, true },
                         { ":\n", ElixirTypes.COLON, INITIAL_STATE, false },
-                        { ":\r", ElixirTypes.COLON, INITIAL_STATE, false },
+                        { ":\r\n", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ":\t", ElixirTypes.COLON, INITIAL_STATE, false },
                         { "]", ElixirTypes.CLOSING_BRACKET, INITIAL_STATE, true },
                         { ";", ElixirTypes.SEMICOLON, INITIAL_STATE, true },
