@@ -15,16 +15,13 @@ import org.jetbrains.jps.model.library.sdk.JpsSdk;
 import org.jetbrains.jps.model.module.JpsModule;
 import org.jetbrains.jps.util.JpsPathUtil;
 
+import java.io.File;
+
 /**
  * Created by zyuyou on 15/7/17.
  */
 public class ElixirBuilderTest extends JpsBuildTestCase {
-  public static final String MAC_ELIXIR_SDK_PATH = "/usr/local/Cellar/elixir";
-  public static final String LINUX_ELIXIR_SDK_PATH = "~/.kiex/elixirs";
-  public static final String ELIXIR_SDK_VERSION = "1.1.1";
-  public static final String TRAVIS_CI_ELIXIR_SDK_VERSION = "1.1.1";
-  public static final String TEST_MODULE_NAME = "m";
-
+  private static final String TEST_MODULE_NAME = "m";
 
   public void testSimple() throws Exception{
     doSingleFileTest("lib/simple.ex", "defmodule Simple do def foo() do :ok end end", "Elixir.Simple.beam");
@@ -32,9 +29,13 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
 
   @Override
   protected JpsSdk<JpsDummyElement> addJdk(String name, String path) {
-    String homePath = getElixirSdkPath();
-    JpsTypedLibrary<JpsSdk<JpsDummyElement>> jdk = myModel.getGlobal().addSdk("Elixir: " + ELIXIR_SDK_VERSION, homePath, ELIXIR_SDK_VERSION, JpsElixirSdkType.INSTANCE);
-    jdk.addRoot(JpsPathUtil.pathToUrl(homePath), JpsOrderRootType.COMPILED);
+    String sdkHome = sdkHome();
+    String elixirVersion = elixirVersion();
+    JpsTypedLibrary<JpsSdk<JpsDummyElement>> jdk = myModel
+            .getGlobal()
+            .addSdk("Elixir: " + elixirVersion, sdkHome, elixirVersion, JpsElixirSdkType.INSTANCE);
+    jdk.addRoot(JpsPathUtil.pathToUrl(sdkHome), JpsOrderRootType.COMPILED);
+
     return jdk.getProperties();
   }
 
@@ -48,10 +49,27 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
   }
 
   @NotNull
-  private static String getElixirSdkPath(){
-    if(SystemInfo.isMac) return MAC_ELIXIR_SDK_PATH + "/" + ELIXIR_SDK_VERSION;
-    if(SystemInfo.isLinux) return LINUX_ELIXIR_SDK_PATH + "/elixir-" + TRAVIS_CI_ELIXIR_SDK_VERSION + "/lib/elixir";
-    throw new RuntimeException("Only Mac supported");
+  private static String sdkHome(){
+    return sdkHomeFromEbinDirectory(ebinDirectory());
+  }
+
+  @NotNull
+  private static String ebinDirectory() {
+    String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");
+
+    assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
+
+    return ebinDirectory;
+  }
+
+
+  @NotNull
+  private static String sdkHomeFromEbinDirectory(@NotNull String ebinDirectory) {
+    return new File(ebinDirectory)
+            .getParentFile()
+            .getParentFile()
+            .getParentFile()
+            .toString();
   }
 
   private void doSingleFileTest(String relativePath, String text, String expectedOutputFileName){
@@ -65,4 +83,12 @@ public class ElixirBuilderTest extends JpsBuildTestCase {
     String absolutePath = getAbsolutePath("out/production/" + moduleName);
     assertNotNull(FileUtil.findFileInProvidedPath(absolutePath, fileName));
   }
+
+  private static String elixirVersion() {
+        String elixirVersion = System.getenv("ELIXIR_VERSION");
+
+        assertNotNull("ELIXIR_VERSION is not set", elixirVersion);
+
+        return elixirVersion;
+    }
 }
