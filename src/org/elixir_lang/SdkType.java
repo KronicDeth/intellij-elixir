@@ -61,7 +61,7 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
 
     @Override
     public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
-
+        // No additionalData
     }
 
     @Nullable
