@@ -14,17 +14,20 @@ import java.util.List;
  */
 public interface Parent extends Fragmented, PsiElement {
     @NotNull
-    public List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
+    List<Integer> addEscapedCharacterCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
     @NotNull
-    public List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
+    List<Integer> addEscapedEOL(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
     @NotNull
-    public List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
+    List<Integer> addFragmentCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-    public OtpErlangObject quoteBinary(OtpErlangTuple binaryConstruction);
+    @NotNull
+    List<Integer> addHexadecimalEscapeSequenceCodePoints(@Nullable List<Integer> codePointList, @NotNull ASTNode child);
 
-    public OtpErlangObject quoteEmpty();
+    OtpErlangObject quoteBinary(OtpErlangTuple binaryConstruction);
 
-    public OtpErlangObject quoteLiteral(List<Integer> codePointList);
+    OtpErlangObject quoteEmpty();
+
+    OtpErlangObject quoteLiteral(List<Integer> codePointList);
 }

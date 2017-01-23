@@ -45,6 +45,7 @@ import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.reference.Callable;
+import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.elixir_lang.structure_view.element.*;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -66,6 +67,7 @@ import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
+import static org.elixir_lang.sdk.ElixirSdkType.getNonNullRelease;
 import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
 import static org.elixir_lang.structure_view.element.modular.Implementation.forNameCollection;
 
@@ -1376,6 +1378,12 @@ public class ElixirPsiImplUtil {
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirStabInfixOperator stabInfixOperator) {
         return TokenSet.create(ElixirTypes.STAB_OPERATOR);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirThreeInfixOperator threeInfixOperator) {
+        return TokenSet.create(ElixirTypes.THREE_OPERATOR);
     }
 
     @Contract(pure = true)
@@ -4616,9 +4624,11 @@ if (quoted == null) {
     @Contract(pure = true)
     @NotNull
     public static OtpErlangObject quoteBinary(InterpolatedCharList interpolatedCharList, OtpErlangTuple binary) {
+
+
         return quotedFunctionCall(
                 "Elixir.String",
-                "to_char_list",
+                quoteBinaryFunctionIdentifier(interpolatedCharList),
                 metadata(interpolatedCharList),
                 binary
         );
@@ -4634,6 +4644,25 @@ if (quoted == null) {
     @NotNull
     public static OtpErlangObject quoteBinary(@SuppressWarnings("unused") Sigil sigil, OtpErlangTuple binary) {
         return binary;
+    }
+
+    /**
+     * Elixir 1.3 changed from `to_char_list` to `to_charlist`
+     * (https://github.com/elixir-lang/elixir/blob/v1.3/CHANGELOG.md)
+     *
+     * @return {@code "to_charlist} by default;  {@code "to_char_list"}
+     */
+    @Contract(pure = true)
+    @NotNull
+    private static String quoteBinaryFunctionIdentifier(@NotNull final InterpolatedCharList interpolatedCharList) {
+        ElixirSdkRelease release = getNonNullRelease(interpolatedCharList);
+        String functionIdentifier = "to_charlist";
+
+        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            functionIdentifier = "to_char_list";
+        }
+
+        return functionIdentifier;
     }
 
     @Contract(pure = true)
@@ -5450,17 +5479,25 @@ if (quoted == null) {
         }
 
         Body body = line.getBody();
-        Collections.addAll(heredocDescendantNodes, childNodes(body));
+        ElixirSdkRelease release = getNonNullRelease(line);
+        ASTNode[] childNodes = childNodes(body);
 
-        ASTNode eolNode = Factory.createSingleLeafElement(
-                fragmentType,
-                "\n",
-                0,
-                1,
-                null,
-                line.getManager()
-        );
-        heredocDescendantNodes.add(eolNode);
+        if (release.compareTo(ElixirSdkRelease.V_1_3) < 0 &&
+                childNodes.length >= 1 &&
+                childNodes[childNodes.length - 1].getElementType().equals(ElixirTypes.ESCAPED_EOL)) {
+            heredocDescendantNodes.addAll(Arrays.asList(childNodes).subList(0, childNodes.length - 1));
+        } else {
+            Collections.addAll(heredocDescendantNodes, childNodes);
+            ASTNode eolNode = Factory.createSingleLeafElement(
+                    fragmentType,
+                    "\n",
+                    0,
+                    1,
+                    null,
+                    line.getManager()
+            );
+            heredocDescendantNodes.add(eolNode);
+        }
     }
 
     @Contract(pure = true)
@@ -5537,6 +5574,27 @@ if (quoted == null) {
         }
 
         return addStringCodePoints(codePointList, childText);
+    }
+
+    @NotNull
+    public static List<Integer> addEscapedEOL(@NotNull Parent parent,
+                                              @Nullable List<Integer> maybeCodePointList,
+                                              @NotNull @SuppressWarnings("unused") ASTNode child) {
+        List<Integer> codePointList = ensureCodePointList(maybeCodePointList);
+
+        ElixirSdkRelease release = getNonNullRelease(parent);
+
+        if (release.compareTo(ElixirSdkRelease.V_1_3) >= 0) {
+            if (parent instanceof LiteralSigilHeredoc) {
+                codePointList = addStringCodePoints(codePointList, "\\");
+            } else if (parent instanceof LiteralSigilLine) {
+                for (Integer codePoint : codePoints("\\\n")) {
+                    codePointList.add(codePoint);
+                }
+            }
+        }
+
+        return codePointList;
     }
 
     @NotNull
@@ -5641,7 +5699,7 @@ if (quoted == null) {
                 } else if (elementType == ElixirTypes.ESCAPED_CHARACTER) {
                     codePointList = parent.addEscapedCharacterCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.ESCAPED_EOL) {
-                    continue;
+                    codePointList = parent.addEscapedEOL(codePointList, child);
                 } else if (elementType == ElixirTypes.HEXADECIMAL_ESCAPE_PREFIX) {
                     codePointList = addChildTextCodePoints(codePointList, child);
                 } else if (elementType == ElixirTypes.INTERPOLATION) {

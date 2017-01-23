@@ -1,5 +1,9 @@
 package org.elixir_lang.parser_definition;
 
+import org.elixir_lang.sdk.ElixirSdkRelease;
+
+import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
+
 /**
  * Created by luke.imhoff on 9/17/14.
  */
@@ -37,11 +41,19 @@ public class CharTokenParsingTestCase extends ParsingTestCase {
      */
 
     public void testOpenHexadecimalEscapeSequence() {
-        assertParsedAndQuotedCorrectly();
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsedAndQuotedCorrectly();
+        } else {
+            assertParsedAndQuotedAroundError();
+        }
     }
 
     public void testEnclosedHexadecimalEscapeSequence() {
-        assertParsedAndQuotedCorrectly();
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsedAndQuotedCorrectly();
+        } else {
+            assertParsedAndQuotedAroundError();
+        }
     }
 
 

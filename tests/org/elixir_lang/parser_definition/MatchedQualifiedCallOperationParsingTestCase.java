@@ -61,6 +61,10 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
         assertParsedAndQuotedCorrectly();
     }
 
+    public void testMatchedThreeOperation() {
+        assertParsedAndQuotedCorrectly();
+    }
+
     public void testMatchedTwoOperation() {
         assertParsedAndQuotedCorrectly();
     }
@@ -173,7 +177,9 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() {
+    public void testStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -181,7 +187,9 @@ public class MatchedQualifiedCallOperationParsingTestCase extends ParsingTestCas
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() {
+    public void testCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

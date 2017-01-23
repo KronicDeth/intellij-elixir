@@ -14,8 +14,9 @@ public final class ElixirSdkRelease implements Comparable<ElixirSdkRelease> {
 
   public static final ElixirSdkRelease V_1_0_4 = new ElixirSdkRelease("1", "0", "4", null, null);
   public static final ElixirSdkRelease V_1_2 = new ElixirSdkRelease("1", "2", null, null, null);
+  public static final ElixirSdkRelease V_1_3 = new ElixirSdkRelease("1", "3", null, null, null);
   public static final ElixirSdkRelease V_1_4 = new ElixirSdkRelease("1", "4", null, null, null);
-
+  public static final ElixirSdkRelease LATEST = V_1_4;
 
   private static final Pattern VERSION_PATTERN = Pattern.compile(
           // @version_regex from Version in elixir itself

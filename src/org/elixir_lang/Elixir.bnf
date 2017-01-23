@@ -85,7 +85,7 @@
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
-  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Two|Type|When)Operation")=[
+  methods(           "(un)?matched(Addition|And|Arrow|Comparison|In|InMatch|Match|Multiplication|Or|Pipe|Relational|Three|Two|Type|When)Operation")=[
     functionName
     functionNameElement
     getDoBlock
@@ -144,6 +144,12 @@
   implements("(un)?matchedPipeOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Pipe"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedThreeOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Three"
   ]
   // methods set by infix operations above
 
@@ -234,6 +240,66 @@
     quote
   ]
 
+  // Heredoc
+  methods("(charList|string)Heredoc")=[
+    addEscapedCharacterCodePoints
+    addEscapedEOL
+    addFragmentCodePoints
+    addHexadecimalEscapeSequenceCodePoints
+    getFragmentType
+    getHeredocLineList
+    quote
+    quoteBinary
+    quoteEmpty
+    quoteLiteral
+  ]
+
+  // Quote
+  methods("(charList|string)Line") = [
+    addEscapedCharacterCodePoints
+    addEscapedEOL
+    addFragmentCodePoints
+    addHexadecimalEscapeSequenceCodePoints
+    getBody
+    getFragmentType
+    quote
+    quoteAsAtom
+    quoteBinary
+    quoteEmpty
+    quoteLiteral
+  ]
+
+  // Sigil Heredoc
+  methods("(interpolated|literal)((CharList|String)Sigil|Regex|Sigil|Words)Heredoc") = [
+    addEscapedCharacterCodePoints
+    addEscapedEOL
+    addFragmentCodePoints
+    addHexadecimalEscapeSequenceCodePoints
+    getFragmentType
+    getHeredocLineList
+    quote
+    quoteBinary
+    quoteEmpty
+    quoteLiteral
+    sigilName
+  ]
+
+  // Sigil Line
+  methods("(interpolated|literal)((CharList|String)Sigil|Regex|Sigil|Words)Line") = [
+    addEscapedCharacterCodePoints
+    addEscapedEOL
+    addFragmentCodePoints
+    addHexadecimalEscapeSequenceCodePoints
+    getBody
+    getFragmentType
+    quote
+    quoteBinary
+    quoteEmpty
+    quoteLiteral
+    sigilName
+    terminator
+  ]
+
   psiClassPrefix="Elixir"
   psiImplClassSuffix="Impl"
   psiPackage="org.elixir_lang.psi"
@@ -248,7 +314,7 @@
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
     AND_OPERATOR = "&&&, `and`, &&"
-    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^"
+    ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
     ASSOCIATION_OPERATOR = "=>"
     ATOM_FRAGMENT = "A-Z, a-z, _, @, 0-9. ?, !"
     AT_OPERATOR = "@"
@@ -361,6 +427,8 @@
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
     TWO_OPERATOR = "++, --, .., <>"
+    // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+    THREE_OPERATOR = "^^^"
     TYPE_OPERATOR = "::"
     UNARY_OPERATOR = "not, ~~~, !, ^"
     UNICODE_ESCAPE_CHARACTER = "u"
@@ -573,17 +641,6 @@ charListHeredoc ::= CHAR_LIST_HEREDOC_PROMOTER EOL
                         "org.elixir_lang.psi.InterpolatedCharList"
                         "org.elixir_lang.psi.Quote"
                       ]
-                      methods = [
-                        addEscapedCharacterCodePoints
-                        addFragmentCodePoints
-                        addHexadecimalEscapeSequenceCodePoints
-                        getFragmentType
-                        getHeredocLineList
-                        quote
-                        quoteBinary
-                        quoteEmpty
-                        quoteLiteral
-                      ]
                       pin = 1
                     }
 charListHeredocLine ::= heredocLinePrefix quoteCharListBody EOL
@@ -608,17 +665,6 @@ stringHeredoc ::= STRING_HEREDOC_PROMOTER EOL
                     implements = [
                       "org.elixir_lang.psi.Heredoc"
                       "org.elixir_lang.psi.InterpolatedString"
-                    ]
-                    methods = [
-                      addEscapedCharacterCodePoints
-                      addFragmentCodePoints
-                      addHexadecimalEscapeSequenceCodePoints
-                      getFragmentType
-                      getHeredocLineList
-                      quote
-                      quoteBinary
-                      quoteEmpty
-                      quoteLiteral
                     ]
                     pin = 1
                   }
@@ -648,19 +694,7 @@ interpolatedCharListSigilHeredoc ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CH
                                        implements = [
                                          "org.elixir_lang.psi.CharListFragmented"
                                          "org.elixir_lang.psi.InterpolatedCharListHeredocLined"
-                                         "org.elixir_lang.psi.SigilHeredoc"
-                                       ]
-                                       methods = [
-                                         addEscapedCharacterCodePoints
-                                         addFragmentCodePoints
-                                         addHexadecimalEscapeSequenceCodePoints
-                                         getFragmentType
-                                         getHeredocLineList
-                                         quote
-                                         quoteBinary
-                                         quoteEmpty
-                                         quoteLiteral
-                                         sigilName
+                                         "org.elixir_lang.psi.InterpolatedSigilHeredoc"
                                        ]
                                        pin = 3
                                      }
@@ -683,19 +717,7 @@ interpolatedRegexHeredoc ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_HEREDOC_
                              {
                                implements = [
                                  "org.elixir_lang.psi.RegexFragmented"
-                                 "org.elixir_lang.psi.SigilHeredoc"
-                               ]
-                               methods = [
-                                 addEscapedCharacterCodePoints
-                                 addFragmentCodePoints
-                                 addHexadecimalEscapeSequenceCodePoints
-                                 getFragmentType
-                                 getHeredocLineList
-                                 quote
-                                 quoteBinary
-                                 quoteEmpty
-                                 quoteLiteral
-                                 sigilName
+                                 "org.elixir_lang.psi.InterpolatedSigilHeredoc"
                                ]
                                pin = 3
                              }
@@ -717,20 +739,8 @@ interpolatedSigilHeredoc ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_HEREDOC_PROMOT
                              heredocPrefix SIGIL_HEREDOC_TERMINATOR sigilModifiers
                              {
                                implements = [
+                                 "org.elixir_lang.psi.InterpolatedSigilHeredoc"
                                  "org.elixir_lang.psi.SigilFragmented"
-                                 "org.elixir_lang.psi.SigilHeredoc"
-                               ]
-                               methods = [
-                                 addEscapedCharacterCodePoints
-                                 addFragmentCodePoints
-                                 addHexadecimalEscapeSequenceCodePoints
-                                 getFragmentType
-                                 getHeredocLineList
-                                 quote
-                                 quoteBinary
-                                 quoteEmpty
-                                 quoteLiteral
-                                 sigilName
                                ]
                                pin = 3
                              }
@@ -753,20 +763,8 @@ interpolatedStringSigilHeredoc ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_
                                    {
                                      implements = [
                                        "org.elixir_lang.psi.StringFragmented"
+                                       "org.elixir_lang.psi.InterpolatedSigilHeredoc"
                                        "org.elixir_lang.psi.InterpolatedStringHeredocLined"
-                                       "org.elixir_lang.psi.SigilHeredoc"
-                                     ]
-                                     methods = [
-                                       addEscapedCharacterCodePoints
-                                       addFragmentCodePoints
-                                       addHexadecimalEscapeSequenceCodePoints
-                                       getFragmentType
-                                       getHeredocLineList
-                                       quote
-                                       quoteBinary
-                                       quoteEmpty
-                                       quoteLiteral
-                                       sigilName
                                      ]
                                      pin = 3
                                    }
@@ -789,19 +787,7 @@ interpolatedWordsHeredoc ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_HEREDOC_
                              {
                                implements = [
                                  "org.elixir_lang.psi.WordsFragmented"
-                                 "org.elixir_lang.psi.SigilHeredoc"
-                               ]
-                               methods = [
-                                 addEscapedCharacterCodePoints
-                                 addFragmentCodePoints
-                                 addHexadecimalEscapeSequenceCodePoints
-                                 getFragmentType
-                                 getHeredocLineList
-                                 quote
-                                 quoteBinary
-                                 quoteEmpty
-                                 quoteLiteral
-                                 sigilName
+                                 "org.elixir_lang.psi.InterpolatedSigilHeredoc"
                                ]
                                pin = 3
                              }
@@ -828,19 +814,7 @@ literalCharListSigilHeredoc ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIG
                                 {
                                   implements = [
                                     "org.elixir_lang.psi.CharListFragmented"
-                                    "org.elixir_lang.psi.SigilHeredoc"
-                                  ]
-                                  methods = [
-                                    addEscapedCharacterCodePoints
-                                    addFragmentCodePoints
-                                    addHexadecimalEscapeSequenceCodePoints
-                                    getFragmentType
-                                    getHeredocLineList
-                                    quote
-                                    quoteBinary
-                                    quoteEmpty
-                                    quoteLiteral
-                                    sigilName
+                                    "org.elixir_lang.psi.LiteralSigilHeredoc"
                                   ]
                                   pin = 3
                                 }
@@ -864,19 +838,7 @@ literalRegexHeredoc ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_HEREDOC_PROMOTER EO
                         {
                           implements = [
                             "org.elixir_lang.psi.RegexFragmented"
-                            "org.elixir_lang.psi.SigilHeredoc"
-                          ]
-                          methods = [
-                            addEscapedCharacterCodePoints
-                            addFragmentCodePoints
-                            addHexadecimalEscapeSequenceCodePoints
-                            getFragmentType
-                            getHeredocLineList
-                            quote
-                            quoteBinary
-                            quoteEmpty
-                            quoteLiteral
-                            sigilName
+                            "org.elixir_lang.psi.LiteralSigilHeredoc"
                           ]
                           pin = 3
                         }
@@ -900,19 +862,7 @@ literalSigilHeredoc ::= TILDE LITERAL_SIGIL_NAME SIGIL_HEREDOC_PROMOTER EOL
                         {
                           implements = [
                             "org.elixir_lang.psi.SigilFragmented"
-                            "org.elixir_lang.psi.SigilHeredoc"
-                          ]
-                          methods = [
-                            addEscapedCharacterCodePoints
-                            addFragmentCodePoints
-                            addHexadecimalEscapeSequenceCodePoints
-                            getFragmentType
-                            getHeredocLineList
-                            quote
-                            quoteBinary
-                            quoteEmpty
-                            quoteLiteral
-                            sigilName
+                            "org.elixir_lang.psi.LiteralSigilHeredoc"
                           ]
                           pin = 3
                         }
@@ -936,19 +886,7 @@ literalStringSigilHeredoc ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_HERED
                               {
                                 implements = [
                                   "org.elixir_lang.psi.StringFragmented"
-                                  "org.elixir_lang.psi.SigilHeredoc"
-                                ]
-                                methods = [
-                                  addEscapedCharacterCodePoints
-                                  addFragmentCodePoints
-                                  addHexadecimalEscapeSequenceCodePoints
-                                  getFragmentType
-                                  getHeredocLineList
-                                  quote
-                                  quoteBinary
-                                  quoteEmpty
-                                  quoteLiteral
-                                  sigilName
+                                  "org.elixir_lang.psi.LiteralSigilHeredoc"
                                 ]
                                 pin = 3
                               }
@@ -972,19 +910,7 @@ literalWordsHeredoc ::= TILDE LITERAL_WORDS_SIGIL_NAME WORDS_HEREDOC_PROMOTER EO
                         {
                           implements = [
                             "org.elixir_lang.psi.WordsFragmented"
-                            "org.elixir_lang.psi.SigilHeredoc"
-                          ]
-                          methods = [
-                            addEscapedCharacterCodePoints
-                            addFragmentCodePoints
-                            addHexadecimalEscapeSequenceCodePoints
-                            getFragmentType
-                            getHeredocLineList
-                            quote
-                            quoteBinary
-                            quoteEmpty
-                            quoteLiteral
-                            sigilName
+                            "org.elixir_lang.psi.LiteralSigilHeredoc"
                           ]
                           pin = 3
                         }
@@ -1027,18 +953,6 @@ charListLine ::= CHAR_LIST_PROMOTER quoteCharListBody CHAR_LIST_TERMINATOR
                      "org.elixir_lang.psi.Line"
                      "org.elixir_lang.psi.Quotable"
                    ]
-                   methods = [
-                     addEscapedCharacterCodePoints
-                     addFragmentCodePoints
-                     addHexadecimalEscapeSequenceCodePoints
-                     getBody
-                     getFragmentType
-                     quote
-                     quoteAsAtom
-                     quoteBinary
-                     quoteEmpty
-                     quoteLiteral
-                   ]
                  }
 
 quoteStringBody ::=  (interpolation | STRING_FRAGMENT | quoteEscapeSequence)*
@@ -1050,18 +964,6 @@ stringLine ::= STRING_PROMOTER quoteStringBody STRING_TERMINATOR
                    "org.elixir_lang.psi.InterpolatedString"
                    "org.elixir_lang.psi.Line"
                    "org.elixir_lang.psi.Quotable"
-                 ]
-                 methods = [
-                   addEscapedCharacterCodePoints
-                   addFragmentCodePoints
-                   addHexadecimalEscapeSequenceCodePoints
-                   getBody
-                   getFragmentType
-                   quote
-                   quoteAsAtom
-                   quoteBinary
-                   quoteEmpty
-                   quoteLiteral
                  ]
                }
 
@@ -1079,20 +981,7 @@ interpolatedCharListSigilLine ::= TILDE INTERPOLATING_CHAR_LIST_SIGIL_NAME CHAR_
                                   {
                                     implements = [
                                       "org.elixir_lang.psi.CharListFragmented"
-                                      "org.elixir_lang.psi.SigilLine"
-                                    ]
-                                    methods = [
-                                      addEscapedCharacterCodePoints
-                                      addFragmentCodePoints
-                                      addHexadecimalEscapeSequenceCodePoints
-                                      getBody
-                                      getFragmentType
-                                      quote
-                                      quoteBinary
-                                      quoteEmpty
-                                      quoteLiteral
-                                      sigilName
-                                      terminator
+                                      "org.elixir_lang.psi.InterpolatedSigilLine"
                                     ]
                                   }
 
@@ -1100,20 +989,7 @@ interpolatedRegexLine ::= TILDE INTERPOLATING_REGEX_SIGIL_NAME REGEX_PROMOTER in
                           {
                             implements = [
                               "org.elixir_lang.psi.RegexFragmented"
-                              "org.elixir_lang.psi.SigilLine"
-                            ]
-                            methods = [
-                              addEscapedCharacterCodePoints
-                              addFragmentCodePoints
-                              addHexadecimalEscapeSequenceCodePoints
-                              getBody
-                              getFragmentType
-                              quote
-                              quoteBinary
-                              quoteEmpty
-                              quoteLiteral
-                              sigilName
-                              terminator
+                              "org.elixir_lang.psi.InterpolatedSigilLine"
                             ]
                           }
 
@@ -1121,20 +997,7 @@ interpolatedSigilLine ::= TILDE INTERPOLATING_SIGIL_NAME SIGIL_PROMOTER interpol
                           {
                             implements = [
                               "org.elixir_lang.psi.SigilFragmented"
-                              "org.elixir_lang.psi.SigilLine"
-                            ]
-                            methods = [
-                              addEscapedCharacterCodePoints
-                              addFragmentCodePoints
-                              addHexadecimalEscapeSequenceCodePoints
-                              getBody
-                              getFragmentType
-                              quote
-                              quoteBinary
-                              quoteEmpty
-                              quoteLiteral
-                              sigilName
-                              terminator
+                              "org.elixir_lang.psi.InterpolatedSigilLine"
                             ]
                           }
 
@@ -1142,20 +1005,7 @@ interpolatedStringSigilLine ::= TILDE INTERPOLATING_STRING_SIGIL_NAME STRING_SIG
                                 {
                                   implements = [
                                     "org.elixir_lang.psi.StringFragmented"
-                                    "org.elixir_lang.psi.SigilLine"
-                                  ]
-                                  methods = [
-                                    addEscapedCharacterCodePoints
-                                    addFragmentCodePoints
-                                    addHexadecimalEscapeSequenceCodePoints
-                                    getBody
-                                    getFragmentType
-                                    quote
-                                    quoteBinary
-                                    quoteEmpty
-                                    quoteLiteral
-                                    sigilName
-                                    terminator
+                                    "org.elixir_lang.psi.InterpolatedSigilLine"
                                   ]
                                 }
 
@@ -1163,20 +1013,7 @@ interpolatedWordsLine ::= TILDE INTERPOLATING_WORDS_SIGIL_NAME WORDS_PROMOTER in
                           {
                             implements = [
                               "org.elixir_lang.psi.WordsFragmented"
-                              "org.elixir_lang.psi.SigilLine"
-                            ]
-                            methods = [
-                              addEscapedCharacterCodePoints
-                              addFragmentCodePoints
-                              addHexadecimalEscapeSequenceCodePoints
-                              getBody
-                              getFragmentType
-                              quote
-                              quoteBinary
-                              quoteEmpty
-                              quoteLiteral
-                              sigilName
-                              terminator
+                              "org.elixir_lang.psi.InterpolatedSigilLine"
                             ]
                           }
 /*
@@ -1187,20 +1024,7 @@ literalCharListSigilLine ::= TILDE LITERAL_CHAR_LIST_SIGIL_NAME CHAR_LIST_SIGIL_
                              {
                                implements = [
                                  "org.elixir_lang.psi.CharListFragmented"
-                                 "org.elixir_lang.psi.SigilLine"
-                               ]
-                               methods = [
-                                 addEscapedCharacterCodePoints
-                                 addFragmentCodePoints
-                                 addHexadecimalEscapeSequenceCodePoints
-                                 getBody
-                                 getFragmentType
-                                 quote
-                                 quoteBinary
-                                 quoteEmpty
-                                 quoteLiteral
-                                 sigilName
-                                 terminator
+                                 "org.elixir_lang.psi.LiteralSigilLine"
                                ]
                              }
 
@@ -1208,41 +1032,15 @@ literalRegexLine ::= TILDE LITERAL_REGEX_SIGIL_NAME REGEX_PROMOTER literalRegexB
                      {
                        implements = [
                          "org.elixir_lang.psi.RegexFragmented"
-                         "org.elixir_lang.psi.SigilLine"
-                       ]
-                       methods = [
-                         addEscapedCharacterCodePoints
-                         addFragmentCodePoints
-                         addHexadecimalEscapeSequenceCodePoints
-                         getBody
-                         getFragmentType
-                         quote
-                         quoteBinary
-                         quoteEmpty
-                         quoteLiteral
-                         sigilName
-                         terminator
+                         "org.elixir_lang.psi.LiteralSigilLine"
                        ]
                      }
 
 literalSigilLine ::= TILDE LITERAL_SIGIL_NAME SIGIL_PROMOTER literalSigilBody SIGIL_TERMINATOR sigilModifiers
                      {
                        implements = [
+                         "org.elixir_lang.psi.LiteralSigilLine"
                          "org.elixir_lang.psi.SigilFragmented"
-                         "org.elixir_lang.psi.SigilLine"
-                       ]
-                       methods = [
-                         addEscapedCharacterCodePoints
-                         addFragmentCodePoints
-                         addHexadecimalEscapeSequenceCodePoints
-                         getBody
-                         getFragmentType
-                         quote
-                         quoteBinary
-                         quoteEmpty
-                         quoteLiteral
-                         sigilName
-                         terminator
                        ]
                      }
 
@@ -1250,20 +1048,7 @@ literalStringSigilLine ::= TILDE LITERAL_STRING_SIGIL_NAME STRING_SIGIL_PROMOTER
                            {
                              implements = [
                                "org.elixir_lang.psi.StringFragmented"
-                               "org.elixir_lang.psi.SigilLine"
-                             ]
-                             methods = [
-                               addEscapedCharacterCodePoints
-                               addFragmentCodePoints
-                               addHexadecimalEscapeSequenceCodePoints
-                               getBody
-                               getFragmentType
-                               quote
-                               quoteBinary
-                               quoteEmpty
-                               quoteLiteral
-                               sigilName
-                               terminator
+                               "org.elixir_lang.psi.LiteralSigilLine"
                              ]
                            }
 
@@ -1271,20 +1056,7 @@ literalWordsLine ::=  TILDE LITERAL_WORDS_SIGIL_NAME WORDS_PROMOTER literalWords
                       {
                         implements = [
                           "org.elixir_lang.psi.WordsFragmented"
-                          "org.elixir_lang.psi.SigilLine"
-                        ]
-                        methods = [
-                          addEscapedCharacterCodePoints
-                          addFragmentCodePoints
-                          addHexadecimalEscapeSequenceCodePoints
-                          getBody
-                          getFragmentType
-                          quote
-                          quoteBinary
-                          quoteEmpty
-                          quoteLiteral
-                          sigilName
-                          terminator
+                          "org.elixir_lang.psi.LiteralSigilLine"
                         ]
                       }
 
@@ -1313,6 +1085,7 @@ matchedExpression ::= matchedCaptureNonNumericOperation |
                       matchedRelationalOperation |
                       matchedArrowOperation |
                       matchedInOperation |
+                      matchedThreeOperation |
                       matchedTwoOperation |
                       matchedAdditionOperation |
                       matchedMultiplicationOperation |
@@ -1538,7 +1311,7 @@ arrowInfixOperator ::= EOL* ARROW_OPERATOR EOL*
                            operatorTokenSet
                            quote
                          ]
-                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>, ^^^"
+                         name = "<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>"
                        }
 // implements and methods defined by "infix operations" section above
 matchedArrowOperation ::= matchedExpression arrowInfixOperator matchedExpression
@@ -1561,6 +1334,23 @@ inInfixOperator ::= EOL* IN_OPERATOR EOL*
 // implements defined by "in operations" section above
 // methods defined by "infix operations" section above
 matchedInOperation ::= matchedExpression inInfixOperator matchedExpression
+
+/*
+ * Three Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
+ */
+threeInfixOperator ::= EOL* THREE_OPERATOR EOL*
+                       {
+                         implements = "org.elixir_lang.psi.Operator"
+                         methods = [
+                           operatorTokenSet
+                           quote
+                         ]
+                         name = "^^^"
+                       }
+// implements and methods defined by "infix operations" section above
+matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
 
 /*
  * Two Operation - right-associative
@@ -1689,6 +1479,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        RESCUE |
                        STAB_OPERATOR |
                        STRUCT_OPERATOR |
+                       THREE_OPERATOR |
                        // NOT TUPLE_OPERATOR because it is a special form
                        TWO_OPERATOR |
                        UNARY_OPERATOR |
@@ -2502,6 +2293,14 @@ unmatchedArrowOperation ::= unmatchedExpression arrowInfixOperator unmatchedExpr
 unmatchedInOperation ::= unmatchedExpression inInfixOperator unmatchedExpression
 
 /*
+ * Three Operation - left-associative
+ *
+ * @see https://github.com/elixir-lang/elixir/blob/3487d00ddb5e90c7cf0e65d03717903b9b27eafd/lib/elixir/src/elixir_parser.yrl#L67
+ */
+// implements and methods defined by "infix operations" section above
+unmatchedThreeOperation ::= unmatchedExpression threeInfixOperator unmatchedExpression
+
+/*
  * Two Operation - right-associative
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
@@ -2814,6 +2613,7 @@ unmatchedExpression ::= unmatchedCaptureNonNumericOperation |
                         unmatchedRelationalOperation |
                         unmatchedArrowOperation |
                         unmatchedInOperation |
+                        unmatchedThreeOperation |
                         unmatchedTwoOperation |
                         unmatchedAdditionOperation |
                         unmatchedMultiplicationOperation |
@@ -3022,12 +2822,14 @@ keywordKey ::= AFTER |
                MAP_OPERATOR |
                MATCH_OPERATOR |
                MULTIPLICATION_OPERATOR |
+               NIL |
                OR_OPERATOR |
                PIPE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |
                STAB_OPERATOR |
                STRUCT_OPERATOR |
+               THREE_OPERATOR |
                TUPLE_OPERATOR |
                TWO_OPERATOR |
                UNARY_OPERATOR |

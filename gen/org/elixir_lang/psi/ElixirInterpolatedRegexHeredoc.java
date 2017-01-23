@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, SigilHeredoc {
+public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, InterpolatedSigilHeredoc {
 
   @Nullable
   ElixirHeredocPrefix getHeredocPrefix();
@@ -23,6 +23,9 @@ public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, SigilHe
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
+
+  @NotNull
+  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
 
   @NotNull
   List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);

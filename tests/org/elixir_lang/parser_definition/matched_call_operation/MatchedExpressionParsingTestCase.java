@@ -5,11 +5,15 @@ public class MatchedExpressionParsingTestCase extends ParsingTestCase {
      * matchedCallOperation
      */
 
-    public void testAtNonNumericOperation() {
+    public void testAtNonNumericOperation() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testVariable() {
+    public void testVariable() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

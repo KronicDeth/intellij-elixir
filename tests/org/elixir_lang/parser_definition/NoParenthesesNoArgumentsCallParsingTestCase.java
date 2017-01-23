@@ -8,13 +8,13 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
     /*
      *
      * Vary Qualifier
-     * 
+     *
      */
-    
+
     public void testAtOperationDotIdentifier() {
         assertParsedAndQuotedCorrectly();
     }
-    
+
     /*
      * matchedAtNonNumericLeftOperand
      */
@@ -121,7 +121,9 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredocDotIdentifier() {
+    public void testStringHeredocDotIdentifier() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -133,7 +135,9 @@ public class NoParenthesesNoArgumentsCallParsingTestCase extends ParsingTestCase
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredocDotIdentifier() {
+    public void testCharListHeredocDotIdentifier() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

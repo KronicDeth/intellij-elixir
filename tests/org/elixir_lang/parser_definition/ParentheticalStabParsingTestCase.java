@@ -25,11 +25,15 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordsInParenthesesWhenExpressionStab() {
+    public void testKeywordsInParenthesesWhenExpressionStab() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testMatchedExpressionStab() {
+    public void testMatchedExpressionStab() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -53,11 +57,15 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalsAndKeywordsInParenthesesStab() {
+    public void testPositionalsAndKeywordsInParenthesesStab() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalsAndKeywordsInParenthesesWhenExpressionStab() {
+    public void testPositionalsAndKeywordsInParenthesesWhenExpressionStab() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -69,7 +77,9 @@ public class ParentheticalStabParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStabExpression() {
+    public void testStabExpression() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

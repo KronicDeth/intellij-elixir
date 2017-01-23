@@ -14,6 +14,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.hash.LinkedHashMap;
 import com.intellij.util.xmlb.Accessor;
 import com.intellij.util.xmlb.SerializationFilter;
@@ -93,6 +94,18 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
   @Override
   public String getProgramParameters() {
     return programParameters;
+  }
+
+  /**
+   * getModules changed to getSearchScope in
+   * https://github.com/JetBrains/intellij-community/commit/4daac1c8cdb0cb98bbb26df7d4900c766626a742#diff-5fa0d6d7f6e6058e338ccec4efdb4596,
+   * which affects IntelliJ 2016.*
+   *
+   * @return scope where to search sources for this configuration
+   */
+  @Nullable
+  public GlobalSearchScope getSearchScope() {
+    return GlobalSearchScope.projectScope(getProject());
   }
 
   @Nullable

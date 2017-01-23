@@ -40,10 +40,6 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testHatOperator() {
-        assertParsedAndQuotedCorrectly();
-    }
-
     public void testInMatchOperator() {
         assertParsedAndQuotedCorrectly();
     }
@@ -77,6 +73,10 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
     }
 
     public void testStructOperator() {
+        assertParsedAndQuotedCorrectly();
+    }
+
+    public void testThreeOperator() {
         assertParsedAndQuotedCorrectly();
     }
 
@@ -188,7 +188,9 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() {
+    public void testStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -196,7 +198,9 @@ public class AtBracketOperationParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() {
+    public void testCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

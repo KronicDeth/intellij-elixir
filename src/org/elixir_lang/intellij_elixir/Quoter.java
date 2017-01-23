@@ -8,11 +8,13 @@ import org.elixir_lang.IntellijElixir;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.junit.ComparisonFailure;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import static org.apache.commons.lang.CharUtils.isAsciiPrintable;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
@@ -86,7 +88,7 @@ public class Quoter {
 
             if (statusString.equals("ok")) {
                 OtpErlangObject actualQuoted = ElixirPsiImplUtil.quote(file);
-                assertEquals(expectedQuoted, actualQuoted);
+                assertQuotedCorrectly(expectedQuoted, actualQuoted);
             } else if (statusString.equals("error")) {
                 OtpErlangTuple error = (OtpErlangTuple) expectedQuoted;
 
@@ -114,6 +116,13 @@ public class Quoter {
         }
     }
 
+    public static void assertQuotedCorrectly(@NotNull OtpErlangObject expectedQuoted,
+                                             @NotNull OtpErlangObject actualQuoted) {
+        if(!expectedQuoted.equals(actualQuoted)) {
+            throw new ComparisonFailure(null, toString(expectedQuoted), toString(actualQuoted));
+        }
+    }
+
     @Contract(pure = true)
     @NotNull
     public static String code(@NotNull OtpErlangMap quotedMessageMap) {
@@ -129,7 +138,7 @@ public class Quoter {
 
         return elixirCharList(elixirCodePointList);
     }
-    
+
     /*
      * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
      * points.
@@ -246,4 +255,92 @@ public class Quoter {
         );
     }
 
+    @NotNull
+    public static String toString(@NotNull OtpErlangBitstr quoted) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append('"');
+
+        for (byte element : quoted.binaryValue()) {
+            if (element == 0x0A) {
+                stringBuilder.append("\\n");
+            } else if (isAsciiPrintable((char) element)) {
+                stringBuilder.append((char) element);
+            } else {
+                stringBuilder.append(String.format("\\x%02X", element));
+            }
+        }
+
+        stringBuilder.append('"');
+
+        return stringBuilder.toString();
+    }
+
+    @NotNull
+    public static String toString(@NotNull OtpErlangList quoted) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("[");
+
+        for (int i = 0; i< quoted.arity(); i++) {
+            if (i > 0) {
+                stringBuilder.append(",");
+            }
+
+            stringBuilder.append(toString(quoted.elementAt(i)));
+        }
+
+        stringBuilder.append("]");
+
+        return stringBuilder.toString();
+    }
+
+    @NotNull
+    public static String toString(@NotNull OtpErlangObject quoted) {
+        String string;
+
+        if (quoted instanceof OtpErlangBoolean ||
+                quoted instanceof OtpErlangAtom ||
+                quoted instanceof OtpErlangByte ||
+                quoted instanceof OtpErlangChar ||
+                quoted instanceof OtpErlangFloat ||
+                quoted instanceof OtpErlangDouble ||
+                quoted instanceof OtpErlangExternalFun ||
+                quoted instanceof OtpErlangFun ||
+                quoted instanceof OtpErlangInt ||
+                quoted instanceof OtpErlangLong ||
+                quoted instanceof OtpErlangMap ||
+                quoted instanceof OtpErlangPid ||
+                quoted instanceof OtpErlangString) {
+            string = quoted.toString();
+        } else if (quoted instanceof OtpErlangBitstr) {
+            string = toString((OtpErlangBitstr) quoted);
+        } else if (quoted instanceof OtpErlangList) {
+            string = toString((OtpErlangList) quoted);
+        } else if (quoted instanceof OtpErlangTuple) {
+            string = toString((OtpErlangTuple) quoted);
+        } else {
+            throw new IllegalArgumentException("Don't know how to convert " + quoted.getClass() + " to string");
+        }
+
+        return string;
+    }
+
+    @NotNull
+    public static String toString(@NotNull OtpErlangTuple quoted) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{");
+
+        for (int i = 0; i < quoted.arity(); i++) {
+            if (i > 0) {
+                stringBuilder.append(",");
+            }
+
+            stringBuilder.append(toString(quoted.elementAt(i)));
+        }
+
+        stringBuilder.append("}");
+
+        return stringBuilder.toString();
+    }
 }

@@ -1,15 +1,21 @@
 package org.elixir_lang.parser_definition;
 
 public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
-    public void testAtDotCallBlock() {
+    public void testAtDotCallBlock() throws Exception{
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testAtQualifiedNoArgumentsCallBlock() {
+    public void testAtQualifiedNoArgumentsCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testAtQualifiedNoParenthesesCallBlock() {
+    public void testAtQualifiedNoParenthesesCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -37,15 +43,21 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCaptureDotCallBlock() {
+    public void testCaptureDotCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCaptureQualifiedNoArgumentsCallBlock() {
+    public void testCaptureQualifiedNoArgumentsCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCaptureQualifiedNoParenthesesCallBlock() {
+    public void testCaptureQualifiedNoParenthesesCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -65,19 +77,27 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testDotCallBlock() {
+    public void testDotCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testExclamationPointDotCallBlock() {
+    public void testExclamationPointDotCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testExclamationPointQualifiedNoArgumentsCallBlock() {
+    public void testExclamationPointQualifiedNoArgumentsCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testExclamationPointQualifiedNoParenthesesCallBlock() {
+    public void testExclamationPointQualifiedNoParenthesesCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -101,15 +121,21 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedWithErrors();
     }
 
-    public void testNotDotCallBlock() {
+    public void testNotDotCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testNotQualifiedNoArgumentsCallBlock() {
+    public void testNotQualifiedNoArgumentsCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testNotQualifiedNoParenthesesCallBlock() {
+    public void testNotQualifiedNoParenthesesCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -125,11 +151,15 @@ public class UnmatchedExpressionParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testQualifiedNoArgumentsCallBlock() {
+    public void testQualifiedNoArgumentsCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testQualifiedNoParenthesesCallBlock() {
+    public void testQualifiedNoParenthesesCallBlock() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

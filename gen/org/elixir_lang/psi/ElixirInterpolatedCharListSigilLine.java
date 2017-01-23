@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface ElixirInterpolatedCharListSigilLine extends CharListFragmented, SigilLine {
+public interface ElixirInterpolatedCharListSigilLine extends CharListFragmented, InterpolatedSigilLine {
 
   @NotNull
   ElixirInterpolatedCharListBody getInterpolatedCharListBody();
@@ -19,6 +19,9 @@ public interface ElixirInterpolatedCharListSigilLine extends CharListFragmented,
 
   @NotNull
   List<Integer> addEscapedCharacterCodePoints(List<Integer> codePointList, ASTNode node);
+
+  @NotNull
+  List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node);
 
   @NotNull
   List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node);

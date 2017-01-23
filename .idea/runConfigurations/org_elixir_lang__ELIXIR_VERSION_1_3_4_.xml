@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="org.elixir_lang" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="org.elixir_lang (ELIXIR_VERSION=1.3.4)" type="JUnit" factoryName="JUnit">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <module name="intellij-elixir" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -19,6 +19,7 @@
     <envs>
       <env name="ELIXIR_LANG_ELIXIR_PATH" value="/Users/limhoff/git/elixir-lang/elixir" />
       <env name="ELIXIR_EBIN_DIRECTORY" value="/usr/local/Cellar/elixir/1.3.4/lib/elixir/ebin/" />
+      <env name="ELIXIR_VERSION" value="1.3.4" />
     </envs>
     <patterns />
     <RunnerSettings RunnerId="Debug">

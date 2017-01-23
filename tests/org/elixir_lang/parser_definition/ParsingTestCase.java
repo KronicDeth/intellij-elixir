@@ -1,14 +1,41 @@
 package org.elixir_lang.parser_definition;
 
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.mock.MockLocalFileSystem;
+import com.intellij.openapi.extensions.Extensions;
+import com.intellij.openapi.extensions.ExtensionsArea;
+import com.intellij.openapi.fileTypes.FileTypeRegistry;
+import com.intellij.openapi.fileTypes.MockFileTypeManager;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.impl.ProgressManagerImpl;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.ProjectJdkTable;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.impl.ProjectJdkTableImpl;
+import com.intellij.openapi.roots.*;
+import com.intellij.openapi.roots.impl.*;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.openapi.vfs.impl.VirtualFileManagerImpl;
 import com.intellij.psi.*;
+import com.intellij.util.messages.MessageBus;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.ElixirParserDefinition;
 import org.elixir_lang.intellij_elixir.Quoter;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.sdk.ElixirSdkType;
+import org.jetbrains.annotations.NotNull;
+import org.picocontainer.MutablePicoContainer;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.elixir_lang.SdkType.pathIsValidSdkHome;
+import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
 /**
  * Created by luke.imhoff on 8/7/14.
@@ -17,6 +44,11 @@ import java.util.List;
 public abstract class ParsingTestCase extends com.intellij.testFramework.ParsingTestCase {
     public ParsingTestCase() {
         super("", "ex", new ElixirParserDefinition());
+    }
+
+    @NotNull
+    protected static MessageBus messageBus(@NotNull MutablePicoContainer appContainer) {
+        return (MessageBus) appContainer.getComponentInstanceOfType(MessageBus.class);
     }
 
     protected void assertParsedAndQuotedAroundError() {
@@ -129,5 +161,176 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
     @Override
     protected boolean includeRanges() {
         return true;
+    }
+
+    @NotNull
+    protected MessageBus messageBus() {
+        final MutablePicoContainer appContainer = getApplication().getPicoContainer();
+
+        return ParsingTestCase.messageBus(appContainer);
+    }
+
+    @NotNull
+    private DirectoryIndex registerDirectoryIndex(MessageBus messageBus)
+            throws ClassNotFoundException, InvocationTargetException, InstantiationException, NoSuchMethodException,
+            IllegalAccessException {
+        /* MUST be registered before DirectoryIndex because DirectoryIndexImpl.markContentRootsForRefresh calls
+            ModuleManager.getInstance(this.myProject).getModules();  */
+        registerModuleManager(messageBus);
+
+        DirectoryIndex directoryIndex = new DirectoryIndexImpl(myProject);
+        myProject.registerService(DirectoryIndex.class, directoryIndex);
+
+        return directoryIndex;
+    }
+
+    protected void registerProjectFileIndex()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
+        registerProjectFileIndex(messageBus());
+    }
+
+    private void registerProjectFileIndex(MessageBus messageBus)
+            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            InvocationTargetException {
+        DirectoryIndex directoryIndex = registerDirectoryIndex(messageBus);
+        FileTypeRegistry fileTypeRegistry = new MockFileTypeManager();
+
+        myProject.registerService(
+                ProjectFileIndex.class,
+                new ProjectFileIndexImpl(myProject, directoryIndex, fileTypeRegistry)
+        );
+    }
+
+    private void registerModuleManager(MessageBus messageBus)
+            throws ClassNotFoundException, IllegalAccessException, InvocationTargetException, InstantiationException,
+            NoSuchMethodException {
+        Class<?> moduleManagerComponentClass = Class.forName("com.intellij.openapi.module.impl.ModuleManagerComponent");
+        Constructor<?> moduleManagerComponentConstructor;
+        ModuleManager moduleManager = null;
+
+        try {
+            // IntelliJ > 2016.3
+            moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
+                    Project.class
+            );
+            moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject);
+        } catch (NoSuchMethodException e1) {
+            try {
+                // IntelliJ 2016.3
+                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
+                        Project.class,
+                        MessageBus.class
+                );
+                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject, messageBus);
+            } catch (NoSuchMethodException e2) {
+                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
+                        Project.class,
+                        ProgressManager.class,
+                        MessageBus.class
+                );
+                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(
+                        myProject,
+                        new ProgressManagerImpl(),
+                        messageBus
+                );
+            }
+        }
+
+        myProject.registerService(ModuleManager.class, moduleManager);
+    }
+
+    @NotNull
+    protected ProjectRootManager registerProjectRootManager() {
+        ProjectRootManager projectRootManager = new ProjectRootManagerImpl(myProject);
+        myProject.registerService(ProjectRootManager.class, projectRootManager);
+
+        return projectRootManager;
+    }
+
+    @NotNull
+    protected ElixirSdkType registerElixirSdkType() {
+        registerExtensionPoint(
+                com.intellij.openapi.projectRoots.SdkType.EP_NAME,
+                com.intellij.openapi.projectRoots.SdkType.class
+        );
+        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new ElixirSdkType());
+        ElixirSdkType elixirSdkType = ElixirSdkType.getInstance();
+
+        assertNotNull(elixirSdkType);
+
+        return elixirSdkType;
+    }
+
+    protected void setProjectSdkFromEbinDirectory()
+            throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+            InvocationTargetException {
+        setProjectSdkFromSdkHome(sdkHomeFromEbinDirectory());
+    }
+
+    private void setProjectSdkFromSdkHome(@NotNull String sdkHome)
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
+        MessageBus messageBus = messageBus();
+        registerProjectFileIndex(messageBus);
+        ProjectRootManager projectRootManager = registerProjectRootManager();
+
+        assertTrue(pathIsValidSdkHome(sdkHome));
+
+        registerExtensionPoint(OrderRootType.EP_NAME, OrderRootType.class);
+        registerExtension(OrderRootType.EP_NAME, new JavadocOrderRootType());
+
+        getApplication().addComponent(
+                VirtualFileManager.class,
+                new VirtualFileManagerImpl(
+                        new VirtualFileSystem[]{
+                                new MockLocalFileSystem()
+                        },
+                        messageBus
+                )
+        );
+
+        ProjectJdkTable projectJdkTable = new ProjectJdkTableImpl();
+        registerApplicationService(ProjectJdkTable.class, projectJdkTable);
+
+        registerExtensionPoint(
+                com.intellij.openapi.projectRoots.SdkType.EP_NAME,
+                com.intellij.openapi.projectRoots.SdkType.class
+        );
+        registerExtension(com.intellij.openapi.projectRoots.SdkType.EP_NAME, new ElixirSdkType());
+
+        Sdk sdk = ElixirSdkType.createMockSdk(sdkHome, elixirSdkRelease());
+        projectJdkTable.addJdk(sdk);
+
+        ExtensionsArea area = Extensions.getArea(myProject);
+        registerExtensionPoint(area, ProjectExtension.EP_NAME, ProjectExtension.class);
+
+        registerExtensionPoint(FilePropertyPusher.EP_NAME, FilePropertyPusher.class);
+        myProject.addComponent(PushedFilePropertiesUpdater.class, new PushedFilePropertiesUpdaterImpl(myProject));
+
+        projectRootManager.setProjectSdk(sdk);
+    }
+
+    @NotNull
+    protected static String ebinDirectory() {
+        String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");
+
+        assertNotNull("ELIXIR_EBIN_DIRECTORY is not set", ebinDirectory);
+
+        return ebinDirectory;
+    }
+
+    @NotNull
+    protected static String sdkHomeFromEbinDirectory() {
+      return sdkHomeFromEbinDirectory(ebinDirectory()) ;
+    }
+
+    @NotNull
+    protected static String sdkHomeFromEbinDirectory(@NotNull String ebinDirectory) {
+        return new File(ebinDirectory)
+                .getParentFile()
+                .getParentFile()
+                .getParentFile()
+                .toString();
     }
 }

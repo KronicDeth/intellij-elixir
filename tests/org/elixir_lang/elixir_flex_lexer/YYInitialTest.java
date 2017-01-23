@@ -84,7 +84,7 @@ public class YYInitialTest extends TokenTest {
                         { ":", ElixirTypes.COLON, ElixirFlexLexer.ATOM_START, true },
                         { "::", ElixirTypes.TYPE_OPERATOR, INITIAL_STATE, true },
                         { ":\n", ElixirTypes.COLON, INITIAL_STATE, false },
-                        { ":\r", ElixirTypes.COLON, INITIAL_STATE, false },
+                        { ":\r\n", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ":\t", ElixirTypes.COLON, INITIAL_STATE, false },
                         { ";", ElixirTypes.SEMICOLON, ElixirFlexLexer.YYINITIAL, true },
                         { "<", ElixirTypes.RELATIONAL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },

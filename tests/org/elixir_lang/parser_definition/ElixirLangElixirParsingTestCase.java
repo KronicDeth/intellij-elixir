@@ -4,10 +4,14 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import org.elixir_lang.intellij_elixir.Quoter;
+import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+
+import static org.elixir_lang.test.ElixirVersion.elixirSdkRelease;
 
 public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     private enum Parse {
@@ -350,7 +354,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testParallelCompilerBat() {
-        assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsed("lib/elixir/test/elixir/fixtures/parallel_compiler/bat.ex", Parse.ERROR);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+        }
     }
 
     public void testParallelCompilerFoo() {
@@ -530,7 +538,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixArchive() {
-        assertParsed("lib/mix/lib/mix/archive.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsed("lib/mix/lib/mix/archive.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+        }
     }
 
     public void testMixCli() {
@@ -706,7 +718,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testMixTasksDepsCheck() {
-        assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsed("lib/mix/lib/mix/tasks/deps.check.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+        }
     }
 
     // TODO re-enable once travis-ci run elixir with https://github.com/elixir-lang/elixir/commit/3e52ed0fbbc09a156e6ea180baff3b89a8da183e so intellij_elixir matches intellij-elixir behavior
@@ -744,7 +760,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/do.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksEscriptBuild() {
+    public void testMixTasksEscriptBuild()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         assertParsed("lib/mix/lib/mix/tasks/escript.build.ex", Parse.CORRECT);
     }
 
@@ -764,7 +782,9 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
         assertParsed("lib/mix/lib/mix/tasks/loadpaths.ex", Parse.CORRECT);
     }
 
-    public void testMixTasksLocal() {
+    public void testMixTasksLocal()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
         assertParsed("lib/mix/lib/mix/tasks/local.ex", Parse.CORRECT);
     }
 
@@ -821,7 +841,11 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     }
 
     public void testNoMixfileLibC() {
-        assertParsed("lib/mix/test/fixtures/no_mixfile/lib/c.ex", Parse.CORRECT);
+        if (elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) < 0) {
+            assertParsed("lib/mix/test/fixtures/no_mixfile/lib/c.ex", Parse.CORRECT);
+        } else {
+            assertTrue(elixirSdkRelease().compareTo(ElixirSdkRelease.V_1_3) >= 0);
+        }
     }
 
     public void testUmbrellaDepDepsUmbrellaAppsBarLibBar() {
@@ -840,6 +864,13 @@ public class ElixirLangElixirParsingTestCase extends ParsingTestCase {
     @NotNull
     protected String getTestDataPath() {
         return System.getenv("ELIXIR_LANG_ELIXIR_PATH");
+    }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        setProjectSdkFromEbinDirectory();
     }
 
     /*

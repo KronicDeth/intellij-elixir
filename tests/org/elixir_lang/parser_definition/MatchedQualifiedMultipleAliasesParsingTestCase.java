@@ -63,6 +63,10 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
+    public void testMatchedThreeOperation() {
+        assertParsedAndQuotedCorrectlyInOneThree();
+    }
+
     public void testMatchedTwoOperation() {
         assertParsedAndQuotedCorrectlyInOneThree();
     }
@@ -175,7 +179,9 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
-    public void testStringHeredoc() {
+    public void testStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
@@ -183,7 +189,9 @@ public class MatchedQualifiedMultipleAliasesParsingTestCase extends ParsingTestC
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 
-    public void testCharListHeredoc() {
+    public void testCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectlyInOneThree();
     }
 

@@ -1,30 +1,79 @@
+sudo: false
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 cache:
   directories:
   - cache
   - dependencies
-language: java
+language: elixir
 matrix:
   include:
-    - env: ELIXIR_VERSION="1.2.3" IDEA_TARBALL_ROOT_BASENAME="idea-IC-162.1121.32" IDEA_VERSION="2016.2"
+    - elixir: 1.4.0
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-163.9166.29" IDEA_VERSION="2016.3.1"
       jdk: oraclejdk8
-    - env: ELIXIR_VERSION="1.1.1" IDEA_TARBALL_ROOT_BASENAME="idea-IC-162.1121.32" IDEA_VERSION="2016.2"
+      otp_release: 19.2
+    - elixir: 1.3.4
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-163.9166.29" IDEA_VERSION="2016.3.1"
       jdk: oraclejdk8
+      otp_release: 19.2
+    - elixir: 1.2.6
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-163.9166.29" IDEA_VERSION="2016.3.1"
+      jdk: oraclejdk8
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-163.9166.29" IDEA_VERSION="2016.3.1"
+      jdk: oraclejdk8
+      otp_release: 18.3
 
-    - env: ELIXIR_VERSION="1.2.3" IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
+    - elixir: 1.4.0
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
-    - env: ELIXIR_VERSION="1.1.1" IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
+      otp_release: 19.2
+    - elixir: 1.3.4
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
+      otp_release: 19.2
+    - elixir: 1.2.6
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
+      jdk: oraclejdk8
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-143.2370.31" IDEA_VERSION="15.0.6"
+      jdk: oraclejdk8
+      otp_release: 18.3
 
-    - env: ELIXIR_VERSION="1.2.3" IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+    - elixir: 1.4.0
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
-    - env: ELIXIR_VERSION="1.1.1" IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3056.4" IDEA_VERSION="14.1.6"
+      otp_release: 19.2
+    - elixir: 1.3.4
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
       jdk: openjdk6
+      otp_release: 19.2
+    - elixir: 1.2.6
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
+      jdk: openjdk6
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_TARBALL_ROOT_BASENAME="idea-IC-141.3058.30" IDEA_VERSION="14.1.7"
+      jdk: openjdk6
+      otp_release: 18.3
 before_install:
+- "export ELIXIR_VERSION=${TRAVIS_ELIXIR_VERSION}"
 - "export DISPLAY=:99.0"
 - "sh -e /etc/init.d/xvfb start"
+- "wget --no-check-certificate --no-cookies --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u112-b15/jdk-8u112-linux-x64.tar.gz"
+- tar xvfz jdk-8u112-linux-x64.tar.gz
+- export JAVA_HOME=${PWD}/jdk1.8.0_112
+- export PATH=${JAVA_HOME}/bin:${PATH}
+- wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.10.0-bin.tar.gz
+- tar xvfz apache-ant-1.10.0-bin.tar.gz
+- export PATH=${PWD}/apache-ant-1.10.0/bin:${PATH}
+- java -version
+- ant -version
 install:
-  - if [ ! -f cache/erlang/18.3/activate ]; then curl -O https://raw.githubusercontent.com/yrashk/kerl/master/kerl && chmod a+x kerl && ./kerl update releases && ./kerl build 18.3 18.3 && ./kerl install 18.3 cache/erlang/18.3; fi
-  - source cache/erlang/18.3/activate
   - ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml get.idea get.intellij-erlang release.intellij_elixir
 script:  ant -logger org.apache.tools.ant.listener.AnsiColorLogger -f intellij-elixir.xml test.modules
 sudo: false

@@ -3,5 +3,5 @@ package org.elixir_lang.psi;
 /**
  * Created by luke.imhoff on 2/15/15.
  */
-public interface InterpolatedString extends Quote, StringFragmented {
+public interface InterpolatedString extends Interpolated, Quote, StringFragmented {
 }

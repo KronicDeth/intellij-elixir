@@ -6,8 +6,6 @@
 
 # Characters
 ?a ; ?1 ; ?\n ; ?\s ; ?\c ; ? ; ?,
-?\x{12} ; ?\x{abcd}
-?\x34 ; ?\xF
 
 # these show that only the first digit is part of the character
 ?\1 ; ?\1 ; ?\7
@@ -16,9 +14,6 @@
 :this ; :that
 :'complex atom'
 :"with' \"\" 'quotes"
-:" multi
- line ' \s \123 \xff
-atom"
 :... ; :<<>> ; :%{} ; :% ; :{}
 :++; :--; :*; :~~~; :::
 :% ; :. ; :<-

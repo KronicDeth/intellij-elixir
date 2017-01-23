@@ -1,5 +1,7 @@
 package org.elixir_lang.parser_definition;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Created by luke.imhoff on 8/8/14.
  */
@@ -28,7 +30,11 @@ public class LiteralStringSigilLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testEscapeSequences() {
+    public void testEscapeSequences()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
+        setProjectSdkFromEbinDirectory();
+
         assertParsedAndQuotedCorrectly();
     }
 

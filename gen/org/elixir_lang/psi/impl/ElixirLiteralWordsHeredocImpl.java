@@ -53,6 +53,11 @@ public class ElixirLiteralWordsHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @NotNull
+  public List<Integer> addEscapedEOL(List<Integer> maybeCodePointList, ASTNode node) {
+    return ElixirPsiImplUtil.addEscapedEOL(this, maybeCodePointList, node);
+  }
+
+  @NotNull
   public List<Integer> addFragmentCodePoints(List<Integer> codePointList, ASTNode node) {
     return ElixirPsiImplUtil.addFragmentCodePoints(this, codePointList, node);
   }

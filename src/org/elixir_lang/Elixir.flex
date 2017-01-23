@@ -129,12 +129,13 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<|>" |
                              "<~>" |
                              ">>>" |
-                             "^^^" |
                              "~>>"
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
+// https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+THREE_TOKEN_THREE_OPERATOR = "^^^"
 THREE_TOKEN_UNARY_OPERATOR = "not" |
                              "~~~"
 
@@ -143,6 +144,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
                        {THREE_TOKEN_OR_OPERATOR} |
+                       {THREE_TOKEN_THREE_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        "..."
 
@@ -237,6 +239,8 @@ RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
 STRUCT_OPERATOR = {ONE_TOKEN_STRUCT_OPERATOR}
+// https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
+THREE_OPERATOR = {THREE_TOKEN_THREE_OPERATOR}
 TUPLE_OPERATOR = {TWO_TOKEN_TUPLE_OPERATOR}
 TWO_OPERATOR = {TWO_TOKEN_TWO_OPERATOR}
 TYPE_OPERATOR = {TWO_TOKEN_TYPE_OPERATOR}
@@ -549,6 +553,7 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 %state GROUP
 %state GROUP_HEREDOC_END
 %state GROUP_HEREDOC_LINE_BODY
+%state GROUP_HEREDOC_LINE_ESCAPED_EOL
 %state GROUP_HEREDOC_LINE_START
 %state GROUP_HEREDOC_START
 %state HEXADECIMAL_ESCAPE_SEQUENCE
@@ -668,6 +673,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER_TOKEN} as "true" would be parsed as an identifier since it's a lowercase alphanumeric.
   {TRUE}                                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TRUE; }
+  // Must be before {UNARY_OPERATOR} as "^^^" is longer than "^" in {UNARY_OPERATOR}
+  {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.THREE_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
   {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR; }
@@ -869,6 +877,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.STAB_OPERATOR; }
   {STRUCT_OPERATOR}                                 { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR; }
+  {THREE_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.THREE_OPERATOR; }
   {TRUE}                                            { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TRUE; }
   {TWO_OPERATOR}                                    { yybegin(CALL_MAYBE);
@@ -925,10 +935,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 }
 
 <ESCAPE_IN_LITERAL_GROUP> {
-  {EOL}|. {
-            yybegin(GROUP);
-            return fragmentType();
-          }
+  {EOL} {
+          yybegin(GROUP);
+          return ElixirTypes.EOL;
+        }
+  .     {
+          yybegin(GROUP);
+          return fragmentType();
+        }
 }
 
 <ESCAPE_SEQUENCE> {
@@ -984,6 +998,15 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                  return fragmentType();
                                }
                              }
+  {ESCAPE} / {EOL}           {
+                               if (isInterpolating()) {
+                                 pushAndBegin(ESCAPE_SEQUENCE);
+                               } else {
+                                 yybegin(ESCAPE_IN_LITERAL_GROUP);
+                               }
+
+                               return ElixirTypes.ESCAPE;
+                             }
   {ESCAPE}                   {
                                if (isInterpolating()) {
                                  pushAndBegin(ESCAPE_SEQUENCE);
@@ -1029,19 +1052,40 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 
 // Rules in GROUP_HEREDOC_LINE_BODY, but not GROUP
 <GROUP_HEREDOC_LINE_BODY> {
-  {ESCAPE} {
-             if (isInterpolating()) {
-               pushAndBegin(ESCAPE_SEQUENCE);
-               return ElixirTypes.ESCAPE;
-             } else {
-               return fragmentType();
-             }
-           }
+  // See https://github.com/elixir-lang/elixir/pull/4341
+  {ESCAPE} / {EOL} {
+                     if (isInterpolating()) {
+                       pushAndBegin(ESCAPE_SEQUENCE);
+                       return ElixirTypes.ESCAPE;
+                     } else {
+                       yybegin(GROUP_HEREDOC_LINE_ESCAPED_EOL);
+                       return ElixirTypes.ESCAPE;
+                     }
+                   }
+  {ESCAPE}         {
+                     if (isInterpolating()) {
+                       pushAndBegin(ESCAPE_SEQUENCE);
+                       return ElixirTypes.ESCAPE;
+                     } else {
+                       return fragmentType();
+                     }
+                   }
+  {EOL}            {
+                     yybegin(GROUP_HEREDOC_LINE_START);
+                     return ElixirTypes.EOL;
+                   }
+  .                { return fragmentType(); }
+}
+
+// See https://github.com/elixir-lang/elixir/pull/4341
+<GROUP_HEREDOC_LINE_ESCAPED_EOL> {
   {EOL} {
-          yybegin(GROUP_HEREDOC_LINE_START);
+          /* The EOL after the escape is also needed to end the Heredoc line.  It functions as both, so arbitarily I'm
+             choosing the escaped version to be a zero-width token. */
+          yypushback(yylength());
+          yybegin(GROUP_HEREDOC_LINE_BODY);
           return ElixirTypes.EOL;
         }
-  .     { return fragmentType(); }
 }
 
 <GROUP_HEREDOC_LINE_START> {

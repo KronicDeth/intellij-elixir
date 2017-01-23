@@ -134,6 +134,7 @@ public interface ElixirTypes {
   IElementType MATCHED_QUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("MATCHED_QUALIFIED_NO_PARENTHESES_CALL");
   IElementType MATCHED_QUALIFIED_PARENTHESES_CALL = ElementTypeFactory.factory("MATCHED_QUALIFIED_PARENTHESES_CALL");
   IElementType MATCHED_RELATIONAL_OPERATION = new ElixirElementType("MATCHED_RELATIONAL_OPERATION");
+  IElementType MATCHED_THREE_OPERATION = new ElixirElementType("MATCHED_THREE_OPERATION");
   IElementType MATCHED_TWO_OPERATION = new ElixirElementType("MATCHED_TWO_OPERATION");
   IElementType MATCHED_TYPE_OPERATION = new ElixirElementType("MATCHED_TYPE_OPERATION");
   IElementType MATCHED_UNARY_NON_NUMERIC_OPERATION = new ElixirElementType("MATCHED_UNARY_NON_NUMERIC_OPERATION");
@@ -175,6 +176,7 @@ public interface ElixirTypes {
   IElementType STRING_HEREDOC_LINE = new ElixirElementType("STRING_HEREDOC_LINE");
   IElementType STRING_LINE = new ElixirElementType("STRING_LINE");
   IElementType STRUCT_OPERATION = new ElixirElementType("STRUCT_OPERATION");
+  IElementType THREE_INFIX_OPERATOR = new ElixirElementType("THREE_INFIX_OPERATOR");
   IElementType TUPLE = new ElixirElementType("TUPLE");
   IElementType TWO_INFIX_OPERATOR = new ElixirElementType("TWO_INFIX_OPERATOR");
   IElementType TYPE_INFIX_OPERATOR = new ElixirElementType("TYPE_INFIX_OPERATOR");
@@ -206,6 +208,7 @@ public interface ElixirTypes {
   IElementType UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL = ElementTypeFactory.factory("UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL");
   IElementType UNMATCHED_QUALIFIED_PARENTHESES_CALL = ElementTypeFactory.factory("UNMATCHED_QUALIFIED_PARENTHESES_CALL");
   IElementType UNMATCHED_RELATIONAL_OPERATION = new ElixirElementType("UNMATCHED_RELATIONAL_OPERATION");
+  IElementType UNMATCHED_THREE_OPERATION = new ElixirElementType("UNMATCHED_THREE_OPERATION");
   IElementType UNMATCHED_TWO_OPERATION = new ElixirElementType("UNMATCHED_TWO_OPERATION");
   IElementType UNMATCHED_TYPE_OPERATION = new ElixirElementType("UNMATCHED_TYPE_OPERATION");
   IElementType UNMATCHED_UNARY_NON_NUMERIC_OPERATION = new ElixirElementType("UNMATCHED_UNARY_NON_NUMERIC_OPERATION");
@@ -221,7 +224,7 @@ public interface ElixirTypes {
   IElementType AFTER = new ElixirTokenType("after");
   IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
   IElementType AND_OPERATOR = new ElixirTokenType("&&&, `and`, &&");
-  IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>, ^^^");
+  IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("=>");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("A-Z, a-z, _, @, 0-9. ?, !");
   IElementType AT_OPERATOR = new ElixirTokenType("@");
@@ -325,6 +328,7 @@ public interface ElixirTypes {
   IElementType STRING_SIGIL_TERMINATOR = new ElixirTokenType("String Sigil Terminator ({, [, <, \", /, (, |, ')");
   IElementType STRING_TERMINATOR = new ElixirTokenType("String Terminator (\")");
   IElementType STRUCT_OPERATOR = new ElixirTokenType("%");
+  IElementType THREE_OPERATOR = new ElixirTokenType("^^^");
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
@@ -719,6 +723,9 @@ public interface ElixirTypes {
       else if (type == MATCHED_RELATIONAL_OPERATION) {
         return new ElixirMatchedRelationalOperationImpl(node);
       }
+      else if (type == MATCHED_THREE_OPERATION) {
+        return new ElixirMatchedThreeOperationImpl(node);
+      }
       else if (type == MATCHED_TWO_OPERATION) {
         return new ElixirMatchedTwoOperationImpl(node);
       }
@@ -842,6 +849,9 @@ public interface ElixirTypes {
       else if (type == STRUCT_OPERATION) {
         return new ElixirStructOperationImpl(node);
       }
+      else if (type == THREE_INFIX_OPERATOR) {
+        return new ElixirThreeInfixOperatorImpl(node);
+      }
       else if (type == TUPLE) {
         return new ElixirTupleImpl(node);
       }
@@ -931,6 +941,9 @@ public interface ElixirTypes {
       }
       else if (type == UNMATCHED_RELATIONAL_OPERATION) {
         return new ElixirUnmatchedRelationalOperationImpl(node);
+      }
+      else if (type == UNMATCHED_THREE_OPERATION) {
+        return new ElixirUnmatchedThreeOperationImpl(node);
       }
       else if (type == UNMATCHED_TWO_OPERATION) {
         return new ElixirUnmatchedTwoOperationImpl(node);

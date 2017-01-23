@@ -21,7 +21,17 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
         return com.intellij.openapi.projectRoots.SdkType.findInstance(SdkType.class);
     }
 
-    public SdkType() {
+    public static boolean pathIsValidSdkHome(String path) {
+        File bin = new File(path, "bin").getAbsoluteFile();
+        File elixir = new File(bin, "elixir");
+        File elixirc = new File(bin, "elixirc");
+        File iex = new File(bin, "iex");
+        File mix = new File(bin, "mix");
+
+        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
+    }
+
+    SdkType() {
         super("Elixir SDK");
     }
 
@@ -38,13 +48,7 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
 
     @Override
     public boolean isValidSdkHome(String path) {
-        File bin = new File(path, "bin").getAbsoluteFile();
-        File elixir = new File(bin, "elixir");
-        File elixirc = new File(bin, "elixirc");
-        File iex = new File(bin, "iex");
-        File mix = new File(bin, "mix");
-
-        return elixir.canExecute() && elixirc.canExecute() && iex.canExecute() && mix.canExecute();
+        return pathIsValidSdkHome(path);
     }
 
     @Nullable
@@ -56,8 +60,8 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
     }
 
     @Override
-    public void saveAdditionalData(SdkAdditionalData additionalData, Element additional) {
-
+    public void saveAdditionalData(@NotNull SdkAdditionalData additionalData, @NotNull Element additional) {
+        // No additionalData
     }
 
     @Nullable
@@ -90,6 +94,7 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
         String sdkHome = sdkModificator.getHomePath();
         File lib = new File(sdkHome, "lib");
 
+        //noinspection ConstantConditions
         for (File library : lib.listFiles()) {
             File beams = new File(library, "ebin");
 
@@ -129,6 +134,7 @@ public class SdkType extends com.intellij.openapi.projectRoots.SdkType {
             File homebrewRoot = new File("/usr/local/Cellar/elixir");
 
             if (homebrewRoot.isDirectory()) {
+                //noinspection ConstantConditions
                 for (File child : homebrewRoot.listFiles()) {
                     if (child.isDirectory()) {
                         String versionString = child.getName();
