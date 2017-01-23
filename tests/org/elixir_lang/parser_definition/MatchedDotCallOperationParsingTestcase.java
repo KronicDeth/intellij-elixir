@@ -155,4 +155,11 @@ public class MatchedDotCallOperationParsingTestcase extends ParsingTestCase {
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/matched_dot_call_operation_parsing_test_case";
     }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        registerProjectFileIndex();
+    }
 }

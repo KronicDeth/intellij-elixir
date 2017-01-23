@@ -24,7 +24,9 @@ public class AtomParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testSingleQuotedInterpolation() {
+    public void testSingleQuotedInterpolation() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

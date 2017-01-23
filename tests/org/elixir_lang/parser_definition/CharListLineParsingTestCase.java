@@ -18,7 +18,9 @@ public class CharListLineParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEscapeSequences() {
+    public void testEscapeSequences() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

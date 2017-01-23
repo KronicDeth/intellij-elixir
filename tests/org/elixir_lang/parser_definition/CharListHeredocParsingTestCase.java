@@ -1,7 +1,5 @@
 package org.elixir_lang.parser_definition;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * Created by luke.imhoff on 8/8/14.
  */
@@ -10,21 +8,25 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedAroundError();
     }
 
-    public void testEmptyHexadecimalEscapeSequence() {
+    public void testEmptyHexadecimalEscapeSequence() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEmptyUnicodeEscapeSequence() {
+    public void testEmptyUnicodeEscapeSequence() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedAroundExit();
     }
 
-    public void testEscapeSequences() {
+    public void testEscapeSequences() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testInterpolation()
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
-            IllegalAccessException {
+    public void testInterpolation() throws Exception {
         setProjectSdkFromEbinDirectory();
 
         assertParsedAndQuotedCorrectly();
@@ -34,7 +36,9 @@ public class CharListHeredocParsingTestCase extends ParsingTestCase {
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testWhitespaceEndPrefix() {
+    public void testWhitespaceEndPrefix() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedAroundError();
     }
 

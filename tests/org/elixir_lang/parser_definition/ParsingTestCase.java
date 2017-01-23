@@ -184,6 +184,12 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         return directoryIndex;
     }
 
+    protected void registerProjectFileIndex()
+            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException,
+            IllegalAccessException {
+        registerProjectFileIndex(messageBus());
+    }
+
     private void registerProjectFileIndex(MessageBus messageBus)
             throws ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
             InvocationTargetException {
@@ -204,22 +210,31 @@ public abstract class ParsingTestCase extends com.intellij.testFramework.Parsing
         ModuleManager moduleManager = null;
 
         try {
-            // IntelliJ 2016.X
+            // IntelliJ > 2016.3
             moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
                     Project.class
             );
             moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject);
-        } catch (NoSuchMethodException e) {
-            moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
-                    Project.class,
-                    ProgressManager.class,
-                    MessageBus.class
-            );
-            moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(
-                    myProject,
-                    new ProgressManagerImpl(),
-                    messageBus
-            );
+        } catch (NoSuchMethodException e1) {
+            try {
+                // IntelliJ 2016.3
+                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
+                        Project.class,
+                        MessageBus.class
+                );
+                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(myProject, messageBus);
+            } catch (NoSuchMethodException e2) {
+                moduleManagerComponentConstructor = moduleManagerComponentClass.getConstructor(
+                        Project.class,
+                        ProgressManager.class,
+                        MessageBus.class
+                );
+                moduleManager = (ModuleManager) moduleManagerComponentConstructor.newInstance(
+                        myProject,
+                        new ProgressManagerImpl(),
+                        messageBus
+                );
+            }
         }
 
         myProject.registerService(ModuleManager.class, moduleManager);

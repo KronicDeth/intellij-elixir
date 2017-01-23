@@ -177,7 +177,9 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testStringHeredoc() {
+    public void testStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -185,7 +187,9 @@ public class MatchedQualifiedAliasOperationParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testCharListHeredoc() {
+    public void testCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 

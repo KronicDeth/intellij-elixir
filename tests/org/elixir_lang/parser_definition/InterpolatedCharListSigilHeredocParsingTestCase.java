@@ -28,4 +28,11 @@ public class InterpolatedCharListSigilHeredocParsingTestCase extends ParsingTest
     protected String getTestDataPath() {
         return super.getTestDataPath() + "/interpolated_char_list_sigil_heredoc_parsing_test_case";
     }
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+
+        registerProjectFileIndex();
+    }
 }

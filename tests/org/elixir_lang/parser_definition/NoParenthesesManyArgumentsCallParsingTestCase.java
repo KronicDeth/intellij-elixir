@@ -52,7 +52,9 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueCharListHeredoc() {
+    public void testKeywordValueCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -108,7 +110,9 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testKeywordValueStringHeredoc() {
+    public void testKeywordValueStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -140,7 +144,9 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalCharListHeredoc() {
+    public void testPositionalCharListHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
@@ -256,7 +262,9 @@ public class NoParenthesesManyArgumentsCallParsingTestCase extends ParsingTestCa
         assertParsedAndQuotedCorrectly();
     }
 
-    public void testPositionalStringHeredoc() {
+    public void testPositionalStringHeredoc() throws Exception {
+        registerProjectFileIndex();
+
         assertParsedAndQuotedCorrectly();
     }
 
