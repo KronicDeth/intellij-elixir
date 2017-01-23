@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>4.8.0</version>
+  <version>5.0.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v4.8.0</h1>
+      <h1>v5.0.0</h1>
       <ul>
         <li>
           <p>Enhancements</p>
@@ -47,6 +47,25 @@
                 <li>Header for macro and function sections</li>
               </ul>
             </li>
+            <li>
+              Update <code>ELIXIR_VERSION</code> for <code>1.2.*</code> from <code>1.2.3</code> to <code>1.2.6</code>
+            </li>
+            <li>Add <code>ELIXIR_VERSION</code> <code>1.3.4</code></li>
+            <li>Add <code>ELIXIR_VERSION</code> <code>1.4.0</code></li>
+            <li>Update <code>IDEA</code> for <code>2016.*</code> to <code>2016.3.1</code></li>
+            <li>
+              Show <code>OtpErlangBitStr</code> (and therefore <code>OtpErlangBinary</code> contents when tests fail
+            </li>
+            <li>
+              Quote binaries as <code>to_charlist</code> instead of <code>to_char_list</code> for Elixir
+              <code>&lt;= 1.3</code>.  Depends on Elixir version of project SDK.
+            </li>
+            <li>
+              Use <code>elixir</code> instead of <code>java</code> VM, so now Erlang and Elixir don't need to be built
+              on travis-ci, but <code>ant</code> and the <code>jdk</code> need to be installed, but unlike Erlang and
+              Elixir, there are tarballs for that, so this way is faster than the old method without depending on
+              Travis-CI cache.
+            </li>
           </ul>
         </li>
         <li>
@@ -77,6 +96,22 @@
               Prefix operator decompilation: <code>+</code> and <code>-</code> are both binary and unary operators.
               When a unary operator they need to be wrapped in parentheses, so that the call definition clause is parsed
               correctly.
+            </li>
+            <li>Ignore <code>JFLex</code> jar</li>
+            <li>Don't check for <code>elixir-lang/elixr</code> files remove in <code>1.3</code></li>
+            <li>
+              Allow <code>nil</code> as a keyword key.  <code>nil</code> was being lexed as a potential keyword key, but
+              <code>NIL</code> was missing from the token list in the keywordKey grammar rule.
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>
+              Move <code>^^^</code> to its own three-operator precedence level to match <code>1.2</code>.  This does
+              mean the parsing will be wrong for Elixir <code>1.1</code>, but is simpler than maintaining two grammars
+              for those that are still using Elixir <code>1.1</code>.
             </li>
           </ul>
         </li>
@@ -2252,6 +2287,7 @@
       </action>
       <separator/>
 
+      <!--suppress PluginXmlValidity -->
       <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewXml" />
     </group>
   </actions>

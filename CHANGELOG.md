@@ -100,7 +100,7 @@
 
 # Changelog
 
-## v4.8.0
+## v5.0.0
 
 ### Enhancements
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - [@KronicDeth](https://github.com/KronicDeth)
@@ -118,6 +118,14 @@
 * [#583](https://github.com/KronicDeth/intellij-elixir/pull/583) - [@KronicDeth](https://github.com/KronicDeth)
   * Macros appear before functions in decompiled `.beam` files
     * Header for macro and function sections
+* [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - [@KronicDeth](https://github.com/KronicDeth)
+  * Update `ELIXIR_VERSION` for `1.2.*` from `1.2.3` to `1.2.6`
+  * Add `ELIXIR_VERSION` `1.3.4`
+  * Add `ELIXIR_VERSION` `1.4.0`
+  * Update `IDEA` for `2016.*` to `2016.3.1`
+  * Show `OtpErlangBitStr` (and therefore `OtpErlangBinary` contents when tests fail
+  * Quote binaries as `to_charlist` instead of `to_char_list` for Elixir `>= 1.3`.  Depends on Elixir version of project SDK.
+  * Use `elixir` instead of `java` VM, so now Erlang and Elixir don't need to be built on travis-ci, but `ant` and the `jdk` need to be installed, but unlike Erlang and Elixir, there are tarballs for that, so this way is faster than the old method without depending on travis-ci cache.
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -130,6 +138,13 @@
   * Add `++`, `=~`, and `in` to `INFIX_OPERATOR_SET`.
   * Only render infix operators if arity is `2`.
   * Prefix operator decompilation: `+` and `-` are both binary and unary operators.  When a unary operator they need to be wrapped in parentheses, so that the call definition clause is parsed correctly.
+* [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `JFLex` jar
+  * Don't check for `elixir-lang/elixr` files remove in `1.3`
+  * Allow `nil` as a keyword key.  `nil` was being lexed as a potential keyword key, but NIL was missing from the token list in the keywordKey grammar rule.
+
+### Incompatible Changes
+* [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.7.0
 
