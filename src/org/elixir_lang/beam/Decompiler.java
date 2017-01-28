@@ -12,6 +12,7 @@ import org.elixir_lang.beam.chunk.exports.Export;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
+import org.elixir_lang.beam.decompiler.SpecialForm;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +29,7 @@ public class Decompiler implements BinaryFileDecompiler {
     static {
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(SpecialForm.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
     }
 
