@@ -61,6 +61,7 @@ public abstract class Variable implements PsiScopeProcessor {
                 element instanceof ElixirBitString ||
                 element instanceof ElixirList ||
                 element instanceof ElixirMapConstructionArguments ||
+                element instanceof ElixirMultipleAliases ||
                 element instanceof ElixirNoParenthesesArguments ||
                 element instanceof ElixirNoParenthesesOneArgument ||
                 element instanceof ElixirParenthesesArguments ||
