@@ -173,6 +173,7 @@ public class Parameter {
                     parent instanceof ElixirDoBlock ||
                     parent instanceof ElixirInterpolation ||
                     parent instanceof ElixirMapUpdateArguments ||
+                    parent instanceof ElixirMultipleAliases ||
                     parent instanceof ElixirQuoteStringBody ||
                     parent instanceof PsiFile ||
                     parent instanceof QualifiedAlias ||
