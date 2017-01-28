@@ -142,6 +142,7 @@
   * Ignore `JFLex` jar
   * Don't check for `elixir-lang/elixr` files remove in `1.3`
   * Allow `nil` as a keyword key.  `nil` was being lexed as a potential keyword key, but NIL was missing from the token list in the keywordKey grammar rule.
+* [#599](https://github.com/KronicDeth/intellij-elixir/pull/599) - Some SpecialForms don't work as literals as they would be interpreted as metaprogramming, so their name needs to be wrapped as an atom to `unquote`. -  [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

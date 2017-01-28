@@ -22,6 +22,9 @@
       <env name="ELIXIR_VERSION" value="1.1.1" />
     </envs>
     <patterns />
-    <method />
+    <method>
+      <option name="Make" enabled="true" />
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_intellij_elixir" />
+    </method>
   </configuration>
 </component>

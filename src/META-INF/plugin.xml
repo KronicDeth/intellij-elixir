@@ -103,6 +103,10 @@
               Allow <code>nil</code> as a keyword key.  <code>nil</code> was being lexed as a potential keyword key, but
               <code>NIL</code> was missing from the token list in the keywordKey grammar rule.
             </li>
+            <li>
+              Some SpecialForms don't work as literals as they would be interpreted as metaprogramming, so their name
+              needs to be wrapped as an atom to <code>unquote</code>.
+            </li>
           </ul>
         </li>
         <li>
