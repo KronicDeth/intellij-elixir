@@ -107,6 +107,8 @@
               Some SpecialForms don't work as literals as they would be interpreted as metaprogramming, so their name
               needs to be wrapped as an atom to <code>unquote</code>.
             </li>
+            <li>Check children of <code>MultipleAliases</code> for variable declarations.</li>
+            <li>Treat any variable declared in a <code>MultipleAliases</code> as invalid.</li>
           </ul>
         </li>
         <li>
