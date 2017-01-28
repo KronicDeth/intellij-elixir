@@ -10,6 +10,29 @@ public class Default extends MacroNameArity {
 
     public static final MacroNameArity INSTANCE = new Default();
 
+    /*
+     * Static Methods
+     */
+
+    static void appendParameters(@NotNull StringBuilder decompiled,
+                                 @NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
+        decompiled.append("(");
+
+        @Nullable Integer arity = macroNameArity.arity;
+
+        if (arity != null) {
+            for (int i = 0; i < arity; i++) {
+                if (i != 0) {
+                    decompiled.append(", ");
+                }
+
+                decompiled.append("p").append(i);
+            }
+        }
+
+        decompiled.append(")");
+    }
+
     /**
      * Whether the decompiler accepts the {@code macroNameArity}
      *
@@ -31,22 +54,9 @@ public class Default extends MacroNameArity {
                 .append("  ")
                 .append(macroNameArity.macro)
                 .append(" ")
-                .append(macroNameArity.name)
-                .append("(");
+                .append(macroNameArity.name);
 
-        @Nullable Integer arity = macroNameArity.arity;
-
-        if (arity != null) {
-            for (int i = 0; i < arity; i++) {
-                if (i != 0) {
-                    decompiled.append(", ");
-                }
-
-                decompiled.append("p").append(i);
-            }
-        }
-
-        decompiled.append(")");
+        appendParameters(decompiled, macroNameArity);
         appendBody(decompiled);
     }
 }
