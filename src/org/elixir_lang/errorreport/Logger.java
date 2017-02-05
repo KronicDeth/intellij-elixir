@@ -112,6 +112,14 @@ public class Logger {
             excerptBuilder.append(startingLine);
             excerptBuilder.append('-');
             excerptBuilder.append(endingLine);
+
+            VirtualFile virtualFile = containingFile.getVirtualFile();
+
+            if (virtualFile != null) {
+                excerptBuilder.append(" in ");
+                excerptBuilder.append(virtualFile.getPath());
+            }
+
             excerptBuilder.append("\n");
         }
 
