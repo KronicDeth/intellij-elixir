@@ -11,6 +11,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.ElixirSyntaxHighlighter;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +67,15 @@ public class Callable implements Annotator, DumbAware {
                             if (reference instanceof PsiPolyVariantReference) {
                                 PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
 
-                                ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
+                                ResolveResult[] resolveResults;
+
+                                try {
+                                    resolveResults = polyVariantReference.multiResolve(false);
+                                } catch (StackOverflowError stackOverflowError) {
+                                    Logger.error(Callable.class, "StackOverflowError when annotating Call", call);
+                                    resolveResults = new ResolveResult[0];
+                                }
+
                                 List<ResolveResult> validResolveResults = ContainerUtil.filter(
                                         resolveResults,
                                         new Condition<ResolveResult>() {
