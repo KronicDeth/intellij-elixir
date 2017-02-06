@@ -4909,6 +4909,25 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
+    public static boolean recursiveKernelImport(@NotNull QualifiableAlias qualifiableAlias,
+                                                @NotNull PsiElement maxScope) {
+        boolean recursiveKernelImport = false;
+
+        if (maxScope instanceof ElixirFile) {
+            ElixirFile elixirFile = (ElixirFile) maxScope;
+
+            if (elixirFile.getName().equals("kernel.ex")) {
+                String qualifiableAliasName = qualifiableAlias.getName();
+
+                recursiveKernelImport = qualifiableAliasName != null && qualifiableAliasName.equals(KERNEL);
+            }
+        }
+
+        return recursiveKernelImport;
+    }
+
+    @Contract(pure = true)
+    @NotNull
     public static int resolvedFinalArity(@NotNull final Call call) {
         Integer resolvedFinalArity = call.resolvedSecondaryArity();
 
@@ -5631,10 +5650,13 @@ if (quoted == null) {
 
         if (maybeQualifiableAlias instanceof QualifiableAlias) {
             QualifiableAlias qualifiableAlias = (QualifiableAlias) maybeQualifiableAlias;
-            /* need to construct reference directly as qualified aliases don't return a
-               reference except for the outermost */
-            PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
-            modular = aliasToModular(qualifiableAlias, reference);
+
+            if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
+                /* need to construct reference directly as qualified aliases don't return a reference except for the
+                   outermost */
+                PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
+                modular = aliasToModular(qualifiableAlias, reference);
+            }
         }
 
         return modular;
