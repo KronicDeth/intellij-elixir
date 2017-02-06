@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.util.Function;
+import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.Import;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Module;
@@ -80,15 +81,19 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
         } else if (Import.is(element)) {
             final ResolveState importState = state.put(IMPORT_CALL, element);
 
-            Import.callDefinitionClauseCallWhile(
-                    element,
-                    new Function<Call,Boolean>() {
-                        @Override
-                        public Boolean fun(Call callDefinitionClause) {
-                            return executeOnCallDefinitionClause(callDefinitionClause, importState);
+            try {
+                Import.callDefinitionClauseCallWhile(
+                        element,
+                        new Function<Call, Boolean>() {
+                            @Override
+                            public Boolean fun(Call callDefinitionClause) {
+                                return executeOnCallDefinitionClause(callDefinitionClause, importState);
+                            }
                         }
-                    }
-            );
+                );
+            } catch (StackOverflowError stackOverflowError) {
+                Logger.error(CallDefinitionClause.class, "StackOverflowError while processing import", element);
+            }
         } else if (Module.is(element)) {
             Call[] childCalls = macroChildCalls(element);
 
