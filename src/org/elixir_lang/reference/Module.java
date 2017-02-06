@@ -1,6 +1,7 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
@@ -79,13 +81,19 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
                                                     @NotNull String name) {
         List<ResolveResult> results = new ArrayList<ResolveResult>();
 
-        Collection<NamedElement> namedElementCollection = StubIndex.getElements(
-                AllName.KEY,
-                name,
-                project,
-                GlobalSearchScope.allScope(project),
-                NamedElement.class
-        );
+        Collection<NamedElement> namedElementCollection;
+
+        if (DumbService.isDumb(project)) {
+            namedElementCollection = Collections.emptyList();
+        } else {
+            namedElementCollection = StubIndex.getElements(
+                    AllName.KEY,
+                    name,
+                    project,
+                    GlobalSearchScope.allScope(project),
+                    NamedElement.class
+            );
+        }
 
         for (NamedElement namedElement : namedElementCollection) {
             /* The NamedElement may be a ModuleImpl from a .beam.  Using #getNaviationElement() ensures a source
