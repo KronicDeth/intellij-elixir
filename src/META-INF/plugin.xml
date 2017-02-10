@@ -140,6 +140,11 @@
               <code>CallDefinitionCluase.renderElement</code>
             </li>
             <li>Update to <code>ant</code> <code>1.10.1</code> because <code>1.10.0</code> is no longer hosted.</li>
+            <li>
+              Yeah, it sounds weird, but an `ElixirVariable` isn't necessarily a variable if it doesn't occur in a
+              declaration context.  It could just be a no-parentheses function call in the wrong spot, so check the
+              parent `PsiElement` to determine if `ElixirVariable` is a variable.
+            </li>
           </ul>
         </li>
         <li>
