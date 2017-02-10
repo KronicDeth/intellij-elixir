@@ -68,9 +68,9 @@ before_install:
 - tar xvfz jdk-8u112-linux-x64.tar.gz
 - export JAVA_HOME=${PWD}/jdk1.8.0_112
 - export PATH=${JAVA_HOME}/bin:${PATH}
-- wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.10.0-bin.tar.gz
-- tar xvfz apache-ant-1.10.0-bin.tar.gz
-- export PATH=${PWD}/apache-ant-1.10.0/bin:${PATH}
+- wget http://www-us.apache.org/dist//ant/binaries/apache-ant-1.10.1-bin.tar.gz
+- tar xvfz apache-ant-1.10.1-bin.tar.gz
+- export PATH=${PWD}/apache-ant-1.10.1/bin:${PATH}
 - java -version
 - ant -version
 install:

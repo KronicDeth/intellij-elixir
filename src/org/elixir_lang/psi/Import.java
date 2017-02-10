@@ -60,7 +60,14 @@ public class Import {
      */
     public static void callDefinitionClauseCallWhile(@NotNull Call importCall,
                                                      @NotNull final Function<Call, Boolean> function) {
-        Call modularCall = modular(importCall);
+        Call modularCall;
+
+        try {
+            modularCall = modular(importCall);
+        } catch (StackOverflowError stackOverflowError) {
+            Logger.error(Import.class, "StackvoerflowError while finding modular for import", importCall);
+            modularCall = null;
+        }
 
         if (modularCall != null) {
             final Function<Call, Boolean> optionsFilter = callDefinitionClauseCallFilter(importCall);

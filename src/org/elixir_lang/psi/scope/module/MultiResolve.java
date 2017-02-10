@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.scope.module;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.Module.concat;
@@ -42,13 +44,21 @@ public class MultiResolve extends Module {
     private static Collection<NamedElement> indexedNamedElements(@NotNull PsiNamedElement match,
                                                                  @NotNull String unaliasedName) {
         Project project = match.getProject();
-        return StubIndex.getElements(
-                AllName.KEY,
-                unaliasedName,
-                project,
-                GlobalSearchScope.allScope(project),
-                NamedElement.class
-        );
+        Collection<NamedElement> indexNamedElementCollection;
+
+        if (DumbService.isDumb(project)) {
+            indexNamedElementCollection = Collections.emptyList();
+        } else {
+            indexNamedElementCollection = StubIndex.getElements(
+                    AllName.KEY,
+                    unaliasedName,
+                    project,
+                    GlobalSearchScope.allScope(project),
+                    NamedElement.class
+            );
+        }
+
+        return indexNamedElementCollection;
     }
 
     @Nullable

@@ -32,6 +32,7 @@ import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
 import static org.elixir_lang.reference.ModuleAttribute.*;
+import static org.elixir_lang.structure_view.element.CallDefinitionHead.stripAllOuterParentheses;
 
 /**
  * Annotates module attributes.
@@ -578,9 +579,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 if (leftOperand instanceof Type) {
                     Type typeOperation = (Type) leftOperand;
                     PsiElement typeOperationLeftOperand = typeOperation.leftOperand();
+                    PsiElement strippedTypeOperationLeftOperand = null;
 
-                    if (typeOperationLeftOperand instanceof Call) {
-                        Call call = (Call) typeOperationLeftOperand;
+                    if (typeOperationLeftOperand != null) {
+                        strippedTypeOperationLeftOperand = stripAllOuterParentheses(typeOperationLeftOperand);
+                    }
+
+                    if (strippedTypeOperationLeftOperand instanceof Call) {
+                        Call call = (Call) strippedTypeOperationLeftOperand;
                         PsiElement functionNameElement = call.functionNameElement();
 
                         if (functionNameElement != null) {
@@ -613,7 +619,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                             );
                         }
                     } else {
-                        cannotHighlightTypes(typeOperationLeftOperand);
+                        cannotHighlightTypes(strippedTypeOperationLeftOperand);
                     }
 
                     PsiElement matchedTypeOperationRightOperand = typeOperation.rightOperand();
