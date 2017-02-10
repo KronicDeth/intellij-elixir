@@ -126,6 +126,12 @@
   * Show `OtpErlangBitStr` (and therefore `OtpErlangBinary` contents when tests fail
   * Quote binaries as `to_charlist` instead of `to_char_list` for Elixir `>= 1.3`.  Depends on Elixir version of project SDK.
   * Use `elixir` instead of `java` VM, so now Erlang and Elixir don't need to be built on travis-ci, but `ant` and the `jdk` need to be installed, but unlike Erlang and Elixir, there are tarballs for that, so this way is faster than the old method without depending on travis-ci cache.
+* [#609](https://github.com/KronicDeth/intellij-elixir/pull/609) - [@KronicDeth](https://github.com/KronicDeth)
+  * If `multiResolve` causes a `StackOverflow` for `org.elixir_lang.annotator.Callable.visitCall`, then `catch` it and use `errorreport` logger to log the element.
+  * Include file path in `errorreport` excerpt
+  * Log element for `StackOverflow` related to `import`s
+  * Regression test for [#605](https://github.com/KronicDeth/intellij-elixir/issues/605).
+  * Log `LookupElement#getObject` when `LookupElement#getPsiElement` is `null` to track down how it was `null` in [#563](https://github.com/KronicDeth/intellij-elixir/issues/563).
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -146,6 +152,12 @@
 * [#600](https://github.com/KronicDeth/intellij-elixir/pull/600) - [@KronicDeth](https://github.com/KronicDeth)
   * Check children of `MultipleAliases` for variable declarations.
   * Treat any variable declared in a `MultipleAliases` as invalid.
+* [#609](https://github.com/KronicDeth/intellij-elixir/pull/609) - [@KronicDeth](https://github.com/KronicDeth)
+  * Skip `import Kernel` in `kernel.ex` to prevent stack overflow due to recursive `import`
+  * Strip all outer parentheses for left type operand, so that `(+value)` can be see as `+` operator type spec.
+  * Use advice from `IndexNotReadyException` documentation and check `DumbService.isDumb(Project)` before calling `StubIndex.getElements` in `Module` and `module.MultiResolve.indexNameElements`.
+  * Don't `assert` that `LookupElement#getPsiElement` is not `null` in `CallDefinitionCluase.renderElement`
+  * Update to `ant` `1.10.1` because `1.10.0` is no longer hosted.
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

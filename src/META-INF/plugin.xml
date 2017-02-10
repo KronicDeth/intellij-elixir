@@ -66,6 +66,19 @@
               Elixir, there are tarballs for that, so this way is faster than the old method without depending on
               Travis-CI cache.
             </li>
+            <li>
+              If <code>multiResolve</code> causes a <code>StackOverflow</code> for
+              <code>org.elixir_lang.annotator.Callable.visitCall</code>, then <code>catch</code> it and use
+              <code>errorreport</code> logger to log the element.
+            </li>
+            <li>Include file path in <code>errorreport</code> excerpt</li>
+            <li>Log element for <code>StackOverflow</code> related to <code>import</code>s</li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/605">#605</a>.</li>
+            <li>
+              Log <code>LookupElement#getObject</code> when <code>LookupElement#getPsiElement</code> is
+              <code>null</code> to track down how it was <code>null</code> in
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/563">#563</a>.
+            </li>
           </ul>
         </li>
         <li>
@@ -109,6 +122,24 @@
             </li>
             <li>Check children of <code>MultipleAliases</code> for variable declarations.</li>
             <li>Treat any variable declared in a <code>MultipleAliases</code> as invalid.</li>
+            <li>
+              Skip <code>import Kernel</code> in <code>kernel.ex</code> to prevent stack overflow due to recursive
+              <code>import</code>
+            </li>
+            <li>
+              Strip all outer parentheses for left type operand, so that <code>(+value)</code> can be see as
+              <code>+</code> operator type spec.
+            </li>
+            <li>
+              Use advice from <code>IndexNotReadyException</code> documentation and check
+              <code>DumbService.isDumb(Project)</code> before calling <code>StubIndex.getElements</code> in
+              <code>Module</code> and <code>module.MultiResolve.indexNameElements</code>.
+            </li>
+            <li>
+              Don't <code>assert</code> that <code>LookupElement#getPsiElement</code> is not <code>null</code> in
+              <code>CallDefinitionCluase.renderElement</code>
+            </li>
+            <li>Update to <code>ant</code> <code>1.10.1</code> because <code>1.10.0</code> is no longer hosted.</li>
           </ul>
         </li>
         <li>
