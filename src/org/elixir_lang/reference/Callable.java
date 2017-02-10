@@ -271,6 +271,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
                 ancestor instanceof ElixirStabBody ||
                 ancestor instanceof ElixirStructOperation ||
                 ancestor instanceof ElixirTuple ||
+                ancestor instanceof ElixirVariable ||
                 ancestor instanceof QualifiedAlias ||
                 ancestor instanceof Type) {
             isVariable = isVariable(ancestor.getParent());
