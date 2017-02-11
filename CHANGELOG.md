@@ -132,6 +132,7 @@
   * Log element for `StackOverflow` related to `import`s
   * Regression test for [#605](https://github.com/KronicDeth/intellij-elixir/issues/605).
   * Log `LookupElement#getObject` when `LookupElement#getPsiElement` is `null` to track down how it was `null` in [#563](https://github.com/KronicDeth/intellij-elixir/issues/563).
+* [#614](https://github.com/KronicDeth/intellij-elixir/pull/614) - Regression test for [#559](https://github.com/KronicDeth/intellij-elixir/issues/559) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -159,6 +160,7 @@
   * Don't `assert` that `LookupElement#getPsiElement` is not `null` in `CallDefinitionCluase.renderElement`
   * Update to `ant` `1.10.1` because `1.10.0` is no longer hosted.
 * [#612](https://github.com/KronicDeth/intellij-elixir/pull/612) - Yeah, it sounds weird, but an `ElixirVariable` isn't necessarily a variable if it doesn't occur in a declaration context.  It could just be a no-parentheses function call in the wrong spot, so check the parent `PsiElement` to determine if `ElixirVariable` is a variable. - [@KronicDeth](https://github.com/KronicDeth)
+* [#614](https://github.com/KronicDeth/intellij-elixir/pull/614) - Highlight parameterized type head (`maybe(t)` in `@type maybe(t)`) the same as a full type definition (`maybe(t)` in `@type maybe(t) :: t | nil`) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

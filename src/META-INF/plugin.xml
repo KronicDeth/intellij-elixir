@@ -79,6 +79,9 @@
               <code>null</code> to track down how it was <code>null</code> in
               <a href="https://github.com/KronicDeth/intellij-elixir/issues/563">#563</a>.
             </li>
+            <li>
+              Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/559">#559</a>
+            </li>
           </ul>
         </li>
         <li>
@@ -144,6 +147,10 @@
               Yeah, it sounds weird, but an `ElixirVariable` isn't necessarily a variable if it doesn't occur in a
               declaration context.  It could just be a no-parentheses function call in the wrong spot, so check the
               parent `PsiElement` to determine if `ElixirVariable` is a variable.
+            </li>
+            <li>
+              Highlight parameterized type head (<code>maybe(t)</code> in <code>@type maybe(t)</code>) the same as a
+              full type definition (<code>maybe(t)</code> in <code>@type maybe(t) :: t | nil</code>)
             </li>
           </ul>
         </li>
