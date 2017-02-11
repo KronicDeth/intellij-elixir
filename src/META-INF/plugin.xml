@@ -152,6 +152,10 @@
               Highlight parameterized type head (<code>maybe(t)</code> in <code>@type maybe(t)</code>) the same as a
               full type definition (<code>maybe(t)</code> in <code>@type maybe(t) :: t | nil</code>)
             </li>
+            <li>
+              Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project
+              SDK is Elixir.  If there is no SDK configured, show "Mix ExUnit Run" in the menu.
+            </li>
           </ul>
         </li>
         <li>
