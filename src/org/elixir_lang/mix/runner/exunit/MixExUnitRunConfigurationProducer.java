@@ -4,12 +4,19 @@ import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.RunConfigurationProducer;
 import com.intellij.ide.projectView.impl.ProjectRootsUtil;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.SdkTypeId;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.elixir_lang.psi.ElixirFile;
+import org.elixir_lang.sdk.ElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +55,25 @@ public class MixExUnitRunConfigurationProducer extends RunConfigurationProducer<
     if (psiElement instanceof PsiDirectory) {
       PsiDirectory psiDirectory = (PsiDirectory) psiElement;
 
-      if (ProjectRootsUtil.isInTestSource(psiDirectory.getVirtualFile(),  psiDirectory.getProject())) {
+      Module module = ModuleUtilCore.findModuleForPsiElement(psiDirectory);
+      Sdk sdk;
+
+      if (module != null) {
+        ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+        sdk = moduleRootManager.getSdk();
+      } else {
+        ProjectRootManager projectRootManager = ProjectRootManager.getInstance(psiDirectory.getProject());
+        sdk = projectRootManager.getProjectSdk();
+      }
+
+      SdkTypeId sdkTypeId = null;
+
+      if (sdk != null) {
+        sdkTypeId = sdk.getSdkType();
+      }
+
+      if ((sdkTypeId == null || sdkTypeId.equals(ElixirSdkType.getInstance())) &&
+              ProjectRootsUtil.isInTestSource(psiDirectory.getVirtualFile(),  psiDirectory.getProject())) {
         String basePath = psiElement.getProject().getBasePath();
         String workingDirectory = workingDirectory(psiElement, basePath);
 
