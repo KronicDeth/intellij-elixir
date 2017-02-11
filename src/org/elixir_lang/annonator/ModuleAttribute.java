@@ -15,7 +15,6 @@ import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Infix;
 import org.elixir_lang.psi.operation.Match;
 import org.elixir_lang.psi.operation.Type;
@@ -280,52 +279,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 if (leftOperand instanceof Call) {
                     Call call = (Call) leftOperand;
-                    PsiElement functionNameElement = call.functionNameElement();
 
-                    if (functionNameElement != null) {
-                        highlight(
-                                functionNameElement.getTextRange(),
-                                annotationHolder,
-                                ElixirSyntaxHighlighter.TYPE
-                        );
-                    }
+                    highlightTypeName(call, annotationHolder);
 
                     if (call instanceof ElixirMatchedUnqualifiedNoArgumentsCall) {
                         // no arguments, so nothing else to do
                     } else if (call instanceof ElixirMatchedUnqualifiedParenthesesCall) {
-                        PsiElement[] primaryArguments = call.primaryArguments();
-                        PsiElement[] secondaryArguments = call.secondaryArguments();
-
-                        /* if there are secondaryArguments, then it is the type parameters as in
-                           `@type quote(type_name)(param1, param2) :: {param1, param2}` */
-                        if (secondaryArguments != null) {
-                            typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments);
-
-                            highlightTypesAndTypeParameterUsages(
-                                    primaryArguments,
-                                    /* as stated above, if there are secondary arguments, then the primary arguments are
-                                       to quote or some equivalent metaprogramming. */
-                                    Collections.<String>emptySet(),
-                                    annotationHolder,
-                                    ElixirSyntaxHighlighter.TYPE
-                            );
-
-                            highlightTypesAndTypeTypeParameterDeclarations(
-                                    secondaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    ElixirSyntaxHighlighter.TYPE
-                            );
-                        } else if (primaryArguments != null) {
-                            typeParameterNameSet = typeTypeParameterNameSet(primaryArguments);
-
-                            highlightTypesAndTypeTypeParameterDeclarations(
-                                    primaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    ElixirSyntaxHighlighter.TYPE
-                            );
-                        }
+                        typeParameterNameSet = highlightTypeLeftOperand(
+                                (ElixirMatchedUnqualifiedParenthesesCall) call,
+                                annotationHolder
+                        );
                     } else {
                         cannotHighlightTypes(call);
                     }
@@ -361,7 +324,15 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         );
                     }
                 } else {
-                    cannotHighlightTypes(matchedUnqualifiedParenthesesCall);
+                    ElixirMatchedUnqualifiedParenthesesCall grandChildCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
+
+                    highlightTypeName(grandChildCall, annotationHolder);
+
+                    // Assume it's `@type foo(bar)` before completed as `@type foo(bar) :: bar`
+                    highlightTypeLeftOperand(
+                            (ElixirMatchedUnqualifiedParenthesesCall) grandChild,
+                            annotationHolder
+                    );
                 }
             } else if (grandChild instanceof QuotableKeywordList) {
                 QuotableKeywordList quotableKeywordList = (QuotableKeywordList) grandChild;
@@ -441,6 +412,58 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
     private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull String message) {
         annotationHolder.createErrorAnnotation(element, message);
+    }
+
+    private Set<String> highlightTypeLeftOperand(@NotNull final ElixirMatchedUnqualifiedParenthesesCall call,
+                                                 @NotNull final AnnotationHolder annotationHolder) {
+        PsiElement[] primaryArguments = call.primaryArguments();
+        PsiElement[] secondaryArguments = call.secondaryArguments();
+        Set<String> typeParameterNameSet;
+
+        /* if there are secondaryArguments, then it is the type parameters as in
+           `@type quote(type_name)(param1, param2) :: {param1, param2}` */
+        if (secondaryArguments != null) {
+            typeParameterNameSet = typeTypeParameterNameSet(secondaryArguments);
+
+            highlightTypesAndTypeParameterUsages(
+                    primaryArguments,
+                    /* as stated above, if there are secondary arguments, then the primary arguments are
+                       to quote or some equivalent metaprogramming. */
+                    Collections.<String>emptySet(),
+                    annotationHolder,
+                    ElixirSyntaxHighlighter.TYPE
+            );
+
+            highlightTypesAndTypeTypeParameterDeclarations(
+                    secondaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    ElixirSyntaxHighlighter.TYPE
+            );
+        } else {
+            typeParameterNameSet = typeTypeParameterNameSet(primaryArguments);
+
+            highlightTypesAndTypeTypeParameterDeclarations(
+                    primaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    ElixirSyntaxHighlighter.TYPE
+            );
+        }
+
+        return typeParameterNameSet;
+    }
+
+    private void highlightTypeName(@NotNull final Call call, @NotNull AnnotationHolder annotationHolder) {
+        PsiElement functionNameElement = call.functionNameElement();
+
+        if (functionNameElement != null) {
+            highlight(
+                    functionNameElement.getTextRange(),
+                    annotationHolder,
+                    ElixirSyntaxHighlighter.TYPE
+            );
+        }
     }
 
     private void highlightTypesAndTypeTypeParameterDeclarations(ElixirUnmatchedUnqualifiedNoArgumentsCall psiElement,
