@@ -125,7 +125,7 @@ end
 
   \n #{\x{ff}}</documentation-text>
   '''
-  <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter> \\ []), do: :ok
+  <predefined-call><macro-call>def</macro-call></predefined-call> func(<parameter>a</parameter>, <parameter>b</parameter> \\ []), <atom>do:</atom> :ok
 
   <documentation-module-attribute>@doc</documentation-module-attribute> false
   <predefined-call><macro-call>def</macro-call></predefined-call> __before_compile__(<ignored>_</ignored>) do
