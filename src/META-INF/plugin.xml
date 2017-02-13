@@ -156,6 +156,7 @@
               Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project
               SDK is Elixir.  If there is no SDK configured, show "Mix ExUnit Run" in the menu.
             </li>
+            <li>Mark <code>do:</code> as atom in demo text</li>
           </ul>
         </li>
         <li>
