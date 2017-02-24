@@ -164,6 +164,7 @@
 * [#614](https://github.com/KronicDeth/intellij-elixir/pull/614) - Highlight parameterized type head (`maybe(t)` in `@type maybe(t)`) the same as a full type definition (`maybe(t)` in `@type maybe(t) :: t | nil`) - [@KronicDeth](https://github.com/KronicDeth)
 * [#616](https://github.com/KronicDeth/intellij-elixir/pull/616) - Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project SDK is Elixir.  If there is no SDK configured, show "Mix ExUnit Run" in the menu. - [@KronicDeth](https://github.com/KronicDeth)
 * [#617](https://github.com/KronicDeth/intellij-elixir/pull/617) - Mark `do:` as atom in demo text - [@KronicDeth](https://github.com/KronicDeth)
+* [#627](https://github.com/KronicDeth/intellij-elixir/pull/627) - Annotations can only be applied to the single, active file, which belongs to the `referrer` `Callable`.  The `resolved` may be outside the file if it is a cross-file function or macro usage, in which case it's `TextRange` should not be highlighted because it is referring to offsets in a different file. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

@@ -157,6 +157,12 @@
               SDK is Elixir.  If there is no SDK configured, show "Mix ExUnit Run" in the menu.
             </li>
             <li>Mark <code>do:</code> as atom in demo text</li>
+            <li>
+              Annotations can only be applied to the single, active file, which belongs to the <code>referrer</code>
+              <code>Callable</code>.  The <code>resolved</code> may be outside the file if it is a cross-file function
+              or macro usage, in which case it's <code>TextRange</code> should not be highlighted because it is
+              referring to offsets in a different file.
+            </li>
           </ul>
         </li>
         <li>
