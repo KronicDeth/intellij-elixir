@@ -6,8 +6,10 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.ElixirSyntaxHighlighter;
@@ -166,7 +168,9 @@ public class Callable implements Annotator, DumbAware {
             highlight(referrer, rangeInReferrer, annotationHolder, referrerTextAttributesKey);
         }
 
-        if (resolvedTextAttributesKey != null) {
+        /* Annotations can only be applied to the single, active file, which belongs to the referrer.  The resolved
+           may be outside the file if it is a cross-file function or macro usage */
+        if (resolvedTextAttributesKey != null && sameFile(referrer, resolved)) {
             highlight(resolved, annotationHolder, resolvedTextAttributesKey);
         }
     }
@@ -208,5 +212,14 @@ public class Callable implements Annotator, DumbAware {
                 .setEnforcedTextAttributes(
                         EditorColorsManager.getInstance().getGlobalScheme().getAttributes(textAttributesKey)
                 );
+    }
+
+    private boolean sameFile(@NotNull PsiElement referrer, @NotNull PsiElement resolved) {
+        @NotNull PsiFile referrerPsiFile = referrer.getContainingFile();
+        VirtualFile referrerVirtualFile = referrerPsiFile.getVirtualFile();
+        @NotNull PsiFile resolvedPsiFile = resolved.getContainingFile();
+        VirtualFile resolvedVirtualFile = resolvedPsiFile.getVirtualFile();
+
+        return Comparing.equal(referrerVirtualFile, resolvedVirtualFile);
     }
 }
