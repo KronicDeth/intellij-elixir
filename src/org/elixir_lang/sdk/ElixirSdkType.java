@@ -24,8 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
-import java.io.File;
+import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
@@ -35,7 +36,7 @@ public class ElixirSdkType extends SdkType {
     private final Map<String, ElixirSdkRelease> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
-    public ElixirSdkType() {
+    private static final Pattern NIX_PATTERN = Pattern.compile(".+-elixir-(\\d+)\\.(\\d+)\\.(\\d+)");public ElixirSdkType() {
         super(JpsElixirModelSerializerExtension.ELIXIR_SDK_TYPE_ID);
     }
 
@@ -310,6 +311,29 @@ public class ElixirSdkType extends SdkType {
                             homePathByVersion.put(version, child.getAbsolutePath());
                         }
                     }
+                }
+            } else {
+                File nixOSRoot = new File("/nix/store/");
+
+                if (nixOSRoot.isDirectory()) {
+                    nixOSRoot.listFiles(
+                            (dir, name) -> {
+                                Matcher matcher = NIX_PATTERN.matcher(name);
+                                boolean accept = false;
+
+                                if (matcher.matches()){
+                                    int major = Integer.parseInt(matcher.group(1));
+                                    int minor = Integer.parseInt(matcher.group(2));
+                                    int bugfix = Integer.parseInt(matcher.group(3));
+
+                                    Version version = new Version(major, minor, bugfix);
+
+                                    homePathByVersion.put(version, new File(dir, name).getAbsolutePath());
+                                    accept = true;
+                                }
+                                return accept;
+                            }
+                    );
                 }
             }
         } else {
