@@ -163,6 +163,23 @@
               or macro usage, in which case it's <code>TextRange</code> should not be highlighted because it is
               referring to offsets in a different file.
             </li>
+            <li>
+              <code>Variable</code> scope for <code>QualifiedMultipleAliases</code>, which occurs when qualified call
+              occurs over a line with assignment to a tuple, such as
+              <pre><code>
+Qualifier.
+{:ok, value} = call()</code></pre>
+            </li>
+            <li>
+              Remove call definition clauses (function or macro) completion for bare words as it had a detrimental
+              impact on typing feedback (the editor still took input, but it wasn't rendered until the completion
+              returned OR <code>ESC</code> was hit to cancel the completion, which became excessive once the index of
+              call definition clauses was expanded by the decompilation of the Elixir standard library
+              <code>.beam</code>s, so disable it.  If bare-words completion is restored.  It will either (1) need to
+              not use the <code>Reference#getVariants()</code> API because it generates too many objects that need to
+              be thrown away or (2) need to only complete call definition clauses that are provably in-scope from
+              imports or other macros.
+            </li>
           </ul>
         </li>
         <li>

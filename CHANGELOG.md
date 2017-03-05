@@ -165,6 +165,13 @@
 * [#616](https://github.com/KronicDeth/intellij-elixir/pull/616) - Only show Mix ExUnit Run in context when the module, or when the module is not a available, the project SDK is Elixir.  If there is no SDK configured, show "Mix ExUnit Run" in the menu. - [@KronicDeth](https://github.com/KronicDeth)
 * [#617](https://github.com/KronicDeth/intellij-elixir/pull/617) - Mark `do:` as atom in demo text - [@KronicDeth](https://github.com/KronicDeth)
 * [#627](https://github.com/KronicDeth/intellij-elixir/pull/627) - Annotations can only be applied to the single, active file, which belongs to the `referrer` `Callable`.  The `resolved` may be outside the file if it is a cross-file function or macro usage, in which case it's `TextRange` should not be highlighted because it is referring to offsets in a different file. - [@KronicDeth](https://github.com/KronicDeth)
+* [#634](https://github.com/KronicDeth/intellij-elixir/pull/634) - [@KronicDeth](https://github.com/KronicDeth)
+  * `Variable` scope for `QualifiedMultipleAliases`, which occurs when qualified call occurs over a line with assignment to a tuple, such as
+      ```elixir
+      Qualifier.
+      {:ok, value} = call()
+      ```
+  * Remove call definition clauses (function or macro) completion for bare words as it had a detrimental impact on typing feedback (the editor still took input, but it wasn't rendered until the completion returned OR `ESC` was hit to cancel the completion, which became excessive once the index of call definition clauses was expanded by the decompilation of the Elixir standard library `.beam`s, so disable it.  If bare-words completion is restored.  It will either (1) need to not use the `Reference#getVariants()` API because it generates too many objects that need to be thrown away or (2) need to only complete call definition clauses that are provably in-scope from imports or other macros.
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)
