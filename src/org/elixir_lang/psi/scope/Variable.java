@@ -106,6 +106,10 @@ public abstract class Variable implements PsiScopeProcessor {
             keepProcessing = executeOnMaybeVariable((UnqualifiedNoArgumentsCall) element, state);
         } else if (element instanceof Call) {
             keepProcessing = execute((Call) element, state);
+        } else if (element instanceof QualifiedMultipleAliases) {
+            /* Occurs when qualified call occurs over a line with assignment to a tuple, such as
+               `Qualifier.\n{:ok, value} = call()` */
+            keepProcessing = execute((QualifiedMultipleAliases) element, state);
         } else if (element instanceof PsiFile) {
             // stop at file.  No reason to look in directories
             keepProcessing = false;
@@ -491,6 +495,15 @@ public abstract class Variable implements PsiScopeProcessor {
         }
 
         return keepProcessing;
+    }
+
+    private boolean execute(@NotNull QualifiedMultipleAliases match, @NotNull ResolveState state) {
+        PsiElement[] children = match.getChildren();
+
+        assert children.length == 3;
+
+        // MultipleAliases assumed to be a tuple on next line
+        return execute(children[children.length - 1], state);
     }
 
     private boolean execute(@NotNull QuotableKeywordList match, @NotNull ResolveState state) {
