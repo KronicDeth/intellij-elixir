@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="runIde" type="GradleRunConfiguration" factoryName="Gradle" show_console_on_std_out="true" show_console_on_std_err="true">
+  <configuration default="false" name="runIde (14.1.7)" type="GradleRunConfiguration" factoryName="Gradle" show_console_on_std_out="true" show_console_on_std_err="true">
     <log_file path="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" checked="true" skipped="true" show_all="false" alias="$PROJECT_DIR$/build/idea-sandbox/system/log/idea.log" />
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="" />
+      <option name="scriptParameters" value="-PideaVersion=14.1.7" />
       <option name="taskDescriptions">
         <list />
       </option>

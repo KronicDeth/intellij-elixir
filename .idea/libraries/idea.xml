@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="idea">
-    <CLASSES>
-      <root url="jar:///Applications/IntelliJ IDEA 14.1 CE.app/Contents/lib/idea.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

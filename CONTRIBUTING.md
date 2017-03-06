@@ -19,7 +19,7 @@
 
 ## Development
 
-Import the project via `File > New > Project from Existing Sources...` and select Gradle as the project type. The default import settings are fine. Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
+Open the project directory. Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
 
 We include run configurations `runIde` and `test`, or you can run `./gradlew runIde` or `./gradlew test`. Note that the tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests.
 

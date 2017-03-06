@@ -10,6 +10,8 @@ cache:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
 language: elixir
+# NOTE: if you add new MAJOR IDEA versions OR change the MINOR/PATCH version numbers, update the corresponding version
+# in the `runIde` and `test` run configurations, to allow for mirrored local development and test.
 matrix:
   include:
     - elixir: 1.4.0

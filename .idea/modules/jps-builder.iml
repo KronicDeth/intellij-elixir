@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="jps-builder" external.linked.project.path="$MODULE_DIR$/../../jps-builder" external.root.project.path="$MODULE_DIR$/../../jps-builder" external.system.id="GRADLE" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../jps-builder">
+      <sourceFolder url="file://$MODULE_DIR$/../../jps-builder/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/../../jps-builder/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../jps-builder/tests" isTestSource="true" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="jps-shared" />
+  </component>
+</module>

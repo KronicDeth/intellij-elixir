@@ -1,7 +1,10 @@
 /tmp
 # user-specific project metadata
+/.idea/compiler.xml
+/.idea/copyright
 /.idea/dictionaries/
 /.idea/markdown-navigator*
+/.idea/misc.xml
 /.idea/workspace.xml
 /.idea/shelf/
 # ignore idea.xml output
