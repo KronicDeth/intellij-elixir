@@ -1,7 +1,10 @@
 /tmp
 # user-specific project metadata
+/.idea/compiler.xml
+/.idea/copyright
 /.idea/dictionaries/
 /.idea/markdown-navigator*
+/.idea/misc.xml
 /.idea/workspace.xml
 /.idea/shelf/
 # ignore idea.xml output
@@ -20,3 +23,10 @@ idea-flex.skeleton
 src/org/elixir_lang/ElixirFlexLexer.java~
 # OS X thumbnail store
 .DS_Store
+
+# Gradle-related
+.gradle
+/build
+jps-builder/build
+jps-shared/build
+libs/
