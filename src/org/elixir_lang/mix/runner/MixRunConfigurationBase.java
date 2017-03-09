@@ -25,10 +25,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationBase.java
@@ -109,6 +106,18 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
   }
 
   @Nullable
+  @NotNull
+  public List<String> getMixArgs() {
+    String programParameters = getProgramParameters();
+
+    if (programParameters != null) {
+      return Arrays.asList(programParameters.split("\\s+"));
+    } else {
+      return new ArrayList<>(0);
+    }
+  }
+
+  @NotNull
   @Override
   public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) throws ExecutionException {
     return new MixRunningState(environment, this);
@@ -187,6 +196,9 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
     );
     EnvironmentVariablesComponent.writeExternal(element, getEnvs());
   }
+
+//  @NotNull
+//  abstract public GeneralCommandLine commandLine(List<String> elixirParams);
 
   /*
    * Package Instance Methods

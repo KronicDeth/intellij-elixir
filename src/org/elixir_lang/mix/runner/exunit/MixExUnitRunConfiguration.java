@@ -8,9 +8,15 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
+import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
   public MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
     super(name, project, MixExUnitRunConfigurationFactory.getInstance());
   }
@@ -26,5 +32,18 @@ final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
   public RunProfileState getState(@NotNull Executor executor,
                                   @NotNull ExecutionEnvironment environment) throws ExecutionException {
     return new MixExUnitRunningState(environment, this);
+  }
+
+  @Nullable
+  public List<String> getMixArgs() {
+    List<String> params = super.getMixArgs();
+    MixSettings mixSettings = MixSettings.getInstance(getProject());
+
+    String task = mixSettings.getSupportsFormatterOption() ? "test" : "test_with_formatter";
+
+    ArrayList<String> mixArgs = new ArrayList<>();
+    mixArgs.addAll(Arrays.asList(task, "--formatter", "TeamCityExUnitFormatter"));
+    mixArgs.addAll(params);
+    return mixArgs;
   }
 }

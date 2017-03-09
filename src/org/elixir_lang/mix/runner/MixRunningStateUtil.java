@@ -14,10 +14,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ObjectUtils;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
 import org.elixir_lang.mix.settings.MixSettings;
+import org.elixir_lang.sdk.ElixirSdkType;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.stripEnd;
 
 /**
  * Created by zyuyou on 15/7/8.
@@ -27,6 +32,28 @@ public class MixRunningStateUtil {
 
   private static final String SKIP_DEPENDENCIES_PARAMETER = "--no-deps-check";
 
+//  @NotNull
+//  public static GeneralCommandLine mixCommandLine(@NotNull MixRunConfigurationBase configuration,
+//                                                  @Nullable List<String> elixirParams,
+//                                                  @Nullable List<String> mixParams) {
+//
+//    GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
+//
+//    Project project = configuration.getProject();
+//    String mixPath = mixPath(project);
+//
+//    String sdkPath = ElixirSdkType.getSdkPath(project);
+//    String elixirPath = elixirPath(sdkPath);
+//
+//    commandLine.setExePath(elixirPath);
+//    if (elixirParams != null) commandLine.addParameters(elixirParams);
+//    commandLine.addParameter(mixPath);
+//    addNewSkipDependencies(commandLine, configuration);
+//    if (mixParams != null) commandLine.addParameters(mixParams);
+//
+//    return commandLine;
+//  }
+
   @NotNull
   private static GeneralCommandLine withEnvironment(@NotNull GeneralCommandLine commandLine,
                                                     @NotNull MixRunConfigurationBase configuration) {
@@ -34,7 +61,7 @@ public class MixRunningStateUtil {
   }
 
   @NotNull
-  private static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
+  public static GeneralCommandLine withWorkDirectory(@NotNull GeneralCommandLine commandLine,
                                                       @NotNull MixRunConfigurationBase configuration) {
     return commandLine.withWorkDirectory(getWorkingDirectory(configuration));
   }
@@ -131,5 +158,31 @@ public class MixRunningStateUtil {
     }
 
     return workingDirectory;
+  }
+
+  public static GeneralCommandLine commandLine(@NotNull MixRunConfigurationBase configuration,
+                                               @NotNull List<String> elixirParams,
+                                               @NotNull List<String> mixParams) {
+
+    GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
+
+    Project project = configuration.getProject();
+    String mixPath = mixPath(project);
+
+    if (mixPath.endsWith(".bat") && elixirParams.isEmpty()) {
+      commandLine.setExePath(mixPath);
+    } else {
+      mixPath = stripEnd(mixPath, ".bat");
+      String sdkPath = ElixirSdkType.getSdkPath(project);
+      String elixirPath = elixirPath(sdkPath);
+
+      commandLine.setExePath(elixirPath);
+      commandLine.addParameters(elixirParams);
+      commandLine.addParameter(mixPath);
+    }
+
+    commandLine.addParameters(mixParams);
+
+    return addNewSkipDependencies(commandLine, configuration);
   }
 }

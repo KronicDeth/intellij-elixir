@@ -6,6 +6,7 @@ import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.filters.TextConsoleBuilder;
+import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.filters.TextConsoleBuilderImpl;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -16,61 +17,55 @@ import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.sdk.ElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.*;
 
 /**
  * Created by zyuyou on 15/7/8.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningState.java
  */
-final class MixRunningState extends CommandLineState {
-    private final MixRunConfigurationBase myConfiguration;
+public class MixRunningState extends CommandLineState {
+  protected final MixRunConfigurationBase myConfiguration;
 
-    MixRunningState(@NotNull ExecutionEnvironment environment, MixRunConfigurationBase configuration) {
-        super(environment);
-        myConfiguration = configuration;
-    }
+  public MixRunningState(@NotNull ExecutionEnvironment environment, MixRunConfigurationBase configuration) {
+    super(environment);
+    myConfiguration = configuration;
+  }
 
-    @NotNull
-    private static GeneralCommandLine commandLine(@NotNull MixRunConfigurationBase configuration) throws ExecutionException {
-        GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
+  @NotNull
+  @Override
+  public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
+    TextConsoleBuilder consoleBuilder = new TextConsoleBuilderImpl(myConfiguration.getProject()) {
+      @Override
+      public ConsoleView getConsole() {
+        ConsoleView consoleView = super.getConsole();
+        ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), consoleView);
+        return consoleView;
+      }
+    };
+    setConsoleBuilder(consoleBuilder);
+    return super.execute(executor, runner);
+  }
 
-        Project project = configuration.getProject();
-        String mixPath = mixPath(project);
+  @NotNull
+  @Override
+  protected ProcessHandler startProcess() throws ExecutionException {
+    GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(
+      myConfiguration, setupElixirParams(), myConfiguration.getMixArgs()
+    );
+    return runMix(myConfiguration.getProject(), commandLine);
+  }
 
-        if (mixPath.endsWith(".bat")) {
-            commandLine.setExePath(mixPath);
-        } else {
-            String sdkPath = ElixirSdkType.getSdkPath(project);
-            String elixirPath = elixirPath(sdkPath);
+  @NotNull
+  public ConsoleView createConsoleView(Executor executor) {
+    TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(myConfiguration.getProject());
+    return consoleBuilder.getConsole();
+  }
 
-            commandLine.setExePath(elixirPath);
-            commandLine.addParameter(mixPath);
-        }
-
-        commandLine = addProgramParameters(commandLine, configuration);
-
-        return addNewSkipDependencies(commandLine, configuration);
-    }
-
-    @NotNull
-    @Override
-    public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
-        TextConsoleBuilder consoleBuilder = new TextConsoleBuilderImpl(myConfiguration.getProject()) {
-            @Override
-            public ConsoleView getConsole() {
-                ConsoleView consoleView = super.getConsole();
-                ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), consoleView);
-                return consoleView;
-            }
-        };
-        setConsoleBuilder(consoleBuilder);
-        return super.execute(executor, runner);
-    }
-
-    @NotNull
-    @Override
-    protected ProcessHandler startProcess() throws ExecutionException {
-        GeneralCommandLine commandLine = commandLine(myConfiguration);
-        return runMix(myConfiguration.getProject(), commandLine);
-    }
+  @NotNull
+  public List<String> setupElixirParams() throws ExecutionException {
+    return new ArrayList<>();
+  }
 }

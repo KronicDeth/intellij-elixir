@@ -2,6 +2,7 @@ package org.elixir_lang.mix.settings;
 
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import org.elixir_lang.jps.mix.JpsMixSettingsSerializer;
 import org.elixir_lang.jps.mix.MixSettingsState;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,16 @@ public class MixSettings implements PersistentStateComponent<MixSettingsState>{
 
   @NotNull
   public String getMixPath(){
-    return myMixSettingsState.myMixPath;
+    return getMixPath(false);
+  }
+
+  @NotNull
+  public String getMixPath(boolean allowBatchFile){
+    if (allowBatchFile) {
+      return myMixSettingsState.myMixPath;
+    } else {
+      return StringUtil.trimEnd(myMixSettingsState.myMixPath, ".bat");
+    }
   }
 
   public void setMixPath(@NotNull String mixPath){
