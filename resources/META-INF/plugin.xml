@@ -82,6 +82,25 @@
             <li>
               Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/559">#559</a>
             </li>
+            <li>
+              <p>Switch to Gradle for builds.</p>
+              <ul>
+                <li>
+                  <code>./gradlew runIde</code> (or the <code>runIde (VERSION)</code> Run Configurations) will run IDEA
+                  in a sandbox with the development version of the plugin.
+                </li>
+                <li>
+                  <code>./gradlew test</code> (or the <code>test (VERSION)</code> Run Configurations) will run the main
+                  plugin and jps-builder tests.
+                </li>
+                <li>
+                  The plugin can now be published with <code>./gradlew publishPlugin</code>, <b>BUT</b> you'll need to
+                  fill in <code>publish*</code> properties in <code>gradle.properties</code>.  This will
+                  <i>eventually</i> allow for automated "nightlies" from successful Travis-CI builds on
+                  <code>master</code>.
+                </li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
@@ -189,6 +208,10 @@ Qualifier.
               Move <code>^^^</code> to its own three-operator precedence level to match <code>1.2</code>.  This does
               mean the parsing will be wrong for Elixir <code>1.1</code>, but is simpler than maintaining two grammars
               for those that are still using Elixir <code>1.1</code>.
+            </li>
+            <li>
+              The <code>ant</code> build files have been removed.  To build the build plugin (for Install From Disk),
+              use the <code>./gradlew buildPlugin</code>.
             </li>
           </ul>
         </li>

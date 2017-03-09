@@ -134,6 +134,11 @@
   * Regression test for [#605](https://github.com/KronicDeth/intellij-elixir/issues/605).
   * Log `LookupElement#getObject` when `LookupElement#getPsiElement` is `null` to track down how it was `null` in [#563](https://github.com/KronicDeth/intellij-elixir/issues/563).
 * [#614](https://github.com/KronicDeth/intellij-elixir/pull/614) - Regression test for [#559](https://github.com/KronicDeth/intellij-elixir/issues/559) - [@KronicDeth](https://github.com/KronicDeth)
+* [#504](https://github.com/KronicDeth/intellij-elixir/pull/504) - [@JakeBecker](https://github.com/JakeBecker)
+  * Switch to Gradle for builds.
+    * `./gradlew runIde` (or the `runIde (VERSION)` Run Configurations) will run IDEA in a sandbox with the development version of the plugin.
+    * `./gradlew test` (or the `test (VERSION)` Run Configurations) will run the main plugin and jps-builder tests.
+    * The plugin can now be published with `./gradlew publishPlugin`, *BUT* you'll need to fill in `publish*` properties in `gradle.properties`.  This will _eventually_ allow for automated "nightlies" from successful Travis-CI builds on `master`.
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -175,6 +180,7 @@
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)
+* [#504](https://github.com/KronicDeth/intellij-elixir/pull/504) - The `ant` build files have been removed.  To build the build plugin (for Install From Disk), use the `./gradlew buildPlugin`. - [@JakeBecker](https://github.com/JakeBecker)
 
 ## v4.7.0
 
