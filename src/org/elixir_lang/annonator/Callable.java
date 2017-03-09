@@ -14,6 +14,8 @@ import com.intellij.psi.*;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.errorreport.Logger;
+import org.elixir_lang.psi.AtNonNumericOperation;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,6 +63,13 @@ public class Callable implements Annotator, DumbAware {
                      */
 
                     private void visitCall(@NotNull final Call call) {
+                        if (!(call instanceof AtNonNumericOperation ||
+                                call instanceof AtUnqualifiedNoParenthesesCall)) {
+                            visitNonModuleAttributeCall(call);
+                        }
+                    }
+
+                    private void visitNonModuleAttributeCall(@NotNull final Call call) {
                         PsiReference reference = call.getReference();
 
                         if (reference != null) {
@@ -117,6 +126,7 @@ public class Callable implements Annotator, DumbAware {
                             }
                         }
                     }
+
                 }
         );
     }
