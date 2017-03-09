@@ -177,6 +177,9 @@
       {:ok, value} = call()
       ```
   * Remove call definition clauses (function or macro) completion for bare words as it had a detrimental impact on typing feedback (the editor still took input, but it wasn't rendered until the completion returned OR `ESC` was hit to cancel the completion, which became excessive once the index of call definition clauses was expanded by the decompilation of the Elixir standard library `.beam`s, so disable it.  If bare-words completion is restored.  It will either (1) need to not use the `Reference#getVariants()` API because it generates too many objects that need to be thrown away or (2) need to only complete call definition clauses that are provably in-scope from imports or other macros.
+* [#636](https://github.com/KronicDeth/intellij-elixir/pull/636) - [@KronicDeth](https://github.com/KronicDeth)
+  * Both intellij-erlang and intellij-community are Apache 2.0 licensed and its the default license for Elixir projects, so seems like a good choice for `LICENSE.md`
+  * Add `CODE_OF_CONDUCT.md`
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

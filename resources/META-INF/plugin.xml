@@ -199,6 +199,11 @@ Qualifier.
               be thrown away or (2) need to only complete call definition clauses that are provably in-scope from
               imports or other macros.
             </li>
+            <li>
+              Both intellij-erlang and intellij-community are Apache 2.0 licensed and its the default license for Elixir
+              projects, so seems like a good choice for <code>LICENSE.md</code>
+            </li>
+            <li>Add <code>CODE_OF_CONDUCT.md</code></li>
           </ul>
         </li>
         <li>
