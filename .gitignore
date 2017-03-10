@@ -1,12 +1,6 @@
 /tmp
-# user-specific project metadata
-/.idea/compiler.xml
-/.idea/copyright
-/.idea/dictionaries/
-/.idea/markdown-navigator*
-/.idea/misc.xml
-/.idea/workspace.xml
-/.idea/shelf/
+# project metadata - Each user should do their own Import using CONTRIBUTING.md
+/.idea
 # ignore idea.xml output
 /cache
 # ignore travis.sh output
