@@ -4,6 +4,8 @@
 
 - [Contributing](#contributing)
   - [Development](#development)
+    - [Importing the project](#importing-the-project)
+    - [Building and running](#building-and-running)
     - [Color Schemes](#color-schemes)
       - [Customizing Scheme](#customizing-scheme)
       - [Exporting Settings](#exporting-settings)
@@ -19,11 +21,27 @@
 
 ## Development
 
-Open the project directory. Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
+### Importing the project
 
-We include run configurations `runIde` and `test`, or you can run `./gradlew runIde` or `./gradlew test`. Note that the tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests.
+Import the project via `File > New > Project from Existing Sources...` and select Gradle as the project type. Your import settings should look something like this:
 
-You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle` for details.
+![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
+
+When prompted about which modules to import, ensure all of them are selected:
+
+![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
+
+When prompted, you can remove the old main module:
+
+![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
+
+### Building and running
+
+Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
+
+We include run configurations `runIde` and `test`, or you can run `./gradlew runIde` or `./gradlew test`. We also include run configurations that override the `ideaVersion` property from `gradle.properties` so you can easily test with particular versions.
+
+Note that the tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle` for details.
 
 Note: If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
 
