@@ -139,6 +139,7 @@
     * `./gradlew runIde` (or the `runIde (VERSION)` Run Configurations) will run IDEA in a sandbox with the development version of the plugin.
     * `./gradlew test` (or the `test (VERSION)` Run Configurations) will run the main plugin and jps-builder tests.
     * The plugin can now be published with `./gradlew publishPlugin`, *BUT* you'll need to fill in `publish*` properties in `gradle.properties`.  This will _eventually_ allow for automated "nightlies" from successful Travis-CI builds on `master`.
+* [#638](https://github.com/KronicDeth/intellij-elixir/pull/638) - The `Callable` annotator is meant for variables, parameters, and macro and function calls and declarations.  The `ModuleAttribute` annotator handles module attribute declaration and usage, so we can save reference resolution time by skipping module attributes in `Callable`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -171,15 +172,16 @@
 * [#617](https://github.com/KronicDeth/intellij-elixir/pull/617) - Mark `do:` as atom in demo text - [@KronicDeth](https://github.com/KronicDeth)
 * [#627](https://github.com/KronicDeth/intellij-elixir/pull/627) - Annotations can only be applied to the single, active file, which belongs to the `referrer` `Callable`.  The `resolved` may be outside the file if it is a cross-file function or macro usage, in which case it's `TextRange` should not be highlighted because it is referring to offsets in a different file. - [@KronicDeth](https://github.com/KronicDeth)
 * [#634](https://github.com/KronicDeth/intellij-elixir/pull/634) - [@KronicDeth](https://github.com/KronicDeth)
-  * `Variable` scope for `QualifiedMultipleAliases`, which occurs when qualified call occurs over a line with assignment to a tuple, such as
-      ```elixir
-      Qualifier.
-      {:ok, value} = call()
-      ```
+  * `Variable` scope for `QualifiedMultipleAliases`, which occurs when qualified call occurs over a line with assignment to a tuple, such as `Qualifier.\n{:ok, value} = call()`
   * Remove call definition clauses (function or macro) completion for bare words as it had a detrimental impact on typing feedback (the editor still took input, but it wasn't rendered until the completion returned OR `ESC` was hit to cancel the completion, which became excessive once the index of call definition clauses was expanded by the decompilation of the Elixir standard library `.beam`s, so disable it.  If bare-words completion is restored.  It will either (1) need to not use the `Reference#getVariants()` API because it generates too many objects that need to be thrown away or (2) need to only complete call definition clauses that are provably in-scope from imports or other macros.
 * [#636](https://github.com/KronicDeth/intellij-elixir/pull/636) - [@KronicDeth](https://github.com/KronicDeth)
   * Both intellij-erlang and intellij-community are Apache 2.0 licensed and its the default license for Elixir projects, so seems like a good choice for `LICENSE.md`
   * Add `CODE_OF_CONDUCT.md`
+* [#638](https://github.com/KronicDeth/intellij-elixir/pull/638) - [@KronicDeth](https://github.com/KronicDeth)
+  * The run configurations I put together in [#504](https://github.com/KronicDeth/intellij-elixir/pull/504) didn't allow for the debugger to work properly: neither pause nor breakpoints had any effect, so regenerate them from the Gradle pane.
+  * Check parent of `when` operation in case it's a guarded function head in `org.elixir_lang.annonator.Parameter.putParameterized(Parameter, PsiElement)`
+  * Instead of highlighting call definition clauses when they are referred to, which only works if it is in the same file, highlight all function and macro declarations when the `def*` call is encountered.
+  * Only increment arity for right pipe operand instead of all operands, so that left operands resolve to correct arity or as variable/parameter.
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

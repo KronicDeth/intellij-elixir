@@ -101,6 +101,11 @@
                 </li>
               </ul>
             </li>
+            <li>
+              The <code>Callable</code> annotator is meant for variables, parameters, and macro and function calls and
+              declarations.  The <code>ModuleAttribute</code> annotator handles module attribute declaration and usage,
+              so we can save reference resolution time by skipping module attributes in <code>Callable</code>.
+            </li>
           </ul>
         </li>
         <li>
@@ -204,6 +209,25 @@ Qualifier.
               projects, so seems like a good choice for <code>LICENSE.md</code>
             </li>
             <li>Add <code>CODE_OF_CONDUCT.md</code></li>
+            <li>
+                The run configurations I put together in
+                <a href="https://github.com/KronicDeth/intellij-elixir/pull/504">#504</a>
+                didn't allow for the debugger to work properly: neither pause nor breakpoints had any effect, so
+                regenerate them from the Gradle pane.
+            </li>
+            <li>
+              Check parent of <code>when</code> operation in case it's a guarded function head in
+              <code>org.elixir_lang.annonator.Parameter.putParameterized(Parameter, PsiElement)</code>
+            </li>
+            <li>
+              Instead of highlighting call definition clauses when they are referred to, which only works if it is in
+              the same file, highlight all function and macro declarations when the <code>def*</code> call is
+              encountered.
+            </li>
+            <li>
+              Only increment arity for right pipe operand instead of all operands, so that left operands resolve to
+              correct arity or as variable/parameter.
+            </li>
           </ul>
         </li>
         <li>
