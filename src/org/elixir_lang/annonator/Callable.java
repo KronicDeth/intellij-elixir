@@ -69,64 +69,102 @@ public class Callable implements Annotator, DumbAware {
                         }
                     }
 
+                    private void visitCallDefinitionClause(@NotNull final Call call) {
+                        PsiElement head = org.elixir_lang.structure_view.element.CallDefinitionClause.head(call);
+
+                        if (head != null) {
+                            visitCallDefinitionHead(head, call);
+                        }
+                    }
+
+                    private void visitCallDefinitionHead(@NotNull final PsiElement head, @NotNull final Call clause) {
+                        PsiElement stripped = org.elixir_lang.structure_view.element.CallDefinitionHead.strip(head);
+
+                        if (stripped instanceof Call) {
+                            visitStrippedCallDefinitionHead((Call) stripped, clause);
+                        }
+                    }
+
                     private void visitNonModuleAttributeCall(@NotNull final Call call) {
-                        PsiReference reference = call.getReference();
+                        if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(call)) {
+                            visitCallDefinitionClause(call);
+                        } else {
+                            PsiReference reference = call.getReference();
 
-                        if (reference != null) {
-                            Collection<PsiElement> resolvedCollection = null;
+                            if (reference != null) {
+                                Collection<PsiElement> resolvedCollection = null;
 
-                            if (reference instanceof PsiPolyVariantReference) {
-                                PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
+                                if (reference instanceof PsiPolyVariantReference) {
+                                    PsiPolyVariantReference polyVariantReference = (PsiPolyVariantReference) reference;
 
-                                ResolveResult[] resolveResults;
+                                    ResolveResult[] resolveResults;
 
-                                try {
-                                    resolveResults = polyVariantReference.multiResolve(false);
-                                } catch (StackOverflowError stackOverflowError) {
-                                    Logger.error(Callable.class, "StackOverflowError when annotating Call", call);
-                                    resolveResults = new ResolveResult[0];
-                                }
+                                    try {
+                                        resolveResults = polyVariantReference.multiResolve(false);
+                                    } catch (StackOverflowError stackOverflowError) {
+                                        Logger.error(Callable.class, "StackOverflowError when annotating Call", call);
+                                        resolveResults = new ResolveResult[0];
+                                    }
 
-                                List<ResolveResult> validResolveResults = ContainerUtil.filter(
-                                        resolveResults,
-                                        new Condition<ResolveResult>() {
-                                            @Override
-                                            public boolean value(ResolveResult resolveResult) {
-                                                return resolveResult.isValidResult();
+                                    List<ResolveResult> validResolveResults = ContainerUtil.filter(
+                                            resolveResults,
+                                            new Condition<ResolveResult>() {
+                                                @Override
+                                                public boolean value(ResolveResult resolveResult) {
+                                                    return resolveResult.isValidResult();
+                                                }
                                             }
-                                        }
-                                );
-                                resolvedCollection = ContainerUtil.map(
-                                        validResolveResults,
-                                        new com.intellij.util.Function<ResolveResult, PsiElement>() {
-                                            @Override
-                                            public PsiElement fun(ResolveResult resolveResult) {
-                                                return resolveResult.getElement();
+                                    );
+                                    resolvedCollection = ContainerUtil.map(
+                                            validResolveResults,
+                                            new com.intellij.util.Function<ResolveResult, PsiElement>() {
+                                                @Override
+                                                public PsiElement fun(ResolveResult resolveResult) {
+                                                    return resolveResult.getElement();
+                                                }
                                             }
-                                        }
-                                );
-                            } else {
-                                PsiElement resolved = reference.resolve();
+                                    );
+                                } else {
+                                    PsiElement resolved = reference.resolve();
 
-                                if (resolved != null) {
-                                    resolvedCollection = Collections.singleton(resolved);
+                                    if (resolved != null) {
+                                        resolvedCollection = Collections.singleton(resolved);
+                                    }
                                 }
-                            }
 
-                            if (resolvedCollection != null) {
-                                for (PsiElement resolved : resolvedCollection) {
-                                    highlight(call, reference.getRangeInElement(), resolved, holder);
+                                if (resolvedCollection != null) {
+                                    for (PsiElement resolved : resolvedCollection) {
+                                        highlight(call, reference.getRangeInElement(), resolved, holder);
+                                    }
                                 }
-                            }
-                        } else if (isBitStreamSegmentOption(call)) {
-                            String name = call.getName();
+                            } else if (isBitStreamSegmentOption(call)) {
+                                String name = call.getName();
 
-                            if (name != null && BIT_STRING_TYPES.contains(name)) {
-                                highlight(call, holder, ElixirSyntaxHighlighter.TYPE);
+                                if (name != null && BIT_STRING_TYPES.contains(name)) {
+                                    highlight(call, holder, ElixirSyntaxHighlighter.TYPE);
+                                }
                             }
                         }
                     }
 
+                    private void visitStrippedCallDefinitionHead(@NotNull final Call stripped,
+                                                                 @NotNull final Call clause) {
+                        PsiElement functionNameElement = stripped.functionNameElement();
+
+                        if (functionNameElement != null) {
+                            TextAttributesKey textAttributeKey = null;
+
+                            if (org.elixir_lang.structure_view.element.CallDefinitionClause.isFunction(clause)) {
+                                textAttributeKey = ElixirSyntaxHighlighter.FUNCTION_DECLARATION;
+                            } else if (org.elixir_lang.structure_view.element.CallDefinitionClause.isMacro(clause)) {
+                                textAttributeKey = ElixirSyntaxHighlighter.MACRO_DECLARATION;
+                            }
+
+                            if (textAttributeKey != null) {
+                                highlight(functionNameElement, holder, textAttributeKey);
+                            }
+                        }
+                    }
                 }
         );
     }
@@ -153,12 +191,14 @@ public class Callable implements Annotator, DumbAware {
                 switch (parameterType) {
                     case FUNCTION_NAME:
                         referrerTextAttributesKey = ElixirSyntaxHighlighter.FUNCTION_CALL;
-                        resolvedTextAttributesKey = ElixirSyntaxHighlighter.FUNCTION_DECLARATION;
+                        // will be handled visitCallDefinitionClause
+                        resolvedTextAttributesKey = null;
                         break;
 
                     case MACRO_NAME:
                         referrerTextAttributesKey = ElixirSyntaxHighlighter.MACRO_CALL;
-                        resolvedTextAttributesKey = ElixirSyntaxHighlighter.MACRO_DECLARATION;
+                        // will be handled visitCallDefinitionClause
+                        resolvedTextAttributesKey = null;
                         break;
 
                     case VARIABLE:
