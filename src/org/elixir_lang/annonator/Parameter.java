@@ -8,6 +8,7 @@ import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.InMatch;
+import org.elixir_lang.psi.operation.When;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.elixir_lang.structure_view.element.Delegation;
 import org.jetbrains.annotations.Contract;
@@ -128,7 +129,11 @@ public class Parameter {
         Parameter parameterizedParameter;
         PsiElement parent = ancestor.getParent();
 
-        if (parent instanceof Call) {
+        /* MUST be before `Call` because `When` operations are `Call` implementations too in all cases even though
+           `When` is not a subinterface. */
+        if (parent instanceof When) {
+            parameterizedParameter = putParameterized(parameter, parent);
+        } else if (parent instanceof Call) {
             parameterizedParameter = putParameterized(parameter, (Call) parent);
         } else if (parent instanceof AtNonNumericOperation ||
                 parent instanceof ElixirAccessExpression ||

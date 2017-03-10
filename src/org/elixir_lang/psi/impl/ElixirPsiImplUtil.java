@@ -5176,11 +5176,20 @@ if (quoted == null) {
                 }
             }
 
-            if (isPipe(call.getParent())) {
-                if (primaryArity == null) {
-                    resolvedPrimaryArity = 1;
-                } else {
-                    resolvedPrimaryArity += 1;
+            PsiElement parent = call.getParent();
+
+            if (isPipe(parent)) {
+                Arrow parentPipeOperation = (Arrow) parent;
+                PsiElement pipedInto = parentPipeOperation.rightOperand();
+
+                /* only the right operand has its arity increased because it is the operand that has the output of the
+                   left operand prepended to its arguments */
+                if (pipedInto != null && call.isEquivalentTo(pipedInto)) {
+                    if (primaryArity == null) {
+                        resolvedPrimaryArity = 1;
+                    } else {
+                        resolvedPrimaryArity += 1;
+                    }
                 }
             }
         }
