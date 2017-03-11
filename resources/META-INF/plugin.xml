@@ -106,6 +106,7 @@
               declarations.  The <code>ModuleAttribute</code> annotator handles module attribute declaration and usage,
               so we can save reference resolution time by skipping module attributes in <code>Callable</code>.
             </li>
+            <li>Allow module attribute folding to be configured.</li>
           </ul>
         </li>
         <li>
@@ -242,6 +243,7 @@ Qualifier.
               The <code>ant</code> build files have been removed.  To build the build plugin (for Install From Disk),
               use the <code>./gradlew buildPlugin</code>.
             </li>
+            <li>Allow module attribute folding to be configured.</li>
           </ul>
         </li>
       </ul>
