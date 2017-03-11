@@ -140,6 +140,7 @@
     * `./gradlew test` (or the `test (VERSION)` Run Configurations) will run the main plugin and jps-builder tests.
     * The plugin can now be published with `./gradlew publishPlugin`, *BUT* you'll need to fill in `publish*` properties in `gradle.properties`.  This will _eventually_ allow for automated "nightlies" from successful Travis-CI builds on `master`.
 * [#638](https://github.com/KronicDeth/intellij-elixir/pull/638) - The `Callable` annotator is meant for variables, parameters, and macro and function calls and declarations.  The `ModuleAttribute` annotator handles module attribute declaration and usage, so we can save reference resolution time by skipping module attributes in `Callable`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#640](https://github.com/KronicDeth/intellij-elixir/pull/640) - Allow module attribute folding to be configured. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#574](https://github.com/KronicDeth/intellij-elixir/pull/574) - Fix copy-paste errors in `MatchOperatorInsteadOfTypeOperator` - [@KronicDeth](https://github.com/KronicDeth)
@@ -186,6 +187,7 @@
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)
 * [#504](https://github.com/KronicDeth/intellij-elixir/pull/504) - The `ant` build files have been removed.  To build the build plugin (for Install From Disk), use the `./gradlew buildPlugin`. - [@JakeBecker](https://github.com/JakeBecker)
+* [#640](https://github.com/KronicDeth/intellij-elixir/pull/640) - Change to module attribute folding to off by default. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v4.7.0
 
