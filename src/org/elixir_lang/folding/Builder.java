@@ -361,7 +361,7 @@ public class Builder extends FoldingBuilderEx {
         boolean isCollapsedByDefault = false;
 
         if (element instanceof AtNonNumericOperation) {
-            isCollapsedByDefault = true;
+            isCollapsedByDefault = ElixirFoldingSettings.getInstance().isReplaceModuleAttributesWithValues();
         } else {
             PsiElement[] children = element.getChildren();
 
