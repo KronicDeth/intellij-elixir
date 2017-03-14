@@ -18,17 +18,22 @@ public class Modular {
      * Public Static Methods
      */
 
-    public static void callDefinitionClauseCallWhile(@NotNull final Call modular,
+    public static boolean callDefinitionClauseCallWhile(@NotNull final Call modular,
                                                      @NotNull Function<Call, Boolean> function) {
         Call[] childCalls = macroChildCalls(modular);
+        boolean keepProcessing = true;
 
         if (childCalls != null) {
             for (Call childCall : childCalls) {
                 if (CallDefinitionClause.is(childCall) && !function.fun(childCall)) {
+                    keepProcessing = false;
+
                     break;
                 }
             }
         }
+
+        return keepProcessing;
     }
 
     public static void forEachCallDefinitionClauseNameIdentifier(

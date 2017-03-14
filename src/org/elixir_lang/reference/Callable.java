@@ -142,6 +142,27 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return elementDescription;
     }
 
+    /**
+     * Callable for the {@code def}, {@code defp}, {@code defmacro}, or {@code defmacrop} that defines {@code call} as
+     * {@code new Callable(call)} will resolve to the {@code name} in {@code def name() do ...}
+     *
+     * @param call call definition clause
+     */
+    @NotNull
+    public static Callable callDefinitionClauseDefiner(@NotNull Call call) {
+        PsiElement functionNameElement = call.functionNameElement();
+
+        assert functionNameElement != null;
+
+        // Can't use `getStartOffsetInParent` because `functionNameElement` doesn't have to be a direct child of `call`
+        // Can't use `getTextOffset` because that's the offset to the navigationElement, which is nameIdentifier
+        int functionNameElementStartOffset = functionNameElement.getTextRange().getStartOffset();
+        int callStartOffset = call.getTextRange().getStartOffset();
+        int startOffset = functionNameElementStartOffset - callStartOffset;
+
+        return new Callable(call, new TextRange(startOffset, startOffset + functionNameElement.getTextLength()));
+    }
+
     public static String ignoredElementDescription(@SuppressWarnings("unused") Call call,
                                                    ElementDescriptionLocation location) {
         String elementDescription = null;
@@ -549,6 +570,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
 
     public Callable(@NotNull Call call) {
         super(call);
+    }
+
+    private Callable(@NotNull Call call, @NotNull TextRange rangeInCall) {
+        super(call, rangeInCall);
     }
 
     @Override

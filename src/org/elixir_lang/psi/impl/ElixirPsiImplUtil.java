@@ -2322,6 +2322,11 @@ public class ElixirPsiImplUtil {
 
                         PsiElement nextResolved = resolveResult.getElement();
 
+                        if (nextResolved != null && nextResolved instanceof Call && isModular((Call) nextResolved)) {
+                            fullyResolved = nextResolved;
+                            break;
+                        }
+
                         if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
                             fullyResolved = currentResolved;
                             break;
@@ -2343,12 +2348,13 @@ public class ElixirPsiImplUtil {
                             }
                         }
 
-                        if (nextResolved == null || nextResolved.isEquivalentTo(currentResolved)) {
+                        if (nextResolved == null) {
                             fullyResolved = currentResolved;
-                            break;
                         } else {
-                            currentResolved = nextResolved;
+                            fullyResolved = nextResolved;
                         }
+
+                        break;
                     }
                 } else {
                     PsiElement nextResolved = reference.resolve();
@@ -3016,7 +3022,11 @@ public class ElixirPsiImplUtil {
             }
 
             if (reference == null) {
-                reference = new Callable(call);
+                if (CallDefinitionClause.is(call)) {
+                    reference = Callable.callDefinitionClauseDefiner(call);
+                } else {
+                    reference = new Callable(call);
+                }
             }
         }
 

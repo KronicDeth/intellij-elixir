@@ -1,5 +1,6 @@
 package org.elixir_lang.psi.scope;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.ResolveState;
@@ -7,11 +8,13 @@ import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.util.Function;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.Import;
+import org.elixir_lang.psi.Modular;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
 
 public abstract class CallDefinitionClause implements PsiScopeProcessor {
@@ -107,6 +110,38 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
 
             // Only check MultiResolve.keepProcessing at the end of a Module to all multiple arities
             keepProcessing = keepProcessing();
+
+            // the implicit `import Kernel`
+            if (keepProcessing) {
+                Project project = element.getProject();
+
+                keepProcessing = org.elixir_lang.reference.Module.forEachNavigationElement(
+                        project,
+                        KERNEL,
+                        new Function<PsiElement, Boolean>() {
+                            @Override
+                            public Boolean fun(PsiElement navigationElement) {
+                                boolean keepProcessingNavigationElements = true;
+
+                                if (navigationElement instanceof Call) {
+                                    Call modular = (Call) navigationElement;
+
+                                    keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
+                                            modular,
+                                            new Function<Call, Boolean>() {
+                                                @Override
+                                                public Boolean fun(Call callDefinitionClause) {
+                                                    return executeOnCallDefinitionClause(callDefinitionClause, state);
+                                                }
+                                            }
+                                    );
+                                }
+
+                                return keepProcessingNavigationElements;
+                            }
+                        }
+                );
+            }
         }
 
         return keepProcessing;

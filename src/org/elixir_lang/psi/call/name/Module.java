@@ -10,6 +10,7 @@ public class Module {
      */
 
     public static final String KERNEL = "Kernel";
+    public static final String KERNEL_SPECIAL_FORMS = KERNEL + ".SpecialForms";
     public static final String ELIXIR_PREFIX = "Elixir.";
 
     /*
