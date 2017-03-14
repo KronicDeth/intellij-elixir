@@ -666,7 +666,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             String name = myElement.functionName();
 
             if (name != null) {
-                if (resolvedFinalArity == 0) {
+                // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
+                // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
+                if (myElement instanceof UnqualifiedNoArgumentsCall && resolvedFinalArity == 0) {
                     List<ResolveResult> variableResolveList =
                             org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
                                     name,
