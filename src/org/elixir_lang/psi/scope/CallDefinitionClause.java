@@ -68,6 +68,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
 
     /**
      * Whether to continue searching after each Module's children have been searched.
+     *
      * @return {@code true} to keep searching up the PSI tree; {@code false} to stop searching.
      */
     protected abstract boolean keepProcessing();
@@ -102,7 +103,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
 
             if (childCalls != null) {
                 for (Call childCall : childCalls) {
-                    if(!execute(childCall, state)) {
+                    if (!execute(childCall, state)) {
                         break;
                     }
                 }
@@ -146,5 +147,4 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
 
         return keepProcessing;
     }
-
 }
