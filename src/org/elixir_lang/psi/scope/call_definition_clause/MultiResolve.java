@@ -97,9 +97,9 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
             PsiElement nameIdentifier = named.getNameIdentifier();
 
             if (nameIdentifier != null) {
-                /* call definition clause needs to not have a self-reference, so that OpenAPI uses Find Usages
-                   instead */
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
+                    addNewToResolveResultList(nameIdentifier, validResult);
+
                     keepProcessing = false;
                 } else {
                 /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a

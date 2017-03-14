@@ -106,11 +106,12 @@ public class IntramoduleTest extends LightCodeInsightFixtureTestCase {
         ResolveResult[] resolveResults = polyVariantReference.multiResolve(false);
 
         assertNotEquals("Resolved to both clauses instead of selected clause", 2, resolveResults.length);
-        assertEquals("Resolves to nothing so find usage can be used instead", 0, resolveResults.length);
+        assertEquals("Resolves to self", 1, resolveResults.length);
 
         PsiElement resolved = reference.resolve();
 
-        assertNull("Reference resolve", resolved);
+        assertNotNull("Reference not resolved", resolved);
+        assertEquals("def referenced(true) do\n  end", resolved.getParent().getParent().getParent().getText());
     }
 
     public void testParenthesesRecursiveReference() {
