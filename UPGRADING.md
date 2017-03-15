@@ -16,6 +16,10 @@
 
 # Upgrading
 
+## v5.0.0
+
+Module attribute folding to their value is off by default now.  If you want to re-enable the old behavior, Check Preferences > Editor > General > Code Folding > Elixir Module Attributes.
+
 ## v4.0.0
 
 ### Preferences/Settings
@@ -51,7 +55,7 @@ To take advantage of the new Project Structure Detector in IntelliJ, you will wa
 previously opened as an Empty Project.
 
 (Copied from Elixir Plugin > Features > Project > From Existing Directory in README.md)
-  
+
 1. File > New > Project From Existing Sources...
 2. Select the root directory of your project.
 3. Leave the default selection, "Create project from existing sources"
@@ -63,7 +67,7 @@ previously opened as an Empty Project.
    .idea directory.  Click Yes.
 9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
    `mix.exs`.  Uncheck any project roots that you don't want added.
-10. Click Next.      
+10. Click Next.
 10. Select a Project SDK directory by clicking Configure.
 11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
     homebrew installs on OSX.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information
