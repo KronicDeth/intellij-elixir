@@ -23,27 +23,53 @@
 
 ### Importing the project
 
-Import the project via `File > New > Project from Existing Sources...` and select Gradle as the project type. Your import settings should look something like this:
-
-![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
-
-When prompted about which modules to import, ensure all of them are selected:
-
-![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
-
-When prompted, you can remove the old main module:
-
-![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
+1. Import the project via `File > New > Project from Existing Sources...`  OR from the `Import Project` option of the splash menu
+2. Select the checkout of `intellij-elixir` directory
+3. Select "Import project from external model" from the radio button group
+4. Select Gradle from the external models
+5. Click Next
+6. In "Import Project from Gradle"
+  1. Check "Use auto-import"
+  2. Check "Create separate module per source set"
+  3. Ensure Gradle JVM is **AT LEAST** Java 1.7 / 7.  (Java 1.8 / 8 is recommended.)
+  Your import settings should look something like this:<br/>
+  ![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
+  4. Click Finish
+7. When the "Gradle Project Data to Import" dialog pops up
+  1. Leave "Elixir (root module), ":jps-builder", and "jps-shared" checked.<br/>
+  ![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
+  2. Click OK
+8. When the "Import Gradle Projects" dialog pops up
+  1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
+     ![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
 
 ### Building and running
 
 Gradle will handle all dependency management, including fetching the Intellij IDEA platform specified in `gradle.properties`, so you can use a normal JDK instead of setting up an "Intellij Platform Plugin SDK".
 
-We include run configurations `runIde` and `test`, or you can run `./gradlew runIde` or `./gradlew test`. We also include run configurations that override the `ideaVersion` property from `gradle.properties` so you can easily test with particular versions.
+**NOTE:** The tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle` for details.
 
-Note that the tests require some additional dependencies which Gradle will fetch for you. You must have Elixir and Hex installed for Gradle to compile some of the dependencies for running the tests. You can run individual JUnit tests via the JUnit run configuration type, but note that some tests require additional setup which the Gradle `test` task does for you, and these tests won't work when run outside Gradle without some additional work. See `build.gradle` for details.
+**NOTE:** If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
 
-Note: If you're having trouble running the plugin against Intellij IDEA 14.1 on Mac, see this [comment](https://github.com/KronicDeth/intellij-elixir/pull/504#issuecomment-284275036).
+### From commandline
+You can run `./gradlew runIde` or `./gradlew test`.
+
+### From IntelliJ
+
+1. Open the Gradle Tool Window (`View > Tool Windows > Gradle` OR from the Gradle button on the right tool button bar)
+2. Expand `Elixir (root) > Task`
+
+#### `runIdea`
+
+1. Expand `intellij`
+2. Right-click `runIdea`
+3. Select `Create 'intellij-elixir' [runIdea]`
+
+#### `test`
+
+1. Expand `verifcation`
+2. Right-click `test`
+3. Select `Create 'intellij-elixir' [test]`
 
 ### Color Schemes
 
