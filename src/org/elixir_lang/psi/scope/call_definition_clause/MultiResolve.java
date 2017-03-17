@@ -127,9 +127,9 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
             String name = nameArityRange.first;
 
             if (name.equals(this.name)) {
-                IntRange arityRange = nameArityRange.second;
+                ArityInterval arityInterval = ArityInterval.arityInterval(nameArityRange, state);
 
-                if (arityRange.containsInteger(resolvedFinalArity)) {
+                if (arityInterval.containsInteger(resolvedFinalArity)) {
                     keepProcessing = addToResolveResultList(element, true, state);
                 } else if (incompleteCode) {
                     keepProcessing = addToResolveResultList(element, false, state);

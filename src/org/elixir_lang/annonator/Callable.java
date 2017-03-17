@@ -136,6 +136,18 @@ public class Callable implements Annotator, DumbAware {
                                     for (PsiElement resolved : resolvedCollection) {
                                         highlight(call, reference.getRangeInElement(), resolved, holder);
                                     }
+                                } else if (call.hasDoBlockOrKeyword()) {
+                                    /* Even though it can't be resolved, it is called like a macro, so highlight like
+                                       one */
+                                    PsiElement functionNameElement = call.functionNameElement();
+
+                                    if (functionNameElement != null) {
+                                        highlight(
+                                                functionNameElement.getTextRange(),
+                                                holder,
+                                                ElixirSyntaxHighlighter.MACRO_CALL
+                                        );
+                                    }
                                 }
                             } else if (isBitStreamSegmentOption(call)) {
                                 String name = call.getName();

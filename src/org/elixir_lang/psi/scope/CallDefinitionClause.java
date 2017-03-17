@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
+import static org.elixir_lang.psi.call.name.Module.KERNEL_SPECIAL_FORMS;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
 
 public abstract class CallDefinitionClause implements PsiScopeProcessor {
@@ -23,6 +24,7 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
      */
 
     protected static final Key<Call> IMPORT_CALL = new Key<Call>("IMPORT_CALL");
+    public static final Key<String> MODULAR_CANONICAL_NAME = new Key<String>("MODULAR_CANONICAL_NAME");
 
     /*
      * Public Instance Methods
@@ -142,6 +144,40 @@ public abstract class CallDefinitionClause implements PsiScopeProcessor {
                             }
                         }
                 );
+
+                // the implicit `import Kernel.SpecialForms`
+                if (keepProcessing) {
+                    ResolveState modularCanonicalNameState = state.put(MODULAR_CANONICAL_NAME, KERNEL_SPECIAL_FORMS);
+                    keepProcessing = org.elixir_lang.reference.Module.forEachNavigationElement(
+                            project,
+                            KERNEL_SPECIAL_FORMS,
+                            new Function<PsiElement, Boolean>() {
+                                @Override
+                                public Boolean fun(PsiElement navigationElement) {
+                                    boolean keepProcessingNavigationElements = true;
+
+                                    if (navigationElement instanceof Call) {
+                                        Call modular = (Call) navigationElement;
+
+                                        keepProcessingNavigationElements = Modular.callDefinitionClauseCallWhile(
+                                                modular,
+                                                new Function<Call, Boolean>() {
+                                                    @Override
+                                                    public Boolean fun(Call callDefinitionClause) {
+                                                        return executeOnCallDefinitionClause(
+                                                                callDefinitionClause,
+                                                                modularCanonicalNameState
+                                                        );
+                                                    }
+                                                }
+                                        );
+                                    }
+
+                                    return keepProcessingNavigationElements;
+                                }
+                            }
+                    );
+                }
             }
         }
 
