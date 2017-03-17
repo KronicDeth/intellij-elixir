@@ -143,13 +143,22 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     }
 
     /**
-     * Callable for the {@code def}, {@code defp}, {@code defmacro}, or {@code defmacrop} that defines {@code call} as
-     * {@code new Callable(call)} will resolve to the {@code name} in {@code def name() do ...}
+     * Callable for any of the following built-in definers
      *
-     * @param call call definition clause
+     * <ul>
+     * <li>{@code def}</li>
+     * <li>{@code defimpl}</li>
+     * <li>{@code defmacro}</li>
+     * <li>{@code defmacrop}</li>
+     * <li>{@code defmodule}</li>
+     * <li>{@code defp}</li>
+     * <li>{@code defprotocol}</li>
+     * </ul>
+     *
+     * @param call definer call
      */
     @NotNull
-    public static Callable callDefinitionClauseDefiner(@NotNull Call call) {
+    public static Callable definer(@NotNull Call call) {
         PsiElement functionNameElement = call.functionNameElement();
 
         assert functionNameElement != null;

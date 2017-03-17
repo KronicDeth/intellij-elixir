@@ -3022,8 +3022,8 @@ public class ElixirPsiImplUtil {
             }
 
             if (reference == null) {
-                if (CallDefinitionClause.is(call)) {
-                    reference = Callable.callDefinitionClauseDefiner(call);
+                if (CallDefinitionClause.is(call) || Implementation.is(call) || Module.is(call) || Protocol.is(call)) {
+                    reference = Callable.definer(call);
                 } else {
                     reference = new Callable(call);
                 }
