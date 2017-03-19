@@ -132,7 +132,7 @@ public class Callable implements Annotator, DumbAware {
                                     }
                                 }
 
-                                if (resolvedCollection != null) {
+                                if (resolvedCollection != null && resolvedCollection.size() > 0) {
                                     for (PsiElement resolved : resolvedCollection) {
                                         highlight(call, reference.getRangeInElement(), resolved, holder);
                                     }
