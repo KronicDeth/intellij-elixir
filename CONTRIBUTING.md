@@ -57,7 +57,7 @@ You can run `./gradlew runIde` or `./gradlew test`.
 ### From IntelliJ
 
 1. Open the Gradle Tool Window (`View > Tool Windows > Gradle` OR from the Gradle button on the right tool button bar)
-2. Expand `Elixir (root) > Task`
+2. Expand `Elixir (root) > Tasks`
 
 #### `runIdea`
 
