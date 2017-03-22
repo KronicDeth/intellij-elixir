@@ -29,18 +29,18 @@
 4. Select Gradle from the external models
 5. Click Next
 6. In "Import Project from Gradle"
-  1. Check "Use auto-import"
-  2. Check "Create separate module per source set"
-  3. Ensure Gradle JVM is **AT LEAST** Java 1.7 / 7.  (Java 1.8 / 8 is recommended.)
-  Your import settings should look something like this:<br/>
-  ![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
-  4. Click Finish
+   1. Check "Use auto-import"
+   2. Check "Create separate module per source set"
+   3. Ensure Gradle JVM is **AT LEAST** Java 1.7 / 7.  (Java 1.8 / 8 is recommended.)
+   Your import settings should look something like this:<br/>
+   ![Gradle settings](/screenshots/contributing/gradle_settings.png?raw=true "Gradle settings")
+   4. Click Finish
 7. When the "Gradle Project Data to Import" dialog pops up
-  1. Leave "Elixir (root module), ":jps-builder", and "jps-shared" checked.<br/>
-  ![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
-  2. Click OK
+   1. Leave "Elixir (root module), ":jps-builder", and "jps-shared" checked.<br/>
+   ![Select modules](/screenshots/contributing/select_modules.png?raw=true "Select modules")
+   2. Click OK
 8. When the "Import Gradle Projects" dialog pops up
-  1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
+   1. Leave "intellij-elixir" checked.  You can remove the old main module:<br/>
      ![Remove module](/screenshots/contributing/remove_module.png?raw=true "Remove module")
 
 ### Building and running
