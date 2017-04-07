@@ -142,6 +142,36 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         return elementDescription;
     }
 
+    /**
+     * Callable for any of the following built-in definers
+     *
+     * <ul>
+     * <li>{@code def}</li>
+     * <li>{@code defimpl}</li>
+     * <li>{@code defmacro}</li>
+     * <li>{@code defmacrop}</li>
+     * <li>{@code defmodule}</li>
+     * <li>{@code defp}</li>
+     * <li>{@code defprotocol}</li>
+     * </ul>
+     *
+     * @param call definer call
+     */
+    @NotNull
+    public static Callable definer(@NotNull Call call) {
+        PsiElement functionNameElement = call.functionNameElement();
+
+        assert functionNameElement != null;
+
+        // Can't use `getStartOffsetInParent` because `functionNameElement` doesn't have to be a direct child of `call`
+        // Can't use `getTextOffset` because that's the offset to the navigationElement, which is nameIdentifier
+        int functionNameElementStartOffset = functionNameElement.getTextRange().getStartOffset();
+        int callStartOffset = call.getTextRange().getStartOffset();
+        int startOffset = functionNameElementStartOffset - callStartOffset;
+
+        return new Callable(call, new TextRange(startOffset, startOffset + functionNameElement.getTextLength()));
+    }
+
     public static String ignoredElementDescription(@SuppressWarnings("unused") Call call,
                                                    ElementDescriptionLocation location) {
         String elementDescription = null;
@@ -551,6 +581,10 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         super(call);
     }
 
+    private Callable(@NotNull Call call, @NotNull TextRange rangeInCall) {
+        super(call, rangeInCall);
+    }
+
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
         return ((NamedElement) myElement).setName(newElementName);
@@ -641,7 +675,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             String name = myElement.functionName();
 
             if (name != null) {
-                if (resolvedFinalArity == 0) {
+                // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
+                // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
+                if (myElement instanceof UnqualifiedNoArgumentsCall && resolvedFinalArity == 0) {
                     List<ResolveResult> variableResolveList =
                             org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
                                     name,

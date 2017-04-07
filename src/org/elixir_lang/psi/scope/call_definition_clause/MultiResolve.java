@@ -97,9 +97,9 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
             PsiElement nameIdentifier = named.getNameIdentifier();
 
             if (nameIdentifier != null) {
-                /* call definition clause needs to not have a self-reference, so that OpenAPI uses Find Usages
-                   instead */
                 if (PsiTreeUtil.isAncestor(state.get(ENTRANCE), nameIdentifier, false)) {
+                    addNewToResolveResultList(nameIdentifier, validResult);
+
                     keepProcessing = false;
                 } else {
                 /* Doesn't use a Map<PsiElement, ResolveSet> so that MultiResolve's helpers that require a
@@ -127,9 +127,9 @@ public class MultiResolve extends org.elixir_lang.psi.scope.CallDefinitionClause
             String name = nameArityRange.first;
 
             if (name.equals(this.name)) {
-                IntRange arityRange = nameArityRange.second;
+                ArityInterval arityInterval = ArityInterval.arityInterval(nameArityRange, state);
 
-                if (arityRange.containsInteger(resolvedFinalArity)) {
+                if (arityInterval.containsInteger(resolvedFinalArity)) {
                     keepProcessing = addToResolveResultList(element, true, state);
                 } else if (incompleteCode) {
                     keepProcessing = addToResolveResultList(element, false, state);

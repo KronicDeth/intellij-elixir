@@ -49,7 +49,13 @@ public class ElixirFile extends PsiFileBase implements ModuleOwner {
                                        @NotNull ResolveState state,
                                        PsiElement lastParent,
                                        @NotNull PsiElement place) {
-        return ElixirPsiImplUtil.processDeclarationsInPreviousSibling(this, processor, state, lastParent, place);
+        boolean keepProcessing = ElixirPsiImplUtil.processDeclarationsInPreviousSibling(this, processor, state, lastParent, place);
+
+        if (keepProcessing) {
+            processor.execute(this, state);
+        }
+
+        return keepProcessing;
     }
 
     /**

@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.psi.impl;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.impl.source.tree.TreeElement;
@@ -167,5 +168,11 @@ public class ModuleImpl<T extends StubElement> extends ModuleElementImpl impleme
     @Override
     public PsiElement getNavigationElement() {
         return getMirror();
+    }
+
+    @NotNull
+    @Override
+    public Project getProject() {
+        return getMirror().getProject();
     }
 }
