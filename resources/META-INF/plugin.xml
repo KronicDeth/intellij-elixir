@@ -107,6 +107,15 @@
               so we can save reference resolution time by skipping module attributes in <code>Callable</code>.
             </li>
             <li>Allow module attribute folding to be configured.</li>
+            <li>
+                Allow call definition heads to resolves to themselves for consistency with Aliases of
+                <code>defmodule</code>.
+            </li>
+            <li>
+                Generalize <code>Callable.callDefinitionClauseDefiner(Call)</code>: in addition to the current
+                <code>CallDefinitionClause</code>, make it work for <code>Implementation</code>, <code>Module</code>,
+                and <code>Protocol</code>.
+            </li>
           </ul>
         </li>
         <li>
@@ -229,6 +238,20 @@ Qualifier.
               Only increment arity for right pipe operand instead of all operands, so that left operands resolve to
               correct arity or as variable/parameter.
             </li>
+            <li>
+                Override <code>ModuleImpl#getProject()</code> to prevent <code>StackOverflowError</code>.  Without
+                overriding <code>#getProject()</code>, <code>IdentifierHighlighterPass</code> gets stuck in a loop
+                between <code>getManager</code> and <code>getProject</code> on the target (the <code>ModuleImpl</code>)
+                when clicking on the space between <code>def</code>s or <code>defmacro</code>s in the decompiled
+                <code>.beam</code> files.
+            </li>
+            <li>Fix source formatting</li>
+            <li>Skip looking for variables unless 0-arity AND no arguments</li>
+            <li>
+              Highlight unresolved macros as macro calls. Anything with a do keyword or a do block will be treated like
+              a macro call even if it can't be resolved.  No resolved is either no resolve results or an empty list
+            </li>
+            <li>Implicit imports at top of file in addition to top of Module.</li>
           </ul>
         </li>
         <li>
