@@ -192,6 +192,9 @@
   * Skip looking for variables unless 0-arity AND no arguments
   * Highlight unresolved macros as macro calls. Anything with a do keyword or a do block will be treated like a macro call even if it can't be resolved.  No resolved is either no resolve results or an empty list
   * Implicit imports at top of file in addition to top of Module.
+* [#663](https://github.com/KronicDeth/intellij-elixir/pull/663) - [@KronicDeth](https://github.com/KronicDeth)
+  * `CallDefinitionClause` completion provider is unexpectedly invoked both when `.` is typed, but continues to be invoked after a letter is typed after the `.`; however, once the letter is typed, the letter becomes the default prefix instead, so the prefix should only be reset to `""` when it ends in `.`.
+  * Disable `Callable#getVariants` unless `Unqualified` to  prevents local functions and macros being shown as completions for qualified names.
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

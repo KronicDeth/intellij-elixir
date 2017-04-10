@@ -252,6 +252,16 @@ Qualifier.
               a macro call even if it can't be resolved.  No resolved is either no resolve results or an empty list
             </li>
             <li>Implicit imports at top of file in addition to top of Module.</li>
+            <li>
+              <code>CallDefinitionClause</code> completion provider is unexpectedly invoked both when <code>.</code> is
+              typed, but continues to be invoked after a letter is typed after the <code>.</code>; however, once the
+              letter is typed, the letter becomes the default prefix instead, so the prefix should only be reset to
+              <code>""</code> when it ends in <code>.</code>.
+            </li>
+            <li>
+              Disable <code>Callable#getVariants</code> unless <code>Unqualified</code> to  prevents local functions and
+              macros being shown as completions for qualified names.
+            </li>
           </ul>
         </li>
         <li>
