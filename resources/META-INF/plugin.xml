@@ -292,6 +292,8 @@ Qualifier.
             </li>
             <li>Fix indentation to fix sub-lists in <code>CONTRIBUTING.md</code></li>
             <li>Fix pluralization in <code>CONTRIBUTING.md</code></li>
+            <li>Check if resolve results are <code>null</code> for <code>For.resolveResultList</code></li>
+            <li>Check if <code>Protocol.resolveResultList</code> is <code>null</code></li>
           </ul>
         </li>
         <li>

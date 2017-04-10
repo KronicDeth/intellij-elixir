@@ -219,6 +219,9 @@
 * [#650](https://github.com/KronicDeth/intellij-elixir/pull/650) - [@StabbyMcDuck](https://github.com/StabbyMcDuck)
   * Fix indentation to fix sub-lists in `CONTRIBUTING.md`
   * Fix pluralization in `CONTRIBUTING.md`
+* [#664](https://github.com/KronicDeth/intellij-elixir/pull/664) - [@KronicDeth](https://github.com/KronicDeth)
+  * Check if resolve results are `null` for `For.resolveResultList`
+  * Check if `Protocol.resolveResultList` is `null`
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)
