@@ -11,6 +11,7 @@ import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.scope.module_attribute.implemetation.For;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -215,7 +216,11 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
                 validResult = validResult("@for", incompleteCode);
 
                 if (validResult != null) {
-                    resultList.addAll(org.elixir_lang.psi.scope.module_attribute.implemetation.For.resolveResultList(validResult, myElement));
+                    List<ResolveResult> resolveResults = For.resolveResultList(validResult, myElement);
+
+                    if (resolveResults != null) {
+                        resultList.addAll(resolveResults);
+                    }
                 }
 
                 if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
@@ -251,6 +256,7 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         return resultList;
     }
 
+    @NotNull
     private List<ResolveResult> multiResolveUpFromElement(@NotNull final PsiElement element, boolean incompleteCode) {
         List<ResolveResult> resultList = new ArrayList<ResolveResult>();
         PsiElement lastSibling = element;

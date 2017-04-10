@@ -27,6 +27,7 @@ public class For implements PsiScopeProcessor {
      *
      */
 
+    @Nullable
     public static List<ResolveResult> resolveResultList(boolean validResult, @NotNull PsiElement entrance) {
         For scopeProcessor = new For(validResult);
         PsiTreeUtil.treeWalkUp(
