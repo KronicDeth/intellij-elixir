@@ -1,6 +1,8 @@
 package org.elixir_lang.reference;
 
 import com.google.common.collect.Sets;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
@@ -10,6 +12,7 @@ import com.intellij.usageView.UsageViewLongNameLocation;
 import com.intellij.usageView.UsageViewShortNameLocation;
 import com.intellij.usageView.UsageViewTypeLocation;
 import com.intellij.util.IncorrectOperationException;
+import com.intellij.util.ProcessingContext;
 import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
@@ -18,6 +21,7 @@ import org.elixir_lang.psi.call.Named;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.call.name.Module;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.scope.variable.Variants;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -607,21 +611,28 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
      * of visible identifiers may not be filtered by the completion prefix string - the
      * filtering is performed later by IDEA core.)
      *
+     * Qualified completion is handled by
+     * {@link org.elixir_lang.code_insight.completion.provider.CallDefinitionClause#addCompletions(CompletionParameters, ProcessingContext, CompletionResultSet)}
+     *
      * @return the array of available identifiers.
      */
     @NotNull
     @Override
     public Object[] getVariants() {
-        List<LookupElement> variableLookupElementList = null;
+        List<LookupElement> lookupElementList = null;
 
-        if (myElement instanceof UnqualifiedNoArgumentsCall) {
-            variableLookupElementList = Variants.lookupElementList(myElement);
+        if (myElement instanceof Unqualified) {
+            List<LookupElement> variableLookupElementList = null;
+
+            if (myElement instanceof UnqualifiedNoArgumentsCall) {
+                variableLookupElementList = Variants.lookupElementList(myElement);
+            }
+
+            List<LookupElement> callDefinitionClauseLookupElementList =
+                    org.elixir_lang.psi.scope.call_definition_clause.Variants.lookupElementList(myElement);
+
+            lookupElementList = merge(variableLookupElementList, callDefinitionClauseLookupElementList);
         }
-
-        List<LookupElement> callDefinitionClauseLookupElementList =
-                org.elixir_lang.psi.scope.call_definition_clause.Variants.lookupElementList(myElement);
-
-        List<LookupElement> lookupElementList = merge(variableLookupElementList, callDefinitionClauseLookupElementList);
 
         Object[] variants;
 

@@ -85,7 +85,11 @@ public class CallDefinitionClause extends CompletionProvider<CompletionParameter
                     Call modular = ElixirPsiImplUtil.maybeAliasToModular(qualifier, qualifier.getContainingFile());
 
                     if (modular != null) {
-                        resultSet.withPrefixMatcher("").addAllElements(
+                        if (resultSet.getPrefixMatcher().getPrefix().endsWith(".")) {
+                            resultSet = resultSet.withPrefixMatcher("");
+                        }
+
+                        resultSet.addAllElements(
                                 callDefinitionClauseLookupElements(modular)
                         );
                     }
