@@ -24,6 +24,7 @@ public class Protocol implements PsiScopeProcessor {
      *
      */
 
+    @Nullable
     public static List<ResolveResult> resolveResultList(boolean validResult, @NotNull PsiElement entrance) {
         Protocol protocol = new Protocol(validResult);
         PsiTreeUtil.treeWalkUp(
