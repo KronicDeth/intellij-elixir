@@ -195,6 +195,27 @@
 * [#663](https://github.com/KronicDeth/intellij-elixir/pull/663) - [@KronicDeth](https://github.com/KronicDeth)
   * `CallDefinitionClause` completion provider is unexpectedly invoked both when `.` is typed, but continues to be invoked after a letter is typed after the `.`; however, once the letter is typed, the letter becomes the default prefix instead, so the prefix should only be reset to `""` when it ends in `.`.
   * Disable `Callable#getVariants` unless `Unqualified` to  prevents local functions and macros being shown as completions for qualified names.
+* [#651](https://github.com/KronicDeth/intellij-elixir/pull/651) - [@StabbyMcDuck](https://github.com/StabbyMcDuck)
+  * Among many other tweaks, the String color is now green, so that Atom and String are no longer close to one another, which was the original issue in #569
+      <img width="760" alt="screen shot 2017-04-09 at 9 44 06 pm" src="https://cloud.githubusercontent.com/assets/298259/24844071/b1c9b51a-1d6d-11e7-8647-46a5075b12d9.png">
+    * `Alias` now has `underscored` effect
+    * `Brackets` are now greenish instead of brownish
+    * `Callbacks` are now a lighter blue and has `underscored` effect
+    * `CharList` is little lighter
+    * `CharToken` is dark yellow now instead of dark purple
+    * `Dot` is now purple instead of dark red
+    * `Expression Substitution Mark` is a little lighter
+    * `Interpolation` is now lime green
+    * `Kernel Macros` are a burnt orange
+    * `Map` is now a dark blue instead of a dark yellow
+    * `Operation Sign` is a little lighter
+    * `Parameters` are a little darker
+    * `Parentheses` are redder
+    * `Predefined` is orange instead of blue
+    * `Specification` is now red instead of purple
+    * `Struct` is now purple instead of yellow
+    * `Type` is now green instead of dark purple
+    * `Variable` is more tealish
 
 ### Incompatible Changes
 * [#585](https://github.com/KronicDeth/intellij-elixir/pull/585) - Move `^^^` to its own three-operator precedence level to match `1.2`.  This does mean the parsing will be wrong for Elixir `1.1`, but is simpler than maintaining two grammars for those that are still using Elixir `1.1` - [@KronicDeth](https://github.com/KronicDeth)

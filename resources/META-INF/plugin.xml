@@ -262,6 +262,34 @@ Qualifier.
               Disable <code>Callable#getVariants</code> unless <code>Unqualified</code> to  prevents local functions and
               macros being shown as completions for qualified names.
             </li>
+            <li>
+              <p>
+                Among many other tweaks, the String color is now green, so that Atom and String are no longer close to
+                one another, which was the original issue in
+                <a href="https://github.com/KronicDeth/intellij-elixir/issues/569">#569</a>
+              </p>
+              <img width="760" alt="screen shot 2017-04-09 at 9 44 06 pm" src="https://cloud.githubusercontent.com/assets/298259/24844071/b1c9b51a-1d6d-11e7-8647-46a5075b12d9.png">
+              <ul>
+                <li><code>Alias</code> now has <code>underscored</code> effect</li>
+                <li><code>Brackets</code> are now greenish instead of brownish</li>
+                <li><code>Callbacks</code> are now a lighter blue and has <code>underscored</code> effect</li>
+                <li><code>CharList</code> is little lighter</li>
+                <li><code>CharToken</code> is dark yellow now instead of dark purple</li>
+                <li><code>Dot</code> is now purple instead of dark red</li>
+                <li><code>Expression Substitution Mark</code> is a little lighter</li>
+                <li><code>Interpolation</code> is now lime green</li>
+                <li><code>Kernel Macros</code> are a burnt orange</li>
+                <li><code>Map</code> is now a dark blue instead of a dark yellow</li>
+                <li><code>Operation Sign</code> is a little lighter</li>
+                <li><code>Parameters</code> are a little darker</li>
+                <li><code>Parentheses</code> are redder</li>
+                <li><code>Predefined</code> is orange instead of blue</li>
+                <li><code>Specification</code> is now red instead of purple</li>
+                <li><code>Struct</code> is now purple instead of yellow</li>
+                <li><code>Type</code> is now green instead of dark purple</li>
+                <li><code>Variable</code> is more tealish</li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
