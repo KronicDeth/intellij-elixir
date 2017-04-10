@@ -290,6 +290,8 @@ Qualifier.
                 <li><code>Variable</code> is more tealish</li>
               </ul>
             </li>
+            <li>Fix indentation to fix sub-lists in <code>CONTRIBUTING.md</code></li>
+            <li>Fix pluralization in <code>CONTRIBUTING.md</code></li>
           </ul>
         </li>
         <li>
