@@ -1274,7 +1274,7 @@ with Alt+Enter. (Will vary based on keymap.)
 
 ### Code Folding
 
-You can collaspe (fold) pre-defined regions of your Elixir code to make it easier to quickly scroll through files or hide details you don't care about right now.
+You can collapse (fold) pre-defined regions of your Elixir code to make it easier to quickly scroll through files or hide details you don't care about right now.
 
 #### Controls
 
@@ -1303,7 +1303,7 @@ You can collaspe (fold) pre-defined regions of your Elixir code to make it easie
 | use ALIAS1<br> use ALIAS2         | `use ALIAS1`                               | Yes                |
 | `@for`                            | `FOR` in `defimpl PROTOCOL, for: FOR`      | Yes                |
 | `@protocol`                       | `PROTOCOL` in `defimpl PROTOCOL, for: FOR` | Yes                |
-| @MODULE_ATTRIBUTE                 | VALUE in `@MODULE_ATTRIBUTE VALUE`         | Yes                |
+| @MODULE_ATTRIBUTE                 | VALUE in `@MODULE_ATTRIBUTE VALUE`         | No                 |
 
 ### Commenter
 
