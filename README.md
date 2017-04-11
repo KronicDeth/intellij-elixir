@@ -177,7 +177,7 @@ If you've already created a (non-`mix`) project, you can load it as an Elixir pr
    .idea directory.  Click Yes.
 9. You'll be prompted with a list of detected Elixir project roots to add to the project.  Each root contains a
    `mix.exs`.  Uncheck any project roots that you don't want added.
-10. Click Next.      
+10. Click Next.
 10. Select a Project SDK directory by clicking Configure.
 11. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
     Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
@@ -279,7 +279,7 @@ name with be created:
 ```elixir
 defmodule MyNamespace.MyModule do
   @moduledoc false
-  
+
 end
 ```
 
@@ -291,7 +291,7 @@ name with be created. It will have a `start/2` function that calls `MyNamespace.
 ```elixir
 defmodule MyNamespace.MyModule do
   @moduledoc false
-  
+
   use Application
 
   def start(_type, _args) do
@@ -309,7 +309,7 @@ up the child specs.  It assumes a `MyWorker` child that should be supervised `:o
 ```elixir
 defmodule MyNamespace.MyModule.Supervisor do
   @moduledoc false
-  
+
   use Supervisor
 
   def start_link(arg) do
@@ -338,7 +338,7 @@ would like the stubs to get started without having to look them up in the docume
 ```elixir
 defmodule MyNamespace.MyModule do
   @moduledoc false
-  
+
   use GenServer
 
   def start_link(state, opts) do
@@ -371,7 +371,7 @@ would like the stubs to get started without having to look them up in the docume
 ```elixir
 defmodule MyNamespace.MyModule do
   @moduledoc false
-  
+
   use GenEvent
 
   # Callbacks
@@ -966,7 +966,7 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
           <li><code>a</code></li>
           <li><code>b</code></li>
         </ul>
-        
+
       </td>
       <td>
         <img src="screenshots/preferences/editor/colors_and_fonts/default/Variables/Parameter.png?raw=true"/>
@@ -996,7 +996,7 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
 
 Built on top of highlighted tokens above, the parser understands the following parts of Elixir grammar as valid or
 allows the grammar because they contain correctable errors:
- 
+
 * [Empty Parentheses](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L299) (`()`)
 * [Keyword Lists](http://elixir-lang.org/getting_started/7.html#7.1-keyword-lists)
   * Keyword Keys - Aliases, identifiers, quotes, or operators when followed immediately by a colon and horizontal or vertical space.
@@ -1022,7 +1022,7 @@ allows the grammar because they contain correctable errors:
     * Keywords (`Alias.function(key: value)`)
     * Positional and Keyword arguments (`Alias.function(positional, key: value)`)
     * Trailing parentheses for quoting (`def unquote(variable)(positional)`)
-* Bracket expression (`variable[key]`)    
+* Bracket expression (`variable[key]`)
 * Block expressions (`function do end`)
 * [Unmatched expressions](https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b//lib/elixir/src/elixir_parser.yrl#L127-L133),
   in other words combinations of block expressions and matched expressions.
@@ -1033,7 +1033,7 @@ Inspections mark sections of code with warnings and errors.  They can be customi
 
 ![Elixir Inspections](/screenshots/inspection/Elixir.png?raw=true "Elixir Inspections")
 
-#### Ambiguous nested calls 
+#### Ambiguous nested calls
 
 Detects when compiler will throw `unexpected comma. Parentheses are required to solve ambiguity in nested calls`.
 Function calls with multiple arguments without parentheses cannot take as arguments functions with multiple arguments
@@ -1092,7 +1092,7 @@ outer_function first_outer_argument
 
 #### Ambiguous parentheses
 
-Detects when compiler will throw `unexpected parenthesis. If you are making a function call, do not insert spaces in between the function name and the opening parentheses`. 
+Detects when compiler will throw `unexpected parenthesis. If you are making a function call, do not insert spaces in between the function name and the opening parentheses`.
 Function calls with space between the function name and the parentheses cannot distinguish between function calls with
 parentheses, but with an accidental space before the `(` and function calls without parentheses where the first
 positional argument is in parentheses.
@@ -1169,7 +1169,7 @@ Type specifications separate the name from the definition using `::`.
 ```
 
 Replace the `:` with ` ::`
- 
+
 ```elixir
 @type name :: definition
 ```
@@ -1219,7 +1219,7 @@ one.(
   <br/>
   <figcaption>
     Keywords Not At End inspection marks the error over the keywords that need to be surrounded by parentheses or moved
-    to the end of the list. 
+    to the end of the list.
   </figcaption>
 </figure>
 
@@ -1241,7 +1241,7 @@ Type specifications separate the name from the definition using `::`.
 ```
 
 Replace the `=` with ` ::`
- 
+
 ```elixir
 @type name :: definition
 ```
@@ -1274,7 +1274,7 @@ with Alt+Enter. (Will vary based on keymap.)
 
 ### Code Folding
 
-You can collaspe (fold) pre-defined regions of your Elixir code to make it easier to quickly scroll through files or hide details you don't care about right now.
+You can collapse (fold) pre-defined regions of your Elixir code to make it easier to quickly scroll through files or hide details you don't care about right now.
 
 #### Controls
 
@@ -1303,7 +1303,7 @@ You can collaspe (fold) pre-defined regions of your Elixir code to make it easie
 | use ALIAS1<br> use ALIAS2         | `use ALIAS1`                               | Yes                |
 | `@for`                            | `FOR` in `defimpl PROTOCOL, for: FOR`      | Yes                |
 | `@protocol`                       | `PROTOCOL` in `defimpl PROTOCOL, for: FOR` | Yes                |
-| @MODULE_ATTRIBUTE                 | VALUE in `@MODULE_ATTRIBUTE VALUE`         | Yes                |
+| @MODULE_ATTRIBUTE                 | VALUE in `@MODULE_ATTRIBUTE VALUE`         | No                 |
 
 ### Commenter
 
@@ -1315,8 +1315,8 @@ Using the menus
 
 1. Highlight one or more lines
 2. Comment (or Uncomment) with one of the following:
-  a. Code > Comment with Line Comment 
-  b. On OSX the key binding is normally `Cmd+/`.  
+  a. Code > Comment with Line Comment
+  b. On OSX the key binding is normally `Cmd+/`.
 
 ### Delimiters
 
@@ -1426,9 +1426,9 @@ Live Templates can be customized in Preferences > Editor > Live Templates > Elix
 ONE
 """
 END
-</code></pre>      
+</code></pre>
       </td>
-    </tr> 
+    </tr>
     <tr>
       <td>
         <code>case</code>
@@ -1450,7 +1450,7 @@ end
 cond do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1461,7 +1461,7 @@ end
 <pre><code>
 def NAME do
   END
-end        
+end
 </code></pre>
       </td>
     </tr>
@@ -1471,7 +1471,7 @@ end
       </td>
       <td>
 <pre><code>
-def NAME, do: END        
+def NAME, do: END
 </code></pre>
       </td>
     </tr>
@@ -1483,8 +1483,8 @@ def NAME, do: END
 <pre><code>
 defimpl PROTOCOL, for: TYPE do
   END
-end  
-</code></pre>      
+end
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1508,7 +1508,7 @@ end
 defmacro MACRO_NAME do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1520,7 +1520,7 @@ end
 defmacrop MACRO_NAME do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1530,7 +1530,7 @@ end
       <td>
 <pre><code>
 defoverridable [NAME: END]
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1542,7 +1542,7 @@ defoverridable [NAME: END]
 defp NAME do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1554,7 +1554,7 @@ end
 defprotocol PROTOCOL do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1564,7 +1564,7 @@ end
       <td>
 <pre><code>
 defstruct [END]
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1572,7 +1572,7 @@ defstruct [END]
         <code>do</code>
       </td>
       <td>
-<pre><code> 
+<pre><code>
 do
   END
 end
@@ -1589,7 +1589,7 @@ end
 ONE
 """
 END
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1599,7 +1599,7 @@ END
       <td>
 <pre><code>
 fn ARGS -> END end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1611,7 +1611,7 @@ fn ARGS -> END end
 for A <- B do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1623,7 +1623,7 @@ end
 if TRUE do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1637,7 +1637,7 @@ if TRUE do
 else
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1647,7 +1647,7 @@ end
       <td>
 <pre><code>
 IO.inspect(END)
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1660,7 +1660,7 @@ IO.inspect(END)
 ONE
 """
 END
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1672,7 +1672,7 @@ END
 receive do
   ONE -> END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1684,7 +1684,7 @@ end
 test "TESTDESC" do
   END
 end
-</code></pre>      
+</code></pre>
       </td>
     </tr>
     <tr>
@@ -1694,10 +1694,10 @@ end
       <td>
 <pre><code>
 try do
-  ONE 
+  ONE
 rescue
   TWO -> END
-</code></pre>      
+</code></pre>
       </td>
     </tr>
   </tbody>
@@ -1708,7 +1708,7 @@ rescue
 #### Mix Tasks
 
 Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
- 
+
 1. Run > Edit Configurations...
    ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
 2. Click +
@@ -1716,7 +1716,7 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
    ![Add New Elixir Mix](/screenshots/features/run_configurations/mix_tasks/Add%20New.png?raw=true "Add New Elixir Mix Run Configuration")
 4. Fill in the "Program arguments" starting with the name of the `mix` task followed by any arguments to that task
 5. Fill in the "Working directory"
-  * Type the absolute path to the directory.  
+  * Type the absolute path to the directory.
   * Select the path using directory picker by clicking the `...` button
 6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 7. Click "OK" to save the Run Configuration and close the dialog
@@ -1730,7 +1730,7 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix test`, so that you get the standard graphical tree of Test Results
 
-##### Creating `mix test` Run Configurations Manually 
+##### Creating `mix test` Run Configurations Manually
 
 1. Run > Edit Configurations...
    ![Edit Run Configurations](/screenshots/features/run_configurations/Edit%20Configurations.png?raw=true "Edit Run Configurations")
@@ -1739,19 +1739,19 @@ The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit
    ![Add New Elixir Mix ExUnit](/screenshots/features/run_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
 4. Fill in the "Program arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
 5. Fill in the "Working directory"
-  * Type the absolute path to the directory.  
+  * Type the absolute path to the directory.
   * Select the path using directory picker by clicking the `...` button
 6. (Optionally) click the `...` button on the "Environment variables" line to add environment variables.
 7. Click "OK" to save the Run Configuration and close the dialog
 8. Click the RUn arrow in the Toolbar to run the `mix test` task
 9. The Run pane will open showing the Test Results
    ![Test Results](/screenshots/features/run_configurations/mix_test/Test%20Results.png?raw=true "Full Green Test Results")
-   
+
 While you can create `Elixir Mix ExUnit` run configurations manually using the `Run > Edit Configurations...` menu, it is probably more convenient to use the context menu.
 
 ##### Creating `mix test` Run Configurations from context
 
-The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root. 
+The context menu must know that the the directory, file, or line you are right-clicking is a test.  It does this by checking if the current directory or an ancestor is marked as a Test Sources Root.
 
 1. In the Project pane, ensure your OTP application's `test` directory is marked as a Test Sources Root
   1. Check if the `test` directory is green.  If it is, it is likely a Test Sources Root.  This color may differ in different themes, so to be sure you can check the context menu
@@ -1803,7 +1803,7 @@ If you want to be able to run a single test, you can create a Run Configuration 
 
 Alternatively, you can use keyboard shortcuts
 
-1. Place the cursor on the line you want to test 
+1. Place the cursor on the line you want to test
 2. `Ctrl+Shift+R` will create the Run Configuration and Run it.
 
 ### Completion
@@ -1820,7 +1820,7 @@ When you start typing an Alias, completion will look in three locations:
     1. `Prefix.Suffix` from `defmodule Prefix.Suffix`
     2. `MyProtocol` from `defprotocol MyProtocol`
     3. `MyProtocol.MyStruct`
-        1. `defimpl MyProtocol, for: MyStruct` 
+        1. `defimpl MyProtocol, for: MyStruct`
         2. `defimpl MyProtocol` nested under `defmodule MyStruct`
 3. Nested modules under aliased names
     1. `Suffix.Nested` for `alias Prefix.Suffix` where `Prefix.Suffix.Nested` is an indexed module, implementation or protocol name.
@@ -1853,6 +1853,10 @@ Module attributes declared earlier in the file can be completed whenever you typ
 
 Parameter and variable usages can be completed whenever typing an identifier.  The completions will include all variables know up from that part of the file.  It can include variables from outside macros, like quote blocks.
 
+### Decompilation
+
+`.beam` files, such as those in the Elixir SDK and in your project's `build` directory will be decompiled to equivalent `def` and `defmacro` calls.  The bodies will not be decompiled, only the call definition head and placeholder parameters.  These decompiled call definition heads are enough to allow Go To Declaration, the Structure pane, and Completion to work with the decompiled `.beam` files.
+
 ### Go To Declaration
 
 Go To Declaration is a feature of JetBrains IDEs that allows you to jump from the usage of a symbol, such as a Module
@@ -1876,7 +1880,7 @@ Alias, to its declaration, such as the `defmodule` call.
 
 You'll know if function or macro usage is resolved and Go To Declaration will work if the call is annotated, which in the default themes will show up as *italics*.
 
-##### Imported Functions or Macros 
+##### Imported Functions or Macros
 
 1. Place the cursor over name of the function or macro call.
 2. Activate the Go to Declaration action with one of the following:
@@ -1887,27 +1891,27 @@ You'll know if function or macro usage is resolved and Go To Declaration will wo
     1. Use arrow keys to select and hit `Enter`
     2. `Click`
 
-##### Local Functions or Macros 
+##### Local Functions or Macros
 
 1. Place the cursor over name of the function or macro call.
 2. Activate the Go to Declaration action with one of the following:
     1. `Cmd+B`
     2. Select Navigate &gt; Declaration from the menu.
     3. `Cmd+Click`
-3. Whether a lookup a Go To Declaration lookup menu appears depends on the number of clauses in the function or macro definition: 
+3. Whether a lookup a Go To Declaration lookup menu appears depends on the number of clauses in the function or macro definition:
     1. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
     2. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
         1. Use arrow keys to select and hit `Enter`
         2. `Click`
 
-##### Remote Functions or Macros 
+##### Remote Functions or Macros
 
 1. Place the cursor over name of the function or macro call that is qualified by an Alias.
 2. Activate the Go to Declaration action with one of the following:
     1. `Cmd+B`
     2. Select Navigate &gt; Declaration from the menu.
     3. `Cmd+Click`
-3. 
+3.
     1. If there is only one clause in the function or macro definition, you'll jump immediately to that clause
     2. If there is more than one clause in the function or macro definition, a Go To Declaration lookup menu will appear, allowing you to jump to either the `import` that imported the function or macro or jumping directly to the function or macro definition clause.  Select which declaration you want.
         1. Use arrow keys to select and hit `Enter`
@@ -1947,7 +1951,7 @@ If you hold `Cmd` and hover over the `@module_attribute` before clicking, the ta
     2. Select Navigate &gt; Declaration from the menu.
     3. `Cmd+Click`
 
-If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color. 
+If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color.
 
 ### Go To Symbol
 
@@ -1994,7 +1998,7 @@ in a `defmodule`, is used, including in strings and comments.
     ii. Select "Find Usages" from the context menu
   b. Select Edit &gt; Find &gt; Find Usages from the menu
   c. `Alt+F7`
-  
+
 [![Find Module Usage Demonstration](http://img.youtube.com/vi/n_EEucKK0N0/0.jpg)](https://www.youtube.com/watch?v=n_EEucKK0N0)
 
 #### Module Attribute
@@ -2511,7 +2515,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2538,7 +2542,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2564,7 +2568,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2591,7 +2595,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2827,7 +2831,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       </td>
       <td>
         The <code>NAME</code> and <code>ARITY</code> of the function that is overridable.  Matches the icon and text
-        for <code>def</code>, but with the addition of  
+        for <code>def</code>, but with the addition of
         <img alt="Overridable" src="https://raw.githubusercontent.com/JetBrains/intellij-community/master/platform/icons/src/general/overridenMethod.png?raw=true" />
         Overridable
       </td>
@@ -2929,7 +2933,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2956,7 +2960,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -2982,7 +2986,7 @@ The Visibility icons indicated whether the element is usable outside its definin
       <td>
       </td>
       <td>
-      </td> 
+      </td>
       <td>
       </td>
       <td>
@@ -3000,7 +3004,7 @@ The Visibility icons indicated whether the element is usable outside its definin
 </table>
 
 ## Installation
- 
+
 ### Inside IDE using JetBrains repository
 
 1. Preferences
@@ -3035,7 +3039,7 @@ The Visibility icons indicated whether the element is usable outside its definin
 ## Error reporting
 
 If the plugin encounters an error, there is a custom error handler registered, so you can open a pre-populated issue in your browser.
- 
+
 1. Click the red error notification in bottom right corner of the IDE window.
 ![Fatal IDE Errors](/screenshots/error_handler/IDE%20Fatal%20Errors.png?raw=true "Fatal IDE Errors")
 2. Fill in a description of what you were doing when the error occurred.
