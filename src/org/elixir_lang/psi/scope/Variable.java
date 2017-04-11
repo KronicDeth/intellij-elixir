@@ -335,7 +335,9 @@ public abstract class Variable implements PsiScopeProcessor {
             if (!match.isCalling(Module.KERNEL, UNQUOTE, 1)) {
                 int resolvedFinalArity = match.resolvedFinalArity();
 
-                if (resolvedFinalArity == 0) {
+                // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
+                // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
+                if (match instanceof UnqualifiedNoArgumentsCall && resolvedFinalArity == 0) {
                     keepProcessing = executeOnVariable((PsiNamedElement) match, state);
                 } else if (maybeMacro(match, state)) {
                     ResolveState maybeMacroState = state.put(MAYBE_MACRO, true);
