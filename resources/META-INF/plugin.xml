@@ -178,9 +178,9 @@
             </li>
             <li>Update to <code>ant</code> <code>1.10.1</code> because <code>1.10.0</code> is no longer hosted.</li>
             <li>
-              Yeah, it sounds weird, but an `ElixirVariable` isn't necessarily a variable if it doesn't occur in a
+              Yeah, it sounds weird, but an <code>ElixirVariable</code> isn't necessarily a variable if it doesn't occur in a
               declaration context.  It could just be a no-parentheses function call in the wrong spot, so check the
-              parent `PsiElement` to determine if `ElixirVariable` is a variable.
+              parent <code>PsiElement</code> to determine if <code>ElixirVariable</code> is a variable.
             </li>
             <li>
               Highlight parameterized type head (<code>maybe(t)</code> in <code>@type maybe(t)</code>) the same as a
@@ -294,6 +294,10 @@ Qualifier.
             <li>Fix pluralization in <code>CONTRIBUTING.md</code></li>
             <li>Check if resolve results are <code>null</code> for <code>For.resolveResultList</code></li>
             <li>Check if <code>Protocol.resolveResultList</code> is <code>null</code></li>
+            <li>
+              Check <code>match</code> <code>Call</code> is an <code>UnqualifiedNoArgumentCall</code>, in addition to
+              being 0 resolved final arity, before checking if the name matches.
+            </li>
           </ul>
         </li>
         <li>
@@ -2411,7 +2415,7 @@ Qualifier.
     <annotator implementationClass="org.elixir_lang.annonator.Map" language="Elixir"/>
     <annotator implementationClass="org.elixir_lang.annonator.ModuleAttribute" language="Elixir"/>
 
-    <!-- `.beam` -->
+    <!-- <code>.beam</code> -->
     <filetype.decompiler filetype="BEAM" implementationClass="org.elixir_lang.beam.Decompiler"/>
     <fileType.fileViewProviderFactory filetype="BEAM" implementationClass="org.elixir_lang.beam.FileViewProviderFactory"/>
     <filetype.stubBuilder filetype="BEAM" implementationClass="org.elixir_lang.beam.StubBuilder"/>
