@@ -3,8 +3,6 @@ plugins {
   id 'de.undercouch.download' version "3.1.2"
 }
 
-version = "${version}.$buildNumber"
-
 ext {
   quoterPath = "${rootDir}/cache/intellij_elixir-0.1.1"
   quoterExe = "${quoterPath}/rel/intellij_elixir/bin/intellij_elixir"
