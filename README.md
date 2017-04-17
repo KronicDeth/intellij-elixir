@@ -66,6 +66,7 @@
         - [Unqualified](#unqualified)
       - [Module Attributes](#module-attributes)
       - [Parameters and Variables](#parameters-and-variables)
+    - [Decompilation](#decompilation)
     - [Go To Declaration](#go-to-declaration)
       - [Alias](#alias)
       - [Function or Macro](#function-or-macro)
