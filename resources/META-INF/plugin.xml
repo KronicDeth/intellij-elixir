@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>5.0.0</version>
+  <version>5.0.1</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,18 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v5.0.1</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              Replace <code>assert scope.isEquivalentTo(lastParent.getParent())</code> with an <code>if</code> and log
+              what <code>lastParent</code> was when condition is <code>false</code>, so root cause can be traced.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v5.0.0</h1>
       <ul>
         <li>

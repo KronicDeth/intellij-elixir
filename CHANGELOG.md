@@ -101,6 +101,11 @@
 
 # Changelog
 
+## v5.0.1
+
+### Bug Fixes
+* [#669](https://github.com/KronicDeth/intellij-elixir/pull/669) - Replace `assert scope.isEquivalentTo(lastParent.getParent())` with an `if` and log what `lastParent` was when condition is `false`, so root cause can be traced. - [@KronicDeth](https://github.com/KronicDeth)
+
 ## v5.0.0
 
 ### Enhancements
