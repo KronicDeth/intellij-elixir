@@ -1691,25 +1691,32 @@ public class ElixirPsiImplUtil {
                                                                @NotNull ResolveState state,
                                                                PsiElement lastParent,
                                                                @NotNull @SuppressWarnings("unused") PsiElement entrance) {
-        assert scope.isEquivalentTo(lastParent.getParent());
-
         boolean keepProcessing = true;
-        PsiElement previousSibling = lastParent.getPrevSibling();
 
-        while (previousSibling != null) {
-            if (!(previousSibling instanceof ElixirEndOfExpression ||
-                    previousSibling instanceof PsiComment ||
-                    previousSibling instanceof PsiWhiteSpace)) {
-                if (!createsNewScope(previousSibling)) {
-                    keepProcessing = processor.execute(previousSibling, state);
+        if (scope.isEquivalentTo(lastParent.getParent())) {
+            PsiElement previousSibling = lastParent.getPrevSibling();
 
-                    if (!keepProcessing) {
-                        break;
+            while (previousSibling != null) {
+                if (!(previousSibling instanceof ElixirEndOfExpression ||
+                        previousSibling instanceof PsiComment ||
+                        previousSibling instanceof PsiWhiteSpace)) {
+                    if (!createsNewScope(previousSibling)) {
+                        keepProcessing = processor.execute(previousSibling, state);
+
+                        if (!keepProcessing) {
+                            break;
+                        }
                     }
                 }
-            }
 
-            previousSibling = previousSibling.getPrevSibling();
+                previousSibling = previousSibling.getPrevSibling();
+            }
+        } else {
+            error(
+                    PsiElement.class,
+                    "Scope is not lastParent's parent\nlastParent:\n" + lastParent.getText(),
+                    scope
+            );
         }
 
         return keepProcessing;
