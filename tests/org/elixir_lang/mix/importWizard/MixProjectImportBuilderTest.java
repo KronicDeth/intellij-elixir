@@ -25,11 +25,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Created by zyuyou on 15/7/17.
  */
 public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
+  private static final String[] FORMATS = new String[]{"14", "2017.1"};
   private static final String MODULE_DIR = "MODULE_DIR";
   private static final String TEST_DATA = "testData/org/elixir_lang/";
   private static final String TEST_DATA_IMPORT = TEST_DATA + "mix/import/";
@@ -90,14 +92,27 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
     PathMacros.getInstance().removeMacro(MODULE_DIR);
 
     String projectPath = getProject().getBaseDir().getPath();
-    File expectedImlFile = new File(projectPath + "/expected/" + module.getName() + ".iml");
-    Document expectedIml = JDOMUtil.loadDocument(expectedImlFile);
-    Element expectedImlElement = expectedIml.getRootElement();
+    StringBuilder expected = new StringBuilder("Configuration of module ").append(module.getName()).append(" does not meet expectations\nExpected:\n");
+    boolean formattedFound = false;
 
-    String errorMsg = "Configuration of module " + module.getName() + " does not meet expectations.\nExpected:\n" +
-        new String(JDOMUtil.printDocument(expectedIml, "\n")) +
-        "\nBut got:\n" + new String(JDOMUtil.printDocument(new Document(actualImlElement), "\n"));
+    for (String format : FORMATS) {
+      File expectedImlFile = new File(projectPath + "/expected/" + format + "/" + module.getName() + ".iml");
+      Document expectedIml = JDOMUtil.loadDocument(expectedImlFile);
+      Element expectedImlElement = expectedIml.getRootElement();
+      expected.append(Arrays.toString(JDOMUtil.printDocument(expectedIml, "\n"))).append('\n');
 
-    assertTrue(errorMsg, JDOMUtil.areElementsEqual(expectedImlElement, actualImlElement));
+      if (JDOMUtil.areElementsEqual(expectedImlElement, actualImlElement)) {
+        assertTrue(true);
+        formattedFound = true;
+      }
+    }
+
+    if (!formattedFound) {
+      String errorMsg = expected
+              .append("\nBut got:\n")
+              .append(Arrays.toString(JDOMUtil.printDocument(new Document(actualImlElement), "\n")))
+              .toString();
+     assertTrue(errorMsg, false);
+    }
   }
 }
