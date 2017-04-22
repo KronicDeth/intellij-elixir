@@ -57,6 +57,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
@@ -5866,5 +5868,33 @@ if (quoted == null) {
         }
 
         return unwrapped;
+    }
+
+    @Nullable
+    public static String getModuleName(PsiElement elem) {
+        final Predicate<PsiElement> isModuleName = (PsiElement c) ->
+          c instanceof MaybeModuleName && ((MaybeModuleName) c).isModuleName();
+
+        PsiElement moduleDefinition = PsiTreeUtil.findFirstParent(elem, e ->
+          Stream.of(e.getChildren()).anyMatch(isModuleName)
+        );
+        if (moduleDefinition != null) {
+            Optional<PsiElement> moduleName =
+              Stream.of(moduleDefinition.getChildren())
+                .filter(isModuleName)
+                .findAny();
+            if (moduleName.isPresent()) {
+                String parentModuleName = getModuleName(moduleDefinition.getParent());
+                if (parentModuleName != null) {
+                    return parentModuleName + "." + moduleName.get().getText();
+                } else {
+                    return moduleName.get().getText();
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }

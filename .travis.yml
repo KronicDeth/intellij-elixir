@@ -14,31 +14,84 @@ language: elixir
 # in the `runIde` and `test` run configurations, to allow for mirrored local development and test.
 matrix:
   include:
-    - elixir: 1.4.0
-      env: IDEA_VERSION="2016.3.1"
+    # version groups based on https://www.jetbrains.com/idea/download/previous.html
+
+    - elixir: 1.4.2
+      env: IDEA_VERSION="2017.1.1"
       jdk: oraclejdk8
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.3.4
-      env: IDEA_VERSION="2016.3.1"
+      env: IDEA_VERSION="2017.1.1"
       jdk: oraclejdk8
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.2.6
-      env: IDEA_VERSION="2016.3.1"
+      env: IDEA_VERSION="2017.1.1"
       jdk: oraclejdk8
       otp_release: 18.3
     - elixir: 1.1.1
-      env: IDEA_VERSION="2016.3.1"
+      env: IDEA_VERSION="2017.1.1"
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.0
+    - elixir: 1.4.2
+      env: IDEA_VERSION="2016.3.5"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.3.4
+      env: IDEA_VERSION="2016.3.5"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.2.6
+      env: IDEA_VERSION="2016.3.5"
+      jdk: oraclejdk8
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_VERSION="2016.3.5"
+      jdk: oraclejdk8
+      otp_release: 18.3
+
+    - elixir: 1.4.2
+      env: IDEA_VERSION="2016.2.5"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.3.4
+      env: IDEA_VERSION="2016.2.5"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.2.6
+      env: IDEA_VERSION="2016.2.5"
+      jdk: oraclejdk8
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_VERSION="2016.2.5"
+      jdk: oraclejdk8
+      otp_release: 18.3
+
+    - elixir: 1.4.2
+      env: IDEA_VERSION="2016.1.4"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.3.4
+      env: IDEA_VERSION="2016.1.4"
+      jdk: oraclejdk8
+      otp_release: 19.3
+    - elixir: 1.2.6
+      env: IDEA_VERSION="2016.1.4"
+      jdk: oraclejdk8
+      otp_release: 18.3
+    - elixir: 1.1.1
+      env: IDEA_VERSION="2016.1.4"
+      jdk: oraclejdk8
+      otp_release: 18.3
+
+    - elixir: 1.4.2
       env: IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.3.4
       env: IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.2.6
       env: IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
@@ -48,14 +101,14 @@ matrix:
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.0
+    - elixir: 1.4.2
       env: IDEA_VERSION="14.1.7"
       jdk: openjdk6
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.3.4
       env: IDEA_VERSION="14.1.7"
       jdk: openjdk6
-      otp_release: 19.2
+      otp_release: 19.3
     - elixir: 1.2.6
       env: IDEA_VERSION="14.1.7"
       jdk: openjdk6

@@ -16,7 +16,6 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.hash.LinkedHashMap;
-import com.intellij.util.xmlb.Accessor;
 import com.intellij.util.xmlb.SerializationFilter;
 import com.intellij.util.xmlb.XmlSerializer;
 import org.elixir_lang.runconfig.ElixirModuleBasedConfiguration;
@@ -25,10 +24,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunConfigurationBase.java
@@ -41,19 +37,14 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
    * CONSTANTS
    */
 
-  private static final SerializationFilter SERIALIZATION_FILTER = new SerializationFilter() {
-    @Override
-    public boolean accepts(@NotNull Accessor accessor, @NotNull @SuppressWarnings("unused") Object bean) {
-      return !accessor.getName().equals("envs");
-    }
-  };
+  private static final SerializationFilter SERIALIZATION_FILTER = (accessor, bean) -> !accessor.getName().equals("envs");
 
   /*
    * Fields
    */
 
   @NotNull
-  private final Map<String, String> envs = new LinkedHashMap<String, String>();
+  private final Map<String, String> envs = new LinkedHashMap<>();
   private boolean mySkipDependencies = false;
   private boolean passParentEnvs = false;
   @Nullable
@@ -108,7 +99,18 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
     return GlobalSearchScope.projectScope(getProject());
   }
 
-  @Nullable
+  @NotNull
+  public List<String> getMixArgs() {
+    String programParameters = getProgramParameters();
+
+    if (programParameters != null) {
+      return Arrays.asList(programParameters.split("\\s+"));
+    } else {
+      return new ArrayList<>(0);
+    }
+  }
+
+  @NotNull
   @Override
   public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment) throws ExecutionException {
     return new MixRunningState(environment, this);
@@ -187,6 +189,9 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
     );
     EnvironmentVariablesComponent.writeExternal(element, getEnvs());
   }
+
+//  @NotNull
+//  abstract public GeneralCommandLine commandLine(List<String> elixirParams);
 
   /*
    * Package Instance Methods
