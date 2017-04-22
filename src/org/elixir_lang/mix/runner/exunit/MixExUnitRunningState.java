@@ -4,10 +4,6 @@ import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configurations.CommandLineState;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.filters.TextConsoleBuilder;
-import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
@@ -15,12 +11,11 @@ import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
 import org.elixir_lang.mix.runner.MixRunningState;
-import org.elixir_lang.mix.runner.MixRunningStateUtil;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,11 +24,12 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 final class MixExUnitRunningState extends MixRunningState {
+  private static final Logger LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(MixExUnitRunningState.class);
+
   private final String TEST_FRAMEWORK_NAME = "ExUnit";
 
   MixExUnitRunningState(@NotNull ExecutionEnvironment environment, MixExUnitRunConfiguration configuration) {
@@ -54,7 +50,43 @@ final class MixExUnitRunningState extends MixRunningState {
   @NotNull
   public ConsoleView createConsoleView(Executor executor) {
     TestConsoleProperties properties = new SMTRunnerConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
-    return SMTestRunnerConnectionUtil.createConsole(TEST_FRAMEWORK_NAME, properties);
+    ConsoleView consoleView = null;
+
+    try {
+      Method createConsole2 = SMTestRunnerConnectionUtil.class.getMethod(
+              "createConsole",
+              String.class,
+              TestConsoleProperties.class
+      );
+
+      try {
+        // first argument is `null` because it's a static method
+        consoleView = (ConsoleView) createConsole2.invoke(null, TEST_FRAMEWORK_NAME, properties);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        LOGGER.error(e);
+      }
+    } catch (NoSuchMethodException e) {
+      try {
+        Method createConsole3 = SMTestRunnerConnectionUtil.class.getMethod(
+                "createConsole",
+                String.class,
+                TestConsoleProperties.class,
+                ExecutionEnvironment.class
+        );
+
+        try {
+          // first argument is `null` because it's a static method
+          consoleView = (ConsoleView) createConsole3.invoke(null, TEST_FRAMEWORK_NAME, properties, null);
+        } catch (IllegalAccessException | InvocationTargetException e1) {
+          LOGGER.error(e1);
+        }
+      } catch (NoSuchMethodException e1) {
+        LOGGER.error(e1);
+      }
+    }
+
+    //noinspection ConstantConditions
+    return consoleView;
   }
 
   /**
