@@ -2,7 +2,6 @@ package org.elixir_lang.mix.importWizard;
 
 import com.intellij.compiler.CompilerWorkspaceConfiguration;
 import com.intellij.ide.projectWizard.ProjectWizardTestCase;
-import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathMacros;
 import com.intellij.openapi.components.PathMacroManager;
@@ -15,14 +14,12 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.impl.ModuleRootManagerImpl;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.util.Consumer;
 import org.elixir_lang.configuration.ElixirCompilerSettings;
 import org.elixir_lang.sdk.ElixirSdkRelease;
 import org.elixir_lang.sdk.ElixirSdkType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.Arrays;
@@ -37,7 +34,7 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
   private static final String TEST_DATA_IMPORT = TEST_DATA + "mix/import/";
   private static final String MOCK_SDK_DIR = TEST_DATA + "mockSdk-1.0.4/";
 
-  public void testFromRootMixExsFile() throws Exception{ doTest(null); }
+  public void testFromRootMixExsFile() throws Exception{ doTest(); }
 
   @Override
   protected String getTestDirectoryName() {
@@ -54,24 +51,18 @@ public class MixProjectImportBuilderTest extends ProjectWizardTestCase{
 
   private static void createMockSdk(){
     final Sdk mockSdk = ElixirSdkType.createMockSdk(MOCK_SDK_DIR, ElixirSdkRelease.V_1_0_4);
-    ApplicationManager.getApplication().runWriteAction(new Runnable() {
-      @Override
-      public void run() {
-        ProjectJdkTable.getInstance().addJdk(mockSdk);
-      }
-    });
+    ApplicationManager.getApplication().runWriteAction(() -> ProjectJdkTable.getInstance().addJdk(mockSdk));
   }
 
-  private Project doTest(@Nullable Consumer<ModuleWizardStep> adjuster) throws Exception{
+  private void doTest() throws Exception{
     String projectPath = getProject().getBaseDir().getPath();
     String importFromPath = projectPath + "/test/";
-    Module firstModule = importProjectFrom(importFromPath, adjuster, new MixProjectImportProvider(new MixProjectImportBuilder()));
+    Module firstModule = importProjectFrom(importFromPath, null, new MixProjectImportProvider(new MixProjectImportBuilder()));
     Project createProject = firstModule.getProject();
     validateProject(createProject);
     for(Module importedModule: ModuleManager.getInstance(createProject).getModules()){
       validateModule(importedModule);
     }
-    return createProject;
   }
 
   private static void validateProject(@NotNull Project project){

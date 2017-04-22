@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +23,7 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import org.jetbrains.annotations.NotNull;
 
 class ElixirTupleXValue extends ElixirArrayXValueBase<OtpErlangTuple> {
-  public ElixirTupleXValue(@NotNull OtpErlangTuple value) {
+  ElixirTupleXValue(@NotNull OtpErlangTuple value) {
     super(value, value.arity());
   }
 

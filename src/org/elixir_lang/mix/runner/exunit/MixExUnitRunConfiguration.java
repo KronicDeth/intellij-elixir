@@ -10,14 +10,13 @@ import com.intellij.openapi.project.Project;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
-  public MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
+  MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
     super(name, project, MixExUnitRunConfigurationFactory.getInstance());
   }
 
@@ -34,7 +33,7 @@ public final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
     return new MixExUnitRunningState(environment, this);
   }
 
-  @Nullable
+  @NotNull
   public List<String> getMixArgs() {
     List<String> params = super.getMixArgs();
     MixSettings mixSettings = MixSettings.getInstance(getProject());

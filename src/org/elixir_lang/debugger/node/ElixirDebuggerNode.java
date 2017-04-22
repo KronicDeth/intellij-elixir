@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import org.elixir_lang.debugger.node.commands.ElixirDebuggerCommandsProducer;
 import org.elixir_lang.debugger.node.events.ErlangDebuggerEvent;
 import org.elixir_lang.utils.ElixirModulesUtil;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +20,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -32,7 +32,7 @@ public class ElixirDebuggerNode {
 
   private OtpErlangPid myLastSuspendedPid;
 
-  private final Queue<ElixirDebuggerCommandsProducer.ErlangDebuggerCommand> myCommandsQueue = new LinkedList<ElixirDebuggerCommandsProducer.ErlangDebuggerCommand>();
+  private final Queue<ElixirDebuggerCommandsProducer.ErlangDebuggerCommand> myCommandsQueue = new LinkedList<>();
   private int myLocalDebuggerPort = -1;
   @NotNull
   private final ElixirDebuggerEventListener myEventListener;
@@ -58,7 +58,8 @@ public class ElixirDebuggerNode {
     myStopped.set(true);
   }
 
-  public boolean isStopped() {
+  @Contract(pure = true)
+  private boolean isStopped() {
     return myStopped.get();
   }
 
@@ -74,20 +75,8 @@ public class ElixirDebuggerNode {
     addCommand(ElixirDebuggerCommandsProducer.getRemoveBreakpointCommand(ElixirModulesUtil.elixirModuleNameToErlang(module), line));
   }
 
-  public void interpretModules(@NotNull List<String> moduleSourcePaths) {
-    addCommand(ElixirDebuggerCommandsProducer.getInterpretModulesCommand(moduleSourcePaths));
-  }
-
-  public void runDebugger(@NotNull String module, @NotNull String function, @NotNull List<String> args) {
-    addCommand(ElixirDebuggerCommandsProducer.getRunDebuggerCommand(module, function, args));
-  }
-
   public void runTask() {
     addCommand(ElixirDebuggerCommandsProducer.getRunTaskCommand());
-  }
-
-  public void debugRemoteNode(@NotNull String nodeName, String cookie) {
-    addCommand(ElixirDebuggerCommandsProducer.getDebugRemoteNodeCommand(nodeName, cookie));
   }
 
   public void stepInto() {
@@ -115,12 +104,7 @@ public class ElixirDebuggerNode {
   @NotNull
   private Future<Integer> runDebuggerServer() {
     final AsyncFutureResult<Integer> portFuture = AsyncFutureFactory.getInstance().createAsyncFutureResult();
-    ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-      @Override
-      public void run() {
-        runDebuggerServerImpl(portFuture);
-      }
-    });
+    ApplicationManager.getApplication().executeOnPooledThread(() -> runDebuggerServerImpl(portFuture));
     return portFuture;
   }
 
@@ -128,43 +112,34 @@ public class ElixirDebuggerNode {
     try {
       Exception cachedException = null;
       LOG.debug("Opening a server socket.");
-      ServerSocket serverSocket = new ServerSocket(0);
-      try {
+
+      try (ServerSocket serverSocket = new ServerSocket(0)) {
         portFuture.set(serverSocket.getLocalPort());
 
         LOG.debug("Listening on port " + serverSocket.getLocalPort() + ".");
 
-        Socket debuggerSocket = serverSocket.accept();
-        try {
+        try (Socket debuggerSocket = serverSocket.accept()) {
           LOG.debug("Debugger connected, closing the server socket.");
           serverSocket.close();
           myEventListener.debuggerStarted();
           LOG.debug("Starting send/receive loop.");
           serverLoop(debuggerSocket);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
           cachedException = e;
           throw e;
-        }
-        finally {
+        } finally {
           myStopped.set(true);
           myEventListener.debuggerStopped();
-          debuggerSocket.close();
         }
-      }
-      catch (Exception e) {
+      } catch (Exception e) {
         if (cachedException != null && cachedException != e) {
           if (e.getCause() == null) {
             e.initCause(cachedException);
-          }
-          else {
+          } else {
             LOG.debug("Lost exception.", cachedException);
           }
         }
         throw e;
-      }
-      finally {
-        serverSocket.close();
       }
     }
     catch (Exception th) {
@@ -266,9 +241,6 @@ public class ElixirDebuggerNode {
    * <p/>
    * Makes #RETRIES_ON_TIMEOUT attempts to read input unless the read request is not forced and no bytes were read.
    *
-   * @param in
-   * @param size
-   * @param force
    * @return bytes read or null if the request was not forced and it timed out, or if an I/O exception occurred.
    * @throws SocketException when a socket exception is thrown from passed input stream or if a number of
    *                         retry attempts was exceeded.

@@ -50,7 +50,15 @@ final class MixExUnitRunningState extends MixRunningState {
   @NotNull
   public ConsoleView createConsoleView(Executor executor) {
     TestConsoleProperties properties = new SMTRunnerConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
-    ConsoleView consoleView = null;
+
+    return createConsole(TEST_FRAMEWORK_NAME, properties);
+  }
+
+  /**
+   * Unifies the interface for {@code SMTestRunnerConnectionUtil.createConsole} between 141 and later releases
+   */
+  private ConsoleView createConsole(@NotNull String name , @NotNull  TestConsoleProperties testConsoleProperties) {
+        ConsoleView consoleView = null;
 
     try {
       Method createConsole2 = SMTestRunnerConnectionUtil.class.getMethod(
@@ -61,7 +69,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
       try {
         // first argument is `null` because it's a static method
-        consoleView = (ConsoleView) createConsole2.invoke(null, TEST_FRAMEWORK_NAME, properties);
+        consoleView = (ConsoleView) createConsole2.invoke(null, name, testConsoleProperties);
       } catch (IllegalAccessException | InvocationTargetException e) {
         LOGGER.error(e);
       }
@@ -76,7 +84,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
         try {
           // first argument is `null` because it's a static method
-          consoleView = (ConsoleView) createConsole3.invoke(null, TEST_FRAMEWORK_NAME, properties, null);
+          consoleView = (ConsoleView) createConsole3.invoke(null, name, testConsoleProperties, null);
         } catch (IllegalAccessException | InvocationTargetException e1) {
           LOGGER.error(e1);
         }
@@ -103,10 +111,8 @@ final class MixExUnitRunningState extends MixRunningState {
 
       try {
         consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties);
-      } catch (IllegalAccessException e) {
-        e.printStackTrace();
-      } catch (InvocationTargetException e) {
-        e.printStackTrace();
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        LOGGER.error(e);
       }
     } catch (NoSuchMethodException noSuchCreateAndAttachConsole3Method) {
       try {
@@ -114,10 +120,8 @@ final class MixExUnitRunningState extends MixRunningState {
 
         try {
           consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties, getEnvironment());
-        } catch (IllegalAccessException e) {
-          e.printStackTrace();
-        } catch (InvocationTargetException e) {
-          e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+          LOGGER.error(e);
         }
       } catch (NoSuchMethodException noSuchCreateAndAttachConsole4Method) {
         noSuchCreateAndAttachConsole4Method.printStackTrace();
@@ -148,7 +152,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
   @NotNull
   public List<String> setupElixirParams() throws ExecutionException {
-    List<File> elixirModuleFileList = new ArrayList<File>();
+    List<File> elixirModuleFileList = new ArrayList<>();
 
     try {
       File elixirModulesDir = createElixirModulesDirectory();

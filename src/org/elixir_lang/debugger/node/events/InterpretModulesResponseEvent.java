@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +31,9 @@ import java.util.List;
 class InterpretModulesResponseEvent extends ErlangDebuggerEvent {
   public static final String NAME = "interpret_modules_response";
   private final String myNodeName;
-  private final List<String> myFailedToInterpretModules = new ArrayList<String>();
+  private final List<String> myFailedToInterpretModules = new ArrayList<>();
 
-  public InterpretModulesResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
+  InterpretModulesResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
     myNodeName = OtpErlangTermUtil.getAtomText(receivedMessage.elementAt(1));
     OtpErlangList interpretModuleStatuses = OtpErlangTermUtil.getListValue(receivedMessage.elementAt(2));
     if (interpretModuleStatuses == null || myNodeName == null) throw new DebuggerEventFormatException();

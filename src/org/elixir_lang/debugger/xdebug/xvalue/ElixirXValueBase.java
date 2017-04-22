@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +126,9 @@ class ElixirXValueBase<T extends OtpErlangObject> extends XValue {
     addNamedChild(childrenList, new OtpErlangLong(numericChild), name);
   }
 
-  static void addNamedChild(@NotNull XValueChildrenList childrenList, @NotNull String atomicChild, String name) {
+  static void addNamedChild(@NotNull XValueChildrenList childrenList,
+                            @NotNull String atomicChild,
+                            @SuppressWarnings("SameParameterValue") String name) {
     addNamedChild(childrenList, new OtpErlangAtom(atomicChild), name);
   }
 
@@ -138,7 +142,7 @@ class ElixirXValueBase<T extends OtpErlangObject> extends XValue {
 }
 
 class ElixirPrimitiveXValueBase<T extends OtpErlangObject> extends ElixirXValueBase<T> {
-  public ElixirPrimitiveXValueBase(T value) {
+  ElixirPrimitiveXValueBase(T value) {
     super(value);
   }
 

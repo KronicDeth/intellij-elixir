@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +40,7 @@ class ElixirStackFrame extends XStackFrame {
   @Nullable
   private final ElixirSourcePosition mySourcePosition;
 
-  public ElixirStackFrame(@NotNull ElixirTraceElement traceElement) {
+  ElixirStackFrame(@NotNull ElixirTraceElement traceElement) {
     myTraceElement = traceElement;
     mySourcePosition = ElixirSourcePosition.create(traceElement);
   }

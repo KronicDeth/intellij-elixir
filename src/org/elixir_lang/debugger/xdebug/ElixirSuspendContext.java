@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +32,8 @@ class ElixirSuspendContext extends XSuspendContext {
   private final XExecutionStack[] myExecutionStacks;
   private final int myActiveStackIdx;
 
-  public ElixirSuspendContext(@NotNull OtpErlangPid activePid,
-                              @NotNull List<ElixirProcessSnapshot> snapshots) {
+  ElixirSuspendContext(@NotNull OtpErlangPid activePid,
+                       @NotNull List<ElixirProcessSnapshot> snapshots) {
     myExecutionStacks = new XExecutionStack[snapshots.size()];
     int activeStackIdx = 0;
     for (int i = 0; i < snapshots.size(); i++) {

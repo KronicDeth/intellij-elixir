@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +30,13 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 public class ElixirXValuePresentation extends XValuePresentation {
-  final OtpErlangObject myValue;
+  private final OtpErlangObject myValue;
 
   public ElixirXValuePresentation(OtpErlangObject value) {
     myValue = value;
   }
 
-  public static void renderObject(OtpErlangObject o, XValueTextRenderer renderer) {
+  private static void renderObject(OtpErlangObject o, XValueTextRenderer renderer) {
     if (o instanceof OtpErlangMap) {
       renderMap((OtpErlangMap) o, renderer);
     } else if (o instanceof OtpErlangAtom) {
@@ -56,7 +58,13 @@ public class ElixirXValuePresentation extends XValuePresentation {
 
   private static void renderMap(OtpErlangMap map, XValueTextRenderer renderer) {
     renderer.renderSpecialSymbol("%");
-    if (isStruct(map)) renderer.renderKeywordValue(structType(map));
+    if (isStruct(map)) {
+      String structType = structType(map);
+
+      assert structType != null;
+
+      renderer.renderKeywordValue(structType);
+    }
     renderer.renderSpecialSymbol("{");
 
     boolean first = true;
@@ -72,6 +80,8 @@ public class ElixirXValuePresentation extends XValuePresentation {
         }
 
         if (symbolKeys) {
+          assert key instanceof OtpErlangAtom;
+
           renderer.renderKeywordValue(((OtpErlangAtom) key).atomValue());
           renderer.renderKeywordValue(": ");
         } else {
@@ -183,7 +193,7 @@ public class ElixirXValuePresentation extends XValuePresentation {
     }
   }
 
-  public static boolean isStruct(OtpErlangMap map) {
+  private static boolean isStruct(OtpErlangMap map) {
     return structType(map) != null;
   }
 

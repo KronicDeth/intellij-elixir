@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class ElixirNumericXValue extends ElixirPrimitiveXValueBase<OtpErlangObject> {
-  public ElixirNumericXValue(OtpErlangObject value) {
+  ElixirNumericXValue(OtpErlangObject value) {
     super(value);
   }
 

@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +18,7 @@
 package org.elixir_lang.debugger.node.commands;
 
 import com.ericsson.otp.erlang.*;
-import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public final class ElixirDebuggerCommandsProducer {
   private ElixirDebuggerCommandsProducer() {
@@ -35,21 +32,6 @@ public final class ElixirDebuggerCommandsProducer {
   @NotNull
   public static ErlangDebuggerCommand getRemoveBreakpointCommand(@NotNull String module, int line) {
     return new RemoveBreakpointCommand(module, line);
-  }
-
-  @NotNull
-  public static ErlangDebuggerCommand getRunDebuggerCommand(@NotNull String module, @NotNull String function, @NotNull List<String> args) {
-    return new RunDebuggerCommand(module, function, args);
-  }
-
-  @NotNull
-  public static ErlangDebuggerCommand getInterpretModulesCommand(@NotNull List<String> moduleSourcePaths) {
-    return new InterpretModulesCommand(moduleSourcePaths);
-  }
-
-  @NotNull
-  public static ErlangDebuggerCommand getDebugRemoteNodeCommand(@NotNull String nodeName, @Nullable String cookie) {
-    return new DebugRemoteNodeCommand(nodeName, cookie);
   }
 
   @NotNull
@@ -78,38 +60,8 @@ public final class ElixirDebuggerCommandsProducer {
   }
 
   private static class StepOverCommand extends AbstractPidCommand {
-    public StepOverCommand(@NotNull OtpErlangPid pid) {
+    StepOverCommand(@NotNull OtpErlangPid pid) {
       super("step_over", pid);
-    }
-  }
-
-  private static class RunDebuggerCommand implements ErlangDebuggerCommand {
-    private final String myModule;
-    private final String myFunction;
-    private final List<String> myArgs;
-
-    RunDebuggerCommand(@NotNull String module, @NotNull String function, @NotNull List<String> args) {
-      myModule = module;
-      myFunction = function;
-      myArgs = args;
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      OtpErlangObject erlangArgs[] = new OtpErlangObject[myArgs.size()];
-      for (int i = 0; i < myArgs.size(); ++i) {
-        erlangArgs[i] = new OtpErlangString(myArgs.get(i));
-      }
-
-      myArgs.stream().map(e -> new OtpErlangString(e)).toArray();
-
-      return new OtpErlangTuple(new OtpErlangObject[] {
-        new OtpErlangAtom("run_debugger"),
-        new OtpErlangAtom(myModule),
-        new OtpErlangAtom(myFunction),
-        new OtpErlangList(erlangArgs)
-      });
     }
   }
 
@@ -140,7 +92,7 @@ public final class ElixirDebuggerCommandsProducer {
     private final String myName;
     private final OtpErlangPid myPid;
 
-    protected AbstractPidCommand(@NotNull String cmdName, @NotNull OtpErlangPid pid) {
+    AbstractPidCommand(@NotNull String cmdName, @NotNull OtpErlangPid pid) {
       myName = cmdName;
       myPid = pid;
     }
@@ -153,61 +105,20 @@ public final class ElixirDebuggerCommandsProducer {
   }
 
   private static class StepOutCommand extends AbstractPidCommand {
-    public StepOutCommand(@NotNull OtpErlangPid pid) {
+    StepOutCommand(@NotNull OtpErlangPid pid) {
       super("step_out", pid);
     }
   }
 
   private static class StepIntoCommand extends AbstractPidCommand {
-    public StepIntoCommand(@NotNull OtpErlangPid pid) {
+    StepIntoCommand(@NotNull OtpErlangPid pid) {
       super("step_into", pid);
     }
   }
 
   private static class ContinueCommand extends AbstractPidCommand {
-    protected ContinueCommand(@NotNull OtpErlangPid pid) {
+    ContinueCommand(@NotNull OtpErlangPid pid) {
       super("continue", pid);
-    }
-  }
-
-  private static class InterpretModulesCommand implements ErlangDebuggerCommand {
-    private final List<String> myModuleSourcePaths;
-
-    public InterpretModulesCommand(@NotNull List<String> moduleSourcePaths) {
-      myModuleSourcePaths = moduleSourcePaths;
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      OtpErlangObject[] moduleSourcePaths = new OtpErlangObject[myModuleSourcePaths.size()];
-      for (int i = 0; i < myModuleSourcePaths.size(); i++) {
-        moduleSourcePaths[i] = new OtpErlangString(myModuleSourcePaths.get(i));
-      }
-      return new OtpErlangTuple(new OtpErlangObject[] {
-        new OtpErlangAtom("interpret_modules"),
-        new OtpErlangList(moduleSourcePaths)
-      });
-    }
-  }
-
-  private static class DebugRemoteNodeCommand implements ErlangDebuggerCommand {
-    private final String myNodeName;
-    private final String myCookie;
-
-    public DebugRemoteNodeCommand(@NotNull String nodeName, @Nullable String cookie) {
-      myNodeName = nodeName;
-      myCookie = !StringUtil.isEmptyOrSpaces(cookie) ? cookie : "nocookie";
-    }
-
-    @NotNull
-    @Override
-    public OtpErlangTuple toMessage() {
-      return new OtpErlangTuple(new OtpErlangObject[] {
-        new OtpErlangAtom("debug_remote_node"),
-        new OtpErlangAtom(myNodeName),
-        new OtpErlangAtom(myCookie)
-      });
     }
   }
 
@@ -215,7 +126,7 @@ public final class ElixirDebuggerCommandsProducer {
     private final String myModule;
     private final int myLine;
 
-    public RemoveBreakpointCommand(@NotNull String module, int line) {
+    RemoveBreakpointCommand(@NotNull String module, int line) {
       myModule = module;
       myLine = line + 1;
     }

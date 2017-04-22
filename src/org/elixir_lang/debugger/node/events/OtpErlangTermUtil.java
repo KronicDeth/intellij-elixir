@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +19,7 @@ package org.elixir_lang.debugger.node.events;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.openapi.util.text.StringUtil;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +28,7 @@ final class OtpErlangTermUtil {
   }
 
   @Nullable
-  public static Integer getIntegerValue(@Nullable OtpErlangObject integerObject) {
+  static Integer getIntegerValue(@Nullable OtpErlangObject integerObject) {
     OtpErlangLong otpLong = integerObject instanceof OtpErlangLong ? (OtpErlangLong) integerObject : null;
     try {
       return otpLong != null ? otpLong.intValue() : null;
@@ -35,8 +37,9 @@ final class OtpErlangTermUtil {
     }
   }
 
+  @Contract("null -> null")
   @Nullable
-  public static OtpErlangList getListValue(@Nullable OtpErlangObject listObject) {
+  static OtpErlangList getListValue(@Nullable OtpErlangObject listObject) {
     if (listObject instanceof OtpErlangList) {
       return (OtpErlangList)listObject;
     }
@@ -47,24 +50,26 @@ final class OtpErlangTermUtil {
     return null;
   }
 
+  @Contract(value = "null -> null", pure = true)
   @Nullable
-  public static OtpErlangTuple getTupleValue(@Nullable OtpErlangObject tupleObject) {
+  static OtpErlangTuple getTupleValue(@Nullable OtpErlangObject tupleObject) {
     return tupleObject instanceof OtpErlangTuple ? (OtpErlangTuple) tupleObject : null;
   }
 
+  @Contract(value = "null -> null", pure = true)
   @Nullable
-  public static OtpErlangPid getPidValue(@Nullable OtpErlangObject pidObject) {
+  static OtpErlangPid getPidValue(@Nullable OtpErlangObject pidObject) {
     return pidObject instanceof OtpErlangPid ? (OtpErlangPid) pidObject : null;
   }
 
   @Nullable
-  public static String getAtomText(@Nullable OtpErlangObject atomObject) {
+  static String getAtomText(@Nullable OtpErlangObject atomObject) {
     OtpErlangAtom atom = atomObject instanceof OtpErlangAtom ? (OtpErlangAtom) atomObject : null;
     return atom != null ? atom.atomValue() : null;
   }
 
   @Nullable
-  public static String getStringText(@Nullable OtpErlangObject stringObject) {
+  static String getStringText(@Nullable OtpErlangObject stringObject) {
     if (stringObject instanceof OtpErlangString) {
       return ((OtpErlangString) stringObject).stringValue();
     }
@@ -77,20 +82,21 @@ final class OtpErlangTermUtil {
     return null;
   }
 
+  @Contract("null, _ -> null")
   @Nullable
   public static OtpErlangObject elementAt(@Nullable OtpErlangTuple tuple, int idx) {
     return tuple != null ? tuple.elementAt(idx) : null;
   }
 
-  public static boolean isOkAtom(@Nullable OtpErlangObject okObject) {
+  static boolean isOkAtom(@Nullable OtpErlangObject okObject) {
     return isAtom("ok", okObject);
   }
 
-  public static boolean isErrorAtom(@Nullable OtpErlangObject errorObject) {
+  static boolean isErrorAtom(@Nullable OtpErlangObject errorObject) {
     return isAtom("error", errorObject);
   }
 
-  public static boolean isAtom(@NotNull String expectedAtom, @Nullable OtpErlangObject atomObject) {
+  private static boolean isAtom(@NotNull String expectedAtom, @Nullable OtpErlangObject atomObject) {
     return StringUtil.equals(expectedAtom, getAtomText(atomObject));
   }
 

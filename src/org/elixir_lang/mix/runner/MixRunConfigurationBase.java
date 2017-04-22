@@ -16,7 +16,6 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.hash.LinkedHashMap;
-import com.intellij.util.xmlb.Accessor;
 import com.intellij.util.xmlb.SerializationFilter;
 import com.intellij.util.xmlb.XmlSerializer;
 import org.elixir_lang.runconfig.ElixirModuleBasedConfiguration;
@@ -38,19 +37,14 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
    * CONSTANTS
    */
 
-  private static final SerializationFilter SERIALIZATION_FILTER = new SerializationFilter() {
-    @Override
-    public boolean accepts(@NotNull Accessor accessor, @NotNull @SuppressWarnings("unused") Object bean) {
-      return !accessor.getName().equals("envs");
-    }
-  };
+  private static final SerializationFilter SERIALIZATION_FILTER = (accessor, bean) -> !accessor.getName().equals("envs");
 
   /*
    * Fields
    */
 
   @NotNull
-  private final Map<String, String> envs = new LinkedHashMap<String, String>();
+  private final Map<String, String> envs = new LinkedHashMap<>();
   private boolean mySkipDependencies = false;
   private boolean passParentEnvs = false;
   @Nullable
@@ -105,7 +99,6 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
     return GlobalSearchScope.projectScope(getProject());
   }
 
-  @Nullable
   @NotNull
   public List<String> getMixArgs() {
     String programParameters = getProgramParameters();

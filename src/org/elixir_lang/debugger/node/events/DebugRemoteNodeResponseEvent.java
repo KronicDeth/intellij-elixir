@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +28,7 @@ class DebugRemoteNodeResponseEvent extends ErlangDebuggerEvent {
   private final String myNodeName;
   private final String myError;
 
-  public DebugRemoteNodeResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
+  DebugRemoteNodeResponseEvent(OtpErlangTuple receivedMessage) throws DebuggerEventFormatException {
     myNodeName = OtpErlangTermUtil.getAtomText(receivedMessage.elementAt(1));
     OtpErlangObject status = receivedMessage.elementAt(2);
     myError = "ok".equals(OtpErlangTermUtil.getAtomText(status)) ? null : status.toString();

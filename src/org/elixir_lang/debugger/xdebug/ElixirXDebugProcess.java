@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2015 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +85,7 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
   private final ConcurrentHashMap<ElixirSourcePosition, XLineBreakpoint<ElixirLineBreakpointProperties>> myPositionToLineBreakpointMap =
     new ConcurrentHashMap<>();
 
-  public ElixirXDebugProcess(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
+  ElixirXDebugProcess(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
     super(session);
 
     session.setPauseActionSupported(false);
@@ -110,6 +112,7 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
     return sourcePosition != null ? ElixirSourcePosition.create(sourcePosition) : null;
   }
 
+  @NotNull
   private static List<String> setUpElixirDebuggerCodePath() throws ExecutionException {
     LOG.debug("Setting up debugger environment.");
     try {
@@ -251,16 +254,19 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void startStepOver() {
     myDebuggerNode.stepOver();
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void startStepInto() {
     myDebuggerNode.stepInto();
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void startStepOut() {
     myDebuggerNode.stepOut();
   }
@@ -271,11 +277,13 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void resume() {
     myDebuggerNode.resume();
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void runToPosition(@NotNull XSourcePosition position) {
     //TODO implement me
   }

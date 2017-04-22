@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +24,7 @@ import com.intellij.xdebugger.XDebuggerUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import org.elixir_lang.debugger.node.ElixirProcessSnapshot;
 import org.elixir_lang.debugger.node.ElixirTraceElement;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,8 +36,9 @@ public final class ElixirSourcePosition {
     mySourcePosition = sourcePosition;
   }
 
+  @Contract(pure = true)
   @NotNull
-  public XSourcePosition getSourcePosition() {
+  XSourcePosition getSourcePosition() {
     return mySourcePosition;
   }
 

@@ -43,16 +43,7 @@ public class MixSettings implements PersistentStateComponent<MixSettingsState>{
 
   @NotNull
   public String getMixPath(){
-    return getMixPath(false);
-  }
-
-  @NotNull
-  public String getMixPath(boolean allowBatchFile){
-    if (allowBatchFile) {
-      return myMixSettingsState.myMixPath;
-    } else {
-      return StringUtil.trimEnd(myMixSettingsState.myMixPath, ".bat");
-    }
+    return StringUtil.trimEnd(myMixSettingsState.myMixPath, ".bat");
   }
 
   public void setMixPath(@NotNull String mixPath){

@@ -1,5 +1,7 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Jake Becker
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 class ElixirLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<ElixirLineBreakpointProperties>> {
   private final ElixirXDebugProcess myDebugProcess;
 
-  public ElixirLineBreakpointHandler(ElixirXDebugProcess debugProcess) {
+  ElixirLineBreakpointHandler(ElixirXDebugProcess debugProcess) {
     super(ElixirLineBreakpointType.class);
     myDebugProcess = debugProcess;
   }

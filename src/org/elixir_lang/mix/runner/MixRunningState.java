@@ -12,15 +12,13 @@ import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.ConsoleView;
-import com.intellij.openapi.project.Project;
 import org.elixir_lang.console.ElixirConsoleUtil;
-import org.elixir_lang.sdk.ElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.elixir_lang.mix.runner.MixRunningStateUtil.*;
+import static org.elixir_lang.mix.runner.MixRunningStateUtil.runMix;
 
 /**
  * Created by zyuyou on 15/7/8.

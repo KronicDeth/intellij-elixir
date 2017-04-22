@@ -1,5 +1,6 @@
 /*
  * Copyright 2012-2014 Sergey Ignatov
+ * Copyright 2017 Luke Imhoff
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +31,13 @@ class SetBreakpointResponseEvent extends ErlangDebuggerEvent {
   private final String myError;
   private final String myFile;
 
-  public SetBreakpointResponseEvent(@NotNull OtpErlangTuple message) throws DebuggerEventFormatException {
+  SetBreakpointResponseEvent(@NotNull OtpErlangTuple message) throws DebuggerEventFormatException {
     myModule = OtpErlangTermUtil.getAtomText(message.elementAt(1));
     if (myModule == null) throw new DebuggerEventFormatException();
 
     Integer line = OtpErlangTermUtil.getIntegerValue(message.elementAt(2));
     if (line == null) throw new DebuggerEventFormatException();
-    myLine = line.intValue() - 1;
+    myLine = line - 1;
 
     myFile = OtpErlangTermUtil.getStringText(message.elementAt(4));
 
