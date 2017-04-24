@@ -108,6 +108,7 @@
 
 ### Enhancements
 * [#643](https://github.com/KronicDeth/intellij-elixir/pull/643) - Graphical debugger with line breakpoints - [@JakeBecker](https://github.com/JakeBecker)
+* [#673](https://github.com/KronicDeth/intellij-elixir/pull/673) - Add Debugger to README - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#669](https://github.com/KronicDeth/intellij-elixir/pull/669) - Replace `assert scope.isEquivalentTo(lastParent.getParent())` with an `if` and log what `lastParent` was when condition is `false`, so root cause can be traced. - [@KronicDeth](https://github.com/KronicDeth)
