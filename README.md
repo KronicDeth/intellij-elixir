@@ -42,6 +42,28 @@
         - [Expanding](#expanding)
       - [Regions](#regions)
     - [Commenter](#commenter)
+    - [Debugger](#debugger)
+      - [Steps](#steps)
+      - [Basics](#basics)
+        - [Keyboard Shortcuts](#keyboard-shortcuts)
+      - [Breakpoints](#breakpoints)
+        - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
+          - [Viewing all breakpoints](#viewing-all-breakpoints)
+          - [Viewing a single breakpoint](#viewing-a-single-breakpoint)
+        - [Configuring Breakpoints](#configuring-breakpoints)
+        - [Creating Line Breakpoints](#creating-line-breakpoints)
+        - [Describing Line Breakpoints](#describing-line-breakpoints)
+        - [Searching for Line Breakpoints](#searching-for-line-breakpoints)
+        - [Jump to Breakpoint Source](#jump-to-breakpoint-source)
+        - [Disabling Line Breakpoints](#disabling-line-breakpoints)
+        - [Deleting Line Breakpoints](#deleting-line-breakpoints)
+      - [Starting the Debugger Session](#starting-the-debugger-session)
+      - [Examining Suspended Program](#examining-suspended-program)
+        - [Processes](#processes)
+        - [Frames](#frames)
+          - [Jump to Current Execution Point](#jump-to-current-execution-point)
+        - [Variables](#variables)
+      - [Stepping](#stepping)
     - [Delimiters](#delimiters)
       - [Auto-inserting](#auto-inserting)
       - [Matching](#matching)
@@ -1318,6 +1340,204 @@ Using the menus
 2. Comment (or Uncomment) with one of the following:
   a. Code > Comment with Line Comment
   b. On OSX the key binding is normally `Cmd+/`.
+
+### Debugger
+
+IntelliJ Elixir allows for graphical debugging of `*.ex` files using line breakpoints.
+
+<figure>
+  <img alt="Line breakpoints for debugger can be set in gutter of editor tab." src="/screenshots/Debugger.png?raw=true"/>
+  <br/>
+  <figcaption>
+    Line breakpoints can added by clicking in the left-hand gutter of an
+    editor tab.  A red dot will appear marking the breakpoint.  When a
+    Run Configuration is Run with the Debug (bug) instead of Run (arrow)
+    button, execution will stop at the breakpoint and you can view the
+    local variables (with Erlang names) and the stackframes.
+  </figcaption>
+</figure>
+
+#### Steps
+
+1. Define a [run/debug configuration](#run-configurations)
+2. [Create breakpoints](#creating-line-breakpoints) in the `*.ex` files
+3. [Launch](#starting-the-debugger-session) a debugging session
+4. During the debugger session, [step through the breakpoints](#stepping), [examine suspended program](#examining-suspended-program), and [explore frames](#frames).
+
+#### Basics
+
+After you have configured a [run configuration](#run-configuration) for your project, you can launch it in debug mode by pressing `Ctrl+D`.
+
+##### Keyboard Shortcuts
+
+| Action                                  | Keyword Shortcut |
+|-----------------------------------------|------------------|
+| Toggle Breakpoint                       | `Cmd+F8`         |
+| Resume Program                          | `Alt+Cmd+R`      |
+| Step Over                               | `F8`             |
+| Step Into                               | `F7`             |
+| View breakpoint details/all breakpoints | `Shift+Cmd+F8`   |
+
+#### Breakpoints
+
+When a breakpoint is set, the editor displays a breakpoint icon in the gutter area to the left of the affected source code. A breakpoint icon denotes status of a breakpoint, and provides useful information about its type, location, and action.
+
+The icons serve as convenient shortcuts for managing breakpoints. Clicking an icon removes the breakpoint. Successive use of Alt - click on an icon toggles its state between enabled and disabled. The settings of a breakpoint are shown in a tooltip when a mouse pointer hovers over a breakpoint icon in the gutter area of the editor.
+
+| Status                 | Icon                                                                                                                                | Description                                                                                   |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| Enabled                | <img alt="Red dot" src="screenshots/debugger/breakpoints/Enabled.png?raw=true"/>                                                    | Indicates the debugger will stop at this line when the breakpoint is hit.                     |
+| Disabled               | <img alt="Red dot with green dot in center" src="screenshots/debugger/breakpoints/Disabled.png?raw=true"/>                          | Indicates that nothing happens when the breakpoint is hit.                                    |
+| Conditionally Disabled | <img alt="Red dot with green dot in top-left corner" src="screenshots/debugger/breakpoints/Conditionally%20Disabled.png?raw=true"/> | This state is assigned to breakpoints when they depend on another breakpoint to be activated. |
+
+When the button <img alt="Red dot surrounded by crossed-out circle" src="screenshots/debugger/breakpoints/Mute.png?raw=true"/> is pressed in the toolbar of the Debug tool window, all the breakpoints in a project are muted, and their icons become grey: <img alt="Grey dot" src="screenshots/debugger/breakpoints/Muted.png?raw=true"/>.
+
+##### Accessing Breakpoint Properties
+
+###### Viewing all breakpoints
+
+To view the list of all breakpoints and their properties, do one of the following:
+
+* Run > View Breakpoints
+* `Shift+Cmd+F8`
+* Click the <img alt="Two red dots layered vertically on top of each other with smaller grey rings to right of the red dots" src="screenshots/debugger/breakpoints/All.gif?raw=true"/>
+* Breakpoints are visible in the Favorites tool window.
+
+###### Viewing a single breakpoint
+
+To view properties of a single breakpoint
+
+* Right-Click a breakpoint icon in the left gutter of the editor.
+  <img src="screenshots/debugger/breakpoints/Properties.png?raw=true"/>
+
+##### Configuring Breakpoints
+
+To configure actions, suspend policy and dependencies of a breakpoint
+
+1. Open the Breakpoint Properties
+   * Right-click a breakpoint in the left gutter, then click the More link or press `Shift+Cmd+F8`
+   * Open the [Breakpoints](#viewing-all-breakpoints) dialog box and select the breakpoint from the list
+   * In the Favorites tool window, select the desired breakpoint, and click the pencil icon.
+2. Define the actions to be performed by IntelliJ IDEA on hitting breakpoint:
+   * To notify about the reaching of a breakpoint with a text message in the debugging console, check the "Log message to console" check box.  A message of the format `*DBG* 'Elixir.IntellijElixir.DebugServer' got cast {breakpoint_reached, PID}` will appear in the console.
+   * To set a breakpoint the current one depends on, select it from the "Disabled until selected breakpoint hit" drop-down list. Once dependency has been set, the current breakpoint is disabled until selected one is hit.
+     * Choose the "Disable again" radio button to disable the current breakpoint after selected breakpoint was hit.
+     * Choose the "Leave enabled" radio button to keep the current breakpoint enabled after selected breakpoint was hit.
+   * Enable suspending an application upon reaching a breakpoint by checking the "Suspend" check box.
+
+##### Creating Line Breakpoints
+
+A line breakpoint is a breakpoint assigned to a specific line in the source code.
+
+Line breakpoints can be set on executable lines. Comments, declarations and empty lines are not valid locations for the line breakpoints.
+
+1. Place the caret on the desired line of the source code.
+2. Do one of the following:
+   * Click the left gutter area at a line where you want to toggle a breakpoint
+   * Run > Toggle Line Breakpoint
+   * `Cmd+F8`
+
+##### Describing Line Breakpoints
+
+1. [Open the Breakpoints dialog](#viewing-all-breakpoints)
+2. Right-click the breakpoint you want to describe
+3. Select "Edit description" from the context menu
+4. In the "Edit Description" dialog box, type the desired description.
+
+##### Searching for Line Breakpoints
+
+1. [Open the Breakpoints dialog](#viewing-all-breakpoints)
+2. Start typing the description of the desired breakpoint
+
+##### Jump to Breakpoint Source
+
+* To view the selected breakpoint without closing the dialog box, use the preview pane.
+* To open the file with the selected breakpoint for editing, double-click the desired breakpoint.
+* To close Breakpoints dialog, press `Cmd+Down`. The caret will be placed at the line marked with the breakpoint in question.
+
+##### Disabling Line Breakpoints
+
+When you temporarily disable or enable a breakpoint, its icon changes from <img src="screenshots/debugger/breakpoints/Enabled.png?raw=true"/> to <img src="screenshots/debugger/breakpoints/Disabled.png?raw=true"/> and vice versa.
+
+1. Place the caret at the desired line with a breakpoint.
+2. Do one of the following:
+   * Run > Toggle Breakpoint Enable
+   * Right-click the desired breakpoint icon, select or deselect the <breakpoint name> enabled check box, and then click Done.
+   * Alt-click the breakpoint icon
+
+##### Deleting Line Breakpoints
+
+Do one of he following:
+
+* In the [Breakpoints](#viewing-all-breakpoints) dialog box, select the desired line breakpoint, and click the red minus sign.
+* In the editor, locate the line with the line breakpoint to be deleted, and click its icon in the left gutter.
+* Place caret on the desired line and press `Cmd+F8`.
+
+#### Starting the Debugger Session
+
+1. Select the run/debug configuration to execute
+2. Do one of the following
+   * Click <img alt="Bug" src="screenshots/debugger/Debug.png?raw=true"/> on the toolbar
+   * Run > Debug
+   * `Ctrl+D`
+
+OR
+
+Debug quick menu
+
+1. `Ctrl+Alt+D`
+2. Select the configuration from the pop-up menu
+3. Hit `Enter`
+
+#### Examining Suspended Program
+
+##### Processes
+
+<figure>
+  <img src="screenshots/debugger/Processes.png?raw=true"/>
+  <br/>
+  <figcaption>
+    The "Thread" drop-down lists the current processes in the local
+    node.  Only the current process is suspended.  The rest of the
+    processes are still running.
+  </figcaption>
+</figure>
+
+##### Frames
+
+<figure>
+  <img src="screenshots/debugger/Frames.png?raw=true"/>
+  <br/>
+  <figcaption>
+    The Frames for the current process can be navigated up and down
+    using the arrow keys or clicking on the frame.
+  </figcaption>
+</figure>
+
+* Press `Up` or `Down` to change frames
+* Click the frame from the list
+
+###### Jump to Current Execution Point
+
+When changing frames or jumping to definitions, you can lose track of where the debugger is paused.  To get back to the current execution point, do one of the following:
+1. Run > Show Execution Point.
+2. `Alt+F10`
+3. Click <img src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> on the stepping toolbar of the Debug tool window.
+
+##### Variables
+
+<img src="screenshots/debugger/Variables.png?raw=true"/>
+
+While Elixir allows rebinding variable names, Erlang does not, so when viewed in the Variables pane, variables will have an `@VERSION` after their name indicating which rebinding of a the variable is.  Even if there is no variable reuse, the first variable will still have `@1` in its name.
+
+#### Stepping
+
+| Action               | Icon                                                                    | Shortcut   | Description                                                                                                                                                                                                                                                                                  |
+|----------------------|-------------------------------------------------------------------------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Show Execution Point | <img src="screenshots/debugger/Show%20Execution%20Point.png?raw=true"/> | `Alt+F10`  | Click this button to highlight the current execution point in the editor and show the corresponding stack frame in the Frames pane.                                                                                                                                                          |
+| Step Over            | <img src="screenshots/debugger/stepping/Step%20Over.png?raw=true"/>     | `F8`       | Click this button to execute the program until the next line in the current function or file, skipping the function referenced at the current execution point (if any). If the current line is the last one in the function, execution steps to the line executed right after this function. |
+| Step Into            | <img src="screenshots/debugger/stepping/Step%20Into.png?raw=true"/>     | `F7`       | Click this button to have the debugger step into the function called at the current execution point.                                                                                                                                                                                         |
+| Step Out             | <img src="screenshots/debugger/stepping/Step%20Out.png?raw=true"/>      | `Shift+F8` | Click this button to have the debugger step out of the current function, to the line executed right after it.                                                                                                                                                                                |
 
 ### Delimiters
 

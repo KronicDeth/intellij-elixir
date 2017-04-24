@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>5.0.1</version>
+  <version>5.1.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,8 +9,15 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v5.0.1</h1>
+      <h1>v5.1.0</h1>
       <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>Graphical debugger with line breakpoints</li>
+            <li>Add Debugger to README</li>
+          </ul>
+        </li>
         <li>
           <p>Bug Fixes</p>
           <ul>
