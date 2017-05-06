@@ -3,9 +3,11 @@ package org.elixir_lang.formatter;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.Function;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.intellij.openapi.util.Pair.pair;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -40,36 +44,39 @@ public class Block extends AbstractBlock implements BlockEx {
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
     }
+
     @Override
     protected List<com.intellij.formatting.Block> buildChildren() {
         List<com.intellij.formatting.Block> blocks;
         // shared so that children are all aligned as alignment is shared based on sharing same alignment instance
-        Alignment childrenAlignment = null;
         IElementType elementType = myNode.getElementType();
 
-        if (isUnmatchedCallElementType(elementType)) {
+        if (isOperationElementType(elementType)) {
+            blocks = buildOperationChildren();
+        } else if (isUnmatchedCallElementType(elementType)) {
             blocks = buildUnmatchedCallChildren();
         } else {
-            blocks = new ArrayList<>();
-            ASTNode child = myNode.getFirstChildNode();
+            final Alignment childrenAlignment = Alignment.createAlignment();
 
-            while (child != null) {
-                if (shouldBuildBlock(child)) {
-                    if (childrenAlignment == null) {
-                        childrenAlignment = Alignment.createAlignment();
+            blocks = buildChildren(
+                    myNode,
+                    (childBlockListPair) -> {
+                        ASTNode child = childBlockListPair.first;
+                        List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
+
+                        if (shouldBuildBlock(child)) {
+                            Block block = new Block(
+                                    child,
+                                    Wrap.createWrap(WrapType.NONE, false),
+                                    childrenAlignment,
+                                    spacingBuilder
+                            );
+                            lambdaBlocks.add(block);
+                        }
+
+                        return lambdaBlocks;
                     }
-
-                    Block block = new Block(
-                            child,
-                            Wrap.createWrap(WrapType.NONE, false),
-                            childrenAlignment,
-                            spacingBuilder
-                    );
-                    blocks.add(block);
-                }
-
-                child = child.getTreeNext();
-            }
+            );
         }
 
         return blocks;
@@ -123,35 +130,94 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildUnmatchedCallChildren() {
+    private List<com.intellij.formatting.Block> buildOperationChildren() {
+        return buildChildren(
+                myNode,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+                    /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
+                       is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
+                    if (isOperatorRuleElementType(child.getElementType())) {
+                        blocks.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blocks.add(buildChild(child, Alignment.createAlignment()));
+                    }
+
+                    return blocks;
+                }
+        );
+    }
+
+    private @NotNull List<com.intellij.formatting.Block> buildChildren(
+            @NotNull ASTNode node,
+            @NotNull Function<Pair<ASTNode, List<com.intellij.formatting.Block>>,
+                              List<com.intellij.formatting.Block>> buildChildBlocks) {
         List<com.intellij.formatting.Block> blocks = new ArrayList<>();
 
-        ASTNode child = myNode.getFirstChildNode();
+        ASTNode child = node.getFirstChildNode();
 
         while (child != null) {
-            IElementType childElementType = child.getElementType();
-
-            if (shouldBuildBlock(child, childElementType)) {
-                /* the elements in the doBlock.stab must be direct children of the call, so that they can be indented
-                   relative to parent */
-                if (childElementType == ElixirTypes.DO_BLOCK) {
-                    blocks.addAll(buildDoBlockChildren(child));
-                } else {
-                    Block block = new Block(
-                            child,
-                            Wrap.createWrap(WrapType.NONE, false),
-                            Alignment.createAlignment(),
-                            spacingBuilder
-                    );
-
-                    blocks.add(block);
-                }
+            if (shouldBuildBlock(child)) {
+                blocks = buildChildBlocks.fun(pair(child, blocks));
             }
 
             child = child.getTreeNext();
         }
 
         return blocks;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildOperatorRuleChildren(ASTNode operatorRuleNode) {
+        return buildChildren(
+                operatorRuleNode,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
+                    blocks.add(buildChild(child, Alignment.createAlignment()));
+
+                    return blocks;
+                }
+        );
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment) {
+        return buildChild(child, alignment, Indent.getNoneIndent());
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment, @NotNull Indent indent) {
+        return new Block(
+                child,
+                Wrap.createWrap(WrapType.NONE, false),
+                alignment,
+                spacingBuilder,
+                indent
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildUnmatchedCallChildren() {
+        return buildChildren(
+                myNode,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
+                    /* the elements in the doBlock.stab must be direct children of the call, so that they can be
+                       indented relative to parent */
+                    if (child.getElementType() == ElixirTypes.DO_BLOCK) {
+                        blocks.addAll(buildDoBlockChildren(child));
+                    } else {
+                        blocks.add(buildChild(child, Alignment.createAlignment()));
+                    }
+
+                    return blocks;
+                }
+        );
     }
 
     private static boolean shouldBuildBlock(@NotNull ASTNode child) {
@@ -173,40 +239,55 @@ public class Block extends AbstractBlock implements BlockEx {
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildDoBlockChildren(@NotNull ASTNode doBlock) {
-        List<com.intellij.formatting.Block> blocks = new ArrayList<>();
+        return buildChildren(
+                doBlock,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-        ASTNode child = doBlock.getFirstChildNode();
-
-        while (child != null) {
-            IElementType childElementType = child.getElementType();
-
-            if (shouldBuildBlock(child, childElementType)) {
-                if (childElementType == ElixirTypes.STAB) {
-                    blocks.addAll(buildStabChildren(child));
-                } else {
-                    Alignment childAlignment;
-
-                    if (childElementType == ElixirTypes.END) {
-                        childAlignment = myAlignment;
+                    if (childElementType == ElixirTypes.STAB) {
+                        blocks.addAll(buildStabChildren(child));
                     } else {
-                        childAlignment = Alignment.createAlignment();
+                        Alignment childAlignment;
+
+                        if (childElementType == ElixirTypes.END) {
+                            childAlignment = myAlignment;
+                        } else {
+                            childAlignment = Alignment.createAlignment();
+                        }
+
+                        blocks.add(buildChild(child, childAlignment));
                     }
 
-                    Block block = new Block(
-                            child,
-                            Wrap.createWrap(WrapType.NONE, false),
-                            childAlignment,
-                            spacingBuilder
-                    );
-
-                    blocks.add(block);
+                    return blocks;
                 }
-            }
+        );
+    }
 
-            child = child.getTreeNext();
-        }
+    /**
+     * Builds stab.stabBody.*
+     *
+     * @param stabBody a child of a `stab` in `doBlock`
+     * @param childAlignment alignment to use for all child blocks of `stabBody`
+     * @param childIndent indent to use for all child blocks of the `stabBody`
+     * @return children of stabBody that should be aligned together with the same indent
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildStabBodyChildren(@NotNull ASTNode stabBody,
+                                                                      @NotNull Alignment childAlignment,
+                                                                      @NotNull Indent childIndent) {
+        return buildChildren(
+                stabBody,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-        return blocks;
+                    blocks.add(buildChild(child, childAlignment, childIndent));
+
+                    return blocks;
+                }
+        );
     }
 
     /**
@@ -218,38 +299,48 @@ public class Block extends AbstractBlock implements BlockEx {
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildStabChildren(@NotNull ASTNode stab) {
-        List<com.intellij.formatting.Block> blocks = new ArrayList<>();
-        ASTNode child = stab.getFirstChildNode();
-        Alignment childAlignment = null;
-        Indent childIndent = null;
+        /* all children share the same alignment as expressions inside a doBlock above the stab are assumed to be
+           aligned on the left-side */
+        Alignment childAlignment = Alignment.createAlignment();
+        Indent childIndent = Indent.getNormalIndent(true);
 
-        while (child != null) {
-            if (shouldBuildBlock(child)) {
-                if (childAlignment == null) {
-                    /* all children share the same alignment as expressions inside a doBlock above the stab are assumed
-                       to be aligned on the left-side */
-                    childAlignment = Alignment.createAlignment();
+        return buildChildren(
+                stab,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.STAB_BODY) {
+                        blocks.addAll(buildStabBodyChildren(child, childAlignment, childIndent));
+                    } else {
+                        blocks.add(buildChild(child, childAlignment, childIndent));
+                    }
+
+                    return blocks;
                 }
+        );
+    }
 
-                if (childIndent == null) {
-                    childIndent = Indent.getNormalIndent(true);
-                }
+    private static final Map<IElementType, Boolean> isOperationByElementType = new IdentityHashMap<>();
 
-                Block block = new Block(
-                        child,
-                        Wrap.createWrap(WrapType.NONE, false),
-                        childAlignment,
-                        spacingBuilder,
-                        childIndent
-                );
+    static {
+        isOperationByElementType.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
+    }
 
-                blocks.add(block);
-            }
+    private static boolean isOperationElementType(IElementType elementType) {
+        return isOperationByElementType.containsKey(elementType);
+    }
 
-            child = child.getTreeNext();
-        }
+    private static final Map<IElementType, Boolean> isOperatorRuleByElementType = new IdentityHashMap<>();
 
-        return blocks;
+    static {
+        isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
+    }
+
+    private static boolean isOperatorRuleElementType(IElementType elementType) {
+        return isOperatorRuleByElementType.containsKey(elementType);
     }
 
     private static final Map<IElementType, Boolean> isUnmatchedCallByElementType = new IdentityHashMap<>();

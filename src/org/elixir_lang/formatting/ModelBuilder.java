@@ -6,8 +6,10 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.formatter.Block;
+import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +53,9 @@ public class ModelBuilder implements FormattingModelBuilder {
 
     @NotNull
     private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
-        return new SpacingBuilder(settings, ElixirLanguage.INSTANCE);
+        CommonCodeStyleSettings elixirCommonSettings = settings.getCommonSettings(ElixirLanguage.INSTANCE);
+        return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
+                .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS);
     }
 
 

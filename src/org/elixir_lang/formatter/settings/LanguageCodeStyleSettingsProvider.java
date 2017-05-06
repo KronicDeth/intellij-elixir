@@ -3,6 +3,7 @@ package org.elixir_lang.formatter.settings;
 import com.intellij.application.options.IndentOptionsEditor;
 import com.intellij.application.options.SmartIndentOptionsEditor;
 import com.intellij.lang.Language;
+import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import org.elixir_lang.ElixirLanguage;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,38 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "  end\n" +
             "end";
 
+    @Override
+    public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
+        if (settingsType == SettingsType.SPACING_SETTINGS) {
+            //consumer.showAllStandardOptions();
+            consumer.showStandardOptions(
+                    // SPACE_BEFORE_PARENTHESES group
+
+                    /* SPACE_BEFORE_METHOD_PARENTHESES - Disabled because space between function name and call arguments
+                       is invalid for parenthesized arguments */
+                    /* SPACE_BEFORE_METHOD_CALL_PARENTHESES - Disabled because space between function name and call
+                       arguments is invalid for parenthesized arguments */
+                    /* SPACE_BEFORE_IF_PARENTHESES - Disabled because `if` is not special, so no specific setting for it
+                       since it's not a keyword unlike in Java */
+                    /* SPACE_BEFORE_FOR_PARENTHESES - Disabled because `for` is a special form, but you wouldn't put
+                       parentheses around the `<-` clauses */
+                    /* SPACE_BEFORE_WHILE_PARENTHESES - There is no `while` in Elixir */
+                    /* SPACE_BEFORE_SWITCH_PARENTHESES - `switch` in Java would be `case` in Elixir and no style
+                       recommends parentheses for it */
+                    /* SPACE_BEFORE_CATCH_PARENTHESES - `catch` in Java would be `rescue` in Elixir, but `rescue` uses
+                       `->` clauses, so its rules would apply */
+                    /* SPACE_BEFORE_SYNCHRONIZED_PARENTHESES - no `synchronized` in Elixir */
+                    /* SPACE_BEFORE_ANNOTATION_PARAMETER_LIST - module attribute calls follow normal call rules and a
+                       space isn't allowed between the function name and parenthesized arguments */
+
+                    // SPACE_AROUND_OPERATORS group
+                    "SPACE_AROUND_ASSIGNMENT_OPERATORS"
+            );
+
+            consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
+        }
+    }
+
     @NotNull
     @Override
     public String getCodeSample(@NotNull SettingsType settingsType) {
@@ -28,7 +61,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                 codeSample = "Blank Line Settings Code Sample";
                 break;
             case SPACING_SETTINGS:
-                codeSample = "Spacing Settings Code Sample";
+                codeSample = "a = 1";
                 break;
             case WRAPPING_AND_BRACES_SETTINGS:
                 codeSample = "Wrapping And Braces Settings Code Sample";

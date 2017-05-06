@@ -42,8 +42,34 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 
     public void testIndentWithoutOverrides() {
-        myFixture.configureByFiles("indent_without_override_before.ex");
+        myFixture.configureByFile("indent_without_override_before.ex");
 
+        reformatFixture();
+
+        myFixture.checkResultByFile("indent_without_override_after.ex");
+    }
+
+    public void testWithSpaceAroundMatch() {
+        myFixture.configureByFile("without_space_around_match.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_match.ex");
+    }
+
+    public void testWithoutSpaceAroundMatch() {
+        myFixture.configureByFile("with_space_around_match.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_match.ex");
+    }
+
+    private void reformatFixture() {
         new WriteCommandAction.Simple(getProject()) {
             @Override
             protected void run() throws Throwable {
@@ -51,7 +77,5 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
                         ContainerUtil.newArrayList(myFixture.getFile().getTextRange()));
             }
         }.execute();
-
-        myFixture.checkResultByFile("indent_without_override_after.ex");
     }
 }
