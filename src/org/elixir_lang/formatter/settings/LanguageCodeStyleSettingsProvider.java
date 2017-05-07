@@ -35,6 +35,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "\n" +
             "# Match Operator\n" +
             "a = 1\n" +
+            "\n" +
+            "# Relationship Operators\n" +
+            "3 < 4\n" +
+            "3 <= 3\n" +
+            "3 >= 3\n" +
+            "4 > 3\n" +
             "";
 
     @Override
@@ -68,7 +74,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                        AND_OPERATOR (and, &&, &&) and OR_OPERATOR (or, ||, |||), so there's no way to just space around
                        the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
                        level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
-                    "SPACE_AROUND_EQUALITY_OPERATORS"
+                    "SPACE_AROUND_EQUALITY_OPERATORS",
+                    "SPACE_AROUND_RELATIONAL_OPERATORS"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
