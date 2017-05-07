@@ -50,44 +50,64 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("indent_without_override_after.ex");
     }
 
-    public void testWithSpaceAroundInMatch() {
-        myFixture.configureByFile("without_space_around_in_match.ex");
+    public void testWithSpaceAroundComparisonOperators() {
+        myFixture.configureByFile("without_space_around_comparison_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_EQUALITY_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_comparison_operators.ex");
+    }
+
+    public void testWithoutSpaceAroundComparisonOperators() {
+        myFixture.configureByFile("with_space_around_comparison_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_EQUALITY_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_comparison_operators.ex");
+    }
+
+    public void testWithSpaceAroundInMatchOperators() {
+        myFixture.configureByFile("without_space_around_in_match_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = true;
 
         reformatFixture();
 
-        myFixture.checkResultByFile("with_space_around_in_match.ex");
+        myFixture.checkResultByFile("with_space_around_in_match_operators.ex");
     }
 
-    public void testWithoutSpaceAroundInMatch() {
-        myFixture.configureByFile("with_space_around_in_match.ex");
+    public void testWithoutSpaceAroundInMatchOperators() {
+        myFixture.configureByFile("with_space_around_in_match_operators.ex");
 
         temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = false;
 
         reformatFixture();
 
-        myFixture.checkResultByFile("without_space_around_in_match.ex");
+        myFixture.checkResultByFile("without_space_around_in_match_operators.ex");
     }
 
-    public void testWithSpaceAroundMatch() {
-        myFixture.configureByFile("without_space_around_match.ex");
+    public void testWithSpaceAroundMatchOperator() {
+        myFixture.configureByFile("without_space_around_match_operator.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = true;
 
         reformatFixture();
 
-        myFixture.checkResultByFile("with_space_around_match.ex");
+        myFixture.checkResultByFile("with_space_around_match_operator.ex");
     }
 
-    public void testWithoutSpaceAroundMatch() {
-        myFixture.configureByFile("with_space_around_match.ex");
+    public void testWithoutSpaceAroundMatchOperator() {
+        myFixture.configureByFile("with_space_around_match_operator.ex");
 
         temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ASSIGNMENT_OPERATORS = false;
 
         reformatFixture();
 
-        myFixture.checkResultByFile("without_space_around_match.ex");
+        myFixture.checkResultByFile("without_space_around_match_operator.ex");
     }
 
     private void reformatFixture() {

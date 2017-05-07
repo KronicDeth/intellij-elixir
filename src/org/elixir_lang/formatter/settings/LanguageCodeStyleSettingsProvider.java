@@ -22,6 +22,13 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "  end\n" +
             "end";
     private static final String SPACING_CODE_SAMPLE =
+            "# Comparison Operators\n" +
+            "1 != 2\n" +
+            "1 == 1.0\n" +
+            "\"abcd\" =~ ~r/c(d)/\n" +
+            "1 !== 1.0\n" +
+            "1.00 === 1.0\n" +
+            "\n" +
             "# In Match Operators\n" +
             "param \\\\ default\n" +
             "{:ok, value} <- elements\n" +
@@ -56,14 +63,19 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
 
                     // SPACE_AROUND_OPERATORS group
 
-                    "SPACE_AROUND_ASSIGNMENT_OPERATORS"
+                    "SPACE_AROUND_ASSIGNMENT_OPERATORS",
                     /* SPACE_AROUND_LOGICAL_OPERATORS - logical operators are mixed with bitwise operator in
                        AND_OPERATOR (and, &&, &&) and OR_OPERATOR (or, ||, |||), so there's no way to just space around
                        the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
                        level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
+                    "SPACE_AROUND_EQUALITY_OPERATORS"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
+            consumer.renameStandardOption(
+                    "SPACE_AROUND_EQUALITY_OPERATORS",
+                    "Comparison operators (!=, ==, =~, !==, ===)"
+            );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",

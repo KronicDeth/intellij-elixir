@@ -325,8 +325,10 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final Map<IElementType, Boolean> isOperationByElementType = new IdentityHashMap<>();
 
     static {
+        isOperationByElementType.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
     }
@@ -338,6 +340,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final Map<IElementType, Boolean> isOperatorRuleByElementType = new IdentityHashMap<>();
 
     static {
+        isOperatorRuleByElementType.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
     }
