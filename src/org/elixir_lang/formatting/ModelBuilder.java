@@ -54,7 +54,10 @@ public class ModelBuilder implements FormattingModelBuilder {
     @NotNull
     private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
         CommonCodeStyleSettings elixirCommonSettings = settings.getCommonSettings(ElixirLanguage.INSTANCE);
+        org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
+                settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
+                .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS);
     }
 

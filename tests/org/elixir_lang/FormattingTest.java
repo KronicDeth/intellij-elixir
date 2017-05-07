@@ -5,6 +5,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.intellij.util.containers.ContainerUtil;
+import org.elixir_lang.code_style.CodeStyleSettings;
 
 public class FormattingTest extends LightCodeInsightFixtureTestCase {
     private com.intellij.psi.codeStyle.CodeStyleSettings temporaryCodeStyleSettings;
@@ -47,6 +48,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         reformatFixture();
 
         myFixture.checkResultByFile("indent_without_override_after.ex");
+    }
+
+    public void testWithSpaceAroundInMatch() {
+        myFixture.configureByFile("without_space_around_in_match.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_in_match.ex");
+    }
+
+    public void testWithoutSpaceAroundInMatch() {
+        myFixture.configureByFile("with_space_around_in_match.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_IN_MATCH_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_in_match.ex");
     }
 
     public void testWithSpaceAroundMatch() {

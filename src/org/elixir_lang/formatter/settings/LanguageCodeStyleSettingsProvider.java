@@ -6,7 +6,10 @@ import com.intellij.lang.Language;
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.code_style.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
+
+import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_AROUND_OPERATORS;
 
 public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider {
     private static final String INDENT_CODE_SAMPLE =
@@ -18,6 +21,14 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "    end\n" +
             "  end\n" +
             "end";
+    private static final String SPACING_CODE_SAMPLE =
+            "# In Match Operators\n" +
+            "param \\\\ default\n" +
+            "{:ok, value} <- elements\n" +
+            "\n" +
+            "# Match Operator\n" +
+            "a = 1\n" +
+            "";
 
     @Override
     public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
@@ -44,10 +55,21 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                        space isn't allowed between the function name and parenthesized arguments */
 
                     // SPACE_AROUND_OPERATORS group
+
                     "SPACE_AROUND_ASSIGNMENT_OPERATORS"
+                    /* SPACE_AROUND_LOGICAL_OPERATORS - logical operators are mixed with bitwise operator in
+                       AND_OPERATOR (and, &&, &&) and OR_OPERATOR (or, ||, |||), so there's no way to just space around
+                       the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
+                       level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_IN_MATCH_OPERATORS",
+                    "In match operators (<-, \\\\)",
+                    SPACES_AROUND_OPERATORS
+            );
         }
     }
 
@@ -61,7 +83,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                 codeSample = "Blank Line Settings Code Sample";
                 break;
             case SPACING_SETTINGS:
-                codeSample = "a = 1";
+                codeSample = SPACING_CODE_SAMPLE;
                 break;
             case WRAPPING_AND_BRACES_SETTINGS:
                 codeSample = "Wrapping And Braces Settings Code Sample";
