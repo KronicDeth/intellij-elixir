@@ -50,6 +50,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("indent_without_override_after.ex");
     }
 
+    public void testWithSpaceAroundAdditionOperators() {
+        myFixture.configureByFile("without_space_around_addition_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ADDITIVE_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_addition_operators.ex");
+    }
+
+    public void testWithoutSpaceAroundAdditionOperators() {
+        myFixture.configureByFile("with_space_around_addition_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_ADDITIVE_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_addition_operators.ex");
+    }
+
     public void testWithSpaceAroundComparisonOperators() {
         myFixture.configureByFile("without_space_around_comparison_operators.ex");
 

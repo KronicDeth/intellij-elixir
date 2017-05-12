@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
+import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.formatter.Block;
 import org.elixir_lang.psi.ElixirTypes;
@@ -58,6 +59,14 @@ public class ModelBuilder implements FormattingModelBuilder {
                 settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
                 .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
+                // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR
+                .aroundInside(
+                        ElixirTypes.DUAL_OPERATOR,
+                        TokenSet.create(
+                                ElixirTypes.MATCHED_ADDITION_OPERATION,
+                                ElixirTypes.UNMATCHED_ADDITION_OPERATION
+                        )
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS);

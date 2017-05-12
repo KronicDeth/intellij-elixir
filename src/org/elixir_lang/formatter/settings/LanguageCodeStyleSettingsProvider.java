@@ -22,6 +22,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "  end\n" +
             "end";
     private static final String SPACING_CODE_SAMPLE =
+            "# Addition Operators\n" +
+            "1 + 1\n" +
+            "1 - 1\n" +
+            "\n" +
             "# Comparison Operators\n" +
             "1 != 2\n" +
             "1 == 1.0\n" +
@@ -75,7 +79,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                        the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
                        level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
                     "SPACE_AROUND_EQUALITY_OPERATORS",
-                    "SPACE_AROUND_RELATIONAL_OPERATORS"
+                    "SPACE_AROUND_RELATIONAL_OPERATORS",
+                    /* SPACE_AROUND_BITWISE_OPERATORS - Bitwise operators are mixed into tokens used for other purposes,
+                       so they can't be spaced independently */
+                    "SPACE_AROUND_ADDITIVE_OPERATORS"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
