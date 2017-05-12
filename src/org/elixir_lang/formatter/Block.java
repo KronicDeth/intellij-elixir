@@ -225,9 +225,10 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private static boolean shouldBuildBlock(@NotNull ASTNode child, @NotNull IElementType childElementType) {
-        return childElementType != TokenType.WHITE_SPACE &&
-                !(childElementType == ElixirTypes.END_OF_EXPRESSION &&
-                        child.getFirstChildNode().getElementType() == ElixirTypes.EOL);
+        return !(childElementType == TokenType.WHITE_SPACE ||
+                childElementType == ElixirTypes.SIGNIFICANT_WHITE_SPACE ||
+                (childElementType == ElixirTypes.END_OF_EXPRESSION &&
+                        child.getFirstChildNode().getElementType() == ElixirTypes.EOL));
     }
 
     /**
