@@ -330,11 +330,13 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
     }
 
@@ -349,6 +351,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperatorRuleByElementType.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
+        isOperatorRuleByElementType.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
     }
 

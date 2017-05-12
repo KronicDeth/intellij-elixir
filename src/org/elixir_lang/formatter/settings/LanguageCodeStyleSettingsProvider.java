@@ -40,6 +40,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "# Match Operator\n" +
             "a = 1\n" +
             "\n" +
+            "# Multiplication Operators\n" +
+            "0 * 1\n" +
+            "0 / 1\n" +
+            "\n" +
             "# Relationship Operators\n" +
             "3 < 4\n" +
             "3 <= 3\n" +
@@ -82,7 +86,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_RELATIONAL_OPERATORS",
                     /* SPACE_AROUND_BITWISE_OPERATORS - Bitwise operators are mixed into tokens used for other purposes,
                        so they can't be spaced independently */
-                    "SPACE_AROUND_ADDITIVE_OPERATORS"
+                    "SPACE_AROUND_ADDITIVE_OPERATORS",
+                    "SPACE_AROUND_MULTIPLICATIVE_OPERATORS"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");

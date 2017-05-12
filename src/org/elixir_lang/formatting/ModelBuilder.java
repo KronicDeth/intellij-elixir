@@ -69,6 +69,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
+                .around(ElixirTypes.MULTIPLICATION_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS);
     }
 

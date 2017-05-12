@@ -130,6 +130,30 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_match_operator.ex");
     }
 
+    public void testWithSpaceAroundMultiplicationOperators() {
+        myFixture.configureByFile("without_space_around_multiplication_operators.ex");
+
+        temporaryCodeStyleSettings
+                .getCommonSettings(ElixirLanguage.INSTANCE)
+                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_multiplication_operators.ex");
+    }
+
+    public void testWithoutSpaceAroundMultiplicationOperators() {
+        myFixture.configureByFile("with_space_around_multiplication_operators.ex");
+
+        temporaryCodeStyleSettings
+                .getCommonSettings(ElixirLanguage.INSTANCE)
+                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_multiplication_operators.ex");
+    }
+
     public void testWithSpaceAroundRelationalOperators() {
         myFixture.configureByFile("without_space_around_relational_operators.ex");
 
