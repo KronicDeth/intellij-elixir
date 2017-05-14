@@ -25,6 +25,7 @@ One
   one + two,
   one ^^^ two,
   !one,
+  not one,
   one.(),
   Two.Three,
   @one,

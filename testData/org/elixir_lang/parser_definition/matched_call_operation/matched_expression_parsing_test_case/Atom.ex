@@ -21,6 +21,7 @@
 :atom @1
 :atom &1
 :atom !1
+:atom not 1
 :atom (;)
 :atom ?1
 :atom 0b10

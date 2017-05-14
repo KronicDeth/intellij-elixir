@@ -73,6 +73,10 @@ Heredoc
 '''
 CharList
 Heredoc
+'''.not
+'''
+CharList
+Heredoc
 '''.after
 '''
 CharList

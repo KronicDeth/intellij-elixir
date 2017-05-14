@@ -21,6 +21,7 @@
 "StringLine" @1
 "StringLine" &1
 "StringLine" !1
+"StringLine" not 1
 "StringLine" (;)
 "StringLine" ?1
 "StringLine" 0b10

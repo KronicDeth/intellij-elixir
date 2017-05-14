@@ -16,6 +16,7 @@
 @non_numeric.% Qualifier.qualified positional, key: value
 @non_numeric.<> Qualifier.qualified positional, key: value
 @non_numeric.^ Qualifier.qualified positional, key: value
+@non_numeric.not Qualifier.qualified positional, key: value
 @non_numeric.after Qualifier.qualified positional, key: value
 @non_numeric.do Qualifier.qualified positional, key: value
 @non_numeric.when Qualifier.qualified positional, key: value

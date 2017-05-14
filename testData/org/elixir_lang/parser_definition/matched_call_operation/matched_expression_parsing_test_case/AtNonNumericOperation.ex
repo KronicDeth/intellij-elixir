@@ -20,6 +20,7 @@
 @non_numeric @1
 @non_numeric &1
 @non_numeric !1
+@non_numeric not 1
 @non_numeric (;)
 @non_numeric ?1
 @non_numeric 0b10

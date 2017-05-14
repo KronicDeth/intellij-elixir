@@ -70,6 +70,14 @@
 &^1.two three, four do end
 &^1.two three + four do end
 
+# Bugged but because it doesn't replicate bug identified by @KronicDeth in
+# https://groups.google.com/d/msg/elixir-lang-core/aZ7KkHrAVzc/g2oA1-6rAQAJ
+#&not 1.two key: value do end
+#&not 1.two three four, key: value do end
+#&not 1.two three, key: value do end
+#&not 1.two three, four do end
+#&not 1.two three + four do end
+
 &fn -> one end.two key: value do end
 &fn -> one end.two three four, key: value do end
 &fn -> one end.two three, key: value do end

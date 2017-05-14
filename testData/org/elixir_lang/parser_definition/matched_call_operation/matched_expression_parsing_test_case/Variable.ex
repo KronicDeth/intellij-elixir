@@ -20,6 +20,7 @@ variable one
 variable @1
 variable &1
 variable !1
+variable not 1
 variable (;)
 variable ?1
 variable 0b10

@@ -61,6 +61,10 @@ Heredoc
 """
 String
 Heredoc
+""" not one
+"""
+String
+Heredoc
 """ One.Two
 """
 String

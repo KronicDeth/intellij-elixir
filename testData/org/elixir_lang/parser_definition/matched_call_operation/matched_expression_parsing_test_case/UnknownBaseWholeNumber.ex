@@ -21,6 +21,7 @@
 0zZ @1
 0zZ &1
 0zZ !1
+0zZ not 1
 0zZ (;)
 0zZ ?1
 0zZ 0b10

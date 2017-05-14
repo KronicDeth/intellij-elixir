@@ -1,1 +1,1 @@
-!one = !two
+!one = not two

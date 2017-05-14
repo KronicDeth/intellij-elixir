@@ -22,6 +22,9 @@ one.two.three do end
 ^1.two do end
 ^1.two.three do end
 
+not 1.two do end
+not 1.two.three do end
+
 (->).one do end
 (->).one.two do end
 

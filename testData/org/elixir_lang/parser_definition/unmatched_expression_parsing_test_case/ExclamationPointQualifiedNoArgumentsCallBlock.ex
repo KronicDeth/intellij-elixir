@@ -22,6 +22,9 @@
 !^1.two do end
 !^1.two.three do end
 
+!not 1.two do end
+!not 1.two.three do end
+
 !fn -> one end.two do end
 !fn -> one end.two.three do end
 

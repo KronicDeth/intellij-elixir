@@ -1,5 +1,5 @@
-!one != !two
-!one == !two
-!one =~ !two
-!one !== !two
-!one === !two
+!one != not two
+!one == not two
+!one =~ not two
+!one !== not two
+!one === not two

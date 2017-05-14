@@ -16,6 +16,7 @@
 "String".%
 "String".<>
 "String".^
+"String".not
 "String".after
 "String".do
 "String".when

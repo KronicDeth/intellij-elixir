@@ -14,6 +14,7 @@
 << one * two, >>
 << one ^^^ two, >>
 << !one, >>
+<< not one, >>
 << one.(), >>
 << One.Two[three], >>
 << One.Two, >>

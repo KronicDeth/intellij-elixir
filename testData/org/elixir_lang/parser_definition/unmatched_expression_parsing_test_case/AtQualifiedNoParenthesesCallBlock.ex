@@ -76,6 +76,18 @@
 @^1.two three, four do end
 @^1.two three + four do end
 
+@not 1.two key: value do end
+@not 1.two three four, key: value do end
+@not 1.two three, key: value do end
+@not 1.two three, four do end
+@not 1.two three + four do end
+
+@not 1.two key: value do end
+@not 1.two three four, key: value do end
+@not 1.two three, key: value do end
+@not 1.two three, four do end
+@not 1.two three + four do end
+
 @fn -> one end.two key: value do end
 @fn -> one end.two three four, key: value do end
 @fn -> one end.two three, key: value do end

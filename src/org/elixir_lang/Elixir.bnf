@@ -386,6 +386,7 @@
     MATCH_OPERATOR = "="
     MULTIPLICATION_OPERATOR = "*, /"
     NIL = "nil"
+    NOT_OPERATOR = "not"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
     OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = "X"
     OCTAL_WHOLE_NUMBER_BASE = "o"
@@ -430,7 +431,7 @@
     // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
     THREE_OPERATOR = "^^^"
     TYPE_OPERATOR = "::"
-    UNARY_OPERATOR = "not, ~~~, !, ^"
+    UNARY_OPERATOR = "~~~, !, ^"
     UNICODE_ESCAPE_CHARACTER = "u"
     UNKNOWN_WHOLE_NUMBER_BASE = "A-Z, a, c-n, p-w, z"
     VALID_BINARY_DIGITS = "0-1"
@@ -1422,7 +1423,7 @@ matchedMultiplicationOperation ::= matchedExpression multiplicationInfixOperator
  *
  */
 
-unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | UNARY_OPERATOR) EOL*
+unaryPrefixOperator ::= (SIGNIFICANT_WHITE_SPACE? DUAL_OPERATOR | NOT_OPERATOR | UNARY_OPERATOR) EOL*
                         {
                           implements = "org.elixir_lang.psi.Operator"
                           methods = [
@@ -2823,6 +2824,7 @@ keywordKey ::= AFTER |
                MATCH_OPERATOR |
                MULTIPLICATION_OPERATOR |
                NIL |
+               NOT_OPERATOR |
                OR_OPERATOR |
                PIPE_OPERATOR |
                RESCUE |

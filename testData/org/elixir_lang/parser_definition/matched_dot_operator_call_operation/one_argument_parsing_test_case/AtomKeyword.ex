@@ -16,6 +16,7 @@ nil.-> positional
 nil.% positional
 nil.<> positional
 nil.^ positional
+nil.not positional
 nil.after positional
 nil.do positional
 nil.when positional

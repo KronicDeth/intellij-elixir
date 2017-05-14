@@ -13,6 +13,7 @@
 (;) one * two
 (;) one ^^^ two
 (;) !one
+(;) not one
 (;) One.Two
 (;) One.two
 (;) @one

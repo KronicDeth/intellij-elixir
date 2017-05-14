@@ -61,6 +61,10 @@ Heredoc
 '''
 CharList
 Heredoc
+''' not one
+'''
+CharList
+Heredoc
 ''' One.Two
 '''
 CharList

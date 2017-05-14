@@ -16,6 +16,7 @@
 (;).% positional
 (;).<> positional
 (;).^ positional
+(;).not positional
 (;).after positional
 (;).do positional
 (;).when positional

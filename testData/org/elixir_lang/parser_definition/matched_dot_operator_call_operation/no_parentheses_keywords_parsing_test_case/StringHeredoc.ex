@@ -73,6 +73,10 @@ Heredoc
 """
 String
 Heredoc
+""".not key1: value1, key2: value2
+"""
+String
+Heredoc
 """.after key1: value1, key2: value2
 """
 String

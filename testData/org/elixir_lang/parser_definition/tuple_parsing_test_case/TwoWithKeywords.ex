@@ -28,6 +28,7 @@
 { @1, two: 2 }
 { &1, two: 2 }
 { !1, two: 2 }
+{ not 1, two: 2 }
 { fn one -> one end, two: 2 }
 { ( one -> one ), two: 2 }
 { ?1, two: 2 }

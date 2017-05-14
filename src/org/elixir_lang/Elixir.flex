@@ -136,8 +136,8 @@ THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
 THREE_TOKEN_OR_OPERATOR = "|||"
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_TOKEN_THREE_OPERATOR = "^^^"
-THREE_TOKEN_UNARY_OPERATOR = "not" |
-                             "~~~"
+THREE_TOKEN_NOT_OPERATOR = "not"
+THREE_TOKEN_UNARY_OPERATOR = "~~~"
 
 THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
@@ -146,6 +146,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_OR_OPERATOR} |
                        {THREE_TOKEN_THREE_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
+                       {THREE_TOKEN_NOT_OPERATOR} |
                        "..."
 
 TWO_TOKEN_AND_OPERATOR = "&&"
@@ -232,6 +233,7 @@ IN_OPERATOR = {ONE_TOKEN_IN_OPERATOR}
 MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
+NOT_OPERATOR = {THREE_TOKEN_NOT_OPERATOR}
 OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
               {TWO_TOKEN_OR_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
@@ -664,6 +666,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER_TOKEN} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
   {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NIL; }
+  // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.NOT_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
   {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_OPERATOR; }
@@ -676,9 +681,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {UNARY_OPERATOR} as "^^^" is longer than "^" in {UNARY_OPERATOR}
   {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.THREE_OPERATOR; }
-  // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.UNARY_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
@@ -708,6 +710,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.TILDE; }
   {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR; }
+  {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.UNARY_OPERATOR; }
   {VALID_DECIMAL_DIGITS}                     { pushAndBegin(DECIMAL_WHOLE_NUMBER);
                                                return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {QUOTE_HEREDOC_PROMOTER}                   { startQuote(yytext());

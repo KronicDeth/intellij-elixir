@@ -16,6 +16,7 @@
 ?c.%
 ?c.<>
 ?c.^
+?c.not
 ?c.after
 ?c.do
 ?c.when

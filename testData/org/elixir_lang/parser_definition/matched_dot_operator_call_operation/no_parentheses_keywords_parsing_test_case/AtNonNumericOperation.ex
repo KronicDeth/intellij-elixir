@@ -16,6 +16,7 @@
 @non_numeric.% key1: value1, key2: value2
 @non_numeric.<> key1: value1, key2: value2
 @non_numeric.^ key1: value1, key2: value2
+@non_numeric.not key1: value1, key2: value2
 @non_numeric.after key1: value1, key2: value2
 @non_numeric.do key1: value1, key2: value2
 @non_numeric.when key1: value1, key2: value2

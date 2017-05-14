@@ -73,6 +73,10 @@ Heredoc
 '''
 CharList
 Heredoc
+'''.not unqualified positional, key: value
+'''
+CharList
+Heredoc
 '''.after unqualified positional, key: value
 '''
 CharList

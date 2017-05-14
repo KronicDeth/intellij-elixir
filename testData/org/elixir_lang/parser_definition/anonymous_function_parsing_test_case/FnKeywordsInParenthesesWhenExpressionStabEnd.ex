@@ -15,6 +15,7 @@ fn (key_one: value_one, key_two: value_two) when one + two -> end
 fn (key_one: value_one, key_two: value_two) when one * two -> end
 fn (key_one: value_one, key_two: value_two) when one <|> two -> end
 fn (key_one: value_one, key_two: value_two) when one ^^^ two -> end
+fn (key_one: value_one, key_two: value_two) when !one -> end
 fn (key_one: value_one, key_two: value_two) when not one -> end
 fn (key_one: value_one, key_two: value_two) when Module.function positional, key: value -> end
 fn (key_one: value_one, key_two: value_two) when @function positional, key: value -> end

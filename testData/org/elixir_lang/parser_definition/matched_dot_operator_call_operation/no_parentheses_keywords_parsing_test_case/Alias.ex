@@ -16,6 +16,7 @@ Alias.-> key1: value1, key2: value2
 Alias.% key1: value1, key2: value2
 Alias.<> key1: value1, key2: value2
 Alias.^ key1: value1, key2: value2
+Alias.not key1: value1, key2: value2
 Alias.after key1: value1, key2: value2
 Alias.do key1: value1, key2: value2
 Alias.when key1: value1, key2: value2

@@ -16,6 +16,7 @@
 ?c.% positional
 ?c.<> positional
 ?c.^ positional
+?c.not positional
 ?c.after positional
 ?c.do positional
 ?c.when positional

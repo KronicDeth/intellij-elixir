@@ -11,6 +11,7 @@
 %@1.Two{}
 %&1.Two{}
 %^1.Two{}
+%not 1.Two{}
 %fn -> end.Two{}
 %(->).Two{}
 %?1.Two{}

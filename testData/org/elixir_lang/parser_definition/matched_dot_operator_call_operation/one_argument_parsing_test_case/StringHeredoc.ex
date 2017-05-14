@@ -73,6 +73,10 @@ Heredoc
 """
 String
 Heredoc
+""".not positional
+"""
+String
+Heredoc
 """.after positional
 """
 String

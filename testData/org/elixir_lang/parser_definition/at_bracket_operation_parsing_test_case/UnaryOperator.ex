@@ -6,3 +6,12 @@
 @Module.^ [matched_expression]
 @Module.^[matched_expression,]
 @Module.^ [matched_expression,]
+
+@Module.not[key: value]
+@Module.not [key: value]
+@Module.not[()]
+@Module.not [()]
+@Module.not[matched_expression]
+@Module.not [matched_expression]
+@Module.not[matched_expression,]
+@Module.not [matched_expression,]

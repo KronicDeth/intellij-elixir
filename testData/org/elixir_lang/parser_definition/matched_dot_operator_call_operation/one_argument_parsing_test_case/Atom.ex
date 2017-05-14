@@ -16,6 +16,7 @@
 :atom.% positional
 :atom.<> positional
 :atom.^ positional
+:atom.not positional
 :atom.after positional
 :atom.do positional
 :atom.when positional

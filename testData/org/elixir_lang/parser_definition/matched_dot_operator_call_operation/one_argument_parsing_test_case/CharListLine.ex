@@ -16,6 +16,7 @@
 'CharList'.% positional
 'CharList'.<> positional
 'CharList'.^ positional
+'CharList'.not positional
 'CharList'.after positional
 'CharList'.do positional
 'CharList'.when positional
