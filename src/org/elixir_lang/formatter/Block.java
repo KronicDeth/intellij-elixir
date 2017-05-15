@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirTypes;
@@ -25,6 +26,9 @@ import static com.intellij.openapi.util.Pair.pair;
  *   will be used.
  */
 public class Block extends AbstractBlock implements BlockEx {
+    private static final TokenSet WHITESPACE_TOKEN_SET =
+            TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
+
     private final SpacingBuilder spacingBuilder;
     private final Indent indent;
 
@@ -64,7 +68,13 @@ public class Block extends AbstractBlock implements BlockEx {
                         ASTNode child = childBlockListPair.first;
                         List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
 
-                        if (shouldBuildBlock(child)) {
+                        IElementType childElementType = child.getElementType();
+
+                        if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                            lambdaBlocks.addAll(
+                                    buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
+                            );
+                        } else {
                             Block block = new Block(
                                     child,
                                     Wrap.createWrap(WrapType.NONE, false),
@@ -221,14 +231,11 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private static boolean shouldBuildBlock(@NotNull ASTNode child) {
-        return shouldBuildBlock(child, child.getElementType());
+        return shouldBuildBlock(child.getElementType());
     }
 
-    private static boolean shouldBuildBlock(@NotNull ASTNode child, @NotNull IElementType childElementType) {
-        return !(childElementType == TokenType.WHITE_SPACE ||
-                childElementType == ElixirTypes.SIGNIFICANT_WHITE_SPACE ||
-                (childElementType == ElixirTypes.END_OF_EXPRESSION &&
-                        child.getFirstChildNode().getElementType() == ElixirTypes.EOL));
+    private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
+        return !WHITESPACE_TOKEN_SET.contains(childElementType);
     }
 
     /**
@@ -247,7 +254,15 @@ public class Block extends AbstractBlock implements BlockEx {
                     IElementType childElementType = child.getElementType();
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-                    if (childElementType == ElixirTypes.STAB) {
+                    if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blocks.addAll(
+                                buildEndOfExpressionChildren(
+                                        child,
+                                        Alignment.createAlignment(),
+                                        Indent.getNoneIndent()
+                                )
+                        );
+                    } else if (childElementType == ElixirTypes.STAB) {
                         blocks.addAll(buildStabChildren(child));
                     } else {
                         Alignment childAlignment;
@@ -260,6 +275,27 @@ public class Block extends AbstractBlock implements BlockEx {
 
                         blocks.add(buildChild(child, childAlignment));
                     }
+
+                    return blocks;
+                }
+        );
+    }
+
+    /**
+     * Builds endOfExpression.*.  Importantly, it separates out the EOLs, which are whitespace from the comments that
+     * may be interlaced
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildEndOfExpressionChildren(@NotNull ASTNode endOfExpression,
+                                                                             @NotNull Alignment childAlignment,
+                                                                             @NotNull Indent childIndent) {
+        return buildChildren(
+                endOfExpression,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
+                    blocks.add(buildChild(child, childAlignment, childIndent));
 
                     return blocks;
                 }
@@ -282,11 +318,16 @@ public class Block extends AbstractBlock implements BlockEx {
                 stabBody,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    blocks.add(buildChild(child, childAlignment, childIndent));
+                    if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
+                    } else {
+                        blockList.add(buildChild(child, childAlignment, childIndent));
+                    }
 
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -312,7 +353,9 @@ public class Block extends AbstractBlock implements BlockEx {
                     IElementType childElementType = child.getElementType();
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-                    if (childElementType == ElixirTypes.STAB_BODY) {
+                    if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blocks.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
+                    } else if (childElementType == ElixirTypes.STAB_BODY) {
                         blocks.addAll(buildStabBodyChildren(child, childAlignment, childIndent));
                     } else {
                         blocks.add(buildChild(child, childAlignment, childIndent));
