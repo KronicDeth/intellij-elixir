@@ -174,6 +174,34 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_relational_operators.ex");
     }
 
+    public void testWithSpaceAroundUnaryOperators() {
+        myFixture.configureByFile("without_space_around_unary_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_UNARY_OPERATOR = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_unary_operators.ex");
+    }
+
+    public void testWithoutSpaceAroundUnaryOperators() {
+        myFixture.configureByFile("with_space_around_unary_operators.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_UNARY_OPERATOR = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_unary_operators.ex");
+    }
+
+    public void testSingleSpaceNotOperator() {
+        myFixture.configureByFile("multispace_not_operator.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("single_space_not_operator.ex");
+    }
+
     private void reformatFixture() {
         new WriteCommandAction.Simple(getProject()) {
             @Override

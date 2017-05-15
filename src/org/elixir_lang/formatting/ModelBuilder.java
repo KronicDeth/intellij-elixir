@@ -67,9 +67,20 @@ public class ModelBuilder implements FormattingModelBuilder {
                                 ElixirTypes.UNMATCHED_ADDITION_OPERATION
                         )
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
+                .aroundInside(
+                        // Cannot contain `ElixirTypes.DUAL_OPERATOR` because a space makes them invalid.
+                        // Cannot contain `ElixirTypes.NOT_OPERATOR` because it MUST have a space.
+                        ElixirTypes.UNARY_OPERATOR,
+                        TokenSet.create(
+                                ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
+                                ElixirTypes.UNARY_NUMERIC_OPERATION,
+                                ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION
+                        )
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
                 .around(ElixirTypes.MULTIPLICATION_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
+                .after(ElixirTypes.NOT_OPERATOR).spaces(1)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS);
     }
 

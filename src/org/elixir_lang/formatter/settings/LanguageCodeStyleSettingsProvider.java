@@ -49,6 +49,30 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "3 <= 3\n" +
             "3 >= 3\n" +
             "4 > 3\n" +
+            "\n" +
+            "# Unary Operators\n" +
+            "\n" +
+            "## Numeric Operands\n" +
+            "+1\n" +
+            "-1\n" +
+            "!1\n" +
+            "^1\n" +
+            "~~~1\n" +
+            "\n" +
+            "## Non-numeric Operands\n" +
+            "+negative\n" +
+            "-positive\n" +
+            "!false\n" +
+            "^pinned\n" +
+            "~~~mask\n" +
+            "\n" +
+            "# Word Operators\n" +
+            "\n" +
+            "## Numeric Operands\n" +
+            "not 1\n" +
+            "\n" +
+            "## Non-numeric Operands\n" +
+            "not true\n" +
             "";
 
     @Override
@@ -87,7 +111,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     /* SPACE_AROUND_BITWISE_OPERATORS - Bitwise operators are mixed into tokens used for other purposes,
                        so they can't be spaced independently */
                     "SPACE_AROUND_ADDITIVE_OPERATORS",
-                    "SPACE_AROUND_MULTIPLICATIVE_OPERATORS"
+                    "SPACE_AROUND_MULTIPLICATIVE_OPERATORS",
+                    /* SPACE_AROUND_SHIFT_OPERATORS - no dedicated shift operators in Elixir */
+                    "SPACE_AROUND_UNARY_OPERATOR"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
@@ -95,6 +121,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_EQUALITY_OPERATORS",
                     "Comparison operators (!=, ==, =~, !==, ===)"
             );
+            consumer.renameStandardOption("SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "Multiplicative operators (*, /)");
+            consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
+
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",
