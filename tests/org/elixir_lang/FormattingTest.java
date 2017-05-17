@@ -174,6 +174,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_relational_operators.ex");
     }
 
+    public void testWithSpaceAroundStabOperator() {
+        myFixture.configureByFile("without_space_around_stab_operator.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_LAMBDA_ARROW = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_stab_operator.ex");
+    }
+
+    public void testWithoutSpaceAroundStabOperator() {
+        myFixture.configureByFile("with_space_around_stab_operator.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_AROUND_LAMBDA_ARROW = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_stab_operator.ex");
+    }
+
     public void testWithSpaceAroundUnaryOperators() {
         myFixture.configureByFile("without_space_around_unary_operators.ex");
 

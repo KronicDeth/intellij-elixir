@@ -376,6 +376,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.STAB_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
@@ -399,6 +400,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
+        isOperatorRuleByElementType.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.UNARY_PREFIX_OPERATOR, true);
     }
 

@@ -50,6 +50,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "3 >= 3\n" +
             "4 > 3\n" +
             "\n" +
+            "# Stab Operator\n" +
+            "fn a -> a == true end\n" +
+            "\n" +
             "# Unary Operators\n" +
             "\n" +
             "## Numeric Operands\n" +
@@ -113,7 +116,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_ADDITIVE_OPERATORS",
                     "SPACE_AROUND_MULTIPLICATIVE_OPERATORS",
                     /* SPACE_AROUND_SHIFT_OPERATORS - no dedicated shift operators in Elixir */
-                    "SPACE_AROUND_UNARY_OPERATOR"
+                    "SPACE_AROUND_UNARY_OPERATOR",
+                    "SPACE_AROUND_LAMBDA_ARROW"
             );
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
@@ -123,6 +127,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             );
             consumer.renameStandardOption("SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "Multiplicative operators (*, /)");
             consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
+            consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
 
             consumer.showCustomOption(
                     CodeStyleSettings.class,
