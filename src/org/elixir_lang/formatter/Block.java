@@ -6,6 +6,7 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
+import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
@@ -31,6 +32,8 @@ public class Block extends AbstractBlock implements BlockEx {
 
     private final SpacingBuilder spacingBuilder;
     private final Indent indent;
+    @Nullable
+    private final Wrap childrenWrap;
 
     public Block(@NotNull ASTNode node,
                  @Nullable Wrap wrap,
@@ -44,9 +47,19 @@ public class Block extends AbstractBlock implements BlockEx {
                  @Nullable Alignment alignment,
                  @NotNull SpacingBuilder spacingBuilder,
                  @NotNull Indent indent) {
+        this(node, wrap, alignment, spacingBuilder, indent, null);
+    }
+
+    public Block(@NotNull ASTNode node,
+                 @Nullable Wrap wrap,
+                 @Nullable Alignment alignment,
+                 @NotNull SpacingBuilder spacingBuilder,
+                 @NotNull Indent indent,
+                 @Nullable Wrap childrenWrap) {
         super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
+        this.childrenWrap = childrenWrap;
     }
 
     @Override
@@ -55,7 +68,9 @@ public class Block extends AbstractBlock implements BlockEx {
         // shared so that children are all aligned as alignment is shared based on sharing same alignment instance
         IElementType elementType = myNode.getElementType();
 
-        if (isOperationElementType(elementType)) {
+        if (elementType == ElixirTypes.STAB_OPERATION) {
+            blocks = buildStabOperationChildren(myNode, childrenWrap);
+        } else if (isOperationElementType(elementType)) {
             blocks = buildOperationChildren();
         } else if (isUnmatchedCallElementType(elementType)) {
             blocks = buildUnmatchedCallChildren();
@@ -74,6 +89,8 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                             );
+                        } else if (childElementType == ElixirTypes.STAB) { // child of ANONYMOUS_FUNCTION
+                            lambdaBlocks.addAll(buildStabChildren((CompositeElement) child));
                         } else {
                             Block block = new Block(
                                     child,
@@ -200,12 +217,39 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment, @NotNull Indent indent) {
-        return new Block(
-                child,
+        return buildChild(child,
                 Wrap.createWrap(WrapType.NONE, false),
                 alignment,
-                spacingBuilder,
                 indent
+        );
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child,
+                             @NotNull Wrap wrap,
+                             @NotNull Alignment alignment,
+                             @NotNull Indent indent) {
+        return buildChild(
+                child,
+                wrap,
+                alignment,
+                indent,
+                null
+        );
+    }
+
+    @NotNull Block buildChild(@NotNull ASTNode child,
+                              @NotNull Wrap wrap,
+                              @NotNull Alignment alignment,
+                              @NotNull Indent indent,
+                              @Nullable Wrap childrenWrap) {
+        return new Block(
+                child,
+                wrap,
+                alignment,
+                spacingBuilder,
+                indent,
+                childrenWrap
         );
     }
 
@@ -263,7 +307,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 )
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
-                        blocks.addAll(buildStabChildren(child));
+                        blocks.addAll(buildStabChildren((CompositeElement) child));
                     } else {
                         Alignment childAlignment;
 
@@ -306,12 +350,14 @@ public class Block extends AbstractBlock implements BlockEx {
      * Builds stab.stabBody.*
      *
      * @param stabBody a child of a `stab` in `doBlock`
+     * @param childWrap wrap for all child blocks in `stabBody`
      * @param childAlignment alignment to use for all child blocks of `stabBody`
      * @param childIndent indent to use for all child blocks of the `stabBody`
      * @return children of stabBody that should be aligned together with the same indent
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildStabBodyChildren(@NotNull ASTNode stabBody,
+                                                                      @NotNull Wrap childWrap,
                                                                       @NotNull Alignment childAlignment,
                                                                       @NotNull Indent childIndent) {
         return buildChildren(
@@ -324,7 +370,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else {
-                        blockList.add(buildChild(child, childAlignment, childIndent));
+                        blockList.add(buildChild(child, childWrap, childAlignment, childIndent));
                     }
 
                     return blockList;
@@ -340,11 +386,22 @@ public class Block extends AbstractBlock implements BlockEx {
      *   doBlock.
      */
     @NotNull
-    private List<com.intellij.formatting.Block> buildStabChildren(@NotNull ASTNode stab) {
+    private List<com.intellij.formatting.Block> buildStabChildren(@NotNull CompositeElement stab) {
         /* all children share the same alignment as expressions inside a doBlock above the stab are assumed to be
            aligned on the left-side */
         Alignment childAlignment = Alignment.createAlignment();
+
         Indent childIndent = Indent.getNormalIndent(true);
+        WrapType stabOperationWrapType;
+
+        if (stab.countChildren(TokenSet.create(ElixirTypes.STAB_OPERATION)) > 1) {
+            stabOperationWrapType = WrapType.ALWAYS;
+        } else {
+            stabOperationWrapType = WrapType.NORMAL;
+        }
+
+        Wrap stabOperationWrap = Wrap.createWrap(stabOperationWrapType, true);
+        Wrap stabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
 
         return buildChildren(
                 stab,
@@ -356,14 +413,60 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
                         blocks.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else if (childElementType == ElixirTypes.STAB_BODY) {
-                        blocks.addAll(buildStabBodyChildren(child, childAlignment, childIndent));
+                        blocks.addAll(
+                                buildStabBodyChildren(
+                                        child,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        childAlignment,
+                                        childIndent
+                                )
+                        );
                     } else {
-                        blocks.add(buildChild(child, childAlignment, childIndent));
+                        blocks.add(
+                                buildChild(child, stabOperationWrap, childAlignment, childIndent, stabBodyChildrenWrap)
+                        );
                     }
 
                     return blocks;
                 }
         );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildStabOperationChildren(
+            @NotNull ASTNode stabOperation,
+            @NotNull Wrap stabBodyChildrenWrap
+    ) {
+       return buildChildren(
+               stabOperation,
+               (childBlockListPair) -> {
+                   ASTNode child = childBlockListPair.first;
+                   IElementType childElementType = child.getElementType();
+                   List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                   if (childElementType == ElixirTypes.STAB_BODY) {
+                       blockList.addAll(
+                               buildStabBodyChildren(
+                                       child,
+                                       stabBodyChildrenWrap,
+                                       Alignment.createAlignment(),
+                                       Indent.getNormalIndent(true)
+                               )
+                       );
+                   } else if (childElementType == ElixirTypes.STAB_INFIX_OPERATOR) {
+                       blockList.addAll(buildOperatorRuleChildren(child));
+                   } else {
+                       blockList.add(
+                               buildChild(
+                                       child,
+                                       Alignment.createAlignment()
+                               )
+                       );
+                   }
+
+                   return blockList;
+               }
+       );
     }
 
     private static final Map<IElementType, Boolean> isOperationByElementType = new IdentityHashMap<>();
@@ -376,7 +479,6 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.STAB_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);

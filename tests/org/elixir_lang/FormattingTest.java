@@ -42,6 +42,42 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         super.tearDown();
     }
 
+    public void testAnonymousFunctionWithMultipleClauses() {
+        String path = "anonymous_function_with_multiple_clauses.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
+    public void testAnonymousFunctionWithMultipleClausesChop() {
+        myFixture.configureByFile("anonymous_function_with_multiple_clauses_chop_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("anonymous_function_with_multiple_clauses_chop_after.ex");
+    }
+
+    public void testAnonymousFunctionWithSingleClause() {
+        String path = "anonymous_function_with_single_clause.ex";
+
+        myFixture.configureByFiles(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
+    public void testAnonymousFunctionWithSingleClauseChop() {
+        myFixture.configureByFiles("anonymous_function_with_single_clause_chop_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("anonymous_function_with_single_clause_chop_after.ex");
+    }
+
     public void testIndentWithoutOverrides() {
         myFixture.configureByFile("indent_without_override_before.ex");
 
