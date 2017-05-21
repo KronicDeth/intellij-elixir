@@ -195,7 +195,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
                         IElementType childElementType = child.getElementType();
 
-                        if (childElementType == END_OF_EXPRESSION) {
+                        if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                            lambdaBlocks.addAll(
+                                    buildAccessExpressionChildren(child, childrenAlignment)
+                            );
+                        } else if (childElementType == END_OF_EXPRESSION) {
                             lambdaBlocks.addAll(
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                             );
@@ -215,6 +219,23 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
+    }
+
+    private @NotNull List<com.intellij.formatting.Block> buildAccessExpressionChildren(
+            @NotNull ASTNode accessExpression,
+            @NotNull Alignment childrenAlignment
+    ) {
+        return buildChildren(
+                accessExpression,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    blockList.add(buildChild(child, childrenAlignment));
+
+                    return blockList;
+                }
+        );
     }
 
     private @NotNull
