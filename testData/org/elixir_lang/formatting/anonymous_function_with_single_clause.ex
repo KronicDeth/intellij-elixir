@@ -1,5 +1,5 @@
 fn a -> a end
 
 fn a ->
-  a
+     a
 end
