@@ -10,6 +10,7 @@
 0zZ one < two
 0zZ one |> two
 0zZ one + two
+0zZ one / two
 0zZ one * two
 0zZ one ^^^ two
 0zZ !one

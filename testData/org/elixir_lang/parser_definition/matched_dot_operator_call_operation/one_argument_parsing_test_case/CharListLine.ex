@@ -8,6 +8,7 @@
 'CharList'.<- positional
 'CharList'.in positional
 'CharList'.= positional
+'CharList'./ positional
 'CharList'.* positional
 'CharList'.|| positional
 'CharList'.| positional

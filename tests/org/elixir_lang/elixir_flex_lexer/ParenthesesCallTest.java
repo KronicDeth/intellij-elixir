@@ -423,7 +423,7 @@ public class ParenthesesCallTest extends Test {
                         {
                                 "/",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },

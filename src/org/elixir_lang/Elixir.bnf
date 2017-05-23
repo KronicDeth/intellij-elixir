@@ -345,6 +345,7 @@
     COMPARISON_OPERATOR = "!==, ===, !=, ==, =~"
     DECIMAL_MARK = "Decimal Mark (.)"
     DECIMAL_SEPARATOR = "_"
+    DIVISION_OPERATOR = "/"
     DO = "do"
     DOT_OPERATOR = "."
     DUAL_OPERATOR = "+, -"
@@ -384,7 +385,7 @@
     LITERAL_WORDS_SIGIL_NAME = "W"
     MAP_OPERATOR = "%{}"
     MATCH_OPERATOR = "="
-    MULTIPLICATION_OPERATOR = "*, /"
+    MULTIPLICATION_OPERATOR = "*"
     NIL = "nil"
     NOT_OPERATOR = "not"
     OBSOLETE_BINARY_WHOLE_NUMBER_BASE = "B"
@@ -1404,7 +1405,7 @@ matchedAdditionOperation ::= matchedExpression additionInfixOperator matchedExpr
  *
  */
 
-multiplicationInfixOperator ::= EOL* MULTIPLICATION_OPERATOR EOL*
+multiplicationInfixOperator ::= EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) EOL*
                                 {
                                   implements = "org.elixir_lang.psi.Operator"
                                   methods = [
@@ -1466,6 +1467,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        CATCH |
                        COMPARISON_OPERATOR |
                        DO |
+                       DIVISION_OPERATOR |
                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
                        ELSE |
                        END |
@@ -2815,6 +2817,7 @@ keywordKey ::= AFTER |
                CATCH |
                COMPARISON_OPERATOR |
                DO |
+               DIVISION_OPERATOR |
                DUAL_OPERATOR |
                ELSE |
                IDENTIFIER_TOKEN |

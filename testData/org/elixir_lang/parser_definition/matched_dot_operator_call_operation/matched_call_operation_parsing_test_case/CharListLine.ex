@@ -8,6 +8,7 @@
 'CharList'.<- Qualifier.qualified positional, key: value
 'CharList'.in Qualifier.qualified positional, key: value
 'CharList'.= Qualifier.qualified positional, key: value
+'CharList'./ Qualifier.qualified positional, key: value
 'CharList'.* Qualifier.qualified positional, key: value
 'CharList'.|| Qualifier.qualified positional, key: value
 'CharList'.| Qualifier.qualified positional, key: value

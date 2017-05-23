@@ -8,6 +8,7 @@ Alias.^^^
 Alias.<-
 Alias.in
 Alias.=
+Alias./
 Alias.*
 Alias.||
 Alias.|

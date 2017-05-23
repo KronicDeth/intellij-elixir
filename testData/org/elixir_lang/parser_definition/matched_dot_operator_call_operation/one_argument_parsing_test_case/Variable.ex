@@ -8,6 +8,7 @@ variable.^^^ positional
 variable.<- positional
 variable.in positional
 variable.= positional
+variable./ positional
 variable.* positional
 variable.|| positional
 variable.| positional

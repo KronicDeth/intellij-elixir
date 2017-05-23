@@ -10,6 +10,7 @@ nil one != two
 nil one < two
 nil one |> two
 nil one + two
+nil one / two
 nil one * two
 nil one ^^^ two
 nil !one

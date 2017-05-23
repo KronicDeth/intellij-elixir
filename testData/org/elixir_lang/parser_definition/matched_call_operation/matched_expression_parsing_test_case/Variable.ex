@@ -10,6 +10,7 @@ variable one != two
 variable one < two
 variable one |> two
 variable one + two
+variable one / two
 variable one * two
 variable one ^^^ two
 variable !one

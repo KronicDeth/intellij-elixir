@@ -1331,7 +1331,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
-        return TokenSet.create(ElixirTypes.MULTIPLICATION_OPERATOR);
+        return TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
     }
 
     @Contract(pure = true)

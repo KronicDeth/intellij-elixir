@@ -10,6 +10,7 @@
 @non_numeric one < two
 @non_numeric one |> two
 @non_numeric one + two
+@non_numeric one / two
 @non_numeric one * two
 @non_numeric one ^^^ two
 @non_numeric !one

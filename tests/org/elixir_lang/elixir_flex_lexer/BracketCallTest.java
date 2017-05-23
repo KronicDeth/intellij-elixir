@@ -441,7 +441,7 @@ public class BracketCallTest extends Test {
                         {
                                 "/",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_BRACKET, INITIAL_STATE)
                                 )
                         },

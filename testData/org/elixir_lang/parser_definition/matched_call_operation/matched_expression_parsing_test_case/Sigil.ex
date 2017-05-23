@@ -10,6 +10,7 @@
 ~x{sigil}modifiers one < two
 ~x{sigil}modifiers one |> two
 ~x{sigil}modifiers one + two
+~x{sigil}modifiers one / two
 ~x{sigil}modifiers one * two
 ~x{sigil}modifiers one ^^^ two
 ~x{sigil}modifiers !one

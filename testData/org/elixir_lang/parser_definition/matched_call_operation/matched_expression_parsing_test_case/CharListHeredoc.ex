@@ -49,6 +49,10 @@ Heredoc
 '''
 CharList
 Heredoc
+''' one / two
+'''
+CharList
+Heredoc
 ''' one * two
 '''
 CharList

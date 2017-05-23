@@ -8,6 +8,7 @@
 0o76543210.<- positional
 0o76543210.in positional
 0o76543210.= positional
+0o76543210./ positional
 0o76543210.* positional
 0o76543210.|| positional
 0o76543210.| positional

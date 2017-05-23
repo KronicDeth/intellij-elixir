@@ -8,6 +8,7 @@
 0b10.<- unqualified positional, key: value
 0b10.in unqualified positional, key: value
 0b10.= unqualified positional, key: value
+0b10./ unqualified positional, key: value
 0b10.* unqualified positional, key: value
 0b10.|| unqualified positional, key: value
 0b10.| unqualified positional, key: value

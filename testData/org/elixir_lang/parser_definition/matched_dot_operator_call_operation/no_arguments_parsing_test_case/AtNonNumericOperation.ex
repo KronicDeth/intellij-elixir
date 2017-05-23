@@ -8,6 +8,7 @@
 @non_numeric.<-
 @non_numeric.in
 @non_numeric.=
+@non_numeric./
 @non_numeric.*
 @non_numeric.||
 @non_numeric.|

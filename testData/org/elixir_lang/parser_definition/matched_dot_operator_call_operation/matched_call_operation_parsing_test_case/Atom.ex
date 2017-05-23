@@ -9,6 +9,7 @@
 :atom.in Qualifier.qualified positional, key: value
 :atom.= Qualifier.qualified positional, key: value
 :atom.* Qualifier.qualified positional, key: value
+:atom./ Qualifier.qualified positional, key: value
 :atom.|| Qualifier.qualified positional, key: value
 :atom.| Qualifier.qualified positional, key: value
 :atom.<= Qualifier.qualified positional, key: value

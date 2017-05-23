@@ -8,6 +8,7 @@
 @non_numeric.<- positional
 @non_numeric.in positional
 @non_numeric.= positional
+@non_numeric./ positional
 @non_numeric.* positional
 @non_numeric.|| positional
 @non_numeric.| positional

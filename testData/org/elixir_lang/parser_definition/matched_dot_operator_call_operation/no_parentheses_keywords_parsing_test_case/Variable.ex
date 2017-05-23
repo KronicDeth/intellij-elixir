@@ -8,6 +8,7 @@ variable.^^^ key1: value1, key2: value2
 variable.<- key1: value1, key2: value2
 variable.in key1: value1, key2: value2
 variable.= key1: value1, key2: value2
+variable./ key1: value1, key2: value2
 variable.* key1: value1, key2: value2
 variable.|| key1: value1, key2: value2
 variable.| key1: value1, key2: value2

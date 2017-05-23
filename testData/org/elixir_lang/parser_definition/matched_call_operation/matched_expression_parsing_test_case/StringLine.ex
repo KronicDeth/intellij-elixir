@@ -10,6 +10,7 @@
 "StringLine" one < two
 "StringLine" one |> two
 "StringLine" one + two
+"StringLine" one / two
 "StringLine" one * two
 "StringLine" one ^^^ two
 "StringLine" !one

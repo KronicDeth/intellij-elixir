@@ -11,6 +11,7 @@
 [key: one < two]
 [key: one |> two]
 [key: one in two]
+[key: one / two]
 [key: one * two]
 [key: one ^^^ two]
 [key: !one]

@@ -8,6 +8,7 @@ nil.^^^ key1: value1, key2: value2
 nil.<- key1: value1, key2: value2
 nil.in key1: value1, key2: value2
 nil.= key1: value1, key2: value2
+nil./ key1: value1, key2: value2
 nil.* key1: value1, key2: value2
 nil.|| key1: value1, key2: value2
 nil.| key1: value1, key2: value2

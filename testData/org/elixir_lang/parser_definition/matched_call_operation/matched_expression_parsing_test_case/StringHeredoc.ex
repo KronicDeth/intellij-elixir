@@ -49,6 +49,10 @@ Heredoc
 """
 String
 Heredoc
+""" one / two
+"""
+String
+Heredoc
 """ one * two
 """
 String

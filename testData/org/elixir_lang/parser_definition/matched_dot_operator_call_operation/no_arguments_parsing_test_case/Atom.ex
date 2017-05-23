@@ -8,6 +8,7 @@
 :atom.<-
 :atom.in
 :atom.=
+:atom./
 :atom.*
 :atom.||
 :atom.|

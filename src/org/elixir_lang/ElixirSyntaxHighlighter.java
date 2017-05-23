@@ -3,13 +3,11 @@ package org.elixir_lang;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.xmlb.annotations.Text;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -327,6 +325,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.AT_OPERATOR,
             ElixirTypes.CAPTURE_OPERATOR,
             ElixirTypes.COMPARISON_OPERATOR,
+            ElixirTypes.DIVISION_OPERATOR,
             ElixirTypes.DUAL_OPERATOR,
             ElixirTypes.IN_OPERATOR,
             ElixirTypes.IN_MATCH_OPERATOR,

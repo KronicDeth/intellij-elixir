@@ -8,6 +8,7 @@
 @non_numeric.<- Qualifier.qualified positional, key: value
 @non_numeric.in Qualifier.qualified positional, key: value
 @non_numeric.= Qualifier.qualified positional, key: value
+@non_numeric./ Qualifier.qualified positional, key: value
 @non_numeric.* Qualifier.qualified positional, key: value
 @non_numeric.|| Qualifier.qualified positional, key: value
 @non_numeric.| Qualifier.qualified positional, key: value

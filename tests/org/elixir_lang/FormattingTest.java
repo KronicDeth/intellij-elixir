@@ -90,6 +90,20 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 */
 
+    public void testCaptureNameArityWithSpaceAroundMultiplication() {
+        String path = "capture_name_arity_with_space_around_multiplication.ex";
+
+        myFixture.configureByFile(path);
+
+        temporaryCodeStyleSettings
+                .getCommonSettings(ElixirLanguage.INSTANCE)
+                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     public void testIndentWithoutOverrides() {
         myFixture.configureByFile("indent_without_override_before.ex");
 

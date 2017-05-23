@@ -15,10 +15,7 @@ import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.psi.ElixirTypes.END_OF_EXPRESSION;
@@ -28,6 +25,14 @@ import static org.elixir_lang.psi.ElixirTypes.END_OF_EXPRESSION;
  * will be used.
  */
 public class Block extends AbstractBlock implements BlockEx {
+    private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+    );
+    private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
+            ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
+    );
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
     private static final Map<IElementType, Boolean> isOperationByElementType = new IdentityHashMap<>();
@@ -36,6 +41,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     static {
         isOperationByElementType.put(ElixirTypes.MATCHED_ADDITION_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
@@ -44,6 +50,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
@@ -54,6 +61,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     static {
         isOperatorRuleByElementType.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
+        isOperatorRuleByElementType.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
@@ -127,6 +135,11 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private Block buildChild(@NotNull ASTNode child) {
+        return buildChild(child, Alignment.createAlignment());
+    }
+
+    @NotNull
     private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment) {
         return buildChild(child, alignment, Indent.getNoneIndent());
     }
@@ -178,10 +191,12 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (elementType == ElixirTypes.ANONYMOUS_FUNCTION) {
             blocks = buildAnonymousFunctionChildren(myNode);
+        } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
+            blocks = buildCaptureNonNumericOperationChildren(myNode);
         } else if (elementType == ElixirTypes.STAB_OPERATION) {
             blocks = buildStabOperationChildren(myNode, childrenWrap);
         } else if (isOperationElementType(elementType)) {
-            blocks = buildOperationChildren();
+            blocks = buildOperationChildren(myNode);
         } else if (isUnmatchedCallElementType(elementType)) {
             blocks = buildUnmatchedCallChildren();
         } else {
@@ -219,6 +234,77 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
+    }
+
+    /**
+     * {@link #getSpacing(com.intellij.formatting.Block, com.intellij.formatting.Block)} only has the parent block and
+     * the two direct children as context for evaluating rules, so to distinguish normal division `/` from `/` in
+     * `&NAME/ARITY`, for `&...` need to look ahead and down and if `NAME/ARITY` is detected then the `/` operation will
+     * need to flattened so that the `DIVISION_OPERATOR` itself is an immediate child of
+     * `MATCHED_CAPTURE_NON_NUMERIC_OPERATION` or `UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION`.
+     *
+     * @param captureNonNumericOperation A capture operation that may be a name/arity reference.
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildCaptureNonNumericOperationChildren(
+            ASTNode captureNonNumericOperation
+    ) {
+        return buildChildren(
+                captureNonNumericOperation,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (MULTIPLICATION_OPERATION_TOKEN_SET.contains(childElementType)) {
+                        blockList.addAll(
+                                buildCapturedMultiplicationOperationChildren(child)
+                        );
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildCapturedMultiplicationOperationChildren(
+            ASTNode multiplicationOperation
+    ) {
+        List<com.intellij.formatting.Block> flattenedBlockList = buildOperationChildren(multiplicationOperation);
+        List<com.intellij.formatting.Block> blockList = null;
+
+        if (flattenedBlockList.size() == 3) {
+            ASTBlock operatorBlock = (ASTBlock) flattenedBlockList.get(1);
+
+            if (operatorBlock.getNode().getElementType() == ElixirTypes.DIVISION_OPERATOR) {
+                ASTBlock rightOperandBlock = (ASTBlock) flattenedBlockList.get(2);
+
+                // `/ARITY` confirmed
+                if (rightOperandBlock.getNode().getElementType() == ElixirTypes.DECIMAL_WHOLE_NUMBER) {
+                    ASTBlock leftOperandBlock = (ASTBlock) flattenedBlockList.get(0);
+                    ASTNode leftOperand = leftOperandBlock.getNode();
+                    IElementType leftOperandElementType = leftOperand.getElementType();
+
+                    if (leftOperandElementType == ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL) {
+                        // `NAME/ARITY` confirmed
+                        if (leftOperand.findChildByType(ElixirTypes.DO_BLOCK) == null) {
+                            blockList = flattenedBlockList;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (blockList == null) {
+            // don't flatten
+            blockList = Collections.singletonList(buildChild(multiplicationOperation));
+        }
+
+        return blockList;
     }
 
     private @NotNull List<com.intellij.formatting.Block> buildAccessExpressionChildren(
@@ -367,15 +453,22 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildOperationChildren() {
+    private List<com.intellij.formatting.Block> buildOperationChildren(ASTNode operation) {
         return buildChildren(
-                myNode,
+                operation,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
                     /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
-                    if (isOperatorRuleElementType(child.getElementType())) {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blocks.addAll(
+                                buildAccessExpressionChildren(child, Alignment.createAlignment())
+                        );
+                    } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blocks.add(buildChild(child, Alignment.createAlignment()));

@@ -8,6 +8,7 @@
 "String".<-
 "String".in
 "String".=
+"String"./
 "String".*
 "String".||
 "String".|

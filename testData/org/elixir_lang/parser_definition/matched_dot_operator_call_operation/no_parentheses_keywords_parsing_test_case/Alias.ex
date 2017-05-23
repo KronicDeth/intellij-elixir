@@ -8,6 +8,7 @@ Alias.^^^ key1: value1, key2: value2
 Alias.<- key1: value1, key2: value2
 Alias.in key1: value1, key2: value2
 Alias.= key1: value1, key2: value2
+Alias./ key1: value1, key2: value2
 Alias.* key1: value1, key2: value2
 Alias.|| key1: value1, key2: value2
 Alias.| key1: value1, key2: value2

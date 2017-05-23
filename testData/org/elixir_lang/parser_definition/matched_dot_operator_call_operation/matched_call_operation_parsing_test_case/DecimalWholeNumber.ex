@@ -8,6 +8,7 @@
 9876543210.<- Qualifier.qualified positional, key: value
 9876543210.in Qualifier.qualified positional, key: value
 9876543210.= Qualifier.qualified positional, key: value
+9876543210./ Qualifier.qualified positional, key: value
 9876543210.* Qualifier.qualified positional, key: value
 9876543210.|| Qualifier.qualified positional, key: value
 9876543210.| Qualifier.qualified positional, key: value

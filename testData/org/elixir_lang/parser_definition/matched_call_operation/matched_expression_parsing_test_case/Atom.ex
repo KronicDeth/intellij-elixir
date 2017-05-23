@@ -10,6 +10,7 @@
 :atom one < two
 :atom one |> two
 :atom one + two
+:atom one / two
 :atom one * two
 :atom one ^^^ two
 :atom !one

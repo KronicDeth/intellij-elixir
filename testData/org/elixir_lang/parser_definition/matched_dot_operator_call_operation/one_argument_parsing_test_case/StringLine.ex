@@ -8,6 +8,7 @@
 "String".<- positional
 "String".in positional
 "String".= positional
+"String"./ positional
 "String".* positional
 "String".|| positional
 "String".| positional

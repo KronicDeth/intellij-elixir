@@ -8,6 +8,7 @@
 !1.<- key1: value1, key2: value2
 !1.in key1: value1, key2: value2
 !1.= key1: value1, key2: value2
+!1./ key1: value1, key2: value2
 !1.* key1: value1, key2: value2
 !1.|| key1: value1, key2: value2
 !1.| key1: value1, key2: value2

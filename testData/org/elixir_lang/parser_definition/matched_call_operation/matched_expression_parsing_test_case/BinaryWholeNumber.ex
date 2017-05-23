@@ -10,6 +10,7 @@
 0b10 one < two
 0b10 one |> two
 0b10 one + two
+0b10 one / two
 0b10 one * two
 0b10 one ^^^ two
 0b10 !one

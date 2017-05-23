@@ -8,6 +8,7 @@ Alias.^^^ unqualified positional, key: value
 Alias.<- unqualified positional, key: value
 Alias.in unqualified positional, key: value
 Alias.= unqualified positional, key: value
+Alias./ unqualified positional, key: value
 Alias.* unqualified positional, key: value
 Alias.|| unqualified positional, key: value
 Alias.| unqualified positional, key: value

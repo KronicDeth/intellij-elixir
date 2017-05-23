@@ -10,6 +10,7 @@
 'CharListLine' one < two
 'CharListLine' one |> two
 'CharListLine' one + two
+'CharListLine' one / two
 'CharListLine' one * two
 'CharListLine' one ^^^ two
 'CharListLine' !one

@@ -8,6 +8,7 @@
 9876543210.<- key1: value1, key2: value2
 9876543210.in key1: value1, key2: value2
 9876543210.= key1: value1, key2: value2
+9876543210./ key1: value1, key2: value2
 9876543210.* key1: value1, key2: value2
 9876543210.|| key1: value1, key2: value2
 9876543210.| key1: value1, key2: value2

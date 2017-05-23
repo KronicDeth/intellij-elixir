@@ -186,6 +186,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
 
 ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
+ONE_TOKEN_DIVISION_OPERATOR = "/"
 ONE_TOKEN_DOT_OPERATOR = "."
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
@@ -193,8 +194,7 @@ ONE_TOKEN_DUAL_OPERATOR = "+" |
                           "-"
 ONE_TOKEN_IN_OPERATOR = "in"
 ONE_TOKEN_MATCH_OPERATOR = "="
-ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
-                                    "/"
+ONE_TOKEN_MULTIPLICATION_OPERATOR = "*"
 ONE_TOKEN_PIPE_OPERATOR = "|"
 ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
                                 ">"
@@ -203,6 +203,7 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 ONE_TOKEN_REFERENCABLE_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                                   {ONE_TOKEN_CAPTURE_OPERATOR} |
+                                  {ONE_TOKEN_DIVISION_OPERATOR} |
                                   {ONE_TOKEN_DUAL_OPERATOR} |
                                   {ONE_TOKEN_IN_OPERATOR} |
                                   {ONE_TOKEN_MATCH_OPERATOR} |
@@ -223,6 +224,7 @@ ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
 AT_OPERATOR = {ONE_TOKEN_AT_OPERATOR}
 BIT_STRING_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
+DIVISION_OPERATOR = {ONE_TOKEN_DIVISION_OPERATOR}
 DOT_OPERATOR = {ONE_TOKEN_DOT_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
@@ -453,8 +455,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  * Function References
  */
 
-REFERENCE_OPERATOR = "/"
-REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{REFERENCE_OPERATOR}
+REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{DIVISION_OPERATOR}
 
 /*
  * Regular Keywords
@@ -639,6 +640,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {OPENING_BIT}                              { return ElixirTypes.OPENING_BIT; }
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
+  {DIVISION_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.DIVISION_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE
   {DOT_OPERATOR}                             { pushAndBegin(DOT_OPERATION);
                                                return ElixirTypes.DOT_OPERATOR; }
@@ -851,6 +854,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.COMPARISON_OPERATOR; }
   {DO}                                              { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DO; }
+  {DIVISION_OPERATOR}                               { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.DIVISION_OPERATOR; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
   {END}                                             { yybegin(CALL_MAYBE);
@@ -1192,9 +1197,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <REFERENCE_OPERATION> {
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {EOL}                        { return ElixirTypes.EOL; }
-  {REFERENCE_OPERATOR}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {DIVISION_OPERATOR}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  yybegin(stackFrame.getLastLexicalState());
-                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
+                                 return ElixirTypes.DIVISION_OPERATOR; }
 }
 
 <SIGIL> {

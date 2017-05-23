@@ -8,6 +8,7 @@
 [].<- unqualified positional, key: value
 [].in unqualified positional, key: value
 [].= unqualified positional, key: value
+[]./ unqualified positional, key: value
 [].* unqualified positional, key: value
 [].|| unqualified positional, key: value
 [].| unqualified positional, key: value

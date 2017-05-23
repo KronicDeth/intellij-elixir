@@ -8,6 +8,7 @@
 ?c.<- key1: value1, key2: value2
 ?c.in key1: value1, key2: value2
 ?c.= key1: value1, key2: value2
+?c./ key1: value1, key2: value2
 ?c.* key1: value1, key2: value2
 ?c.|| key1: value1, key2: value2
 ?c.| key1: value1, key2: value2

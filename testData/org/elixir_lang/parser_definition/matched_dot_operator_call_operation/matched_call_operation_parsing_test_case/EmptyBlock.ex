@@ -8,6 +8,7 @@
 (;).<- Qualifier.qualified positional, key: value
 (;).in Qualifier.qualified positional, key: value
 (;).= Qualifier.qualified positional, key: value
+(;)./ Qualifier.qualified positional, key: value
 (;).* Qualifier.qualified positional, key: value
 (;).|| Qualifier.qualified positional, key: value
 (;).| Qualifier.qualified positional, key: value

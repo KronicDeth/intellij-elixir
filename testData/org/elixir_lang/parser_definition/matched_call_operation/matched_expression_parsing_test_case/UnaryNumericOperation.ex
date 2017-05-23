@@ -10,6 +10,7 @@
 !1 one < two
 !1 one |> two
 !1 one + two
+!1 one / two
 !1 one * two
 !1 one ^^^ two
 !1 !one

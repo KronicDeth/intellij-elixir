@@ -748,7 +748,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "additionTail_0_2")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, "/");
+    r = consumeToken(b, DIVISION_OPERATOR);
     if (!r) r = consumeToken(b, ">");
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, STRUCT_OPERATOR);
@@ -2777,6 +2777,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                CATCH |
   //                COMPARISON_OPERATOR |
   //                DO |
+  //                DIVISION_OPERATOR |
   //                DUAL_OPERATOR |
   //                ELSE |
   //                IDENTIFIER_TOKEN |
@@ -2814,6 +2815,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, CATCH);
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
     if (!r) r = consumeToken(b, DO);
+    if (!r) r = consumeToken(b, DIVISION_OPERATOR);
     if (!r) r = consumeToken(b, DUAL_OPERATOR);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, IDENTIFIER_TOKEN);
@@ -3903,14 +3905,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* MULTIPLICATION_OPERATOR EOL*
+  // EOL* (DIVISION_OPERATOR | MULTIPLICATION_OPERATOR) EOL*
   public static boolean multiplicationInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "multiplicationInfixOperator")) return false;
-    if (!nextTokenIs(b, "<*, />", EOL, MULTIPLICATION_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, MULTIPLICATION_INFIX_OPERATOR, "<*, />");
     r = multiplicationInfixOperator_0(b, l + 1);
-    r = r && consumeToken(b, MULTIPLICATION_OPERATOR);
+    r = r && multiplicationInfixOperator_1(b, l + 1);
     r = r && multiplicationInfixOperator_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -3926,6 +3927,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  // DIVISION_OPERATOR | MULTIPLICATION_OPERATOR
+  private static boolean multiplicationInfixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "multiplicationInfixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, DIVISION_OPERATOR);
+    if (!r) r = consumeToken(b, MULTIPLICATION_OPERATOR);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // EOL*
@@ -4728,6 +4740,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                        CATCH |
   //                        COMPARISON_OPERATOR |
   //                        DO |
+  //                        DIVISION_OPERATOR |
   //                        DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE? |
   //                        ELSE |
   //                        END |
@@ -4763,7 +4776,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, CATCH);
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
     if (!r) r = consumeToken(b, DO);
-    if (!r) r = relativeIdentifier_9(b, l + 1);
+    if (!r) r = consumeToken(b, DIVISION_OPERATOR);
+    if (!r) r = relativeIdentifier_10(b, l + 1);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, END);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
@@ -4788,19 +4802,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_9(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_9")) return false;
+  private static boolean relativeIdentifier_10(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_10")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DUAL_OPERATOR);
-    r = r && relativeIdentifier_9_1(b, l + 1);
+    r = r && relativeIdentifier_10_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_9_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_9_1")) return false;
+  private static boolean relativeIdentifier_10_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_10_1")) return false;
     consumeToken(b, SIGNIFICANT_WHITE_SPACE);
     return true;
   }

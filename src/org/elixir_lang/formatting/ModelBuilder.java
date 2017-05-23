@@ -80,7 +80,18 @@ public class ModelBuilder implements FormattingModelBuilder {
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
-                .around(ElixirTypes.MULTIPLICATION_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
+                /* This isn't precisely strict enough as there's no check that there's a name or qualified name to the
+                   left of `/` and an integer to the right of `/` before no space is allowed */
+                .aroundInside(
+                        ElixirTypes.DIVISION_OPERATOR,
+                        TokenSet.create(
+                                ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                                ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+                        )
+                ).none()
+                .around(
+                        TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR)
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
                 .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW);

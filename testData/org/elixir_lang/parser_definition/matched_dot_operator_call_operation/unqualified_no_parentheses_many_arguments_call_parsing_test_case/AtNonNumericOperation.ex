@@ -8,6 +8,7 @@
 @non_numeric.<- unqualified positional, key: value
 @non_numeric.in unqualified positional, key: value
 @non_numeric.= unqualified positional, key: value
+@non_numeric./ unqualified positional, key: value
 @non_numeric.* unqualified positional, key: value
 @non_numeric.|| unqualified positional, key: value
 @non_numeric.| unqualified positional, key: value

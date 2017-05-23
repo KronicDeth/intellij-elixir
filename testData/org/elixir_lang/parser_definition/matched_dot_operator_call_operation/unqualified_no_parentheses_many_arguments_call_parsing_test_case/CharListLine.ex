@@ -8,6 +8,7 @@
 'CharList'.<- unqualified positional, key: value
 'CharList'.in unqualified positional, key: value
 'CharList'.= unqualified positional, key: value
+'CharList'./ unqualified positional, key: value
 'CharList'.* unqualified positional, key: value
 'CharList'.|| unqualified positional, key: value
 'CharList'.| unqualified positional, key: value

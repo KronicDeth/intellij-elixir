@@ -11,6 +11,7 @@
 << one in two, three: 3 >>
 << one ++ two, three: 3 >>
 << one + two, three: 3 >>
+<< one / two, three: 3 >>
 << one * two, three: 3 >>
 << one ^^^ two, three: 3 >>
 << not one, two: 2 >>

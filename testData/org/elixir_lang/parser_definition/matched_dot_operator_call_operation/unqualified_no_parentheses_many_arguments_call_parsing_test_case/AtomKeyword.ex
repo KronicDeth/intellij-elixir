@@ -8,6 +8,7 @@ nil.^^^ unqualified positional, key: value
 nil.<- unqualified positional, key: value
 nil.in unqualified positional, key: value
 nil.= unqualified positional, key: value
+nil./ unqualified positional, key: value
 nil.* unqualified positional, key: value
 nil.|| unqualified positional, key: value
 nil.| unqualified positional, key: value

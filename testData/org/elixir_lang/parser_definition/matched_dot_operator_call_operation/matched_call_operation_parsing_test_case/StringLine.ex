@@ -8,6 +8,7 @@
 "String".<- Qualifier.qualified positional, key: value
 "String".in Qualifier.qualified positional, key: value
 "String".= Qualifier.qualified positional, key: value
+"String"./ Qualifier.qualified positional, key: value
 "String".* Qualifier.qualified positional, key: value
 "String".|| Qualifier.qualified positional, key: value
 "String".| Qualifier.qualified positional, key: value

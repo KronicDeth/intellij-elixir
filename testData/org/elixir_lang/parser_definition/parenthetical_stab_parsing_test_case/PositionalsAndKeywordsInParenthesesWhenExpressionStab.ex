@@ -12,6 +12,7 @@
 ( (positional, key: value) when guard -> one != two )
 ( (positional, key: value) when guard -> one < two )
 ( (positional, key: value) when guard -> one + two )
+( (positional, key: value) when guard -> one / two )
 ( (positional, key: value) when guard -> one * two )
 ( (positional, key: value) when guard -> one ^^^ two )
 ( (positional, key: value) when guard -> ! one )

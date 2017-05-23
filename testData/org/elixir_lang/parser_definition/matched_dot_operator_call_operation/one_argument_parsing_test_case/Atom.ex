@@ -8,6 +8,7 @@
 :atom.<- positional
 :atom.in positional
 :atom.= positional
+:atom./ positional
 :atom.* positional
 :atom.|| positional
 :atom.| positional

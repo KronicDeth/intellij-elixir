@@ -8,6 +8,7 @@
 9876543210.<- positional
 9876543210.in positional
 9876543210.= positional
+9876543210./ positional
 9876543210.* positional
 9876543210.|| positional
 9876543210.| positional

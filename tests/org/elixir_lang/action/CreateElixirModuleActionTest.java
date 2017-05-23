@@ -16,14 +16,17 @@ import java.io.IOException;
 public class CreateElixirModuleActionTest extends LightCodeInsightFixtureTestCase {
     public static final String TEMPLATE_NAME = "Elixir Module";
 
+    // TODO fix extra blank lines added by formatter
     public void testCamelCaseAliasIsLowerCaseUnderscored() throws IOException {
         checkModuleFile("FooBar", "foo_bar.ex");
     }
 
+    // TODO fix extra blank lines added by formatter
     public void testAliasDotAliasIsDirectorySlashFile()  throws IOException {
         checkModuleFile("Foo.Bar", "foo/bar.ex");
     }
 
+    // TODO fix extra blank lines added by formatter
     public void testCamelCaseAliasDotCamelCaseAliasIsLowerCaseUnderscored() throws IOException {
         checkModuleFile("CamelCaseOne.CamelCaseTwo", "camel_case_one/camel_case_two.ex");
     }

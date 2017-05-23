@@ -10,6 +10,7 @@
 1.2e-3 one < two
 1.2e-3 one |> two
 1.2e-3 one + two
+1.2e-3 one / two
 1.2e-3 one * two
 1.2e-3 one ^^^ two
 1.2e-3 !one

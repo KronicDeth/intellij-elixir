@@ -8,6 +8,7 @@
 "String".<- unqualified positional, key: value
 "String".in unqualified positional, key: value
 "String".= unqualified positional, key: value
+"String"./ unqualified positional, key: value
 "String".* unqualified positional, key: value
 "String".|| unqualified positional, key: value
 "String".| unqualified positional, key: value

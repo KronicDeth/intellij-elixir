@@ -8,6 +8,7 @@ nil.^^^
 nil.<-
 nil.in
 nil.=
+nil./
 nil.*
 nil.||
 nil.|

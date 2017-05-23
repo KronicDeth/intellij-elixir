@@ -1,1 +1,1 @@
-one * two in three * four
+one * two in three / four

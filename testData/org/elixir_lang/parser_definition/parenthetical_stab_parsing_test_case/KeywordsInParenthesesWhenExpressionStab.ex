@@ -12,6 +12,7 @@
 ( (key_one: value_one, key_two: value_two) when one != two  -> )
 ( (key_one: value_one, key_two: value_two) when one < two  -> )
 ( (key_one: value_one, key_two: value_two) when one + two  -> )
+( (key_one: value_one, key_two: value_two) when one / two  -> )
 ( (key_one: value_one, key_two: value_two) when one * two  -> )
 ( (key_one: value_one, key_two: value_two) when one ^^^ two  -> )
 ( (key_one: value_one, key_two: value_two) when ! one  -> )

@@ -8,6 +8,7 @@ variable.^^^
 variable.<-
 variable.in
 variable.=
+variable./
 variable.*
 variable.||
 variable.|

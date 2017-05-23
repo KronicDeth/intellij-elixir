@@ -41,6 +41,10 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./ Qualifier.qualified positional, key: value
+'''
+CharList
+Heredoc
 '''.* Qualifier.qualified positional, key: value
 '''
 CharList

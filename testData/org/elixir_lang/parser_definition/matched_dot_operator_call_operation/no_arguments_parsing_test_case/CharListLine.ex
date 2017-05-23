@@ -8,6 +8,7 @@
 'CharList'.<-
 'CharList'.in
 'CharList'.=
+'CharList'./
 'CharList'.*
 'CharList'.||
 'CharList'.|

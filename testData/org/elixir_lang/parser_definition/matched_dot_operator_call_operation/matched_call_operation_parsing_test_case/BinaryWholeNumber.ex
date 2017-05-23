@@ -8,6 +8,7 @@
 0b10.<- Qualifier.qualified positional, key: value
 0b10.in Qualifier.qualified positional, key: value
 0b10.= Qualifier.qualified positional, key: value
+0b10./ Qualifier.qualified positional, key: value
 0b10.* Qualifier.qualified positional, key: value
 0b10.|| Qualifier.qualified positional, key: value
 0b10.| Qualifier.qualified positional, key: value
