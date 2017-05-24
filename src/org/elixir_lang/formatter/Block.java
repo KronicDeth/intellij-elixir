@@ -156,7 +156,7 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private Block buildChild(@NotNull ASTNode child,
                              @NotNull Wrap wrap,
-                             @Nullable Alignment alignment,
+                             @NotNull Alignment alignment,
                              @NotNull Indent indent) {
         return buildChild(
                 child,
@@ -168,11 +168,26 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    Block buildChild(@NotNull ASTNode child,
-                     @NotNull Wrap wrap,
-                     @Nullable Alignment alignment,
-                     @NotNull Indent indent,
-                     @Nullable Wrap childrenWrap) {
+    private Block buildChild(@NotNull ASTNode child,
+                             @NotNull Wrap wrap,
+                             @NotNull Indent indent,
+                             @Nullable Wrap childrenWrap) {
+        return new Block(
+                child,
+                wrap,
+                null,
+                spacingBuilder,
+                indent,
+                childrenWrap
+        );
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child,
+                             @NotNull Wrap wrap,
+                             @NotNull Alignment alignment,
+                             @NotNull Indent indent,
+                             @Nullable Wrap childrenWrap) {
         return new Block(
                 child,
                 wrap,
@@ -194,6 +209,7 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
             blocks = buildCaptureNonNumericOperationChildren(myNode);
         } else if (elementType == ElixirTypes.STAB_OPERATION) {
+            //noinspection ConstantConditions
             blocks = buildStabOperationChildren(myNode, childrenWrap);
         } else if (isOperationElementType(elementType)) {
             blocks = buildOperationChildren(myNode);
@@ -376,6 +392,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
 
                     if (childElementType == ElixirTypes.END) {
+                        //noinspection ConstantConditions
                         lambdaBlocks.add(buildChild(child, endWrap, myAlignment, Indent.getNoneIndent()));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         lambdaBlocks.addAll(
@@ -427,6 +444,7 @@ public class Block extends AbstractBlock implements BlockEx {
                             childAlignment = Alignment.createAlignment();
                         }
 
+                        //noinspection ConstantConditions
                         blocks.add(buildChild(child, childAlignment));
                     }
 
@@ -589,7 +607,6 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildChild(
                                         child,
                                         stabOperationWrap,
-                                        childAlignment,
                                         childIndent,
                                         finalStabBodyChildrenWrap
                                 )
@@ -618,8 +635,8 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildStabBodyChildren(
                                         child,
                                         stabBodyChildrenWrap,
-                                        Alignment.createAlignment(),
-                                        Indent.getNormalIndent(true)
+                                        Alignment.createAlignment(), // null,
+                                        Indent.getNormalIndent(false)
                                 )
                         );
                     } else if (childElementType == ElixirTypes.STAB_INFIX_OPERATOR) {
