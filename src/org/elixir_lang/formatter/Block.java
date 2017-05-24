@@ -257,7 +257,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    if (MULTIPLICATION_OPERATION_TOKEN_SET.contains(childElementType)) {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, Alignment.createAlignment()));
+                    } else if (childElementType == ElixirTypes.CAPTURE_PREFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else if (MULTIPLICATION_OPERATION_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(
                                 buildCapturedMultiplicationOperationChildren(child)
                         );
@@ -689,7 +693,30 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public Spacing getSpacing(@Nullable com.intellij.formatting.Block child1,
                               @NotNull com.intellij.formatting.Block child2) {
-        return spacingBuilder.getSpacing(this, child1, child2);
+        Spacing spacing = null;
+
+        // Prevent `& &1` from becoming `&&1`, which is parsed as `&& 1` with a missing left operand
+        /* Prevent `& &1 + &2` from becoming `&&1 + &2`, which is parsed as `&& 1 + &2` with missing left operand for
+           `&& 1` */
+        if (child1 instanceof ASTBlock && child2 instanceof ASTBlock) {
+            ASTBlock child1ASTBlock = (ASTBlock) child1;
+
+            if (child1ASTBlock.getNode().getElementType() == ElixirTypes.CAPTURE_OPERATOR) {
+                ASTBlock child2ASTBlock = (ASTBlock) child2;
+                ASTNode firstLeafElementASTNode = child2ASTBlock.getNode().findLeafElementAt(0);
+
+                if (firstLeafElementASTNode != null &&
+                        firstLeafElementASTNode.getElementType() == ElixirTypes.CAPTURE_OPERATOR) {
+                    spacing = Spacing.createSpacing(1, 1, 0, true, 0);
+                }
+            }
+        }
+
+        if (spacing == null) {
+            spacing = spacingBuilder.getSpacing(this, child1, child2);
+        }
+
+        return spacing;
     }
 
     /**

@@ -58,6 +58,7 @@ public class ModelBuilder implements FormattingModelBuilder {
         org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
                 settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
+                .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
                 .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
                 .after(ElixirTypes.FN).spaces(1)
                 // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR
