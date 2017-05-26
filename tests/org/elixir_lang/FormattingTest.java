@@ -112,6 +112,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("indent_without_override_after.ex");
     }
 
+    public void testWhenWrapsWithRightOperand() {
+        myFixture.configureByFile("when_wraps_with_right_operand_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("when_wraps_with_right_operand_after.ex");
+    }
+
     public void testWithSpaceAroundAdditionOperators() {
         myFixture.configureByFile("without_space_around_addition_operators.ex");
 
