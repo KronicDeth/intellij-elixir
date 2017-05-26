@@ -53,6 +53,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "# Stab Operator\n" +
             "fn a -> a == true end\n" +
             "\n" +
+            "# Type Operator\n" +
+            "@type a :: term\n" +
+            "@type a(b) :: b\n" +
+            "\n" +
             "# Unary Operators\n" +
             "\n" +
             "## Numeric Operands\n" +
@@ -133,6 +137,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",
                     "In match operators (<-, \\\\)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_TYPE_OPERATOR",
+                    "Type operator (::)",
                     SPACES_AROUND_OPERATORS
             );
         }
