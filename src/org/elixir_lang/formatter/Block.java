@@ -48,6 +48,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.MATCHED_WHEN_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
@@ -57,6 +58,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperationByElementType.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
         isOperationByElementType.put(ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION, true);
+        isOperationByElementType.put(ElixirTypes.UNMATCHED_WHEN_OPERATION, true);
     }
 
     static {
@@ -69,6 +71,7 @@ public class Block extends AbstractBlock implements BlockEx {
         isOperatorRuleByElementType.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
         isOperatorRuleByElementType.put(ElixirTypes.UNARY_PREFIX_OPERATOR, true);
+        isOperatorRuleByElementType.put(ElixirTypes.WHEN_INFIX_OPERATOR, true);
     }
 
     static {
@@ -234,6 +237,8 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                             );
+                        } else if (childElementType == ElixirTypes.WHEN_INFIX_OPERATOR) {
+                            lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else {
                             Block block = new Block(
                                     child,

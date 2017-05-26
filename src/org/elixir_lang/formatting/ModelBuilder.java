@@ -95,7 +95,8 @@ public class ModelBuilder implements FormattingModelBuilder {
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
-                .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW);
+                .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)
+                .around(ElixirTypes.WHEN_OPERATOR).spaces(1);
     }
 
 
