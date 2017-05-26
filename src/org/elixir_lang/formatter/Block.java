@@ -30,6 +30,9 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
     );
+    private static final Map<IElementType, Boolean> IS_OPERATION_BY_ELEMENT_TYPE = new IdentityHashMap<>();
+    private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
+    private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
@@ -40,54 +43,51 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
-    private static final Map<IElementType, Boolean> isOperationByElementType = new IdentityHashMap<>();
-    private static final Map<IElementType, Boolean> isOperatorRuleByElementType = new IdentityHashMap<>();
-    private static final Map<IElementType, Boolean> isUnmatchedCallByElementType = new IdentityHashMap<>();
 
     static {
-        isOperationByElementType.put(ElixirTypes.MATCHED_ADDITION_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.MATCHED_WHEN_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION, true);
-        isOperationByElementType.put(ElixirTypes.UNMATCHED_WHEN_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_ADDITION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_WHEN_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_WHEN_OPERATION, true);
     }
 
     static {
-        isOperatorRuleByElementType.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.UNARY_PREFIX_OPERATOR, true);
-        isOperatorRuleByElementType.put(ElixirTypes.WHEN_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.UNARY_PREFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.WHEN_INFIX_OPERATOR, true);
     }
 
     static {
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_DOT_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_QUALIFIED_PARENTHESES_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, true);
-        isUnmatchedCallByElementType.put(ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_DOT_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_PARENTHESES_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, true);
+        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, true);
     }
 
     @Nullable
@@ -123,15 +123,15 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private static boolean isOperationElementType(IElementType elementType) {
-        return isOperationByElementType.containsKey(elementType);
+        return IS_OPERATION_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean isOperatorRuleElementType(IElementType elementType) {
-        return isOperatorRuleByElementType.containsKey(elementType);
+        return IS_OPERATOR_RULE_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean isUnmatchedCallElementType(IElementType elementType) {
-        return isUnmatchedCallByElementType.containsKey(elementType);
+        return IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
