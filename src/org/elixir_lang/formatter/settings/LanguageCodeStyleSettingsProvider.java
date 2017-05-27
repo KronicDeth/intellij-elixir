@@ -44,6 +44,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "0 * 1\n" +
             "0 / 1\n" +
             "\n" +
+            "# Pipe Operator\n" +
+            "[head | tail]\n" +
+            "%{map | a: 1}\n" +
+            "\n" +
             "# Relationship Operators\n" +
             "3 < 4\n" +
             "3 <= 3\n" +
@@ -137,6 +141,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",
                     "In match operators (<-, \\\\)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_PIPE_OPERATOR",
+                    "Pipe operator (|)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(

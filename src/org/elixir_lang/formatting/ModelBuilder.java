@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ModelBuilder implements FormattingModelBuilder {
-    private static final boolean DUMP_FORMATTING_AST = false;
+    private static final boolean DUMP_FORMATTING_AST = true;
 
     /**
      * Requests building the formatting model for a section of the file containing
@@ -94,6 +94,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                         TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR)
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
+                .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
                 .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)
                 .around(ElixirTypes.TYPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TYPE_OPERATOR)

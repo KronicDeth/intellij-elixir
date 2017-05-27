@@ -51,6 +51,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_PIPE_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_TYPE_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
@@ -62,6 +63,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_PIPE_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_TYPE_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION, true);
@@ -75,6 +77,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.PIPE_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.TYPE_INFIX_OPERATOR, true);
@@ -379,6 +382,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildAnonymousFunctionChildren(myNode);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
             blocks = buildCaptureNonNumericOperationChildren(myNode);
+        } else if (elementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
+            blocks = buildMapUpdateArgumentsChildren(myNode);
         } else if (elementType == ElixirTypes.STAB_OPERATION) {
             //noinspection ConstantConditions
             blocks = buildStabOperationChildren(myNode, childrenWrap);
@@ -425,6 +430,26 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
+        return buildChildren(
+                mapUpdateArguments,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     private @NotNull
