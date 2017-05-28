@@ -833,15 +833,21 @@ public class Block extends AbstractBlock implements BlockEx {
         // Prevent `_ &&& &2` from becoming ` _ &&&& 2`, which has no meaning
         if (child1 instanceof ASTBlock && child2 instanceof ASTBlock) {
             ASTBlock child1ASTBlock = (ASTBlock) child1;
+            ASTNode child1Node = child1ASTBlock.getNode();
 
-            if (child1ASTBlock.getNode().getElementType() == ElixirTypes.CAPTURE_OPERATOR) {
-                ASTBlock child2ASTBlock = (ASTBlock) child2;
-                ASTNode firstLeafElementASTNode = child2ASTBlock.getNode().findLeafElementAt(0);
+            if (child1Node instanceof LeafPsiElement) {
+                LeafPsiElement child1LeafPsiElement = (LeafPsiElement) child1Node;
 
-                if (firstLeafElementASTNode != null &&
-                        firstLeafElementASTNode instanceof LeafPsiElement &&
-                        ((LeafPsiElement) firstLeafElementASTNode).charAt(0) == '&') {
-                    spacing = Spacing.createSpacing(1, 1, 0, true, 0);
+                // capture (`&`) or and symbol operators (`&&` or `&&&`)
+                if (child1LeafPsiElement.charAt(child1LeafPsiElement.getTextLength() - 1) == '&') {
+                    ASTBlock child2ASTBlock = (ASTBlock) child2;
+                    ASTNode firstLeafElementASTNode = child2ASTBlock.getNode().findLeafElementAt(0);
+
+                    if (firstLeafElementASTNode != null &&
+                            firstLeafElementASTNode instanceof LeafPsiElement &&
+                            ((LeafPsiElement) firstLeafElementASTNode).charAt(0) == '&') {
+                        spacing = Spacing.createSpacing(1, 1, 0, true, 0);
+                    }
                 }
             }
         }

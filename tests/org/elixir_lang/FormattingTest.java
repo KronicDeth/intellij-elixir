@@ -152,6 +152,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_addition_operators.ex");
     }
 
+    public void testCaptureRightOperandWithoutSpaceAroundAndOperators() {
+        myFixture.configureByFile("capture_right_operand_without_space_around_and_operators_before.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_AND_OPERATORS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("capture_right_operand_without_space_around_and_operators_after.ex");
+    }
+
     public void testWithSpaceAroundAndOperators() {
         myFixture.configureByFile("without_space_around_and_operators.ex");
 
