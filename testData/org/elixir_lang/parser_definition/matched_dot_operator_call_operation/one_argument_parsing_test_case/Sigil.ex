@@ -1,3 +1,4 @@
+~x{}i.and positional
 ~x{}i.&& positional
 ~x{}i.|> positional
 ~x{}i.@ positional

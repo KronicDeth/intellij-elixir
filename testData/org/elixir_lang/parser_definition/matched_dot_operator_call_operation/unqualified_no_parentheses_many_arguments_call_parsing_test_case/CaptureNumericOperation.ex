@@ -1,3 +1,4 @@
+&1.and unqualified positional, key: value
 &1.&& unqualified positional, key: value
 &1.|> unqualified positional, key: value
 &1.@ unqualified positional, key: value

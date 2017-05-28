@@ -6,6 +6,7 @@
 :atom one = two
 :atom one or two
 :atom one || two
+:atom one and two
 :atom one && two
 :atom one != two
 :atom one < two

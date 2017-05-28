@@ -1,3 +1,4 @@
+'CharList'.and Qualifier.qualified positional, key: value
 'CharList'.&& Qualifier.qualified positional, key: value
 'CharList'.|> Qualifier.qualified positional, key: value
 'CharList'.@ Qualifier.qualified positional, key: value

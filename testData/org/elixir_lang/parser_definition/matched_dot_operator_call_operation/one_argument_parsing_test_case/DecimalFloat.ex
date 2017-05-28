@@ -1,3 +1,4 @@
+1.2e-3.and positional
 1.2e-3.&& positional
 1.2e-3.|> positional
 1.2e-3.@ positional

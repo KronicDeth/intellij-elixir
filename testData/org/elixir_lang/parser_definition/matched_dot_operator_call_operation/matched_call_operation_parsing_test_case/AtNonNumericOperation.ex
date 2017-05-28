@@ -1,3 +1,4 @@
+@non_numeric.and Qualifier.qualified positional, key: value
 @non_numeric.&& Qualifier.qualified positional, key: value
 @non_numeric.|> Qualifier.qualified positional, key: value
 @non_numeric.@ Qualifier.qualified positional, key: value

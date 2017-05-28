@@ -1,3 +1,4 @@
+?c.and positional
 ?c.&& positional
 ?c.|> positional
 ?c.@ positional

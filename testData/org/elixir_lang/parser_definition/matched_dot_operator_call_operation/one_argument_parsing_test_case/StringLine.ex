@@ -1,3 +1,4 @@
+"String".and positional
 "String".&& positional
 "String".|> positional
 "String".@ positional

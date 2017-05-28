@@ -1,3 +1,4 @@
+0b10.and Qualifier.qualified positional, key: value
 0b10.&& Qualifier.qualified positional, key: value
 0b10.|> Qualifier.qualified positional, key: value
 0b10.@ Qualifier.qualified positional, key: value

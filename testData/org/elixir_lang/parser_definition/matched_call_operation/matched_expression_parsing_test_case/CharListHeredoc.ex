@@ -33,6 +33,10 @@ Heredoc
 '''
 CharList
 Heredoc
+''' one and two
+'''
+CharList
+Heredoc
 ''' one && two
 '''
 CharList

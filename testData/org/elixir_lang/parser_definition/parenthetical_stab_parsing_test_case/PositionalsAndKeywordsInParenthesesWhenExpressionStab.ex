@@ -9,6 +9,7 @@
 ( (positional, key: value) when guard -> one = two )
 ( (positional, key: value) when guard -> one or two )
 ( (positional, key: value) when guard -> one || two )
+( (positional, key: value) when guard -> one and two )
 ( (positional, key: value) when guard -> one && two )
 ( (positional, key: value) when guard -> one != two )
 ( (positional, key: value) when guard -> one < two )

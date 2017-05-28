@@ -6,6 +6,7 @@
 "StringLine" one = two
 "StringLine" one or two
 "StringLine" one || two
+"StringLine" one and two
 "StringLine" one && two
 "StringLine" one != two
 "StringLine" one < two

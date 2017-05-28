@@ -1,3 +1,4 @@
+9876543210.and unqualified positional, key: value
 9876543210.&& unqualified positional, key: value
 9876543210.|> unqualified positional, key: value
 9876543210.@ unqualified positional, key: value

@@ -1,3 +1,4 @@
+~x{}i.and Qualifier.qualified positional, key: value
 ~x{}i.&& Qualifier.qualified positional, key: value
 ~x{}i.|> Qualifier.qualified positional, key: value
 ~x{}i.@ Qualifier.qualified positional, key: value

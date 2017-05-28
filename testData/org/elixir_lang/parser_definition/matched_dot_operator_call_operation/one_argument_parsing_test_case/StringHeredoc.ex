@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and positional
+"""
+String
+Heredoc
 """.&& positional
 """
 String

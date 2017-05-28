@@ -1,3 +1,4 @@
+variable.and Qualifier.qualified positional, key: value
 variable.&& Qualifier.qualified positional, key: value
 variable.|> Qualifier.qualified positional, key: value
 variable.@ Qualifier.qualified positional, key: value

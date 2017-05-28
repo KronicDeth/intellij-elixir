@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and
+'''
+CharList
+Heredoc
 '''.&&
 '''
 CharList

@@ -1,3 +1,4 @@
+variable.and unqualified positional, key: value
 variable.&& unqualified positional, key: value
 variable.|> unqualified positional, key: value
 variable.@ unqualified positional, key: value

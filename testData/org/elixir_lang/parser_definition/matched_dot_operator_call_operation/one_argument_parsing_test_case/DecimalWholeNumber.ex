@@ -1,3 +1,4 @@
+9876543210.and positional
 9876543210.&& positional
 9876543210.|> positional
 9876543210.@ positional

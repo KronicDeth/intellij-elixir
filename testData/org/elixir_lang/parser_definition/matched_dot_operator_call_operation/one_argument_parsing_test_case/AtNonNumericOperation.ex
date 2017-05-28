@@ -1,3 +1,4 @@
+@non_numeric.and positional
 @non_numeric.&& positional
 @non_numeric.|> positional
 @non_numeric.@ positional

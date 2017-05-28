@@ -5,7 +5,8 @@
 %{ one = two => three = four }
 %{ one or two => three || four }
 %{ one || two => three ||| four }
-%{ one && two => three && four }
+%{ one and two => three && four }
+%{ one && two => three &&& four }
 %{ one != two => three != four }
 %{ one < two => three > four }
 %{ one |> two => three |> four }

@@ -1,3 +1,4 @@
+0b10.and positional
 0b10.&& positional
 0b10.|> positional
 0b10.@ positional

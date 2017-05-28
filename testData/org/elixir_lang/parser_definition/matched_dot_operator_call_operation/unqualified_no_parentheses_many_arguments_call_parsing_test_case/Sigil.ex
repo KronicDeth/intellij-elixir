@@ -1,3 +1,4 @@
+~x{}i.and unqualified positional, key: value
 ~x{}i.&& unqualified positional, key: value
 ~x{}i.|> unqualified positional, key: value
 ~x{}i.@ unqualified positional, key: value

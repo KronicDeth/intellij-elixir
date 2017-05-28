@@ -1,3 +1,4 @@
+9876543210.and Qualifier.qualified positional, key: value
 9876543210.&& Qualifier.qualified positional, key: value
 9876543210.|> Qualifier.qualified positional, key: value
 9876543210.@ Qualifier.qualified positional, key: value

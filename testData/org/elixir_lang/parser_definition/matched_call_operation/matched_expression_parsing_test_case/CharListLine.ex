@@ -6,6 +6,7 @@
 'CharListLine' one = two
 'CharListLine' one or two
 'CharListLine' one || two
+'CharListLine' one and two
 'CharListLine' one && two
 'CharListLine' one != two
 'CharListLine' one < two

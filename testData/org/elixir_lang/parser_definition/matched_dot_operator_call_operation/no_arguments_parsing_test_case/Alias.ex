@@ -1,3 +1,4 @@
+Alias.and
 Alias.&&
 Alias.|>
 Alias.@

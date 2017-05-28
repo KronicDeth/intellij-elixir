@@ -1,3 +1,4 @@
+0xFEDCBAfedcba9876543210.and unqualified positional, key: value
 0xFEDCBAfedcba9876543210.&& unqualified positional, key: value
 0xFEDCBAfedcba9876543210.|> unqualified positional, key: value
 0xFEDCBAfedcba9876543210.@ unqualified positional, key: value

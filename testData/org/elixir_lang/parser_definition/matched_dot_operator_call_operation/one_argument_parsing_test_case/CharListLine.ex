@@ -1,3 +1,4 @@
+'CharList'.and positional
 'CharList'.&& positional
 'CharList'.|> positional
 'CharList'.@ positional

@@ -18,6 +18,7 @@ function positional, keyword_key: first_value or second_value
 function positional, keyword_key: first_value ||| second_value
 
 # matchedExpressionAndOperation
+function positional, keyword_key: first_value and second_value
 function positional, keyword_key: first_value &&& second_value
 
 # matchedExpressionComparisonOperation

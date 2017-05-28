@@ -1,3 +1,4 @@
+"String".and Qualifier.qualified positional, key: value
 "String".&& Qualifier.qualified positional, key: value
 "String".|> Qualifier.qualified positional, key: value
 "String".@ Qualifier.qualified positional, key: value

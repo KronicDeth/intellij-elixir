@@ -313,7 +313,8 @@
   tokens = [
     AFTER = "after"
     ALIAS_TOKEN = "Alias"
-    AND_OPERATOR = "&&&, `and`, &&"
+    AND_SYMBOL_OPERATOR = "&&&, &&"
+    AND_WORD_OPERATOR = "`and`"
     ARROW_OPERATOR = "<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>"
     ASSOCIATION_OPERATOR = "=>"
     ATOM_FRAGMENT = "A-Z, a-z, _, @, 0-9. ?, !"
@@ -1253,7 +1254,7 @@ matchedOrOperation ::= matchedExpression orInfixOperator matchedExpression
  *
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L58
  */
-andInfixOperator ::= EOL* AND_OPERATOR EOL*
+andInfixOperator ::= EOL* (AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR) EOL*
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1459,7 +1460,8 @@ dotInfixOperator ::= EOL* DOT_OPERATOR EOL*
 // @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L121
 relativeIdentifier ::= IDENTIFIER_TOKEN |
                        AFTER |
-                       AND_OPERATOR |
+                       AND_SYMBOL_OPERATOR |
+                       AND_WORD_OPERATOR |
                        ARROW_OPERATOR |
                        // NOT ASSOCIATION_OPERATOR
                        AT_OPERATOR |
@@ -2810,7 +2812,8 @@ quoteHexadecimalEscapeSequence ::= hexadecimalEscapePrefix (openHexadecimalEscap
 
 keywordKey ::= AFTER |
                ALIAS_TOKEN |
-               AND_OPERATOR |
+               AND_SYMBOL_OPERATOR |
+               AND_WORD_OPERATOR |
                ARROW_OPERATOR |
                ASSOCIATION_OPERATOR |
                AT_OPERATOR |

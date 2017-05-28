@@ -6,6 +6,7 @@
 0o7 one = two
 0o7 one or two
 0o7 one || two
+0o7 one and two
 0o7 one && two
 0o7 one != two
 0o7 one < two

@@ -9,6 +9,7 @@ fn (positional, key: value) when guard -> one | two end
 fn (positional, key: value) when guard -> one = two end
 fn (positional, key: value) when guard -> one or two end
 fn (positional, key: value) when guard -> one || two end
+fn (positional, key: value) when guard -> one and two end
 fn (positional, key: value) when guard -> one && two end
 fn (positional, key: value) when guard -> one != two end
 fn (positional, key: value) when guard -> one < two end

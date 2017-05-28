@@ -6,6 +6,7 @@ nil one | new
 nil one = two
 nil one or two
 nil one || two
+nil one and two
 nil one && two
 nil one != two
 nil one < two

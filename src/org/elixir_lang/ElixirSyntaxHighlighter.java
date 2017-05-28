@@ -319,7 +319,8 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE
     );
     private static final TokenSet OPERATION_SIGNS = TokenSet.create(
-            ElixirTypes.AND_OPERATOR,
+            ElixirTypes.AND_SYMBOL_OPERATOR,
+            ElixirTypes.AND_WORD_OPERATOR,
             ElixirTypes.ARROW_OPERATOR,
             ElixirTypes.ASSOCIATION_OPERATOR,
             ElixirTypes.AT_OPERATOR,

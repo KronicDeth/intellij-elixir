@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and
+"""
+String
+Heredoc
 """.&&
 """
 String

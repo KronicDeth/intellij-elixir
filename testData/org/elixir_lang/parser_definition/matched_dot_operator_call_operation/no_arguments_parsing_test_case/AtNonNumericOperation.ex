@@ -1,3 +1,4 @@
+@non_numeric.and
 @non_numeric.&&
 @non_numeric.|>
 @non_numeric.@

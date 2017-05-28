@@ -1,3 +1,4 @@
+Alias.and unqualified positional, key: value
 Alias.&& unqualified positional, key: value
 Alias.|> unqualified positional, key: value
 Alias.@ unqualified positional, key: value

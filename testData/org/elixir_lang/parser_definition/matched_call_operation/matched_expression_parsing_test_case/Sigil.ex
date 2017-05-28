@@ -6,6 +6,7 @@
 ~x{sigil}modifiers one = two
 ~x{sigil}modifiers one or two
 ~x{sigil}modifiers one || two
+~x{sigil}modifiers one and two
 ~x{sigil}modifiers one && two
 ~x{sigil}modifiers one != two
 ~x{sigil}modifiers one < two

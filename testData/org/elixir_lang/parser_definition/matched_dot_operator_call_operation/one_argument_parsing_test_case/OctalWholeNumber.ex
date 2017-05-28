@@ -1,3 +1,4 @@
+0o76543210.and positional
 0o76543210.&& positional
 0o76543210.|> positional
 0o76543210.@ positional

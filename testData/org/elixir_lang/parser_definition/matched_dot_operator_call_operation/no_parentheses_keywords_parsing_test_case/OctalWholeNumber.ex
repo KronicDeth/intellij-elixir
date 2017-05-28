@@ -1,3 +1,4 @@
+0o76543210.and key1: value1, key2: value2
 0o76543210.&& key1: value1, key2: value2
 0o76543210.|> key1: value1, key2: value2
 0o76543210.@ key1: value1, key2: value2

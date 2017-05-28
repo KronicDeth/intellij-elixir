@@ -786,14 +786,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* AND_OPERATOR EOL*
+  // EOL* (AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR) EOL*
   public static boolean andInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "andInfixOperator")) return false;
-    if (!nextTokenIs(b, "<&&, &&&, and>", AND_OPERATOR, EOL)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, AND_INFIX_OPERATOR, "<&&, &&&, and>");
     r = andInfixOperator_0(b, l + 1);
-    r = r && consumeToken(b, AND_OPERATOR);
+    r = r && andInfixOperator_1(b, l + 1);
     r = r && andInfixOperator_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -809,6 +808,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  // AND_SYMBOL_OPERATOR | AND_WORD_OPERATOR
+  private static boolean andInfixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "andInfixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, AND_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, AND_WORD_OPERATOR);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // EOL*
@@ -2768,7 +2778,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // AFTER |
   //                ALIAS_TOKEN |
-  //                AND_OPERATOR |
+  //                AND_SYMBOL_OPERATOR |
+  //                AND_WORD_OPERATOR |
   //                ARROW_OPERATOR |
   //                ASSOCIATION_OPERATOR |
   //                AT_OPERATOR |
@@ -2807,7 +2818,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, KEYWORD_KEY, "<keyword key>");
     r = consumeToken(b, AFTER);
     if (!r) r = consumeToken(b, ALIAS_TOKEN);
-    if (!r) r = consumeToken(b, AND_OPERATOR);
+    if (!r) r = consumeToken(b, AND_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, AND_WORD_OPERATOR);
     if (!r) r = consumeToken(b, ARROW_OPERATOR);
     if (!r) r = consumeToken(b, ASSOCIATION_OPERATOR);
     if (!r) r = consumeToken(b, AT_OPERATOR);
@@ -4743,7 +4755,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // IDENTIFIER_TOKEN |
   //                        AFTER |
-  //                        AND_OPERATOR |
+  //                        AND_SYMBOL_OPERATOR |
+  //                        AND_WORD_OPERATOR |
   //                        ARROW_OPERATOR |
   //                        // NOT ASSOCIATION_OPERATOR
   //                        AT_OPERATOR |
@@ -4782,7 +4795,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, RELATIVE_IDENTIFIER, "<relative identifier>");
     r = consumeToken(b, IDENTIFIER_TOKEN);
     if (!r) r = consumeToken(b, AFTER);
-    if (!r) r = consumeToken(b, AND_OPERATOR);
+    if (!r) r = consumeToken(b, AND_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, AND_WORD_OPERATOR);
     if (!r) r = consumeToken(b, ARROW_OPERATOR);
     if (!r) r = consumeToken(b, AT_OPERATOR);
     if (!r) r = consumeToken(b, CAPTURE_OPERATOR);
@@ -4790,7 +4804,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, COMPARISON_OPERATOR);
     if (!r) r = consumeToken(b, DO);
     if (!r) r = consumeToken(b, DIVISION_OPERATOR);
-    if (!r) r = relativeIdentifier_10(b, l + 1);
+    if (!r) r = relativeIdentifier_11(b, l + 1);
     if (!r) r = consumeToken(b, ELSE);
     if (!r) r = consumeToken(b, END);
     if (!r) r = consumeToken(b, IN_MATCH_OPERATOR);
@@ -4816,19 +4830,19 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   // DUAL_OPERATOR SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_10(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_10")) return false;
+  private static boolean relativeIdentifier_11(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_11")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, DUAL_OPERATOR);
-    r = r && relativeIdentifier_10_1(b, l + 1);
+    r = r && relativeIdentifier_11_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // SIGNIFICANT_WHITE_SPACE?
-  private static boolean relativeIdentifier_10_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "relativeIdentifier_10_1")) return false;
+  private static boolean relativeIdentifier_11_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "relativeIdentifier_11_1")) return false;
     consumeToken(b, SIGNIFICANT_WHITE_SPACE);
     return true;
   }

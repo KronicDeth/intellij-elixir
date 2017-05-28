@@ -1,3 +1,4 @@
+:atom.and
 :atom.&&
 :atom.|>
 :atom.@

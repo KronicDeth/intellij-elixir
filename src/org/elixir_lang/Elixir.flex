@@ -122,8 +122,8 @@ FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
                       {FOUR_TOKEN_WHEN_OPERATOR}
 
-THREE_TOKEN_AND_OPERATOR = "&&&" |
-                           "and"
+THREE_TOKEN_AND_SYMBOL_OPERATOR = "&&&"
+THREE_TOKEN_AND_WORD_OPERATOR = "and"
 THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<<~" |
                              "<|>" |
@@ -139,7 +139,8 @@ THREE_TOKEN_THREE_OPERATOR = "^^^"
 THREE_TOKEN_NOT_OPERATOR = "not"
 THREE_TOKEN_UNARY_OPERATOR = "~~~"
 
-THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
+THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
+                       {THREE_TOKEN_AND_WORD_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
@@ -149,7 +150,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_NOT_OPERATOR} |
                        "..."
 
-TWO_TOKEN_AND_OPERATOR = "&&"
+TWO_TOKEN_AND_SYMBOL_OPERATOR = "&&"
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
                            "|>" |
                            "~>"
@@ -172,7 +173,7 @@ TWO_TOKEN_TWO_OPERATOR = "++" |
                          "<>"
 TWO_TOKEN_TYPE_OPERATOR = "::"
 
-TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
+TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
                      {TWO_TOKEN_ASSOCIATION_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
@@ -217,8 +218,9 @@ ONE_TOKEN_UNREFERENCABLE_OPERATOR = {ONE_TOKEN_DOT_OPERATOR} |
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_REFERENCABLE_OPERATOR} |
                      {ONE_TOKEN_UNREFERENCABLE_OPERATOR}
 
-AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
-               {TWO_TOKEN_AND_OPERATOR}
+AND_SYMBOL_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
+                      {TWO_TOKEN_AND_SYMBOL_OPERATOR}
+AND_WORD_OPERATOR = {THREE_TOKEN_AND_WORD_OPERATOR}
 ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
 ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
@@ -584,8 +586,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before any single operator's match
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
-  {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.AND_OPERATOR; }
+  {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AND_SYMBOL_OPERATOR; }
+  {AND_WORD_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AND_WORD_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -844,8 +848,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <DOT_OPERATION> {
   {AFTER}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AFTER; }
-  {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.AND_OPERATOR; }
+  {AND_SYMBOL_OPERATOR}                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_SYMBOL_OPERATOR; }
+  {AND_WORD_OPERATOR}                               { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_WORD_OPERATOR; }
   {ARROW_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ARROW_OPERATOR; }
   {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);

@@ -1,3 +1,4 @@
+variable.and positional
 variable.&& positional
 variable.|> positional
 variable.@ positional

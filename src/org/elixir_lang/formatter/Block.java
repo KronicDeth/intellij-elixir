@@ -46,6 +46,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     static {
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_ADDITION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_AND_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
@@ -59,6 +60,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_WHEN_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
+        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_AND_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
         IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
@@ -74,6 +76,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     static {
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.AND_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);

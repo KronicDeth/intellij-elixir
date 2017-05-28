@@ -1,3 +1,4 @@
+[].and positional
 [].&& positional
 [].|> positional
 [].@ positional

@@ -6,6 +6,7 @@
 @non_numeric one = two
 @non_numeric one or two
 @non_numeric one || two
+@non_numeric one and two
 @non_numeric one && two
 @non_numeric one != two
 @non_numeric one < two

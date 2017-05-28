@@ -1,3 +1,4 @@
+'CharList'.and
 'CharList'.&&
 'CharList'.|>
 'CharList'.@

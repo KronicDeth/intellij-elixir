@@ -1,3 +1,4 @@
+!1.and positional
 !1.&& positional
 !1.|> positional
 !1.@ positional

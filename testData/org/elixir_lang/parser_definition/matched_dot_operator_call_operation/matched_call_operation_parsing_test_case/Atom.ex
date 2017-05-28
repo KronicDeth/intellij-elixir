@@ -1,3 +1,4 @@
+:atom.and Qualifier.qualified positional, key: value
 :atom.&& Qualifier.qualified positional, key: value
 :atom.|> Qualifier.qualified positional, key: value
 :atom.@ Qualifier.qualified positional, key: value

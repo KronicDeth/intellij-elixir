@@ -26,6 +26,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "1 + 1\n" +
             "1 - 1\n" +
             "\n" +
+            "# And Operators\n" +
+            "true && true\n" +
+            "0b11 &&& 0b01\n" +
+            "\n" +
             "# Comparison Operators\n" +
             "1 != 2\n" +
             "1 == 1.0\n" +
@@ -82,6 +86,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "~~~mask\n" +
             "\n" +
             "# Word Operators\n" +
+            "true and true\n" +
             "false or true\n" +
             "\n" +
             "## Numeric Operands\n" +
@@ -142,6 +147,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
             consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
 
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_AND_OPERATORS",
+                    "And operators (&&, &&&)",
+                    SPACES_AROUND_OPERATORS
+            );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",

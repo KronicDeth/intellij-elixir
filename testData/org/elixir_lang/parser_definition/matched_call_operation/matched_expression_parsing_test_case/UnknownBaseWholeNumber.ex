@@ -6,6 +6,7 @@
 0zZ one = two
 0zZ one or two
 0zZ one || two
+0zZ one and two
 0zZ one && two
 0zZ one != two
 0zZ one < two

@@ -1,3 +1,4 @@
+?c.and unqualified positional, key: value
 ?c.&& unqualified positional, key: value
 ?c.|> unqualified positional, key: value
 ?c.@ unqualified positional, key: value

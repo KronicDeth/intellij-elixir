@@ -7,6 +7,7 @@
 [key: one = two]
 [key: one or two]
 [key: one || two]
+[key: one and two]
 [key: one && two]
 [key: one == two]
 [key: one < two]

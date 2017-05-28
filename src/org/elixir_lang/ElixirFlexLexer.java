@@ -133,14 +133,14 @@ public class ElixirFlexLexer implements FlexLexer {
     "\1\70\1\170\1\200\1\70\1\201\2\70\2\0\1\113"+
     "\1\202\1\203\1\0\1\204\1\0\1\205\4\0\1\126"+
     "\1\206\1\0\1\30\1\0\1\126\17\0\1\5\1\207"+
-    "\1\5\1\210\1\211\2\153\1\5\1\11\1\155\1\0"+
-    "\1\212\3\5\1\213\2\5\1\214\1\215\1\70\1\216"+
-    "\1\70\1\217\2\173\1\70\1\73\1\175\1\220\4\70"+
-    "\1\221\1\113\1\222\1\0\1\223\1\224\1\225\1\226"+
-    "\1\0\1\227\1\230\1\5\1\0\1\231\3\5\1\232"+
-    "\1\233\1\70\1\234\3\70\1\113\1\235\1\0\1\236"+
-    "\1\237\1\5\1\240\1\241\1\242\1\70\1\243\1\244"+
-    "\1\113\1\245\1\246\1\247\1\113";
+    "\1\5\1\210\1\211\1\153\1\212\1\5\1\11\1\155"+
+    "\1\0\1\213\3\5\1\214\2\5\1\215\1\216\1\70"+
+    "\1\217\1\70\1\220\1\173\1\221\1\70\1\73\1\175"+
+    "\1\222\4\70\1\223\1\113\1\224\1\0\1\225\1\226"+
+    "\1\227\1\230\1\0\1\231\1\232\1\5\1\0\1\233"+
+    "\3\5\1\234\1\235\1\70\1\236\3\70\1\113\1\237"+
+    "\1\0\1\240\1\241\1\5\1\242\1\243\1\244\1\70"+
+    "\1\245\1\246\1\113\1\247\1\250\1\251\1\113";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[435];
@@ -1108,13 +1108,13 @@ public class ElixirFlexLexer implements FlexLexer {
           case 1: 
             { return TokenType.BAD_CHARACTER;
             }
-          case 168: break;
+          case 170: break;
           case 2: 
             { // use stack to match up nested OPENING_CURLY and CLOSING_CURLY
                                                pushAndBegin(YYINITIAL);
                                                return ElixirTypes.OPENING_CURLY;
             }
-          case 169: break;
+          case 171: break;
           case 3: 
             { // protect from too many "}"
                     if (!stack.empty()) {
@@ -1124,128 +1124,128 @@ public class ElixirFlexLexer implements FlexLexer {
 
                     return ElixirTypes.CLOSING_CURLY;
             }
-          case 170: break;
+          case 172: break;
           case 4: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR;
             }
-          case 171: break;
+          case 173: break;
           case 5: 
             { pushAndBegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IDENTIFIER_TOKEN;
             }
-          case 172: break;
+          case 174: break;
           case 6: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.CAPTURE_OPERATOR;
             }
-          case 173: break;
+          case 175: break;
           case 7: 
             { pushAndBegin(SIGIL);
                                                return ElixirTypes.TILDE;
             }
-          case 174: break;
+          case 176: break;
           case 8: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR;
             }
-          case 175: break;
+          case 177: break;
           case 9: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.UNARY_OPERATOR;
             }
-          case 176: break;
+          case 178: break;
           case 10: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MATCH_OPERATOR;
             }
-          case 177: break;
+          case 179: break;
           case 11: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.STRUCT_OPERATOR;
             }
-          case 178: break;
+          case 180: break;
           case 12: 
             { pushAndBegin(DOT_OPERATION);
                                                return ElixirTypes.DOT_OPERATOR;
             }
-          case 179: break;
+          case 181: break;
           case 13: 
             { pushAndBegin(DUAL_OPERATION);
                                                return ElixirTypes.DUAL_OPERATOR;
             }
-          case 180: break;
+          case 182: break;
           case 14: 
             { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON;
             }
-          case 181: break;
+          case 183: break;
           case 15: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AT_OPERATOR;
             }
-          case 182: break;
+          case 184: break;
           case 16: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DIVISION_OPERATOR;
             }
-          case 183: break;
+          case 185: break;
           case 17: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR;
             }
-          case 184: break;
+          case 186: break;
           case 18: 
             { pushAndBegin(CHAR_TOKENIZATION);
                                                           return ElixirTypes.CHAR_TOKENIZER;
             }
-          case 185: break;
+          case 187: break;
           case 19: 
             { pushAndBegin(DECIMAL_WHOLE_NUMBER);
                                                return ElixirTypes.VALID_DECIMAL_DIGITS;
             }
-          case 186: break;
+          case 188: break;
           case 20: 
             { return ElixirTypes.COMMA;
             }
-          case 187: break;
+          case 189: break;
           case 21: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ALIAS_TOKEN;
             }
-          case 188: break;
+          case 190: break;
           case 22: 
             { return ElixirTypes.SEMICOLON;
             }
-          case 189: break;
+          case 191: break;
           case 23: 
             { return ElixirTypes.EOL;
             }
-          case 190: break;
+          case 192: break;
           case 24: 
             { return TokenType.WHITE_SPACE;
             }
-          case 191: break;
+          case 193: break;
           case 25: 
             { return ElixirTypes.OPENING_PARENTHESIS;
             }
-          case 192: break;
+          case 194: break;
           case 26: 
             { return ElixirTypes.COMMENT;
             }
-          case 193: break;
+          case 195: break;
           case 27: 
             { return ElixirTypes.CLOSING_BRACKET;
             }
-          case 194: break;
+          case 196: break;
           case 28: 
             { return ElixirTypes.OPENING_BRACKET;
             }
-          case 195: break;
+          case 197: break;
           case 29: 
             { return ElixirTypes.CLOSING_PARENTHESIS;
             }
-          case 196: break;
+          case 198: break;
           case 30: 
             { /* return to KEYWORD_PAIR_MAYBE so that COLON after quote can be parsed
                                                   as KEYWORD_PAIR_COLON to differentiate between valid `<quote><colon>`
@@ -1254,13 +1254,13 @@ public class ElixirFlexLexer implements FlexLexer {
                                                startQuote(yytext());
                                                return promoterType();
             }
-          case 197: break;
+          case 199: break;
           case 31: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      yybegin(stackFrame.getLastLexicalState());
                      return ElixirTypes.ATOM_FRAGMENT;
             }
-          case 198: break;
+          case 200: break;
           case 32: 
             { /* At the end of the quote, return the state (YYINITIAL or INTERPOLATION) before ATOM_START as
                         anything after the closing quote should be handle by the state prior to ATOM_START.  Without
@@ -1270,168 +1270,168 @@ public class ElixirFlexLexer implements FlexLexer {
                      startQuote(yytext());
                      return promoterType();
             }
-          case 199: break;
+          case 201: break;
           case 33: 
             { yybegin(UNKNOWN_BASE_WHOLE_NUMBER);
                                              return ElixirTypes.UNKNOWN_WHOLE_NUMBER_BASE;
             }
-          case 200: break;
+          case 202: break;
           case 34: 
             { yybegin(OCTAL_WHOLE_NUMBER);
                                              return ElixirTypes.OCTAL_WHOLE_NUMBER_BASE;
             }
-          case 201: break;
+          case 203: break;
           case 35: 
             { yybegin(BINARY_WHOLE_NUMBER);
                                              return ElixirTypes.BINARY_WHOLE_NUMBER_BASE;
             }
-          case 202: break;
+          case 204: break;
           case 36: 
             { yybegin(BINARY_WHOLE_NUMBER);
                                              return ElixirTypes.OBSOLETE_BINARY_WHOLE_NUMBER_BASE;
             }
-          case 203: break;
+          case 205: break;
           case 37: 
             { yybegin(HEXADECIMAL_WHOLE_NUMBER);
                                              return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE;
             }
-          case 204: break;
+          case 206: break;
           case 38: 
             { yybegin(HEXADECIMAL_WHOLE_NUMBER);
                                              return ElixirTypes.OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE;
             }
-          case 205: break;
+          case 207: break;
           case 39: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                             handleInState(stackFrame.getLastLexicalState());
             }
-          case 206: break;
+          case 208: break;
           case 40: 
             { return ElixirTypes.INVALID_BINARY_DIGITS;
             }
-          case 207: break;
+          case 209: break;
           case 41: 
             { return ElixirTypes.VALID_BINARY_DIGITS;
             }
-          case 208: break;
+          case 210: break;
           case 42: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                             handleInState(stackFrame.getLastLexicalState());
             }
-          case 209: break;
+          case 211: break;
           case 43: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                             handleInState(stackFrame.getLastLexicalState());
                                             // zero-width token
                                             return ElixirTypes.CALL;
             }
-          case 210: break;
+          case 212: break;
           case 44: 
             { handleInState(KEYWORD_PAIR_MAYBE);
             }
-          case 211: break;
+          case 213: break;
           case 45: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
              yybegin(stackFrame.getLastLexicalState());
              return ElixirTypes.CHAR_LIST_FRAGMENT;
             }
-          case 212: break;
+          case 214: break;
           case 46: 
             { yybegin(ESCAPE_SEQUENCE);
              return ElixirTypes.ESCAPE;
             }
-          case 213: break;
+          case 215: break;
           case 47: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              handleInState(stackFrame.getLastLexicalState());
             }
-          case 214: break;
+          case 216: break;
           case 48: 
             { return ElixirTypes.INVALID_DECIMAL_DIGITS;
             }
-          case 215: break;
+          case 217: break;
           case 49: 
             { return ElixirTypes.VALID_DECIMAL_DIGITS;
             }
-          case 216: break;
+          case 218: break;
           case 50: 
             { return ElixirTypes.DECIMAL_SEPARATOR;
             }
-          case 217: break;
+          case 219: break;
           case 51: 
             { handleInState(DECIMAL_EXPONENT);
             }
-          case 218: break;
+          case 220: break;
           case 52: 
             { yybegin(DECIMAL_EXPONENT);
                     return ElixirTypes.DUAL_OPERATOR;
             }
-          case 219: break;
+          case 221: break;
           case 53: 
             { yybegin(DECIMAL_EXPONENT_SIGN);
                     return ElixirTypes.EXPONENT_MARK;
             }
-          case 220: break;
+          case 222: break;
           case 54: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState());
             }
-          case 221: break;
+          case 223: break;
           case 55: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR;
             }
-          case 222: break;
+          case 224: break;
           case 56: 
             { yybegin(CALL_OR_KEYWORD_PAIR_MAYBE);
                                                       return ElixirTypes.IDENTIFIER_TOKEN;
             }
-          case 223: break;
+          case 225: break;
           case 57: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CAPTURE_OPERATOR;
             }
-          case 224: break;
+          case 226: break;
           case 58: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR;
             }
-          case 225: break;
+          case 227: break;
           case 59: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.UNARY_OPERATOR;
             }
-          case 226: break;
+          case 228: break;
           case 60: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MATCH_OPERATOR;
             }
-          case 227: break;
+          case 229: break;
           case 61: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STRUCT_OPERATOR;
             }
-          case 228: break;
+          case 230: break;
           case 62: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR;
             }
-          case 229: break;
+          case 231: break;
           case 63: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AT_OPERATOR;
             }
-          case 230: break;
+          case 232: break;
           case 64: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DIVISION_OPERATOR;
             }
-          case 231: break;
+          case 233: break;
           case 65: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR;
             }
-          case 232: break;
+          case 234: break;
           case 66: 
             { /* return to CALL_MAYBE so that OPENING_BRACKET or
                                                          OPENING_PARENTHESES after quote can be parsed
@@ -1441,59 +1441,59 @@ public class ElixirFlexLexer implements FlexLexer {
                                                       startQuote(yytext());
                                                       return promoterType();
             }
-          case 233: break;
+          case 235: break;
           case 67: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                    yybegin(stackFrame.getLastLexicalState());
                    return ElixirTypes.SIGNIFICANT_WHITE_SPACE;
             }
-          case 234: break;
+          case 236: break;
           case 68: 
             { yybegin(GROUP);
           return fragmentType();
             }
-          case 235: break;
+          case 237: break;
           case 69: 
             { yybegin(GROUP);
           return ElixirTypes.EOL;
             }
-          case 236: break;
+          case 238: break;
           case 70: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                     yybegin(stackFrame.getLastLexicalState());
                                     return ElixirTypes.ESCAPED_CHARACTER_TOKEN;
             }
-          case 237: break;
+          case 239: break;
           case 71: 
             { yybegin(UNICODE_ESCAPE_SEQUENCE);
                                     return ElixirTypes.UNICODE_ESCAPE_CHARACTER;
             }
-          case 238: break;
+          case 240: break;
           case 72: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                     yybegin(stackFrame.getLastLexicalState());
                                     return ElixirTypes.EOL;
             }
-          case 239: break;
+          case 241: break;
           case 73: 
             { yybegin(HEXADECIMAL_ESCAPE_SEQUENCE);
                                     return ElixirTypes.HEXADECIMAL_WHOLE_NUMBER_BASE;
             }
-          case 240: break;
+          case 242: break;
           case 74: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.CLOSING_CURLY;
             }
-          case 241: break;
+          case 243: break;
           case 75: 
             { return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
             }
-          case 242: break;
+          case 244: break;
           case 76: 
             { return fragmentType();
             }
-          case 243: break;
+          case 245: break;
           case 77: 
             { if (isTerminator(yytext())) {
                                  if (isSigil()) {
@@ -1508,7 +1508,7 @@ public class ElixirFlexLexer implements FlexLexer {
                                  return fragmentType();
                                }
             }
-          case 244: break;
+          case 246: break;
           case 78: 
             { if (isInterpolating()) {
                                  pushAndBegin(ESCAPE_SEQUENCE);
@@ -1518,7 +1518,7 @@ public class ElixirFlexLexer implements FlexLexer {
                                  return fragmentType();
                                }
             }
-          case 245: break;
+          case 247: break;
           case 79: 
             { if (isInterpolating()) {
                        pushAndBegin(ESCAPE_SEQUENCE);
@@ -1527,12 +1527,12 @@ public class ElixirFlexLexer implements FlexLexer {
                        return fragmentType();
                      }
             }
-          case 246: break;
+          case 248: break;
           case 80: 
             { yybegin(GROUP_HEREDOC_LINE_START);
                      return ElixirTypes.EOL;
             }
-          case 247: break;
+          case 249: break;
           case 81: 
             { /* The EOL after the escape is also needed to end the Heredoc line.  It functions as both, so arbitarily I'm
              choosing the escaped version to be a zero-width token. */
@@ -1540,120 +1540,120 @@ public class ElixirFlexLexer implements FlexLexer {
           yybegin(GROUP_HEREDOC_LINE_BODY);
           return ElixirTypes.EOL;
             }
-          case 248: break;
+          case 250: break;
           case 82: 
             { handleInState(GROUP_HEREDOC_LINE_BODY);
             }
-          case 249: break;
+          case 251: break;
           case 83: 
             { yybegin(GROUP_HEREDOC_LINE_BODY);
                                                 return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
             }
-          case 250: break;
+          case 252: break;
           case 84: 
             { yybegin(GROUP_HEREDOC_LINE_START);
                                return ElixirTypes.EOL;
             }
-          case 251: break;
+          case 253: break;
           case 85: 
             { yybegin(EXTENDED_HEXADECIMAL_ESCAPE_SEQUENCE);
                              return ElixirTypes.OPENING_CURLY;
             }
-          case 252: break;
+          case 254: break;
           case 86: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                              yybegin(stackFrame.getLastLexicalState());
                              return ElixirTypes.VALID_HEXADECIMAL_DIGITS;
             }
-          case 253: break;
+          case 255: break;
           case 87: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  handleInState(stackFrame.getLastLexicalState());
             }
-          case 254: break;
+          case 256: break;
           case 88: 
             { return ElixirTypes.INVALID_HEXADECIMAL_DIGITS;
             }
-          case 255: break;
+          case 257: break;
           case 89: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                 yybegin(stackFrame.getLastLexicalState());
                                 return ElixirTypes.INTERPOLATION_END;
             }
-          case 256: break;
+          case 258: break;
           case 90: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                               handleInState(stackFrame.getLastLexicalState());
             }
-          case 257: break;
+          case 259: break;
           case 91: 
             { setPromoter(yytext());
                              yybegin(GROUP);
                              return promoterType();
             }
-          case 258: break;
+          case 260: break;
           case 92: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                            handleInState(stackFrame.getLastLexicalState());
             }
-          case 259: break;
+          case 261: break;
           case 93: 
             { return ElixirTypes.INVALID_OCTAL_DIGITS;
             }
-          case 260: break;
+          case 262: break;
           case 94: 
             { return ElixirTypes.VALID_OCTAL_DIGITS;
             }
-          case 261: break;
+          case 263: break;
           case 95: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  yybegin(stackFrame.getLastLexicalState());
                                  return ElixirTypes.DIVISION_OPERATOR;
             }
-          case 262: break;
+          case 264: break;
           case 96: 
             { nameSigil(yytext());
                                yybegin(NAMED_SIGIL);
                                return sigilNameType();
             }
-          case 263: break;
+          case 265: break;
           case 97: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                      handleInState(stackFrame.getLastLexicalState());
             }
-          case 264: break;
+          case 266: break;
           case 98: 
             { return ElixirTypes.SIGIL_MODIFIER;
             }
-          case 265: break;
+          case 267: break;
           case 99: 
             { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                   handleInState(stackFrame.getLastLexicalState());
             }
-          case 266: break;
+          case 268: break;
           case 100: 
             { return ElixirTypes.INVALID_UNKNOWN_BASE_DIGITS;
             }
-          case 267: break;
+          case 269: break;
           case 101: 
             { return ElixirTypes.OPENING_BIT;
             }
-          case 268: break;
+          case 270: break;
           case 102: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR;
             }
-          case 269: break;
+          case 271: break;
           case 103: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ARROW_OPERATOR;
             }
-          case 270: break;
+          case 272: break;
           case 104: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_MATCH_OPERATOR;
             }
-          case 271: break;
+          case 273: break;
           case 105: 
             // general lookahead, find correct zzMarkedPos
             { int zzFState = 33;
@@ -1683,67 +1683,67 @@ public class ElixirFlexLexer implements FlexLexer {
             { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN;
             }
-          case 272: break;
+          case 274: break;
           case 106: 
             { return ElixirTypes.CLOSING_BIT;
             }
-          case 273: break;
+          case 275: break;
           case 107: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.AND_OPERATOR;
+                                               return ElixirTypes.AND_SYMBOL_OPERATOR;
             }
-          case 274: break;
+          case 276: break;
           case 108: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.DO;
             }
-          case 275: break;
+          case 277: break;
           case 109: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_SYMBOL_OPERATOR;
             }
-          case 276: break;
+          case 278: break;
           case 110: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR;
             }
-          case 277: break;
+          case 279: break;
           case 111: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ASSOCIATION_OPERATOR;
             }
-          case 278: break;
+          case 280: break;
           case 112: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.OR_WORD_OPERATOR;
             }
-          case 279: break;
+          case 281: break;
           case 113: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.STAB_OPERATOR;
             }
-          case 280: break;
+          case 282: break;
           case 114: 
             { return ElixirTypes.TYPE_OPERATOR;
             }
-          case 281: break;
+          case 283: break;
           case 115: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 1);
             { return ElixirTypes.COLON;
             }
-          case 282: break;
+          case 284: break;
           case 116: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.IN_OPERATOR;
             }
-          case 283: break;
+          case 285: break;
           case 117: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FN;
             }
-          case 284: break;
+          case 286: break;
           case 118: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1751,7 +1751,7 @@ public class ElixirFlexLexer implements FlexLexer {
             { pushAndBegin(BASE_WHOLE_NUMBER_BASE);
                                                           return ElixirTypes.BASE_WHOLE_NUMBER_PREFIX;
             }
-          case 285: break;
+          case 287: break;
           case 119: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1759,57 +1759,57 @@ public class ElixirFlexLexer implements FlexLexer {
             { yybegin(DECIMAL_FRACTION);
                                             return ElixirTypes.DECIMAL_MARK;
             }
-          case 286: break;
+          case 288: break;
           case 120: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TWO_OPERATOR;
             }
-          case 287: break;
+          case 289: break;
           case 121: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ARROW_OPERATOR;
             }
-          case 288: break;
+          case 290: break;
           case 122: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_MATCH_OPERATOR;
             }
-          case 289: break;
+          case 291: break;
           case 123: 
             { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.AND_OPERATOR;
+                                                      return ElixirTypes.AND_SYMBOL_OPERATOR;
             }
-          case 290: break;
+          case 292: break;
           case 124: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DO;
             }
-          case 291: break;
+          case 293: break;
           case 125: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.OR_SYMBOL_OPERATOR;
             }
-          case 292: break;
+          case 294: break;
           case 126: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.COMPARISON_OPERATOR;
             }
-          case 293: break;
+          case 295: break;
           case 127: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.OR_WORD_OPERATOR;
             }
-          case 294: break;
+          case 296: break;
           case 128: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.STAB_OPERATOR;
             }
-          case 295: break;
+          case 297: break;
           case 129: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.IN_OPERATOR;
             }
-          case 296: break;
+          case 298: break;
           case 130: 
             { CharSequence groupTerminator = yytext().subSequence(1, yytext().length());
 
@@ -1828,7 +1828,7 @@ public class ElixirFlexLexer implements FlexLexer {
                                  return fragmentType();
                                }
             }
-          case 297: break;
+          case 299: break;
           case 131: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1841,7 +1841,7 @@ public class ElixirFlexLexer implements FlexLexer {
 
                                return ElixirTypes.ESCAPE;
             }
-          case 298: break;
+          case 300: break;
           case 132: 
             { if (isInterpolating()) {
                            pushAndBegin(INTERPOLATION);
@@ -1850,7 +1850,7 @@ public class ElixirFlexLexer implements FlexLexer {
                            return fragmentType();
                           }
             }
-          case 299: break;
+          case 301: break;
           case 133: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1863,7 +1863,7 @@ public class ElixirFlexLexer implements FlexLexer {
                        return ElixirTypes.ESCAPE;
                      }
             }
-          case 300: break;
+          case 302: break;
           case 134: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
@@ -1872,71 +1872,81 @@ public class ElixirFlexLexer implements FlexLexer {
                               yybegin(stackFrame.getLastLexicalState());
                               return ElixirTypes.KEYWORD_PAIR_COLON;
             }
-          case 301: break;
+          case 303: break;
           case 135: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.END;
             }
-          case 302: break;
+          case 304: break;
           case 136: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NOT_OPERATOR;
             }
-          case 303: break;
+          case 305: break;
           case 137: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NIL;
             }
-          case 304: break;
+          case 306: break;
           case 138: 
+            { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AND_WORD_OPERATOR;
+            }
+          case 307: break;
+          case 139: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.THREE_OPERATOR;
             }
-          case 305: break;
-          case 139: 
+          case 308: break;
+          case 140: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 1);
             { pushAndBegin(ATOM_START);
                                                return ElixirTypes.COLON;
             }
-          case 306: break;
-          case 140: 
+          case 309: break;
+          case 141: 
             // lookahead expression with fixed lookahead length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzMarkedPos, -2);
             { return ElixirTypes.SIGNIFICANT_WHITE_SPACE;
             }
-          case 307: break;
-          case 141: 
+          case 310: break;
+          case 142: 
             { startQuote(yytext());
                                                return promoterType();
             }
-          case 308: break;
-          case 142: 
+          case 311: break;
+          case 143: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.END;
             }
-          case 309: break;
-          case 143: 
+          case 312: break;
+          case 144: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.NIL;
             }
-          case 310: break;
-          case 144: 
+          case 313: break;
+          case 145: 
+            { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_WORD_OPERATOR;
+            }
+          case 314: break;
+          case 146: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.THREE_OPERATOR;
             }
-          case 311: break;
-          case 145: 
+          case 315: break;
+          case 147: 
             { /* Does NOT return to CALL_MAYBE because heredocs aren't valid
                                                          relative identifiers.  This clauses is only here to prevent a
                                                          prefix match on {QUOTE_PROMOTER}. */
                                                       org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                                       handleInState(stackFrame.getLastLexicalState());
             }
-          case 312: break;
-          case 146: 
+          case 316: break;
+          case 148: 
             { if (isTerminator(yytext())) {
                                       if (isSigil()) {
                                         yybegin(SIGIL_MODIFIERS);
@@ -1950,12 +1960,12 @@ public class ElixirFlexLexer implements FlexLexer {
                                       handleInState(GROUP_HEREDOC_LINE_BODY);
                                    }
             }
-          case 313: break;
-          case 147: 
+          case 317: break;
+          case 149: 
             { handleInState(GROUP_HEREDOC_END);
             }
-          case 314: break;
-          case 148: 
+          case 318: break;
+          case 150: 
             { // Similar to GROUP_HEREDOC_END's GROUP_HEREDOC_TERMINATOR rule, but...
                                if (isTerminator(yytext())) {
                                  if (isSigil()) {
@@ -1972,14 +1982,14 @@ public class ElixirFlexLexer implements FlexLexer {
                                  return TokenType.BAD_CHARACTER;
                                }
             }
-          case 315: break;
-          case 149: 
+          case 319: break;
+          case 151: 
             { setPromoter(yytext());
                              yybegin(GROUP_HEREDOC_START);
                              return promoterType();
             }
-          case 316: break;
-          case 150: 
+          case 320: break;
+          case 152: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 2);
@@ -1987,38 +1997,38 @@ public class ElixirFlexLexer implements FlexLexer {
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TUPLE_OPERATOR;
             }
-          case 317: break;
-          case 151: 
+          case 321: break;
+          case 153: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR;
             }
-          case 318: break;
-          case 152: 
+          case 322: break;
+          case 154: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ELSE;
             }
-          case 319: break;
-          case 153: 
+          case 323: break;
+          case 155: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TRUE;
             }
-          case 320: break;
-          case 154: 
+          case 324: break;
+          case 156: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.WHEN_OPERATOR;
             }
-          case 321: break;
-          case 155: 
+          case 325: break;
+          case 157: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ELSE;
             }
-          case 322: break;
-          case 156: 
+          case 326: break;
+          case 158: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.TRUE;
             }
-          case 323: break;
-          case 157: 
+          case 327: break;
+          case 159: 
             { String groupHeredocTerminator = yytext().toString().trim();
 
                                                 // manual lookahead pushes terminator back
@@ -2032,13 +2042,13 @@ public class ElixirFlexLexer implements FlexLexer {
                                                   return ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN;
                                                 }
             }
-          case 324: break;
-          case 158: 
+          case 328: break;
+          case 160: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.AFTER;
             }
-          case 325: break;
-          case 159: 
+          case 329: break;
+          case 161: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 3);
@@ -2046,33 +2056,33 @@ public class ElixirFlexLexer implements FlexLexer {
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MAP_OPERATOR;
             }
-          case 326: break;
-          case 160: 
+          case 330: break;
+          case 162: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.FALSE;
             }
-          case 327: break;
-          case 161: 
+          case 331: break;
+          case 163: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.CATCH;
             }
-          case 328: break;
-          case 162: 
+          case 332: break;
+          case 164: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AFTER;
             }
-          case 329: break;
-          case 163: 
+          case 333: break;
+          case 165: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.FALSE;
             }
-          case 330: break;
-          case 164: 
+          case 334: break;
+          case 166: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.CATCH;
             }
-          case 331: break;
-          case 165: 
+          case 335: break;
+          case 167: 
             // lookahead expression with fixed base length
             zzMarkedPos = Character.offsetByCodePoints
                 (zzBufferL/*, zzStartRead, zzEndRead - zzStartRead*/, zzStartRead, 4);
@@ -2080,17 +2090,17 @@ public class ElixirFlexLexer implements FlexLexer {
                                                pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.BIT_STRING_OPERATOR;
             }
-          case 332: break;
-          case 166: 
+          case 336: break;
+          case 168: 
             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RESCUE;
             }
-          case 333: break;
-          case 167: 
+          case 337: break;
+          case 169: 
             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RESCUE;
             }
-          case 334: break;
+          case 338: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

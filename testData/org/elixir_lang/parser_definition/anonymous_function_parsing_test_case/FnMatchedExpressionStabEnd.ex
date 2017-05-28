@@ -7,6 +7,7 @@ fn one | two -> end
 fn one = two -> end
 fn one or two -> end
 fn one || two -> end
+fn one and two -> end
 fn one && two -> end
 fn one != two -> end
 fn one < two -> end

@@ -9,6 +9,7 @@ true.(
   one = two,
   one or two,
   one || two,
+  one and two,
   one && two,
   one != two,
   one < two,

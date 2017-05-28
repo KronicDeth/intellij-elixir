@@ -6,6 +6,7 @@
 &1 one = two
 &1 one or two
 &1 one || two
+&1 one and two
 &1 one && two
 &1 one != two
 &1 one < two

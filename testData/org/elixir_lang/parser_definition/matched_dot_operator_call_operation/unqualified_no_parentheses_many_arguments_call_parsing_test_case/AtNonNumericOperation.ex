@@ -1,3 +1,4 @@
+@non_numeric.and unqualified positional, key: value
 @non_numeric.&& unqualified positional, key: value
 @non_numeric.|> unqualified positional, key: value
 @non_numeric.@ unqualified positional, key: value
@@ -15,6 +16,7 @@
 @non_numeric.| unqualified positional, key: value
 @non_numeric.<= unqualified positional, key: value
 @non_numeric.-> unqualified positional, key: value
+@non_numeric.% unqualified positional, key: value
 @non_numeric.% unqualified positional, key: value
 @non_numeric.<> unqualified positional, key: value
 @non_numeric.^ unqualified positional, key: value

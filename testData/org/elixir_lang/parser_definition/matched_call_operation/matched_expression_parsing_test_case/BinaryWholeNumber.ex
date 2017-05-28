@@ -6,6 +6,7 @@
 0b10 one = two
 0b10 one or two
 0b10 one || two
+0b10 one and two
 0b10 one && two
 0b10 one != two
 0b10 one < two

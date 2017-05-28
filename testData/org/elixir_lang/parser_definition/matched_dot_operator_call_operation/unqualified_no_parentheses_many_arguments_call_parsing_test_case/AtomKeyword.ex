@@ -1,3 +1,4 @@
+nil.and unqualified positional, key: value
 nil.&& unqualified positional, key: value
 nil.|> unqualified positional, key: value
 nil.@ unqualified positional, key: value

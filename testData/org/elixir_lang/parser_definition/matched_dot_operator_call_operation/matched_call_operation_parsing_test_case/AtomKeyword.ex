@@ -1,3 +1,4 @@
+nil.and Qualifier.qualified positional, key: value
 nil.&& Qualifier.qualified positional, key: value
 nil.|> Qualifier.qualified positional, key: value
 nil.@ Qualifier.qualified positional, key: value

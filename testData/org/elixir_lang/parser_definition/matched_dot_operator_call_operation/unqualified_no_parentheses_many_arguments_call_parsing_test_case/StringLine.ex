@@ -1,3 +1,4 @@
+"String".and unqualified positional, key: value
 "String".&& unqualified positional, key: value
 "String".|> unqualified positional, key: value
 "String".@ unqualified positional, key: value

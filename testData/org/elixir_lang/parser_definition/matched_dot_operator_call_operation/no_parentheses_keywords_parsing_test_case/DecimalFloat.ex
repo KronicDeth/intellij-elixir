@@ -1,3 +1,4 @@
+1.2e-3.and key1: value1, key2: value2
 1.2e-3.&& key1: value1, key2: value2
 1.2e-3.|> key1: value1, key2: value2
 1.2e-3.@ key1: value1, key2: value2

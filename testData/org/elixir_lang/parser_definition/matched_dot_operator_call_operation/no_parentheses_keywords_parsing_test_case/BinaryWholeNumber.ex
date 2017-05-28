@@ -1,3 +1,4 @@
+0b10.and key1: value1, key2: value2
 0b10.&& key1: value1, key2: value2
 0b10.|> key1: value1, key2: value2
 0b10.@ key1: value1, key2: value2

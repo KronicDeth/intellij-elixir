@@ -33,6 +33,10 @@ Heredoc
 """
 String
 Heredoc
+""" one and two
+"""
+String
+Heredoc
 """ one && two
 """
 String

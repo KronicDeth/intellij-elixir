@@ -1,3 +1,4 @@
+:atom.and unqualified positional, key: value
 :atom.&& unqualified positional, key: value
 :atom.|> unqualified positional, key: value
 :atom.@ unqualified positional, key: value

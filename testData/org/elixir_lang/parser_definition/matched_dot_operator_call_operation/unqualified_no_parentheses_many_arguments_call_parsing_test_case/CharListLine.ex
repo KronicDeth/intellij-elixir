@@ -1,3 +1,4 @@
+'CharList'.and unqualified positional, key: value
 'CharList'.&& unqualified positional, key: value
 'CharList'.|> unqualified positional, key: value
 'CharList'.@ unqualified positional, key: value

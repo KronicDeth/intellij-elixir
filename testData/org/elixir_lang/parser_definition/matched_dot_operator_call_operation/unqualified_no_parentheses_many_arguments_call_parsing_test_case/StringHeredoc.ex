@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and unqualified positional, key: value
+"""
+String
+Heredoc
 """.&& unqualified positional, key: value
 """
 String

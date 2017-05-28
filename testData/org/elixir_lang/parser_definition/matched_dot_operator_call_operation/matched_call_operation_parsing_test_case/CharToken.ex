@@ -1,3 +1,4 @@
+?c.and Qualifier.qualified positional, key: value
 ?c.&& Qualifier.qualified positional, key: value
 ?c.|> Qualifier.qualified positional, key: value
 ?c.@ Qualifier.qualified positional, key: value
