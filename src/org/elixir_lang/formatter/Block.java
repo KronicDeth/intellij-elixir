@@ -37,6 +37,10 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
     );
+    private static final TokenSet UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
+    );
     private static final TokenSet WHEN_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_WHEN_OPERATION,
             ElixirTypes.UNMATCHED_WHEN_OPERATION
@@ -286,7 +290,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode leftOperand = leftOperandBlock.getNode();
                     IElementType leftOperandElementType = leftOperand.getElementType();
 
-                    if (leftOperandElementType == ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL) {
+                    if (UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType)) {
                         // `NAME/ARITY` confirmed
                         if (leftOperand.findChildByType(ElixirTypes.DO_BLOCK) == null) {
                             blockList = flattenedBlockList;
