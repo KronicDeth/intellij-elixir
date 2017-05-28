@@ -21,14 +21,22 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "    end\n" +
             "  end\n" +
             "end";
+    private static final String SPACE_AFTER_OPERATORS = "After Operators";
     private static final String SPACING_CODE_SAMPLE =
             "# Addition Operators\n" +
             "1 + 1\n" +
             "1 - 1\n" +
             "\n" +
             "# And Operators\n" +
+            "& &1 && &2\n" +
             "true && true\n" +
+            "& &1 &&& &2\n" +
             "0b11 &&& 0b01\n" +
+            "\n" +
+            "# Capture Operators\n" +
+            "& &1 + &2\n" +
+            "&Kernel.||/2\n" +
+            "&foo/0\n" +
             "\n" +
             "# Comparison Operators\n" +
             "1 != 2\n" +
@@ -137,6 +145,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_UNARY_OPERATOR",
                     "SPACE_AROUND_LAMBDA_ARROW"
             );
+
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AFTER_CAPTURE_OPERATOR",
+                    "Capture operator (&)",
+                    SPACE_AFTER_OPERATORS);
 
             consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
             consumer.renameStandardOption(
