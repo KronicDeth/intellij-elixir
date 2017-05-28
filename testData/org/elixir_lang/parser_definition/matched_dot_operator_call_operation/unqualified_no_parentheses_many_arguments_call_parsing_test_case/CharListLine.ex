@@ -10,6 +10,7 @@
 'CharList'.= unqualified positional, key: value
 'CharList'./ unqualified positional, key: value
 'CharList'.* unqualified positional, key: value
+'CharList'.or unqualified positional, key: value
 'CharList'.|| unqualified positional, key: value
 'CharList'.| unqualified positional, key: value
 'CharList'.<= unqualified positional, key: value

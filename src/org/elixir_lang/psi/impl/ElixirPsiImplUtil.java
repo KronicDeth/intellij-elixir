@@ -1361,7 +1361,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirOrInfixOperator orInfixOperator) {
-        return TokenSet.create(ElixirTypes.OR_OPERATOR);
+        return TokenSet.create(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirTypes.OR_WORD_OPERATOR);
     }
 
     @Contract(pure = true)

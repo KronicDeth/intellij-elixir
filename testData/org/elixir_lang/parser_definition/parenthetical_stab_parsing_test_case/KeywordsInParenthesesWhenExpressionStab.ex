@@ -7,6 +7,7 @@
 ( (key_one: value_one, key_two: value_two) when one :: type  -> )
 ( (key_one: value_one, key_two: value_two) when one | two  -> )
 ( (key_one: value_one, key_two: value_two) when one = two  -> )
+( (key_one: value_one, key_two: value_two) when one or two  -> )
 ( (key_one: value_one, key_two: value_two) when one || two  -> )
 ( (key_one: value_one, key_two: value_two) when one && two  -> )
 ( (key_one: value_one, key_two: value_two) when one != two  -> )

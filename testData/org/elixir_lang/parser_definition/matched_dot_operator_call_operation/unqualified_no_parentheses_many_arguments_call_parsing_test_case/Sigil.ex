@@ -10,6 +10,7 @@
 ~x{}i.= unqualified positional, key: value
 ~x{}i./ unqualified positional, key: value
 ~x{}i.* unqualified positional, key: value
+~x{}i.or unqualified positional, key: value
 ~x{}i.|| unqualified positional, key: value
 ~x{}i.| unqualified positional, key: value
 ~x{}i.<= unqualified positional, key: value

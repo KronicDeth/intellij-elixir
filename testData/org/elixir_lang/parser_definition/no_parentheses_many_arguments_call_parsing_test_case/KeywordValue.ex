@@ -14,6 +14,7 @@ function positional, keyword_key: keyword_value | update
 function positional, keyword_key: keyword_value = match_value
 
 # matchedExpressionOrOperation
+function positional, keyword_key: first_value or second_value
 function positional, keyword_key: first_value ||| second_value
 
 # matchedExpressionAndOperation

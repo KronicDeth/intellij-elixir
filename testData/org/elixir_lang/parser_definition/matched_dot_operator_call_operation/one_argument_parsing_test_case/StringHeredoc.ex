@@ -49,6 +49,10 @@ Heredoc
 """
 String
 Heredoc
+""".or positional
+"""
+String
+Heredoc
 """.|| positional
 """
 String

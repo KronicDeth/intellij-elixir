@@ -10,6 +10,7 @@
 0o76543210.= key1: value1, key2: value2
 0o76543210./ key1: value1, key2: value2
 0o76543210.* key1: value1, key2: value2
+0o76543210.or key1: value1, key2: value2
 0o76543210.|| key1: value1, key2: value2
 0o76543210.| key1: value1, key2: value2
 0o76543210.<= key1: value1, key2: value2

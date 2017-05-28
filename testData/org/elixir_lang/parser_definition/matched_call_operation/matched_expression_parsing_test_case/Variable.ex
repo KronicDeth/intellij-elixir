@@ -4,6 +4,7 @@ variable one when guard
 variable one :: type
 variable one | new
 variable one = two
+variable one or two
 variable one || two
 variable one && two
 variable one != two

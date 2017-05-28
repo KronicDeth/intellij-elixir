@@ -10,6 +10,7 @@ Alias.in positional
 Alias.= positional
 Alias./ positional
 Alias.* positional
+Alias.or positional
 Alias.|| positional
 Alias.| positional
 Alias.<= positional

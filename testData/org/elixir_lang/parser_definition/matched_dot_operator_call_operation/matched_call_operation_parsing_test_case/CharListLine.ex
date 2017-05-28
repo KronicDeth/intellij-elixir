@@ -10,6 +10,7 @@
 'CharList'.= Qualifier.qualified positional, key: value
 'CharList'./ Qualifier.qualified positional, key: value
 'CharList'.* Qualifier.qualified positional, key: value
+'CharList'.or Qualifier.qualified positional, key: value
 'CharList'.|| Qualifier.qualified positional, key: value
 'CharList'.| Qualifier.qualified positional, key: value
 'CharList'.<= Qualifier.qualified positional, key: value

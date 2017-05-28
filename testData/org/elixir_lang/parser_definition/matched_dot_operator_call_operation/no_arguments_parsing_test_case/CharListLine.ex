@@ -10,6 +10,7 @@
 'CharList'.=
 'CharList'./
 'CharList'.*
+'CharList'.or
 'CharList'.||
 'CharList'.|
 'CharList'.<=

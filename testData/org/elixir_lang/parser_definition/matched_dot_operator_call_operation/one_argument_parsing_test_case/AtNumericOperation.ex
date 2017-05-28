@@ -10,6 +10,7 @@
 @1.= positional
 @1./ positional
 @1.* positional
+@1.or positional
 @1.|| positional
 @1.| positional
 @1.<= positional

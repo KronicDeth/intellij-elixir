@@ -4,6 +4,7 @@
 "StringLine" one :: type
 "StringLine" one | new
 "StringLine" one = two
+"StringLine" one or two
 "StringLine" one || two
 "StringLine" one && two
 "StringLine" one != two

@@ -49,6 +49,10 @@ Heredoc
 '''
 CharList
 Heredoc
+'''.or positional
+'''
+CharList
+Heredoc
 '''.|| positional
 '''
 CharList

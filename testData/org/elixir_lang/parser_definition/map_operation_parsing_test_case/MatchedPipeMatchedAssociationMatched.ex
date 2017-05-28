@@ -1,5 +1,5 @@
 %{ one = two | three = four => five = six }
-%{ one || two | three || four => five || six }
+%{ one || two | three or four => five ||| six }
 %{ one && two | three && four => five && six }
 %{ one != two | three != four => five == six }
 %{ one < two | three > four => five <= six }

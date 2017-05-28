@@ -10,6 +10,7 @@
 0b10.= positional
 0b10./ positional
 0b10.* positional
+0b10.or positional
 0b10.|| positional
 0b10.| positional
 0b10.<= positional

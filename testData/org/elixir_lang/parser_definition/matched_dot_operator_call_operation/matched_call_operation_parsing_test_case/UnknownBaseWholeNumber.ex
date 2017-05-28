@@ -10,6 +10,7 @@
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.= Qualifier.qualified positional, key: value
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210./ Qualifier.qualified positional, key: value
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.* Qualifier.qualified positional, key: value
+0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.or Qualifier.qualified positional, key: value
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.|| Qualifier.qualified positional, key: value
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.| Qualifier.qualified positional, key: value
 0zABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz9876543210.<= Qualifier.qualified positional, key: value

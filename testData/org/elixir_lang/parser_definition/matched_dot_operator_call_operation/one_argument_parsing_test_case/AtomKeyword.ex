@@ -10,6 +10,7 @@ nil.in positional
 nil.= positional
 nil./ positional
 nil.* positional
+nil.or positional
 nil.|| positional
 nil.| positional
 nil.<= positional

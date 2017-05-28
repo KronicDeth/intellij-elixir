@@ -10,6 +10,7 @@
 :atom.= Qualifier.qualified positional, key: value
 :atom.* Qualifier.qualified positional, key: value
 :atom./ Qualifier.qualified positional, key: value
+:atom.or Qualifier.qualified positional, key: value
 :atom.|| Qualifier.qualified positional, key: value
 :atom.| Qualifier.qualified positional, key: value
 :atom.<= Qualifier.qualified positional, key: value

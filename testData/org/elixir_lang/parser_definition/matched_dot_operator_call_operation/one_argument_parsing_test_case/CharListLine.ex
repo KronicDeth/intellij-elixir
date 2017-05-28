@@ -10,6 +10,7 @@
 'CharList'.= positional
 'CharList'./ positional
 'CharList'.* positional
+'CharList'.or positional
 'CharList'.|| positional
 'CharList'.| positional
 'CharList'.<= positional

@@ -3,7 +3,8 @@
 %{ one when one => two when two }
 %{ one :: two => three :: four }
 %{ one = two => three = four }
-%{ one || two => three || four }
+%{ one or two => three || four }
+%{ one || two => three ||| four }
 %{ one && two => three && four }
 %{ one != two => three != four }
 %{ one < two => three > four }

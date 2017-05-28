@@ -10,6 +10,7 @@
 ~x{}i.= positional
 ~x{}i./ positional
 ~x{}i.* positional
+~x{}i.or positional
 ~x{}i.|| positional
 ~x{}i.| positional
 ~x{}i.<= positional

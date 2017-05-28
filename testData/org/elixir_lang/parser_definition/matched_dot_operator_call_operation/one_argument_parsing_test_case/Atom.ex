@@ -10,6 +10,7 @@
 :atom.= positional
 :atom./ positional
 :atom.* positional
+:atom.or positional
 :atom.|| positional
 :atom.| positional
 :atom.<= positional

@@ -10,6 +10,7 @@ nil.in Qualifier.qualified positional, key: value
 nil.= Qualifier.qualified positional, key: value
 nil./ Qualifier.qualified positional, key: value
 nil.* Qualifier.qualified positional, key: value
+nil.or Qualifier.qualified positional, key: value
 nil.|| Qualifier.qualified positional, key: value
 nil.| Qualifier.qualified positional, key: value
 nil.<= Qualifier.qualified positional, key: value

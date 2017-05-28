@@ -4,6 +4,7 @@
 0b10 one :: type
 0b10 one | new
 0b10 one = two
+0b10 one or two
 0b10 one || two
 0b10 one && two
 0b10 one != two

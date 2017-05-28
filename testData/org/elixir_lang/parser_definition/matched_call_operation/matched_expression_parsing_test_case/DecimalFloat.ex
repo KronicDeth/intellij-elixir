@@ -4,6 +4,7 @@
 1.2e-3 one :: type
 1.2e-3 one | new
 1.2e-3 one = two
+1.2e-3 one or two
 1.2e-3 one || two
 1.2e-3 one && two
 1.2e-3 one != two

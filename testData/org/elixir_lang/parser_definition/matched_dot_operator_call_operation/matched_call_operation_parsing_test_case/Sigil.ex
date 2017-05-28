@@ -10,6 +10,7 @@
 ~x{}i.= Qualifier.qualified positional, key: value
 ~x{}i./ Qualifier.qualified positional, key: value
 ~x{}i.* Qualifier.qualified positional, key: value
+~x{}i.or Qualifier.qualified positional, key: value
 ~x{}i.|| Qualifier.qualified positional, key: value
 ~x{}i.| Qualifier.qualified positional, key: value
 ~x{}i.<= Qualifier.qualified positional, key: value

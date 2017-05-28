@@ -1,1 +1,1 @@
-one or two when three or four
+one or two when three || four

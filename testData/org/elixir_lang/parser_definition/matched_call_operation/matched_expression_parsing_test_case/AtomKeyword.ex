@@ -4,6 +4,7 @@ nil one when guard
 nil one :: type
 nil one | new
 nil one = two
+nil one or two
 nil one || two
 nil one && two
 nil one != two

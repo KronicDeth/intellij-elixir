@@ -25,6 +25,10 @@ Heredoc
 """
 String
 Heredoc
+""" one or two
+"""
+String
+Heredoc
 """ one || two
 """
 String

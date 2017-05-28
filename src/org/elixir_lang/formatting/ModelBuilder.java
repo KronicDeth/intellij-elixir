@@ -94,6 +94,8 @@ public class ModelBuilder implements FormattingModelBuilder {
                         TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR)
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
+                .around(ElixirTypes.OR_WORD_OPERATOR).spaces(1)
+                .around(ElixirTypes.OR_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_OR_OPERATORS)
                 .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
                 .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)

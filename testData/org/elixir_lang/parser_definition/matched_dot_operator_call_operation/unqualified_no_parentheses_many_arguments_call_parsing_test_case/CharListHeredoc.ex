@@ -49,6 +49,10 @@ Heredoc
 '''
 CharList
 Heredoc
+'''.or unqualified positional, key: value
+'''
+CharList
+Heredoc
 '''.|| unqualified positional, key: value
 '''
 CharList

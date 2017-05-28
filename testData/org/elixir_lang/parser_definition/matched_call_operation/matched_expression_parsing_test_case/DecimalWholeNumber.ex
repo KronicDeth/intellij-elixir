@@ -4,6 +4,7 @@
 1 one :: type
 1 one | new
 1 one = two
+1 one or two
 1 one || two
 1 one && two
 1 one != two

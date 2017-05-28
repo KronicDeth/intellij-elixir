@@ -10,6 +10,7 @@
 0o76543210.= positional
 0o76543210./ positional
 0o76543210.* positional
+0o76543210.or positional
 0o76543210.|| positional
 0o76543210.| positional
 0o76543210.<= positional

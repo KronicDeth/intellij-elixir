@@ -10,6 +10,7 @@
 @non_numeric.=
 @non_numeric./
 @non_numeric.*
+@non_numeric.or
 @non_numeric.||
 @non_numeric.|
 @non_numeric.<=

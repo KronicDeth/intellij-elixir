@@ -3,6 +3,7 @@
 { one :: two, three: 3 }
 { one | two, three: 3 }
 { one = two, three: 3 }
+{ one or two, three: 3 }
 { one || two, three: 3 }
 { one && two, three: 3 }
 { one != two, three: 3 }

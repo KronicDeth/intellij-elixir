@@ -7,6 +7,7 @@ fn (positional, key: value) when guard -> one when guard end
 fn (positional, key: value) when guard -> one :: type end
 fn (positional, key: value) when guard -> one | two end
 fn (positional, key: value) when guard -> one = two end
+fn (positional, key: value) when guard -> one or two end
 fn (positional, key: value) when guard -> one || two end
 fn (positional, key: value) when guard -> one && two end
 fn (positional, key: value) when guard -> one != two end

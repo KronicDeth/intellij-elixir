@@ -5,6 +5,7 @@ fn one when guard -> end
 fn one :: type -> end
 fn one | two -> end
 fn one = two -> end
+fn one or two -> end
 fn one || two -> end
 fn one && two -> end
 fn one != two -> end

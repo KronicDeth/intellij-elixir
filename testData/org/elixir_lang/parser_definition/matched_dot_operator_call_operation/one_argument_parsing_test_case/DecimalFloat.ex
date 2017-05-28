@@ -10,6 +10,7 @@
 1.2e-3.= positional
 1.2e-3./ positional
 1.2e-3.* positional
+1.2e-3.or positional
 1.2e-3.|| positional
 1.2e-3.| positional
 1.2e-3.<= positional

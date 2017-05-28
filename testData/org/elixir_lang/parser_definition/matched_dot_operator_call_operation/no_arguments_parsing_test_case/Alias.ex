@@ -10,6 +10,7 @@ Alias.in
 Alias.=
 Alias./
 Alias.*
+Alias.or
 Alias.||
 Alias.|
 Alias.<=

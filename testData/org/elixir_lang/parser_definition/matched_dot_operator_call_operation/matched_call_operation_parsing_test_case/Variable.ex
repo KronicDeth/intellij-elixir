@@ -10,6 +10,7 @@ variable.in Qualifier.qualified positional, key: value
 variable.= Qualifier.qualified positional, key: value
 variable./ Qualifier.qualified positional, key: value
 variable.* Qualifier.qualified positional, key: value
+variable.or Qualifier.qualified positional, key: value
 variable.|| Qualifier.qualified positional, key: value
 variable.| Qualifier.qualified positional, key: value
 variable.<= Qualifier.qualified positional, key: value

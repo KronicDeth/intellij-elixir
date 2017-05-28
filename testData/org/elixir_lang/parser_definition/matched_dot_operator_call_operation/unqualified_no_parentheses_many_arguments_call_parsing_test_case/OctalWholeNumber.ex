@@ -10,6 +10,7 @@
 0o76543210.= unqualified positional, key: value
 0o76543210./ unqualified positional, key: value
 0o76543210.* unqualified positional, key: value
+0o76543210.or unqualified positional, key: value
 0o76543210.|| unqualified positional, key: value
 0o76543210.| unqualified positional, key: value
 0o76543210.<= unqualified positional, key: value

@@ -133,7 +133,7 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
-THREE_TOKEN_OR_OPERATOR = "|||"
+THREE_TOKEN_OR_SYMBOL_OPERATOR = "|||"
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_TOKEN_THREE_OPERATOR = "^^^"
 THREE_TOKEN_NOT_OPERATOR = "not"
@@ -143,7 +143,7 @@ THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
-                       {THREE_TOKEN_OR_OPERATOR} |
+                       {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                        {THREE_TOKEN_THREE_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
                        {THREE_TOKEN_NOT_OPERATOR} |
@@ -159,8 +159,8 @@ TWO_TOKEN_COMPARISON_OPERATOR = "!=" |
                                 "=~"
 TWO_TOKEN_IN_MATCH_OPERATOR = "<-" |
                               "\\\\"
-TWO_TOKEN_OR_OPERATOR = "or" |
-                        "||"
+TWO_TOKEN_OR_WORD_OPERATOR = "or"
+TWO_TOKEN_OR_SYMBOL_OPERATOR = "||"
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
@@ -177,7 +177,8 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
                      {TWO_TOKEN_ASSOCIATION_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
                      {TWO_TOKEN_IN_MATCH_OPERATOR} |
-                     {TWO_TOKEN_OR_OPERATOR} |
+                     {TWO_TOKEN_OR_WORD_OPERATOR} |
+                     {TWO_TOKEN_OR_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
                      {TWO_TOKEN_TUPLE_OPERATOR} |
@@ -236,8 +237,9 @@ MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
 NOT_OPERATOR = {THREE_TOKEN_NOT_OPERATOR}
-OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
-              {TWO_TOKEN_OR_OPERATOR}
+OR_WORD_OPERATOR = {TWO_TOKEN_OR_WORD_OPERATOR}
+OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
+                     {TWO_TOKEN_OR_SYMBOL_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
@@ -673,8 +675,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NOT_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.OR_OPERATOR; }
+  {OR_WORD_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.OR_WORD_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
   {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RESCUE; }
@@ -700,6 +702,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -874,8 +878,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {NIL}                                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.NIL; }
-  {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.OR_OPERATOR; }
+  {OR_SYMBOL_OPERATOR}                              { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.OR_SYMBOL_OPERATOR; }
+  {OR_WORD_OPERATOR}                                { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.OR_WORD_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);

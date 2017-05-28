@@ -279,7 +279,7 @@ public class ParenthesesCallTest extends Test {
                         {
                                 "or",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_WORD_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },
@@ -351,14 +351,14 @@ public class ParenthesesCallTest extends Test {
                         {
                                 "||",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },
                         {
                                 "|||",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
                         },

@@ -10,6 +10,7 @@ variable.in positional
 variable.= positional
 variable./ positional
 variable.* positional
+variable.or positional
 variable.|| positional
 variable.| positional
 variable.<= positional

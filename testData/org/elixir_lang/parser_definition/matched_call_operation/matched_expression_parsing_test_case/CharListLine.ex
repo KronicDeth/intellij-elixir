@@ -4,6 +4,7 @@
 'CharListLine' one :: type
 'CharListLine' one | new
 'CharListLine' one = two
+'CharListLine' one or two
 'CharListLine' one || two
 'CharListLine' one && two
 'CharListLine' one != two

@@ -10,6 +10,7 @@
 "String".=
 "String"./
 "String".*
+"String".or
 "String".||
 "String".|
 "String".<=

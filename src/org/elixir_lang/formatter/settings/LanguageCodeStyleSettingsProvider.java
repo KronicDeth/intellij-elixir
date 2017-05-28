@@ -44,6 +44,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "0 * 1\n" +
             "0 / 1\n" +
             "\n" +
+            "# Or Operators\n" +
+            "false || true\n" +
+            "0b10 ||| 0b01\n" +
+            "\n" +
             "# Pipe Operator\n" +
             "[head | tail]\n" +
             "%{map | a: 1}\n" +
@@ -78,6 +82,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "~~~mask\n" +
             "\n" +
             "# Word Operators\n" +
+            "false or true\n" +
             "\n" +
             "## Numeric Operands\n" +
             "not 1\n" +
@@ -141,6 +146,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_IN_MATCH_OPERATORS",
                     "In match operators (<-, \\\\)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_OR_OPERATORS",
+                    "Or operators (||, |||)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(

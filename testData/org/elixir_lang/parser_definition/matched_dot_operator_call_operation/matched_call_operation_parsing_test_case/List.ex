@@ -10,6 +10,7 @@
 [].= Qualifier.qualified positional, key: value
 []./ Qualifier.qualified positional, key: value
 [].* Qualifier.qualified positional, key: value
+[].or Qualifier.qualified positional, key: value
 [].|| Qualifier.qualified positional, key: value
 [].| Qualifier.qualified positional, key: value
 [].<= Qualifier.qualified positional, key: value

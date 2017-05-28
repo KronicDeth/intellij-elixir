@@ -4,6 +4,7 @@
 :atom one :: type
 :atom one | new
 :atom one = two
+:atom one or two
 :atom one || two
 :atom one && two
 :atom one != two

@@ -395,7 +395,8 @@
     OPENING_BRACKET = "["
     OPENING_CURLY = "{"
     OPENING_PARENTHESIS = "("
-    OR_OPERATOR = "|||, `or`, ||"
+    OR_SYMBOL_OPERATOR = "|||, ||"
+    OR_WORD_OPERATOR = "`or`"
     PIPE_OPERATOR = "|"
     REGEX_FRAGMENT = "Regex Fragment"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
@@ -1235,7 +1236,7 @@ matchedMatchOperation ::= matchedExpression matchInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L57
  */
 
-orInfixOperator ::= EOL* OR_OPERATOR EOL*
+orInfixOperator ::= EOL* (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) EOL*
                     {
                       implements = "org.elixir_lang.psi.Operator"
                       methods = [
@@ -1476,7 +1477,8 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        // NOT MAP_OPERATOR because it is a special form
                        MATCH_OPERATOR |
                        MULTIPLICATION_OPERATOR |
-                       OR_OPERATOR |
+                       OR_SYMBOL_OPERATOR |
+                       OR_WORD_OPERATOR |
                        PIPE_OPERATOR |
                        RELATIONAL_OPERATOR |
                        RESCUE |
@@ -2828,7 +2830,8 @@ keywordKey ::= AFTER |
                MULTIPLICATION_OPERATOR |
                NIL |
                NOT_OPERATOR |
-               OR_OPERATOR |
+               OR_SYMBOL_OPERATOR |
+               OR_WORD_OPERATOR |
                PIPE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |

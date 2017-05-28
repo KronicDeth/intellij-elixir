@@ -25,6 +25,10 @@ Heredoc
 '''
 CharList
 Heredoc
+''' one or two
+'''
+CharList
+Heredoc
 ''' one || two
 '''
 CharList

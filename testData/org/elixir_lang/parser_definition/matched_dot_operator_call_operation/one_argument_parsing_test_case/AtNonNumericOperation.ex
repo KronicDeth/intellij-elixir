@@ -10,6 +10,7 @@
 @non_numeric.= positional
 @non_numeric./ positional
 @non_numeric.* positional
+@non_numeric.or positional
 @non_numeric.|| positional
 @non_numeric.| positional
 @non_numeric.<= positional

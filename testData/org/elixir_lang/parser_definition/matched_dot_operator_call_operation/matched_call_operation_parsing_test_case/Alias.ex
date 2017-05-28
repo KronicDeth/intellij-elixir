@@ -10,6 +10,7 @@ Alias.in Qualifier.qualified positional, key: value
 Alias.= Qualifier.qualified positional, key: value
 Alias./ Qualifier.qualified positional, key: value
 Alias.* Qualifier.qualified positional, key: value
+Alias.or Qualifier.qualified positional, key: value
 Alias.|| Qualifier.qualified positional, key: value
 Alias.| Qualifier.qualified positional, key: value
 Alias.<= Qualifier.qualified positional, key: value

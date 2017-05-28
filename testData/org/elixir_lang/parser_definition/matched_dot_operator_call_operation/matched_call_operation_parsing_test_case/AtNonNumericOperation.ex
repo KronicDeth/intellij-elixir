@@ -10,6 +10,7 @@
 @non_numeric.= Qualifier.qualified positional, key: value
 @non_numeric./ Qualifier.qualified positional, key: value
 @non_numeric.* Qualifier.qualified positional, key: value
+@non_numeric.or Qualifier.qualified positional, key: value
 @non_numeric.|| Qualifier.qualified positional, key: value
 @non_numeric.| Qualifier.qualified positional, key: value
 @non_numeric.<= Qualifier.qualified positional, key: value

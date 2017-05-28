@@ -10,6 +10,7 @@
 &1.= key1: value1, key2: value2
 &1./ key1: value1, key2: value2
 &1.* key1: value1, key2: value2
+&1.or key1: value1, key2: value2
 &1.|| key1: value1, key2: value2
 &1.| key1: value1, key2: value2
 &1.<= key1: value1, key2: value2

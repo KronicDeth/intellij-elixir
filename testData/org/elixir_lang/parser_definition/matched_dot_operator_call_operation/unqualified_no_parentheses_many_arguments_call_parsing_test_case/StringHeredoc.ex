@@ -49,6 +49,10 @@ Heredoc
 """
 String
 Heredoc
+""".or unqualified positional, key: value
+"""
+String
+Heredoc
 """.|| unqualified positional, key: value
 """
 String

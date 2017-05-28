@@ -10,6 +10,7 @@
 :atom.=
 :atom./
 :atom.*
+:atom.or
 :atom.||
 :atom.|
 :atom.<=

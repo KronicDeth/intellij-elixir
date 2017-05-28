@@ -10,6 +10,7 @@
 "String".= positional
 "String"./ positional
 "String".* positional
+"String".or positional
 "String".|| positional
 "String".| positional
 "String".<= positional

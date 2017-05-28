@@ -10,6 +10,7 @@
 9876543210.= positional
 9876543210./ positional
 9876543210.* positional
+9876543210.or positional
 9876543210.|| positional
 9876543210.| positional
 9876543210.<= positional

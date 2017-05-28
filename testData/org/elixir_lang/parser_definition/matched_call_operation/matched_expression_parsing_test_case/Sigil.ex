@@ -4,6 +4,7 @@
 ~x{sigil}modifiers one :: type
 ~x{sigil}modifiers one | new
 ~x{sigil}modifiers one = two
+~x{sigil}modifiers one or two
 ~x{sigil}modifiers one || two
 ~x{sigil}modifiers one && two
 ~x{sigil}modifiers one != two

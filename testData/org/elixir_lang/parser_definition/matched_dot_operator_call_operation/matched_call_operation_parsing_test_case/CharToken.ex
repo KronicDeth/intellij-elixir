@@ -10,6 +10,7 @@
 ?c.= Qualifier.qualified positional, key: value
 ?c./ Qualifier.qualified positional, key: value
 ?c.* Qualifier.qualified positional, key: value
+?c.or Qualifier.qualified positional, key: value
 ?c.|| Qualifier.qualified positional, key: value
 ?c.| Qualifier.qualified positional, key: value
 ?c.<= Qualifier.qualified positional, key: value

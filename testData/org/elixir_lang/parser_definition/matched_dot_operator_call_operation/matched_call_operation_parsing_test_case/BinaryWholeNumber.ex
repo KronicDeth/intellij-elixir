@@ -10,6 +10,7 @@
 0b10.= Qualifier.qualified positional, key: value
 0b10./ Qualifier.qualified positional, key: value
 0b10.* Qualifier.qualified positional, key: value
+0b10.or Qualifier.qualified positional, key: value
 0b10.|| Qualifier.qualified positional, key: value
 0b10.| Qualifier.qualified positional, key: value
 0b10.<= Qualifier.qualified positional, key: value

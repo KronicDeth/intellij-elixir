@@ -4,6 +4,7 @@
 [] one :: type
 [] one | new
 [] one = two
+[] one or two
 [] one || two
 [] one && two
 [] one != two

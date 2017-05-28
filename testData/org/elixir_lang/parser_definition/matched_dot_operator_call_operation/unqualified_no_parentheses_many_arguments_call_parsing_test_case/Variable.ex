@@ -10,6 +10,7 @@ variable.in unqualified positional, key: value
 variable.= unqualified positional, key: value
 variable./ unqualified positional, key: value
 variable.* unqualified positional, key: value
+variable.or unqualified positional, key: value
 variable.|| unqualified positional, key: value
 variable.| unqualified positional, key: value
 variable.<= unqualified positional, key: value

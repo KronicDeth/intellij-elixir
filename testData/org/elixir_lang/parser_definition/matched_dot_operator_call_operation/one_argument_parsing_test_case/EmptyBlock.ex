@@ -10,6 +10,7 @@
 (;).= positional
 (;)./ positional
 (;).* positional
+(;).or positional
 (;).|| positional
 (;).| positional
 (;).<= positional

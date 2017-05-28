@@ -2788,7 +2788,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                MULTIPLICATION_OPERATOR |
   //                NIL |
   //                NOT_OPERATOR |
-  //                OR_OPERATOR |
+  //                OR_SYMBOL_OPERATOR |
+  //                OR_WORD_OPERATOR |
   //                PIPE_OPERATOR |
   //                RESCUE |
   //                RELATIONAL_OPERATOR |
@@ -2826,7 +2827,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, MULTIPLICATION_OPERATOR);
     if (!r) r = consumeToken(b, NIL);
     if (!r) r = consumeToken(b, NOT_OPERATOR);
-    if (!r) r = consumeToken(b, OR_OPERATOR);
+    if (!r) r = consumeToken(b, OR_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
     if (!r) r = consumeToken(b, RESCUE);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
@@ -4322,14 +4324,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* OR_OPERATOR EOL*
+  // EOL* (OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR) EOL*
   public static boolean orInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "orInfixOperator")) return false;
-    if (!nextTokenIs(b, "<||, |||, or>", EOL, OR_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, OR_INFIX_OPERATOR, "<||, |||, or>");
     r = orInfixOperator_0(b, l + 1);
-    r = r && consumeToken(b, OR_OPERATOR);
+    r = r && orInfixOperator_1(b, l + 1);
     r = r && orInfixOperator_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -4345,6 +4346,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  // OR_SYMBOL_OPERATOR | OR_WORD_OPERATOR
+  private static boolean orInfixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "orInfixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, OR_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // EOL*
@@ -4749,7 +4761,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                        // NOT MAP_OPERATOR because it is a special form
   //                        MATCH_OPERATOR |
   //                        MULTIPLICATION_OPERATOR |
-  //                        OR_OPERATOR |
+  //                        OR_SYMBOL_OPERATOR |
+  //                        OR_WORD_OPERATOR |
   //                        PIPE_OPERATOR |
   //                        RELATIONAL_OPERATOR |
   //                        RESCUE |
@@ -4784,7 +4797,8 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, IN_OPERATOR);
     if (!r) r = consumeToken(b, MATCH_OPERATOR);
     if (!r) r = consumeToken(b, MULTIPLICATION_OPERATOR);
-    if (!r) r = consumeToken(b, OR_OPERATOR);
+    if (!r) r = consumeToken(b, OR_SYMBOL_OPERATOR);
+    if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
     if (!r) r = consumeToken(b, RESCUE);

@@ -10,6 +10,7 @@
 ?c.= unqualified positional, key: value
 ?c./ unqualified positional, key: value
 ?c.* unqualified positional, key: value
+?c.or unqualified positional, key: value
 ?c.|| unqualified positional, key: value
 ?c.| unqualified positional, key: value
 ?c.<= unqualified positional, key: value
