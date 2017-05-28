@@ -3231,19 +3231,33 @@ There is currently no direct support for Embedded Elixir (`*.eex`) templates.
 
 However, because the Elixir syntax is so similar to Ruby, you can use
 the Ruby language support for RHTML/ERB to get some syntax highlighting support
-in `*.eex` views.  Some non-Ruby syntax (e.g. `->`) will still show as an
-error, and of course none of the native Elixir support works, but most
-things will highlight reasonably well.
+in `*.eex` views.
 
 Note that this involves disabling some of the support for Ruby, but
 if you don't write Ruby, or if you write it in a different IDE (e.g. RubyMine),
 it won't matter.
 
 Here's the steps in Preferences (for OSX, other platforms may differ):
-  * Install the [standard Jetbrains Ruby plugin](https://confluence.jetbrains.com/display/RUBYDEV/RubyMine+and+IntelliJ+IDEA+Ruby+Plugin)
-  * Editor -> File Types -> RHTML: Add "*.eex" as type
-  * Editor -> Inspections -> Ruby -> Unresolved Ruby Reference: Uncheck
-  * Editor -> Inspections -> Ruby -> Double Quoted String: Uncheck
+
+* Install the [standard Jetbrains Ruby plugin](https://confluence.jetbrains.com/display/RUBYDEV/RubyMine+and+IntelliJ+IDEA+Ruby+Plugin)
+* Editor -> File Types -> RHTML: Add "`*.eex`" as type
+* Editor -> Inspections -> Ruby -> Unresolved Ruby Reference: Uncheck
+* Editor -> Inspections -> Ruby -> Double Quoted String: Uncheck
+
+Some non-Ruby syntax (e.g. `->` or `do`) will still show as an
+error, and of course none of the native Elixir support works, but most
+things will highlight reasonably well.  Unfortunately it's not
+possible to disable all error highlighting, but you can
+[vote for this issue](https://youtrack.jetbrains.com/issue/IDEA-173521)
+to try and get that fixed (click the "thumbs up" next to "Voters").
+
+You *can* disable the errors on a per-file basis, though, with the
+following steps:
+
+* Open the `*.eex` file which is showing a Ruby syntax error inspection
+* From the menu pick `Analyze -> Configure Current File Analysis`
+* Move the "ruby" Highlighting Level slider to "None"
+
 
 ## Installation
 
