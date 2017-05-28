@@ -70,25 +70,23 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
 
         myFixture.checkResultByFile(path);
     }
-/*
-    // TODO fix indentation of body after wrapping: it is relative to stab operation start instead start of line
-    public void testAnonymousFunctionWithSingleClauseChopBody() {
-        myFixture.configureByFiles("anonymous_function_with_single_clause_chop_body_before.ex");
+
+    public void testCaptureAndSymbolOperatorsWithoutSpaceAfterCapture() {
+        String path = "capture_and_symbol_operators_without_space_after_capture.ex";
+
+        myFixture.configureByFile(path);
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .SPACE_AFTER_CAPTURE_OPERATOR = false;
+        temporaryCodeStyleSettings
+                .getCommonSettings(ElixirLanguage.INSTANCE)
+                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
 
         reformatFixture();
 
-        myFixture.checkResultByFile("anonymous_function_with_single_clause_chop_body_after.ex");
+        myFixture.checkResultByFile(path);
     }
-
-    // TODO fix indentation of body after wrapping: it is relative to stab operation start instead start of line
-    public void testAnonymousFunctionWithSingleClauseChopEnd() {
-        myFixture.configureByFiles("anonymous_function_with_single_clause_chop_end_before.ex");
-
-        reformatFixture();
-
-        myFixture.checkResultByFile("anonymous_function_with_single_clause_chop_end_after.ex");
-    }
-*/
 
     public void testCaptureNameArityWithSpaceAroundMultiplication() {
         String path = "capture_name_arity_with_space_around_multiplication.ex";

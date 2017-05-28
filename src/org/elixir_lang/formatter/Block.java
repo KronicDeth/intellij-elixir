@@ -8,6 +8,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.impl.source.tree.CompositeElement;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.Function;
@@ -828,6 +829,8 @@ public class Block extends AbstractBlock implements BlockEx {
         // Prevent `& &1` from becoming `&&1`, which is parsed as `&& 1` with a missing left operand
         /* Prevent `& &1 + &2` from becoming `&&1 + &2`, which is parsed as `&& 1 + &2` with missing left operand for
            `&& 1` */
+        // Prevent `_ && &1` from becoming `_ &&& 1`
+        // Prevent `_ &&& &2` from becoming ` _ &&&& 2`, which has no meaning
         if (child1 instanceof ASTBlock && child2 instanceof ASTBlock) {
             ASTBlock child1ASTBlock = (ASTBlock) child1;
 
@@ -836,7 +839,8 @@ public class Block extends AbstractBlock implements BlockEx {
                 ASTNode firstLeafElementASTNode = child2ASTBlock.getNode().findLeafElementAt(0);
 
                 if (firstLeafElementASTNode != null &&
-                        firstLeafElementASTNode.getElementType() == ElixirTypes.CAPTURE_OPERATOR) {
+                        firstLeafElementASTNode instanceof LeafPsiElement &&
+                        ((LeafPsiElement) firstLeafElementASTNode).charAt(0) == '&') {
                     spacing = Spacing.createSpacing(1, 1, 0, true, 0);
                 }
             }
