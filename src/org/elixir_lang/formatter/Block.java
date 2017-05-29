@@ -91,6 +91,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.AND_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ARROW_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.AT_PREFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.DOT_INFIX_OPERATOR, true);
@@ -432,7 +433,7 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
                             );
-                        } else if (childElementType == ElixirTypes.DOT_INFIX_OPERATOR) {
+                        } else if (isOperatorRuleElementType(childElementType)) {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             lambdaBlocks.addAll(
@@ -766,7 +767,7 @@ public class Block extends AbstractBlock implements BlockEx {
                        indented relative to parent */
                     if (childElementType == ElixirTypes.DO_BLOCK) {
                         blocks.addAll(buildDoBlockChildren(child));
-                    } else if (childElementType == ElixirTypes.DOT_INFIX_OPERATOR) {
+                    } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blocks.add(buildChild(child, Alignment.createAlignment()));

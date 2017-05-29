@@ -71,6 +71,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testNoSpaceAfterAtOperator() {
+        myFixture.configureByFile("space_after_at_operator.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("no_space_after_at_operator.ex");
+    }
+
     public void testCaptureAndSymbolOperatorsWithoutSpaceAfterCapture() {
         String path = "capture_and_symbol_operators_without_space_after_capture.ex";
 
