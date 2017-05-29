@@ -262,6 +262,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_in_match_operators.ex");
     }
 
+    public void testSpaceAroundInOperator() {
+        myFixture.configureByFile("incorrect_spaces_around_in_operator.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("space_around_in_operator.ex");
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 

@@ -83,6 +83,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                         )
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
+                .around(ElixirTypes.IN_OPERATOR).spaces(1)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
                 /* This isn't precisely strict enough as there's no check that there's a name or qualified name to the
                    left of `/` and an integer to the right of `/` before no space is allowed */
