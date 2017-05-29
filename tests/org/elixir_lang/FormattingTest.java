@@ -394,6 +394,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_stab_operator.ex");
     }
 
+    public void testWithSpaceAroundThreeOperator() {
+        myFixture.configureByFile("without_space_around_three_operator.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_THREE_OPERATOR = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_three_operator.ex");
+    }
+
+    public void testWithoutSpaceAroundThreeOperator() {
+        myFixture.configureByFile("with_space_around_three_operator.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_THREE_OPERATOR = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_three_operator.ex");
+    }
+
     public void testWithSpaceAroundTypeOperator() {
         myFixture.configureByFile("without_space_around_type_operator.ex");
 

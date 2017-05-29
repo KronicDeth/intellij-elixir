@@ -89,6 +89,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "@type a :: term\n" +
             "@type a(b) :: b\n" +
             "\n" +
+            "# Three Operator\n" +
+            "register ^^^ register\n" +
+            "\n" +
             "# Unary Operators\n" +
             "\n" +
             "## Numeric Operands\n" +
@@ -201,6 +204,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_PIPE_OPERATOR",
                     "Pipe operator (|)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_THREE_OPERATOR",
+                    "Three operator (^^^)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(

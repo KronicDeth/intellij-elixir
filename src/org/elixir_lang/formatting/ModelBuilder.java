@@ -103,6 +103,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
                 .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)
+                .around(ElixirTypes.THREE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_THREE_OPERATOR)
                 .around(ElixirTypes.TYPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TYPE_OPERATOR)
                 .around(ElixirTypes.WHEN_OPERATOR).spaces(1);
     }
