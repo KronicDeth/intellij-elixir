@@ -93,6 +93,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ARROW_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
+        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.DOT_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
@@ -431,6 +432,8 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
                             );
+                        } else if (childElementType == ElixirTypes.DOT_INFIX_OPERATOR) {
+                            lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             lambdaBlocks.addAll(
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
@@ -755,12 +758,16 @@ public class Block extends AbstractBlock implements BlockEx {
                 myNode,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
                     /* the elements in the doBlock.stab must be direct children of the call, so that they can be
                        indented relative to parent */
-                    if (child.getElementType() == ElixirTypes.DO_BLOCK) {
+                    if (childElementType == ElixirTypes.DO_BLOCK) {
                         blocks.addAll(buildDoBlockChildren(child));
+                    } else if (childElementType == ElixirTypes.DOT_INFIX_OPERATOR) {
+                        blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blocks.add(buildChild(child, Alignment.createAlignment()));
                     }
