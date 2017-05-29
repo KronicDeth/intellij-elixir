@@ -12,6 +12,7 @@
 { one |> two, three: 3 }
 { one in two, three: 3 }
 { one ++ two, three: 3 }
+{ one..two, three: 3 }
 { one + two, three: 3 }
 { one / two, three: 3 }
 { one * two, three: 3 }

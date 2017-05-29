@@ -11,7 +11,7 @@
 %{ one < two => three > four }
 %{ one |> two => three |> four }
 %{ one in two => three in four }
-%{ one ++ two => three -- four }
+%{ one ++ two => three..four }
 %{ one + two => three - four }
 %{ one * two => three / four }
 %{ one ^^^ two => three ^^^ four }

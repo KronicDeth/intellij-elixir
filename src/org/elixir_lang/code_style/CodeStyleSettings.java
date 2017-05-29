@@ -9,6 +9,7 @@ public class CodeStyleSettings extends CustomCodeStyleSettings {
     public boolean SPACE_AROUND_IN_MATCH_OPERATORS = true;
     public boolean SPACE_AROUND_OR_OPERATORS = true;
     public boolean SPACE_AROUND_PIPE_OPERATOR = true;
+    public boolean SPACE_AROUND_RANGE_OPERATOR = false;
     public boolean SPACE_AROUND_THREE_OPERATOR = true;
     public boolean SPACE_AROUND_TWO_OPERATORS = true;
     public boolean SPACE_AROUND_TYPE_OPERATOR = true;

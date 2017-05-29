@@ -1,4 +1,4 @@
 [one: ()] ++ [two: ()]
 [three: ()] -- [four: ()]
-[five: ()] .. [six: ()]
-[seven: ()] .. [eight: ()]
+[five: ()]..[six: ()]
+[seven: ()] <> [eight: ()]

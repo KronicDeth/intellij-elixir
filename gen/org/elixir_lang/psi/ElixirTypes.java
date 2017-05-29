@@ -306,6 +306,7 @@ public interface ElixirTypes {
   IElementType OR_SYMBOL_OPERATOR = new ElixirTokenType("|||, ||");
   IElementType OR_WORD_OPERATOR = new ElixirTokenType("`or`");
   IElementType PIPE_OPERATOR = new ElixirTokenType("|");
+  IElementType RANGE_OPERATOR = new ElixirTokenType("..");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("Regex Fragment");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("Regex Heredoc Promoter (\"\"\", ''')");
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("Regex Heredoc Terminator (\"\"\", ''')");
@@ -336,7 +337,7 @@ public interface ElixirTypes {
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
-  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, .., <>");
+  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, <>");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
   IElementType UNARY_OPERATOR = new ElixirTokenType("~~~, !, ^");
   IElementType UNICODE_ESCAPE_CHARACTER = new ElixirTokenType("u");

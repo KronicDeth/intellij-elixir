@@ -335,6 +335,7 @@ public class ElixirSyntaxHighlighter extends SyntaxHighlighterBase {
             ElixirTypes.OR_SYMBOL_OPERATOR,
             ElixirTypes.OR_WORD_OPERATOR,
             ElixirTypes.PIPE_OPERATOR,
+            ElixirTypes.RANGE_OPERATOR,
             ElixirTypes.RELATIONAL_OPERATOR,
             ElixirTypes.STAB_OPERATOR,
             ElixirTypes.TWO_OPERATOR,

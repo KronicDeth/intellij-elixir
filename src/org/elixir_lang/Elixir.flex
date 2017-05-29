@@ -162,6 +162,7 @@ TWO_TOKEN_IN_MATCH_OPERATOR = "<-" |
                               "\\\\"
 TWO_TOKEN_OR_WORD_OPERATOR = "or"
 TWO_TOKEN_OR_SYMBOL_OPERATOR = "||"
+TWO_TOKEN_RANGE_OPERATOR = ".."
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
@@ -169,7 +170,6 @@ TWO_TOKEN_TUPLE_OPERATOR = {OPENING_CURLY} {CLOSING_CURLY}
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          "--" |
-                         ".." |
                          "<>"
 TWO_TOKEN_TYPE_OPERATOR = "::"
 
@@ -180,6 +180,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_IN_MATCH_OPERATOR} |
                      {TWO_TOKEN_OR_WORD_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR} |
+                     {TWO_TOKEN_RANGE_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
                      {TWO_TOKEN_TUPLE_OPERATOR} |
@@ -243,6 +244,7 @@ OR_WORD_OPERATOR = {TWO_TOKEN_OR_WORD_OPERATOR}
 OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_OR_SYMBOL_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
+RANGE_OPERATOR = {TWO_TOKEN_RANGE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
@@ -710,6 +712,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
+  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
   {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
@@ -890,6 +894,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.OR_WORD_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
+  {RANGE_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR; }
   {RESCUE}                                          { yybegin(CALL_MAYBE);

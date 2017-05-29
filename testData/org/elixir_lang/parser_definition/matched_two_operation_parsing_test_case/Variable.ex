@@ -1,4 +1,4 @@
 one ++ two
 three -- four
-five .. six
+five..six
 seven <> eight

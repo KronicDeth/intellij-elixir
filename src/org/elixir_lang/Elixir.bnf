@@ -399,6 +399,7 @@
     OR_SYMBOL_OPERATOR = "|||, ||"
     OR_WORD_OPERATOR = "`or`"
     PIPE_OPERATOR = "|"
+    RANGE_OPERATOR = ".."
     REGEX_FRAGMENT = "Regex Fragment"
     REGEX_HEREDOC_PROMOTER = "Regex Heredoc Promoter (\"\"\", ''')"
     REGEX_HEREDOC_TERMINATOR = "Regex Heredoc Terminator (\"\"\", ''')"
@@ -430,7 +431,7 @@
     TILDE = "~"
     TRUE = "true"
     TUPLE_OPERATOR = "{}"
-    TWO_OPERATOR = "++, --, .., <>"
+    TWO_OPERATOR = "++, --, <>"
     // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
     THREE_OPERATOR = "^^^"
     TYPE_OPERATOR = "::"
@@ -1362,7 +1363,7 @@ matchedThreeOperation ::= matchedExpression threeInfixOperator matchedExpression
  * @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_parser.yrl#L63
  */
 
-twoInfixOperator ::= EOL* TWO_OPERATOR EOL*
+twoInfixOperator ::= EOL* (RANGE_OPERATOR | TWO_OPERATOR) EOL*
                      {
                        implements = "org.elixir_lang.psi.Operator"
                        methods = [
@@ -1482,6 +1483,7 @@ relativeIdentifier ::= IDENTIFIER_TOKEN |
                        OR_SYMBOL_OPERATOR |
                        OR_WORD_OPERATOR |
                        PIPE_OPERATOR |
+                       RANGE_OPERATOR |
                        RELATIONAL_OPERATOR |
                        RESCUE |
                        STAB_OPERATOR |
@@ -2836,6 +2838,7 @@ keywordKey ::= AFTER |
                OR_SYMBOL_OPERATOR |
                OR_WORD_OPERATOR |
                PIPE_OPERATOR |
+               RANGE_OPERATOR |
                RESCUE |
                RELATIONAL_OPERATOR |
                STAB_OPERATOR |

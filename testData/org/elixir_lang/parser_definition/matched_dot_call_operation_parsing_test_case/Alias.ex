@@ -16,6 +16,7 @@ One.(
   one |> two,
   one in two,
   one ++ two,
+  one..two,
   one + two,
   one ^^^ two,
   !one,

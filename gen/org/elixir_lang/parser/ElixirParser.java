@@ -2802,6 +2802,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                OR_SYMBOL_OPERATOR |
   //                OR_WORD_OPERATOR |
   //                PIPE_OPERATOR |
+  //                RANGE_OPERATOR |
   //                RESCUE |
   //                RELATIONAL_OPERATOR |
   //                STAB_OPERATOR |
@@ -2842,6 +2843,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, OR_SYMBOL_OPERATOR);
     if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
+    if (!r) r = consumeToken(b, RANGE_OPERATOR);
     if (!r) r = consumeToken(b, RESCUE);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
     if (!r) r = consumeToken(b, STAB_OPERATOR);
@@ -4777,6 +4779,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   //                        OR_SYMBOL_OPERATOR |
   //                        OR_WORD_OPERATOR |
   //                        PIPE_OPERATOR |
+  //                        RANGE_OPERATOR |
   //                        RELATIONAL_OPERATOR |
   //                        RESCUE |
   //                        STAB_OPERATOR |
@@ -4814,6 +4817,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, OR_SYMBOL_OPERATOR);
     if (!r) r = consumeToken(b, OR_WORD_OPERATOR);
     if (!r) r = consumeToken(b, PIPE_OPERATOR);
+    if (!r) r = consumeToken(b, RANGE_OPERATOR);
     if (!r) r = consumeToken(b, RELATIONAL_OPERATOR);
     if (!r) r = consumeToken(b, RESCUE);
     if (!r) r = consumeToken(b, STAB_OPERATOR);
@@ -5318,14 +5322,13 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // EOL* TWO_OPERATOR EOL*
+  // EOL* (RANGE_OPERATOR | TWO_OPERATOR) EOL*
   public static boolean twoInfixOperator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "twoInfixOperator")) return false;
-    if (!nextTokenIs(b, "<++, --, .., <>>", EOL, TWO_OPERATOR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TWO_INFIX_OPERATOR, "<++, --, .., <>>");
     r = twoInfixOperator_0(b, l + 1);
-    r = r && consumeToken(b, TWO_OPERATOR);
+    r = r && twoInfixOperator_1(b, l + 1);
     r = r && twoInfixOperator_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -5341,6 +5344,17 @@ public class ElixirParser implements PsiParser, LightPsiParser {
       c = current_position_(b);
     }
     return true;
+  }
+
+  // RANGE_OPERATOR | TWO_OPERATOR
+  private static boolean twoInfixOperator_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "twoInfixOperator_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, RANGE_OPERATOR);
+    if (!r) r = consumeToken(b, TWO_OPERATOR);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // EOL*

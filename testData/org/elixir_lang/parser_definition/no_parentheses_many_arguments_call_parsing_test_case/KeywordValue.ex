@@ -35,6 +35,7 @@ function positional, keyword_key: value in array_or_range
 
 # matchedExpressionTwoOperation
 function positional, keyword_key: first_list ++ second_list
+function positional, keyword_key: first..last
 
 # matchedExpressionAdditionOperation
 function positional, keyword_key: first_value + second_value

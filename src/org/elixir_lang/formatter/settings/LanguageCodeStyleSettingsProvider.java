@@ -76,6 +76,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "[head | tail]\n" +
             "%{map | a: 1}\n" +
             "\n" +
+            "# Range Operator\n" +
+            "first..last\n" +
+            "\n" +
             "# Relationship Operators\n" +
             "3 < 4\n" +
             "3 <= 3\n" +
@@ -92,7 +95,6 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "# Two Operators\n" +
             "first_list ++ second_list\n" +
             "full_list -- removal_list\n" +
-            "first .. last\n" +
             "\"Hello\" <> \", world!\"\n" +
             "\n" +
             "# Three Operator\n" +
@@ -214,6 +216,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
+                    "SPACE_AROUND_RANGE_OPERATOR",
+                    "Range operator (..)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
                     "SPACE_AROUND_THREE_OPERATOR",
                     "Three operator (^^^)",
                     SPACES_AROUND_OPERATORS
@@ -221,7 +229,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "SPACE_AROUND_TWO_OPERATORS",
-                    "Two operator (++, --, .., <>)",
+                    "Two operator (++, --, <>)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(

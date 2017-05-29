@@ -1391,7 +1391,7 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirTwoInfixOperator twoInfixOperator) {
-        return TokenSet.create(ElixirTypes.TWO_OPERATOR);
+        return TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
     }
 
     @Contract(pure = true)
