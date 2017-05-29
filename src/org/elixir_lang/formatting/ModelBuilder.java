@@ -60,6 +60,7 @@ public class ModelBuilder implements FormattingModelBuilder {
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
                 .around(ElixirTypes.AND_WORD_OPERATOR).spaces(1)
                 .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
+                .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)
                 .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
                 .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
                 .after(ElixirTypes.FN).spaces(1)

@@ -33,6 +33,18 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "& &1 &&& &2\n" +
             "0b11 &&& 0b01\n" +
             "\n" +
+            "# Arrow Operators\n" +
+            "a <~ b\n" +
+            "a\n" +
+            "|> b()\n" +
+            "a ~> b\n" +
+            "a <<< b\n" +
+            "a <<~ b\n" +
+            "a <|> b\n" +
+            "a <~> b\n" +
+            "a >>> b\n" +
+            "a ~>> b\n" +
+            "\n" +
             "# Capture Operators\n" +
             "& &1 + &2\n" +
             "&Kernel.||/2\n" +
@@ -165,6 +177,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_AND_OPERATORS",
                     "And operators (&&, &&&)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_ARROW_OPERATORS",
+                    "Arrow operators (<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(
