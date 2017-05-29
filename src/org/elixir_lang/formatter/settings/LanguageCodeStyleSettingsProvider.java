@@ -89,6 +89,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "@type a :: term\n" +
             "@type a(b) :: b\n" +
             "\n" +
+            "# Two Operators\n" +
+            "first_list ++ second_list\n" +
+            "full_list -- removal_list\n" +
+            "first .. last\n" +
+            "\"Hello\" <> \", world!\"\n" +
+            "\n" +
             "# Three Operator\n" +
             "register ^^^ register\n" +
             "\n" +
@@ -210,6 +216,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_THREE_OPERATOR",
                     "Three operator (^^^)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_TWO_OPERATORS",
+                    "Two operator (++, --, .., <>)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(

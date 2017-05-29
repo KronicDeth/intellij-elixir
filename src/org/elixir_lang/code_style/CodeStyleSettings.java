@@ -10,6 +10,7 @@ public class CodeStyleSettings extends CustomCodeStyleSettings {
     public boolean SPACE_AROUND_OR_OPERATORS = true;
     public boolean SPACE_AROUND_PIPE_OPERATOR = true;
     public boolean SPACE_AROUND_THREE_OPERATOR = true;
+    public boolean SPACE_AROUND_TWO_OPERATORS = true;
     public boolean SPACE_AROUND_TYPE_OPERATOR = true;
 
     public CodeStyleSettings(com.intellij.psi.codeStyle.CodeStyleSettings container) {
