@@ -57,6 +57,13 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "1 !== 1.0\n" +
             "1.00 === 1.0\n" +
             "\n" +
+            "# Curly Braces\n" +
+            "{one}\n" +
+            "%{key: :value}\n" +
+            "%{key => value}\n" +
+            "%One{field: value}\n" +
+            "%One{field => value}\n" +
+            "\n" +
             "# In Match Operators\n" +
             "param \\\\ default\n" +
             "{:ok, value} <- elements\n" +
@@ -166,7 +173,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_MULTIPLICATIVE_OPERATORS",
                     /* SPACE_AROUND_SHIFT_OPERATORS - no dedicated shift operators in Elixir */
                     "SPACE_AROUND_UNARY_OPERATOR",
-                    "SPACE_AROUND_LAMBDA_ARROW"
+                    "SPACE_AROUND_LAMBDA_ARROW",
+
+                    // SPACES_WITHIN group
+                    "SPACE_WITHIN_BRACES"
             );
 
             consumer.showCustomOption(
@@ -183,6 +193,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             consumer.renameStandardOption("SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "Multiplicative operators (*, /)");
             consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
             consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
+            consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
 
             consumer.showCustomOption(
                     CodeStyleSettings.class,

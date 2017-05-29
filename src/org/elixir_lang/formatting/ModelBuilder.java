@@ -64,6 +64,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .after(ElixirTypes.AT_OPERATOR).none()
                 .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
                 .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
+                .withinPair(ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACES)
                 .around(ElixirTypes.DOT_OPERATOR).none()
                 .after(ElixirTypes.FN).spaces(1)
                 // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR

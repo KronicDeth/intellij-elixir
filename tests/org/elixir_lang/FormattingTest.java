@@ -250,6 +250,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_comparison_operators.ex");
     }
 
+    public void testWithSpaceWithinCurlyBraces() {
+        myFixture.configureByFile("without_space_within_curly_braces.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACES = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_within_curly_braces.ex");
+    }
+
+    public void testWithoutSpaceWithinCurlyBraces() {
+        myFixture.configureByFile("with_space_within_curly_braces.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACES = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_within_curly_braces.ex");
+    }
+
     public void testNoSpaceAroundDotOperator() {
         myFixture.configureByFile("incorrect_spaces_around_dot_operator.ex");
 
