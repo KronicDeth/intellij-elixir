@@ -250,6 +250,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_within_bits.ex");
     }
 
+    public void testWithSpaceWithinBrackets() {
+        myFixture.configureByFile("without_space_within_brackets.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACKETS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_within_brackets.ex");
+    }
+
+    public void testWithoutSpaceWithinBrackets() {
+        myFixture.configureByFile("with_space_within_brackets.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_BRACKETS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_within_brackets.ex");
+    }
+
     public void testWithSpaceAroundComparisonOperators() {
         myFixture.configureByFile("without_space_around_comparison_operators.ex");
 

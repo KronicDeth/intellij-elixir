@@ -49,6 +49,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "# Bit Strings and Binaries\n" +
             "<<one>>\n" +
             "\n" +
+            "# Brackets\n" +
+            "map[:key]\n" +
+            "[head | tail]\n" +
+            "\n" +
             "# Capture Operators\n" +
             "& &1 + &2\n" +
             "&Kernel.||/2\n" +
@@ -180,7 +184,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_LAMBDA_ARROW",
 
                     // SPACES_WITHIN group
-                    "SPACE_WITHIN_BRACES"
+
+                    "SPACE_WITHIN_BRACES",
+                    "SPACE_WITHIN_BRACKETS"
             );
 
             consumer.showCustomOption(

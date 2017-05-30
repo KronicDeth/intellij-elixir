@@ -1,0 +1,2 @@
+map[ :key ]
+[ head | tail ]
