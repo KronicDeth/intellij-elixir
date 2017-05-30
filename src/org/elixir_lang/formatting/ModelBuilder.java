@@ -62,6 +62,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
                 .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)
                 .after(ElixirTypes.AT_OPERATOR).none()
+                .withinPair(ElixirTypes.OPENING_BIT, ElixirTypes.CLOSING_BIT).spaceIf(elixirCustomSettings.SPACE_WITHIN_BITS)
                 .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
                 .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
                 .withinPair(ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACES)

@@ -13,6 +13,7 @@ public class CodeStyleSettings extends CustomCodeStyleSettings {
     public boolean SPACE_AROUND_THREE_OPERATOR = true;
     public boolean SPACE_AROUND_TWO_OPERATORS = true;
     public boolean SPACE_AROUND_TYPE_OPERATOR = true;
+    public boolean SPACE_WITHIN_BITS = false;
 
     public CodeStyleSettings(com.intellij.psi.codeStyle.CodeStyleSettings container) {
         super("ElixirCodeStyleSettings", container);

@@ -10,6 +10,7 @@ import org.elixir_lang.code_style.CodeStyleSettings;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_AROUND_OPERATORS;
+import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_WITHIN;
 
 public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider {
     private static final String INDENT_CODE_SAMPLE =
@@ -44,6 +45,9 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "a <~> b\n" +
             "a >>> b\n" +
             "a ~>> b\n" +
+            "\n" +
+            "# Bit Strings and Binaries\n" +
+            "<<one>>\n" +
             "\n" +
             "# Capture Operators\n" +
             "& &1 + &2\n" +
@@ -248,6 +252,13 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "SPACE_AROUND_TYPE_OPERATOR",
                     "Type operator (::)",
                     SPACES_AROUND_OPERATORS
+            );
+
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_WITHIN_BITS",
+                    "Bit strings and binaries (<<>>)",
+                    SPACES_WITHIN
             );
         }
     }

@@ -230,6 +230,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_after_capture_operator.ex");
     }
 
+    public void testWithSpaceWithinBits() {
+        myFixture.configureByFile("without_space_within_bits.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_WITHIN_BITS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_within_bits.ex");
+    }
+
+    public void testWithoutSpaceWithinBits() {
+        myFixture.configureByFile("with_space_within_bits.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_WITHIN_BITS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_within_bits.ex");
+    }
+
     public void testWithSpaceAroundComparisonOperators() {
         myFixture.configureByFile("without_space_around_comparison_operators.ex");
 
