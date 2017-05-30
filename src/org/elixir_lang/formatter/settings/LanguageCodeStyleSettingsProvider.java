@@ -58,6 +58,18 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "&Kernel.||/2\n" +
             "&foo/0\n" +
             "\n" +
+            "# Comma\n" +
+            "one(two: 2,)\n" +
+            "one(two, three)\n" +
+            "one two, three\n" +
+            "one two, three: 3\n" +
+            "[one: 1,]\n" +
+            "[one: 1, two: 2]\n" +
+            "%{one: 1,}\n" +
+            "%{one: 1, two: 2}\n" +
+            "%{one => 1,}\n" +
+            "%{one => 1, two => 2}\n" +
+            "\n" +
             "# Comparison Operators\n" +
             "1 != 2\n" +
             "1 == 1.0\n" +
@@ -193,7 +205,11 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
 
                     "SPACE_WITHIN_BRACES",
                     "SPACE_WITHIN_BRACKETS",
-                    "SPACE_WITHIN_PARENTHESES"
+                    "SPACE_WITHIN_PARENTHESES",
+
+                    // OTHER group
+
+                    "SPACE_BEFORE_COMMA"
             );
 
             consumer.showCustomOption(
