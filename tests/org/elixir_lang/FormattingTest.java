@@ -410,6 +410,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_or_operators.ex");
     }
 
+    public void testWithSpaceWithinParentheses() {
+        myFixture.configureByFile("without_space_within_parentheses.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_PARENTHESES = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_within_parentheses.ex");
+    }
+
+    public void testWithoutSpaceWithinParentheses() {
+        myFixture.configureByFile("with_space_within_parentheses.ex");
+
+        temporaryCodeStyleSettings.getCommonSettings(ElixirLanguage.INSTANCE).SPACE_WITHIN_PARENTHESES = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_within_parentheses.ex");
+    }
+
     public void testWithSpaceAroundPipeOperators() {
         myFixture.configureByFile("without_space_around_pipe_operator.ex");
 

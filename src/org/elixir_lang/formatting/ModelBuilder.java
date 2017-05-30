@@ -105,6 +105,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
                 .around(ElixirTypes.OR_WORD_OPERATOR).spaces(1)
                 .around(ElixirTypes.OR_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_OR_OPERATORS)
+                .withinPair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS).spaceIf(elixirCommonSettings.SPACE_WITHIN_PARENTHESES)
                 .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
                 .around(ElixirTypes.RANGE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_RANGE_OPERATOR)
                 .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)

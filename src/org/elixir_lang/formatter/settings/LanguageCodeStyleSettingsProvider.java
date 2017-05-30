@@ -87,6 +87,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "false || true\n" +
             "0b10 ||| 0b01\n" +
             "\n" +
+            "# Parentheses\n" +
+            "()\n" +
+            "(one)\n" +
+            "one()\n" +
+            "one(two)\n" +
+            "\n" +
             "# Pipe Operator\n" +
             "[head | tail]\n" +
             "%{map | a: 1}\n" +
@@ -186,7 +192,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     // SPACES_WITHIN group
 
                     "SPACE_WITHIN_BRACES",
-                    "SPACE_WITHIN_BRACKETS"
+                    "SPACE_WITHIN_BRACKETS",
+                    "SPACE_WITHIN_PARENTHESES"
             );
 
             consumer.showCustomOption(
@@ -204,6 +211,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
             consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
             consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
+            consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Parentheses");
 
             consumer.showCustomOption(
                     CodeStyleSettings.class,
