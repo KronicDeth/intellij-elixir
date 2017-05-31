@@ -210,6 +210,27 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_arrow_operators.ex");
     }
 
+
+    public void testWithSpaceAroundAssociationOperator() {
+        myFixture.configureByFile("without_space_around_association_operator.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ASSOCIATION_OPERATOR = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("with_space_around_association_operator.ex");
+    }
+
+    public void testWithoutSpaceAroundAssociationOperator() {
+        myFixture.configureByFile("with_space_around_association_operator.ex");
+
+        temporaryCodeStyleSettings.getCustomSettings(CodeStyleSettings.class).SPACE_AROUND_ASSOCIATION_OPERATOR = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("without_space_around_association_operator.ex");
+    }
+
     public void testWithSpaceAfterCaptureOperator() {
         myFixture.configureByFile("without_space_after_capture_operator.ex");
 

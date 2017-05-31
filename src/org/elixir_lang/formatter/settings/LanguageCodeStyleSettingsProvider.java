@@ -46,6 +46,10 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "a >>> b\n" +
             "a ~>> b\n" +
             "\n" +
+            "# Association Operator\n" +
+            "%{key => value}\n" +
+            "%{map | key => updated_value}\n" +
+            "\n" +
             "# Bit Strings and Binaries\n" +
             "<<one>>\n" +
             "\n" +
@@ -240,6 +244,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     CodeStyleSettings.class,
                     "SPACE_AROUND_ARROW_OPERATORS",
                     "Arrow operators (<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>)",
+                    SPACES_AROUND_OPERATORS
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "SPACE_AROUND_ASSOCIATION_OPERATOR",
+                    "Association operator (=>)",
                     SPACES_AROUND_OPERATORS
             );
             consumer.showCustomOption(
