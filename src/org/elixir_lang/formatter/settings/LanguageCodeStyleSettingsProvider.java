@@ -209,7 +209,8 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
 
                     // OTHER group
 
-                    "SPACE_BEFORE_COMMA"
+                    "SPACE_BEFORE_COMMA",
+                    "SPACE_AFTER_COMMA"
             );
 
             consumer.showCustomOption(
