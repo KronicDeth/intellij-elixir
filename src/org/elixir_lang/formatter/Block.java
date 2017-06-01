@@ -265,14 +265,16 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(ASTNode blockIdentifier) {
+    private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(@NotNull ASTNode blockIdentifier) {
+        Wrap childrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+
         return buildChildren(
                 blockIdentifier,
                 childBlockListPair -> {
                     ASTNode child = childBlockListPair.first;
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    blockList.add(buildChild(child));
+                    blockList.add(buildChild(child, childrenWrap, myAlignment));
 
                     return blockList;
                 }
