@@ -15,7 +15,93 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ModelBuilder implements FormattingModelBuilder {
+    private static final TokenSet ADDITION_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_ADDITION_OPERATION,
+            ElixirTypes.UNMATCHED_ADDITION_OPERATION
+    );
+    private static final TokenSet BLOCK_IDENTIFIER_TOKEN_SET = TokenSet.create(
+            ElixirTypes.AFTER,
+            ElixirTypes.CATCH
+    );
+    private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+    );
     private static final boolean DUMP_FORMATTING_AST = true;
+    private static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
+    private static final TokenSet UNARY_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNARY_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION
+    );
+
+    @NotNull
+    private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
+        CommonCodeStyleSettings elixirCommonSettings = settings.getCommonSettings(ElixirLanguage.INSTANCE);
+        org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
+                settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
+        return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
+                .after(BLOCK_IDENTIFIER_TOKEN_SET).spaces(1)
+                .around(ElixirTypes.AND_WORD_OPERATOR).spaces(1)
+                .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
+                .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)
+                .around(ElixirTypes.ASSOCIATION_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ASSOCIATION_OPERATOR)
+                .after(ElixirTypes.AT_OPERATOR).none()
+                .withinPair(ElixirTypes.OPENING_BIT, ElixirTypes.CLOSING_BIT).spaceIf(elixirCustomSettings.SPACE_WITHIN_BITS)
+                .withinPair(ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACKETS)
+                .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
+                .before(ElixirTypes.COMMA).spaceIf(elixirCommonSettings.SPACE_BEFORE_COMMA)
+                .after(ElixirTypes.COMMA).spaceIf(elixirCommonSettings.SPACE_AFTER_COMMA)
+                .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
+                .withinPair(ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACES)
+                .around(ElixirTypes.DOT_OPERATOR).none()
+                .after(ElixirTypes.FN).spaces(1)
+                // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR
+                .aroundInside(
+                        ElixirTypes.DUAL_OPERATOR,
+                        ADDITION_OPERATION_TOKEN_SET
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
+                .aroundInside(
+                        // Cannot contain `ElixirTypes.DUAL_OPERATOR` because a space makes them invalid.
+                        // Cannot contain `ElixirTypes.NOT_OPERATOR` because it MUST have a space.
+                        ElixirTypes.UNARY_OPERATOR,
+                        UNARY_OPERATION_TOKEN_SET
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
+                .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
+                .around(ElixirTypes.IN_OPERATOR).spaces(1)
+                .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
+                /* This isn't precisely strict enough as there's no check that there's a name or qualified name to the
+                   left of `/` and an integer to the right of `/` before no space is allowed */
+                .aroundInside(ElixirTypes.DIVISION_OPERATOR, CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET).none()
+                .around(
+                        MULTIPLICATIVE_OPERATOR_TOKEN_SET
+                ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
+                .after(ElixirTypes.NOT_OPERATOR).spaces(1)
+                .around(ElixirTypes.OR_WORD_OPERATOR).spaces(1)
+                .around(ElixirTypes.OR_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_OR_OPERATORS)
+                .withinPair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS).spaceIf(elixirCommonSettings.SPACE_WITHIN_PARENTHESES)
+                .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
+                .around(ElixirTypes.RANGE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_RANGE_OPERATOR)
+                .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
+                .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)
+                .around(ElixirTypes.THREE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_THREE_OPERATOR)
+                .around(ElixirTypes.TWO_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TWO_OPERATORS)
+                .around(ElixirTypes.TYPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TYPE_OPERATOR)
+                .around(ElixirTypes.WHEN_OPERATOR).spaces(1);
+    }
+
+    // @see com.jetbrains.python.formatter.PythonFormattingModelBuilder
+    private static void printAST(ASTNode node, int indent) {
+        while (node != null) {
+            for (int i = 0; i < indent; i++) {
+                System.out.print(" ");
+            }
+
+            System.out.println(node.toString() + " " + node.getTextRange().toString());
+            printAST(node.getFirstChildNode(), indent + 2);
+            node = node.getTreeNext();
+        }
+    }
 
     /**
      * Requests building the formatting model for a section of the file containing
@@ -52,75 +138,6 @@ public class ModelBuilder implements FormattingModelBuilder {
         return FormattingModelProvider.createFormattingModelForPsiFile(containingFile, block, settings);
     }
 
-    @NotNull
-    private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
-        CommonCodeStyleSettings elixirCommonSettings = settings.getCommonSettings(ElixirLanguage.INSTANCE);
-        org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
-                settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
-        return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
-                .after(ElixirTypes.AFTER).spaces(1)
-                .around(ElixirTypes.AND_WORD_OPERATOR).spaces(1)
-                .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
-                .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)
-                .around(ElixirTypes.ASSOCIATION_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ASSOCIATION_OPERATOR)
-                .after(ElixirTypes.AT_OPERATOR).none()
-                .withinPair(ElixirTypes.OPENING_BIT, ElixirTypes.CLOSING_BIT).spaceIf(elixirCustomSettings.SPACE_WITHIN_BITS)
-                .withinPair(ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACKETS)
-                .after(ElixirTypes.CAPTURE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AFTER_CAPTURE_OPERATOR)
-                .before(ElixirTypes.COMMA).spaceIf(elixirCommonSettings.SPACE_BEFORE_COMMA)
-                .after(ElixirTypes.COMMA).spaceIf(elixirCommonSettings.SPACE_AFTER_COMMA)
-                .around(ElixirTypes.COMPARISON_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_EQUALITY_OPERATORS)
-                .withinPair(ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY).spaceIf(elixirCommonSettings.SPACE_WITHIN_BRACES)
-                .around(ElixirTypes.DOT_OPERATOR).none()
-                .after(ElixirTypes.FN).spaces(1)
-                // MUST specific inside *_ADDITION_OPERATION as DUAL_OPERATOR is also used IN UNARY_PREFIX_OPERATOR
-                .aroundInside(
-                        ElixirTypes.DUAL_OPERATOR,
-                        TokenSet.create(
-                                ElixirTypes.MATCHED_ADDITION_OPERATION,
-                                ElixirTypes.UNMATCHED_ADDITION_OPERATION
-                        )
-                ).spaceIf(elixirCommonSettings.SPACE_AROUND_ADDITIVE_OPERATORS)
-                .aroundInside(
-                        // Cannot contain `ElixirTypes.DUAL_OPERATOR` because a space makes them invalid.
-                        // Cannot contain `ElixirTypes.NOT_OPERATOR` because it MUST have a space.
-                        ElixirTypes.UNARY_OPERATOR,
-                        TokenSet.create(
-                                ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
-                                ElixirTypes.UNARY_NUMERIC_OPERATION,
-                                ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION
-                        )
-                ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
-                .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
-                .around(ElixirTypes.IN_OPERATOR).spaces(1)
-                .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
-                /* This isn't precisely strict enough as there's no check that there's a name or qualified name to the
-                   left of `/` and an integer to the right of `/` before no space is allowed */
-                .aroundInside(
-                        ElixirTypes.DIVISION_OPERATOR,
-                        TokenSet.create(
-                                ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-                                ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
-                        )
-                ).none()
-                .around(
-                        TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR)
-                ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
-                .after(ElixirTypes.NOT_OPERATOR).spaces(1)
-                .around(ElixirTypes.OR_WORD_OPERATOR).spaces(1)
-                .around(ElixirTypes.OR_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_OR_OPERATORS)
-                .withinPair(ElixirTypes.OPENING_PARENTHESIS, ElixirTypes.CLOSING_PARENTHESIS).spaceIf(elixirCommonSettings.SPACE_WITHIN_PARENTHESES)
-                .around(ElixirTypes.PIPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_PIPE_OPERATOR)
-                .around(ElixirTypes.RANGE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_RANGE_OPERATOR)
-                .around(ElixirTypes.RELATIONAL_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_RELATIONAL_OPERATORS)
-                .around(ElixirTypes.STAB_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_LAMBDA_ARROW)
-                .around(ElixirTypes.THREE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_THREE_OPERATOR)
-                .around(ElixirTypes.TWO_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TWO_OPERATORS)
-                .around(ElixirTypes.TYPE_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_TYPE_OPERATOR)
-                .around(ElixirTypes.WHEN_OPERATOR).spaces(1);
-    }
-
-
     /**
      * Returns the TextRange which should be processed by the formatter in order to calculate the
      * indent for a new line when a line break is inserted at the specified offset.
@@ -134,18 +151,5 @@ public class ModelBuilder implements FormattingModelBuilder {
     @Override
     public TextRange getRangeAffectingIndent(PsiFile file, int offset, ASTNode elementAtOffset) {
         return null;
-    }
-
-    // @see com.jetbrains.python.formatter.PythonFormattingModelBuilder
-    private static void printAST(ASTNode node, int indent) {
-        while (node != null) {
-            for (int i = 0; i < indent; i++) {
-                System.out.print(" ");
-            }
-
-            System.out.println(node.toString() + " " + node.getTextRange().toString());
-            printAST(node.getFirstChildNode(), indent + 2);
-            node = node.getTreeNext();
-        }
     }
 }

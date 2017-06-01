@@ -259,6 +259,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_after_capture_operator.ex");
     }
 
+    public void testSpaceAfterCatchKeyword() {
+        myFixture.configureByFile("incorrect_spaces_after_catch_keyword.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("space_after_catch_keyword.ex");
+    }
+
     public void testWithSpaceWithinBits() {
         myFixture.configureByFile("without_space_within_bits.ex");
 
