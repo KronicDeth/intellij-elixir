@@ -153,6 +153,21 @@ public class Block extends AbstractBlock implements BlockEx {
         this.childrenWrap = childrenWrap;
     }
 
+    private static boolean hasAtLeastCountChildren(@NotNull CompositeElement parent,
+                                                   @NotNull IElementType childElementType,
+                                                   int atLeastCount) {
+        int count = 0;
+        for (ASTNode child = parent.getFirstChildNode();
+             child != null && count < atLeastCount;
+             child = child.getTreeNext()) {
+            if (child.getElementType() == childElementType) {
+                count++;
+            }
+        }
+
+        return count >= atLeastCount;
+    }
+
     private static boolean isOperationElementType(IElementType elementType) {
         return IS_OPERATION_BY_ELEMENT_TYPE.containsKey(elementType);
     }
@@ -165,12 +180,12 @@ public class Block extends AbstractBlock implements BlockEx {
         return IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
-    private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
-        return !WHITESPACE_TOKEN_SET.contains(childElementType);
-    }
-
     private static boolean shouldBuildBlock(@NotNull ASTNode child) {
         return shouldBuildBlock(child.getElementType());
+    }
+
+    private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
+        return !WHITESPACE_TOKEN_SET.contains(childElementType);
     }
 
     @NotNull
@@ -530,6 +545,8 @@ public class Block extends AbstractBlock implements BlockEx {
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildDoBlockChildren(@NotNull ASTNode doBlock) {
+        boolean hasBLockLists = hasAtLeastCountChildren((CompositeElement) doBlock, ElixirTypes.BLOCK_LIST, 1);
+
         return buildChildren(
                 doBlock,
                 (childBlockListPair) -> {
@@ -537,7 +554,21 @@ public class Block extends AbstractBlock implements BlockEx {
                     IElementType childElementType = child.getElementType();
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-                    if (childElementType == END_OF_EXPRESSION) {
+                    if (childElementType == ElixirTypes.BLOCK_LIST) {
+                        //noinspection ConstantConditions
+                        blocks.add(buildChild(child, myAlignment));
+                    } else if (childElementType == ElixirTypes.END) {
+                        Wrap endWrap;
+
+                        if (hasBLockLists) {
+                            endWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+                        } else {
+                            endWrap = Wrap.createWrap(WrapType.NORMAL, true);
+                        }
+
+                        //noinspection ConstantConditions
+                        blocks.add(buildChild(child, endWrap, myAlignment));
+                    } else if (childElementType == END_OF_EXPRESSION) {
                         blocks.addAll(
                                 buildEndOfExpressionChildren(
                                         child,
@@ -548,16 +579,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.STAB) {
                         blocks.addAll(buildStabChildren((CompositeElement) child));
                     } else {
-                        Alignment childAlignment;
-
-                        if (childElementType == ElixirTypes.BLOCK_LIST || childElementType == ElixirTypes.END) {
-                            childAlignment = myAlignment;
-                        } else {
-                            childAlignment = Alignment.createAlignment();
-                        }
-
-                        //noinspection ConstantConditions
-                        blocks.add(buildChild(child, childAlignment));
+                        blocks.add(buildChild(child));
                     }
 
                     return blocks;
@@ -729,7 +751,7 @@ public class Block extends AbstractBlock implements BlockEx {
         Indent childIndent = Indent.getNormalIndent(true);
         WrapType stabOperationWrapType;
 
-        if (stab.countChildren(TokenSet.create(ElixirTypes.STAB_OPERATION)) > 1) {
+        if (hasAtLeastCountChildren(stab, ElixirTypes.STAB_OPERATION, 2)) {
             stabOperationWrapType = WrapType.ALWAYS;
         } else {
             stabOperationWrapType = WrapType.NORMAL;
