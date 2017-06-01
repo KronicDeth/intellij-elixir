@@ -58,6 +58,7 @@ public class ModelBuilder implements FormattingModelBuilder {
         org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
                 settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
+                .after(ElixirTypes.AFTER).spaces(1)
                 .around(ElixirTypes.AND_WORD_OPERATOR).spaces(1)
                 .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
                 .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)

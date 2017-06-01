@@ -160,6 +160,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_addition_operators.ex");
     }
 
+    public void testSpaceAfterAfterKeyword() {
+        myFixture.configureByFile("incorrect_spaces_after_after_keyword.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("space_after_after_keyword.ex");
+    }
+
     public void testCaptureRightOperandWithoutSpaceAroundAndOperators() {
         myFixture.configureByFile("capture_right_operand_without_space_around_and_operators_before.ex");
 

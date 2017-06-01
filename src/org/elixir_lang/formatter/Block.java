@@ -185,7 +185,8 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    private @NotNull List<com.intellij.formatting.Block> buildAccessExpressionChildren(
+    private @NotNull
+    List<com.intellij.formatting.Block> buildAccessExpressionChildren(
             @NotNull ASTNode accessExpression,
             @Nullable Wrap childrenWrap,
             @NotNull Alignment childrenAlignment
@@ -205,7 +206,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     /**
      * Builds anonymousFunction FN, stab, and END as siblings.  If it is a one-liner, the END is setup to wrap once
-     *   all other part wraps, such as due to chopping.
+     * all other part wraps, such as due to chopping.
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildAnonymousFunctionChildren(@NotNull ASTNode anonymousFunction) {
@@ -244,6 +245,45 @@ public class Block extends AbstractBlock implements BlockEx {
                     }
 
                     return lambdaBlocks;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(ASTNode blockIdentifier) {
+        return buildChildren(
+                blockIdentifier,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    blockList.add(buildChild(child));
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildBlockItemChildren(ASTNode blockItem) {
+        return buildChildren(
+                blockItem,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.BLOCK_IDENTIFIER) {
+                        blockList.addAll(buildBlockIdentifierChildren(child));
+                    } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blockList.addAll(buildEndOfExpressionChildren(child));
+                    } else if (childElementType == ElixirTypes.STAB) {
+                        blockList.addAll(buildStabChildren((CompositeElement) child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
                 }
         );
     }
@@ -405,6 +445,8 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (elementType == ElixirTypes.ANONYMOUS_FUNCTION) {
             blocks = buildAnonymousFunctionChildren(myNode);
+        } else if (elementType == ElixirTypes.BLOCK_ITEM) {
+            blocks = buildBlockItemChildren(myNode);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
             blocks = buildCaptureNonNumericOperationChildren(myNode);
         } else if (elementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
@@ -459,26 +501,6 @@ public class Block extends AbstractBlock implements BlockEx {
         return blocks;
     }
 
-    @NotNull
-    private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
-        return buildChildren(
-                mapUpdateArguments,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
-                    if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
-                    } else {
-                        blockList.add(buildChild(child));
-                    }
-
-                    return blockList;
-                }
-        );
-    }
-
     private @NotNull
     List<com.intellij.formatting.Block> buildChildren(
             @NotNull ASTNode node,
@@ -528,7 +550,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else {
                         Alignment childAlignment;
 
-                        if (childElementType == ElixirTypes.END) {
+                        if (childElementType == ElixirTypes.BLOCK_LIST || childElementType == ElixirTypes.END) {
                             childAlignment = myAlignment;
                         } else {
                             childAlignment = Alignment.createAlignment();
@@ -537,6 +559,25 @@ public class Block extends AbstractBlock implements BlockEx {
                         //noinspection ConstantConditions
                         blocks.add(buildChild(child, childAlignment));
                     }
+
+                    return blocks;
+                }
+        );
+    }
+
+    /**
+     * Builds endOfExpression.*.  Importantly, it separates out the EOLs, which are whitespace from the comments that
+     * may be interlaced
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildEndOfExpressionChildren(@NotNull ASTNode endOfExpression) {
+        return buildChildren(
+                endOfExpression,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+
+                    blocks.add(buildChild(child));
 
                     return blocks;
                 }
@@ -560,6 +601,26 @@ public class Block extends AbstractBlock implements BlockEx {
                     blocks.add(buildChild(child, childAlignment, childIndent));
 
                     return blocks;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
+        return buildChildren(
+                mapUpdateArguments,
+                (childBlockListPair) -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
                 }
         );
     }
@@ -677,7 +738,7 @@ public class Block extends AbstractBlock implements BlockEx {
         Wrap stabOperationWrap = Wrap.createWrap(stabOperationWrapType, true);
 
         if (stabBodyChildrenWrap == null) {
-           stabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
+            stabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
         }
 
         Wrap finalStabBodyChildrenWrap = stabBodyChildrenWrap;
