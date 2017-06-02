@@ -439,6 +439,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("space_around_in_operator.ex");
     }
 
+    public void testSpaceAfterKeywordPairColon() {
+        myFixture.configureByFile("incorrect_spaces_after_keyword_pair_colon.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("space_after_keyword_pair_colon.ex");
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 

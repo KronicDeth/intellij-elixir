@@ -69,6 +69,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                         ElixirTypes.UNARY_OPERATOR,
                         UNARY_OPERATION_TOKEN_SET
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_UNARY_OPERATOR)
+                .after(ElixirTypes.KEYWORD_PAIR_COLON).spaces(1)
                 .around(ElixirTypes.IN_MATCH_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_IN_MATCH_OPERATORS)
                 .around(ElixirTypes.IN_OPERATOR).spaces(1)
                 .around(ElixirTypes.MATCH_OPERATOR).spaceIf(elixirCommonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS)
