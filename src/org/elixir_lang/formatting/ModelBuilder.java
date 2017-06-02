@@ -22,7 +22,8 @@ public class ModelBuilder implements FormattingModelBuilder {
     private static final TokenSet BLOCK_IDENTIFIER_TOKEN_SET = TokenSet.create(
             ElixirTypes.AFTER,
             ElixirTypes.CATCH,
-            ElixirTypes.ELSE
+            ElixirTypes.ELSE,
+            ElixirTypes.RESCUE
     );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,

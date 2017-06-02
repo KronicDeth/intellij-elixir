@@ -583,6 +583,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("without_space_around_relational_operators.ex");
     }
 
+    public void testSpaceAfterRescueKeyword() {
+        myFixture.configureByFile("incorrect_spaces_after_rescue_keyword.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("space_after_rescue_keyword.ex");
+    }
+
     public void testWithSpaceAroundStabOperator() {
         myFixture.configureByFile("without_space_around_stab_operator.ex");
 
