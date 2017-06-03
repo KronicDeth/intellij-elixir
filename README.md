@@ -1960,6 +1960,8 @@ The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit
 3. Select "Elixir Mix ExUnit"
    ![Add New Elixir Mix ExUnit](/screenshots/features/run_configurations/mix_test/Add%20New.png?raw=true "Add New Elixir Mix ExUnit Run Configuration")
 4. Fill in the "Program arguments" with the argument(s) to pass to `mix test`.  Normally, this will be a directory like `test`, relative to the "Working directory"
+  * NOTE: If you are working in an umbrella project which contains multiple apps, and you want to run all tests in all
+    apps at once, you will need to enter multiple space-delimited absolute paths to the `test` directories in all apps. 
 5. Fill in the "Working directory"
   * Type the absolute path to the directory.
   * Select the path using directory picker by clicking the `...` button
