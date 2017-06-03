@@ -125,9 +125,9 @@ before_install:
 - "export DISPLAY=:99.0"
 - export TERM=dumb
 - "sh -e /etc/init.d/xvfb start"
-- "wget --no-check-certificate --no-cookies --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u112-b15/jdk-8u112-linux-x64.tar.gz"
-- tar xvfz jdk-8u112-linux-x64.tar.gz
-- export JAVA_HOME=${PWD}/jdk1.8.0_112
+- "wget -v -c --header \"Cookie: oraclelicense=accept-securebackup-cookie\" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz"
+- tar xvfz jdk-8u131-linux-x64.tar.gz
+- export JAVA_HOME=${PWD}/jdk1.8.0_131
 - export PATH=${JAVA_HOME}/bin:${PATH}
 - export CASHER_TIME_OUT=360
 - java -version
