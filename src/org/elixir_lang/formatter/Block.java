@@ -268,7 +268,10 @@ public class Block extends AbstractBlock implements BlockEx {
      * all other part wraps, such as due to chopping.
      */
     @NotNull
-    private List<com.intellij.formatting.Block> buildAnonymousFunctionChildren(@NotNull ASTNode anonymousFunction) {
+    private List<com.intellij.formatting.Block> buildAnonymousFunctionChildren(
+            @NotNull ASTNode anonymousFunction,
+            @Nullable Alignment anonymousFunctionAlignment
+    ) {
         final Alignment childrenAlignment = Alignment.createAlignment();
         Wrap endWrap;
         Wrap stabBodyChildrenWrap;
@@ -283,7 +286,7 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return buildChildren(
-                myNode,
+                anonymousFunction,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
                     IElementType childElementType = child.getElementType();
@@ -309,7 +312,10 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(@NotNull ASTNode blockIdentifier) {
+    private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(
+            @NotNull ASTNode blockIdentifier,
+            @Nullable Alignment blockIdentifierAlignment
+    ) {
         Wrap childrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
 
         return buildChildren(
@@ -318,7 +324,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode child = childBlockListPair.first;
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    blockList.add(buildChild(child, childrenWrap, myAlignment));
+                    blockList.add(buildChild(child, childrenWrap, blockIdentifierAlignment));
 
                     return blockList;
                 }
@@ -326,7 +332,8 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildBlockItemChildren(ASTNode blockItem) {
+    private List<com.intellij.formatting.Block> buildBlockItemChildren(@NotNull ASTNode blockItem,
+                                                                       @Nullable Alignment blockItemAlignment) {
         return buildChildren(
                 blockItem,
                 (childBlockListPair) -> {
@@ -335,7 +342,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
                     if (childElementType == ElixirTypes.BLOCK_IDENTIFIER) {
-                        blockList.addAll(buildBlockIdentifierChildren(child));
+                        blockList.addAll(buildBlockIdentifierChildren(child, blockItemAlignment));
                     } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, null));
                     } else if (childElementType == ElixirTypes.STAB) {
@@ -482,38 +489,38 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    @Override
-    protected List<com.intellij.formatting.Block> buildChildren() {
+    @NotNull
+    private List<com.intellij.formatting.Block> buildChildren(@NotNull ASTNode parent,
+                                                              @Nullable Alignment parentAlignment) {
         List<com.intellij.formatting.Block> blocks;
-        // shared so that children are all aligned as alignment is shared based on sharing same alignment instance
-        IElementType elementType = myNode.getElementType();
+        IElementType parentElementType = parent.getElementType();
 
-        if (elementType == ElixirTypes.ANONYMOUS_FUNCTION) {
-            blocks = buildAnonymousFunctionChildren(myNode);
-        } else if (elementType == ElixirTypes.BLOCK_ITEM) {
-            blocks = buildBlockItemChildren(myNode);
-        } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
-            blocks = buildCaptureNonNumericOperationChildren(myNode);
-        } else if (HEREDOC_TOKEN_SET.contains(elementType)) {
-            blocks = buildHeredocChildren((CompositeElement) myNode);
-        } else if (elementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
-            blocks = buildMapUpdateArgumentsChildren(myNode);
-        } else if (elementType == ElixirTypes.STAB_OPERATION) {
+        if (parentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
+            blocks = buildAnonymousFunctionChildren(parent, parentAlignment);
+        } else if (parentElementType == ElixirTypes.BLOCK_ITEM) {
+            blocks = buildBlockItemChildren(parent, parentAlignment);
+        } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildCaptureNonNumericOperationChildren(parent);
+        } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildHeredocChildren((CompositeElement) parent);
+        } else if (parentElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
+            blocks = buildMapUpdateArgumentsChildren(parent);
+        } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
             //noinspection ConstantConditions
-            blocks = buildStabOperationChildren(myNode, childrenWrap);
-        } else if (WHEN_OPERATION_TOKEN_SET.contains(elementType)) {
-            blocks = buildWhenOperationChildren(myNode);
-        } else if (isOperationElementType(elementType)) {
-            blocks = buildOperationChildren(myNode);
-        } else if (isUnmatchedCallElementType(elementType)) {
-            blocks = buildUnmatchedCallChildren();
+            blocks = buildStabOperationChildren(parent, childrenWrap);
+        } else if (WHEN_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildWhenOperationChildren(parent);
+        } else if (isOperationElementType(parentElementType)) {
+            blocks = buildOperationChildren(parent);
+        } else if (isUnmatchedCallElementType(parentElementType)) {
+            blocks = buildUnmatchedCallChildren(parent, parentAlignment);
         } else {
             /* all children need a shared alignment, so that the second child doesn't have an automatic continuation
                indent */
-            final Alignment childrenAlignment = Alignment.createChildAlignment(myAlignment);
+            final Alignment childrenAlignment = Alignment.createChildAlignment(parentAlignment);
 
             blocks = buildChildren(
-                    myNode,
+                    parent,
                     (childBlockListPair) -> {
                         ASTNode child = childBlockListPair.first;
                         List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
@@ -547,15 +554,21 @@ public class Block extends AbstractBlock implements BlockEx {
         return blocks;
     }
 
+    @Override
+    protected List<com.intellij.formatting.Block> buildChildren() {
+        return buildChildren(myNode, myAlignment);
+    }
+
     /**
      * Builds doBlock DO, stab.*, and END as siblings, so they can all be indented relative to the parent unmatched call
-     * from {@link #buildUnmatchedCallChildren()}
+     * from {@link #buildUnmatchedCallChildren(ASTNode, Alignment)}
      *
      * @param doBlock doBlock that is a child of an unmatched call, but needs to be flattened for formatting
      * @return the flattened children of the doBlock: DO, stab.*, and END.
      */
     @NotNull
-    private List<com.intellij.formatting.Block> buildDoBlockChildren(@NotNull ASTNode doBlock) {
+    private List<com.intellij.formatting.Block> buildDoBlockChildren(@NotNull ASTNode doBlock,
+                                                                     @Nullable Alignment parentAlignment) {
         boolean hasBLockLists = hasAtLeastCountChildren((CompositeElement) doBlock, ElixirTypes.BLOCK_LIST, 1);
 
         return buildChildren(
@@ -567,7 +580,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
                     if (childElementType == ElixirTypes.BLOCK_LIST) {
                         //noinspection ConstantConditions
-                        blocks.add(buildChild(child, myAlignment));
+                        blocks.add(buildChild(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.END) {
                         Wrap endWrap;
 
@@ -578,7 +591,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         }
 
                         //noinspection ConstantConditions
-                        blocks.add(buildChild(child, endWrap, myAlignment));
+                        blocks.add(buildChild(child, endWrap, parentAlignment));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blocks.addAll(
                                 buildEndOfExpressionChildren(child, null, Indent.getNoneIndent())
@@ -861,9 +874,10 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildUnmatchedCallChildren() {
+    private List<com.intellij.formatting.Block> buildUnmatchedCallChildren(@NotNull ASTNode parentNode,
+                                                                           @Nullable Alignment parentAlignment) {
         return buildChildren(
-                myNode,
+                parentNode,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
                     IElementType childElementType = child.getElementType();
@@ -873,7 +887,9 @@ public class Block extends AbstractBlock implements BlockEx {
                     /* the elements in the doBlock.stab must be direct children of the call, so that they can be
                        indented relative to parent */
                     if (childElementType == ElixirTypes.DO_BLOCK) {
-                        blocks.addAll(buildDoBlockChildren(child));
+                        blocks.addAll(buildDoBlockChildren(child, parentAlignment));
+                    } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                        blocks.addAll(buildNoParenthesesOneArgument(child, parentAlignment));
                     } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
@@ -883,6 +899,23 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blocks;
                 }
         );
+    }
+
+    private Collection<? extends com.intellij.formatting.Block> buildNoParenthesesOneArgument(ASTNode child, Alignment parentAlignment) {
+        List<com.intellij.formatting.Block> blockList = buildChildren(child, parentAlignment);
+
+        if (blockList.size() == 1) {
+            Block block = (Block) blockList.get(0);
+
+            blockList = Collections.singletonList(
+                    /* Clear alignment, so that it allows anonymous functions and heredocs to align with call when they
+                       are the only argument.  The Alignment.createChildAlignment does this when there is more than one
+                       argument.  I don't know why it doesn't work with only 1 argument. */
+                    new Block(block.myNode, block.myWrap, null, block.spacingBuilder, block.indent, block.childrenWrap)
+            );
+        }
+
+        return blockList;
     }
 
     @NotNull
