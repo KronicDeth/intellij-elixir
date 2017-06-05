@@ -126,11 +126,6 @@ public class ModelBuilder implements FormattingModelBuilder {
 
         Block block = new Block(
                 element.getNode(),
-                Wrap.createWrap(
-                        WrapType.NORMAL,
-                        false
-                ),
-                Alignment.createAlignment(),
                 createSpaceBuilder(settings)
         );
 

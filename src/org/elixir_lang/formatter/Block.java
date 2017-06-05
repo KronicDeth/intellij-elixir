@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
-import static org.elixir_lang.psi.ElixirTypes.END_OF_EXPRESSION;
+import static org.elixir_lang.psi.ElixirTypes.*;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -30,6 +30,34 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+    );
+    private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.CHAR_LIST_HEREDOC_LINE,
+            ElixirTypes.INTERPOLATED_CHAR_LIST_HEREDOC_LINE,
+            ElixirTypes.INTERPOLATED_REGEX_HEREDOC_LINE,
+            ElixirTypes.INTERPOLATED_SIGIL_HEREDOC_LINE,
+            ElixirTypes.INTERPOLATED_STRING_HEREDOC_LINE,
+            ElixirTypes.INTERPOLATED_WORDS_HEREDOC_LINE,
+            ElixirTypes.LITERAL_CHAR_LIST_HEREDOC_LINE,
+            ElixirTypes.LITERAL_REGEX_HEREDOC_LINE,
+            ElixirTypes.LITERAL_SIGIL_HEREDOC_LINE,
+            ElixirTypes.LITERAL_STRING_HEREDOC_LINE,
+            ElixirTypes.LITERAL_WORDS_HEREDOC_LINE,
+            ElixirTypes.STRING_HEREDOC_LINE
+    );
+    private static final TokenSet HEREDOC_TOKEN_SET = TokenSet.create(
+            CHAR_LIST_HEREDOC,
+            INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC,
+            INTERPOLATED_REGEX_HEREDOC,
+            INTERPOLATED_SIGIL_HEREDOC,
+            INTERPOLATED_STRING_SIGIL_HEREDOC,
+            INTERPOLATED_WORDS_HEREDOC,
+            LITERAL_CHAR_LIST_SIGIL_HEREDOC,
+            LITERAL_REGEX_HEREDOC,
+            LITERAL_SIGIL_HEREDOC,
+            LITERAL_STRING_SIGIL_HEREDOC,
+            LITERAL_WORDS_HEREDOC,
+            STRING_HEREDOC
     );
     private static final Map<IElementType, Boolean> IS_OPERATION_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
@@ -123,34 +151,45 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @Nullable
     private final Wrap childrenWrap;
+    @Nullable
     private final Indent indent;
+    @NotNull
     private final SpacingBuilder spacingBuilder;
 
-    public Block(@NotNull ASTNode node,
-                 @Nullable Wrap wrap,
-                 @Nullable Alignment alignment,
-                 @NotNull SpacingBuilder spacingBuilder) {
-        this(node, wrap, alignment, spacingBuilder, Indent.getNoneIndent());
+    public Block(@NotNull ASTNode node, @NotNull SpacingBuilder spacingBuilder) {
+        this(node, null, null, spacingBuilder, null, null);
     }
 
     public Block(@NotNull ASTNode node,
                  @Nullable Wrap wrap,
                  @Nullable Alignment alignment,
                  @NotNull SpacingBuilder spacingBuilder,
-                 @NotNull Indent indent) {
-        this(node, wrap, alignment, spacingBuilder, indent, null);
-    }
-
-    public Block(@NotNull ASTNode node,
-                 @Nullable Wrap wrap,
-                 @Nullable Alignment alignment,
-                 @NotNull SpacingBuilder spacingBuilder,
-                 @NotNull Indent indent,
+                 @Nullable Indent indent,
                  @Nullable Wrap childrenWrap) {
         super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
         this.childrenWrap = childrenWrap;
+    }
+
+    @NotNull
+    static List<com.intellij.formatting.Block> buildChildren(
+            @NotNull ASTNode node,
+            @NotNull Function<Pair<ASTNode, List<com.intellij.formatting.Block>>,
+                    List<com.intellij.formatting.Block>> buildChildBlocks) {
+        List<com.intellij.formatting.Block> blocks = new ArrayList<>();
+
+        ASTNode child = node.getFirstChildNode();
+
+        while (child != null) {
+            if (shouldBuildBlock(child)) {
+                blocks = buildChildBlocks.fun(pair(child, blocks));
+            }
+
+            child = child.getTreeNext();
+        }
+
+        return blocks;
     }
 
     private static boolean hasAtLeastCountChildren(@NotNull CompositeElement parent,
@@ -180,31 +219,36 @@ public class Block extends AbstractBlock implements BlockEx {
         return IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
+    private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
+        return !WHITESPACE_TOKEN_SET.contains(childElementType);
+    }
+
     private static boolean shouldBuildBlock(@NotNull ASTNode child) {
         return shouldBuildBlock(child.getElementType());
     }
 
-    private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
-        return !WHITESPACE_TOKEN_SET.contains(childElementType);
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression) {
+        return buildAccessExpressionChildren(accessExpression, null, null);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression,
+                                                                              @Nullable Alignment childrenAlignment) {
+        return buildAccessExpressionChildren(accessExpression, null, childrenAlignment);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression,
+                                                                              @Nullable Wrap childrenWrap) {
+        return buildAccessExpressionChildren(accessExpression, childrenWrap, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildAccessExpressionChildren(
             @NotNull ASTNode accessExpression,
-            @NotNull Alignment childrenAlignment
-    ) {
-        return buildAccessExpressionChildren(
-                accessExpression,
-                Wrap.createWrap(WrapType.NORMAL, true),
-                childrenAlignment
-        );
-    }
-
-    private @NotNull
-    List<com.intellij.formatting.Block> buildAccessExpressionChildren(
-            @NotNull ASTNode accessExpression,
             @Nullable Wrap childrenWrap,
-            @NotNull Alignment childrenAlignment
+            @Nullable Alignment childrenAlignment
     ) {
         return buildChildren(
                 accessExpression,
@@ -248,7 +292,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
                     if (childElementType == ElixirTypes.END) {
                         //noinspection ConstantConditions
-                        lambdaBlocks.add(buildChild(child, endWrap, myAlignment, Indent.getNoneIndent()));
+                        lambdaBlocks.add(buildChild(child, endWrap, null, Indent.getNoneIndent()));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         lambdaBlocks.addAll(
                                 buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
@@ -256,7 +300,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.STAB) {
                         lambdaBlocks.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
-                        lambdaBlocks.add(buildChild(child, childrenAlignment));
+                        lambdaBlocks.add(buildChild(child/*, childrenAlignment*/));
                     }
 
                     return lambdaBlocks;
@@ -293,7 +337,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == ElixirTypes.BLOCK_IDENTIFIER) {
                         blockList.addAll(buildBlockIdentifierChildren(child));
                     } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
-                        blockList.addAll(buildEndOfExpressionChildren(child));
+                        blockList.addAll(buildEndOfExpressionChildren(child, null, null));
                     } else if (childElementType == ElixirTypes.STAB) {
                         blockList.addAll(buildStabChildren((CompositeElement) child));
                     } else {
@@ -327,7 +371,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, Alignment.createAlignment()));
+                        blockList.addAll(buildAccessExpressionChildren(child));
                     } else if (childElementType == ElixirTypes.CAPTURE_PREFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else if (MULTIPLICATION_OPERATION_TOKEN_SET.contains(childElementType)) {
@@ -382,72 +426,56 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private Block buildChild(@NotNull ASTNode child) {
-        return buildChild(child, Alignment.createAlignment());
+        return new Block(child, spacingBuilder);
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment) {
-        return buildChild(child, alignment, Indent.getNoneIndent());
+    private Block buildChild(@NotNull ASTNode child, @Nullable Alignment alignment) {
+        return new Block(child, null, alignment, spacingBuilder, null, null);
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child, @NotNull Wrap wrap, @NotNull Alignment alignment) {
-        return buildChild(
-                child,
-                wrap,
-                alignment,
-                Indent.getNoneIndent()
-        );
+    private Block buildChild(@NotNull ASTNode child, @NotNull Indent indent) {
+        return new Block(child, null, null, spacingBuilder, indent, null);
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child, @NotNull Alignment alignment, @NotNull Indent indent) {
-        return buildChild(child,
-                Wrap.createWrap(WrapType.NONE, false),
-                alignment,
-                indent
-        );
+    private Block buildChild(@NotNull ASTNode child, @Nullable Wrap wrap) {
+        return new Block(child, wrap, null, spacingBuilder, null, null);
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child,
-                             @NotNull Wrap wrap,
-                             @NotNull Alignment alignment,
-                             @NotNull Indent indent) {
-        return buildChild(
-                child,
-                wrap,
-                alignment,
-                indent,
-                null
-        );
+    private Block buildChild(@NotNull ASTNode child, @Nullable Wrap wrap, @Nullable Alignment alignment) {
+        return new Block(child, wrap, alignment, spacingBuilder, null, null);
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child, @Nullable Wrap wrap, @Nullable Indent indent) {
+        return new Block(child, wrap, null, spacingBuilder, indent, null);
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child, @Nullable Alignment alignment, @Nullable Indent indent) {
+        return new Block(child, null, alignment, spacingBuilder, indent, null);
     }
 
     @NotNull
     private Block buildChild(@NotNull ASTNode child,
-                             @NotNull Wrap wrap,
-                             @NotNull Indent indent,
+                             @Nullable Wrap wrap,
+                             @Nullable Alignment alignment,
+                             @Nullable Indent indent) {
+        return new Block(child, wrap, alignment, spacingBuilder, indent, null);
+    }
+
+    @NotNull
+    private Block buildChild(@NotNull ASTNode child,
+                             @Nullable Wrap wrap,
+                             @Nullable Indent indent,
                              @Nullable Wrap childrenWrap) {
         return new Block(
                 child,
                 wrap,
                 null,
-                spacingBuilder,
-                indent,
-                childrenWrap
-        );
-    }
-
-    @NotNull
-    private Block buildChild(@NotNull ASTNode child,
-                             @NotNull Wrap wrap,
-                             @NotNull Alignment alignment,
-                             @NotNull Indent indent,
-                             @Nullable Wrap childrenWrap) {
-        return new Block(
-                child,
-                wrap,
-                alignment,
                 spacingBuilder,
                 indent,
                 childrenWrap
@@ -466,6 +494,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildBlockItemChildren(myNode);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(elementType)) {
             blocks = buildCaptureNonNumericOperationChildren(myNode);
+        } else if (HEREDOC_TOKEN_SET.contains(elementType)) {
+            blocks = buildHeredocChildren((CompositeElement) myNode);
         } else if (elementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
             blocks = buildMapUpdateArgumentsChildren(myNode);
         } else if (elementType == ElixirTypes.STAB_OPERATION) {
@@ -478,7 +508,9 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (isUnmatchedCallElementType(elementType)) {
             blocks = buildUnmatchedCallChildren();
         } else {
-            final Alignment childrenAlignment = Alignment.createAlignment();
+            /* all children need a shared alignment, so that the second child doesn't have an automatic continuation
+               indent */
+            final Alignment childrenAlignment = Alignment.createChildAlignment(myAlignment);
 
             blocks = buildChildren(
                     myNode,
@@ -496,43 +528,20 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             lambdaBlocks.addAll(
+                                    // None Indent because comments should align to left
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                             );
                         } else if (childElementType == ElixirTypes.WHEN_INFIX_OPERATOR) {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else {
-                            Block block = new Block(
-                                    child,
-                                    Wrap.createWrap(WrapType.NONE, false),
-                                    childrenAlignment,
-                                    spacingBuilder
+                            lambdaBlocks.add(
+                                    buildChild(child, childrenAlignment)
                             );
-                            lambdaBlocks.add(block);
                         }
 
                         return lambdaBlocks;
                     }
             );
-        }
-
-        return blocks;
-    }
-
-    private @NotNull
-    List<com.intellij.formatting.Block> buildChildren(
-            @NotNull ASTNode node,
-            @NotNull Function<Pair<ASTNode, List<com.intellij.formatting.Block>>,
-                    List<com.intellij.formatting.Block>> buildChildBlocks) {
-        List<com.intellij.formatting.Block> blocks = new ArrayList<>();
-
-        ASTNode child = node.getFirstChildNode();
-
-        while (child != null) {
-            if (shouldBuildBlock(child)) {
-                blocks = buildChildBlocks.fun(pair(child, blocks));
-            }
-
-            child = child.getTreeNext();
         }
 
         return blocks;
@@ -572,11 +581,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blocks.add(buildChild(child, endWrap, myAlignment));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blocks.addAll(
-                                buildEndOfExpressionChildren(
-                                        child,
-                                        Alignment.createAlignment(),
-                                        Indent.getNoneIndent()
-                                )
+                                buildEndOfExpressionChildren(child, null, Indent.getNoneIndent())
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
                         blocks.addAll(buildStabChildren((CompositeElement) child));
@@ -594,28 +599,9 @@ public class Block extends AbstractBlock implements BlockEx {
      * may be interlaced
      */
     @NotNull
-    private List<com.intellij.formatting.Block> buildEndOfExpressionChildren(@NotNull ASTNode endOfExpression) {
-        return buildChildren(
-                endOfExpression,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
-
-                    blocks.add(buildChild(child));
-
-                    return blocks;
-                }
-        );
-    }
-
-    /**
-     * Builds endOfExpression.*.  Importantly, it separates out the EOLs, which are whitespace from the comments that
-     * may be interlaced
-     */
-    @NotNull
     private List<com.intellij.formatting.Block> buildEndOfExpressionChildren(@NotNull ASTNode endOfExpression,
-                                                                             @NotNull Alignment childAlignment,
-                                                                             @NotNull Indent childIndent) {
+                                                                             @Nullable Alignment childAlignment,
+                                                                             @Nullable Indent childIndent) {
         return buildChildren(
                 endOfExpression,
                 childBlockListPair -> {
@@ -627,6 +613,44 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blocks;
                 }
         );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildHeredocChildren(CompositeElement heredoc) {
+        ASTNode heredocPrefix = heredoc.findChildByType(ElixirTypes.HEREDOC_PREFIX);
+        int heredocPrefixLength = 0;
+
+        if (heredocPrefix != null) {
+            heredocPrefixLength = heredocPrefix.getTextLength();
+        }
+
+        Indent indent = Indent.getNoneIndent();
+        int finalHeredocPrefixLength = heredocPrefixLength;
+
+        return buildChildren(
+                heredoc,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (HEREDOC_LINE_TOKEN_SET.contains(childElementType)) {
+                        blockList.add(buildHeredocLineChild(child, finalHeredocPrefixLength));
+                    } else if (childElementType != ElixirTypes.HEREDOC_PREFIX) {
+                        /* The heredocPrefix while important for determining the significant white space in each heredoc
+                           line, is normal, insignificant whitespace when shifting the lines, so it has no block */
+                        blockList.add(buildChild(child, indent));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private com.intellij.formatting.Block buildHeredocLineChild(ASTNode heredocLine, int heredocPrefixLength) {
+        return new HeredocLineBlock(heredocLine, heredocPrefixLength, spacingBuilder);
     }
 
     @NotNull
@@ -663,12 +687,12 @@ public class Block extends AbstractBlock implements BlockEx {
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blocks.addAll(
-                                buildAccessExpressionChildren(child, Alignment.createAlignment())
+                                buildAccessExpressionChildren(child)
                         );
                     } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blocks.add(buildChild(child, Alignment.createAlignment()));
+                        blocks.add(buildChild(child));
                     }
 
                     return blocks;
@@ -678,13 +702,13 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRuleNode) {
-        return buildOperatorRuleChildren(operatorRuleNode, Wrap.createWrap(WrapType.NORMAL, true));
+        return buildOperatorRuleChildren(operatorRuleNode, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(
             @NotNull ASTNode operatorRuleNode,
-            @NotNull Wrap operatorWrap
+            @Nullable Wrap operatorWrap
     ) {
         return buildChildren(
                 operatorRuleNode,
@@ -692,7 +716,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode child = childBlockListPair.first;
                     List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
 
-                    blocks.add(buildChild(child, operatorWrap, Alignment.createAlignment()));
+                    blocks.add(buildChild(child, operatorWrap, Indent.getNoneIndent()));
 
                     return blocks;
                 }
@@ -713,6 +737,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                       @NotNull Wrap childWrap,
                                                                       @NotNull Alignment childAlignment,
                                                                       @NotNull Indent childIndent) {
+
         return buildChildren(
                 stabBody,
                 (childBlockListPair) -> {
@@ -826,10 +851,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blockList.add(
-                                buildChild(
-                                        child,
-                                        Alignment.createAlignment()
-                                )
+                                buildChild(child)
                         );
                     }
 
@@ -855,7 +877,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blocks.add(buildChild(child, Alignment.createAlignment()));
+                        blocks.add(buildChild(child));
                     }
 
                     return blocks;
@@ -881,13 +903,13 @@ public class Block extends AbstractBlock implements BlockEx {
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(
-                                buildAccessExpressionChildren(child, childWrapRef.get(), Alignment.createAlignment())
+                                buildAccessExpressionChildren(child, childWrapRef.get())
                         );
                     } else if (isOperatorRuleElementType(childElementType)) {
                         blockList.addAll(buildOperatorRuleChildren(child, operatorWrap));
                         childWrapRef.set(rightOperandWrap);
                     } else {
-                        blockList.add(buildChild(child, childWrapRef.get(), Alignment.createAlignment()));
+                        blockList.add(buildChild(child, childWrapRef.get()));
                     }
 
                     return blockList;
@@ -895,7 +917,11 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    @NotNull
+    /**
+     * @return {@code null} means to use the default indentation for the default formatter.  Any instance means use the
+     * specified indent.
+     */
+    @Nullable
     @Override
     public Indent getIndent() {
         return indent;

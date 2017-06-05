@@ -52,6 +52,26 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testAnonymousFunctionAsLastArgument() {
+        String path = "anonymous_function_as_last_argument.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
+    public void testAnonymousFunctionAsOnlyArgument() {
+        String path = "anonymous_function_as_only_argument.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     public void testAnonymousFunctionWithMultipleClausesChop() {
         myFixture.configureByFile("anonymous_function_with_multiple_clauses_chop_before.ex");
 
@@ -409,6 +429,34 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         reformatFixture();
 
         myFixture.checkResultByFile("indent_after_else_keyword.ex");
+    }
+
+    public void testHeredocAlignment() {
+        myFixture.configureByFile("heredoc_alignment_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("heredoc_alignment_after.ex");
+    }
+
+    public void testHeredocAsLastArgument() {
+        String path = "heredoc_as_last_argument.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("heredoc_as_last_argument.ex");
+    }
+
+    public void testHeredocAsOnlyArgument() {
+        String path = "heredoc_as_only_argument.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("heredoc_as_only_argument.ex");
     }
 
     public void testWithSpaceAroundInMatchOperators() {
