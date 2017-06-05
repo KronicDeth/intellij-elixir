@@ -59,6 +59,10 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
+    private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
+            TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
+            HEREDOC_TOKEN_SET
+    );
     private static final Map<IElementType, Boolean> IS_OPERATION_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
@@ -906,13 +910,23 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (blockList.size() == 1) {
             Block block = (Block) blockList.get(0);
+            ASTNode blockNode = block.myNode;
 
-            blockList = Collections.singletonList(
+            if (UNINDENTED_ONLY_ARGUMENT_TOKEN_SET.contains(blockNode.getElementType())) {
+                blockList = Collections.singletonList(
                     /* Clear alignment, so that it allows anonymous functions and heredocs to align with call when they
                        are the only argument.  The Alignment.createChildAlignment does this when there is more than one
                        argument.  I don't know why it doesn't work with only 1 argument. */
-                    new Block(block.myNode, block.myWrap, null, block.spacingBuilder, block.indent, block.childrenWrap)
-            );
+                        new Block(
+                                blockNode,
+                                block.myWrap,
+                                null,
+                                block.spacingBuilder,
+                                block.indent,
+                                block.childrenWrap
+                        )
+                );
+            }
         }
 
         return blockList;
