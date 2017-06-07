@@ -99,11 +99,17 @@ class HeredocLineBlock extends AbstractBlock {
     @Override
     public TextRange getTextRange() {
         if (textRange == null) {
-            TextRange heredocLineTextRange = super.getTextRange();
-            textRange = new TextRange(
-                    heredocLineTextRange.getStartOffset() + heredocPrefixLength,
-                    heredocLineTextRange.getEndOffset()
-            );
+            TextRange superTextRange = super.getTextRange();
+            int startedOffsetWithoutPrefix = superTextRange.getStartOffset() + heredocPrefixLength;
+            int endOffset = superTextRange.getEndOffset();
+
+            /* HeredocLines are generated for the blank lines that only have a newline.  Those lines don't have a
+               whitespace prefix, so don't adjust them. */
+            if (startedOffsetWithoutPrefix < endOffset) {
+                textRange = new TextRange(startedOffsetWithoutPrefix, endOffset);
+            } else {
+                textRange = superTextRange;
+            }
         }
 
         return textRange;
