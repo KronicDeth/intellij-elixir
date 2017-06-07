@@ -653,7 +653,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
                     if (HEREDOC_LINE_TOKEN_SET.contains(childElementType)) {
-                        blockList.add(buildHeredocLineChild(child, finalHeredocPrefixLength));
+                        blockList.addAll(buildHeredocLineChildren(child, finalHeredocPrefixLength));
                     } else if (childElementType != ElixirTypes.HEREDOC_PREFIX) {
                         /* The heredocPrefix while important for determining the significant white space in each heredoc
                            line, is normal, insignificant whitespace when shifting the lines, so it has no block */
@@ -666,8 +666,19 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private com.intellij.formatting.Block buildHeredocLineChild(ASTNode heredocLine, int heredocPrefixLength) {
-        return new HeredocLineBlock(heredocLine, heredocPrefixLength, spacingBuilder);
+    private List<com.intellij.formatting.Block> buildHeredocLineChildren(ASTNode heredocLine, int heredocPrefixLength) {
+        List<com.intellij.formatting.Block> blockList;
+
+        if (heredocLine.getTextLength() == 1 && heredocLine.getText().equals("\n")) {
+            // prevent insertion of prefix length spaces on blank lines
+            blockList = Collections.emptyList();
+        } else {
+           blockList = Collections.singletonList(
+                   new HeredocLineBlock(heredocLine, heredocPrefixLength, spacingBuilder)
+           );
+        }
+
+        return blockList;
     }
 
     @NotNull

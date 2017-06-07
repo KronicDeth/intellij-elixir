@@ -446,7 +446,7 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
 
         reformatFixture();
 
-        myFixture.checkResultByFile("heredoc_as_last_argument.ex");
+        myFixture.checkResultByFile(path);
     }
 
     public void testHeredocAsOnlyArgument() {
@@ -456,7 +456,17 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
 
         reformatFixture();
 
-        myFixture.checkResultByFile("heredoc_as_only_argument.ex");
+        myFixture.checkResultByFile(path);
+    }
+
+    public void testHeredocBlankLines() {
+        String path = "heredoc_blank_lines.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
     }
 
     public void testWithSpaceAroundInMatchOperators() {
