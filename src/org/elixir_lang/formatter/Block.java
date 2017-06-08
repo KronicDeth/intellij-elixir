@@ -21,6 +21,7 @@ import java.util.*;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.lineNumber;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -716,7 +717,15 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
                                                                           @NotNull Wrap mapChildWrap,
                                                                           @NotNull Alignment mapAlignment) {
-        Wrap tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        Wrap tailWrap;
+
+        // if already partially wrapped, wrap all
+        if (lineNumber(mapArguments.findChildByType(ElixirTypes.OPENING_CURLY)) !=
+                lineNumber(mapArguments.findChildByType(ElixirTypes.CLOSING_CURLY))) {
+            tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+        } else {
+            tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        }
 
         return buildChildren(
                 mapArguments,

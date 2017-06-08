@@ -791,6 +791,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testStructAllKeysWrap() {
+        myFixture.configureByFile("struct_some_keys_wrap.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("struct_all_keys_wrap.ex");
+    }
+
     private void reformatFixture() {
         new WriteCommandAction.Simple(getProject()) {
             @Override
