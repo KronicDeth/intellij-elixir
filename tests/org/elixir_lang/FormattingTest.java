@@ -773,6 +773,24 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("single_space_not_operator.ex");
     }
 
+    public void testStructKeysAreAligned() {
+        myFixture.configureByFile("struct_keys_unaligned.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("struct_keys_aligned.ex");
+    }
+
+    public void testStructKeysAreNormalIndented() {
+        String path = "struct_keys_are_normal_indented.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     private void reformatFixture() {
         new WriteCommandAction.Simple(getProject()) {
             @Override

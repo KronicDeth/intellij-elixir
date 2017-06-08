@@ -59,16 +59,20 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
-    private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
-            TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
-            HEREDOC_TOKEN_SET
-    );
     private static final Map<IElementType, Boolean> IS_OPERATION_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
+    private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MAP_OPERATION,
+            ElixirTypes.STRUCT_OPERATION
+    );
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
+    );
+    private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
+            TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
+            HEREDOC_TOKEN_SET
     );
     private static final TokenSet UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
             ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
@@ -495,6 +499,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildChildren(@NotNull ASTNode parent,
+                                                              @Nullable Wrap parentWrap,
                                                               @Nullable Alignment parentAlignment) {
         List<com.intellij.formatting.Block> blocks;
         IElementType parentElementType = parent.getElementType();
@@ -507,6 +512,13 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildCaptureNonNumericOperationChildren(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
+        } else if (MAP_TOKEN_SET.contains(parentElementType)) {
+            assert parentWrap != null : "mapOperation and structOperation must have a Wrap, so child wrap can be " +
+                                        "created for opening curly ({) and mapExpression for structOperation";
+            assert parentAlignment != null : "mapOperation and structOperation must have an Alignment, so that " +
+                                             "closing curly ({) can align to start of map";
+
+            blocks = buildMapChildren(parent, parentWrap, parentAlignment);
         } else if (parentElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
             blocks = buildMapUpdateArgumentsChildren(parent);
         } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
@@ -517,7 +529,7 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (isOperationElementType(parentElementType)) {
             blocks = buildOperationChildren(parent);
         } else if (isUnmatchedCallElementType(parentElementType)) {
-            blocks = buildUnmatchedCallChildren(parent, parentAlignment);
+            blocks = buildUnmatchedCallChildren(parent, parentWrap, parentAlignment);
         } else {
             /* all children need a shared alignment, so that the second child doesn't have an automatic continuation
                indent */
@@ -535,6 +547,25 @@ public class Block extends AbstractBlock implements BlockEx {
                             lambdaBlocks.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
                             );
+
+                        } else if (MAP_TOKEN_SET.contains(childElementType)) {
+                            Wrap mapWrap;
+
+                            if (childrenWrap != null) {
+                                mapWrap = childrenWrap;
+                            } else {
+                                mapWrap = Wrap.createWrap(WrapType.NORMAL, true);
+                            }
+
+                            Alignment mapAlignment;
+
+                            if (childrenAlignment != null) {
+                                mapAlignment = childrenAlignment;
+                            } else {
+                                mapAlignment = Alignment.createAlignment();
+                            }
+
+                            lambdaBlocks.add(buildChild(child, mapWrap, mapAlignment));
                         } else if (isOperatorRuleElementType(childElementType)) {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
@@ -560,7 +591,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @Override
     protected List<com.intellij.formatting.Block> buildChildren() {
-        return buildChildren(myNode, myAlignment);
+        return buildChildren(myNode, myWrap, myAlignment);
     }
 
     /**
@@ -682,6 +713,63 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
+                                                                          @NotNull Wrap mapChildWrap,
+                                                                          @NotNull Alignment mapAlignment) {
+        Wrap tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+
+        return buildChildren(
+                mapArguments,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.CLOSING_CURLY) {
+                        blockList.add(buildChild(child, tailWrap, mapAlignment, Indent.getNoneIndent()));
+                    } else if (childElementType == ElixirTypes.OPENING_CURLY) {
+                        blockList.add(
+                                buildChild(child, mapChildWrap)
+                        );
+                    } else {
+                        blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapChildren(@NotNull ASTNode map,
+                                                                 @NotNull Wrap mapWrap,
+                                                                 @NotNull Alignment mapAlignment) {
+        Wrap mapChildWrap = Wrap.createChildWrap(mapWrap, WrapType.NORMAL, true);
+
+        return buildChildren(
+                map,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.MAP_ARGUMENTS) {
+                        // pass mapAlignment for CLOSING_CURLY alignment
+                        blockList.addAll(buildMapArgumentsChildren(child, mapChildWrap, mapAlignment));
+                    } else if (childElementType == ElixirTypes.MAP_PREFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
     private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
         return buildChildren(
                 mapUpdateArguments,
@@ -699,6 +787,38 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildNoParenthesesOneArgument(
+            @NotNull ASTNode child,
+            @Nullable Wrap parentWrap,
+            @Nullable Alignment parentAlignment
+    ) {
+        List<com.intellij.formatting.Block> blockList = buildChildren(child, parentWrap, parentAlignment);
+
+        if (blockList.size() == 1) {
+            Block block = (Block) blockList.get(0);
+            ASTNode blockNode = block.myNode;
+
+            if (UNINDENTED_ONLY_ARGUMENT_TOKEN_SET.contains(blockNode.getElementType())) {
+                blockList = Collections.singletonList(
+                    /* Clear alignment, so that it allows anonymous functions and heredocs to align with call when they
+                       are the only argument.  The Alignment.createChildAlignment does this when there is more than one
+                       argument.  I don't know why it doesn't work with only 1 argument. */
+                        new Block(
+                                blockNode,
+                                block.myWrap,
+                                null,
+                                block.spacingBuilder,
+                                block.indent,
+                                block.childrenWrap
+                        )
+                );
+            }
+        }
+
+        return blockList;
     }
 
     @NotNull
@@ -890,6 +1010,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildUnmatchedCallChildren(@NotNull ASTNode parentNode,
+                                                                           @Nullable Wrap parentWrap,
                                                                            @Nullable Alignment parentAlignment) {
         return buildChildren(
                 parentNode,
@@ -904,7 +1025,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == ElixirTypes.DO_BLOCK) {
                         blocks.addAll(buildDoBlockChildren(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                        blocks.addAll(buildNoParenthesesOneArgument(child, parentAlignment));
+                        blocks.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
                     } else if (isOperatorRuleElementType(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
@@ -914,33 +1035,6 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blocks;
                 }
         );
-    }
-
-    private Collection<? extends com.intellij.formatting.Block> buildNoParenthesesOneArgument(ASTNode child, Alignment parentAlignment) {
-        List<com.intellij.formatting.Block> blockList = buildChildren(child, parentAlignment);
-
-        if (blockList.size() == 1) {
-            Block block = (Block) blockList.get(0);
-            ASTNode blockNode = block.myNode;
-
-            if (UNINDENTED_ONLY_ARGUMENT_TOKEN_SET.contains(blockNode.getElementType())) {
-                blockList = Collections.singletonList(
-                    /* Clear alignment, so that it allows anonymous functions and heredocs to align with call when they
-                       are the only argument.  The Alignment.createChildAlignment does this when there is more than one
-                       argument.  I don't know why it doesn't work with only 1 argument. */
-                        new Block(
-                                blockNode,
-                                block.myWrap,
-                                null,
-                                block.spacingBuilder,
-                                block.indent,
-                                block.childrenWrap
-                        )
-                );
-            }
-        }
-
-        return blockList;
     }
 
     @NotNull
