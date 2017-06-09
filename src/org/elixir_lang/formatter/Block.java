@@ -16,6 +16,7 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import sun.tools.jstat.Token;
 
 import java.util.*;
 
@@ -60,7 +61,6 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
-    private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
             ElixirTypes.MAP_OPERATION,
@@ -107,6 +107,28 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_WHEN_OPERATION
     );
+    private static final TokenSet OPERATOR_RULE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.ADDITION_INFIX_OPERATOR,
+            ElixirTypes.AND_INFIX_OPERATOR,
+            ElixirTypes.ARROW_INFIX_OPERATOR,
+            ElixirTypes.AT_PREFIX_OPERATOR,
+            ElixirTypes.CAPTURE_PREFIX_OPERATOR,
+            ElixirTypes.COMPARISON_INFIX_OPERATOR,
+            ElixirTypes.DOT_INFIX_OPERATOR,
+            ElixirTypes.IN_INFIX_OPERATOR,
+            ElixirTypes.IN_MATCH_INFIX_OPERATOR,
+            ElixirTypes.MATCH_INFIX_OPERATOR,
+            ElixirTypes.MULTIPLICATION_INFIX_OPERATOR,
+            ElixirTypes.OR_INFIX_OPERATOR,
+            ElixirTypes.PIPE_INFIX_OPERATOR,
+            ElixirTypes.RELATIONAL_INFIX_OPERATOR,
+            ElixirTypes.STAB_INFIX_OPERATOR,
+            ElixirTypes.THREE_INFIX_OPERATOR,
+            ElixirTypes.TWO_INFIX_OPERATOR,
+            ElixirTypes.TYPE_INFIX_OPERATOR,
+            ElixirTypes.UNARY_PREFIX_OPERATOR,
+            ElixirTypes.WHEN_INFIX_OPERATOR
+    );
     private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
             HEREDOC_TOKEN_SET
@@ -121,29 +143,6 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
-
-    static {
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.AND_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ARROW_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.AT_PREFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.CAPTURE_PREFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.COMPARISON_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.DOT_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.IN_MATCH_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MATCH_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.MULTIPLICATION_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.OR_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.PIPE_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.RELATIONAL_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.STAB_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.THREE_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.TWO_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.TYPE_INFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.UNARY_PREFIX_OPERATOR, true);
-        IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.WHEN_INFIX_OPERATOR, true);
-    }
 
     static {
         IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, true);
@@ -219,10 +218,6 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return count >= atLeastCount;
-    }
-
-    private static boolean isOperatorRuleElementType(IElementType elementType) {
-        return IS_OPERATOR_RULE_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean isUnmatchedCallElementType(IElementType elementType) {
@@ -605,7 +600,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
                         } else if (MAP_TOKEN_SET.contains(childElementType)) {
                             lambdaBlocks.add(buildMapChild(child, childrenWrap, childrenAlignment));
-                        } else if (isOperatorRuleElementType(childElementType)) {
+                        } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             lambdaBlocks.addAll(
@@ -966,7 +961,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blocks.addAll(
                                 buildAccessExpressionChildren(child)
                         );
-                    } else if (isOperatorRuleElementType(childElementType)) {
+                    } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blocks.add(buildChild(child));
@@ -1155,7 +1150,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blocks.addAll(buildDoBlockChildren(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
                         blocks.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
-                    } else if (isOperatorRuleElementType(childElementType)) {
+                    } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                         blocks.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blocks.add(buildChild(child));
@@ -1186,7 +1181,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(
                                 buildAccessExpressionChildren(child, childWrapRef.get())
                         );
-                    } else if (isOperatorRuleElementType(childElementType)) {
+                    } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildOperatorRuleChildren(child, operatorWrap));
                         childWrapRef.set(rightOperandWrap);
                     } else {
