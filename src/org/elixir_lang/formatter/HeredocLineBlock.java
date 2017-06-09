@@ -4,7 +4,6 @@ import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.formatter.common.AbstractBlock;
-import com.intellij.psi.tree.IElementType;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +32,7 @@ class HeredocLineBlock extends AbstractBlock {
     protected List<com.intellij.formatting.Block> buildChildren() {
         return Block.buildChildren(
                 myNode,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.HEREDOC_LINE_PREFIX) {
                         blockList.addAll(buildHeredocLinePrefixChildren(child));
                     } else {
@@ -59,12 +53,7 @@ class HeredocLineBlock extends AbstractBlock {
     private List<com.intellij.formatting.Block> buildHeredocLinePrefixChildren(ASTNode heredocLinePrefix) {
         return Block.buildChildren(
                 heredocLinePrefix,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN) {
                         blockList.add(new HeredocLinkWhiteSpaceTokenBlock(child, heredocPrefixLength , spacingBuilder));
                     } else {

@@ -3,7 +3,6 @@ package org.elixir_lang.formatter;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
@@ -11,16 +10,15 @@ import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.Function;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import sun.tools.jstat.Token;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.lineNumber;
 
@@ -186,21 +184,20 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     static List<com.intellij.formatting.Block> buildChildren(
             @NotNull ASTNode node,
-            @NotNull Function<Pair<ASTNode, List<com.intellij.formatting.Block>>,
-                    List<com.intellij.formatting.Block>> buildChildBlocks) {
-        List<com.intellij.formatting.Block> blocks = new ArrayList<>();
+            @NotNull BlockListReducer blockListReducer) {
+        List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
         ASTNode child = node.getFirstChildNode();
 
         while (child != null) {
             if (shouldBuildBlock(child)) {
-                blocks = buildChildBlocks.fun(pair(child, blocks));
+                blockList = blockListReducer.reduce(child, child.getElementType(), blockList);
             }
 
             child = child.getTreeNext();
         }
 
-        return blocks;
+        return blockList;
     }
 
     private static boolean hasAtLeastCountChildren(@NotNull CompositeElement parent,
@@ -251,12 +248,7 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 accessExpression,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (MAP_TOKEN_SET.contains(childElementType)) {
                         blockList.add(buildMapChild(child, childrenWrap, childrenAlignment));
                     } else {
@@ -292,26 +284,21 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 anonymousFunction,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.END) {
                         //noinspection ConstantConditions
-                        lambdaBlocks.add(buildChild(child, endWrap, null, Indent.getNoneIndent()));
+                        blockList.add(buildChild(child, endWrap, null, Indent.getNoneIndent()));
                     } else if (childElementType == END_OF_EXPRESSION) {
-                        lambdaBlocks.addAll(
+                        blockList.addAll(
                                 buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
-                        lambdaBlocks.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
+                        blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
-                        lambdaBlocks.add(buildChild(child/*, childrenAlignment*/));
+                        blockList.add(buildChild(child/*, childrenAlignment*/));
                     }
 
-                    return lambdaBlocks;
+                    return blockList;
                 }
         );
     }
@@ -323,12 +310,7 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 associationsBase,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.CONTAINER_ASSOCIATION_OPERATION) {
                         blockList.add(buildChild(child, containerAssociationOperationWrap, Indent.getNormalIndent()));
                     } else {
@@ -345,12 +327,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                           @NotNull Wrap associationExpressionWrap) {
         return buildChildren(
                 associations,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
                         blockList.addAll(buildAssociationsBaseChildren(child, associationExpressionWrap));
                     } else {
@@ -372,10 +349,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 blockIdentifier,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     blockList.add(buildChild(child, childrenWrap, blockIdentifierAlignment));
 
                     return blockList;
@@ -388,11 +362,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                        @Nullable Alignment blockItemAlignment) {
         return buildChildren(
                 blockItem,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.BLOCK_IDENTIFIER) {
                         blockList.addAll(buildBlockIdentifierChildren(child, blockItemAlignment));
                     } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
@@ -423,12 +393,7 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 captureNonNumericOperation,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child));
                     } else if (childElementType == ElixirTypes.CAPTURE_PREFIX_OPERATOR) {
@@ -581,35 +546,29 @@ public class Block extends AbstractBlock implements BlockEx {
 
             blocks = buildChildren(
                     parent,
-                    (childBlockListPair) -> {
-                        ASTNode child = childBlockListPair.first;
-                        List<com.intellij.formatting.Block> lambdaBlocks = childBlockListPair.second;
-
-                        IElementType childElementType = child.getElementType();
-
+                    (child, childElementType, blockList) -> {
                         if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                            lambdaBlocks.addAll(
+                            blockList.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
                             );
-
                         } else if (MAP_TOKEN_SET.contains(childElementType)) {
-                            lambdaBlocks.add(buildMapChild(child, childrenWrap, childrenAlignment));
+                            blockList.add(buildMapChild(child, childrenWrap, childrenAlignment));
                         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
-                            lambdaBlocks.addAll(buildOperatorRuleChildren(child));
+                            blockList.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
-                            lambdaBlocks.addAll(
+                            blockList.addAll(
                                     // None Indent because comments should align to left
                                     buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNoneIndent())
                             );
                         } else if (childElementType == ElixirTypes.WHEN_INFIX_OPERATOR) {
-                            lambdaBlocks.addAll(buildOperatorRuleChildren(child));
+                            blockList.addAll(buildOperatorRuleChildren(child));
                         } else {
-                            lambdaBlocks.add(
+                            blockList.add(
                                     buildChild(child, childrenAlignment)
                             );
                         }
 
-                        return lambdaBlocks;
+                        return blockList;
                     }
             );
         }
@@ -624,7 +583,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     /**
      * Builds doBlock DO, stab.*, and END as siblings, so they can all be indented relative to the parent unmatched call
-     * from {@link #buildUnmatchedCallChildren(ASTNode, Alignment)}
+     * from {@link #buildUnmatchedCallChildren(ASTNode, Wrap, Alignment)}
      *
      * @param doBlock doBlock that is a child of an unmatched call, but needs to be flattened for formatting
      * @return the flattened children of the doBlock: DO, stab.*, and END.
@@ -636,14 +595,10 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 doBlock,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.BLOCK_LIST) {
                         //noinspection ConstantConditions
-                        blocks.add(buildChild(child, parentAlignment));
+                        blockList.add(buildChild(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.END) {
                         Wrap endWrap;
 
@@ -654,18 +609,18 @@ public class Block extends AbstractBlock implements BlockEx {
                         }
 
                         //noinspection ConstantConditions
-                        blocks.add(buildChild(child, endWrap, parentAlignment));
+                        blockList.add(buildChild(child, endWrap, parentAlignment));
                     } else if (childElementType == END_OF_EXPRESSION) {
-                        blocks.addAll(
+                        blockList.addAll(
                                 buildEndOfExpressionChildren(child, null, Indent.getNoneIndent())
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
-                        blocks.addAll(buildStabChildren((CompositeElement) child));
+                        blockList.addAll(buildStabChildren((CompositeElement) child));
                     } else {
-                        blocks.add(buildChild(child));
+                        blockList.add(buildChild(child));
                     }
 
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -680,13 +635,10 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                              @Nullable Indent childIndent) {
         return buildChildren(
                 endOfExpression,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child, childAlignment, childIndent));
 
-                    blocks.add(buildChild(child, childAlignment, childIndent));
-
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -705,12 +657,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 heredoc,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (HEREDOC_LINE_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildHeredocLineChildren(child, finalHeredocPrefixLength));
                     } else if (childElementType != ElixirTypes.HEREDOC_PREFIX) {
@@ -746,12 +693,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 keywords,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.KEYWORD_PAIR) {
                         blockList.add(buildChild(child, keywordPairWrap, Indent.getNormalIndent()));
                     } else {
@@ -780,12 +722,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 mapArguments,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.CLOSING_CURLY) {
                         blockList.add(buildChild(child, tailWrap, mapAlignment, Indent.getNoneIndent()));
                     } else if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
@@ -834,12 +771,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 map,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.MAP_ARGUMENTS) {
                         // pass mapAlignment for CLOSING_CURLY alignment
                         blockList.addAll(buildMapArgumentsChildren(child, mapChildWrap, mapAlignment));
@@ -866,12 +798,7 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 mapConstructionArguments,
-                childBlockListPair -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
                         blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
                     } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
@@ -891,11 +818,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
         return buildChildren(
                 mapUpdateArguments,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
@@ -943,25 +866,20 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildOperationChildren(ASTNode operation) {
         return buildChildren(
                 operation,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blocks.addAll(
+                        blockList.addAll(
                                 buildAccessExpressionChildren(child)
                         );
                     } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
-                        blocks.addAll(buildOperatorRuleChildren(child));
+                        blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blocks.add(buildChild(child));
+                        blockList.add(buildChild(child));
                     }
 
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -978,13 +896,10 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 operatorRuleNode,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child, operatorWrap, Indent.getNoneIndent()));
 
-                    blocks.add(buildChild(child, operatorWrap, Indent.getNoneIndent()));
-
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -1006,11 +921,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 stabBody,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else {
@@ -1060,15 +971,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 stab,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == END_OF_EXPRESSION) {
-                        blocks.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
+                        blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else if (childElementType == ElixirTypes.STAB_BODY) {
-                        blocks.addAll(
+                        blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
                                         Wrap.createWrap(WrapType.ALWAYS, true),
@@ -1077,7 +984,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 )
                         );
                     } else {
-                        blocks.add(
+                        blockList.add(
                                 buildChild(
                                         child,
                                         stabOperationWrap,
@@ -1087,7 +994,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         );
                     }
 
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -1099,11 +1006,7 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         return buildChildren(
                 stabOperation,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.STAB_BODY) {
                         blockList.addAll(
                                 buildStabBodyChildren(
@@ -1132,25 +1035,20 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                            @Nullable Alignment parentAlignment) {
         return buildChildren(
                 parentNode,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blocks = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     /* the elements in the doBlock.stab must be direct children of the call, so that they can be
                        indented relative to parent */
                     if (childElementType == ElixirTypes.DO_BLOCK) {
-                        blocks.addAll(buildDoBlockChildren(child, parentAlignment));
+                        blockList.addAll(buildDoBlockChildren(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                        blocks.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
+                        blockList.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
                     } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
-                        blocks.addAll(buildOperatorRuleChildren(child));
+                        blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blocks.add(buildChild(child));
+                        blockList.add(buildChild(child));
                     }
 
-                    return blocks;
+                    return blockList;
                 }
         );
     }
@@ -1163,12 +1061,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildChildren(
                 whenOperation,
-                (childBlockListPair) -> {
-                    ASTNode child = childBlockListPair.first;
-                    IElementType childElementType = child.getElementType();
-
-                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
-
+                (child, childElementType, blockList) -> {
                     /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
