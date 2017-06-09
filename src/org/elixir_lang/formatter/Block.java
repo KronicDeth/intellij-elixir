@@ -60,7 +60,6 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
-    private static final Map<IElementType, Boolean> IS_OPERATION_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_OPERATOR_RULE_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
@@ -70,6 +69,43 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
+    );
+    private static final TokenSet OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_ADDITION_OPERATION,
+            ElixirTypes.MATCHED_AND_OPERATION,
+            ElixirTypes.MATCHED_ARROW_OPERATION,
+            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.MATCHED_COMPARISON_OPERATION,
+            ElixirTypes.MATCHED_IN_MATCH_OPERATION,
+            ElixirTypes.MATCHED_IN_OPERATION,
+            ElixirTypes.MATCHED_MATCH_OPERATION,
+            ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
+            ElixirTypes.MATCHED_OR_OPERATION,
+            ElixirTypes.MATCHED_PIPE_OPERATION,
+            ElixirTypes.MATCHED_RELATIONAL_OPERATION,
+            ElixirTypes.MATCHED_THREE_OPERATION,
+            ElixirTypes.MATCHED_TWO_OPERATION,
+            ElixirTypes.MATCHED_TYPE_OPERATION,
+            ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
+            ElixirTypes.MATCHED_WHEN_OPERATION,
+            ElixirTypes.UNARY_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_ADDITION_OPERATION,
+            ElixirTypes.UNMATCHED_AND_OPERATION,
+            ElixirTypes.UNMATCHED_ARROW_OPERATION,
+            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_COMPARISON_OPERATION,
+            ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
+            ElixirTypes.UNMATCHED_IN_OPERATION,
+            ElixirTypes.UNMATCHED_MATCH_OPERATION,
+            ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION,
+            ElixirTypes.UNMATCHED_OR_OPERATION,
+            ElixirTypes.UNMATCHED_PIPE_OPERATION,
+            ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
+            ElixirTypes.UNMATCHED_THREE_OPERATION,
+            ElixirTypes.UNMATCHED_TWO_OPERATION,
+            ElixirTypes.UNMATCHED_TYPE_OPERATION,
+            ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
+            ElixirTypes.UNMATCHED_WHEN_OPERATION
     );
     private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
@@ -85,44 +121,6 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
-
-    static {
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_ADDITION_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_AND_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_ARROW_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_COMPARISON_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_IN_MATCH_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_IN_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MATCH_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_MULTIPLICATION_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_OR_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_PIPE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_RELATIONAL_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_THREE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_TWO_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_TYPE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.MATCHED_WHEN_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNARY_NUMERIC_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_ADDITION_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_AND_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_ARROW_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_COMPARISON_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_IN_MATCH_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_IN_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MATCH_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_OR_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_PIPE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_RELATIONAL_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_THREE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_TWO_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_TYPE_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION, true);
-        IS_OPERATION_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_WHEN_OPERATION, true);
-    }
 
     static {
         IS_OPERATOR_RULE_BY_ELEMENT_TYPE.put(ElixirTypes.ADDITION_INFIX_OPERATOR, true);
@@ -221,10 +219,6 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return count >= atLeastCount;
-    }
-
-    private static boolean isOperationElementType(IElementType elementType) {
-        return IS_OPERATION_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean isOperatorRuleElementType(IElementType elementType) {
@@ -587,7 +581,7 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildStabOperationChildren(parent, childrenWrap);
         } else if (WHEN_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildWhenOperationChildren(parent);
-        } else if (isOperationElementType(parentElementType)) {
+        } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildOperationChildren(parent);
         } else if (isUnmatchedCallElementType(parentElementType)) {
             blocks = buildUnmatchedCallChildren(parent, parentWrap, parentAlignment);
