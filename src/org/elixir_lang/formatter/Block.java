@@ -334,8 +334,10 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildAssociationsBaseChildren(@NotNull ASTNode associationsBase,
-                                                                              @NotNull Wrap containerAssociationOperation) {
+    private List<com.intellij.formatting.Block> buildAssociationsBaseChildren(
+            @NotNull ASTNode associationsBase,
+            @NotNull Wrap containerAssociationOperationWrap
+    ) {
         return buildChildren(
                 associationsBase,
                 childBlockListPair -> {
@@ -345,7 +347,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
                     if (childElementType == ElixirTypes.CONTAINER_ASSOCIATION_OPERATION) {
-                        blockList.add(buildChild(child, containerAssociationOperation, Indent.getNormalIndent()));
+                        blockList.add(buildChild(child, containerAssociationOperationWrap, Indent.getNormalIndent()));
                     } else {
                         blockList.add(buildChild(child));
                     }
@@ -887,7 +889,9 @@ public class Block extends AbstractBlock implements BlockEx {
 
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    if (childElementType == ElixirTypes.ASSOCIATIONS) {
+                    if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
+                        blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
+                    } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
                         blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap));
                     } else if (childElementType == ElixirTypes.KEYWORDS) {
                         blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));

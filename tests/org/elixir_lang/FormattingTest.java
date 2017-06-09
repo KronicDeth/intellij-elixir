@@ -521,6 +521,18 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("map_construction_arguments_associations_all_wrap_if_any_wraps_after.ex");
     }
 
+    public void testMapConstructionArgumentsAssociationsBaseAndKeywordsAllWrapIfAnyWraps() {
+        myFixture.configureByFile(
+                "map_construction_arguments_associations_base_and_keywords_all_wrap_if_any_wraps_before.ex"
+        );
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(
+                "map_construction_arguments_associations_base_and_keywords_all_wrap_if_any_wraps_after.ex"
+        );
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 
