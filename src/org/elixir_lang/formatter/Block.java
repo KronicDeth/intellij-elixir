@@ -179,6 +179,13 @@ public class Block extends AbstractBlock implements BlockEx {
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
         this.childrenWrap = childrenWrap;
+
+        if (MAP_TOKEN_SET.contains(node.getElementType())) {
+            assert wrap != null : "mapOperation and structOperation must have a Wrap, so child wrap can be " +
+                    "created for opening curly ({) and mapExpression for structOperation";
+            assert alignment != null : "mapOperation and structOperation must have an Alignment, so that " +
+                    "closing curly ({) can align to start of map";
+        }
     }
 
     @NotNull
@@ -263,9 +270,15 @@ public class Block extends AbstractBlock implements BlockEx {
                 accessExpression,
                 (childBlockListPair) -> {
                     ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
                     List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
 
-                    blockList.add(buildChild(child, childrenWrap, childrenAlignment));
+                    if (MAP_TOKEN_SET.contains(childElementType)) {
+                        blockList.add(buildMapChild(child, childrenWrap, childrenAlignment));
+                    } else {
+                        blockList.add(buildChild(child, childrenWrap, childrenAlignment));
+                    }
 
                     return blockList;
                 }
@@ -550,23 +563,7 @@ public class Block extends AbstractBlock implements BlockEx {
                             );
 
                         } else if (MAP_TOKEN_SET.contains(childElementType)) {
-                            Wrap mapWrap;
-
-                            if (childrenWrap != null) {
-                                mapWrap = childrenWrap;
-                            } else {
-                                mapWrap = Wrap.createWrap(WrapType.NORMAL, true);
-                            }
-
-                            Alignment mapAlignment;
-
-                            if (childrenAlignment != null) {
-                                mapAlignment = childrenAlignment;
-                            } else {
-                                mapAlignment = Alignment.createAlignment();
-                            }
-
-                            lambdaBlocks.add(buildChild(child, mapWrap, mapAlignment));
+                            lambdaBlocks.add(buildMapChild(child, childrenWrap, childrenAlignment));
                         } else if (isOperatorRuleElementType(childElementType)) {
                             lambdaBlocks.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
@@ -737,6 +734,8 @@ public class Block extends AbstractBlock implements BlockEx {
 
                     if (childElementType == ElixirTypes.CLOSING_CURLY) {
                         blockList.add(buildChild(child, tailWrap, mapAlignment, Indent.getNoneIndent()));
+                    } else if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
+                        blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap));
                     } else if (childElementType == ElixirTypes.OPENING_CURLY) {
                         blockList.add(
                                 buildChild(child, mapChildWrap)
@@ -748,6 +747,82 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    /**
+     *
+     * @param mapArgumentsTailWrap {@link Wrap} shared between the mapConstructionArguments and
+     *   {@link ElixirTypes#CLOSING_CURLY}.
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapConstructArgumentsChildren(
+            @NotNull ASTNode mapConstructionArguments,
+            @NotNull Wrap mapArgumentsTailWrap
+    ) {
+        return buildChildren(
+                mapConstructionArguments,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.KEYWORDS) {
+                        blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildKeywordsChildren(@NotNull ASTNode keywords,
+                                                                      @NotNull Wrap keywordPairWrap) {
+
+        return buildChildren(
+                keywords,
+                childBlockListPair -> {
+                    ASTNode child = childBlockListPair.first;
+                    IElementType childElementType = child.getElementType();
+
+                    List<com.intellij.formatting.Block> blockList = childBlockListPair.second;
+
+                    if (childElementType == ElixirTypes.KEYWORD_PAIR) {
+                        blockList.add(buildChild(child, keywordPairWrap, Indent.getNormalIndent()));
+                    } else {
+                        // commas and comments
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private com.intellij.formatting.Block buildMapChild(@NotNull ASTNode map,
+                                                        @Nullable Wrap childrenWrap,
+                                                        @Nullable Alignment childrenAlignment) {
+        Wrap mapWrap;
+
+        if (childrenWrap != null) {
+            mapWrap = childrenWrap;
+        } else {
+            mapWrap = Wrap.createWrap(WrapType.NORMAL, true);
+        }
+
+        Alignment mapAlignment;
+
+        if (childrenAlignment != null) {
+            mapAlignment = childrenAlignment;
+        } else {
+            mapAlignment = Alignment.createAlignment();
+        }
+
+        return buildChild(map, mapWrap, mapAlignment);
     }
 
     @NotNull

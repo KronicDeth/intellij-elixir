@@ -505,6 +505,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("space_after_keyword_pair_colon.ex");
     }
 
+    public void testMapTailArgumentsAllWrapIfAnyWraps() {
+        myFixture.configureByFile("map_tail_arguments_all_wrap_if_any_wraps_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("map_tail_arguments_all_wrap_if_any_wraps_after.ex");
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 
