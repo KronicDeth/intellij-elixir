@@ -61,7 +61,6 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
-    private static final Map<IElementType, Boolean> IS_UNMATCHED_CALL_BY_ELEMENT_TYPE = new IdentityHashMap<>();
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
             ElixirTypes.MAP_OPERATION,
             ElixirTypes.STRUCT_OPERATION
@@ -143,17 +142,16 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
-
-    static {
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_DOT_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_QUALIFIED_PARENTHESES_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL, true);
-        IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.put(ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL, true);
-    }
+    private static final TokenSet UNMATCHED_CALL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.UNMATCHED_DOT_CALL,
+            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.UNMATCHED_QUALIFIED_PARENTHESES_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL
+    );
 
     @Nullable
     private final Wrap childrenWrap;
@@ -218,10 +216,6 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return count >= atLeastCount;
-    }
-
-    private static boolean isUnmatchedCallElementType(IElementType elementType) {
-        return IS_UNMATCHED_CALL_BY_ELEMENT_TYPE.containsKey(elementType);
     }
 
     private static boolean shouldBuildBlock(@NotNull IElementType childElementType) {
@@ -578,7 +572,7 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildWhenOperationChildren(parent);
         } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildOperationChildren(parent);
-        } else if (isUnmatchedCallElementType(parentElementType)) {
+        } else if (UNMATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildUnmatchedCallChildren(parent, parentWrap, parentAlignment);
         } else {
             /* all children need a shared alignment, so that the second child doesn't have an automatic continuation
