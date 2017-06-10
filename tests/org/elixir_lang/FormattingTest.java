@@ -801,6 +801,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("single_space_not_operator.ex");
     }
 
+    public void testSpec() {
+        String path = "spec.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     public void testStructKeysAreAligned() {
         myFixture.configureByFile("struct_keys_unaligned.ex");
 

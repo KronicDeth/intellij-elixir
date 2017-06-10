@@ -63,6 +63,16 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MAP_OPERATION,
             ElixirTypes.STRUCT_OPERATION
     );
+    private static final TokenSet MATCHED_CALL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.MATCHED_DOT_CALL,
+            ElixirTypes.MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.MATCHED_QUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.MATCHED_QUALIFIED_PARENTHESES_CALL,
+            ElixirTypes.MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
+            ElixirTypes.MATCHED_UNQUALIFIED_PARENTHESES_CALL
+    );
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
@@ -377,6 +387,26 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
+    @NotNull
+    private List<com.intellij.formatting.Block> buildCallChildChildren(@NotNull ASTNode child,
+                                                                       @NotNull IElementType childElementType,
+                                                                       @Nullable Wrap callWrap,
+                                                                       @Nullable Alignment callAlignment) {
+        List<com.intellij.formatting.Block> blockList = new ArrayList<>();
+
+        if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
+            blockList.addAll(buildMatchedParenthesesArguments(child, callWrap, callAlignment));
+        } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+            blockList.addAll(buildNoParenthesesOneArgument(child, callWrap, callAlignment));
+        } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
+            blockList.addAll(buildOperatorRuleChildren(child));
+        } else {
+            blockList.add(buildChild(child));
+        }
+
+        return blockList;
+    }
+
     /**
      * {@link #getSpacing(com.intellij.formatting.Block, com.intellij.formatting.Block)} only has the parent block and
      * the two direct children as context for evaluating rules, so to distinguish normal division `/` from `/` in
@@ -520,6 +550,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildCaptureNonNumericOperationChildren(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
+        } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
             assert parentWrap != null : "mapOperation and structOperation must have a Wrap, so child wrap can be " +
                                         "created for opening curly ({) and mapExpression for structOperation";
@@ -822,6 +854,27 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private List<com.intellij.formatting.Block> buildMatchedCallChildren(@NotNull ASTNode matchedCall,
+                                                                         @Nullable Wrap parentWrap,
+                                                                         @Nullable Alignment parentAlignment) {
+        return buildChildren(
+                matchedCall,
+                (child, childElementType, blockList) -> {
+                    blockList.addAll(
+                            buildCallChildChildren(
+                                    child,
+                                    childElementType,
+                                    parentWrap,
+                                    parentAlignment
+                            )
+                    );
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
     private List<com.intellij.formatting.Block> buildMatchedParenthesesArguments(
             @NotNull ASTNode matchedParenthesesArguments,
             @Nullable Wrap parentWrap,
@@ -1084,14 +1137,10 @@ public class Block extends AbstractBlock implements BlockEx {
                        indented relative to parent */
                     if (childElementType == ElixirTypes.DO_BLOCK) {
                         blockList.addAll(buildDoBlockChildren(child, parentAlignment));
-                    } else if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
-                        blockList.addAll(buildMatchedParenthesesArguments(child, parentWrap, parentAlignment));
-                    } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                        blockList.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
-                    } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blockList.add(buildChild(child));
+                        blockList.addAll(
+                                buildCallChildChildren(child, childElementType, parentWrap, parentAlignment)
+                        );
                     }
 
                     return blockList;
