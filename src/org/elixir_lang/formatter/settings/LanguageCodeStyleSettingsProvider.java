@@ -336,7 +336,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
 
         CommonCodeStyleSettings.IndentOptions indentOptions = defaultCommonSettings.initIndentOptions();
         indentOptions.INDENT_SIZE = 2;
-        indentOptions.CONTINUATION_INDENT_SIZE = 4;
+        indentOptions.CONTINUATION_INDENT_SIZE = 2;
         indentOptions.TAB_SIZE = 2;
 
         return defaultCommonSettings;
