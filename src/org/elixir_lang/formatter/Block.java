@@ -130,16 +130,6 @@ public class Block extends AbstractBlock implements BlockEx {
             TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION),
             HEREDOC_TOKEN_SET
     );
-    private static final TokenSet UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
-            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
-    );
-    private static final TokenSet WHEN_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_WHEN_OPERATION,
-            ElixirTypes.UNMATCHED_WHEN_OPERATION
-    );
-    private static final TokenSet WHITESPACE_TOKEN_SET =
-            TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
     private static final TokenSet UNMATCHED_CALL_TOKEN_SET = TokenSet.create(
             ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
             ElixirTypes.UNMATCHED_DOT_CALL,
@@ -150,7 +140,16 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
             ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL
     );
-
+    private static final TokenSet UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
+    );
+    private static final TokenSet WHEN_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_WHEN_OPERATION,
+            ElixirTypes.UNMATCHED_WHEN_OPERATION
+    );
+    private static final TokenSet WHITESPACE_TOKEN_SET =
+            TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
     @Nullable
     private final Wrap childrenWrap;
     @Nullable
@@ -710,15 +709,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
                                                                           @NotNull Wrap mapChildWrap,
                                                                           @NotNull Alignment mapAlignment) {
-        Wrap tailWrap;
-
-        // if already partially wrapped, wrap all
-        if (lineNumber(mapArguments.findChildByType(ElixirTypes.OPENING_CURLY)) !=
-                lineNumber(mapArguments.findChildByType(ElixirTypes.CLOSING_CURLY))) {
-            tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-        } else {
-            tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
-        }
+        Wrap tailWrap = tailWrap(mapArguments, ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY);
 
         return buildChildren(
                 mapArguments,
@@ -831,6 +822,25 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private List<com.intellij.formatting.Block> buildMatchedParenthesesArguments(
+            @NotNull ASTNode matchedParenthesesArguments,
+            @Nullable Wrap parentWrap,
+            @Nullable Alignment parentAlignment) {
+        return buildChildren(
+                matchedParenthesesArguments,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.PARENTHESES_ARGUMENTS) {
+                        blockList.addAll(buildParenthesesArgumentsChildren(child, parentWrap, parentAlignment));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
     private List<com.intellij.formatting.Block> buildNoParenthesesOneArgument(
             @NotNull ASTNode child,
             @Nullable Wrap parentWrap,
@@ -898,6 +908,40 @@ public class Block extends AbstractBlock implements BlockEx {
                 operatorRuleNode,
                 (child, childElementType, blockList) -> {
                     blockList.add(buildChild(child, operatorWrap, Indent.getNoneIndent()));
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildParenthesesArgumentsChildren(
+            @NotNull ASTNode parenthesesArguments,
+            @Nullable Wrap parentWrap,
+            @Nullable Alignment parentAlignment) {
+        Wrap tailWrap = tailWrap(
+                parenthesesArguments,
+                ElixirTypes.OPENING_PARENTHESIS,
+                ElixirTypes.CLOSING_PARENTHESIS
+        );
+
+        return buildChildren(
+                parenthesesArguments,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.CLOSING_PARENTHESIS) {
+                        blockList.add(buildChild(child, tailWrap, parentAlignment, Indent.getNoneIndent()));
+                    } else if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                    } else if (childElementType == ElixirTypes.OPENING_PARENTHESIS) {
+                        blockList.add(
+                                buildChild(child, Wrap.createChildWrap(parentWrap, WrapType.CHOP_DOWN_IF_LONG, true))
+                        );
+                    } else {
+                        // arguments that aren't keywords.
+                        blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
+                    }
 
                     return blockList;
                 }
@@ -1040,6 +1084,8 @@ public class Block extends AbstractBlock implements BlockEx {
                        indented relative to parent */
                     if (childElementType == ElixirTypes.DO_BLOCK) {
                         blockList.addAll(buildDoBlockChildren(child, parentAlignment));
+                    } else if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
+                        blockList.addAll(buildMatchedParenthesesArguments(child, parentWrap, parentAlignment));
                     } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
                         blockList.addAll(buildNoParenthesesOneArgument(child, parentWrap, parentAlignment));
                     } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
@@ -1162,5 +1208,27 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public boolean isLeaf() {
         return myNode.getFirstChildNode() == null;
+    }
+
+    /**
+     * If already partially wrapped between {@code openingElementType} and {@code closingElementType}, then wrap all
+     *
+     * @return {@link WrapType#ALWAYS} if elements for {@code openingElementType} and {@code closingElementType} are on
+     *   different lines; otherwise, {@link WrapType#CHOP_DOWN_IF_LONG}.
+     */
+    @NotNull
+    private Wrap tailWrap(@NotNull ASTNode parent,
+                          @NotNull IElementType openingElementType,
+                          @NotNull IElementType closingElementType) {
+        Wrap tailWrap;
+
+        if (lineNumber(parent.findChildByType(openingElementType)) !=
+                lineNumber(parent.findChildByType(closingElementType))) {
+            tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+        } else {
+            tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        }
+
+        return tailWrap;
     }
 }
