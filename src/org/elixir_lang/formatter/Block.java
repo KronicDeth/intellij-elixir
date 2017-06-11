@@ -1099,7 +1099,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 stabBody,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == END_OF_EXPRESSION) {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, childWrap, childAlignment, childIndent));
+                    } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else {
                         blockList.add(buildChild(child, childWrap, childAlignment, childIndent));
