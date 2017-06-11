@@ -268,7 +268,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 accessExpression,
                 (child, childElementType, blockList) -> {
-                    if (MAP_TOKEN_SET.contains(childElementType)) {
+                    if (childElementType == ElixirTypes.LIST) {
+                        blockList.addAll(buildListChildren(child, childrenWrap, childrenAlignment, childrenIndent));
+                    } else if (MAP_TOKEN_SET.contains(childElementType)) {
                         blockList.add(buildMapChild(child, childrenWrap, childrenAlignment, childrenIndent));
                     } else {
                         blockList.add(buildChild(child, childrenWrap, childrenAlignment, childrenIndent));
@@ -795,6 +797,34 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else {
                         // commas and comments
                         blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildListChildren(@NotNull ASTNode list,
+                                                                  @Nullable Wrap listWrap,
+                                                                  @Nullable Alignment listAlignment,
+                                                                  @Nullable Indent listIndent) {
+        Wrap listChildWrap = Wrap.createChildWrap(listWrap, WrapType.NORMAL, true);
+        Wrap tailWrap = tailWrap(list, ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET);
+
+        return buildChildren(
+                list,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.CLOSING_BRACKET) {
+                        blockList.add(buildChild(child, tailWrap, listAlignment, Indent.getNoneIndent()));
+                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                    } else if (childElementType == ElixirTypes.OPENING_BRACKET) {
+                        blockList.add(
+                                buildChild(child, listChildWrap, listIndent)
+                        );
+                    } else {
+                        blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
                     }
 
                     return blockList;

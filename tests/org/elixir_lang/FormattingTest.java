@@ -474,6 +474,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("space_after_keyword_pair_colon.ex");
     }
 
+    public void testListIndent() {
+        assertFormatted("list_indent.ex");
+    }
+
     public void testMapConstructionArgumentsKeywordsAllWrapIfAnyWraps() {
         myFixture.configureByFile("map_construction_arguments_keywords_all_wrap_if_any_wraps_before.ex");
 
