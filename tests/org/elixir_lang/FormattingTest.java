@@ -6,6 +6,8 @@ import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.intellij.util.containers.ContainerUtil;
 import org.elixir_lang.code_style.CodeStyleSettings;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FormattingTest extends LightCodeInsightFixtureTestCase {
     private com.intellij.psi.codeStyle.CodeStyleSettings temporaryCodeStyleSettings;
@@ -43,33 +45,15 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 
     public void testAnonymousFunctionWithMultipleClauses() {
-        String path = "anonymous_function_with_multiple_clauses.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("anonymous_function_with_multiple_clauses.ex");
     }
 
     public void testAnonymousFunctionAsLastArgument() {
-        String path = "anonymous_function_as_last_argument.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("anonymous_function_as_last_argument.ex");
     }
 
     public void testAnonymousFunctionAsOnlyArgument() {
-        String path = "anonymous_function_as_only_argument.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("anonymous_function_as_only_argument.ex");
     }
 
     public void testAnonymousFunctionWithMultipleClausesChop() {
@@ -82,13 +66,7 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
 
     // TODO fix indentation of body after wrapping: it is relative to stab operation start instead start of line
     public void testAnonymousFunctionWithSingleClause() {
-        String path = "anonymous_function_with_single_clause.ex";
-
-        myFixture.configureByFiles(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("anonymous_function_with_single_clause.ex");
     }
 
     public void testNoSpaceAfterAtOperator() {
@@ -100,58 +78,43 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 
     public void testCaptureAndSymbolOperatorsWithoutSpaceAfterCapture() {
-        String path = "capture_and_symbol_operators_without_space_after_capture.ex";
-
-        myFixture.configureByFile(path);
-
-        temporaryCodeStyleSettings
-                .getCustomSettings(CodeStyleSettings.class)
-                .SPACE_AFTER_CAPTURE_OPERATOR = false;
-        temporaryCodeStyleSettings
-                .getCommonSettings(ElixirLanguage.INSTANCE)
-                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted(
+                "capture_and_symbol_operators_without_space_after_capture.ex",
+                () -> {
+                    temporaryCodeStyleSettings
+                            .getCustomSettings(CodeStyleSettings.class)
+                            .SPACE_AFTER_CAPTURE_OPERATOR = false;
+                    temporaryCodeStyleSettings
+                            .getCommonSettings(ElixirLanguage.INSTANCE)
+                            .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
+                }
+        );
     }
 
     public void testCaptureNameArityWithSpaceAroundMultiplication() {
-        String path = "capture_name_arity_with_space_around_multiplication.ex";
-
-        myFixture.configureByFile(path);
-
-        temporaryCodeStyleSettings
-                .getCommonSettings(ElixirLanguage.INSTANCE)
-                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted(
+                "capture_name_arity_with_space_around_multiplication.ex",
+                () -> {
+                    temporaryCodeStyleSettings
+                            .getCommonSettings(ElixirLanguage.INSTANCE)
+                            .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
+                }
+        );
     }
 
     public void testCaptureQualifierDotNameArityWithSpaceAroundMultiplication() {
-        String path = "capture_qualifier_dot_name_arity_with_space_around_multiplication.ex";
-
-        myFixture.configureByFile(path);
-
-        temporaryCodeStyleSettings
-                .getCommonSettings(ElixirLanguage.INSTANCE)
-                .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted(
+                "capture_qualifier_dot_name_arity_with_space_around_multiplication.ex",
+                () -> {
+                    temporaryCodeStyleSettings
+                            .getCommonSettings(ElixirLanguage.INSTANCE)
+                            .SPACE_AROUND_MULTIPLICATIVE_OPERATORS = true;
+                }
+        );
     }
 
     public void testCommentIndentAfterDoInDoBlock() {
-        String path = "comment_indent_after_do_in_do_block.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("comment_indent_after_do_in_do_block.ex");
     }
 
     public void testIndentWithoutOverrides() {
@@ -460,33 +423,15 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 
     public void testHeredocAsLastArgument() {
-        String path = "heredoc_as_last_argument.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("heredoc_as_last_argument.ex");
     }
 
     public void testHeredocAsOnlyArgument() {
-        String path = "heredoc_as_only_argument.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("heredoc_as_only_argument.ex");
     }
 
     public void testHeredocBlankLines() {
-        String path = "heredoc_blank_lines.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted( "heredoc_blank_lines.ex");
     }
 
     public void testWithSpaceAroundInMatchOperators() {
@@ -822,13 +767,7 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     }
 
     public void testSpec() {
-        String path = "spec.ex";
-
-        myFixture.configureByFile(path);
-
-        reformatFixture();
-
-        myFixture.checkResultByFile(path);
+        assertFormatted("spec.ex");
     }
 
     public void testStructKeysAreAligned() {
@@ -861,6 +800,25 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         String path = "unmatched_qualifed_parentheses_call_argument_indent.ex";
 
         myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
+    private void assertFormatted(@NotNull String path) {
+        assertFormatted(path, null);
+    }
+
+    /**
+     * Asserts that {@code path} will not change when reformatted.
+     */
+    private void assertFormatted(@NotNull String path, @Nullable Runnable runnable) {
+        myFixture.configureByFile(path);
+
+        if (runnable != null) {
+            runnable.run();
+        }
 
         reformatFixture();
 
