@@ -815,7 +815,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 list,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.CLOSING_BRACKET) {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, Indent.getNormalIndent()));
+                    } else if (childElementType == ElixirTypes.CLOSING_BRACKET) {
                         blockList.add(buildChild(child, tailWrap, listAlignment, Indent.getNoneIndent()));
                     } else if (childElementType == ElixirTypes.KEYWORDS) {
                         blockList.addAll(buildKeywordsChildren(child, tailWrap));
