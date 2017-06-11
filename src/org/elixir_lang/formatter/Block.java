@@ -394,7 +394,9 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                        @Nullable Alignment callAlignment) {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
-        if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
+        if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+            blockList.addAll(buildAccessExpressionChildren(child));
+        } else if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
             blockList.addAll(buildMatchedParenthesesArguments(child, callWrap, callAlignment));
         } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
             blockList.addAll(buildNoParenthesesOneArgument(child, callWrap, callAlignment));
