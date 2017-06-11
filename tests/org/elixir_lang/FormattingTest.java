@@ -121,6 +121,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("comment_indent_after_do_in_do_block.ex");
     }
 
+    public void testCommentIndentAfterFn() {
+        assertFormatted("comment_indent_after_fn.ex");
+    }
+
     public void testIndentWithoutOverrides() {
         myFixture.configureByFile("indent_without_override_before.ex");
 
