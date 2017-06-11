@@ -113,6 +113,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testCaseAtEndOfPipeline() {
+        assertFormatted("case_at_end_of_pipeline.ex");
+    }
+
     public void testCommentIndentAfterDoInDoBlock() {
         assertFormatted("comment_indent_after_do_in_do_block.ex");
     }

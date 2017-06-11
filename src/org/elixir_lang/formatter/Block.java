@@ -360,8 +360,10 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(buildArrowOperationChildren(child, nestedStartAlignment));
                     } else if (childElementType == ElixirTypes.ARROW_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child, operatorAlignment));
-                        // right operand has no alignment as it is on same line as arrow operator when indented
-                        operandAlignment[0] = null;
+                        /* right operand has alignment only so that any children can align to it instead of operator,
+                           which ensures that unmatched call do block's end aligns with start of the call instead of
+                           the arrow operator */
+                        operandAlignment[0] = Alignment.createAlignment();
                     } else {
                         blockList.add(buildChild(child, operandAlignment[0]));
                     }
