@@ -415,6 +415,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("no_spaces_around_dot_operator.ex");
     }
 
+    public void testPipelineMatchAlignment() {
+        String path = "pipeline_match_alignment.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     public void testIndentBeforeElseKeyword() {
         myFixture.configureByFile("incorrect_indent_before_else_keyword.ex");
 

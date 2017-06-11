@@ -27,6 +27,10 @@ import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.lineNumber;
  * will be used.
  */
 public class Block extends AbstractBlock implements BlockEx {
+    private static final TokenSet ARROW_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_ARROW_OPERATION,
+            ElixirTypes.UNMATCHED_ARROW_OPERATION
+    );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
@@ -80,7 +84,6 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_ADDITION_OPERATION,
             ElixirTypes.MATCHED_AND_OPERATION,
-            ElixirTypes.MATCHED_ARROW_OPERATION,
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.MATCHED_COMPARISON_OPERATION,
             ElixirTypes.MATCHED_IN_MATCH_OPERATION,
@@ -98,7 +101,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNARY_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_ADDITION_OPERATION,
             ElixirTypes.UNMATCHED_AND_OPERATION,
-            ElixirTypes.UNMATCHED_ARROW_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_COMPARISON_OPERATION,
             ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
@@ -313,6 +315,55 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
                         blockList.add(buildChild(child/*, childrenAlignment*/));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    /**
+     * @param startAlignment the alignment for the start of the arrow operation (pipeline) chain.  If {@code null} is
+     *                       given, then the left operand of the {@code arrowOperation} is given an alignment and it
+     *                       will be the startAlignment or any arrowOperations in the right operand.
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildArrowOperationChildren(@NotNull ASTNode arrowOperation,
+                                                                            @Nullable Alignment startAlignment) {
+        Alignment operatorAlignment;
+        final Alignment[] operandAlignment = new Alignment[1];
+        Alignment nestedStartAlignment;
+
+        if (startAlignment == null) {
+            nestedStartAlignment = Alignment.createAlignment();
+        } else {
+            nestedStartAlignment = startAlignment;
+        }
+
+        // if no arrow operations remain, then first operand in buildChildren lambda will be start
+        if (arrowOperation.findChildByType(ARROW_OPERATION_TOKEN_SET) == null) {
+            operandAlignment[0] = nestedStartAlignment;
+        } else {
+            operandAlignment[0] = null;
+        }
+
+        operatorAlignment = nestedStartAlignment;
+
+        return buildChildren(
+                arrowOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(
+                                buildAccessExpressionChildren(child, operandAlignment[0])
+                        );
+                    } else if (ARROW_OPERATION_TOKEN_SET.contains(childElementType)) {
+                        blockList.addAll(buildArrowOperationChildren(child, nestedStartAlignment));
+                    } else if (childElementType == ElixirTypes.ARROW_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child, operatorAlignment));
+                        // right operand has no alignment as it is on same line as arrow operator when indented
+                        operandAlignment[0] = null;
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment[0]));
                     }
 
                     return blockList;
@@ -554,6 +605,8 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (parentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
             blocks = buildAnonymousFunctionChildren(parent, parentAlignment);
+        } else if (ARROW_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildArrowOperationChildren(parent, null);
         } else if (parentElementType == ElixirTypes.BLOCK_ITEM) {
             blocks = buildBlockItemChildren(parent, parentAlignment);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(parentElementType)) {
@@ -959,19 +1012,32 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRuleNode) {
-        return buildOperatorRuleChildren(operatorRuleNode, null);
+    private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule) {
+        return buildOperatorRuleChildren(operatorRule, null, null);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
+                                                                          @Nullable Alignment operatorAlignment) {
+        return buildOperatorRuleChildren(operatorRule, null, operatorAlignment);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
+                                                                          @Nullable Wrap operatorWrap) {
+        return buildOperatorRuleChildren(operatorRule, operatorWrap, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(
-            @NotNull ASTNode operatorRuleNode,
-            @Nullable Wrap operatorWrap
+            @NotNull ASTNode operatorRule,
+            @Nullable Wrap operatorWrap,
+            @Nullable Alignment operatorAlignment
     ) {
         return buildChildren(
-                operatorRuleNode,
+                operatorRule,
                 (child, childElementType, blockList) -> {
-                    blockList.add(buildChild(child, operatorWrap, Indent.getNoneIndent()));
+                    blockList.add(buildChild(child, operatorWrap, operatorAlignment, Indent.getNoneIndent()));
 
                     return blockList;
                 }
