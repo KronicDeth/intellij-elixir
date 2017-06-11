@@ -706,7 +706,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.add(buildChild(child, endWrap, parentAlignment));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(
-                                buildEndOfExpressionChildren(child, null, Indent.getNoneIndent())
+                                buildEndOfExpressionChildren(child, null, Indent.getNormalIndent())
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
                         blockList.addAll(buildStabChildren((CompositeElement) child));

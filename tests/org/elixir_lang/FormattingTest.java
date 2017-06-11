@@ -144,6 +144,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testCommentIndentAfterDoInDoBlock() {
+        String path = "comment_indent_after_do_in_do_block.ex";
+
+        myFixture.configureByFile(path);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile(path);
+    }
+
     public void testIndentWithoutOverrides() {
         myFixture.configureByFile("indent_without_override_before.ex");
 
