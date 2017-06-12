@@ -3,6 +3,7 @@ package org.elixir_lang.formatter;
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
@@ -20,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.ElixirTypes.*;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.lineNumber;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.document;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -1385,12 +1386,26 @@ public class Block extends AbstractBlock implements BlockEx {
     private Wrap tailWrap(@NotNull ASTNode parent,
                           @NotNull IElementType openingElementType,
                           @NotNull IElementType closingElementType) {
-        Wrap tailWrap;
+        Document document = document(parent.getPsi());
+        Wrap tailWrap = null;
 
-        if (lineNumber(parent.findChildByType(openingElementType)) !=
-                lineNumber(parent.findChildByType(closingElementType))) {
-            tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-        } else {
+        if (document != null) {
+            ASTNode openingElement = parent.findChildByType(openingElementType);
+
+            if (openingElement != null) {
+                ASTNode closingElement = parent.findChildByType(closingElementType);
+
+                if (closingElement != null) {
+                    if (document.getLineNumber(openingElement.getStartOffset()) !=
+                            document.getLineNumber(closingElement.getStartOffset())) {
+                        tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+                    }
+
+                }
+            }
+        }
+
+        if (tailWrap == null) {
             tailWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
         }
 
