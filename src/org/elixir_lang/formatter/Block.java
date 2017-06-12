@@ -684,6 +684,35 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(myNode, myWrap, myAlignment);
     }
 
+    @NotNull
+    private List<com.intellij.formatting.Block> buildContainerChildren(@NotNull ASTNode container,
+                                                                       @NotNull IElementType openingElementType,
+                                                                       @NotNull IElementType closingElementType) {
+        Indent childrenIndent = Indent.getNormalIndent();
+        Wrap tailWrap = tailWrap(container, openingElementType, closingElementType);
+
+        return buildChildren(
+                container,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
+                    } else if (childElementType == closingElementType) {
+                        blockList.add(buildChild(child, tailWrap, Indent.getNoneIndent()));
+                    } else if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                    } else if (childElementType == openingElementType) {
+                        blockList.add(buildChild(child));
+                    } else {
+                        blockList.add(buildChild(child, tailWrap, childrenIndent));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
     /**
      * Builds doBlock DO, stab.*, and END as siblings, so they can all be indented relative to the parent unmatched call
      * from {@link #buildUnmatchedCallChildren(ASTNode, Wrap, Alignment)}
@@ -811,29 +840,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildListChildren(@NotNull ASTNode list) {
-        Indent childrenIndent = Indent.getNormalIndent();
-        Wrap tailWrap = tailWrap(list, ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET);
-
-        return buildChildren(
-                list,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
-                    } else if (childElementType == ElixirTypes.CLOSING_BRACKET) {
-                        blockList.add(buildChild(child, tailWrap, Indent.getNoneIndent()));
-                    } else if (childElementType == ElixirTypes.COMMA) {
-                        blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
-                    } else if (childElementType == ElixirTypes.OPENING_BRACKET) {
-                        blockList.add(buildChild(child));
-                    } else {
-                        blockList.add(buildChild(child, tailWrap, childrenIndent));
-                    }
-
-                    return blockList;
-                }
-        );
+        return buildContainerChildren(list, ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET);
     }
 
     @NotNull
@@ -1246,27 +1253,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildTupleChildren(@NotNull ASTNode tuple) {
-        Indent childrenIndent = Indent.getNormalIndent();
-        Wrap tailWrap = tailWrap(tuple, ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET);
-
-        return buildChildren(
-                tuple,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
-                    } else if (childElementType == ElixirTypes.CLOSING_CURLY) {
-                        blockList.add(buildChild(child, tailWrap, Indent.getNoneIndent()));
-                    } else if (childElementType == ElixirTypes.COMMA) {
-                        blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.OPENING_CURLY) {
-                        blockList.add(buildChild(child));
-                    } else {
-                        blockList.add(buildChild(child, tailWrap, childrenIndent));
-                    }
-
-                    return blockList;
-                }
-        );
+        return buildContainerChildren(tuple, ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY);
     }
 
     @NotNull
