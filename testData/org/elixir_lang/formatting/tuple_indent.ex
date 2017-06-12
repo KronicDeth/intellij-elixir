@@ -1,55 +1,55 @@
-[
+{
   one,
   two
-]
+}
 
-one = [
+one = {
   two,
   three
-]
+}
 
-one [
+one {
   two,
   three
-]
+}
 
-one two, [
+one two, {
   three,
   four
-]
+}
 
-one [
+one {
       two
-    ],
-    [
+    },
+    {
       three
-    ]
+    }
 
 def stab do
-  [
+  {
     one,
     two
-  ]
+  }
 
-  one = [
+  one = {
     two,
     three
-  ]
+  }
 
-  one [
+  one {
     two,
     three
-  ]
+  }
 
-  one two, [
+  one two, {
     three,
     four
-  ]
+  }
 
-  one [
+  one {
         two
-      ],
-      [
+      },
+      {
         three
-      ]
+      }
 end

@@ -808,6 +808,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("struct_all_keys_wrap.ex");
     }
 
+    public void testTupleIndent() {
+        assertFormatted("tuple_indent.ex");
+    }
+
     public void testUnmatchedQualifedParenthesesCallArgumentIndent() {
         String path = "unmatched_qualifed_parentheses_call_argument_indent.ex";
 
