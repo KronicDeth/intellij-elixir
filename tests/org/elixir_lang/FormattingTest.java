@@ -510,6 +510,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testMapIndent() {
+        assertFormatted("map_indent.ex");
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 

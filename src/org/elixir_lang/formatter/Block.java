@@ -190,13 +190,6 @@ public class Block extends AbstractBlock implements BlockEx {
 
         assert elementType != ElixirTypes.ACCESS_EXPRESSION : "accessExpressions should be flattened with " +
                 "buildAccessExpressionChildren";
-
-        if (MAP_TOKEN_SET.contains(node.getElementType())) {
-            assert wrap != null : "mapOperation and structOperation must have a Wrap, so child wrap can be " +
-                    "created for opening curly ({) and mapExpression for structOperation";
-            assert alignment != null : "mapOperation and structOperation must have an Alignment, so that " +
-                    "closing curly ({) can align to start of map";
-        }
     }
 
     @NotNull
@@ -275,11 +268,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 accessExpression,
                 (child, childElementType, blockList) -> {
-                    if (MAP_TOKEN_SET.contains(childElementType)) {
-                        blockList.add(buildMapChild(child, childrenWrap, childrenAlignment, childrenIndent));
-                    } else {
-                        blockList.add(buildChild(child, childrenWrap, childrenAlignment, childrenIndent));
-                    }
+                    blockList.add(buildChild(child, childrenWrap, childrenAlignment, childrenIndent));
 
                     return blockList;
                 }
@@ -623,12 +612,7 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
-            assert parentWrap != null : "mapOperation and structOperation must have a Wrap, so child wrap can be " +
-                                        "created for opening curly ({) and mapExpression for structOperation";
-            assert parentAlignment != null : "mapOperation and structOperation must have an Alignment, so that " +
-                                             "closing curly ({) can align to start of map";
-
-            blocks = buildMapChildren(parent, parentWrap, parentAlignment);
+            blocks = buildMapChildren(parent);
         } else if (parentElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
             blocks = buildMapUpdateArgumentsChildren(parent);
         } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
@@ -654,8 +638,6 @@ public class Block extends AbstractBlock implements BlockEx {
                             blockList.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
                             );
-                        } else if (MAP_TOKEN_SET.contains(childElementType)) {
-                            blockList.add(buildMapChild(child, childrenWrap, childrenAlignment, null));
                         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                             blockList.addAll(buildOperatorRuleChildren(child));
                         } else if (childElementType == END_OF_EXPRESSION) {
@@ -688,24 +670,51 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildContainerChildren(@NotNull ASTNode container,
                                                                        @NotNull IElementType openingElementType,
                                                                        @NotNull IElementType closingElementType) {
+        return buildContainerChildren(
+                container,
+                openingElementType,
+                closingElementType,
+                (child, childElementType, tailWrap, childrenIndent, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
+                    } else if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                    } else {
+                        blockList.add(buildChild(child, tailWrap, childrenIndent));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildContainerChildren(
+            @NotNull ASTNode container,
+            @NotNull IElementType openingElementType,
+            @NotNull IElementType closingElementType,
+            ContainerBlockListReducer containerBlockListReducer
+    ) {
         Indent childrenIndent = Indent.getNormalIndent();
         Wrap tailWrap = tailWrap(container, openingElementType, closingElementType);
 
         return buildChildren(
                 container,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
-                    } else if (childElementType == closingElementType) {
+                    if (childElementType == closingElementType) {
                         blockList.add(buildChild(child, tailWrap, Indent.getNoneIndent()));
-                    } else if (childElementType == ElixirTypes.COMMA) {
-                        blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
                     } else if (childElementType == openingElementType) {
                         blockList.add(buildChild(child));
                     } else {
-                        blockList.add(buildChild(child, tailWrap, childrenIndent));
+                        blockList = containerBlockListReducer.reduce(
+                                child,
+                                childElementType,
+                                tailWrap,
+                                childrenIndent,
+                                blockList
+                        );
                     }
 
                     return blockList;
@@ -844,22 +853,14 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
-                                                                          @NotNull Wrap mapChildWrap,
-                                                                          @NotNull Alignment mapAlignment) {
-        Wrap tailWrap = tailWrap(mapArguments, ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY);
-
-        return buildChildren(
+    private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments) {
+        return buildContainerChildren(
                 mapArguments,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.CLOSING_CURLY) {
-                        blockList.add(buildChild(child, tailWrap, mapAlignment, Indent.getNoneIndent()));
-                    } else if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
+                ElixirTypes.OPENING_CURLY,
+                ElixirTypes.CLOSING_CURLY,
+                (child, childElementType, tailWrap, childrenIndent, blockList) -> {
+                    if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
                         blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap));
-                    } else if (childElementType == ElixirTypes.OPENING_CURLY) {
-                        blockList.add(
-                                buildChild(child, mapChildWrap)
-                        );
                     } else {
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
                     }
@@ -870,41 +871,12 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private com.intellij.formatting.Block buildMapChild(@NotNull ASTNode map,
-                                                        @Nullable Wrap childrenWrap,
-                                                        @Nullable Alignment childrenAlignment,
-                                                        @Nullable Indent childrenIndent) {
-        Wrap mapWrap;
-
-        if (childrenWrap != null) {
-            mapWrap = childrenWrap;
-        } else {
-            mapWrap = Wrap.createWrap(WrapType.NORMAL, true);
-        }
-
-        Alignment mapAlignment;
-
-        if (childrenAlignment != null) {
-            mapAlignment = childrenAlignment;
-        } else {
-            mapAlignment = Alignment.createAlignment();
-        }
-
-        return buildChild(map, mapWrap, mapAlignment, childrenIndent);
-    }
-
-    @NotNull
-    private List<com.intellij.formatting.Block> buildMapChildren(@NotNull ASTNode map,
-                                                                 @NotNull Wrap mapWrap,
-                                                                 @NotNull Alignment mapAlignment) {
-        Wrap mapChildWrap = Wrap.createChildWrap(mapWrap, WrapType.NORMAL, true);
-
+    private List<com.intellij.formatting.Block> buildMapChildren(@NotNull ASTNode map) {
         return buildChildren(
                 map,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.MAP_ARGUMENTS) {
-                        // pass mapAlignment for CLOSING_CURLY alignment
-                        blockList.addAll(buildMapArgumentsChildren(child, mapChildWrap, mapAlignment));
+                        blockList.addAll(buildMapArgumentsChildren(child));
                     } else if (childElementType == ElixirTypes.MAP_PREFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
