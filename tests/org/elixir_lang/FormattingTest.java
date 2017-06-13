@@ -44,6 +44,30 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         super.tearDown();
     }
 
+    public void testAlignTypeDefinitionToRightOfOperatorFalse() {
+        myFixture.configureByFile("align_type_definition_to_right_of_operator_true.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_type_definition_to_right_of_operator_false.ex");
+    }
+
+    public void testAlignTypeDefinitionToRightOfOperatorTrue() {
+        myFixture.configureByFile("align_type_definition_to_right_of_operator_false.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_type_definition_to_right_of_operator_true.ex");
+    }
+
     public void testAnonymousFunctionWithMultipleClauses() {
         assertFormatted("anonymous_function_with_multiple_clauses.ex");
     }

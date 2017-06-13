@@ -163,6 +163,15 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "## Non-numeric Operands\n" +
             "not true\n" +
             "";
+    private static final String WRAPPING_AND_BRACES_SETTINGS_CODE_SAMPLE =
+            "defmodule Calcinator.Resources.Page do\n" +
+            "  defstruct ~w(number size)a\n" +
+            "\n" +
+            "  @type t :: %__MODULE__{\n" +
+            "               number: pos_integer,\n" +
+            "               size: pos_integer,\n" +
+            "             }\n" +
+            "end\n";
 
     @Override
     public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
@@ -301,6 +310,13 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "Bit strings and binaries (<<>>)",
                     SPACES_WITHIN
             );
+        } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR",
+                    "Align type definition to right of operator (::)",
+                    null
+            );
         }
     }
 
@@ -317,7 +333,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                 codeSample = SPACING_CODE_SAMPLE;
                 break;
             case WRAPPING_AND_BRACES_SETTINGS:
-                codeSample = "Wrapping And Braces Settings Code Sample";
+                codeSample = WRAPPING_AND_BRACES_SETTINGS_CODE_SAMPLE;
                 break;
             case INDENT_SETTINGS:
                 codeSample = INDENT_CODE_SAMPLE;
@@ -327,6 +343,7 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                 break;
         }
 
+        //noinspection ConstantConditions
         return codeSample;
     }
 

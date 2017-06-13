@@ -6,12 +6,14 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirLanguage;
+import org.elixir_lang.code_style.CodeStyleSettings;
 import org.elixir_lang.psi.ElixirTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -96,7 +98,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_RELATIONAL_OPERATION,
             ElixirTypes.MATCHED_THREE_OPERATION,
             ElixirTypes.MATCHED_TWO_OPERATION,
-            ElixirTypes.MATCHED_TYPE_OPERATION,
             ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.MATCHED_WHEN_OPERATION,
             ElixirTypes.UNARY_NUMERIC_OPERATION,
@@ -113,7 +114,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
             ElixirTypes.UNMATCHED_THREE_OPERATION,
             ElixirTypes.UNMATCHED_TWO_OPERATION,
-            ElixirTypes.UNMATCHED_TYPE_OPERATION,
             ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_WHEN_OPERATION
     );
@@ -135,9 +135,12 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.STAB_INFIX_OPERATOR,
             ElixirTypes.THREE_INFIX_OPERATOR,
             ElixirTypes.TWO_INFIX_OPERATOR,
-            ElixirTypes.TYPE_INFIX_OPERATOR,
             ElixirTypes.UNARY_PREFIX_OPERATOR,
             ElixirTypes.WHEN_INFIX_OPERATOR
+    );
+    private static final TokenSet TYPE_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_TYPE_OPERATION,
+            ElixirTypes.UNMATCHED_TYPE_OPERATION
     );
     private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION, ElixirTypes.LIST, ElixirTypes.TUPLE),
@@ -624,6 +627,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildWhenOperationChildren(parent);
         } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildOperationChildren(parent);
+        } else if (TYPE_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildTypeOperationChildren(parent);
         } else if (UNMATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildUnmatchedCallChildren(parent, parentWrap, parentAlignment);
         } else {
@@ -659,6 +664,34 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildTypeOperationChildren(ASTNode typeOperation) {
+        final Alignment[] operandAlignment = {null};
+
+        return buildChildren(
+                typeOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment[0]));
+                    } else if (childElementType == ElixirTypes.TYPE_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+
+                        if (CodeStyleSettingsManager
+                                .getInstance(typeOperation.getPsi().getProject())
+                                .getCurrentSettings()
+                                .getCustomSettings(CodeStyleSettings.class)
+                                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
+                            operandAlignment[0] = Alignment.createAlignment();
+                        }
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment[0]));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @Override
