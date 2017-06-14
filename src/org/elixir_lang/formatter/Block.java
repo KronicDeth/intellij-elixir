@@ -613,6 +613,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildHeredocChildren((CompositeElement) parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_PAIR) {
             blocks = buildKeywordPairChildren(parent);
+        } else if (parentElementType == ElixirTypes.KEYWORD_KEY) {
+            blocks = buildKeywordKeyChildren(parent);
         } else if (parentElementType == ElixirTypes.LIST) {
             blocks = buildListChildren(parent);
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
@@ -836,6 +838,18 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blockList;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildKeywordKeyChildren(@NotNull ASTNode keywordKey) {
+        return buildChildren(
+                keywordKey,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child));
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
