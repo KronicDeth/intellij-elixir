@@ -65,6 +65,20 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
     );
+    private static final TokenSet LINE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.CHAR_LIST_LINE,
+            ElixirTypes.INTERPOLATED_CHAR_LIST_SIGIL_LINE,
+            ElixirTypes.INTERPOLATED_REGEX_LINE,
+            ElixirTypes.INTERPOLATED_SIGIL_LINE,
+            ElixirTypes.INTERPOLATED_STRING_SIGIL_LINE,
+            ElixirTypes.INTERPOLATED_WORDS_LINE,
+            ElixirTypes.LITERAL_CHAR_LIST_SIGIL_LINE,
+            ElixirTypes.LITERAL_REGEX_LINE,
+            ElixirTypes.LITERAL_SIGIL_LINE,
+            ElixirTypes.LITERAL_STRING_SIGIL_LINE,
+            ElixirTypes.LITERAL_WORDS_LINE,
+            ElixirTypes.STRING_LINE
+    );
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
             ElixirTypes.MAP_OPERATION,
             ElixirTypes.STRUCT_OPERATION
@@ -615,6 +629,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildKeywordPairChildren(parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_KEY) {
             blocks = buildKeywordKeyChildren(parent);
+        } else if (LINE_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildLineChildren(parent);
         } else if (parentElementType == ElixirTypes.LIST) {
             blocks = buildListChildren(parent);
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
@@ -881,6 +897,18 @@ public class Block extends AbstractBlock implements BlockEx {
                         // commas and comments
                         blockList.add(buildChild(child));
                     }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildLineChildren(@NotNull ASTNode line) {
+        return buildChildren(
+                line,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child));
 
                     return blockList;
                 }
