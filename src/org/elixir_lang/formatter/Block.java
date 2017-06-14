@@ -653,6 +653,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildCaptureNonNumericOperationChildren(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
+        } else if (parentElementType == ElixirTypes.INTERPOLATION) {
+            blocks = buildInterpolationChildren(parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_PAIR) {
             blocks = buildKeywordPairChildren(parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_KEY) {
@@ -894,6 +896,11 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildInterpolationChildren(@NotNull ASTNode interpolation) {
+        return buildContainerChildren(interpolation, ElixirTypes.INTERPOLATION_START, ElixirTypes.INTERPOLATION_END);
     }
 
     @NotNull
