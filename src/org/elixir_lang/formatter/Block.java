@@ -493,6 +493,8 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
             blockList.addAll(buildAccessExpressionChildren(child));
+        } else if (childElementType == ElixirTypes.IDENTIFIER) {
+            blockList.addAll(buildIdentifierChildren(child));
         } else if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
             blockList.addAll(buildMatchedParenthesesArguments(child, callWrap, callAlignment));
         } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
@@ -880,6 +882,18 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blockList;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildIdentifierChildren(ASTNode identifier) {
+        return buildChildren(
+                identifier,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child));
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
