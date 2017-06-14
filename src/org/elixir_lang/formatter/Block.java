@@ -611,6 +611,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildCaptureNonNumericOperationChildren(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
+        } else if (parentElementType == ElixirTypes.KEYWORD_PAIR) {
+            blocks = buildKeywordPairChildren(parent);
         } else if (parentElementType == ElixirTypes.LIST) {
             blocks = buildListChildren(parent);
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
@@ -667,64 +669,6 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
-    }
-
-    @NotNull
-    private List<com.intellij.formatting.Block> buildTwoOperationChildren(@NotNull ASTNode twoOperation) {
-        Alignment operandAlignment;
-
-        if (CodeStyleSettingsManager
-                .getInstance(twoOperation.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class)
-                .ALIGN_TWO_OPERANDS) {
-            operandAlignment = Alignment.createAlignment();
-        } else {
-            operandAlignment = null;
-        }
-
-        return buildChildren(
-                twoOperation,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
-                    } else if (childElementType == ElixirTypes.TWO_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
-                    } else {
-                        blockList.add(buildChild(child, operandAlignment));
-                    }
-
-                    return blockList;
-                }
-        );
-    }
-
-    @NotNull
-    private List<com.intellij.formatting.Block> buildTypeOperationChildren(ASTNode typeOperation) {
-        final Alignment[] operandAlignment = {null};
-
-        return buildChildren(
-                typeOperation,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment[0]));
-                    } else if (childElementType == ElixirTypes.TYPE_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
-
-                        if (CodeStyleSettingsManager
-                                .getInstance(typeOperation.getPsi().getProject())
-                                .getCurrentSettings()
-                                .getCustomSettings(CodeStyleSettings.class)
-                                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
-                            operandAlignment[0] = Alignment.createAlignment();
-                        }
-                    } else {
-                        blockList.add(buildChild(child, operandAlignment[0]));
-                    }
-
-                    return blockList;
-                }
-        );
     }
 
     @Override
@@ -892,6 +836,22 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blockList;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildKeywordPairChildren(@NotNull ASTNode keywordPair) {
+        return buildChildren(
+                keywordPair,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
@@ -1292,6 +1252,64 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildTupleChildren(@NotNull ASTNode tuple) {
         return buildContainerChildren(tuple, ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildTwoOperationChildren(@NotNull ASTNode twoOperation) {
+        Alignment operandAlignment;
+
+        if (CodeStyleSettingsManager
+                .getInstance(twoOperation.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TWO_OPERANDS) {
+            operandAlignment = Alignment.createAlignment();
+        } else {
+            operandAlignment = null;
+        }
+
+        return buildChildren(
+                twoOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
+                    } else if (childElementType == ElixirTypes.TWO_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildTypeOperationChildren(ASTNode typeOperation) {
+        final Alignment[] operandAlignment = {null};
+
+        return buildChildren(
+                typeOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment[0]));
+                    } else if (childElementType == ElixirTypes.TYPE_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+
+                        if (CodeStyleSettingsManager
+                                .getInstance(typeOperation.getPsi().getProject())
+                                .getCurrentSettings()
+                                .getCustomSettings(CodeStyleSettings.class)
+                                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
+                            operandAlignment[0] = Alignment.createAlignment();
+                        }
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment[0]));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
