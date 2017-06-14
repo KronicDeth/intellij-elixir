@@ -33,6 +33,20 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_ARROW_OPERATION,
             ElixirTypes.UNMATCHED_ARROW_OPERATION
     );
+    private static final TokenSet BODY_TOKEN_SET = TokenSet.create(
+            ElixirTypes.INTERPOLATED_CHAR_LIST_BODY,
+            ElixirTypes.INTERPOLATED_REGEX_BODY,
+            ElixirTypes.INTERPOLATED_SIGIL_BODY,
+            ElixirTypes.INTERPOLATED_STRING_BODY,
+            ElixirTypes.INTERPOLATED_WORDS_BODY,
+            ElixirTypes.LITERAL_CHAR_LIST_BODY,
+            ElixirTypes.LITERAL_REGEX_BODY,
+            ElixirTypes.LITERAL_SIGIL_BODY,
+            ElixirTypes.LITERAL_STRING_BODY,
+            ElixirTypes.LITERAL_WORDS_BODY,
+            ElixirTypes.QUOTE_CHAR_LIST_BODY,
+            ElixirTypes.QUOTE_STRING_BODY
+    );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
@@ -452,6 +466,18 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else {
                         blockList.add(buildChild(child));
                     }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildBodyChildren(ASTNode body) {
+        return buildChildren(
+                body,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child));
 
                     return blockList;
                 }
@@ -908,7 +934,13 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 line,
                 (child, childElementType, blockList) -> {
-                    blockList.add(buildChild(child));
+                    if (BODY_TOKEN_SET.contains(childElementType)) {
+                        /* Flatten body because its children represent textual elements that can't be aligned without
+                           changing their meaning, so there's no need for a formatting block for them */
+                        blockList.addAll(buildBodyChildren(child));
+                    } else {
+                        blockList.add(buildChild(child));
+                    }
 
                     return blockList;
                 }
