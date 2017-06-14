@@ -313,6 +313,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
         } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
             consumer.showCustomOption(
                     CodeStyleSettings.class,
+                    "ALIGN_TWO_OPERANDS",
+                    "Align operands of two operator (++, --, <>)",
+                    null
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
                     "ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR",
                     "Align type definition to right of operator (::)",
                     null

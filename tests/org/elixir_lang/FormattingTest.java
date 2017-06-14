@@ -44,6 +44,30 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         super.tearDown();
     }
 
+    public void testAlignTwoOperandsFalse() {
+        myFixture.configureByFile("align_two_operands_true.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TWO_OPERANDS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_two_operands_false.ex");
+    }
+
+    public void testAlignTwoOperandsTrue() {
+        myFixture.configureByFile("align_two_operands_false.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TWO_OPERANDS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_two_operands_true.ex");
+    }
+
     public void testAlignTypeDefinitionToRightOfOperatorFalse() {
         myFixture.configureByFile("align_type_definition_to_right_of_operator_true.ex");
 

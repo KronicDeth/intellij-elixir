@@ -96,7 +96,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_PIPE_OPERATION,
             ElixirTypes.MATCHED_RELATIONAL_OPERATION,
             ElixirTypes.MATCHED_THREE_OPERATION,
-            ElixirTypes.MATCHED_TWO_OPERATION,
             ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.MATCHED_WHEN_OPERATION,
             ElixirTypes.UNARY_NUMERIC_OPERATION,
@@ -112,7 +111,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_PIPE_OPERATION,
             ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
             ElixirTypes.UNMATCHED_THREE_OPERATION,
-            ElixirTypes.UNMATCHED_TWO_OPERATION,
             ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_WHEN_OPERATION
     );
@@ -133,9 +131,12 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.RELATIONAL_INFIX_OPERATOR,
             ElixirTypes.STAB_INFIX_OPERATOR,
             ElixirTypes.THREE_INFIX_OPERATOR,
-            ElixirTypes.TWO_INFIX_OPERATOR,
             ElixirTypes.UNARY_PREFIX_OPERATOR,
             ElixirTypes.WHEN_INFIX_OPERATOR
+    );
+    private static final TokenSet TWO_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_TWO_OPERATION,
+            ElixirTypes.UNMATCHED_TWO_OPERATION
     );
     private static final TokenSet TYPE_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_TYPE_OPERATION,
@@ -627,6 +628,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildWhenOperationChildren(parent);
         } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildOperationChildren(parent);
+        } else if (TWO_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildTwoOperationChildren(parent);
         } else if (TYPE_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildTypeOperationChildren(parent);
         } else if (UNMATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
@@ -664,6 +667,36 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return blocks;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildTwoOperationChildren(@NotNull ASTNode twoOperation) {
+        Alignment operandAlignment;
+
+        if (CodeStyleSettingsManager
+                .getInstance(twoOperation.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_TWO_OPERANDS) {
+            operandAlignment = Alignment.createAlignment();
+        } else {
+            operandAlignment = null;
+        }
+
+        return buildChildren(
+                twoOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
+                    } else if (childElementType == ElixirTypes.TWO_INFIX_OPERATOR) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
