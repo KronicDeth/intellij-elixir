@@ -4,7 +4,6 @@ import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.util.Ref;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.formatter.common.AbstractBlock;
@@ -239,7 +238,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression) {
-        return buildAccessExpressionChildren(accessExpression, null, null);
+        return buildAccessExpressionChildren(accessExpression, null, null, null);
     }
 
     @NotNull
@@ -250,8 +249,9 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression,
-                                                                              @Nullable Wrap childrenWrap) {
-        return buildAccessExpressionChildren(accessExpression, childrenWrap, null);
+                                                                              @Nullable Wrap childrenWrap,
+                                                                              @Nullable Alignment childrenAlignment) {
+        return buildAccessExpressionChildren(accessExpression, childrenWrap, childrenAlignment, null);
     }
 
     @NotNull
@@ -1286,23 +1286,23 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildWhenOperationChildren(@NotNull ASTNode whenOperation) {
         Wrap operatorWrap = Wrap.createWrap(WrapType.NORMAL, true);
-        Wrap rightOperandWrap = Wrap.createChildWrap(operatorWrap, WrapType.NORMAL, true);
-        Ref<Wrap> childWrapRef = Ref.create(Wrap.createWrap(WrapType.NONE, false));
+
+        final Alignment[] operandAlignment = {null};
+        final Wrap[] operandWrap = {Wrap.createWrap(WrapType.NONE, false)};
 
         return buildChildren(
                 whenOperation,
                 (child, childElementType, blockList) -> {
-                    /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
-                       is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(
-                                buildAccessExpressionChildren(child, childWrapRef.get())
+                                buildAccessExpressionChildren(child, operandWrap[0], operandAlignment[0])
                         );
                     } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildOperatorRuleChildren(child, operatorWrap));
-                        childWrapRef.set(rightOperandWrap);
+                        operandAlignment[0] = Alignment.createAlignment();
+                        operandWrap[0] = Wrap.createChildWrap(operatorWrap, WrapType.NORMAL, true);
                     } else {
-                        blockList.add(buildChild(child, childWrapRef.get()));
+                        blockList.add(buildChild(child, operandWrap[0], operandAlignment[0]));
                     }
 
                     return blockList;

@@ -68,6 +68,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("align_type_definition_to_right_of_operator_true.ex");
     }
 
+    public void testAlignGuardsToRightOfWhenTrue() {
+        myFixture.configureByFile("align_guards_to_right_of_when_false.ex");
+
+        // Not configurable
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_guards_to_right_of_when_true.ex");
+    }
+
     public void testAnonymousFunctionWithMultipleClauses() {
         assertFormatted("anonymous_function_with_multiple_clauses.ex");
     }
