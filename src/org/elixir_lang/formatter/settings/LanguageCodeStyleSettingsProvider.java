@@ -15,6 +15,9 @@ import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_WI
 public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider {
     private static final String INDENT_CODE_SAMPLE =
             "defmodule Foo do\n" +
+            "  @spec foo :: one |\n" +
+            "               two |\n" +
+            "               three\n" +
             "  def foo do\n" +
             "    receive do\n" +
             "      {:ok, value} -> value\n" +
@@ -311,6 +314,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     SPACES_WITHIN
             );
         } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "ALIGN_PIPE_OPERANDS",
+                    "Align operands of pipe operator (|)",
+                    null
+            );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "ALIGN_TWO_OPERANDS",
