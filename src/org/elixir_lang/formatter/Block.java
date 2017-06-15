@@ -11,6 +11,7 @@ import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.containers.Predicate;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.elixir_lang.psi.ElixirTypes;
@@ -302,6 +303,38 @@ public class Block extends AbstractBlock implements BlockEx {
                 accessExpression,
                 (child, childElementType, blockList) -> {
                     blockList.add(buildChild(child, childrenWrap, childrenAlignment, childrenIndent));
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAlignedOperandsOperationChildren(
+            @NotNull ASTNode operation,
+            @NotNull Predicate<CodeStyleSettings> alignOperands,
+            @NotNull IElementType operatorRuleElementType) {
+        Alignment operandAlignment;
+
+        if (alignOperands.apply(CodeStyleSettingsManager
+                .getInstance(operation.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class))) {
+            operandAlignment = Alignment.createAlignment();
+        } else {
+            operandAlignment = null;
+        }
+
+        return buildChildren(
+                operation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
+                    } else if (childElementType == operatorRuleElementType) {
+                        blockList.addAll(buildOperatorRuleChildren(child));
+                    } else {
+                        blockList.add(buildChild(child, operandAlignment));
+                    }
 
                     return blockList;
                 }
@@ -1222,31 +1255,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildPipeOperationChildren(@NotNull ASTNode pipeOperation) {
-        Alignment operandAlignment;
-
-        if (CodeStyleSettingsManager
-                .getInstance(pipeOperation.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class)
-                .ALIGN_PIPE_OPERANDS) {
-            operandAlignment = Alignment.createAlignment();
-        } else {
-            operandAlignment = null;
-        }
-
-        return buildChildren(
+        //noinspection ConstantConditions
+        return buildAlignedOperandsOperationChildren(
                 pipeOperation,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
-                    } else if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
-                    } else {
-                        blockList.add(buildChild(child, operandAlignment));
-                    }
-
-                    return blockList;
-                }
+                (codeStyleSettings) -> codeStyleSettings.ALIGN_PIPE_OPERANDS,
+                ElixirTypes.PIPE_INFIX_OPERATOR
         );
     }
 
@@ -1384,31 +1397,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildTwoOperationChildren(@NotNull ASTNode twoOperation) {
-        Alignment operandAlignment;
-
-        if (CodeStyleSettingsManager
-                .getInstance(twoOperation.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class)
-                .ALIGN_TWO_OPERANDS) {
-            operandAlignment = Alignment.createAlignment();
-        } else {
-            operandAlignment = null;
-        }
-
-        return buildChildren(
+        //noinspection ConstantConditions
+        return buildAlignedOperandsOperationChildren(
                 twoOperation,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
-                    } else if (childElementType == ElixirTypes.TWO_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
-                    } else {
-                        blockList.add(buildChild(child, operandAlignment));
-                    }
-
-                    return blockList;
-                }
+                (codeStyleSettings) -> codeStyleSettings.ALIGN_TWO_OPERANDS,
+                ElixirTypes.TWO_INFIX_OPERATOR
         );
     }
 
