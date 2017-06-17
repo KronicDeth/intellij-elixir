@@ -44,6 +44,30 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         super.tearDown();
     }
 
+    public void testAlignBooleanOperandsFalse() {
+        myFixture.configureByFile("align_boolean_operands_true.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_BOOLEAN_OPERANDS = false;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_boolean_operands_false.ex");
+    }
+
+    public void testAlignBooleanOperandsTrue() {
+        myFixture.configureByFile("align_boolean_operands_false.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_BOOLEAN_OPERANDS = true;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("align_boolean_operands_true.ex");
+    }
+
     public void testAlignPipeOperandsFalse() {
         myFixture.configureByFile("align_pipe_operands_true.ex");
 

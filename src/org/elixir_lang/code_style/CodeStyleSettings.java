@@ -3,6 +3,7 @@ package org.elixir_lang.code_style;
 import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 
 public class CodeStyleSettings extends CustomCodeStyleSettings {
+    public boolean ALIGN_BOOLEAN_OPERANDS = true;
     public boolean ALIGN_PIPE_OPERANDS = true;
     public boolean ALIGN_TWO_OPERANDS = true;
     public boolean ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR = true;

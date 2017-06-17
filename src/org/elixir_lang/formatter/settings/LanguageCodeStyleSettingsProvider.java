@@ -167,6 +167,14 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "not true\n" +
             "";
     private static final String WRAPPING_AND_BRACES_SETTINGS_CODE_SAMPLE =
+            "defmodule Calcinator do\n" +
+            "  def can(%__MODULE__{authorization_module: authorization_module, subject: subject}, action, target)\n" +
+            "      when action in @actions and\n" +
+            "           not is_nil(authorization_module) and\n" +
+            "           (is_atom(target) or is_map(target) or is_list(target)) do\n" +
+            "  end\n" +
+            "end\n" +
+            "\n" +
             "defmodule Calcinator.Resources.Page do\n" +
             "  defstruct ~w(number size)a\n" +
             "\n" +
@@ -314,6 +322,12 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     SPACES_WITHIN
             );
         } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "ALIGN_BOOLEAN_OPERANDS",
+                    "Align operands of `and` and `or` operators",
+                    null
+            );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
                     "ALIGN_PIPE_OPERANDS",

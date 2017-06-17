@@ -48,6 +48,10 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.QUOTE_CHAR_LIST_BODY,
             ElixirTypes.QUOTE_STRING_BODY
     );
+    private static final TokenSet BOOLEAN_WORD_OPERATOR_TOKEN_SET = TokenSet.create(
+            ElixirTypes.AND_WORD_OPERATOR,
+            ElixirTypes.OR_WORD_OPERATOR
+    );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
@@ -114,28 +118,24 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_ADDITION_OPERATION,
-            ElixirTypes.MATCHED_AND_OPERATION,
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.MATCHED_COMPARISON_OPERATION,
             ElixirTypes.MATCHED_IN_MATCH_OPERATION,
             ElixirTypes.MATCHED_IN_OPERATION,
             ElixirTypes.MATCHED_MATCH_OPERATION,
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
-            ElixirTypes.MATCHED_OR_OPERATION,
             ElixirTypes.MATCHED_RELATIONAL_OPERATION,
             ElixirTypes.MATCHED_THREE_OPERATION,
             ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
             ElixirTypes.MATCHED_WHEN_OPERATION,
             ElixirTypes.UNARY_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_ADDITION_OPERATION,
-            ElixirTypes.UNMATCHED_AND_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_COMPARISON_OPERATION,
             ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
             ElixirTypes.UNMATCHED_IN_OPERATION,
             ElixirTypes.UNMATCHED_MATCH_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION,
-            ElixirTypes.UNMATCHED_OR_OPERATION,
             ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
             ElixirTypes.UNMATCHED_THREE_OPERATION,
             ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
@@ -143,7 +143,6 @@ public class Block extends AbstractBlock implements BlockEx {
     );
     private static final TokenSet OPERATOR_RULE_TOKEN_SET = TokenSet.create(
             ElixirTypes.ADDITION_INFIX_OPERATOR,
-            ElixirTypes.AND_INFIX_OPERATOR,
             ElixirTypes.ARROW_INFIX_OPERATOR,
             ElixirTypes.AT_PREFIX_OPERATOR,
             ElixirTypes.CAPTURE_PREFIX_OPERATOR,
@@ -153,7 +152,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.IN_MATCH_INFIX_OPERATOR,
             ElixirTypes.MATCH_INFIX_OPERATOR,
             ElixirTypes.MULTIPLICATION_INFIX_OPERATOR,
-            ElixirTypes.OR_INFIX_OPERATOR,
             ElixirTypes.RELATIONAL_INFIX_OPERATOR,
             ElixirTypes.STAB_INFIX_OPERATOR,
             ElixirTypes.THREE_INFIX_OPERATOR,
@@ -163,6 +161,18 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet PIPE_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_PIPE_OPERATION,
             ElixirTypes.UNMATCHED_PIPE_OPERATION
+    );
+    // "Sometimes" because only the `and` and `or` operators will be affected
+    private static final TokenSet SOMETIMES_BOOLEAN_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_AND_OPERATION,
+            ElixirTypes.MATCHED_OR_OPERATION,
+            ElixirTypes.UNMATCHED_AND_OPERATION,
+            ElixirTypes.UNMATCHED_OR_OPERATION
+    );
+    // "Sometimes" because only the `and` and `or` operators will be affected
+    private static final TokenSet SOMETIMES_BOOLEAN_OPERATOR_RULE_TOKEN_SET = TokenSet.create(
+            ElixirTypes.AND_INFIX_OPERATOR,
+            ElixirTypes.OR_INFIX_OPERATOR
     );
     private static final TokenSet TWO_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_TWO_OPERATION,
@@ -314,6 +324,18 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull ASTNode operation,
             @NotNull Predicate<CodeStyleSettings> alignOperands,
             @NotNull IElementType operatorRuleElementType) {
+        return buildAlignedOperandsOperationChildren(
+                operation,
+                alignOperands,
+                TokenSet.create(operatorRuleElementType)
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAlignedOperandsOperationChildren(
+            @NotNull ASTNode operation,
+            @NotNull Predicate<CodeStyleSettings> alignOperands,
+            @NotNull TokenSet operatorRuleTokenSet) {
         Alignment operandAlignment;
 
         if (alignOperands.apply(CodeStyleSettingsManager
@@ -330,7 +352,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
-                    } else if (childElementType == operatorRuleElementType) {
+                    } else if (operatorRuleTokenSet.contains(childElementType)) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blockList.add(buildChild(child, operandAlignment));
@@ -714,6 +736,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildOperationChildren(parent);
         } else if (PIPE_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildPipeOperationChildren(parent);
+        } else if (SOMETIMES_BOOLEAN_OPERATION_TOKEN_SET.contains(parentElementType)) {
+            blocks = buildSometimesBooleanOperationChildren(parent);
         } else if (TWO_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildTwoOperationChildren(parent);
         } else if (TYPE_OPERATION_TOKEN_SET.contains(parentElementType)) {
@@ -1260,6 +1284,32 @@ public class Block extends AbstractBlock implements BlockEx {
                 pipeOperation,
                 (codeStyleSettings) -> codeStyleSettings.ALIGN_PIPE_OPERANDS,
                 ElixirTypes.PIPE_INFIX_OPERATOR
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildSometimesBooleanOperationChildren(
+            @NotNull ASTNode sometimesBooleanOperation
+    ) {
+        return buildAlignedOperandsOperationChildren(
+                sometimesBooleanOperation,
+                (codeStyleSettings) -> {
+                    ASTNode operatorRule = sometimesBooleanOperation.findChildByType(
+                            SOMETIMES_BOOLEAN_OPERATOR_RULE_TOKEN_SET
+                    );
+                    boolean alignOperands = false;
+
+                    if (operatorRule != null) {
+                        ASTNode wordOperator = operatorRule.findChildByType(BOOLEAN_WORD_OPERATOR_TOKEN_SET);
+
+                        if (wordOperator != null) {
+                            alignOperands = codeStyleSettings.ALIGN_BOOLEAN_OPERANDS;
+                        }
+                    }
+
+                    return alignOperands;
+                },
+                SOMETIMES_BOOLEAN_OPERATOR_RULE_TOKEN_SET
         );
     }
 
