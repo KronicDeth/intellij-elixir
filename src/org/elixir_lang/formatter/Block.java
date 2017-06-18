@@ -112,34 +112,41 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
             ElixirTypes.MATCHED_UNQUALIFIED_PARENTHESES_CALL
     );
+    private static final TokenSet MATCH_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_MATCH_OPERATION,
+            ElixirTypes.UNMATCHED_MATCH_OPERATION
+    );
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
     );
-    private static final TokenSet OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_ADDITION_OPERATION,
-            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-            ElixirTypes.MATCHED_COMPARISON_OPERATION,
-            ElixirTypes.MATCHED_IN_MATCH_OPERATION,
-            ElixirTypes.MATCHED_IN_OPERATION,
-            ElixirTypes.MATCHED_MATCH_OPERATION,
-            ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
-            ElixirTypes.MATCHED_RELATIONAL_OPERATION,
-            ElixirTypes.MATCHED_THREE_OPERATION,
-            ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
-            ElixirTypes.MATCHED_WHEN_OPERATION,
-            ElixirTypes.UNARY_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_ADDITION_OPERATION,
-            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_COMPARISON_OPERATION,
-            ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
-            ElixirTypes.UNMATCHED_IN_OPERATION,
-            ElixirTypes.UNMATCHED_MATCH_OPERATION,
-            ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION,
-            ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
-            ElixirTypes.UNMATCHED_THREE_OPERATION,
-            ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_WHEN_OPERATION
+    private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
+            TokenSet.create(
+                    ElixirTypes.MATCHED_ADDITION_OPERATION,
+                    ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    ElixirTypes.MATCHED_COMPARISON_OPERATION,
+                    ElixirTypes.MATCHED_IN_MATCH_OPERATION,
+                    ElixirTypes.MATCHED_IN_OPERATION,
+                    ElixirTypes.MATCHED_MATCH_OPERATION,
+                    ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
+                    ElixirTypes.MATCHED_RELATIONAL_OPERATION,
+                    ElixirTypes.MATCHED_THREE_OPERATION,
+                    ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
+                    ElixirTypes.MATCHED_WHEN_OPERATION,
+                    ElixirTypes.UNARY_NUMERIC_OPERATION,
+                    ElixirTypes.UNMATCHED_ADDITION_OPERATION,
+                    ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    ElixirTypes.UNMATCHED_COMPARISON_OPERATION,
+                    ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
+                    ElixirTypes.UNMATCHED_IN_OPERATION,
+                    ElixirTypes.UNMATCHED_MATCH_OPERATION,
+                    ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION,
+                    ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
+                    ElixirTypes.UNMATCHED_THREE_OPERATION,
+                    ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
+                    ElixirTypes.UNMATCHED_WHEN_OPERATION
+            ),
+            MATCH_OPERATION_TOKEN_SET
     );
     private static final TokenSet OPERATOR_RULE_TOKEN_SET = TokenSet.create(
             ElixirTypes.ADDITION_INFIX_OPERATOR,
@@ -759,6 +766,20 @@ public class Block extends AbstractBlock implements BlockEx {
                         if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                             blockList.addAll(
                                     buildAccessExpressionChildren(child, childrenAlignment)
+                            );
+                        } else if (MATCH_OPERATION_TOKEN_SET.contains(childElementType)) {
+                            blockList.add(
+                                    buildChild(
+                                            child,
+                                            childrenAlignment,
+                                            Indent.getIndent(
+                                                    Indent.Type.NONE,
+                                                    true,
+                                                    /* `enforceIndentToChildren = true`, so that `do` blocks none-indent
+                                                       aligns to start of match when match is argument to `assert`  */
+                                                    true
+                                            )
+                                    )
                             );
                         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                             blockList.addAll(buildOperatorRuleChildren(child));
