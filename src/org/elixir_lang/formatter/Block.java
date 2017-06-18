@@ -741,8 +741,6 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMapChildren(parent);
-        } else if (parentElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
-            blocks = buildMapUpdateArgumentsChildren(parent);
         } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
             //noinspection ConstantConditions
             blocks = buildStabOperationChildren(parent, childrenWrap);
@@ -1084,6 +1082,8 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
                     if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
                         blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap));
+                    } else if (childElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
+                        blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap));
                     } else {
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
                     }
@@ -1124,15 +1124,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 mapConstructionArguments,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
-                        blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
-                    } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
-                        blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap));
-                    } else if (childElementType == ElixirTypes.KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
-                    } else {
-                        blockList.add(buildChild(child));
-                    }
+                    blockList.addAll(buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap));
 
                     return blockList;
                 }
@@ -1140,14 +1132,42 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(ASTNode mapUpdateArguments) {
+    private List<com.intellij.formatting.Block> buildMapTailArgumentsChildChildren(
+            @NotNull ASTNode child,
+            @NotNull IElementType childElementType,
+            @NotNull Wrap mapArgumentsTailWrap
+    ) {
+        List<com.intellij.formatting.Block> blockList = new ArrayList<>();
+
+        if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
+            blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
+        } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
+            blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap));
+        } else if (childElementType == ElixirTypes.KEYWORDS) {
+            blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
+        } else {
+            blockList.add(buildChild(child));
+        }
+
+        return blockList;
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(
+            @NotNull ASTNode mapUpdateArguments,
+            @NotNull Wrap mapArgumentsTailWrap
+    ) {
         return buildChildren(
                 mapUpdateArguments,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
+                    if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
-                        blockList.add(buildChild(child));
+                        blockList.addAll(
+                                buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap)
+                        );
                     }
 
                     return blockList;
@@ -1501,7 +1521,7 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildTypeOperationChildren(ASTNode typeOperation) {
+    private List<com.intellij.formatting.Block> buildTypeOperationChildren(@NotNull ASTNode typeOperation) {
         final Alignment[] operandAlignment = {null};
 
         return buildChildren(

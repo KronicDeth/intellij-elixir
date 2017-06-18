@@ -624,6 +624,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("map_indent.ex");
     }
 
+    public void testMapUpdateArgumentsAlignKeywords() {
+        assertFormatted("map_update_arguments_align_keywords.ex");
+    }
+
     public void testMatchOperationEnforceIndentToChildren() {
         assertFormatted("match_operation_enforce_indent_to_children.ex");
     }
