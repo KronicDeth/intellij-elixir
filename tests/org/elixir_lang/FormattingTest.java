@@ -223,6 +223,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("case_at_end_of_pipeline.ex");
     }
 
+    public void testComparisonOperationEnforceIndentToChildren() {
+        assertFormatted("comparison_operation_enforce_indent_to_children.ex");
+    }
+
     public void testCommentIndentAfterDoInDoBlock() {
         assertFormatted("comment_indent_after_do_in_do_block.ex");
     }
