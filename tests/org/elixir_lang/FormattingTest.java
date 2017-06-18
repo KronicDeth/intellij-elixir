@@ -922,6 +922,30 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("tuple_indent.ex");
     }
 
+    public void testUnmatchedCallAlignDoBlockToCall() {
+        myFixture.configureByFile("unmatched_call_align_do_block_to_line.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_UNMATCHED_CALL_DO_BLOCKS = CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("unmatched_call_align_do_block_to_call.ex");
+    }
+
+    public void testUnmatchedCallAlignDoBlockToLine() {
+        myFixture.configureByFile("unmatched_call_align_do_block_to_call.ex");
+
+        temporaryCodeStyleSettings
+                .getCustomSettings(CodeStyleSettings.class)
+                .ALIGN_UNMATCHED_CALL_DO_BLOCKS = CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.value;
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("unmatched_call_align_do_block_to_line.ex");
+    }
+
     public void testUnmatchedQualifedParenthesesCallArgumentIndent() {
         String path = "unmatched_qualifed_parentheses_call_argument_indent.ex";
 

@@ -338,10 +338,7 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull TokenSet operatorRuleTokenSet) {
         Alignment operandAlignment;
 
-        if (alignOperands.apply(CodeStyleSettingsManager
-                .getInstance(operation.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class))) {
+        if (alignOperands.apply(codeStyleSettings(operation))) {
             operandAlignment = Alignment.createAlignment();
         } else {
             operandAlignment = null;
@@ -361,6 +358,13 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode operation) {
+        return CodeStyleSettingsManager
+                .getInstance(operation.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class);
     }
 
     /**
@@ -867,8 +871,18 @@ public class Block extends AbstractBlock implements BlockEx {
                             endWrap = Wrap.createWrap(WrapType.NORMAL, true);
                         }
 
-                        //noinspection ConstantConditions
-                        blockList.add(buildChild(child, endWrap, parentAlignment));
+                        boolean indentRelativeToDirectParent =
+                                codeStyleSettings(child).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
+                                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value;
+
+                        blockList.add(
+                                buildChild(
+                                        child,
+                                        endWrap,
+                                        parentAlignment,
+                                        Indent.getIndent(Indent.Type.NONE, indentRelativeToDirectParent, false)
+                                )
+                        );
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(
                                 buildEndOfExpressionChildren(child, null, Indent.getNormalIndent())
@@ -1363,7 +1377,10 @@ public class Block extends AbstractBlock implements BlockEx {
            aligned on the left-side */
         Alignment childAlignment = Alignment.createAlignment();
 
-        Indent childIndent = Indent.getNormalIndent(true);
+        Indent childIndent = Indent.getNormalIndent(
+                codeStyleSettings(stab).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
+                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
+        );
         WrapType stabOperationWrapType;
 
         if (hasAtLeastCountChildren(stab, ElixirTypes.STAB_OPERATION, 2)) {
@@ -1467,11 +1484,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.TYPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
 
-                        if (CodeStyleSettingsManager
-                                .getInstance(typeOperation.getPsi().getProject())
-                                .getCurrentSettings()
-                                .getCustomSettings(CodeStyleSettings.class)
-                                .ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
+                        if (codeStyleSettings(typeOperation).ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
                             operandAlignment[0] = Alignment.createAlignment();
                         }
                     } else {

@@ -173,6 +173,21 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
             "           not is_nil(authorization_module) and\n" +
             "           (is_atom(target) or is_map(target) or is_list(target)) do\n" +
             "  end\n" +
+            "\n" +
+            "  defp authorized(%__MODULE__{authorization_module: authorization_module, subject: subject}, unfiltered, pagination)\n" +
+            "       when is_list(unfiltered) and\n" +
+            "            (is_nil(pagination) or is_map(pagination)) do\n" +
+            "    {shallow_filtered, filtered_pagination} = case authorization_module.filter_can(unfiltered, subject, :show) do\n" +
+            "      ^unfiltered ->\n" +
+            "        {unfiltered, pagination}\n" +
+            "      filtered_can ->\n" +
+            "        {filtered_can, pagination}\n" +
+            "    end\n" +
+            "\n" +
+            "    deep_filtered = authorization_module.filter_associations_can(shallow_filtered, subject, :show)\n" +
+            "\n" +
+            "    {deep_filtered, filtered_pagination}\n" +
+            "  end\n" +
             "end\n" +
             "\n" +
             "defmodule Calcinator.Resources.Page do\n" +
@@ -333,6 +348,20 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
                     "ALIGN_PIPE_OPERANDS",
                     "Align operands of pipe operator (|)",
                     null
+            );
+            consumer.showCustomOption(
+                    CodeStyleSettings.class,
+                    "ALIGN_UNMATCHED_CALL_DO_BLOCKS",
+                    "Align unmatched call `do` blocks to",
+                    null,
+                    new String[]{
+                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.name,
+                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.name,
+                    },
+                    new int[]{
+                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value,
+                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.value
+                    }
             );
             consumer.showCustomOption(
                     CodeStyleSettings.class,
