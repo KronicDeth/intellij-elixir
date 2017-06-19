@@ -129,6 +129,12 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
             ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
     );
+    private static final TokenSet NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
+    );
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
                     ElixirTypes.MATCHED_ADDITION_OPERATION,
@@ -235,10 +241,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
             ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
             ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL
-    );
-    private static final TokenSet UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
-            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
     );
     private static final TokenSet WHEN_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_WHEN_OPERATION,
@@ -657,7 +659,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode leftOperand = leftOperandBlock.getNode();
                     IElementType leftOperandElementType = leftOperand.getElementType();
 
-                    if (UNMATCHED_NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType)) {
+                    if (NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType)) {
                         // `NAME/ARITY` confirmed
                         if (leftOperand.findChildByType(ElixirTypes.DO_BLOCK) == null) {
                             blockList = flattenedBlockList;
