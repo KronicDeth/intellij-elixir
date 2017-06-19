@@ -272,6 +272,11 @@ public class Block extends AbstractBlock implements BlockEx {
 
         assert elementType != ElixirTypes.ACCESS_EXPRESSION : "accessExpressions should be flattened with " +
                 "buildAccessExpressionChildren";
+
+        if (elementType == ElixirTypes.STAB_OPERATION) {
+            assert childrenWrap != null : "stabOperation must have a non-null childrenWrap, so that sibling " +
+                    "stabOperations and their children are wrapped consistently";
+        }
     }
 
     @NotNull
@@ -759,6 +764,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMapChildren(parent);
+        } else if (parentElementType == ElixirTypes.PARENTHETICAL_STAB) {
+            blocks = buildParentheticalStabChildren(parent);
         } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
             //noinspection ConstantConditions
             blocks = buildStabOperationChildren(parent, childrenWrap);
@@ -1355,6 +1362,35 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else {
                         // arguments that aren't keywords.
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildParentheticalStabChildren(@NotNull ASTNode parentheticalStab) {
+        Indent childIndent = Indent.getNormalIndent();
+        Wrap stabBodyChildrenWrap;
+
+        if (parentheticalStab.textContains('\n')) {
+            stabBodyChildrenWrap = null;
+        } else {
+            stabBodyChildrenWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        }
+
+        return buildChildren(
+                parentheticalStab,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.SEMICOLON) {
+                        blockList.add(
+                                buildChild(child, Wrap.createWrap(WrapType.NONE, true), childIndent)
+                        );
+                    } else if (childElementType == ElixirTypes.STAB) {
+                        blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
+                    } else {
+                        blockList.add(buildChild(child));
                     }
 
                     return blockList;
