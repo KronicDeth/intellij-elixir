@@ -106,6 +106,25 @@ public class ElixirPsiImplUtil {
     public static final OtpErlangAtom NOT = new OtpErlangAtom("not");
     public static final OtpErlangAtom PLUS = new OtpErlangAtom("+");
     public static final OtpErlangAtom TRUE = new OtpErlangAtom("true");
+    public static final TokenSet ADDITION_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR);
+    public static final TokenSet AND_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirTypes.AND_WORD_OPERATOR);
+    public static final TokenSet AT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.AT_OPERATOR);
+    public static final TokenSet CAPTURE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
+    public static final TokenSet COMPARISON_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.COMPARISON_OPERATOR);
+    public static final TokenSet DOT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DOT_OPERATOR);
+    public static final TokenSet IN_MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_MATCH_OPERATOR);
+    public static final TokenSet IN_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.IN_OPERATOR);
+    public static final TokenSet MATCH_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MATCH_OPERATOR);
+    public static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
+    public static final TokenSet OR_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirTypes.OR_WORD_OPERATOR);
+    public static final TokenSet PIPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.PIPE_OPERATOR);
+    public static final TokenSet RELATIONAL_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RELATIONAL_OPERATOR);
+    public static final TokenSet STAB_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.STAB_OPERATOR);
+    public static final TokenSet STRUCT_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.STRUCT_OPERATOR);
+    public static final TokenSet THREE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.THREE_OPERATOR);
+    public static final TokenSet TWO_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
+    public static final TokenSet TYPE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.TYPE_OPERATOR);
+    public static final TokenSet UNARY_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.UNARY_OPERATOR);
     private static final OtpErlangAtom WHEN = new OtpErlangAtom("when");
     public static final OtpErlangAtom UNQUOTE_SPLICING = new OtpErlangAtom("unquote_splicing");
     public static final OtpErlangAtom[] ATOM_KEYWORDS = new OtpErlangAtom[]{
@@ -137,7 +156,8 @@ public class ElixirPsiImplUtil {
                     return element.getPrevSibling();
                 }
             };
-    private static final TokenSet ARROW_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.ARROW_OPERATOR);
+    public static final TokenSet ARROW_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.ARROW_OPERATOR);
+    public static final TokenSet WHEN_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.WHEN_OPERATOR);
 
     @Contract(pure = true)
     @NotNull
@@ -1289,13 +1309,13 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAdditionInfixOperator additionInfixOperator) {
-        return TokenSet.create(ElixirTypes.DUAL_OPERATOR);
+        return ADDITION_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAndInfixOperator andInfixOperator) {
-        return TokenSet.create(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirTypes.AND_WORD_OPERATOR);
+        return AND_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
@@ -1307,109 +1327,109 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirAtPrefixOperator atPrefixOperator) {
-        return TokenSet.create(ElixirTypes.AT_OPERATOR);
+        return AT_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirCapturePrefixOperator capturePrefixOperator) {
-        return TokenSet.create(ElixirTypes.CAPTURE_OPERATOR);
+        return CAPTURE_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirComparisonInfixOperator comparisonInfixOperator) {
-        return TokenSet.create(ElixirTypes.COMPARISON_OPERATOR);
+        return COMPARISON_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirDotInfixOperator dotInfixOperator) {
-        return TokenSet.create(ElixirTypes.DOT_OPERATOR);
+        return DOT_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMultiplicationInfixOperator multiplicationInfixOperator) {
-        return TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
+        return MULTIPLICATIVE_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirInInfixOperator inInfixOperator) {
-        return TokenSet.create(ElixirTypes.IN_OPERATOR);
+        return IN_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirInMatchInfixOperator inMatchInfixOperator) {
-        return TokenSet.create(ElixirTypes.IN_MATCH_OPERATOR);
+        return IN_MATCH_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMapPrefixOperator mapPrefixOperator) {
-        return TokenSet.create(ElixirTypes.STRUCT_OPERATOR);
+        return STRUCT_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirMatchInfixOperator matchInfixOperator) {
-        return TokenSet.create(ElixirTypes.MATCH_OPERATOR);
+        return MATCH_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirOrInfixOperator orInfixOperator) {
-        return TokenSet.create(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirTypes.OR_WORD_OPERATOR);
+        return OR_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirPipeInfixOperator pipeInfixOperator) {
-        return TokenSet.create(ElixirTypes.PIPE_OPERATOR);
+        return PIPE_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirRelationalInfixOperator relationalInfixOperator) {
-        return TokenSet.create(ElixirTypes.RELATIONAL_OPERATOR);
+        return RELATIONAL_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirStabInfixOperator stabInfixOperator) {
-        return TokenSet.create(ElixirTypes.STAB_OPERATOR);
+        return STAB_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirThreeInfixOperator threeInfixOperator) {
-        return TokenSet.create(ElixirTypes.THREE_OPERATOR);
+        return THREE_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirTwoInfixOperator twoInfixOperator) {
-        return TokenSet.create(ElixirTypes.RANGE_OPERATOR, ElixirTypes.TWO_OPERATOR);
+        return TWO_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirTypeInfixOperator typeInfixOperator) {
-        return TokenSet.create(ElixirTypes.TYPE_OPERATOR);
+        return TYPE_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirUnaryPrefixOperator unaryPrefixOperator) {
-        return TokenSet.create(ElixirTypes.DUAL_OPERATOR, ElixirTypes.NOT_OPERATOR, ElixirTypes.UNARY_OPERATOR);
+        return UNARY_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)
     @NotNull
     public static TokenSet operatorTokenSet(@SuppressWarnings("unused") final ElixirWhenInfixOperator whenInfixOperator) {
-        return TokenSet.create(ElixirTypes.WHEN_OPERATOR);
+        return WHEN_OPERATOR_TOKEN_SET;
     }
 
     @Contract(pure = true)

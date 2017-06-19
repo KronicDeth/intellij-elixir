@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.elixir_lang.psi.ElixirTypes.*;
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.document;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 /**
  * @note MUST implement {@link BlockEx} or language-specific indent settings will NOT be used and only the generic ones
@@ -55,6 +55,10 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+    );
+    private static final TokenSet COMPARISON_OPERATION_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MATCHED_COMPARISON_OPERATION,
+            ElixirTypes.UNMATCHED_COMPARISON_OPERATION
     );
     private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
             ElixirTypes.CHAR_LIST_HEREDOC_LINE,
@@ -98,6 +102,7 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.LITERAL_WORDS_LINE,
             ElixirTypes.STRING_LINE
     );
+    private static final TokenSet MAP_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MAP_OPERATOR);
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
             ElixirTypes.MAP_OPERATION,
             ElixirTypes.STRUCT_OPERATION
@@ -111,10 +116,6 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
             ElixirTypes.MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
             ElixirTypes.MATCHED_UNQUALIFIED_PARENTHESES_CALL
-    );
-    private static final TokenSet COMPARISON_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_COMPARISON_OPERATION,
-            ElixirTypes.UNMATCHED_COMPARISON_OPERATION
     );
     private static final TokenSet MATCH_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_MATCH_OPERATION,
@@ -171,6 +172,30 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.THREE_INFIX_OPERATOR,
             ElixirTypes.UNARY_PREFIX_OPERATOR,
             ElixirTypes.WHEN_INFIX_OPERATOR
+    );
+    private static final TokenSet OPERATOR_TOKEN_SET = TokenSet.orSet(
+            ADDITION_OPERATOR_TOKEN_SET,
+            AND_OPERATOR_TOKEN_SET,
+            ARROW_OPERATOR_TOKEN_SET,
+            AT_OPERATOR_TOKEN_SET,
+            CAPTURE_OPERATOR_TOKEN_SET,
+            COMPARISON_OPERATOR_TOKEN_SET,
+            DOT_OPERATOR_TOKEN_SET,
+            IN_OPERATOR_TOKEN_SET,
+            IN_MATCH_OPERATOR_TOKEN_SET,
+            MAP_OPERATOR_TOKEN_SET,
+            MATCH_OPERATOR_TOKEN_SET,
+            MULTIPLICATIVE_OPERATOR_TOKEN_SET,
+            PIPE_OPERATOR_TOKEN_SET,
+            OR_OPERATOR_TOKEN_SET,
+            RELATIONAL_OPERATOR_TOKEN_SET,
+            STAB_OPERATOR_TOKEN_SET,
+            STRUCT_OPERATOR_TOKEN_SET,
+            THREE_OPERATOR_TOKEN_SET,
+            TYPE_OPERATOR_TOKEN_SET,
+            TWO_OPERATOR_TOKEN_SET,
+            UNARY_OPERATOR_TOKEN_SET,
+            WHEN_OPERATOR_TOKEN_SET
     );
     private static final TokenSet PIPE_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_PIPE_OPERATION,
@@ -372,13 +397,6 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
-    }
-
-    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode operation) {
-        return CodeStyleSettingsManager
-                .getInstance(operation.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class);
     }
 
     /**
@@ -1295,7 +1313,12 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 operatorRule,
                 (child, childElementType, blockList) -> {
-                    blockList.add(buildChild(child, operatorWrap, operatorAlignment, Indent.getNoneIndent()));
+                    if (OPERATOR_TOKEN_SET.contains(childElementType)) {
+                        blockList.add(buildChild(child, operatorWrap, operatorAlignment, Indent.getNoneIndent()));
+                    } else {
+                        // comments
+                        blockList.add(buildChild(child, Indent.getNormalIndent()));
+                    }
 
                     return blockList;
                 }
@@ -1591,6 +1614,13 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode operation) {
+        return CodeStyleSettingsManager
+                .getInstance(operation.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class);
     }
 
     /**
