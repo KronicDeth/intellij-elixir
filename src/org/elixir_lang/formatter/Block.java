@@ -396,7 +396,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
                     } else if (operatorRuleTokenSet.contains(childElementType)) {
-                        blockList.addAll(buildOperatorRuleChildren(child));
+                        blockList.addAll(buildOperatorRuleChildren(child, null, null, operandAlignment));
                     } else {
                         blockList.add(buildChild(child, operandAlignment));
                     }
@@ -1314,26 +1314,27 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule) {
-        return buildOperatorRuleChildren(operatorRule, null, null);
+        return buildOperatorRuleChildren(operatorRule, null, null, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
                                                                           @Nullable Alignment operatorAlignment) {
-        return buildOperatorRuleChildren(operatorRule, null, operatorAlignment);
+        return buildOperatorRuleChildren(operatorRule, null, operatorAlignment, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
                                                                           @Nullable Wrap operatorWrap) {
-        return buildOperatorRuleChildren(operatorRule, operatorWrap, null);
+        return buildOperatorRuleChildren(operatorRule, operatorWrap, null, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(
             @NotNull ASTNode operatorRule,
             @Nullable Wrap operatorWrap,
-            @Nullable Alignment operatorAlignment
+            @Nullable Alignment operatorAlignment,
+            @Nullable Alignment commentAlignment
     ) {
         return buildChildren(
                 operatorRule,
@@ -1342,7 +1343,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.add(buildChild(child, operatorWrap, operatorAlignment, Indent.getNoneIndent()));
                     } else {
                         // comments
-                        blockList.add(buildChild(child, Indent.getNormalIndent()));
+                        blockList.add(buildChild(child, commentAlignment));
                     }
 
                     return blockList;
