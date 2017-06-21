@@ -231,6 +231,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("comment_indent_after_do_in_do_block.ex");
     }
 
+    public void testCommentAtEndOfLine() {
+        assertFormatted("comment_at_end_of_line.ex");
+    }
+
     public void testCommentIndentAfterFn() {
         assertFormatted("comment_indent_after_fn.ex");
     }

@@ -1472,6 +1472,9 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, childWrap, childAlignment, childIndent));
+                    } else if (childElementType == ElixirTypes.COMMENT) {
+                        // COMMENTs don't use childWrap as they can either be at end-of-line or on their own line
+                        blockList.add(buildChild(child, childAlignment, childIndent));
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
                     } else {
