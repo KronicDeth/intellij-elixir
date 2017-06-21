@@ -514,6 +514,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("no_spaces_around_dot_operator.ex");
     }
 
+    public void testParenthesesWrapping() {
+        assertFormatted("parentheses_wrapping.ex");
+    }
+
     public void testPipelineMatchAlignment() {
         String path = "pipeline_match_alignment.ex";
 

@@ -561,7 +561,15 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, null));
                     } else if (childElementType == ElixirTypes.STAB) {
-                        blockList.addAll(buildStabChildren((CompositeElement) child));
+                        Wrap stabBodyChildrenWrap;
+
+                        if (child.findChildByType(ElixirTypes.STAB_BODY) != null) {
+                            stabBodyChildrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+                        } else {
+                            stabBodyChildrenWrap = null;
+                        }
+
+                        blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
                         blockList.add(buildChild(child));
                     }
@@ -941,7 +949,15 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildEndOfExpressionChildren(child, null, Indent.getNormalIndent())
                         );
                     } else if (childElementType == ElixirTypes.STAB) {
-                        blockList.addAll(buildStabChildren((CompositeElement) child));
+                        Wrap stabBodyChildrenWrap;
+
+                        if (child.findChildByType(ElixirTypes.STAB_BODY) != null) {
+                            stabBodyChildrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+                        } else {
+                            stabBodyChildrenWrap = null;
+                        }
+
+                        blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
                         blockList.add(buildChild(child));
                     }
@@ -1467,11 +1483,6 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    @NotNull
-    private List<com.intellij.formatting.Block> buildStabChildren(@NotNull CompositeElement stab) {
-        return buildStabChildren(stab, null);
-    }
-
     /**
      * Builds stab.*
      *
@@ -1515,7 +1526,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        finalStabBodyChildrenWrap,
                                         childAlignment,
                                         childIndent
                                 )
