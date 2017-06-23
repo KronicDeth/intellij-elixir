@@ -219,6 +219,7 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.AND_INFIX_OPERATOR,
             ElixirTypes.OR_INFIX_OPERATOR
     );
+    private static final TokenSet TUPLISH_TOKEN_SET = TokenSet.create(ElixirTypes.MULTIPLE_ALIASES, ElixirTypes.TUPLE);
     private static final TokenSet TWO_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_TWO_OPERATION,
             ElixirTypes.UNMATCHED_TWO_OPERATION
@@ -774,6 +775,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMapChildren(parent);
+        } else if (parentElementType == ElixirTypes.MULTIPLE_ALIASES) {
+            blocks = buildMultipleAliasesChildren(parent);
         } else if (parentElementType == ElixirTypes.PARENTHETICAL_STAB) {
             blocks = buildParentheticalStabChildren(parent);
         } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
@@ -1251,6 +1254,45 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(buildParenthesesArgumentsChildren(child, parentWrap, parentAlignment));
                     } else {
                         blockList.add(buildChild(child));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    /**
+     * The whole point of adding multiple aliases to Elixir was to allow for compact `import`s and `aliases`, so unlike
+     * actual tuples, where `WrapType.ALWAYS` makes sense for multiline tuples, for multi-line multiple aliases, we
+     * want the most compact arrangement that still preserves alignment inside the `{` `}` and wrapping when the line is
+     * too long.
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMultipleAliasesChildren(@NotNull ASTNode multipleAliases) {
+        // Align all aliases so when they wrap they line up inside the `{` instead of with the `{`.
+        Alignment aliasAlignment = Alignment.createAlignment();
+        // The same Wrap can be used for multiple comma-separated values in the example code for `Wrap.createWrap` ...
+        Wrap aliasWrap = Wrap.createWrap(
+                WrapType.NORMAL,
+                /* ... that code say that `wrapFirstElement` should be `false` if only those elements past margin should
+                   be wrapped. */
+                true
+        );
+        Wrap commaWrap = Wrap.createChildWrap(aliasWrap, WrapType.NONE, true);
+
+        return buildChildren(
+                multipleAliases,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.CLOSING_CURLY) {
+                        blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.OPENING_CURLY) {
+                        blockList.add(buildChild(child, Wrap.createWrap(WrapType.NONE, false)));
+                    } else if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildAccessExpressionChildren(child, aliasWrap, aliasAlignment));
+                    } else if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child, commaWrap));
+                    } else {
+                        blockList.add(buildChild(child, aliasWrap, aliasAlignment));
                     }
 
                     return blockList;

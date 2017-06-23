@@ -652,6 +652,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("match_operation_enforce_indent_to_children.ex");
     }
 
+    public void testMultipleAliasesAlignContainerArguments() {
+        assertFormatted("multiple_aliases_align_container_arguments.ex");
+    }
+
     public void testWithSpaceAroundMatchOperator() {
         myFixture.configureByFile("without_space_around_match_operator.ex");
 
