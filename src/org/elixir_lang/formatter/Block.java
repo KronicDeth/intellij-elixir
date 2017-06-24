@@ -587,11 +587,11 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildBodyChildren(ASTNode body) {
+    private List<com.intellij.formatting.Block> buildBodyChildren(@NotNull ASTNode body, @Nullable Wrap childrenWrap) {
         return buildChildren(
                 body,
                 (child, childElementType, blockList) -> {
-                    blockList.add(buildChild(child));
+                    blockList.add(buildChild(child, childrenWrap));
 
                     return blockList;
                 }
@@ -896,10 +896,12 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildContainerChildren(@NotNull ASTNode container,
                                                                        @NotNull IElementType openingElementType,
+                                                                       @Nullable Wrap openingWrap,
                                                                        @NotNull IElementType closingElementType) {
         return buildContainerChildren(
                 container,
                 openingElementType,
+                openingWrap,
                 closingElementType,
                 null,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
@@ -924,6 +926,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildContainerChildren(
             @NotNull ASTNode container,
             @NotNull IElementType openingElementType,
+            @Nullable Wrap openingWrap,
             @NotNull IElementType closingElementType,
             @Nullable Wrap givenTailWrap,
             @NotNull ContainerBlockListReducer containerBlockListReducer
@@ -946,7 +949,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (childElementType == closingElementType) {
                         blockList.add(buildChild(child, tailWrap[0], Indent.getNoneIndent()));
                     } else if (childElementType == openingElementType) {
-                        blockList.add(buildChild(child));
+                        blockList.add(buildChild(child, openingWrap));
                     } else {
                         tailWrap[0] = nonEmptyTailWrap;
 
@@ -1102,7 +1105,12 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildInterpolationChildren(@NotNull ASTNode interpolation) {
-        return buildContainerChildren(interpolation, ElixirTypes.INTERPOLATION_START, ElixirTypes.INTERPOLATION_END);
+        return buildContainerChildren(
+                interpolation,
+                ElixirTypes.INTERPOLATION_START,
+                Wrap.createWrap(WrapType.NONE, false),
+                ElixirTypes.INTERPOLATION_END
+        );
     }
 
     @NotNull
@@ -1162,15 +1170,18 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildLineChildren(@NotNull ASTNode line) {
+        // Everything on a line contains significant white space, so no automatic newlines should be inserted
+        Wrap none = Wrap.createWrap(WrapType.NONE, true);
+
         return buildChildren(
                 line,
                 (child, childElementType, blockList) -> {
                     if (BODY_TOKEN_SET.contains(childElementType)) {
                         /* Flatten body because its children represent textual elements that can't be aligned without
                            changing their meaning, so there's no need for a formatting block for them */
-                        blockList.addAll(buildBodyChildren(child));
+                        blockList.addAll(buildBodyChildren(child, none));
                     } else {
-                        blockList.add(buildChild(child));
+                        blockList.add(buildChild(child, none));
                     }
 
                     return blockList;
@@ -1180,7 +1191,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildListChildren(@NotNull ASTNode list) {
-        return buildContainerChildren(list, ElixirTypes.OPENING_BRACKET, ElixirTypes.CLOSING_BRACKET);
+        return buildContainerChildren(list, ElixirTypes.OPENING_BRACKET, null, ElixirTypes.CLOSING_BRACKET);
     }
 
     @NotNull
@@ -1189,6 +1200,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildContainerChildren(
                 mapArguments,
                 ElixirTypes.OPENING_CURLY,
+                null,
                 ElixirTypes.CLOSING_CURLY,
                 mapArgumentsWrap,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
@@ -1719,7 +1731,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildTupleChildren(@NotNull ASTNode tuple) {
-        return buildContainerChildren(tuple, ElixirTypes.OPENING_CURLY, ElixirTypes.CLOSING_CURLY);
+        return buildContainerChildren(tuple, ElixirTypes.OPENING_CURLY, null, ElixirTypes.CLOSING_CURLY);
     }
 
     @NotNull

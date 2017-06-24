@@ -259,6 +259,16 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("indent_without_override_after.ex");
     }
 
+    public void testInterpolationCompact() {
+        myFixture.configureByFile("interpolation_compact_before.ex");
+
+        temporaryCodeStyleSettings.setRightMargin(ElixirLanguage.INSTANCE, 120);
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("interpolation_compact_after.ex");
+    }
+
     public void testWhenWrapsWithRightOperand() {
         myFixture.configureByFile("when_wraps_with_right_operand_before.ex");
 
