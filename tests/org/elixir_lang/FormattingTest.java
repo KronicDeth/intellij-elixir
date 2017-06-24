@@ -640,6 +640,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testMapAndStructOneKeyPerLine() {
+        myFixture.configureByFile("map_and_struct_one_key_per_line_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("map_and_struct_one_key_per_line_after.ex");
+    }
+
     public void testMapIndent() {
         assertFormatted("map_indent.ex");
     }
