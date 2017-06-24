@@ -46,6 +46,7 @@
       - [Steps](#steps)
       - [Basics](#basics)
         - [Keyboard Shortcuts](#keyboard-shortcuts)
+        - [Environment Variables](#environment-variables)
       - [Breakpoints](#breakpoints)
         - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
           - [Viewing all breakpoints](#viewing-all-breakpoints)
@@ -1378,6 +1379,12 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | Step Over                               | `F8`             |
 | Step Into                               | `F7`             |
 | View breakpoint details/all breakpoints | `Shift+Cmd+F8`   |
+
+##### Environment Variables
+
+| Variable              | Example    | Description                     |
+| ----------------------|------------| --------------------------------|
+| MIX\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
 #### Breakpoints
 

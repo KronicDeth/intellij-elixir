@@ -56,12 +56,21 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
   end
 
   defp interpret_modules_in(path) do
+    blacklist = get_blacklist()
     path
     |> Path.join("**/*.beam")
     |> Path.wildcard
     |> Enum.map(&(Path.basename(&1, ".beam") |> String.to_atom))
     |> Enum.filter(&(:int.interpretable(&1) == true && !:code.is_sticky(&1) && &1 != __MODULE__))
+    |> Enum.filter(&(!Enum.any?(blacklist, fn(x) -> &1 == x end)))
     |> Enum.each(&(:int.ni(&1)))
+  end
+
+  defp get_blacklist() do
+    blacklist = System.get_env("MIX_DEBUG_BLACKLIST") || ""
+    blacklist
+      |> String.split(",")
+      |> Enum.map(&(String.to_atom(&1)))
   end
 
   defp get_task(["-" <> _ | _]) do
