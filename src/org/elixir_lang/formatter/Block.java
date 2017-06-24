@@ -907,6 +907,8 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
                     } else if (childElementType == ElixirTypes.COMMA) {
                         blockList.add(buildChild(child));
+                    } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
                     } else if (childElementType == ElixirTypes.KEYWORDS) {
                         blockList.addAll(buildKeywordsChildren(child, tailWrap));
                     } else {
