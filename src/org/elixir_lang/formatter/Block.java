@@ -337,6 +337,12 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression,
+                                                                              @Nullable Wrap childrenWrap) {
+        return buildAccessExpressionChildren(accessExpression, childrenWrap, null, null);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildAccessExpressionChildren(@NotNull ASTNode accessExpression,
                                                                               @Nullable Wrap childrenWrap,
                                                                               @Nullable Alignment childrenAlignment) {
         return buildAccessExpressionChildren(accessExpression, childrenWrap, childrenAlignment, null);
@@ -760,6 +766,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildBlockItemChildren(parent, parentAlignment);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildCaptureNonNumericOperationChildren(parent);
+        } else if (parentElementType == ElixirTypes.CONTAINER_ASSOCIATION_OPERATION) {
+            blocks = buildContainerAssociationOperation(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
         } else if (parentElementType == ElixirTypes.INTERPOLATION) {
@@ -851,6 +859,38 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     protected List<com.intellij.formatting.Block> buildChildren() {
         return buildChildren(myNode, myWrap, myAlignment, childrenWrap);
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildContainerAssociationOperation(
+            @NotNull ASTNode containerAssociationOperation
+    ) {
+        Wrap keyWrap = Wrap.createWrap(WrapType.NORMAL, true);
+        Wrap associationOperatorWrap = Wrap.createChildWrap(keyWrap, WrapType.NONE, true);
+        Wrap valueWrap = Wrap.createWrap(WrapType.NORMAL, true);
+        final Wrap[] operandWrap = {keyWrap};
+        final boolean[] rightOperand = {false};
+
+        return buildChildren(
+                containerAssociationOperation,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        if (rightOperand[0]) {
+                            blockList.addAll(buildMapValueAccessExpressionChildren(child));
+                        } else {
+                            blockList.addAll(buildAccessExpressionChildren(child, operandWrap[0]));
+                        }
+                    } else if (childElementType == ElixirTypes.ASSOCIATION_OPERATOR) {
+                        blockList.add(buildChild(child, associationOperatorWrap));
+                        operandWrap[0] = valueWrap;
+                        rightOperand[0] = true;
+                    } else {
+                        blockList.add(buildChild(child, operandWrap[0]));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
@@ -1080,30 +1120,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 keywordPair,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        /* Nested maps and structs will be in accessExpressions, so can't use `buildAccessExpression` or
-                           the nested maps and structs won't be wrapped, so that nested keywordKeys don't appear on the
-                           same line */
-                        blockList.addAll(
-                                buildChildren(
-                                        child,
-                                        (grandChild, grandChildElementType, childBlockList) -> {
-                                            if (MAP_TOKEN_SET.contains(grandChildElementType)) {
-                                                childBlockList.add(
-                                                        buildChild(
-                                                                grandChild,
-                                                                null,
-                                                                null,
-                                                                Wrap.createWrap(WrapType.ALWAYS, true)
-                                                        )
-                                                );
-                                            } else {
-                                                childBlockList.add(buildChild(grandChild));
-                                            }
-
-                                            return childBlockList;
-                                        }
-                                )
-                        );
+                        blockList.addAll(buildMapValueAccessExpressionChildren(child));
                     } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
                         blockList.add(buildChild(child, keywordKeyWrap));
                     } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
@@ -1260,6 +1277,33 @@ public class Block extends AbstractBlock implements BlockEx {
                     }
 
                     return blockList;
+                }
+        );
+    }
+
+    /* Nested maps and structs will be in accessExpressions, so can't use `buildAccessExpression` or the nested maps and
+       structs won't be wrapped, so that nested keywordKeys don't appear on the same line */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildMapValueAccessExpressionChildren(
+            @NotNull ASTNode mapValueAccessExpression
+    ) {
+        return buildChildren(
+                mapValueAccessExpression,
+                (grandChild, grandChildElementType, childBlockList) -> {
+                    if (MAP_TOKEN_SET.contains(grandChildElementType)) {
+                        childBlockList.add(
+                                buildChild(
+                                        grandChild,
+                                        null,
+                                        null,
+                                        Wrap.createWrap(WrapType.ALWAYS, true)
+                                )
+                        );
+                    } else {
+                        childBlockList.add(buildChild(grandChild));
+                    }
+
+                    return childBlockList;
                 }
         );
     }
