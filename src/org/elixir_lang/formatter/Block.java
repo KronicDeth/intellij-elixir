@@ -927,26 +927,31 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull ContainerBlockListReducer containerBlockListReducer
     ) {
         Indent childrenIndent = Indent.getNormalIndent();
-        Wrap tailWrap;
+        Wrap nonEmptyTailWrap;
 
         if (givenTailWrap != null) {
-            tailWrap = givenTailWrap;
+            nonEmptyTailWrap = givenTailWrap;
         } else {
-            tailWrap = tailWrap(container, openingElementType, closingElementType);
+            nonEmptyTailWrap = tailWrap(container, openingElementType, closingElementType);
         }
+
+        // empty tailWrap
+        final Wrap[] tailWrap = {Wrap.createWrap(WrapType.NORMAL, true)};
 
         return buildChildren(
                 container,
                 (child, childElementType, blockList) -> {
                     if (childElementType == closingElementType) {
-                        blockList.add(buildChild(child, tailWrap, Indent.getNoneIndent()));
+                        blockList.add(buildChild(child, tailWrap[0], Indent.getNoneIndent()));
                     } else if (childElementType == openingElementType) {
                         blockList.add(buildChild(child));
                     } else {
+                        tailWrap[0] = nonEmptyTailWrap;
+
                         blockList = containerBlockListReducer.reduce(
                                 child,
                                 childElementType,
-                                tailWrap,
+                                tailWrap[0],
                                 childrenIndent,
                                 blockList
                         );

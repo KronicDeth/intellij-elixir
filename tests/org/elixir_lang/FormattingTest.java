@@ -640,6 +640,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         );
     }
 
+    public void testMapAndStructCompactEmpty() {
+        assertFormatted("map_and_struct_compact_empty.ex");
+    }
+
     public void testMapAndStructOneKeyPerLine() {
         myFixture.configureByFile("map_and_struct_one_key_per_line_before.ex");
 
