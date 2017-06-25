@@ -662,12 +662,20 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("map_and_struct_compact_empty.ex");
     }
 
-    public void testMapAndStructOneKeyPerLine() {
-        myFixture.configureByFile("map_and_struct_one_key_per_line_before.ex");
+    public void testMapAndStructConstructionOneKeyPerLine() {
+        myFixture.configureByFile("map_and_struct_construction_one_key_per_line_before.ex");
 
         reformatFixture();
 
-        myFixture.checkResultByFile("map_and_struct_one_key_per_line_after.ex");
+        myFixture.checkResultByFile("map_and_struct_construction_one_key_per_line_after.ex");
+    }
+
+    public void testMapAndStructUpdateOneKeyPerLine() {
+        myFixture.configureByFile("map_and_struct_update_one_key_per_line_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("map_and_struct_update_one_key_per_line_after.ex");
     }
 
     public void testMapIndent() {

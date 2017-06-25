@@ -1292,8 +1292,10 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(
             @NotNull ASTNode mapUpdateArguments,
-            @NotNull Wrap mapArgumentsTailWrap
+            @NotNull Wrap operandWrap
     ) {
+        final boolean[] leftOperand = {true};
+
         return buildChildren(
                 mapUpdateArguments,
                 (child, childElementType, blockList) -> {
@@ -1301,10 +1303,15 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.add(buildChild(child));
                     } else if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
+                        leftOperand[0] = false;
                     } else {
-                        blockList.addAll(
-                                buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap)
-                        );
+                        if (leftOperand[0]) {
+                            blockList.add(buildChild(child, operandWrap));
+                        } else {
+                            blockList.addAll(
+                                    buildMapTailArgumentsChildChildren(child, childElementType, operandWrap)
+                            );
+                        }
                     }
 
                     return blockList;
