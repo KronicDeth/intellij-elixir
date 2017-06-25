@@ -550,6 +550,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testPipelineMixedPosition() {
+        myFixture.configureByFile("pipeline_mixed_position_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("pipeline_mixed_position_after.ex");
+    }
+
     public void testMatchIfElse() {
         assertFormatted("match_if_else.ex");
     }

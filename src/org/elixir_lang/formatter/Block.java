@@ -477,6 +477,7 @@ public class Block extends AbstractBlock implements BlockEx {
             operandAlignment[0] = null;
         }
 
+        final Wrap[] operandWrap = {null};
         operatorAlignment = nestedStartAlignment;
 
         return buildChildren(
@@ -484,18 +485,25 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         blockList.addAll(
-                                buildAccessExpressionChildren(child, operandAlignment[0])
+                                buildAccessExpressionChildren(child, operandWrap[0], operandAlignment[0])
                         );
                     } else if (ARROW_OPERATION_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildArrowOperationChildren(child, nestedStartAlignment));
                     } else if (childElementType == ElixirTypes.ARROW_INFIX_OPERATOR) {
-                        blockList.addAll(buildOperatorRuleChildren(child, operatorAlignment));
+                        blockList.addAll(
+                                buildOperatorRuleChildren(
+                                        child,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        operatorAlignment
+                                )
+                        );
                         /* right operand has alignment only so that any children can align to it instead of operator,
                            which ensures that unmatched call do block's end aligns with start of the call instead of
                            the arrow operator */
                         operandAlignment[0] = Alignment.createAlignment();
+                        operandWrap[0] = Wrap.createWrap(WrapType.NONE, true);
                     } else {
-                        blockList.add(buildChild(child, operandAlignment[0]));
+                        blockList.add(buildChild(child, operandWrap[0], operandAlignment[0]));
                     }
 
                     return blockList;
@@ -1488,14 +1496,15 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
-                                                                          @Nullable Alignment operatorAlignment) {
-        return buildOperatorRuleChildren(operatorRule, null, operatorAlignment, null);
+                                                                          @Nullable Wrap operatorWrap) {
+        return buildOperatorRuleChildren(operatorRule, operatorWrap, null, null);
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildOperatorRuleChildren(@NotNull ASTNode operatorRule,
-                                                                          @Nullable Wrap operatorWrap) {
-        return buildOperatorRuleChildren(operatorRule, operatorWrap, null, null);
+                                                                          @Nullable Wrap operatorWrap,
+                                                                          @Nullable Alignment operatorAlignment) {
+        return buildOperatorRuleChildren(operatorRule, operatorWrap, operatorAlignment, null);
     }
 
     @NotNull

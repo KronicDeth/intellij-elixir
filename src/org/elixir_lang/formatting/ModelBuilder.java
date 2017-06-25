@@ -42,11 +42,25 @@ public class ModelBuilder implements FormattingModelBuilder {
         CommonCodeStyleSettings elixirCommonSettings = settings.getCommonSettings(ElixirLanguage.INSTANCE);
         org.elixir_lang.code_style.CodeStyleSettings elixirCustomSettings =
                 settings.getCustomSettings(org.elixir_lang.code_style.CodeStyleSettings.class);
+        // Not using `spacesIf` as `spacing` is needed to override keepLineBreaks
+        int aroundArrowOperatorSpaceCount;
+
+        if (elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS) {
+            aroundArrowOperatorSpaceCount = 1;
+        } else {
+            aroundArrowOperatorSpaceCount = 0;
+        }
+
         return new SpacingBuilder(settings, ElixirLanguage.INSTANCE)
                 .after(BLOCK_IDENTIFIER_TOKEN_SET).spaces(1)
                 .around(ElixirTypes.AND_WORD_OPERATOR).spaces(1)
                 .around(ElixirTypes.AND_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_AND_OPERATORS)
-                .around(ElixirTypes.ARROW_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ARROW_OPERATORS)
+                .before(ElixirTypes.ARROW_OPERATOR).spaces(aroundArrowOperatorSpaceCount)
+                /* Don't keep line breaks, so that pipelines that end with |> can be converted to pipelines that start
+                   with |> instead */
+                .after(
+                        ElixirTypes.ARROW_OPERATOR
+                ).spacing(aroundArrowOperatorSpaceCount, aroundArrowOperatorSpaceCount, 0, false, 0)
                 .around(ElixirTypes.ASSOCIATION_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_ASSOCIATION_OPERATOR)
                 .after(ElixirTypes.AT_OPERATOR).none()
                 .withinPair(ElixirTypes.OPENING_BIT, ElixirTypes.CLOSING_BIT).spaceIf(elixirCustomSettings.SPACE_WITHIN_BITS)
