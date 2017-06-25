@@ -587,6 +587,19 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private List<com.intellij.formatting.Block> buildBlockListChildren(@NotNull ASTNode blockListNode,
+                                                                       @Nullable Alignment parentAlignment) {
+        return buildChildren(
+                blockListNode,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child, parentAlignment, Indent.getNoneIndent()));
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
     private List<com.intellij.formatting.Block> buildBodyChildren(@NotNull ASTNode body, @Nullable Wrap childrenWrap) {
         return buildChildren(
                 body,
@@ -983,8 +996,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 doBlock,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.BLOCK_LIST) {
-                        //noinspection ConstantConditions
-                        blockList.add(buildChild(child, parentAlignment));
+                        blockList.addAll(buildBlockListChildren(child, parentAlignment));
                     } else if (childElementType == ElixirTypes.END) {
                         Wrap endWrap;
 

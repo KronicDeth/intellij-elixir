@@ -546,6 +546,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile(path);
     }
 
+    public void testMatchIfElse() {
+        assertFormatted("match_if_else.ex");
+    }
+
     public void testIndentBeforeElseKeyword() {
         myFixture.configureByFile("incorrect_indent_before_else_keyword.ex");
 
