@@ -1494,16 +1494,22 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull ASTNode operatorRule,
             @Nullable Wrap operatorWrap,
             @Nullable Alignment operatorAlignment,
-            @Nullable Alignment commentAlignment
+            @Nullable Alignment rightCommentAlignment
     ) {
+        final Alignment[] commentAlignment = {operatorAlignment};
+        Indent operatorIndent = Indent.getNoneIndent();
+        final Indent[] commentIndent = {operatorIndent};
+
+
         return buildChildren(
                 operatorRule,
                 (child, childElementType, blockList) -> {
                     if (OPERATOR_TOKEN_SET.contains(childElementType)) {
-                        blockList.add(buildChild(child, operatorWrap, operatorAlignment, Indent.getNoneIndent()));
+                        blockList.add(buildChild(child, operatorWrap, operatorAlignment, operatorIndent));
+                        commentAlignment[0] = rightCommentAlignment;
+                        commentIndent[0] = null;
                     } else {
-                        // comments
-                        blockList.add(buildChild(child, commentAlignment));
+                        blockList.add(buildChild(child, commentAlignment[0], commentIndent[0]));
                     }
 
                     return blockList;

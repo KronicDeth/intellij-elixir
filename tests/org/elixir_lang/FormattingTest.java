@@ -235,6 +235,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("comment_at_end_of_line.ex");
     }
 
+    public void testCommentInPipeline() {
+        assertFormatted("comment_in_pipeline.ex");
+    }
+
     public void testCommentInSpec() {
         assertFormatted("comment_in_spec.ex");
     }
