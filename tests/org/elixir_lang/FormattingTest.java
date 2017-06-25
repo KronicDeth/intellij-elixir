@@ -954,6 +954,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("space_around_when_operator.ex");
     }
 
+    public void testSigilConcatenation() {
+        assertFormatted("sigil_concatenation.ex");
+    }
+
     public void testSingleSpaceNotOperator() {
         myFixture.configureByFile("multispace_not_operator.ex");
 

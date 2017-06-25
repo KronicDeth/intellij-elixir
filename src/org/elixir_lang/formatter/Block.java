@@ -1192,6 +1192,8 @@ public class Block extends AbstractBlock implements BlockEx {
                         /* Flatten body because its children represent textual elements that can't be aligned without
                            changing their meaning, so there's no need for a formatting block for them */
                         blockList.addAll(buildBodyChildren(child, none));
+                    } else if (childElementType == ElixirTypes.SIGIL_MODIFIERS) {
+                        blockList.addAll(buildSigilModifiersChildren(child, none));
                     } else {
                         blockList.add(buildChild(child, none));
                     }
@@ -1597,6 +1599,23 @@ public class Block extends AbstractBlock implements BlockEx {
                 pipeOperation,
                 (codeStyleSettings) -> codeStyleSettings.ALIGN_PIPE_OPERANDS,
                 ElixirTypes.PIPE_INFIX_OPERATOR
+        );
+    }
+
+    /**
+     * sigilModifiers must be flattened because they may be empty and empty blocks SHOULD NOT be created a it messes up
+     * the spacing
+     */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildSigilModifiersChildren(@NotNull ASTNode sigilModifiers,
+                                                                            @NotNull Wrap childrenWrap) {
+        return buildChildren(
+                sigilModifiers,
+                (child, childElementType, blockList) -> {
+                    blockList.add(buildChild(child, childrenWrap));
+
+                    return blockList;
+                }
         );
     }
 
