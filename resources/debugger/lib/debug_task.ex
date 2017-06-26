@@ -67,7 +67,7 @@ defmodule Mix.Tasks.IntellijElixir.DebugTask do
   end
 
   defp get_blacklist() do
-    blacklist = System.get_env("MIX_DEBUG_BLACKLIST") || ""
+    blacklist = System.get_env("INTELLIJ_ELIXIR_DEBUG_BLACKLIST") || ""
     blacklist
       |> String.split(",")
       |> Enum.map(&(String.to_atom(&1)))
