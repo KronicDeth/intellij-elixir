@@ -1382,9 +1382,9 @@ After you have configured a [run configuration](#run-configuration) for your pro
 
 ##### Environment Variables
 
-| Variable              | Example    | Description                     |
-| ----------------------|------------| --------------------------------|
-| MIX\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
+| Variable                           | Example    | Description                     |
+| -----------------------------------|------------| --------------------------------|
+| INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
 #### Breakpoints
 
