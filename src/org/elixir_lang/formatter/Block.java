@@ -250,9 +250,9 @@ public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet WHITESPACE_TOKEN_SET =
             TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
     @Nullable
-    private final Wrap childrenWrap;
-    @Nullable
     private final Alignment childrenAlignment;
+    @Nullable
+    private final Wrap childrenWrap;
     @Nullable
     private final Indent indent;
     @NotNull
@@ -943,50 +943,6 @@ public class Block extends AbstractBlock implements BlockEx {
         return blocks;
     }
 
-    @NotNull
-    private List<com.intellij.formatting.Block> buildNoParenthesesKeywordPairChildren(
-            @NotNull ASTNode noParenthesesKeywordPair
-    ) {
-        Wrap keywordKeyWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
-        Indent keywordKeyIndent = Indent.getIndent(Indent.Type.NONE, true, false);
-        Wrap keywordPairColonWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
-        Wrap keywordValueWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
-
-        return buildChildren(
-                noParenthesesKeywordPair,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildContainerValueAccessExpressionChildren(child, keywordValueWrap));
-                    } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
-                        blockList.add(buildChild(child, keywordKeyWrap, keywordKeyIndent));
-                    } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
-                        blockList.add(buildChild(child, keywordPairColonWrap));
-                    } else {
-                        blockList.add(buildChild(child, keywordValueWrap));
-                    }
-
-                    return blockList;
-                }
-        );
-    }
-
-    @NotNull
-    private List<com.intellij.formatting.Block> buildNoParenthesesKeywordsChildren(ASTNode noParenthesesKeywords) {
-        return buildChildren(
-                noParenthesesKeywords,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
-                        blockList.add(buildChild(child, Indent.getIndent(Indent.Type.NONE, true, false)));
-                    } else {
-                        // commas and comments
-                        blockList.add(buildChild(child));
-                    }
-
-                    return blockList;
-                }
-        );
-    }
-
     @Override
     protected List<com.intellij.formatting.Block> buildChildren() {
         return buildChildren(myNode, myWrap, myAlignment, childrenWrap, childrenAlignment);
@@ -1112,6 +1068,58 @@ public class Block extends AbstractBlock implements BlockEx {
                                 elementIndent,
                                 blockList
                         );
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    /* Nested list, maps, and structs will be in accessExpressions, so can't use `buildAccessExpression` or the nested
+       list, maps, and structs won't be wrapped, so that nested keywordKeys don't appear on the same line */
+    @NotNull
+    private List<com.intellij.formatting.Block> buildContainerValueAccessExpressionChildren(
+            @NotNull ASTNode containerValueAccessExpression,
+            @Nullable Wrap openingWrap
+    ) {
+        return buildChildren(
+                containerValueAccessExpression,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.LIST) {
+                        // flatten, so that `]` will see list's parent as direct parent
+                        blockList.addAll(
+                                buildListChildren(
+                                        child,
+                                        openingWrap,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else if (MAP_TOKEN_SET.contains(childElementType)) {
+                        // flatten, so that `}` will see map/struct's parent as direct parent
+                        blockList.addAll(
+                                buildMapChildren(
+                                        child,
+                                        openingWrap,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else if (childElementType == ElixirTypes.TUPLE) {
+                        // flatten, so that `}` will see tuple's parent as direct parent
+                        blockList.addAll(
+                                buildTupleChildren(
+                                        child,
+                                        openingWrap,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else {
+                        blockList.add(buildChild(child, openingWrap));
                     }
 
                     return blockList;
@@ -1499,58 +1507,6 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    /* Nested list, maps, and structs will be in accessExpressions, so can't use `buildAccessExpression` or the nested
-       list, maps, and structs won't be wrapped, so that nested keywordKeys don't appear on the same line */
-    @NotNull
-    private List<com.intellij.formatting.Block> buildContainerValueAccessExpressionChildren(
-            @NotNull ASTNode containerValueAccessExpression,
-            @Nullable Wrap openingWrap
-    ) {
-        return buildChildren(
-                containerValueAccessExpression,
-                (grandChild, grandChildElementType, childBlockList) -> {
-                    if (grandChildElementType == ElixirTypes.LIST) {
-                        // flatten, so that `]` will see list's parent as direct parent
-                        childBlockList.addAll(
-                                buildListChildren(
-                                        grandChild,
-                                        openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
-                                        Indent.getNormalIndent(true),
-                                        null
-                                )
-                        );
-                    } else if (MAP_TOKEN_SET.contains(grandChildElementType)) {
-                        // flatten, so that `}` will see map/struct's parent as direct parent
-                        childBlockList.addAll(
-                                buildMapChildren(
-                                        grandChild,
-                                        openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
-                                        Indent.getNormalIndent(true),
-                                        null
-                                )
-                        );
-                    } else if (grandChildElementType == ElixirTypes.TUPLE) {
-                        // flatten, so that `}` will see tuple's parent as direct parent
-                        childBlockList.addAll(
-                                buildTupleChildren(
-                                        grandChild,
-                                        openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
-                                        Indent.getNormalIndent(true),
-                                        null
-                                )
-                        );
-                    } else {
-                        childBlockList.add(buildChild(grandChild, openingWrap));
-                    }
-
-                    return childBlockList;
-                }
-        );
-    }
-
     @NotNull
     private List<com.intellij.formatting.Block> buildMatchedCallChildren(@NotNull ASTNode matchedCall,
                                                                          @Nullable Wrap parentWrap,
@@ -1623,6 +1579,50 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.add(buildChild(child, commaWrap));
                     } else {
                         blockList.add(buildChild(child, aliasWrap, aliasAlignment));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildNoParenthesesKeywordPairChildren(
+            @NotNull ASTNode noParenthesesKeywordPair
+    ) {
+        Wrap keywordKeyWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        Indent keywordKeyIndent = Indent.getIndent(Indent.Type.NONE, true, false);
+        Wrap keywordPairColonWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
+        Wrap keywordValueWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
+
+        return buildChildren(
+                noParenthesesKeywordPair,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildContainerValueAccessExpressionChildren(child, keywordValueWrap));
+                    } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
+                        blockList.add(buildChild(child, keywordKeyWrap, keywordKeyIndent));
+                    } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
+                        blockList.add(buildChild(child, keywordPairColonWrap));
+                    } else {
+                        blockList.add(buildChild(child, keywordValueWrap));
+                    }
+
+                    return blockList;
+                }
+        );
+    }
+
+    @NotNull
+    private List<com.intellij.formatting.Block> buildNoParenthesesKeywordsChildren(ASTNode noParenthesesKeywords) {
+        return buildChildren(
+                noParenthesesKeywords,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
+                        blockList.add(buildChild(child, Indent.getIndent(Indent.Type.NONE, true, false)));
+                    } else {
+                        // commas and comments
+                        blockList.add(buildChild(child));
                     }
 
                     return blockList;
