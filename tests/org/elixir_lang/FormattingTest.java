@@ -175,9 +175,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("anonymous_function_with_single_clause.ex");
     }
 
-    public void testNoParenthesesKeywordsAlignment() {
-        assertFormatted("no_parentheses_keywords_alignment.ex");
+    public void testNoParenthesesKeywordsKeywordValueContainerClosingAlignment() {
+        assertFormatted("no_parentheses_keywords_keyword_value_container_closing_alignment.ex");
     }
+
+    public void testNoParenthesesKeywordsKeywordValueContainerElementAlignment() {
+        assertFormatted("no_parentheses_keywords_keyword_value_container_element_alignment.ex");
+    }
+
 
     public void testNoSpaceAfterAtOperator() {
         myFixture.configureByFile("space_after_at_operator.ex");

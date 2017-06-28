@@ -518,8 +518,8 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildAssociationsBaseChildren(
             @NotNull ASTNode associationsBase,
-            @NotNull Wrap containerAssociationOperationWrap
-    ) {
+            @NotNull Wrap containerAssociationOperationWrap,
+            Indent containerAssociationOperationIndent) {
         return buildChildren(
                 associationsBase,
                 (child, childElementType, blockList) -> {
@@ -535,16 +535,27 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildAssociationsChildren(@NotNull ASTNode associations,
-                                                                          @NotNull Wrap associationExpressionWrap) {
+    private List<com.intellij.formatting.Block> buildAssociationsChildren(
+            @NotNull ASTNode associations,
+            @NotNull Wrap associationExpressionWrap,
+            @Nullable Indent associationsExpressionIndent
+    ) {
         return buildChildren(
                 associations,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
-                        blockList.addAll(buildAssociationsBaseChildren(child, associationExpressionWrap));
+                        blockList.addAll(
+                                buildAssociationsBaseChildren(
+                                        child,
+                                        associationExpressionWrap,
+                                        associationsExpressionIndent
+                                )
+                        );
+                    } else if (childElementType == ElixirTypes.COMMA) {
+                        blockList.add(buildChild(child, Wrap.createWrap(WrapType.NONE, false)));
                     } else {
-                        // comma or comment
-                        blockList.add(buildChild(child));
+                        // comment
+                        blockList.add(buildChild(child, associationsExpressionIndent));
                     }
 
                     return blockList;
@@ -728,7 +739,7 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child, @NotNull Indent indent) {
+    private Block buildChild(@NotNull ASTNode child, @Nullable Indent indent) {
         return new Block(child, null, null, spacingBuilder, indent, null, null);
     }
 
@@ -841,17 +852,17 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (parentElementType == ElixirTypes.INTERPOLATION) {
             blocks = buildInterpolationChildren(parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_PAIR) {
-            blocks = buildKeywordPairChildren(parent, null);
+            blocks = buildKeywordPairChildren(parent);
         } else if (parentElementType == ElixirTypes.KEYWORD_KEY) {
             blocks = buildKeywordKeyChildren(parent);
         } else if (LINE_TOKEN_SET.contains(parentElementType)) {
             blocks = buildLineChildren(parent);
         } else if (parentElementType == ElixirTypes.LIST) {
-            blocks = buildListChildren(parent, childrenAlignment);
+            blocks = buildListChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
-            blocks = buildMapChildren(parent, childrenWrap, childrenAlignment);
+            blocks = buildMapChildren(parent, null, childrenWrap, null, childrenAlignment);
         } else if (parentElementType == ElixirTypes.MULTIPLE_ALIASES) {
             blocks = buildMultipleAliasesChildren(parent);
         } else if (parentElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
@@ -864,7 +875,7 @@ public class Block extends AbstractBlock implements BlockEx {
             //noinspection ConstantConditions
             blocks = buildStabOperationChildren(parent, childrenWrap);
         } else if (parentElementType == ElixirTypes.TUPLE) {
-            blocks = buildTupleChildren(parent, childrenAlignment);
+            blocks = buildTupleChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
         } else if (WHEN_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildWhenOperationChildren(parent);
         } else if (OPERATION_TOKEN_SET.contains(parentElementType)) {
@@ -936,7 +947,27 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildNoParenthesesKeywordPairChildren(
             @NotNull ASTNode noParenthesesKeywordPair
     ) {
-        return buildKeywordPairChildren(noParenthesesKeywordPair, Alignment.createAlignment());
+        Wrap keywordKeyWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
+        Indent keywordKeyIndent = Indent.getIndent(Indent.Type.NONE, true, false);
+        Wrap keywordPairColonWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
+        Wrap keywordValueWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
+
+        return buildChildren(
+                noParenthesesKeywordPair,
+                (child, childElementType, blockList) -> {
+                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        blockList.addAll(buildContainerValueAccessExpressionChildren(child, keywordValueWrap));
+                    } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
+                        blockList.add(buildChild(child, keywordKeyWrap, keywordKeyIndent));
+                    } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
+                        blockList.add(buildChild(child, keywordPairColonWrap));
+                    } else {
+                        blockList.add(buildChild(child, keywordValueWrap));
+                    }
+
+                    return blockList;
+                }
+        );
     }
 
     @NotNull
@@ -945,7 +976,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 noParenthesesKeywords,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
-                        blockList.add(buildChild(child, Indent.getIndent(Indent.Type.NONE, true, true)));
+                        blockList.add(buildChild(child, Indent.getIndent(Indent.Type.NONE, true, false)));
                     } else {
                         // commas and comments
                         blockList.add(buildChild(child));
@@ -976,7 +1007,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                         if (rightOperand[0]) {
-                            blockList.addAll(buildMapValueAccessExpressionChildren(child, null));
+                            blockList.addAll(buildContainerValueAccessExpressionChildren(child, operandWrap[0]));
                         } else {
                             blockList.addAll(buildAccessExpressionChildren(child, operandWrap[0]));
                         }
@@ -998,20 +1029,31 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                        @NotNull IElementType openingElementType,
                                                                        @Nullable Wrap openingWrap,
                                                                        @NotNull IElementType closingElementType) {
-        return buildContainerChildren(container, openingElementType, openingWrap, closingElementType, null);
+        return buildContainerChildren(
+                container,
+                openingElementType,
+                openingWrap,
+                null,
+                null,
+                closingElementType,
+                null
+        );
     }
 
     @NotNull
     private List<com.intellij.formatting.Block> buildContainerChildren(@NotNull ASTNode container,
                                                                        @NotNull IElementType openingElementType,
                                                                        @Nullable Wrap openingWrap,
+                                                                       @Nullable Indent elementIndent,
+                                                                       @Nullable Wrap givenTailWrap,
                                                                        @NotNull IElementType closingElementType,
                                                                        @Nullable Alignment closingAlignment) {
         return buildContainerChildren(
                 container,
                 openingElementType,
                 openingWrap,
-                null,
+                elementIndent,
+                givenTailWrap,
                 closingElementType,
                 closingAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
@@ -1022,7 +1064,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
                     } else if (childElementType == ElixirTypes.KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
                     } else {
                         blockList.add(buildChild(child, tailWrap, childrenIndent));
                     }
@@ -1036,12 +1078,12 @@ public class Block extends AbstractBlock implements BlockEx {
             @NotNull ASTNode container,
             @NotNull IElementType openingElementType,
             @Nullable Wrap openingWrap,
+            @Nullable Indent elementIndent,
             @Nullable Wrap givenTailWrap,
             @NotNull IElementType closingElementType,
             @Nullable Alignment closingAlignment,
             @NotNull ContainerBlockListReducer containerBlockListReducer
     ) {
-        Indent childrenIndent = Indent.getNormalIndent();
         Wrap nonEmptyTailWrap;
 
         if (givenTailWrap != null) {
@@ -1067,7 +1109,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 child,
                                 childElementType,
                                 tailWrap[0],
-                                childrenIndent,
+                                elementIndent,
                                 blockList
                         );
                     }
@@ -1235,8 +1277,7 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private List<com.intellij.formatting.Block> buildKeywordPairChildren(@NotNull ASTNode keywordPair,
-                                                                         @Nullable Alignment keywordKeyAlignment) {
+    private List<com.intellij.formatting.Block> buildKeywordPairChildren(@NotNull ASTNode keywordPair) {
         Wrap keywordKeyWrap = Wrap.createWrap(WrapType.NORMAL, true);
         Wrap keywordPairColonWrap  = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
         Wrap keywordValueWrap = Wrap.createWrap(WrapType.NORMAL, true);
@@ -1245,13 +1286,18 @@ public class Block extends AbstractBlock implements BlockEx {
                 keywordPair,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
-                        blockList.addAll(buildMapValueAccessExpressionChildren(child, keywordKeyAlignment));
+                        blockList.addAll(
+                                buildContainerValueAccessExpressionChildren(
+                                        child,
+                                        Wrap.createWrap(WrapType.NONE, true)
+                                )
+                        );
                     } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
-                        blockList.add(buildChild(child, keywordKeyWrap, keywordKeyAlignment));
+                        blockList.add(buildChild(child, keywordKeyWrap, (Alignment) null));
                     } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
                         blockList.add(buildChild(child, keywordPairColonWrap));
                     } else {
-                        blockList.add(buildChild(child, keywordValueWrap, null, keywordKeyAlignment));
+                        blockList.add(buildChild(child, keywordValueWrap, null, (Alignment) null));
                     }
 
                     return blockList;
@@ -1261,7 +1307,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildKeywordsChildren(@NotNull ASTNode keywords,
-                                                                      @NotNull Wrap keywordPairWrap) {
+                                                                      @NotNull Wrap keywordPairWrap, Indent keywordPairIndent) {
 
         return buildChildren(
                 keywords,
@@ -1303,11 +1349,16 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildListChildren(@NotNull ASTNode list,
+                                                                  @Nullable Wrap openingBracketWrap,
+                                                                  @Nullable Wrap listArgumentsWrap,
+                                                                  @Nullable Indent elementIndent,
                                                                   @Nullable Alignment closingBracketAlignment) {
         return buildContainerChildren(
                 list,
                 ElixirTypes.OPENING_BRACKET,
-                null,
+                openingBracketWrap,
+                elementIndent,
+                listArgumentsWrap,
                 ElixirTypes.CLOSING_BRACKET,
                 closingBracketAlignment
         );
@@ -1315,20 +1366,23 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
+                                                                          @Nullable Wrap openingCurlyWrap,
                                                                           @Nullable Wrap mapArgumentsWrap,
+                                                                          @Nullable Indent elementIndent,
                                                                           @Nullable Alignment mapArgumentsAlignment) {
         return buildContainerChildren(
                 mapArguments,
                 ElixirTypes.OPENING_CURLY,
-                null,
+                openingCurlyWrap,
+                elementIndent,
                 mapArgumentsWrap,
                 ElixirTypes.CLOSING_CURLY,
                 mapArgumentsAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
                     if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
-                        blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap));
+                        blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap, null));
                     } else if (childElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
-                        blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap));
+                        blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap, null));
                     } else {
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
                     }
@@ -1339,13 +1393,23 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildMapChildren(@NotNull ASTNode map,
+                                                                 @Nullable Wrap openingCurlyWrap,
                                                                  @Nullable Wrap mapArgumentsWrap,
-                                                                 @Nullable Alignment mapArgumentAlignment) {
+                                                                 @Nullable Indent mapArgumentsIndent,
+                                                                 @Nullable Alignment mapArgumentsAlignment) {
         return buildChildren(
                 map,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.MAP_ARGUMENTS) {
-                        blockList.addAll(buildMapArgumentsChildren(child, mapArgumentsWrap, mapArgumentAlignment));
+                        blockList.addAll(
+                                buildMapArgumentsChildren(
+                                        child,
+                                        openingCurlyWrap,
+                                        mapArgumentsWrap,
+                                        mapArgumentsIndent,
+                                        mapArgumentsAlignment
+                                )
+                        );
                     } else if (childElementType == ElixirTypes.MAP_PREFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
@@ -1365,12 +1429,13 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapConstructArgumentsChildren(
             @NotNull ASTNode mapConstructionArguments,
-            @NotNull Wrap mapArgumentsTailWrap
+            @NotNull Wrap mapArgumentsTailWrap,
+            @Nullable Indent mapArgumentsTailIndent
     ) {
         return buildChildren(
                 mapConstructionArguments,
                 (child, childElementType, blockList) -> {
-                    blockList.addAll(buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap));
+                    blockList.addAll(buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap, mapArgumentsTailIndent));
 
                     return blockList;
                 }
@@ -1381,18 +1446,19 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildMapTailArgumentsChildChildren(
             @NotNull ASTNode child,
             @NotNull IElementType childElementType,
-            @NotNull Wrap mapArgumentsTailWrap
+            @NotNull Wrap mapArgumentsTailWrap,
+            @Nullable Indent mapArgumentsTailIndent
     ) {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
         if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
-            blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
+            blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
-            blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap));
+            blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else if (childElementType == ElixirTypes.KEYWORDS) {
-            blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
+            blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else {
-            blockList.add(buildChild(child));
+            blockList.add(buildChild(child, mapArgumentsTailIndent));
         }
 
         return blockList;
@@ -1401,8 +1467,8 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(
             @NotNull ASTNode mapUpdateArguments,
-            @NotNull Wrap operandWrap
-    ) {
+            @NotNull Wrap operandWrap,
+            @Nullable Indent operandIndent) {
         final boolean[] leftOperand = {true};
 
         return buildChildren(
@@ -1418,7 +1484,12 @@ public class Block extends AbstractBlock implements BlockEx {
                             blockList.add(buildChild(child, operandWrap));
                         } else {
                             blockList.addAll(
-                                    buildMapTailArgumentsChildChildren(child, childElementType, operandWrap)
+                                    buildMapTailArgumentsChildChildren(
+                                            child,
+                                            childElementType,
+                                            operandWrap,
+                                            operandIndent
+                                    )
                             );
                         }
                     }
@@ -1428,28 +1499,51 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    /* Nested maps and structs will be in accessExpressions, so can't use `buildAccessExpression` or the nested maps and
-       structs won't be wrapped, so that nested keywordKeys don't appear on the same line */
+    /* Nested list, maps, and structs will be in accessExpressions, so can't use `buildAccessExpression` or the nested
+       list, maps, and structs won't be wrapped, so that nested keywordKeys don't appear on the same line */
     @NotNull
-    private List<com.intellij.formatting.Block> buildMapValueAccessExpressionChildren(
-            @NotNull ASTNode mapValueAccessExpression,
-            @Nullable Alignment childrenAlignment
+    private List<com.intellij.formatting.Block> buildContainerValueAccessExpressionChildren(
+            @NotNull ASTNode containerValueAccessExpression,
+            @Nullable Wrap openingWrap
     ) {
         return buildChildren(
-                mapValueAccessExpression,
+                containerValueAccessExpression,
                 (grandChild, grandChildElementType, childBlockList) -> {
-                    if (MAP_TOKEN_SET.contains(grandChildElementType)) {
-                        childBlockList.add(
-                                buildChild(
+                    if (grandChildElementType == ElixirTypes.LIST) {
+                        // flatten, so that `]` will see list's parent as direct parent
+                        childBlockList.addAll(
+                                buildListChildren(
                                         grandChild,
-                                        null,
-                                        null,
+                                        openingWrap,
                                         Wrap.createWrap(WrapType.ALWAYS, true),
-                                        childrenAlignment
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else if (MAP_TOKEN_SET.contains(grandChildElementType)) {
+                        // flatten, so that `}` will see map/struct's parent as direct parent
+                        childBlockList.addAll(
+                                buildMapChildren(
+                                        grandChild,
+                                        openingWrap,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else if (grandChildElementType == ElixirTypes.TUPLE) {
+                        // flatten, so that `}` will see tuple's parent as direct parent
+                        childBlockList.addAll(
+                                buildTupleChildren(
+                                        grandChild,
+                                        openingWrap,
+                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Indent.getNormalIndent(true),
+                                        null
                                 )
                         );
                     } else {
-                        childBlockList.add(buildChild(grandChild, null, null, null, childrenAlignment));
+                        childBlockList.add(buildChild(grandChild, openingWrap));
                     }
 
                     return childBlockList;
@@ -1659,7 +1753,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == ElixirTypes.COMMA) {
                         blockList.add(buildChild(child));
                     } else if (childElementType == ElixirTypes.KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
                     } else if (childElementType == ElixirTypes.OPENING_PARENTHESIS) {
                         blockList.add(
                                 buildChild(child, Wrap.createChildWrap(parentWrap, WrapType.CHOP_DOWN_IF_LONG, true))
@@ -1886,11 +1980,16 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildTupleChildren(@NotNull ASTNode tuple,
+                                                                   @Nullable Wrap openingCurlyWrap,
+                                                                   @Nullable Wrap containerArgumentsWrap,
+                                                                   @Nullable Indent elementIndent,
                                                                    @Nullable Alignment closingCurlyAlignment) {
         return buildContainerChildren(
                 tuple,
                 ElixirTypes.OPENING_CURLY,
-                null,
+                openingCurlyWrap,
+                elementIndent,
+                containerArgumentsWrap,
                 ElixirTypes.CLOSING_CURLY,
                 closingCurlyAlignment
         );
