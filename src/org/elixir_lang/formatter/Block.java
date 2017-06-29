@@ -1104,7 +1104,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildListChildren(
                                         child,
                                         openingWrap,
-                                        Wrap.createWrap(wrapType, true),
+                                        containerValueWrap(child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -1126,7 +1126,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildTupleChildren(
                                         child,
                                         openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        containerValueWrap(child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -1956,17 +1956,6 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    private int normalIndentSize(@NotNull ASTNode node) {
-        CommonCodeStyleSettings.IndentOptions indentOptions = commonCodeStyleSettings(node).getIndentOptions();
-        int normalIndentSize = 2;
-
-        if (indentOptions != null) {
-            normalIndentSize = indentOptions.INDENT_SIZE;
-        }
-
-        return normalIndentSize;
-    }
-
     @NotNull
     private List<com.intellij.formatting.Block> buildStabOperationChildren(
             @NotNull ASTNode stabOperation,
@@ -2167,6 +2156,13 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
+    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode node) {
+        return CodeStyleSettingsManager
+                .getInstance(node.getPsi().getProject())
+                .getCurrentSettings()
+                .getCustomSettings(CodeStyleSettings.class);
+    }
+
     private CommonCodeStyleSettings commonCodeStyleSettings(@NotNull ASTNode node) {
         return CodeStyleSettingsManager
                 .getInstance(node.getPsi().getProject())
@@ -2174,11 +2170,22 @@ public class Block extends AbstractBlock implements BlockEx {
                 .getCommonSettings(ElixirLanguage.INSTANCE);
     }
 
-    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode node) {
-        return CodeStyleSettingsManager
-                .getInstance(node.getPsi().getProject())
-                .getCurrentSettings()
-                .getCustomSettings(CodeStyleSettings.class);
+    @NotNull
+    private Wrap containerValueWrap(@NotNull ASTNode container) {
+        return Wrap.createWrap(containerValueWrapType(container), true);
+    }
+
+    @NotNull
+    private WrapType containerValueWrapType(@NotNull ASTNode container) {
+        WrapType wrapType;
+
+        if (container.findChildByType(ElixirTypes.KEYWORDS) != null) {
+            wrapType = WrapType.ALWAYS;
+        } else {
+            wrapType = WrapType.CHOP_DOWN_IF_LONG;
+        }
+
+        return wrapType;
     }
 
     private boolean firstOnLine(@NotNull ASTNode node) {
@@ -2298,6 +2305,17 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return lastArgument;
+    }
+
+    private int normalIndentSize(@NotNull ASTNode node) {
+        CommonCodeStyleSettings.IndentOptions indentOptions = commonCodeStyleSettings(node).getIndentOptions();
+        int normalIndentSize = 2;
+
+        if (indentOptions != null) {
+            normalIndentSize = indentOptions.INDENT_SIZE;
+        }
+
+        return normalIndentSize;
     }
 
     @Nullable

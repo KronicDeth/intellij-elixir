@@ -1025,6 +1025,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("tuple_indent.ex");
     }
 
+    public void testTupleOnlyIndentNestedKeywords() {
+        assertFormatted("tuple_only_indent_nested_keywords.ex");
+    }
+
     public void testUnmatchedCallAlignDoBlockToCall() {
         myFixture.configureByFile("unmatched_call_align_do_block_to_line.ex");
 
