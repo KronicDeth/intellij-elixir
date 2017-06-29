@@ -1091,12 +1091,20 @@ public class Block extends AbstractBlock implements BlockEx {
                 containerValueAccessExpression,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.LIST) {
-                        // flatten, so that `]` will see list's parent as direct parent
+                        WrapType wrapType;
+
+                        if (child.findChildByType(ElixirTypes.KEYWORDS) != null) {
+                            wrapType = WrapType.ALWAYS;
+                        } else {
+                            wrapType = WrapType.CHOP_DOWN_IF_LONG;
+                        }
+
                         blockList.addAll(
+                                // flatten, so that `]` will see list's parent as direct parent
                                 buildListChildren(
                                         child,
                                         openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        Wrap.createWrap(wrapType, true),
                                         Indent.getNormalIndent(true),
                                         null
                                 )

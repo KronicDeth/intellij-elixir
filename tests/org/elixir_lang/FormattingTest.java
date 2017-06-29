@@ -651,6 +651,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("list_indent.ex");
     }
 
+    public void testListOnlyIndentNestedKeywords() {
+        assertFormatted("list_only_indent_nested_keywords.ex");
+    }
+
     public void testMapConstructionArgumentsKeywordsAllWrapIfAnyWraps() {
         myFixture.configureByFile("map_construction_arguments_keywords_all_wrap_if_any_wraps_before.ex");
 
