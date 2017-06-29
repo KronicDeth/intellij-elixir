@@ -41,6 +41,9 @@ public interface ElixirLiteralCharListSigilHeredoc extends CharListFragmented, L
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

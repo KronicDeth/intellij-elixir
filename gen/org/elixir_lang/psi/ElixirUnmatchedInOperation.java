@@ -30,6 +30,14 @@ public interface ElixirUnmatchedInOperation extends ElixirUnmatchedExpression, C
   @Nullable
   ElixirDoBlock getDoBlock();
 
+  //WARNING: getName(...) is skipped
+  //matching getName(ElixirUnmatchedInOperation, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getNameIdentifier(...) is skipped
+  //matching getNameIdentifier(ElixirUnmatchedInOperation, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   boolean isCalling(String resolvedModuleName, String functionName);

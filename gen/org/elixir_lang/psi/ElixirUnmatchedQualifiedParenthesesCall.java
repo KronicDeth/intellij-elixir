@@ -43,6 +43,10 @@ public interface ElixirUnmatchedQualifiedParenthesesCall extends ElixirUnmatched
 
   PsiElement functionNameElement();
 
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedQualifiedParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   @Nullable
@@ -55,6 +59,14 @@ public interface ElixirUnmatchedQualifiedParenthesesCall extends ElixirUnmatched
 
   @Nullable
   PsiReference getReference();
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedQualifiedParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirUnmatchedQualifiedParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   boolean isCalling(String resolvedModuleName, String functionName);
 

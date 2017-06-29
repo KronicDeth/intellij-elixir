@@ -39,6 +39,10 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
   @Nullable
   PsiElement functionNameElement();
 
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedAtUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   @Nullable
@@ -51,6 +55,10 @@ public interface ElixirUnmatchedAtUnqualifiedNoParenthesesCall extends ElixirUnm
 
   @Nullable
   PsiReference getReference();
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedAtUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   @NotNull
   SearchScope getUseScope();

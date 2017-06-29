@@ -5569,7 +5569,7 @@ if (quoted == null) {
 
     @Contract(pure = true)
     @NotNull
-    private static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
+    public static OtpErlangObject quote(@NotNull Sigil sigil, @NotNull OtpErlangObject quotedContent) {
         char sigilName = sigil.sigilName();
 
         OtpErlangList sigilMetadata = metadata(sigil);

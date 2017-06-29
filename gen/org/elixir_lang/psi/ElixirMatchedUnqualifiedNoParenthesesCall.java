@@ -58,6 +58,14 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
   @Nullable
   PsiReference getReference();
 
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean isCalling(String resolvedModuleName, String functionName);
 
   boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);
@@ -103,5 +111,13 @@ public interface ElixirMatchedUnqualifiedNoParenthesesCall extends ElixirMatched
 
   @NotNull
   PsiElement setName(String newName);
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirMatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
 }

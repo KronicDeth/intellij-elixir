@@ -16,6 +16,10 @@ public interface ElixirKeywordPair extends QuotableKeywordPair {
   @Nullable
   ElixirUnmatchedExpression getUnmatchedExpression();
 
+  //WARNING: getKeywordKey(...) is skipped
+  //matching getKeywordKey(ElixirKeywordPair, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   Quotable getKeywordValue();
 
   @NotNull

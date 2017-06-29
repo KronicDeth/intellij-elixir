@@ -37,6 +37,9 @@ public interface ElixirLiteralWordsLine extends WordsFragmented, LiteralSigilLin
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

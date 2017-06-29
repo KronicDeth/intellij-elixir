@@ -30,6 +30,14 @@ public interface ElixirMatchedInOperation extends ElixirMatchedExpression, Call,
   @Nullable
   ElixirDoBlock getDoBlock();
 
+  //WARNING: getName(...) is skipped
+  //matching getName(ElixirMatchedInOperation, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getNameIdentifier(...) is skipped
+  //matching getNameIdentifier(ElixirMatchedInOperation, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   boolean isCalling(String resolvedModuleName, String functionName);
