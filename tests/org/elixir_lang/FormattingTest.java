@@ -175,6 +175,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("anonymous_function_with_single_clause.ex");
     }
 
+    public void testBitStringIndent() {
+        assertFormatted("bit_string_indent.ex");
+    }
+
+    public void testBitStringOnlyIndentNestedKeywords() {
+        assertFormatted("bit_string_only_indent_nested_keywords.ex");
+    }
+
     public void testNoParenthesesCallMultipleFunctionStabBodyAlignment() {
         assertFormatted("no_parentheses_call_multiple_anonymous_function_stab_body_alignment.ex");
     }

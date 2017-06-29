@@ -232,7 +232,12 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_TYPE_OPERATION
     );
     private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
-            TokenSet.create(ElixirTypes.ANONYMOUS_FUNCTION, ElixirTypes.LIST, ElixirTypes.TUPLE),
+            TokenSet.create(
+                    ElixirTypes.ANONYMOUS_FUNCTION,
+                    ElixirTypes.BIT_STRING,
+                    ElixirTypes.LIST,
+                    ElixirTypes.TUPLE
+            ),
             HEREDOC_TOKEN_SET,
             MAP_TOKEN_SET
     );
@@ -570,6 +575,23 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
+    private List<com.intellij.formatting.Block> buildBitStringChildren(@NotNull ASTNode list,
+                                                                       @Nullable Wrap openingBitWrap,
+                                                                       @Nullable Wrap containerArgumentsWrap,
+                                                                       @Nullable Indent elementIndent,
+                                                                       @Nullable Alignment closingBitAlignment) {
+        return buildContainerChildren(
+                list,
+                ElixirTypes.OPENING_BIT,
+                openingBitWrap,
+                elementIndent,
+                containerArgumentsWrap,
+                ElixirTypes.CLOSING_BIT,
+                closingBitAlignment
+        );
+    }
+
+    @NotNull
     private List<com.intellij.formatting.Block> buildBlockIdentifierChildren(
             @NotNull ASTNode blockIdentifier,
             @Nullable Alignment blockIdentifierAlignment
@@ -846,6 +868,8 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildAnonymousFunctionChildren(parent, childrenWrap, childrenAlignment);
         } else if (ARROW_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildArrowOperationChildren(parent, null);
+        } else if (parentElementType == ElixirTypes.BIT_STRING) {
+            blocks = buildBitStringChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
         } else if (parentElementType == ElixirTypes.BLOCK_ITEM) {
             blocks = buildBlockItemChildren(parent, parentAlignment);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(parentElementType)) {
@@ -1090,15 +1114,18 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 containerValueAccessExpression,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.LIST) {
-                        WrapType wrapType;
-
-                        if (child.findChildByType(ElixirTypes.KEYWORDS) != null) {
-                            wrapType = WrapType.ALWAYS;
-                        } else {
-                            wrapType = WrapType.CHOP_DOWN_IF_LONG;
-                        }
-
+                    if (childElementType == ElixirTypes.BIT_STRING) {
+                        blockList.addAll(
+                                // flatten, so that `>>` will see bitString's parent as direct parent
+                                buildBitStringChildren(
+                                        child,
+                                        openingWrap,
+                                        containerValueWrap(child),
+                                        Indent.getNormalIndent(true),
+                                        null
+                                )
+                        );
+                    } else if (childElementType == ElixirTypes.LIST) {
                         blockList.addAll(
                                 // flatten, so that `]` will see list's parent as direct parent
                                 buildListChildren(
