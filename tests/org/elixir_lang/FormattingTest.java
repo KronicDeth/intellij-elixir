@@ -175,6 +175,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("anonymous_function_with_single_clause.ex");
     }
 
+    public void testNoParenthesesCallMultipleFunctionStabBodyAlignment() {
+        assertFormatted("no_parentheses_call_multiple_anonymous_function_stab_body_alignment.ex");
+    }
+
     public void testNoParenthesesKeywordsKeywordValueContainerClosingAlignment() {
         assertFormatted("no_parentheses_keywords_keyword_value_container_closing_alignment.ex");
     }

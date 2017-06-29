@@ -4,8 +4,10 @@ import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.impl.source.tree.CompositeElement;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.apache.commons.lang.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
@@ -422,33 +425,36 @@ public class Block extends AbstractBlock implements BlockEx {
      * all other part wraps, such as due to chopping.
      */
     @NotNull
-    private List<com.intellij.formatting.Block> buildAnonymousFunctionChildren(@NotNull ASTNode anonymousFunction) {
-        final Alignment childrenAlignment = Alignment.createAlignment();
-        Wrap endWrap;
-        Wrap stabBodyChildrenWrap;
+    private List<com.intellij.formatting.Block> buildAnonymousFunctionChildren(@NotNull ASTNode anonymousFunction,
+                                                                               @Nullable Wrap stabWrap,
+                                                                               @Nullable Alignment endAlignment) {
+        boolean relativeToIndirectParent = !firstOnLine(anonymousFunction) && !lastArgument(anonymousFunction);
+        Indent stabIndent = Indent.getNormalIndent(relativeToIndirectParent);
 
-        if (anonymousFunction.textContains('\n')) {
-            endWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-            stabBodyChildrenWrap = null;
-        } else {
-            // if `end` wraps, then the function should be de-one-liner-ed, so all wraps are shared after the ->
-            endWrap = Wrap.createWrap(WrapType.CHOP_DOWN_IF_LONG, true);
-            stabBodyChildrenWrap = endWrap;
-        }
-
-        return buildChildren(
+        return buildContainerChildren(
                 anonymousFunction,
-                (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.END) {
-                        blockList.add(buildChild(child, endWrap, Indent.getNoneIndent()));
-                    } else if (childElementType == END_OF_EXPRESSION) {
-                        blockList.addAll(
-                                buildEndOfExpressionChildren(child, childrenAlignment, Indent.getNormalIndent())
-                        );
+                ElixirTypes.FN,
+                null,
+                stabIndent,
+                stabWrap,
+                ElixirTypes.END,
+                endAlignment,
+                (child, childElementType, tailWrap, childrenIndent, blockList) -> {
+                    if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                        blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
                     } else if (childElementType == ElixirTypes.STAB) {
-                        blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
+                        blockList.addAll(
+                                buildStabChildren(
+                                        (CompositeElement) child,
+                                        /* DO NOT use `tailWrap` because it will be `WrapType.ALWAYS` if `fn .. end` is
+                                           over more than one line, but in that case only the `stabBody` of the
+                                           `stabOperation` needs to be wrapped UNLESS there are more than one
+                                           `stabOperation`, but `buildStabChildren` will determine that */
+                                        null
+                                )
+                        );
                     } else {
-                        blockList.add(buildChild(child));
+                        blockList.add(buildChild(child, tailWrap, childrenIndent));
                     }
 
                     return blockList;
@@ -810,7 +816,6 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-
     @NotNull
     private Block buildChild(@NotNull ASTNode child,
                              @Nullable Wrap wrap,
@@ -838,7 +843,7 @@ public class Block extends AbstractBlock implements BlockEx {
         IElementType parentElementType = parent.getElementType();
 
         if (parentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
-            blocks = buildAnonymousFunctionChildren(parent);
+            blocks = buildAnonymousFunctionChildren(parent, childrenWrap, childrenAlignment);
         } else if (ARROW_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildArrowOperationChildren(parent, null);
         } else if (parentElementType == ElixirTypes.BLOCK_ITEM) {
@@ -1375,8 +1380,8 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapArgumentsChildren(@NotNull ASTNode mapArguments,
                                                                           @Nullable Wrap openingCurlyWrap,
-                                                                          @Nullable Wrap mapArgumentsWrap,
                                                                           @Nullable Indent elementIndent,
+                                                                          @Nullable Wrap mapArgumentsWrap,
                                                                           @Nullable Alignment mapArgumentsAlignment) {
         return buildContainerChildren(
                 mapArguments,
@@ -1413,8 +1418,8 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildMapArgumentsChildren(
                                         child,
                                         openingCurlyWrap,
-                                        mapArgumentsWrap,
                                         mapArgumentsIndent,
+                                        mapArgumentsWrap,
                                         mapArgumentsAlignment
                                 )
                         );
@@ -1636,7 +1641,13 @@ public class Block extends AbstractBlock implements BlockEx {
             @Nullable Wrap parentWrap,
             @Nullable Alignment parentAlignment
     ) {
-        List<com.intellij.formatting.Block> blockList = buildChildren(child, parentWrap, parentAlignment, null, null);
+        List<com.intellij.formatting.Block> blockList = buildChildren(
+                child,
+                parentWrap,
+                parentAlignment,
+                null,
+                null
+        );
 
         if (blockList.size() == 1) {
             Block block = (Block) blockList.get(0);
@@ -1863,7 +1874,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildStabBodyChildren(@NotNull ASTNode stabBody,
                                                                       @NotNull Wrap childWrap,
                                                                       @NotNull Alignment childAlignment,
-                                                                      @NotNull Indent childIndent) {
+                                                                      @Nullable Indent childIndent) {
 
         return buildChildren(
                 stabBody,
@@ -1898,19 +1909,8 @@ public class Block extends AbstractBlock implements BlockEx {
            aligned on the left-side */
         Alignment childAlignment = Alignment.createAlignment();
 
-        Indent childIndent = Indent.getNormalIndent(
-                codeStyleSettings(stab).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
-                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
-        );
-        WrapType stabOperationWrapType;
-
-        if (hasAtLeastCountChildren(stab, ElixirTypes.STAB_OPERATION, 2)) {
-            stabOperationWrapType = WrapType.ALWAYS;
-        } else {
-            stabOperationWrapType = WrapType.NORMAL;
-        }
-
-        Wrap stabOperationWrap = Wrap.createWrap(stabOperationWrapType, true);
+        Wrap stabOperationWrap = stabOperationWrap(stab);
+        Indent childrenIndent = stabChildrenIndent(stab);
 
         if (stabBodyChildrenWrap == null) {
             stabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
@@ -1922,14 +1922,14 @@ public class Block extends AbstractBlock implements BlockEx {
                 stab,
                 (child, childElementType, blockList) -> {
                     if (childElementType == END_OF_EXPRESSION) {
-                        blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childIndent));
+                        blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childrenIndent));
                     } else if (childElementType == ElixirTypes.STAB_BODY) {
                         blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
                                         finalStabBodyChildrenWrap,
                                         childAlignment,
-                                        childIndent
+                                        childrenIndent
                                 )
                         );
                     } else {
@@ -1937,7 +1937,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildChild(
                                         child,
                                         stabOperationWrap,
-                                        childIndent,
+                                        childrenIndent,
                                         finalStabBodyChildrenWrap
                                 )
                         );
@@ -1946,6 +1946,17 @@ public class Block extends AbstractBlock implements BlockEx {
                     return blockList;
                 }
         );
+    }
+
+    private int normalIndentSize(@NotNull ASTNode node) {
+        CommonCodeStyleSettings.IndentOptions indentOptions = commonCodeStyleSettings(node).getIndentOptions();
+        int normalIndentSize = 2;
+
+        if (indentOptions != null) {
+            normalIndentSize = indentOptions.INDENT_SIZE;
+        }
+
+        return normalIndentSize;
     }
 
     @NotNull
@@ -1957,12 +1968,82 @@ public class Block extends AbstractBlock implements BlockEx {
                 stabOperation,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.STAB_BODY) {
+                        Indent childrenIndent;
+
+                        // `stabBody` is on line below `->`
+                        if (firstOnLine(child)) {
+                            ASTNode stab = stabOperation.getTreeParent();
+
+                            // `stabOperation` is on line below `fn`, `blockIdentifier`, `(`, or `do`
+                            if (firstOnLine(stabOperation)) {
+                                ASTNode stabParent = stab.getTreeParent();
+                                IElementType stabParentElementType = stabParent.getElementType();
+
+                                childrenIndent = Indent.getNormalIndent(
+                                        stabParentElementType == ElixirTypes.DO_BLOCK &&
+                                                codeStyleSettings(stabParent).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
+                                                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
+                                );
+                            } else {
+                                // `stab` is on line below `fn`, `blockIdentifier`, `(`, or `do`
+                                if (firstOnLine(stab)) {
+                                    childrenIndent = Indent.getSpaceIndent(normalIndentSize(stab), true);
+                                } else {
+                                    ASTNode stabParent = stab.getTreeParent();
+
+                                    // `fn`, `blockIdentifier`, `(`, or `do` is start of line
+                                    if (firstOnLine(stabParent)) {
+                                        childrenIndent = null;
+                                    } else {
+                                        IElementType stabParentElementType = stabParent.getElementType();
+
+                                        if (stabParentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
+                                            if (lastArgument(stabParent)) {
+                                                /* handles
+
+                                                   ```
+                                                   one fn ->
+                                                     two
+                                                   end
+                                                   ```
+
+                                                   and
+
+                                                   ```
+                                                   one two, fn ->
+                                                     three
+                                                   end
+                                                   ```
+                                                  */
+                                                childrenIndent = Indent.getNormalIndent();
+                                            } else {
+                                                /* Indent needs to adjusted to look like a normal indent relative to
+                                                   start of `fn` */
+                                                int stabParentStartOffset = stabParent.getStartOffset();
+                                                int directParentStartOffset = stabOperation.getStartOffset();
+
+                                                childrenIndent = Indent.getSpaceIndent(
+                                                        normalIndentSize(stabParent) -
+                                                                (directParentStartOffset - stabParentStartOffset),
+                                                        true
+                                                );
+                                            }
+                                        } else {
+                                           childrenIndent = null;
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            childrenIndent = null;
+                        }
+
                         blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
                                         stabBodyChildrenWrap,
-                                        Alignment.createAlignment(), // null,
-                                        Indent.getNormalIndent(false)
+                                        Alignment.createAlignment(),
+                                        childrenIndent
                                 )
                         );
                     } else if (childElementType == ElixirTypes.STAB_INFIX_OPERATOR) {
@@ -2078,11 +2159,28 @@ public class Block extends AbstractBlock implements BlockEx {
         );
     }
 
-    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode operation) {
+    private CommonCodeStyleSettings commonCodeStyleSettings(@NotNull ASTNode node) {
         return CodeStyleSettingsManager
-                .getInstance(operation.getPsi().getProject())
+                .getInstance(node.getPsi().getProject())
+                .getCurrentSettings()
+                .getCommonSettings(ElixirLanguage.INSTANCE);
+    }
+
+    private CodeStyleSettings codeStyleSettings(@NotNull ASTNode node) {
+        return CodeStyleSettingsManager
+                .getInstance(node.getPsi().getProject())
                 .getCurrentSettings()
                 .getCustomSettings(CodeStyleSettings.class);
+    }
+
+    private boolean firstOnLine(@NotNull ASTNode node) {
+        Document document = document(node.getPsi());
+        int nodeStartOffset = node.getStartOffset();
+        int lineNumber = document.getLineNumber(nodeStartOffset);
+        int lineStartOffset = document.getLineStartOffset(lineNumber);
+        String prefix = document.getText(new TextRange(lineStartOffset, nodeStartOffset));
+
+        return isWhitespace(prefix);
     }
 
     /**
@@ -2167,6 +2265,68 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public boolean isLeaf() {
         return myNode.getFirstChildNode() == null;
+    }
+
+    private boolean lastArgument(@NotNull ASTNode node) {
+        boolean lastArgument = true;
+
+        while (node != null) {
+            IElementType elementType = node.getElementType();
+
+            if (elementType == ElixirTypes.COMMA) {
+                lastArgument = false;
+                break;
+            } else if (elementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                break;
+            } else {
+                ASTNode nextNode = node.getTreeNext();
+
+                if (nextNode == null) {
+                    node = node.getTreeParent();
+                } else {
+                    node = nextNode;
+                }
+            }
+        }
+
+        return lastArgument;
+    }
+
+    @Nullable
+    private Indent stabChildrenIndent(@NotNull ASTNode stab) {
+        Indent childrenIndent;
+
+        if (firstOnLine(stab)) {
+            ASTNode stabParent = stab.getTreeParent();
+
+            childrenIndent = Indent.getNormalIndent(
+                    stabParent.getElementType() == ElixirTypes.DO_BLOCK &&
+                            codeStyleSettings(stabParent).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
+                                    CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
+            );
+        } else {
+            childrenIndent = null;
+        }
+
+        return childrenIndent;
+    }
+
+    @NotNull
+    private Wrap stabOperationWrap(@NotNull CompositeElement stab) {
+        return Wrap.createWrap(stabOperationWrapType(stab), true);
+    }
+
+    @NotNull
+    private WrapType stabOperationWrapType(@NotNull CompositeElement stab) {
+        WrapType stabOperationWrapType;
+
+        if (hasAtLeastCountChildren(stab, ElixirTypes.STAB_OPERATION, 2)) {
+            stabOperationWrapType = WrapType.ALWAYS;
+        } else {
+            stabOperationWrapType = WrapType.NORMAL;
+        }
+
+        return  stabOperationWrapType;
     }
 
     /**
