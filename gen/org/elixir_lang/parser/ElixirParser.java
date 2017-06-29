@@ -1166,7 +1166,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // OPENING_BIT EOL*
-  //               (containerArguments EOL*)?
+  //               containerArguments? EOL*
   //               CLOSING_BIT
   public static boolean bitString(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bitString")) return false;
@@ -1176,6 +1176,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, OPENING_BIT);
     r = r && bitString_1(b, l + 1);
     r = r && bitString_2(b, l + 1);
+    r = r && bitString_3(b, l + 1);
     r = r && consumeToken(b, CLOSING_BIT);
     exit_section_(b, m, BIT_STRING, r);
     return r;
@@ -1193,31 +1194,20 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (containerArguments EOL*)?
+  // containerArguments?
   private static boolean bitString_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "bitString_2")) return false;
-    bitString_2_0(b, l + 1);
+    containerArguments(b, l + 1);
     return true;
   }
 
-  // containerArguments EOL*
-  private static boolean bitString_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bitString_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = containerArguments(b, l + 1);
-    r = r && bitString_2_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   // EOL*
-  private static boolean bitString_2_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "bitString_2_0_1")) return false;
+  private static boolean bitString_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "bitString_3")) return false;
     int c = current_position_(b);
     while (true) {
       if (!consumeToken(b, EOL)) break;
-      if (!empty_element_parsed_guard_(b, "bitString_2_0_1", c)) break;
+      if (!empty_element_parsed_guard_(b, "bitString_3", c)) break;
       c = current_position_(b);
     }
     return true;

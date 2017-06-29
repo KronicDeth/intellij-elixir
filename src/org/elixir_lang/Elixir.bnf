@@ -2097,7 +2097,7 @@ tuple ::= OPENING_CURLY EOL*
  */
 
 bitString ::= OPENING_BIT EOL*
-              (containerArguments EOL*)?
+              containerArguments? EOL*
               CLOSING_BIT
               { implements = "org.elixir_lang.psi.Quotable" methods = [quote] }
 
