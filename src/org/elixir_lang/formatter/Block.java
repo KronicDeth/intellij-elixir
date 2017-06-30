@@ -1148,7 +1148,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildMapChildren(
                                         child,
                                         openingWrap,
-                                        Wrap.createWrap(WrapType.ALWAYS, true),
+                                        containerValueWrap(child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -2214,6 +2214,29 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (container.findChildByType(ElixirTypes.KEYWORDS) != null) {
             wrapType = WrapType.ALWAYS;
+
+            ASTNode containerParent = container.getTreeParent();
+
+            if (containerParent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
+                ASTNode accessExpressionParent = containerParent.getTreeParent();
+
+                if (KEYWORD_PAIR_TOKEN_SET.contains(accessExpressionParent.getElementType())) {
+                    ASTNode keywordKey = accessExpressionParent.findChildByType(ElixirTypes.KEYWORD_KEY);
+
+                    if (keywordKey != null && keywordKey.getText().equals("do")) {
+                        ASTNode keywords = accessExpressionParent.getTreeParent();
+                        ASTNode keywordsParent = keywords.getTreeParent();
+
+                        if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                            ASTNode argumentsParent = keywordsParent.getTreeParent();
+
+                            if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
+                                wrapType = WrapType.CHOP_DOWN_IF_LONG;
+                            }
+                        }
+                    }
+                }
+            }
         } else {
             wrapType = WrapType.CHOP_DOWN_IF_LONG;
         }

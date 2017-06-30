@@ -1065,6 +1065,10 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("unmatched_call_align_do_block_to_line.ex");
     }
 
+    public void testUnmatchedCallDoValueDoNoIndent() {
+        assertFormatted("unmatched_call_do_value_do_not_indent.ex");
+    }
+
     public void testUnmatchedQualifedParenthesesCallArgumentIndent() {
         String path = "unmatched_qualifed_parentheses_call_argument_indent.ex";
 
