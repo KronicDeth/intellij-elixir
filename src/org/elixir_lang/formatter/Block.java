@@ -17,6 +17,7 @@ import com.intellij.util.containers.Predicate;
 import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.code_style.CodeStyleSettings;
 import org.elixir_lang.psi.ElixirTypes;
+import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static org.elixir_lang.psi.call.name.Function.IMPORT;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 /**
@@ -90,6 +92,10 @@ public class Block extends AbstractBlock implements BlockEx {
             LITERAL_STRING_SIGIL_HEREDOC,
             LITERAL_WORDS_HEREDOC,
             STRING_HEREDOC
+    );
+    private static final TokenSet KEYWORD_PAIR_TOKEN_SET = TokenSet.create(
+            ElixirTypes.KEYWORD_PAIR,
+            ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR
     );
     private static final TokenSet LINE_TOKEN_SET = TokenSet.create(
             ElixirTypes.CHAR_LIST_LINE,
@@ -1131,7 +1137,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildListChildren(
                                         child,
                                         openingWrap,
-                                        containerValueWrap(child),
+                                        listContainerValueWrap(child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -2332,6 +2338,47 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return lastArgument;
+    }
+
+    @NotNull
+    private Wrap listContainerValueWrap(@NotNull ASTNode list) {
+        return Wrap.createWrap(listContainerValueWrapType(list), true);
+    }
+
+    @NotNull
+    private WrapType listContainerValueWrapType(@NotNull ASTNode list) {
+        WrapType wrapType = containerValueWrapType(list);
+
+        if (wrapType == WrapType.ALWAYS) {
+            ASTNode parent = list.getTreeParent();
+
+            if (parent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
+                ASTNode grandParent = parent.getTreeParent();
+
+                if (KEYWORD_PAIR_TOKEN_SET.contains(grandParent.getElementType())) {
+                    // It is assumed that the parent of a keyword pair is keywords
+                    ASTNode keywords = grandParent.getTreeParent();
+                    ASTNode keywordsParent = keywords.getTreeParent();
+                    IElementType keywordsParentElementType = keywordsParent.getElementType();
+
+                    if (keywordsParentElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                        ASTNode keywordsGrandParent = keywordsParent.getTreeParent();
+
+                        if (UNMATCHED_CALL_TOKEN_SET.contains(keywordsGrandParent.getElementType())) {
+                            Call call = keywordsGrandParent.getPsi(Call.class);
+
+                            if (IMPORT.equals(call.functionName())) {
+                                /* Usage of `import` with `only` or `except` is meant for compactness, so applying
+                                   keyword exclusivity would go against that */
+                                wrapType = WrapType.CHOP_DOWN_IF_LONG;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return wrapType;
     }
 
     private int normalIndentSize(@NotNull ASTNode node) {
