@@ -183,6 +183,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("bit_string_only_indent_nested_keywords.ex");
     }
 
+    public void testNoParenthesesCallMultipleArgumentsWithWrappedMap() {
+        myFixture.configureByFile("no_parentheses_call_multiple_arguments_with_wrapped_map_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("no_parentheses_call_multiple_arguments_with_wrapped_map_after.ex");
+    }
+
     public void testNoParenthesesCallMultipleFunctionStabBodyAlignment() {
         assertFormatted("no_parentheses_call_multiple_anonymous_function_stab_body_alignment.ex");
     }
@@ -194,7 +202,6 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
     public void testNoParenthesesKeywordsKeywordValueContainerElementAlignment() {
         assertFormatted("no_parentheses_keywords_keyword_value_container_element_alignment.ex");
     }
-
 
     public void testNoSpaceAfterAtOperator() {
         myFixture.configureByFile("space_after_at_operator.ex");

@@ -935,6 +935,8 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (UNMATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildUnmatchedCallChildren(parent, parentWrap, parentAlignment);
         } else {
+            Wrap commaWrap = Wrap.createChildWrap(childrenWrap, WrapType.NONE, true);
+
             /* all children need a shared alignment, so that the second child doesn't have an automatic continuation
                indent */
             if (childrenAlignment == null) {
@@ -948,7 +950,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     (child, childElementType, blockList) -> {
                         if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
                             blockList.addAll(
-                                    buildAccessExpressionChildren(child, finalChildrenAlignment)
+                                    buildAccessExpressionChildren(child, childrenWrap, finalChildrenAlignment)
                             );
                         } else if (ENFORCE_INDENT_TO_CHILDREN_TOKEN_SET.contains(childElementType)) {
                             blockList.add(
@@ -966,6 +968,8 @@ public class Block extends AbstractBlock implements BlockEx {
                             );
                         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                             blockList.addAll(buildOperatorRuleChildren(child));
+                        } else if (childElementType == ElixirTypes.COMMA) {
+                            blockList.add(buildChild(child, commaWrap));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             blockList.addAll(
                                     // None Indent because comments should align to left
@@ -975,7 +979,7 @@ public class Block extends AbstractBlock implements BlockEx {
                             blockList.addAll(buildOperatorRuleChildren(child));
                         } else {
                             blockList.add(
-                                    buildChild(child, finalChildrenAlignment)
+                                    buildChild(child, childrenWrap, finalChildrenAlignment)
                             );
                         }
 
@@ -1157,7 +1161,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildMapChildren(
                                         child,
                                         openingWrap,
-                                        mapContainerValueWrap(child),
+                                        mapContainerValueWrap(openingWrap, child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -1690,11 +1694,17 @@ public class Block extends AbstractBlock implements BlockEx {
             @Nullable Wrap parentWrap,
             @Nullable Alignment parentAlignment
     ) {
+        Wrap childrenWrap = Wrap.createWrap(
+                WrapType.CHOP_DOWN_IF_LONG,
+                // MUST NOT be `true` as wrapping the first argument disassociates the arguments with the call
+                false
+        );
+
         List<com.intellij.formatting.Block> blockList = buildChildren(
                 child,
                 parentWrap,
                 parentAlignment,
-                null,
+                childrenWrap,
                 null
         );
 
@@ -2390,8 +2400,8 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private Wrap mapContainerValueWrap(ASTNode mapOrStructOperation) {
-        return Wrap.createWrap(mapContainerValueWrapType(mapOrStructOperation), true);
+    private Wrap mapContainerValueWrap(@Nullable Wrap parentWrap, @NotNull ASTNode mapOrStructOperation) {
+        return Wrap.createChildWrap(parentWrap, mapContainerValueWrapType(mapOrStructOperation), true);
     }
 
     @NotNull
