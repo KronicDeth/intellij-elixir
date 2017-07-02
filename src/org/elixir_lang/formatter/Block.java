@@ -111,7 +111,16 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.LITERAL_WORDS_LINE,
             ElixirTypes.STRING_LINE
     );
+    private static final TokenSet MAP_ARGUMENTS_CHILD_TOKEN_SET = TokenSet.create(
+            ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS,
+            ElixirTypes.MAP_UPDATE_ARGUMENTS
+    );
     private static final TokenSet MAP_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MAP_OPERATOR);
+    private static final TokenSet MAP_TAIL_ARGUMENTS_TOKEN_SET = TokenSet.create(
+            ElixirTypes.ASSOCIATIONS,
+            ElixirTypes.ASSOCIATIONS_BASE,
+            ElixirTypes.KEYWORDS
+    );
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
             ElixirTypes.MAP_OPERATION,
             ElixirTypes.STRUCT_OPERATION
@@ -1148,7 +1157,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 buildMapChildren(
                                         child,
                                         openingWrap,
-                                        containerValueWrap(child),
+                                        mapContainerValueWrap(child),
                                         Indent.getNormalIndent(true),
                                         null
                                 )
@@ -1288,9 +1297,9 @@ public class Block extends AbstractBlock implements BlockEx {
             // prevent insertion of prefix length spaces on blank lines
             blockList = Collections.emptyList();
         } else {
-           blockList = Collections.singletonList(
-                   new HeredocLineBlock(heredocLine, heredocPrefixLength, spacingBuilder)
-           );
+            blockList = Collections.singletonList(
+                    new HeredocLineBlock(heredocLine, heredocPrefixLength, spacingBuilder)
+            );
         }
 
         return blockList;
@@ -1333,7 +1342,7 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildKeywordPairChildren(@NotNull ASTNode keywordPair) {
         Wrap keywordKeyWrap = Wrap.createWrap(WrapType.NORMAL, true);
-        Wrap keywordPairColonWrap  = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
+        Wrap keywordPairColonWrap = Wrap.createChildWrap(keywordKeyWrap, WrapType.NONE, true);
         Wrap keywordValueWrap = Wrap.createWrap(WrapType.NORMAL, true);
 
         return buildChildren(
@@ -1476,9 +1485,8 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     /**
-     *
      * @param mapArgumentsTailWrap {@link Wrap} shared between the mapConstructionArguments and
-     *   {@link ElixirTypes#CLOSING_CURLY}.
+     *                             {@link ElixirTypes#CLOSING_CURLY}.
      */
     @NotNull
     private List<com.intellij.formatting.Block> buildMapConstructArgumentsChildren(
@@ -2059,7 +2067,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                                 );
                                             }
                                         } else {
-                                           childrenIndent = null;
+                                            childrenIndent = null;
                                         }
                                     }
                                 }
@@ -2212,31 +2220,8 @@ public class Block extends AbstractBlock implements BlockEx {
     private WrapType containerValueWrapType(@NotNull ASTNode container) {
         WrapType wrapType;
 
-        if (container.findChildByType(ElixirTypes.KEYWORDS) != null) {
+        if (container.findChildByType(ElixirTypes.KEYWORDS) != null && !oneLinerUnmatchedCallBody(container)) {
             wrapType = WrapType.ALWAYS;
-
-            ASTNode containerParent = container.getTreeParent();
-
-            if (containerParent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
-                ASTNode accessExpressionParent = containerParent.getTreeParent();
-
-                if (KEYWORD_PAIR_TOKEN_SET.contains(accessExpressionParent.getElementType())) {
-                    ASTNode keywordKey = accessExpressionParent.findChildByType(ElixirTypes.KEYWORD_KEY);
-
-                    if (keywordKey != null && keywordKey.getText().equals("do")) {
-                        ASTNode keywords = accessExpressionParent.getTreeParent();
-                        ASTNode keywordsParent = keywords.getTreeParent();
-
-                        if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                            ASTNode argumentsParent = keywordsParent.getTreeParent();
-
-                            if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
-                                wrapType = WrapType.CHOP_DOWN_IF_LONG;
-                            }
-                        }
-                    }
-                }
-            }
         } else {
             wrapType = WrapType.CHOP_DOWN_IF_LONG;
         }
@@ -2404,6 +2389,30 @@ public class Block extends AbstractBlock implements BlockEx {
         return wrapType;
     }
 
+    @NotNull
+    private Wrap mapContainerValueWrap(ASTNode mapOrStructOperation) {
+        return Wrap.createWrap(mapContainerValueWrapType(mapOrStructOperation), true);
+    }
+
+    @NotNull
+    private WrapType mapContainerValueWrapType(ASTNode mapOrStructOperation) {
+        ASTNode mapArguments = mapOrStructOperation.findChildByType(ElixirTypes.MAP_ARGUMENTS);
+        WrapType wrapType = WrapType.CHOP_DOWN_IF_LONG;
+
+        if (mapArguments != null) {
+            ASTNode mapArgumentsChild = mapArguments.findChildByType(MAP_ARGUMENTS_CHILD_TOKEN_SET);
+
+            if (mapArgumentsChild != null) {
+                if (mapArgumentsChild.findChildByType(MAP_TAIL_ARGUMENTS_TOKEN_SET) != null &&
+                        !oneLinerUnmatchedCallBody(mapOrStructOperation)) {
+                    wrapType = WrapType.ALWAYS;
+                }
+            }
+        }
+
+        return wrapType;
+    }
+
     private int normalIndentSize(@NotNull ASTNode node) {
         CommonCodeStyleSettings.IndentOptions indentOptions = commonCodeStyleSettings(node).getIndentOptions();
         int normalIndentSize = 2;
@@ -2413,6 +2422,34 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return normalIndentSize;
+    }
+
+    private boolean oneLinerUnmatchedCallBody(@NotNull ASTNode container) {
+        ASTNode containerParent = container.getTreeParent();
+        boolean oneLiner = false;
+
+        if (containerParent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
+            ASTNode accessExpressionParent = containerParent.getTreeParent();
+
+            if (KEYWORD_PAIR_TOKEN_SET.contains(accessExpressionParent.getElementType())) {
+                ASTNode keywordKey = accessExpressionParent.findChildByType(ElixirTypes.KEYWORD_KEY);
+
+                if (keywordKey != null && keywordKey.getText().equals("do")) {
+                    ASTNode keywords = accessExpressionParent.getTreeParent();
+                    ASTNode keywordsParent = keywords.getTreeParent();
+
+                    if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                        ASTNode argumentsParent = keywordsParent.getTreeParent();
+
+                        if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
+                            oneLiner = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return oneLiner;
     }
 
     @Nullable
@@ -2449,14 +2486,14 @@ public class Block extends AbstractBlock implements BlockEx {
             stabOperationWrapType = WrapType.NORMAL;
         }
 
-        return  stabOperationWrapType;
+        return stabOperationWrapType;
     }
 
     /**
      * If already partially wrapped between {@code openingElementType} and {@code closingElementType}, then wrap all
      *
      * @return {@link WrapType#ALWAYS} if elements for {@code openingElementType} and {@code closingElementType} are on
-     *   different lines; otherwise, {@link WrapType#CHOP_DOWN_IF_LONG}.
+     * different lines; otherwise, {@link WrapType#CHOP_DOWN_IF_LONG}.
      */
     @NotNull
     private Wrap tailWrap(@NotNull ASTNode parent,
