@@ -93,6 +93,7 @@ public class ModelBuilder implements FormattingModelBuilder {
                 .around(
                         MULTIPLICATIVE_OPERATOR_TOKEN_SET
                 ).spaceIf(elixirCommonSettings.SPACE_AROUND_MULTIPLICATIVE_OPERATORS)
+                .before(ElixirTypes.NO_PARENTHESES_KEYWORDS).spaces(1)
                 .after(ElixirTypes.NOT_OPERATOR).spaces(1)
                 .around(ElixirTypes.OR_WORD_OPERATOR).spaces(1)
                 .around(ElixirTypes.OR_SYMBOL_OPERATOR).spaceIf(elixirCustomSettings.SPACE_AROUND_OR_OPERATORS)
