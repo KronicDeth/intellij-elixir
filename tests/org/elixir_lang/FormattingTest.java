@@ -586,6 +586,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkResultByFile("pipeline_mixed_position_after.ex");
     }
 
+    public void testQuoteKeywords() {
+        myFixture.configureByFile("quote_keywords_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("quote_keywords_after.ex");
+    }
+
     public void testMatchIfElse() {
         assertFormatted("match_if_else.ex");
     }
