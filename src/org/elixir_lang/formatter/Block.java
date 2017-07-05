@@ -153,6 +153,7 @@ public class Block extends AbstractBlock implements BlockEx {
             ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
             ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
     );
+    private static final TokenSet NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET = TokenSet.create(ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR);
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
                     ElixirTypes.MATCHED_ADDITION_OPERATION,
@@ -2384,24 +2385,6 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private WrapType noParenthesesOneArgumentWrapType(@NotNull ASTNode noParenthesesOneArgument) {
-        ASTNode noParenthesesOneArgumentParent = noParenthesesOneArgument.getTreeParent();
-        WrapType wrapType = WrapType.ALWAYS;
-
-        if (UNMATCHED_CALL_TOKEN_SET.contains(noParenthesesOneArgumentParent.getElementType())) {
-            Call call = noParenthesesOneArgumentParent.getPsi(Call.class);
-
-            if (IMPORT.equals(call.functionName())) {
-                                /* Usage of `import` with `only` or `except` is meant for compactness, so applying
-                                   keyword exclusivity would go against that */
-                wrapType = WrapType.CHOP_DOWN_IF_LONG;
-            }
-        }
-
-        return wrapType;
-    }
-
-    @NotNull
     private Wrap mapContainerValueWrap(@Nullable Wrap parentWrap, @NotNull ASTNode mapOrStructOperation) {
         return Wrap.createChildWrap(parentWrap, mapContainerValueWrapType(mapOrStructOperation), true);
     }
@@ -2419,6 +2402,61 @@ public class Block extends AbstractBlock implements BlockEx {
                         !oneLinerUnmatchedCallBody(mapOrStructOperation)) {
                     wrapType = WrapType.ALWAYS;
                 }
+            }
+        }
+
+        return wrapType;
+    }
+
+    @NotNull
+    private Wrap noParenthesesOneArgumentChildrenWrap(@NotNull ASTNode noParenthesesOneArgument) {
+        return Wrap.createWrap(
+                noParenthesesOneArgumentChildrenWrapType(noParenthesesOneArgument),
+                // MUST NOT be `true` as wrapping the first argument disassociates the arguments with the call
+                false
+        );
+    }
+
+    @NotNull
+    private WrapType noParenthesesOneArgumentChildrenWrapType(@NotNull ASTNode noParenthesesOneArgument) {
+        WrapType childrenWrapType;
+
+        ASTNode noParenthesesKeywords = noParenthesesOneArgument.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORDS);
+
+        if (noParenthesesKeywords != null) {
+            ASTNode[] noParenthesesKeywordPairs =
+                    noParenthesesKeywords.getChildren(NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET);
+            childrenWrapType = null;
+
+            for (ASTNode noParenthesesKeywordPair : noParenthesesKeywordPairs) {
+                if (oneLinerKeywordPair(noParenthesesKeywordPair)) {
+                    childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
+                    break;
+                }
+            }
+
+            if (childrenWrapType == null) {
+                childrenWrapType = noParenthesesOneArgumentWrapType(noParenthesesOneArgument);
+            }
+        } else {
+            childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
+        }
+
+        return childrenWrapType;
+    }
+
+    @NotNull
+    private WrapType noParenthesesOneArgumentWrapType(@NotNull ASTNode noParenthesesOneArgument) {
+        ASTNode noParenthesesOneArgumentParent = noParenthesesOneArgument.getTreeParent();
+        WrapType wrapType = WrapType.ALWAYS;
+
+        if (UNMATCHED_CALL_TOKEN_SET.contains(noParenthesesOneArgumentParent.getElementType())) {
+            Call call = noParenthesesOneArgumentParent.getPsi(Call.class);
+
+            if (IMPORT.equals(call.functionName())) {
+                                /* Usage of `import` with `only` or `except` is meant for compactness, so applying
+                                   keyword exclusivity would go against that */
+                wrapType = WrapType.CHOP_DOWN_IF_LONG;
             }
         }
 
@@ -2454,37 +2492,6 @@ public class Block extends AbstractBlock implements BlockEx {
         }
 
         return oneLiner;
-    }
-
-    @NotNull
-    private Wrap noParenthesesOneArgumentChildrenWrap(@NotNull ASTNode noParenthesesOneArgument) {
-        return Wrap.createWrap(
-                noParenthesesOneArgumentChildrenWrapType(noParenthesesOneArgument),
-                // MUST NOT be `true` as wrapping the first argument disassociates the arguments with the call
-                false
-        );
-    }
-
-    @NotNull
-    private WrapType noParenthesesOneArgumentChildrenWrapType(@NotNull ASTNode noParenthesesOneArgument) {
-        WrapType childrenWrapType;
-
-        ASTNode noParenthesesKeywords = noParenthesesOneArgument.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORDS);
-
-        if (noParenthesesKeywords != null) {
-            ASTNode firstNoParenthesesKeywordPair =
-                    noParenthesesKeywords.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR);
-
-            if (oneLinerKeywordPair(firstNoParenthesesKeywordPair)) {
-                childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
-            } else {
-                childrenWrapType = noParenthesesOneArgumentWrapType(noParenthesesOneArgument);
-            }
-        } else {
-            childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
-        }
-
-        return childrenWrapType;
     }
 
     private boolean oneLinerUnmatchedCallBody(@NotNull ASTNode container) {
