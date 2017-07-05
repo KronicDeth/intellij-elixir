@@ -1694,17 +1694,11 @@ public class Block extends AbstractBlock implements BlockEx {
             @Nullable Wrap parentWrap,
             @Nullable Alignment parentAlignment
     ) {
-        Wrap childrenWrap = Wrap.createWrap(
-                WrapType.CHOP_DOWN_IF_LONG,
-                // MUST NOT be `true` as wrapping the first argument disassociates the arguments with the call
-                false
-        );
-
         List<com.intellij.formatting.Block> blockList = buildChildren(
                 child,
                 parentWrap,
                 parentAlignment,
-                childrenWrap,
+                noParenthesesOneArgumentChildrenWrap(child),
                 null
         );
 
@@ -2380,19 +2374,27 @@ public class Block extends AbstractBlock implements BlockEx {
                     IElementType keywordsParentElementType = keywordsParent.getElementType();
 
                     if (keywordsParentElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                        ASTNode keywordsGrandParent = keywordsParent.getTreeParent();
-
-                        if (UNMATCHED_CALL_TOKEN_SET.contains(keywordsGrandParent.getElementType())) {
-                            Call call = keywordsGrandParent.getPsi(Call.class);
-
-                            if (IMPORT.equals(call.functionName())) {
-                                /* Usage of `import` with `only` or `except` is meant for compactness, so applying
-                                   keyword exclusivity would go against that */
-                                wrapType = WrapType.CHOP_DOWN_IF_LONG;
-                            }
-                        }
+                        wrapType = noParenthesesOneArgumentWrapType(keywordsParent);
                     }
                 }
+            }
+        }
+
+        return wrapType;
+    }
+
+    @NotNull
+    private WrapType noParenthesesOneArgumentWrapType(@NotNull ASTNode noParenthesesOneArgument) {
+        ASTNode noParenthesesOneArgumentParent = noParenthesesOneArgument.getTreeParent();
+        WrapType wrapType = WrapType.ALWAYS;
+
+        if (UNMATCHED_CALL_TOKEN_SET.contains(noParenthesesOneArgumentParent.getElementType())) {
+            Call call = noParenthesesOneArgumentParent.getPsi(Call.class);
+
+            if (IMPORT.equals(call.functionName())) {
+                                /* Usage of `import` with `only` or `except` is meant for compactness, so applying
+                                   keyword exclusivity would go against that */
+                wrapType = WrapType.CHOP_DOWN_IF_LONG;
             }
         }
 
@@ -2434,6 +2436,57 @@ public class Block extends AbstractBlock implements BlockEx {
         return normalIndentSize;
     }
 
+    private boolean oneLinerKeywordPair(ASTNode keywordPair) {
+        ASTNode keywordKey = keywordPair.findChildByType(ElixirTypes.KEYWORD_KEY);
+        boolean oneLiner = false;
+
+        if (keywordKey != null && keywordKey.getText().equals("do")) {
+            ASTNode keywords = keywordPair.getTreeParent();
+            ASTNode keywordsParent = keywords.getTreeParent();
+
+            if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                ASTNode argumentsParent = keywordsParent.getTreeParent();
+
+                if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
+                    oneLiner = true;
+                }
+            }
+        }
+
+        return oneLiner;
+    }
+
+    @NotNull
+    private Wrap noParenthesesOneArgumentChildrenWrap(@NotNull ASTNode noParenthesesOneArgument) {
+        return Wrap.createWrap(
+                noParenthesesOneArgumentChildrenWrapType(noParenthesesOneArgument),
+                // MUST NOT be `true` as wrapping the first argument disassociates the arguments with the call
+                false
+        );
+    }
+
+    @NotNull
+    private WrapType noParenthesesOneArgumentChildrenWrapType(@NotNull ASTNode noParenthesesOneArgument) {
+        WrapType childrenWrapType;
+
+        ASTNode noParenthesesKeywords = noParenthesesOneArgument.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORDS);
+
+        if (noParenthesesKeywords != null) {
+            ASTNode firstNoParenthesesKeywordPair =
+                    noParenthesesKeywords.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR);
+
+            if (oneLinerKeywordPair(firstNoParenthesesKeywordPair)) {
+                childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
+            } else {
+                childrenWrapType = noParenthesesOneArgumentWrapType(noParenthesesOneArgument);
+            }
+        } else {
+            childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
+        }
+
+        return childrenWrapType;
+    }
+
     private boolean oneLinerUnmatchedCallBody(@NotNull ASTNode container) {
         ASTNode containerParent = container.getTreeParent();
         boolean oneLiner = false;
@@ -2442,20 +2495,7 @@ public class Block extends AbstractBlock implements BlockEx {
             ASTNode accessExpressionParent = containerParent.getTreeParent();
 
             if (KEYWORD_PAIR_TOKEN_SET.contains(accessExpressionParent.getElementType())) {
-                ASTNode keywordKey = accessExpressionParent.findChildByType(ElixirTypes.KEYWORD_KEY);
-
-                if (keywordKey != null && keywordKey.getText().equals("do")) {
-                    ASTNode keywords = accessExpressionParent.getTreeParent();
-                    ASTNode keywordsParent = keywords.getTreeParent();
-
-                    if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
-                        ASTNode argumentsParent = keywordsParent.getTreeParent();
-
-                        if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
-                            oneLiner = true;
-                        }
-                    }
-                }
+                oneLiner = oneLinerKeywordPair(accessExpressionParent);
             }
         }
 
