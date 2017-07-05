@@ -183,6 +183,14 @@ public class FormattingTest extends LightCodeInsightFixtureTestCase {
         assertFormatted("bit_string_only_indent_nested_keywords.ex");
     }
 
+    public void testNoParenthesesCallDoNotWrapUnlessKeywordsMultiline() {
+        myFixture.configureByFile("no_parentheses_call_do_not_wrap_unless_keywords_multiline_before.ex");
+
+        reformatFixture();
+
+        myFixture.checkResultByFile("no_parentheses_call_do_not_wrap_unless_keywords_multiline_after.ex");
+    }
+
     public void testNoParenthesesCallMultipleArgumentsWithWrappedMap() {
         myFixture.configureByFile("no_parentheses_call_multiple_arguments_with_wrapped_map_before.ex");
 

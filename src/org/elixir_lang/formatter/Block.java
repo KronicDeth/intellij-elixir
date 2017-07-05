@@ -2437,6 +2437,10 @@ public class Block extends AbstractBlock implements BlockEx {
 
             if (childrenWrapType == null) {
                 childrenWrapType = noParenthesesOneArgumentWrapType(noParenthesesOneArgument);
+
+                if (childrenWrapType == WrapType.ALWAYS && !noParenthesesKeywords.textContains('\n')) {
+                    childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
+                }
             }
         } else {
             childrenWrapType = WrapType.CHOP_DOWN_IF_LONG;
