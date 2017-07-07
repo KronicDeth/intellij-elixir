@@ -27,6 +27,8 @@ import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static org.elixir_lang.psi.ElixirTypes.FN;
+import static org.elixir_lang.psi.ElixirTypes.MULTIPLE_ALIASES;
 import static org.elixir_lang.psi.call.name.Function.IMPORT;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
@@ -36,48 +38,48 @@ import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
  */
 public class Block extends AbstractBlock implements BlockEx {
     private static final TokenSet ARROW_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_ARROW_OPERATION,
-            ElixirTypes.UNMATCHED_ARROW_OPERATION
+            MATCHED_ARROW_OPERATION,
+            UNMATCHED_ARROW_OPERATION
     );
     private static final TokenSet BODY_TOKEN_SET = TokenSet.create(
-            ElixirTypes.INTERPOLATED_CHAR_LIST_BODY,
-            ElixirTypes.INTERPOLATED_REGEX_BODY,
-            ElixirTypes.INTERPOLATED_SIGIL_BODY,
-            ElixirTypes.INTERPOLATED_STRING_BODY,
-            ElixirTypes.INTERPOLATED_WORDS_BODY,
-            ElixirTypes.LITERAL_CHAR_LIST_BODY,
-            ElixirTypes.LITERAL_REGEX_BODY,
-            ElixirTypes.LITERAL_SIGIL_BODY,
-            ElixirTypes.LITERAL_STRING_BODY,
-            ElixirTypes.LITERAL_WORDS_BODY,
-            ElixirTypes.QUOTE_CHAR_LIST_BODY,
-            ElixirTypes.QUOTE_STRING_BODY
+            INTERPOLATED_CHAR_LIST_BODY,
+            INTERPOLATED_REGEX_BODY,
+            INTERPOLATED_SIGIL_BODY,
+            INTERPOLATED_STRING_BODY,
+            INTERPOLATED_WORDS_BODY,
+            LITERAL_CHAR_LIST_BODY,
+            LITERAL_REGEX_BODY,
+            LITERAL_SIGIL_BODY,
+            LITERAL_STRING_BODY,
+            LITERAL_WORDS_BODY,
+            QUOTE_CHAR_LIST_BODY,
+            QUOTE_STRING_BODY
     );
     private static final TokenSet BOOLEAN_WORD_OPERATOR_TOKEN_SET = TokenSet.create(
-            ElixirTypes.AND_WORD_OPERATOR,
-            ElixirTypes.OR_WORD_OPERATOR
+            AND_WORD_OPERATOR,
+            OR_WORD_OPERATOR
     );
     private static final TokenSet CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-            ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
+            MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+            UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
     );
     private static final TokenSet COMPARISON_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_COMPARISON_OPERATION,
-            ElixirTypes.UNMATCHED_COMPARISON_OPERATION
+            MATCHED_COMPARISON_OPERATION,
+            UNMATCHED_COMPARISON_OPERATION
     );
     private static final TokenSet HEREDOC_LINE_TOKEN_SET = TokenSet.create(
-            ElixirTypes.CHAR_LIST_HEREDOC_LINE,
-            ElixirTypes.INTERPOLATED_CHAR_LIST_HEREDOC_LINE,
-            ElixirTypes.INTERPOLATED_REGEX_HEREDOC_LINE,
-            ElixirTypes.INTERPOLATED_SIGIL_HEREDOC_LINE,
-            ElixirTypes.INTERPOLATED_STRING_HEREDOC_LINE,
-            ElixirTypes.INTERPOLATED_WORDS_HEREDOC_LINE,
-            ElixirTypes.LITERAL_CHAR_LIST_HEREDOC_LINE,
-            ElixirTypes.LITERAL_REGEX_HEREDOC_LINE,
-            ElixirTypes.LITERAL_SIGIL_HEREDOC_LINE,
-            ElixirTypes.LITERAL_STRING_HEREDOC_LINE,
-            ElixirTypes.LITERAL_WORDS_HEREDOC_LINE,
-            ElixirTypes.STRING_HEREDOC_LINE
+            CHAR_LIST_HEREDOC_LINE,
+            INTERPOLATED_CHAR_LIST_HEREDOC_LINE,
+            INTERPOLATED_REGEX_HEREDOC_LINE,
+            INTERPOLATED_SIGIL_HEREDOC_LINE,
+            INTERPOLATED_STRING_HEREDOC_LINE,
+            INTERPOLATED_WORDS_HEREDOC_LINE,
+            LITERAL_CHAR_LIST_HEREDOC_LINE,
+            LITERAL_REGEX_HEREDOC_LINE,
+            LITERAL_SIGIL_HEREDOC_LINE,
+            LITERAL_STRING_HEREDOC_LINE,
+            LITERAL_WORDS_HEREDOC_LINE,
+            STRING_HEREDOC_LINE
     );
     private static final TokenSet HEREDOC_TOKEN_SET = TokenSet.create(
             CHAR_LIST_HEREDOC,
@@ -94,109 +96,109 @@ public class Block extends AbstractBlock implements BlockEx {
             STRING_HEREDOC
     );
     private static final TokenSet KEYWORD_PAIR_TOKEN_SET = TokenSet.create(
-            ElixirTypes.KEYWORD_PAIR,
-            ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR
+            KEYWORD_PAIR,
+            NO_PARENTHESES_KEYWORD_PAIR
     );
     private static final TokenSet LINE_TOKEN_SET = TokenSet.create(
-            ElixirTypes.CHAR_LIST_LINE,
-            ElixirTypes.INTERPOLATED_CHAR_LIST_SIGIL_LINE,
-            ElixirTypes.INTERPOLATED_REGEX_LINE,
-            ElixirTypes.INTERPOLATED_SIGIL_LINE,
-            ElixirTypes.INTERPOLATED_STRING_SIGIL_LINE,
-            ElixirTypes.INTERPOLATED_WORDS_LINE,
-            ElixirTypes.LITERAL_CHAR_LIST_SIGIL_LINE,
-            ElixirTypes.LITERAL_REGEX_LINE,
-            ElixirTypes.LITERAL_SIGIL_LINE,
-            ElixirTypes.LITERAL_STRING_SIGIL_LINE,
-            ElixirTypes.LITERAL_WORDS_LINE,
-            ElixirTypes.STRING_LINE
+            CHAR_LIST_LINE,
+            INTERPOLATED_CHAR_LIST_SIGIL_LINE,
+            INTERPOLATED_REGEX_LINE,
+            INTERPOLATED_SIGIL_LINE,
+            INTERPOLATED_STRING_SIGIL_LINE,
+            INTERPOLATED_WORDS_LINE,
+            LITERAL_CHAR_LIST_SIGIL_LINE,
+            LITERAL_REGEX_LINE,
+            LITERAL_SIGIL_LINE,
+            LITERAL_STRING_SIGIL_LINE,
+            LITERAL_WORDS_LINE,
+            STRING_LINE
     );
     private static final TokenSet MAP_ARGUMENTS_CHILD_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS,
-            ElixirTypes.MAP_UPDATE_ARGUMENTS
+            MAP_CONSTRUCTION_ARGUMENTS,
+            MAP_UPDATE_ARGUMENTS
     );
-    private static final TokenSet MAP_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.MAP_OPERATOR);
+    private static final TokenSet MAP_OPERATOR_TOKEN_SET = TokenSet.create(MAP_OPERATOR);
     private static final TokenSet MAP_TAIL_ARGUMENTS_TOKEN_SET = TokenSet.create(
-            ElixirTypes.ASSOCIATIONS,
-            ElixirTypes.ASSOCIATIONS_BASE,
-            ElixirTypes.KEYWORDS
+            ASSOCIATIONS,
+            ASSOCIATIONS_BASE,
+            KEYWORDS
     );
     private static final TokenSet MAP_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MAP_OPERATION,
-            ElixirTypes.STRUCT_OPERATION
+            MAP_OPERATION,
+            STRUCT_OPERATION
     );
     private static final TokenSet MATCHED_CALL_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.MATCHED_DOT_CALL,
-            ElixirTypes.MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.MATCHED_QUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.MATCHED_QUALIFIED_PARENTHESES_CALL,
-            ElixirTypes.MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.MATCHED_UNQUALIFIED_PARENTHESES_CALL
+            MATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
+            MATCHED_DOT_CALL,
+            MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            MATCHED_QUALIFIED_NO_PARENTHESES_CALL,
+            MATCHED_QUALIFIED_PARENTHESES_CALL,
+            MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            MATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
+            MATCHED_UNQUALIFIED_PARENTHESES_CALL
     );
     private static final TokenSet MATCH_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_MATCH_OPERATION,
-            ElixirTypes.UNMATCHED_MATCH_OPERATION
+            MATCHED_MATCH_OPERATION,
+            UNMATCHED_MATCH_OPERATION
     );
     private static final TokenSet ENFORCE_INDENT_TO_CHILDREN_TOKEN_SET = TokenSet.orSet(
             COMPARISON_OPERATION_TOKEN_SET,
             MATCH_OPERATION_TOKEN_SET
     );
     private static final TokenSet MULTIPLICATION_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
-            ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION
+            MATCHED_MULTIPLICATION_OPERATION,
+            UNMATCHED_MULTIPLICATION_OPERATION
     );
     private static final TokenSet NO_ARGUMENTS_CALL_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
+            MATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            MATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL
     );
-    private static final TokenSet NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET = TokenSet.create(ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR);
+    private static final TokenSet NO_PARENTHESES_KEYWORD_PAIR_TOKEN_SET = TokenSet.create(NO_PARENTHESES_KEYWORD_PAIR);
     private static final TokenSet OPERATION_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
-                    ElixirTypes.MATCHED_ADDITION_OPERATION,
-                    ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-                    ElixirTypes.MATCHED_IN_MATCH_OPERATION,
-                    ElixirTypes.MATCHED_IN_OPERATION,
-                    ElixirTypes.MATCHED_MATCH_OPERATION,
-                    ElixirTypes.MATCHED_MULTIPLICATION_OPERATION,
-                    ElixirTypes.MATCHED_RELATIONAL_OPERATION,
-                    ElixirTypes.MATCHED_THREE_OPERATION,
-                    ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
-                    ElixirTypes.MATCHED_WHEN_OPERATION,
-                    ElixirTypes.UNARY_NUMERIC_OPERATION,
-                    ElixirTypes.UNMATCHED_ADDITION_OPERATION,
-                    ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
-                    ElixirTypes.UNMATCHED_IN_MATCH_OPERATION,
-                    ElixirTypes.UNMATCHED_IN_OPERATION,
-                    ElixirTypes.UNMATCHED_MATCH_OPERATION,
-                    ElixirTypes.UNMATCHED_MULTIPLICATION_OPERATION,
-                    ElixirTypes.UNMATCHED_RELATIONAL_OPERATION,
-                    ElixirTypes.UNMATCHED_THREE_OPERATION,
-                    ElixirTypes.UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
-                    ElixirTypes.UNMATCHED_WHEN_OPERATION
+                    MATCHED_ADDITION_OPERATION,
+                    MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    MATCHED_IN_MATCH_OPERATION,
+                    MATCHED_IN_OPERATION,
+                    MATCHED_MATCH_OPERATION,
+                    MATCHED_MULTIPLICATION_OPERATION,
+                    MATCHED_RELATIONAL_OPERATION,
+                    MATCHED_THREE_OPERATION,
+                    MATCHED_UNARY_NON_NUMERIC_OPERATION,
+                    MATCHED_WHEN_OPERATION,
+                    UNARY_NUMERIC_OPERATION,
+                    UNMATCHED_ADDITION_OPERATION,
+                    UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION,
+                    UNMATCHED_IN_MATCH_OPERATION,
+                    UNMATCHED_IN_OPERATION,
+                    UNMATCHED_MATCH_OPERATION,
+                    UNMATCHED_MULTIPLICATION_OPERATION,
+                    UNMATCHED_RELATIONAL_OPERATION,
+                    UNMATCHED_THREE_OPERATION,
+                    UNMATCHED_UNARY_NON_NUMERIC_OPERATION,
+                    UNMATCHED_WHEN_OPERATION
             ),
             COMPARISON_OPERATION_TOKEN_SET,
             MATCH_OPERATION_TOKEN_SET
     );
     private static final TokenSet OPERATOR_RULE_TOKEN_SET = TokenSet.create(
-            ElixirTypes.ADDITION_INFIX_OPERATOR,
-            ElixirTypes.ARROW_INFIX_OPERATOR,
-            ElixirTypes.AT_PREFIX_OPERATOR,
-            ElixirTypes.CAPTURE_PREFIX_OPERATOR,
-            ElixirTypes.COMPARISON_INFIX_OPERATOR,
-            ElixirTypes.DOT_INFIX_OPERATOR,
-            ElixirTypes.IN_INFIX_OPERATOR,
-            ElixirTypes.IN_MATCH_INFIX_OPERATOR,
-            ElixirTypes.MATCH_INFIX_OPERATOR,
-            ElixirTypes.MULTIPLICATION_INFIX_OPERATOR,
-            ElixirTypes.RELATIONAL_INFIX_OPERATOR,
-            ElixirTypes.STAB_INFIX_OPERATOR,
-            ElixirTypes.THREE_INFIX_OPERATOR,
-            ElixirTypes.UNARY_PREFIX_OPERATOR,
-            ElixirTypes.WHEN_INFIX_OPERATOR
+            ADDITION_INFIX_OPERATOR,
+            ARROW_INFIX_OPERATOR,
+            AT_PREFIX_OPERATOR,
+            CAPTURE_PREFIX_OPERATOR,
+            COMPARISON_INFIX_OPERATOR,
+            DOT_INFIX_OPERATOR,
+            IN_INFIX_OPERATOR,
+            IN_MATCH_INFIX_OPERATOR,
+            MATCH_INFIX_OPERATOR,
+            MULTIPLICATION_INFIX_OPERATOR,
+            RELATIONAL_INFIX_OPERATOR,
+            STAB_INFIX_OPERATOR,
+            THREE_INFIX_OPERATOR,
+            UNARY_PREFIX_OPERATOR,
+            WHEN_INFIX_OPERATOR
     );
     private static final TokenSet OPERATOR_TOKEN_SET = TokenSet.orSet(
             ADDITION_OPERATOR_TOKEN_SET,
@@ -223,56 +225,56 @@ public class Block extends AbstractBlock implements BlockEx {
             WHEN_OPERATOR_TOKEN_SET
     );
     private static final TokenSet PIPE_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_PIPE_OPERATION,
-            ElixirTypes.UNMATCHED_PIPE_OPERATION
+            MATCHED_PIPE_OPERATION,
+            UNMATCHED_PIPE_OPERATION
     );
     // "Sometimes" because only the `and` and `or` operators will be affected
     private static final TokenSet SOMETIMES_BOOLEAN_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_AND_OPERATION,
-            ElixirTypes.MATCHED_OR_OPERATION,
-            ElixirTypes.UNMATCHED_AND_OPERATION,
-            ElixirTypes.UNMATCHED_OR_OPERATION
+            MATCHED_AND_OPERATION,
+            MATCHED_OR_OPERATION,
+            UNMATCHED_AND_OPERATION,
+            UNMATCHED_OR_OPERATION
     );
     // "Sometimes" because only the `and` and `or` operators will be affected
     private static final TokenSet SOMETIMES_BOOLEAN_OPERATOR_RULE_TOKEN_SET = TokenSet.create(
-            ElixirTypes.AND_INFIX_OPERATOR,
-            ElixirTypes.OR_INFIX_OPERATOR
+            AND_INFIX_OPERATOR,
+            OR_INFIX_OPERATOR
     );
-    private static final TokenSet TUPLISH_TOKEN_SET = TokenSet.create(ElixirTypes.MULTIPLE_ALIASES, ElixirTypes.TUPLE);
+    private static final TokenSet TUPLISH_TOKEN_SET = TokenSet.create(MULTIPLE_ALIASES, TUPLE);
     private static final TokenSet TWO_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_TWO_OPERATION,
-            ElixirTypes.UNMATCHED_TWO_OPERATION
+            MATCHED_TWO_OPERATION,
+            UNMATCHED_TWO_OPERATION
     );
     private static final TokenSet TYPE_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_TYPE_OPERATION,
-            ElixirTypes.UNMATCHED_TYPE_OPERATION
+            MATCHED_TYPE_OPERATION,
+            UNMATCHED_TYPE_OPERATION
     );
     private static final TokenSet UNINDENTED_ONLY_ARGUMENT_TOKEN_SET = TokenSet.orSet(
             TokenSet.create(
-                    ElixirTypes.ANONYMOUS_FUNCTION,
-                    ElixirTypes.BIT_STRING,
-                    ElixirTypes.LIST,
-                    ElixirTypes.TUPLE
+                    ANONYMOUS_FUNCTION,
+                    BIT_STRING,
+                    LIST,
+                    TUPLE
             ),
             HEREDOC_TOKEN_SET,
             MAP_TOKEN_SET
     );
     private static final TokenSet UNMATCHED_CALL_TOKEN_SET = TokenSet.create(
-            ElixirTypes.UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.UNMATCHED_DOT_CALL,
-            ElixirTypes.UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.UNMATCHED_QUALIFIED_PARENTHESES_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
-            ElixirTypes.UNMATCHED_UNQUALIFIED_PARENTHESES_CALL
+            UNMATCHED_AT_UNQUALIFIED_NO_PARENTHESES_CALL,
+            UNMATCHED_DOT_CALL,
+            UNMATCHED_QUALIFIED_NO_ARGUMENTS_CALL,
+            UNMATCHED_QUALIFIED_NO_PARENTHESES_CALL,
+            UNMATCHED_QUALIFIED_PARENTHESES_CALL,
+            UNMATCHED_UNQUALIFIED_NO_ARGUMENTS_CALL,
+            UNMATCHED_UNQUALIFIED_NO_PARENTHESES_CALL,
+            UNMATCHED_UNQUALIFIED_PARENTHESES_CALL
     );
     private static final TokenSet WHEN_OPERATION_TOKEN_SET = TokenSet.create(
-            ElixirTypes.MATCHED_WHEN_OPERATION,
-            ElixirTypes.UNMATCHED_WHEN_OPERATION
+            MATCHED_WHEN_OPERATION,
+            UNMATCHED_WHEN_OPERATION
     );
     private static final TokenSet WHITESPACE_TOKEN_SET =
-            TokenSet.create(ElixirTypes.EOL, TokenType.WHITE_SPACE, ElixirTypes.SIGNIFICANT_WHITE_SPACE);
+            TokenSet.create(EOL, TokenType.WHITE_SPACE, SIGNIFICANT_WHITE_SPACE);
     @Nullable
     private final Alignment childrenAlignment;
     @Nullable
@@ -301,10 +303,10 @@ public class Block extends AbstractBlock implements BlockEx {
 
         IElementType elementType = node.getElementType();
 
-        assert elementType != ElixirTypes.ACCESS_EXPRESSION : "accessExpressions should be flattened with " +
+        assert elementType != ACCESS_EXPRESSION : "accessExpressions should be flattened with " +
                 "buildAccessExpressionChildren";
 
-        if (elementType == ElixirTypes.STAB_OPERATION) {
+        if (elementType == STAB_OPERATION) {
             assert childrenWrap != null : "stabOperation must have a non-null childrenWrap, so that sibling " +
                     "stabOperations and their children are wrapped consistently";
         }
@@ -428,7 +430,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 operation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, operandAlignment));
                     } else if (operatorRuleTokenSet.contains(childElementType)) {
                         blockList.addAll(buildOperatorRuleChildren(child, null, null, operandAlignment));
@@ -454,16 +456,16 @@ public class Block extends AbstractBlock implements BlockEx {
 
         return buildContainerChildren(
                 anonymousFunction,
-                ElixirTypes.FN,
+                FN,
                 null,
                 stabIndent,
                 stabWrap,
-                ElixirTypes.END,
+                END,
                 endAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
-                    if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                    if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
-                    } else if (childElementType == ElixirTypes.STAB) {
+                    } else if (childElementType == STAB) {
                         blockList.addAll(
                                 buildStabChildren(
                                         (CompositeElement) child,
@@ -514,13 +516,13 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 arrowOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(
                                 buildAccessExpressionChildren(child, operandWrap[0], operandAlignment[0])
                         );
                     } else if (ARROW_OPERATION_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildArrowOperationChildren(child, nestedStartAlignment));
-                    } else if (childElementType == ElixirTypes.ARROW_INFIX_OPERATOR) {
+                    } else if (childElementType == ARROW_INFIX_OPERATOR) {
                         blockList.addAll(
                                 buildOperatorRuleChildren(
                                         child,
@@ -550,7 +552,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 associationsBase,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.CONTAINER_ASSOCIATION_OPERATION) {
+                    if (childElementType == CONTAINER_ASSOCIATION_OPERATION) {
                         blockList.add(buildChild(child, containerAssociationOperationWrap, Indent.getNormalIndent()));
                     } else {
                         blockList.add(buildChild(child));
@@ -570,7 +572,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 associations,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
+                    if (childElementType == ASSOCIATIONS_BASE) {
                         blockList.addAll(
                                 buildAssociationsBaseChildren(
                                         child,
@@ -578,7 +580,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         associationsExpressionIndent
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.COMMA) {
+                    } else if (childElementType == COMMA) {
                         blockList.add(buildChild(child, Wrap.createWrap(WrapType.NONE, false)));
                     } else {
                         // comment
@@ -598,11 +600,11 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                        @Nullable Alignment closingBitAlignment) {
         return buildContainerChildren(
                 list,
-                ElixirTypes.OPENING_BIT,
+                OPENING_BIT,
                 openingBitWrap,
                 elementIndent,
                 containerArgumentsWrap,
-                ElixirTypes.CLOSING_BIT,
+                CLOSING_BIT,
                 closingBitAlignment
         );
     }
@@ -630,14 +632,14 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 blockItem,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.BLOCK_IDENTIFIER) {
+                    if (childElementType == BLOCK_IDENTIFIER) {
                         blockList.addAll(buildBlockIdentifierChildren(child, blockItemAlignment));
-                    } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                    } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, null));
-                    } else if (childElementType == ElixirTypes.STAB) {
+                    } else if (childElementType == STAB) {
                         Wrap stabBodyChildrenWrap;
 
-                        if (child.findChildByType(ElixirTypes.STAB_BODY) != null) {
+                        if (child.findChildByType(STAB_BODY) != null) {
                             stabBodyChildrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
                         } else {
                             stabBodyChildrenWrap = null;
@@ -685,13 +687,13 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                        @Nullable Alignment callAlignment) {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
-        if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+        if (childElementType == ACCESS_EXPRESSION) {
             blockList.addAll(buildAccessExpressionChildren(child));
-        } else if (childElementType == ElixirTypes.IDENTIFIER) {
+        } else if (childElementType == IDENTIFIER) {
             blockList.addAll(buildIdentifierChildren(child));
-        } else if (childElementType == ElixirTypes.MATCHED_PARENTHESES_ARGUMENTS) {
+        } else if (childElementType == MATCHED_PARENTHESES_ARGUMENTS) {
             blockList.addAll(buildMatchedParenthesesArguments(child, callWrap, callAlignment));
-        } else if (childElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+        } else if (childElementType == NO_PARENTHESES_ONE_ARGUMENT) {
             blockList.addAll(buildNoParenthesesOneArgument(child, callWrap, callAlignment));
         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
             blockList.addAll(buildOperatorRuleChildren(child));
@@ -718,9 +720,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 captureNonNumericOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child));
-                    } else if (childElementType == ElixirTypes.CAPTURE_PREFIX_OPERATOR) {
+                    } else if (childElementType == CAPTURE_PREFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else if (MULTIPLICATION_OPERATION_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(
@@ -745,18 +747,18 @@ public class Block extends AbstractBlock implements BlockEx {
         if (flattenedBlockList.size() == 3) {
             ASTBlock operatorBlock = (ASTBlock) flattenedBlockList.get(1);
 
-            if (operatorBlock.getNode().getElementType() == ElixirTypes.DIVISION_OPERATOR) {
+            if (operatorBlock.getNode().getElementType() == DIVISION_OPERATOR) {
                 ASTBlock rightOperandBlock = (ASTBlock) flattenedBlockList.get(2);
 
                 // `/ARITY` confirmed
-                if (rightOperandBlock.getNode().getElementType() == ElixirTypes.DECIMAL_WHOLE_NUMBER) {
+                if (rightOperandBlock.getNode().getElementType() == DECIMAL_WHOLE_NUMBER) {
                     ASTBlock leftOperandBlock = (ASTBlock) flattenedBlockList.get(0);
                     ASTNode leftOperand = leftOperandBlock.getNode();
                     IElementType leftOperandElementType = leftOperand.getElementType();
 
                     if (NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType)) {
                         // `NAME/ARITY` confirmed
-                        if (leftOperand.findChildByType(ElixirTypes.DO_BLOCK) == null) {
+                        if (leftOperand.findChildByType(DO_BLOCK) == null) {
                             blockList = flattenedBlockList;
                         }
                     }
@@ -880,46 +882,46 @@ public class Block extends AbstractBlock implements BlockEx {
         List<com.intellij.formatting.Block> blocks;
         IElementType parentElementType = parent.getElementType();
 
-        if (parentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
+        if (parentElementType == ANONYMOUS_FUNCTION) {
             blocks = buildAnonymousFunctionChildren(parent, childrenWrap, childrenAlignment);
         } else if (ARROW_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildArrowOperationChildren(parent, null);
-        } else if (parentElementType == ElixirTypes.BIT_STRING) {
+        } else if (parentElementType == BIT_STRING) {
             blocks = buildBitStringChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
-        } else if (parentElementType == ElixirTypes.BLOCK_ITEM) {
+        } else if (parentElementType == BLOCK_ITEM) {
             blocks = buildBlockItemChildren(parent, parentAlignment);
         } else if (CAPTURE_NON_NUMERIC_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildCaptureNonNumericOperationChildren(parent);
-        } else if (parentElementType == ElixirTypes.CONTAINER_ASSOCIATION_OPERATION) {
+        } else if (parentElementType == CONTAINER_ASSOCIATION_OPERATION) {
             blocks = buildContainerAssociationOperation(parent);
         } else if (HEREDOC_TOKEN_SET.contains(parentElementType)) {
             blocks = buildHeredocChildren((CompositeElement) parent);
-        } else if (parentElementType == ElixirTypes.INTERPOLATION) {
+        } else if (parentElementType == INTERPOLATION) {
             blocks = buildInterpolationChildren(parent);
-        } else if (parentElementType == ElixirTypes.KEYWORD_PAIR) {
+        } else if (parentElementType == KEYWORD_PAIR) {
             blocks = buildKeywordPairChildren(parent);
-        } else if (parentElementType == ElixirTypes.KEYWORD_KEY) {
+        } else if (parentElementType == KEYWORD_KEY) {
             blocks = buildKeywordKeyChildren(parent);
         } else if (LINE_TOKEN_SET.contains(parentElementType)) {
             blocks = buildLineChildren(parent);
-        } else if (parentElementType == ElixirTypes.LIST) {
+        } else if (parentElementType == LIST) {
             blocks = buildListChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
         } else if (MATCHED_CALL_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMatchedCallChildren(parent, parentWrap, parentAlignment);
         } else if (MAP_TOKEN_SET.contains(parentElementType)) {
             blocks = buildMapChildren(parent, null, childrenWrap, null, childrenAlignment);
-        } else if (parentElementType == ElixirTypes.MULTIPLE_ALIASES) {
+        } else if (parentElementType == MULTIPLE_ALIASES) {
             blocks = buildMultipleAliasesChildren(parent);
-        } else if (parentElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
+        } else if (parentElementType == NO_PARENTHESES_KEYWORD_PAIR) {
             blocks = buildNoParenthesesKeywordPairChildren(parent);
-        } else if (parentElementType == ElixirTypes.NO_PARENTHESES_KEYWORDS) {
+        } else if (parentElementType == NO_PARENTHESES_KEYWORDS) {
             blocks = buildNoParenthesesKeywordsChildren(parent);
-        } else if (parentElementType == ElixirTypes.PARENTHETICAL_STAB) {
+        } else if (parentElementType == PARENTHETICAL_STAB) {
             blocks = buildParentheticalStabChildren(parent);
-        } else if (parentElementType == ElixirTypes.STAB_OPERATION) {
+        } else if (parentElementType == STAB_OPERATION) {
             //noinspection ConstantConditions
             blocks = buildStabOperationChildren(parent, childrenWrap);
-        } else if (parentElementType == ElixirTypes.TUPLE) {
+        } else if (parentElementType == TUPLE) {
             blocks = buildTupleChildren(parent, null, childrenWrap, Indent.getNormalIndent(), childrenAlignment);
         } else if (WHEN_OPERATION_TOKEN_SET.contains(parentElementType)) {
             blocks = buildWhenOperationChildren(parent);
@@ -949,7 +951,7 @@ public class Block extends AbstractBlock implements BlockEx {
             blocks = buildChildren(
                     parent,
                     (child, childElementType, blockList) -> {
-                        if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                        if (childElementType == ACCESS_EXPRESSION) {
                             blockList.addAll(
                                     buildAccessExpressionChildren(child, childrenWrap, finalChildrenAlignment)
                             );
@@ -969,14 +971,14 @@ public class Block extends AbstractBlock implements BlockEx {
                             );
                         } else if (OPERATOR_RULE_TOKEN_SET.contains(childElementType)) {
                             blockList.addAll(buildOperatorRuleChildren(child));
-                        } else if (childElementType == ElixirTypes.COMMA) {
+                        } else if (childElementType == COMMA) {
                             blockList.add(buildChild(child, commaWrap));
                         } else if (childElementType == END_OF_EXPRESSION) {
                             blockList.addAll(
                                     // None Indent because comments should align to left
                                     buildEndOfExpressionChildren(child, finalChildrenAlignment, Indent.getNoneIndent())
                             );
-                        } else if (childElementType == ElixirTypes.WHEN_INFIX_OPERATOR) {
+                        } else if (childElementType == WHEN_INFIX_OPERATOR) {
                             blockList.addAll(buildOperatorRuleChildren(child));
                         } else {
                             blockList.add(
@@ -1010,13 +1012,13 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 containerAssociationOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         if (rightOperand[0]) {
                             blockList.addAll(buildContainerValueAccessExpressionChildren(child, operandWrap[0]));
                         } else {
                             blockList.addAll(buildAccessExpressionChildren(child, operandWrap[0]));
                         }
-                    } else if (childElementType == ElixirTypes.ASSOCIATION_OPERATOR) {
+                    } else if (childElementType == ASSOCIATION_OPERATOR) {
                         blockList.add(buildChild(child, associationOperatorWrap));
                         operandWrap[0] = valueWrap;
                         rightOperand[0] = true;
@@ -1062,13 +1064,13 @@ public class Block extends AbstractBlock implements BlockEx {
                 closingElementType,
                 closingAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, tailWrap, childrenIndent));
-                    } else if (childElementType == ElixirTypes.COMMA) {
+                    } else if (childElementType == COMMA) {
                         blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.END_OF_EXPRESSION) {
+                    } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
-                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                    } else if (childElementType == KEYWORDS) {
                         blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
                     } else {
                         blockList.add(buildChild(child, tailWrap, childrenIndent));
@@ -1134,7 +1136,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 containerValueAccessExpression,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.BIT_STRING) {
+                    if (childElementType == BIT_STRING) {
                         blockList.addAll(
                                 // flatten, so that `>>` will see bitString's parent as direct parent
                                 buildBitStringChildren(
@@ -1145,7 +1147,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         null
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.LIST) {
+                    } else if (childElementType == LIST) {
                         blockList.addAll(
                                 // flatten, so that `]` will see list's parent as direct parent
                                 buildListChildren(
@@ -1167,7 +1169,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         null
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.TUPLE) {
+                    } else if (childElementType == TUPLE) {
                         // flatten, so that `}` will see tuple's parent as direct parent
                         blockList.addAll(
                                 buildTupleChildren(
@@ -1197,14 +1199,14 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildDoBlockChildren(@NotNull ASTNode doBlock,
                                                                      @Nullable Alignment parentAlignment) {
-        boolean hasBLockLists = hasAtLeastCountChildren((CompositeElement) doBlock, ElixirTypes.BLOCK_LIST, 1);
+        boolean hasBLockLists = hasAtLeastCountChildren((CompositeElement) doBlock, BLOCK_LIST, 1);
 
         return buildChildren(
                 doBlock,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.BLOCK_LIST) {
+                    if (childElementType == BLOCK_LIST) {
                         blockList.addAll(buildBlockListChildren(child, parentAlignment));
-                    } else if (childElementType == ElixirTypes.END) {
+                    } else if (childElementType == END) {
                         Wrap endWrap;
 
                         if (hasBLockLists) {
@@ -1229,10 +1231,10 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(
                                 buildEndOfExpressionChildren(child, null, Indent.getNormalIndent())
                         );
-                    } else if (childElementType == ElixirTypes.STAB) {
+                    } else if (childElementType == STAB) {
                         Wrap stabBodyChildrenWrap;
 
-                        if (child.findChildByType(ElixirTypes.STAB_BODY) != null) {
+                        if (child.findChildByType(STAB_BODY) != null) {
                             stabBodyChildrenWrap = Wrap.createWrap(WrapType.ALWAYS, true);
                         } else {
                             stabBodyChildrenWrap = null;
@@ -1268,7 +1270,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildHeredocChildren(CompositeElement heredoc) {
-        ASTNode heredocPrefix = heredoc.findChildByType(ElixirTypes.HEREDOC_PREFIX);
+        ASTNode heredocPrefix = heredoc.findChildByType(HEREDOC_PREFIX);
         int heredocPrefixLength = 0;
 
         if (heredocPrefix != null) {
@@ -1283,7 +1285,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (HEREDOC_LINE_TOKEN_SET.contains(childElementType)) {
                         blockList.addAll(buildHeredocLineChildren(child, finalHeredocPrefixLength));
-                    } else if (childElementType != ElixirTypes.HEREDOC_PREFIX) {
+                    } else if (childElementType != HEREDOC_PREFIX) {
                         /* The heredocPrefix while important for determining the significant white space in each heredoc
                            line, is normal, insignificant whitespace when shifting the lines, so it has no block */
                         blockList.add(buildChild(child, indent));
@@ -1326,9 +1328,9 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildInterpolationChildren(@NotNull ASTNode interpolation) {
         return buildContainerChildren(
                 interpolation,
-                ElixirTypes.INTERPOLATION_START,
+                INTERPOLATION_START,
                 Wrap.createWrap(WrapType.NONE, false),
-                ElixirTypes.INTERPOLATION_END
+                INTERPOLATION_END
         );
     }
 
@@ -1353,16 +1355,16 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 keywordPair,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(
                                 buildContainerValueAccessExpressionChildren(
                                         child,
                                         Wrap.createWrap(WrapType.NONE, true)
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
+                    } else if (childElementType == KEYWORD_KEY) {
                         blockList.add(buildChild(child, keywordKeyWrap, (Alignment) null));
-                    } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
+                    } else if (childElementType == KEYWORD_PAIR_COLON) {
                         blockList.add(buildChild(child, keywordPairColonWrap));
                     } else {
                         blockList.add(buildChild(child, keywordValueWrap, null, (Alignment) null));
@@ -1380,7 +1382,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 keywords,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.KEYWORD_PAIR) {
+                    if (childElementType == KEYWORD_PAIR) {
                         blockList.add(buildChild(child, keywordPairWrap, Indent.getNormalIndent()));
                     } else {
                         // commas and comments
@@ -1404,7 +1406,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         /* Flatten body because its children represent textual elements that can't be aligned without
                            changing their meaning, so there's no need for a formatting block for them */
                         blockList.addAll(buildBodyChildren(child, none));
-                    } else if (childElementType == ElixirTypes.SIGIL_MODIFIERS) {
+                    } else if (childElementType == SIGIL_MODIFIERS) {
                         blockList.addAll(buildSigilModifiersChildren(child, none));
                     } else {
                         blockList.add(buildChild(child, none));
@@ -1423,11 +1425,11 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                   @Nullable Alignment closingBracketAlignment) {
         return buildContainerChildren(
                 list,
-                ElixirTypes.OPENING_BRACKET,
+                OPENING_BRACKET,
                 openingBracketWrap,
                 elementIndent,
                 listArgumentsWrap,
-                ElixirTypes.CLOSING_BRACKET,
+                CLOSING_BRACKET,
                 closingBracketAlignment
         );
     }
@@ -1440,16 +1442,16 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                           @Nullable Alignment mapArgumentsAlignment) {
         return buildContainerChildren(
                 mapArguments,
-                ElixirTypes.OPENING_CURLY,
+                OPENING_CURLY,
                 openingCurlyWrap,
                 elementIndent,
                 mapArgumentsWrap,
-                ElixirTypes.CLOSING_CURLY,
+                CLOSING_CURLY,
                 mapArgumentsAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
-                    if (childElementType == ElixirTypes.MAP_CONSTRUCTION_ARGUMENTS) {
+                    if (childElementType == MAP_CONSTRUCTION_ARGUMENTS) {
                         blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap, null));
-                    } else if (childElementType == ElixirTypes.MAP_UPDATE_ARGUMENTS) {
+                    } else if (childElementType == MAP_UPDATE_ARGUMENTS) {
                         blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap, null));
                     } else {
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
@@ -1468,7 +1470,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 map,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.MAP_ARGUMENTS) {
+                    if (childElementType == MAP_ARGUMENTS) {
                         blockList.addAll(
                                 buildMapArgumentsChildren(
                                         child,
@@ -1478,7 +1480,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         mapArgumentsAlignment
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.MAP_PREFIX_OPERATOR) {
+                    } else if (childElementType == MAP_PREFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blockList.add(buildChild(child));
@@ -1518,11 +1520,11 @@ public class Block extends AbstractBlock implements BlockEx {
     ) {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
-        if (childElementType == ElixirTypes.ASSOCIATIONS_BASE) {
+        if (childElementType == ASSOCIATIONS_BASE) {
             blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
-        } else if (childElementType == ElixirTypes.ASSOCIATIONS) {
+        } else if (childElementType == ASSOCIATIONS) {
             blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
-        } else if (childElementType == ElixirTypes.KEYWORDS) {
+        } else if (childElementType == KEYWORDS) {
             blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else {
             blockList.add(buildChild(child, mapArgumentsTailIndent));
@@ -1541,9 +1543,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 mapUpdateArguments,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.COMMA) {
+                    if (childElementType == COMMA) {
                         blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.PIPE_INFIX_OPERATOR) {
+                    } else if (childElementType == PIPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                         leftOperand[0] = false;
                     } else {
@@ -1595,7 +1597,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 matchedParenthesesArguments,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.PARENTHESES_ARGUMENTS) {
+                    if (childElementType == PARENTHESES_ARGUMENTS) {
                         blockList.addAll(buildParenthesesArgumentsChildren(child, parentWrap, parentAlignment));
                     } else {
                         blockList.add(buildChild(child));
@@ -1628,13 +1630,13 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 multipleAliases,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.CLOSING_CURLY) {
+                    if (childElementType == CLOSING_CURLY) {
                         blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.OPENING_CURLY) {
+                    } else if (childElementType == OPENING_CURLY) {
                         blockList.add(buildChild(child, Wrap.createWrap(WrapType.NONE, false)));
-                    } else if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    } else if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, aliasWrap, aliasAlignment));
-                    } else if (childElementType == ElixirTypes.COMMA) {
+                    } else if (childElementType == COMMA) {
                         blockList.add(buildChild(child, commaWrap));
                     } else {
                         blockList.add(buildChild(child, aliasWrap, aliasAlignment));
@@ -1657,11 +1659,11 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 noParenthesesKeywordPair,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildContainerValueAccessExpressionChildren(child, keywordValueWrap));
-                    } else if (childElementType == ElixirTypes.KEYWORD_KEY) {
+                    } else if (childElementType == KEYWORD_KEY) {
                         blockList.add(buildChild(child, keywordKeyWrap, keywordKeyIndent));
-                    } else if (childElementType == ElixirTypes.KEYWORD_PAIR_COLON) {
+                    } else if (childElementType == KEYWORD_PAIR_COLON) {
                         blockList.add(buildChild(child, keywordPairColonWrap));
                     } else {
                         blockList.add(buildChild(child, keywordValueWrap));
@@ -1677,7 +1679,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 noParenthesesKeywords,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.NO_PARENTHESES_KEYWORD_PAIR) {
+                    if (childElementType == NO_PARENTHESES_KEYWORD_PAIR) {
                         blockList.add(buildChild(child, Indent.getIndent(Indent.Type.NONE, true, false)));
                     } else {
                         // commas and comments
@@ -1735,7 +1737,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     /* Move the operator token ASTNode up, out of the operator rule ASTNode as the operator rule ASTNode
                        is only there to consume EOLs around the operator token ASTNode and EOLs will ignored */
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(
                                 buildAccessExpressionChildren(child)
                         );
@@ -1803,23 +1805,23 @@ public class Block extends AbstractBlock implements BlockEx {
             @Nullable Alignment parentAlignment) {
         Wrap tailWrap = tailWrap(
                 parenthesesArguments,
-                ElixirTypes.OPENING_PARENTHESIS,
-                ElixirTypes.CLOSING_PARENTHESIS
+                OPENING_PARENTHESIS,
+                CLOSING_PARENTHESIS
         );
 
         return buildChildren(
                 parenthesesArguments,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         // arguments
                         blockList.addAll(buildAccessExpressionChildren(child, tailWrap, Indent.getNormalIndent()));
-                    } else if (childElementType == ElixirTypes.CLOSING_PARENTHESIS) {
+                    } else if (childElementType == CLOSING_PARENTHESIS) {
                         blockList.add(buildChild(child, tailWrap, parentAlignment, Indent.getNoneIndent()));
-                    } else if (childElementType == ElixirTypes.COMMA) {
+                    } else if (childElementType == COMMA) {
                         blockList.add(buildChild(child));
-                    } else if (childElementType == ElixirTypes.KEYWORDS) {
+                    } else if (childElementType == KEYWORDS) {
                         blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
-                    } else if (childElementType == ElixirTypes.OPENING_PARENTHESIS) {
+                    } else if (childElementType == OPENING_PARENTHESIS) {
                         blockList.add(
                                 buildChild(child, Wrap.createChildWrap(parentWrap, WrapType.CHOP_DOWN_IF_LONG, true))
                         );
@@ -1847,11 +1849,11 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 parentheticalStab,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.SEMICOLON) {
+                    if (childElementType == SEMICOLON) {
                         blockList.add(
                                 buildChild(child, Wrap.createWrap(WrapType.NONE, true), childIndent)
                         );
-                    } else if (childElementType == ElixirTypes.STAB) {
+                    } else if (childElementType == STAB) {
                         blockList.addAll(buildStabChildren((CompositeElement) child, stabBodyChildrenWrap));
                     } else {
                         blockList.add(buildChild(child));
@@ -1868,7 +1870,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildAlignedOperandsOperationChildren(
                 pipeOperation,
                 (codeStyleSettings) -> codeStyleSettings.ALIGN_PIPE_OPERANDS,
-                ElixirTypes.PIPE_INFIX_OPERATOR
+                PIPE_INFIX_OPERATOR
         );
     }
 
@@ -1933,9 +1935,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 stabBody,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, childWrap, childAlignment, childIndent));
-                    } else if (childElementType == ElixirTypes.COMMENT) {
+                    } else if (childElementType == COMMENT) {
                         // COMMENTs don't use childWrap as they can either be at end-of-line or on their own line
                         blockList.add(buildChild(child, childAlignment, childIndent));
                     } else if (childElementType == END_OF_EXPRESSION) {
@@ -1977,7 +1979,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, childAlignment, childrenIndent));
-                    } else if (childElementType == ElixirTypes.STAB_BODY) {
+                    } else if (childElementType == STAB_BODY) {
                         blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
@@ -2010,7 +2012,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 stabOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.STAB_BODY) {
+                    if (childElementType == STAB_BODY) {
                         Indent childrenIndent;
 
                         // `stabBody` is on line below `->`
@@ -2023,7 +2025,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                 IElementType stabParentElementType = stabParent.getElementType();
 
                                 childrenIndent = Indent.getNormalIndent(
-                                        stabParentElementType == ElixirTypes.DO_BLOCK &&
+                                        stabParentElementType == DO_BLOCK &&
                                                 codeStyleSettings(stabParent).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
                                                         CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
                                 );
@@ -2040,7 +2042,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                     } else {
                                         IElementType stabParentElementType = stabParent.getElementType();
 
-                                        if (stabParentElementType == ElixirTypes.ANONYMOUS_FUNCTION) {
+                                        if (stabParentElementType == ANONYMOUS_FUNCTION) {
                                             if (lastArgument(stabParent)) {
                                                 /* handles
 
@@ -2089,7 +2091,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         childrenIndent
                                 )
                         );
-                    } else if (childElementType == ElixirTypes.STAB_INFIX_OPERATOR) {
+                    } else if (childElementType == STAB_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
                     } else {
                         blockList.add(
@@ -2110,11 +2112,11 @@ public class Block extends AbstractBlock implements BlockEx {
                                                                    @Nullable Alignment closingCurlyAlignment) {
         return buildContainerChildren(
                 tuple,
-                ElixirTypes.OPENING_CURLY,
+                OPENING_CURLY,
                 openingCurlyWrap,
                 elementIndent,
                 containerArgumentsWrap,
-                ElixirTypes.CLOSING_CURLY,
+                CLOSING_CURLY,
                 closingCurlyAlignment
         );
     }
@@ -2125,7 +2127,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildAlignedOperandsOperationChildren(
                 twoOperation,
                 (codeStyleSettings) -> codeStyleSettings.ALIGN_TWO_OPERANDS,
-                ElixirTypes.TWO_INFIX_OPERATOR
+                TWO_INFIX_OPERATOR
         );
     }
 
@@ -2136,9 +2138,9 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 typeOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(buildAccessExpressionChildren(child, operandAlignment[0]));
-                    } else if (childElementType == ElixirTypes.TYPE_INFIX_OPERATOR) {
+                    } else if (childElementType == TYPE_INFIX_OPERATOR) {
                         blockList.addAll(buildOperatorRuleChildren(child));
 
                         if (codeStyleSettings(typeOperation).ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR) {
@@ -2162,7 +2164,7 @@ public class Block extends AbstractBlock implements BlockEx {
                 (child, childElementType, blockList) -> {
                     /* the elements in the doBlock.stab must be direct children of the call, so that they can be
                        indented relative to parent */
-                    if (childElementType == ElixirTypes.DO_BLOCK) {
+                    if (childElementType == DO_BLOCK) {
                         blockList.addAll(buildDoBlockChildren(child, parentAlignment));
                     } else {
                         blockList.addAll(
@@ -2185,7 +2187,7 @@ public class Block extends AbstractBlock implements BlockEx {
         return buildChildren(
                 whenOperation,
                 (child, childElementType, blockList) -> {
-                    if (childElementType == ElixirTypes.ACCESS_EXPRESSION) {
+                    if (childElementType == ACCESS_EXPRESSION) {
                         blockList.addAll(
                                 buildAccessExpressionChildren(child, operandWrap[0], operandAlignment[0])
                         );
@@ -2225,7 +2227,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private WrapType containerValueWrapType(@NotNull ASTNode container) {
         WrapType wrapType;
 
-        if (container.findChildByType(ElixirTypes.KEYWORDS) != null && !oneLinerUnmatchedCallBody(container)) {
+        if (container.findChildByType(KEYWORDS) != null && !oneLinerUnmatchedCallBody(container)) {
             wrapType = WrapType.ALWAYS;
         } else {
             wrapType = WrapType.CHOP_DOWN_IF_LONG;
@@ -2334,10 +2336,10 @@ public class Block extends AbstractBlock implements BlockEx {
         while (node != null) {
             IElementType elementType = node.getElementType();
 
-            if (elementType == ElixirTypes.COMMA) {
+            if (elementType == COMMA) {
                 lastArgument = false;
                 break;
-            } else if (elementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+            } else if (elementType == NO_PARENTHESES_ONE_ARGUMENT) {
                 break;
             } else {
                 ASTNode nextNode = node.getTreeNext();
@@ -2365,7 +2367,7 @@ public class Block extends AbstractBlock implements BlockEx {
         if (wrapType == WrapType.ALWAYS) {
             ASTNode parent = list.getTreeParent();
 
-            if (parent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
+            if (parent.getElementType() == ACCESS_EXPRESSION) {
                 ASTNode grandParent = parent.getTreeParent();
 
                 if (KEYWORD_PAIR_TOKEN_SET.contains(grandParent.getElementType())) {
@@ -2374,7 +2376,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode keywordsParent = keywords.getTreeParent();
                     IElementType keywordsParentElementType = keywordsParent.getElementType();
 
-                    if (keywordsParentElementType == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+                    if (keywordsParentElementType == NO_PARENTHESES_ONE_ARGUMENT) {
                         wrapType = noParenthesesOneArgumentWrapType(keywordsParent);
                     }
                 }
@@ -2391,7 +2393,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private WrapType mapContainerValueWrapType(ASTNode mapOrStructOperation) {
-        ASTNode mapArguments = mapOrStructOperation.findChildByType(ElixirTypes.MAP_ARGUMENTS);
+        ASTNode mapArguments = mapOrStructOperation.findChildByType(MAP_ARGUMENTS);
         WrapType wrapType = WrapType.CHOP_DOWN_IF_LONG;
 
         if (mapArguments != null) {
@@ -2421,7 +2423,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private WrapType noParenthesesOneArgumentChildrenWrapType(@NotNull ASTNode noParenthesesOneArgument) {
         WrapType childrenWrapType;
 
-        ASTNode noParenthesesKeywords = noParenthesesOneArgument.findChildByType(ElixirTypes.NO_PARENTHESES_KEYWORDS);
+        ASTNode noParenthesesKeywords = noParenthesesOneArgument.findChildByType(NO_PARENTHESES_KEYWORDS);
 
         if (noParenthesesKeywords != null) {
             ASTNode[] noParenthesesKeywordPairs =
@@ -2479,14 +2481,14 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private boolean oneLinerKeywordPair(ASTNode keywordPair) {
-        ASTNode keywordKey = keywordPair.findChildByType(ElixirTypes.KEYWORD_KEY);
+        ASTNode keywordKey = keywordPair.findChildByType(KEYWORD_KEY);
         boolean oneLiner = false;
 
         if (keywordKey != null && keywordKey.getText().equals("do")) {
             ASTNode keywords = keywordPair.getTreeParent();
             ASTNode keywordsParent = keywords.getTreeParent();
 
-            if (keywordsParent.getElementType() == ElixirTypes.NO_PARENTHESES_ONE_ARGUMENT) {
+            if (keywordsParent.getElementType() == NO_PARENTHESES_ONE_ARGUMENT) {
                 ASTNode argumentsParent = keywordsParent.getTreeParent();
 
                 if (UNMATCHED_CALL_TOKEN_SET.contains(argumentsParent.getElementType())) {
@@ -2502,7 +2504,7 @@ public class Block extends AbstractBlock implements BlockEx {
         ASTNode containerParent = container.getTreeParent();
         boolean oneLiner = false;
 
-        if (containerParent.getElementType() == ElixirTypes.ACCESS_EXPRESSION) {
+        if (containerParent.getElementType() == ACCESS_EXPRESSION) {
             ASTNode accessExpressionParent = containerParent.getTreeParent();
 
             if (KEYWORD_PAIR_TOKEN_SET.contains(accessExpressionParent.getElementType())) {
@@ -2521,7 +2523,7 @@ public class Block extends AbstractBlock implements BlockEx {
             ASTNode stabParent = stab.getTreeParent();
 
             childrenIndent = Indent.getNormalIndent(
-                    stabParent.getElementType() == ElixirTypes.DO_BLOCK &&
+                    stabParent.getElementType() == DO_BLOCK &&
                             codeStyleSettings(stabParent).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
                                     CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value
             );
@@ -2541,7 +2543,7 @@ public class Block extends AbstractBlock implements BlockEx {
     private WrapType stabOperationWrapType(@NotNull CompositeElement stab) {
         WrapType stabOperationWrapType;
 
-        if (hasAtLeastCountChildren(stab, ElixirTypes.STAB_OPERATION, 2)) {
+        if (hasAtLeastCountChildren(stab, STAB_OPERATION, 2)) {
             stabOperationWrapType = WrapType.ALWAYS;
         } else {
             stabOperationWrapType = WrapType.NORMAL;
