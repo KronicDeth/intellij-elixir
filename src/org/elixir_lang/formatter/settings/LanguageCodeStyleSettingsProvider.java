@@ -202,180 +202,187 @@ public class LanguageCodeStyleSettingsProvider extends com.intellij.psi.codeStyl
     @Override
     public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
         if (settingsType == SettingsType.SPACING_SETTINGS) {
-            //consumer.showAllStandardOptions();
-            consumer.showStandardOptions(
-                    // SPACE_BEFORE_PARENTHESES group
-
-                    /* SPACE_BEFORE_METHOD_PARENTHESES - Disabled because space between function name and call arguments
-                       is invalid for parenthesized arguments */
-                    /* SPACE_BEFORE_METHOD_CALL_PARENTHESES - Disabled because space between function name and call
-                       arguments is invalid for parenthesized arguments */
-                    /* SPACE_BEFORE_IF_PARENTHESES - Disabled because `if` is not special, so no specific setting for it
-                       since it's not a keyword unlike in Java */
-                    /* SPACE_BEFORE_FOR_PARENTHESES - Disabled because `for` is a special form, but you wouldn't put
-                       parentheses around the `<-` clauses */
-                    /* SPACE_BEFORE_WHILE_PARENTHESES - There is no `while` in Elixir */
-                    /* SPACE_BEFORE_SWITCH_PARENTHESES - `switch` in Java would be `case` in Elixir and no style
-                       recommends parentheses for it */
-                    /* SPACE_BEFORE_CATCH_PARENTHESES - `catch` in Java would be `rescue` in Elixir, but `rescue` uses
-                       `->` clauses, so its rules would apply */
-                    /* SPACE_BEFORE_SYNCHRONIZED_PARENTHESES - no `synchronized` in Elixir */
-                    /* SPACE_BEFORE_ANNOTATION_PARAMETER_LIST - module attribute calls follow normal call rules and a
-                       space isn't allowed between the function name and parenthesized arguments */
-
-                    // SPACE_AROUND_OPERATORS group
-
-                    "SPACE_AROUND_ASSIGNMENT_OPERATORS",
-                    /* SPACE_AROUND_LOGICAL_OPERATORS - logical operators are mixed with bitwise operator in
-                       AND_OPERATOR (and, &&, &&) and OR_OPERATOR (or, ||, |||), so there's no way to just space around
-                       the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
-                       level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
-                    "SPACE_AROUND_EQUALITY_OPERATORS",
-                    "SPACE_AROUND_RELATIONAL_OPERATORS",
-                    /* SPACE_AROUND_BITWISE_OPERATORS - Bitwise operators are mixed into tokens used for other purposes,
-                       so they can't be spaced independently */
-                    "SPACE_AROUND_ADDITIVE_OPERATORS",
-                    "SPACE_AROUND_MULTIPLICATIVE_OPERATORS",
-                    /* SPACE_AROUND_SHIFT_OPERATORS - no dedicated shift operators in Elixir */
-                    "SPACE_AROUND_UNARY_OPERATOR",
-                    "SPACE_AROUND_LAMBDA_ARROW",
-
-                    // SPACES_WITHIN group
-
-                    "SPACE_WITHIN_BRACES",
-                    "SPACE_WITHIN_BRACKETS",
-                    "SPACE_WITHIN_PARENTHESES",
-
-                    // OTHER group
-
-                    "SPACE_BEFORE_COMMA",
-                    "SPACE_AFTER_COMMA"
-            );
-
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AFTER_CAPTURE_OPERATOR",
-                    "Capture operator (&)",
-                    SPACE_AFTER_OPERATORS);
-
-            consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
-            consumer.renameStandardOption(
-                    "SPACE_AROUND_EQUALITY_OPERATORS",
-                    "Comparison operators (!=, ==, =~, !==, ===)"
-            );
-            consumer.renameStandardOption("SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "Multiplicative operators (*, /)");
-            consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
-            consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
-            consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
-            consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Parentheses");
-
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_AND_OPERATORS",
-                    "And operators (&&, &&&)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_ARROW_OPERATORS",
-                    "Arrow operators (<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_ASSOCIATION_OPERATOR",
-                    "Association operator (=>)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_IN_MATCH_OPERATORS",
-                    "In match operators (<-, \\\\)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_OR_OPERATORS",
-                    "Or operators (||, |||)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_PIPE_OPERATOR",
-                    "Pipe operator (|)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_RANGE_OPERATOR",
-                    "Range operator (..)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_THREE_OPERATOR",
-                    "Three operator (^^^)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_TWO_OPERATORS",
-                    "Two operator (++, --, <>)",
-                    SPACES_AROUND_OPERATORS
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_AROUND_TYPE_OPERATOR",
-                    "Type operator (::)",
-                    SPACES_AROUND_OPERATORS
-            );
-
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "SPACE_WITHIN_BITS",
-                    "Bit strings and binaries (<<>>)",
-                    SPACES_WITHIN
-            );
+            customizeSpaceSettings(consumer);
         } else if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "ALIGN_BOOLEAN_OPERANDS",
-                    "Align operands of `and` and `or` operators",
-                    null
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "ALIGN_PIPE_OPERANDS",
-                    "Align operands of pipe operator (|)",
-                    null
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "ALIGN_UNMATCHED_CALL_DO_BLOCKS",
-                    "Align unmatched call `do` blocks to",
-                    null,
-                    new String[]{
-                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.name,
-                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.name,
-                    },
-                    new int[]{
-                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value,
-                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.value
-                    }
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "ALIGN_TWO_OPERANDS",
-                    "Align operands of two operator (++, --, <>)",
-                    null
-            );
-            consumer.showCustomOption(
-                    CodeStyleSettings.class,
-                    "ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR",
-                    "Align type definition to right of operator (::)",
-                    null
-            );
+            customizeWrappingAndBracesSettings(consumer);
         }
+    }
+
+    private void customizeSpaceSettings(@NotNull CodeStyleSettingsCustomizable consumer) {
+        consumer.showStandardOptions(
+                // SPACE_BEFORE_PARENTHESES group
+
+                /* SPACE_BEFORE_METHOD_PARENTHESES - Disabled because space between function name and call arguments
+                   is invalid for parenthesized arguments */
+                /* SPACE_BEFORE_METHOD_CALL_PARENTHESES - Disabled because space between function name and call
+                   arguments is invalid for parenthesized arguments */
+                /* SPACE_BEFORE_IF_PARENTHESES - Disabled because `if` is not special, so no specific setting for it
+                   since it's not a keyword unlike in Java */
+                /* SPACE_BEFORE_FOR_PARENTHESES - Disabled because `for` is a special form, but you wouldn't put
+                   parentheses around the `<-` clauses */
+                /* SPACE_BEFORE_WHILE_PARENTHESES - There is no `while` in Elixir */
+                /* SPACE_BEFORE_SWITCH_PARENTHESES - `switch` in Java would be `case` in Elixir and no style
+                   recommends parentheses for it */
+                /* SPACE_BEFORE_CATCH_PARENTHESES - `catch` in Java would be `rescue` in Elixir, but `rescue` uses
+                   `->` clauses, so its rules would apply */
+                /* SPACE_BEFORE_SYNCHRONIZED_PARENTHESES - no `synchronized` in Elixir */
+                /* SPACE_BEFORE_ANNOTATION_PARAMETER_LIST - module attribute calls follow normal call rules and a
+                   space isn't allowed between the function name and parenthesized arguments */
+
+                // SPACE_AROUND_OPERATORS group
+
+                "SPACE_AROUND_ASSIGNMENT_OPERATORS",
+                /* SPACE_AROUND_LOGICAL_OPERATORS - logical operators are mixed with bitwise operator in
+                   AND_OPERATOR (and, &&, &&) and OR_OPERATOR (or, ||, |||), so there's no way to just space around
+                   the logical version without inspecting the text value, but SpacingBuilder works at the ASTNode
+                   level.  Additionally, all the operators can be overridden, so they don't HAVE to be logical even if Kernel defines them that way. */
+                "SPACE_AROUND_EQUALITY_OPERATORS",
+                "SPACE_AROUND_RELATIONAL_OPERATORS",
+                /* SPACE_AROUND_BITWISE_OPERATORS - Bitwise operators are mixed into tokens used for other purposes,
+                   so they can't be spaced independently */
+                "SPACE_AROUND_ADDITIVE_OPERATORS",
+                "SPACE_AROUND_MULTIPLICATIVE_OPERATORS",
+                /* SPACE_AROUND_SHIFT_OPERATORS - no dedicated shift operators in Elixir */
+                "SPACE_AROUND_UNARY_OPERATOR",
+                "SPACE_AROUND_LAMBDA_ARROW",
+
+                // SPACES_WITHIN group
+
+                "SPACE_WITHIN_BRACES",
+                "SPACE_WITHIN_BRACKETS",
+                "SPACE_WITHIN_PARENTHESES",
+
+                // OTHER group
+
+                "SPACE_BEFORE_COMMA",
+                "SPACE_AFTER_COMMA"
+        );
+
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AFTER_CAPTURE_OPERATOR",
+                "Capture operator (&)",
+                SPACE_AFTER_OPERATORS);
+
+        consumer.renameStandardOption("SPACE_AROUND_ASSIGNMENT_OPERATORS", "Match operator (=)");
+        consumer.renameStandardOption(
+                "SPACE_AROUND_EQUALITY_OPERATORS",
+                "Comparison operators (!=, ==, =~, !==, ===)"
+        );
+        consumer.renameStandardOption("SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "Multiplicative operators (*, /)");
+        consumer.renameStandardOption("SPACE_AROUND_UNARY_OPERATOR", "Unary operators (!, ^, ~~~)");
+        consumer.renameStandardOption("SPACE_AROUND_LAMBDA_ARROW", "Stab operator (->)");
+        consumer.renameStandardOption("SPACE_WITHIN_BRACES", "Map (%{}), Struct (%Alias{}), and Tuple ({}) braces");
+        consumer.renameStandardOption("SPACE_WITHIN_PARENTHESES", "Parentheses");
+
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_AND_OPERATORS",
+                "And operators (&&, &&&)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_ARROW_OPERATORS",
+                "Arrow operators (<~, |>, ~>, <<<, <<~, <|>, <~>, >>>, ~>>)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_ASSOCIATION_OPERATOR",
+                "Association operator (=>)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_IN_MATCH_OPERATORS",
+                "In match operators (<-, \\\\)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_OR_OPERATORS",
+                "Or operators (||, |||)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_PIPE_OPERATOR",
+                "Pipe operator (|)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_RANGE_OPERATOR",
+                "Range operator (..)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_THREE_OPERATOR",
+                "Three operator (^^^)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_TWO_OPERATORS",
+                "Two operator (++, --, <>)",
+                SPACES_AROUND_OPERATORS
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_AROUND_TYPE_OPERATOR",
+                "Type operator (::)",
+                SPACES_AROUND_OPERATORS
+        );
+
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "SPACE_WITHIN_BITS",
+                "Bit strings and binaries (<<>>)",
+                SPACES_WITHIN
+        );
+    }
+
+    private void customizeWrappingAndBracesSettings(@NotNull CodeStyleSettingsCustomizable consumer) {
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "ALIGN_BOOLEAN_OPERANDS",
+                "Align operands of `and` and `or` operators",
+                null
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "ALIGN_PIPE_OPERANDS",
+                "Align operands of pipe operator (|)",
+                null
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "ALIGN_UNMATCHED_CALL_DO_BLOCKS",
+                "Align unmatched call `do` blocks to",
+                null,
+                new String[]{
+                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.name,
+                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.name,
+                },
+                new int[]{
+                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value,
+                        CodeStyleSettings.UnmatchedCallDoBlockAlignment.LINE.value
+                }
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "ALIGN_TWO_OPERANDS",
+                "Align operands of two operator (++, --, <>)",
+                null
+        );
+        consumer.showCustomOption(
+                CodeStyleSettings.class,
+                "ALIGN_TYPE_DEFINITION_TO_RIGHT_OF_OPERATOR",
+                "Align type definition to right of operator (::)",
+                null
+        );
     }
 
     @NotNull
