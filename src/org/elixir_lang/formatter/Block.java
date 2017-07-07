@@ -2553,12 +2553,10 @@ public class Block extends AbstractBlock implements BlockEx {
             if (openingElement != null) {
                 ASTNode closingElement = parent.findChildByType(closingElementType);
 
-                if (closingElement != null) {
-                    if (document.getLineNumber(openingElement.getStartOffset()) !=
-                            document.getLineNumber(closingElement.getStartOffset())) {
-                        tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-                    }
-
+                if (closingElement != null &&
+                        document.getLineNumber(openingElement.getStartOffset()) !=
+                                document.getLineNumber(closingElement.getStartOffset())) {
+                    tailWrap = Wrap.createWrap(WrapType.ALWAYS, true);
                 }
             }
         }
