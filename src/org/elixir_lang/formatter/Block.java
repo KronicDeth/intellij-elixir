@@ -754,11 +754,10 @@ public class Block extends AbstractBlock implements BlockEx {
                     ASTNode leftOperand = leftOperandBlock.getNode();
                     IElementType leftOperandElementType = leftOperand.getElementType();
 
-                    if (NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType)) {
-                        // `NAME/ARITY` confirmed
-                        if (leftOperand.findChildByType(DO_BLOCK) == null) {
-                            blockList = flattenedBlockList;
-                        }
+                    // `NAME/ARITY` confirmed
+                    if (NO_ARGUMENTS_CALL_TOKEN_SET.contains(leftOperandElementType) &&
+                            leftOperand.findChildByType(DO_BLOCK) == null) {
+                        blockList = flattenedBlockList;
                     }
                 }
             }
