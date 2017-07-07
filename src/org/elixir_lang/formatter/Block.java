@@ -349,7 +349,7 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     private static boolean shouldBuildBlock(@NotNull ASTNode child) {
-        return shouldBuildBlock(child.getElementType());
+        return shouldBuildBlock(child.getElementType()) && child.getTextLength() > 0;
     }
 
     @NotNull
