@@ -1948,11 +1948,13 @@ public class Block extends AbstractBlock implements BlockEx {
         Wrap stabOperationWrap = stabOperationWrap(stab);
         Indent childrenIndent = stabChildrenIndent(stab);
 
-        if (stabBodyChildrenWrap == null) {
-            stabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
-        }
+        @NotNull Wrap nonNullStabBodyChildrenWrap;
 
-        Wrap finalStabBodyChildrenWrap = stabBodyChildrenWrap;
+        if (stabBodyChildrenWrap == null) {
+            nonNullStabBodyChildrenWrap = Wrap.createChildWrap(stabOperationWrap, WrapType.CHOP_DOWN_IF_LONG, true);
+        } else {
+            nonNullStabBodyChildrenWrap = stabBodyChildrenWrap;
+        }
 
         return buildChildren(
                 stab,
@@ -1963,7 +1965,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(
                                 buildStabBodyChildren(
                                         child,
-                                        finalStabBodyChildrenWrap,
+                                        nonNullStabBodyChildrenWrap,
                                         childAlignment,
                                         childrenIndent
                                 )
@@ -1974,7 +1976,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                         child,
                                         stabOperationWrap,
                                         childrenIndent,
-                                        finalStabBodyChildrenWrap
+                                        nonNullStabBodyChildrenWrap
                                 )
                         );
                     }
