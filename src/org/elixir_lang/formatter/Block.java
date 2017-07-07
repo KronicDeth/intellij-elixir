@@ -2382,11 +2382,10 @@ public class Block extends AbstractBlock implements BlockEx {
         if (mapArguments != null) {
             ASTNode mapArgumentsChild = mapArguments.findChildByType(MAP_ARGUMENTS_CHILD_TOKEN_SET);
 
-            if (mapArgumentsChild != null) {
-                if (mapArgumentsChild.findChildByType(MAP_TAIL_ARGUMENTS_TOKEN_SET) != null &&
-                        !oneLinerUnmatchedCallBody(mapOrStructOperation)) {
-                    wrapType = WrapType.ALWAYS;
-                }
+            if (mapArgumentsChild != null &&
+                    mapArgumentsChild.findChildByType(MAP_TAIL_ARGUMENTS_TOKEN_SET) != null &&
+                    !oneLinerUnmatchedCallBody(mapOrStructOperation)) {
+                wrapType = WrapType.ALWAYS;
             }
         }
 
