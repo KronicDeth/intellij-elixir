@@ -564,8 +564,7 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildAssociationsChildren(
             @NotNull ASTNode associations,
-            @NotNull Wrap associationExpressionWrap,
-            @Nullable Indent associationsExpressionIndent
+            @NotNull Wrap associationExpressionWrap
     ) {
         return buildChildren(
                 associations,
@@ -581,7 +580,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.add(buildChild(child, Wrap.createWrap(WrapType.NONE, false)));
                     } else {
                         // comment
-                        blockList.add(buildChild(child, associationsExpressionIndent));
+                        blockList.add(buildChild(child, (Indent) null));
                     }
 
                     return blockList;
@@ -1414,9 +1413,9 @@ public class Block extends AbstractBlock implements BlockEx {
                 mapArgumentsAlignment,
                 (child, childElementType, tailWrap, childrenIndent, blockList) -> {
                     if (childElementType == MAP_CONSTRUCTION_ARGUMENTS) {
-                        blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap, null));
+                        blockList.addAll(buildMapConstructArgumentsChildren(child, tailWrap));
                     } else if (childElementType == MAP_UPDATE_ARGUMENTS) {
-                        blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap, null));
+                        blockList.addAll(buildMapUpdateArgumentsChildren(child, tailWrap));
                     } else {
                         blockList.add(buildChild(child, tailWrap, Indent.getNormalIndent()));
                     }
@@ -1462,13 +1461,14 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapConstructArgumentsChildren(
             @NotNull ASTNode mapConstructionArguments,
-            @NotNull Wrap mapArgumentsTailWrap,
-            @Nullable Indent mapArgumentsTailIndent
+            @NotNull Wrap mapArgumentsTailWrap
     ) {
         return buildChildren(
                 mapConstructionArguments,
                 (child, childElementType, blockList) -> {
-                    blockList.addAll(buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap, mapArgumentsTailIndent));
+                    blockList.addAll(
+                            buildMapTailArgumentsChildChildren(child, childElementType, mapArgumentsTailWrap)
+                    );
 
                     return blockList;
                 }
@@ -1479,19 +1479,18 @@ public class Block extends AbstractBlock implements BlockEx {
     private List<com.intellij.formatting.Block> buildMapTailArgumentsChildChildren(
             @NotNull ASTNode child,
             @NotNull IElementType childElementType,
-            @NotNull Wrap mapArgumentsTailWrap,
-            @Nullable Indent mapArgumentsTailIndent
+            @NotNull Wrap mapArgumentsTailWrap
     ) {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
         if (childElementType == ASSOCIATIONS_BASE) {
             blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
         } else if (childElementType == ASSOCIATIONS) {
-            blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
+            blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap));
         } else if (childElementType == KEYWORDS) {
             blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
         } else {
-            blockList.add(buildChild(child, mapArgumentsTailIndent));
+            blockList.add(buildChild(child, (Indent) null));
         }
 
         return blockList;
@@ -1500,8 +1499,7 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildMapUpdateArgumentsChildren(
             @NotNull ASTNode mapUpdateArguments,
-            @NotNull Wrap operandWrap,
-            @Nullable Indent operandIndent) {
+            @NotNull Wrap operandWrap) {
         final boolean[] leftOperand = {true};
 
         return buildChildren(
@@ -1520,8 +1518,7 @@ public class Block extends AbstractBlock implements BlockEx {
                                     buildMapTailArgumentsChildChildren(
                                             child,
                                             childElementType,
-                                            operandWrap,
-                                            operandIndent
+                                            operandWrap
                                     )
                             );
                         }
