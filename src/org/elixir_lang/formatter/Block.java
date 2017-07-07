@@ -240,7 +240,6 @@ public class Block extends AbstractBlock implements BlockEx {
             AND_INFIX_OPERATOR,
             OR_INFIX_OPERATOR
     );
-    private static final TokenSet TUPLISH_TOKEN_SET = TokenSet.create(MULTIPLE_ALIASES, TUPLE);
     private static final TokenSet TWO_OPERATION_TOKEN_SET = TokenSet.create(
             MATCHED_TWO_OPERATION,
             UNMATCHED_TWO_OPERATION
