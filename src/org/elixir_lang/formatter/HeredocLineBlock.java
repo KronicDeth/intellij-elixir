@@ -58,7 +58,20 @@ class HeredocLineBlock extends AbstractBlock {
                 heredocLinePrefix,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN) {
-                        blockList.add(new HeredocLineWhiteSpaceTokenBlock(child, heredocPrefixLength , spacingBuilder));
+                        /* It is an error to make an empty block.  This can occur if the line's text is indented before
+                           the prefix for the terminator like `One` below
+
+                           ```
+                            """
+                            One
+                             """
+                           ```
+                         */
+                        if (heredocPrefixLength < child.getTextLength()) {
+                            blockList.add(
+                                    new HeredocLineWhiteSpaceTokenBlock(child, heredocPrefixLength, spacingBuilder)
+                            );
+                        }
                     } else {
                         blockList.add(new Block(child, spacingBuilder));
                     }

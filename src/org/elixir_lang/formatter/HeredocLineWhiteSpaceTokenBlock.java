@@ -21,6 +21,9 @@ public class HeredocLineWhiteSpaceTokenBlock extends AbstractBlock {
 
     HeredocLineWhiteSpaceTokenBlock(ASTNode child, int heredocPrefixLength, SpacingBuilder spacingBuilder) {
         super(child, null, null);
+
+        assert heredocPrefixLength < child.getTextLength() : "HeredocLineWhiteSpaceTokenBlocks that are shorter than the heredocPrefixLength should not be created";
+
         this.heredocPrefixLength = heredocPrefixLength;
         this.spacingBuilder = spacingBuilder;
     }
