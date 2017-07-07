@@ -12,14 +12,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class HeredocLinkWhiteSpaceTokenBlock extends AbstractBlock {
+public class HeredocLineWhiteSpaceTokenBlock extends AbstractBlock {
     private final int heredocPrefixLength;
     @NotNull
     private final SpacingBuilder spacingBuilder;
     @Nullable
     private TextRange textRange;
 
-    HeredocLinkWhiteSpaceTokenBlock(ASTNode child, int heredocPrefixLength, SpacingBuilder spacingBuilder) {
+    HeredocLineWhiteSpaceTokenBlock(ASTNode child, int heredocPrefixLength, SpacingBuilder spacingBuilder) {
         super(child, null, null);
         this.heredocPrefixLength = heredocPrefixLength;
         this.spacingBuilder = spacingBuilder;

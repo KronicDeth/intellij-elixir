@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static java.lang.Character.isWhitespace;
+import static java.lang.Math.min;
+
 /**
  * Unlike a {@link Block}, whose {@link Block#getTextRange()} is its full {@link ASTNode#getTextRange()}, a
  * HeredocLinkBlock's {@link #getTextRange()} starts {@link #heredocPrefixLength} characters into its {@link #getNode()}
@@ -55,7 +58,7 @@ class HeredocLineBlock extends AbstractBlock {
                 heredocLinePrefix,
                 (child, childElementType, blockList) -> {
                     if (childElementType == ElixirTypes.HEREDOC_LINE_WHITE_SPACE_TOKEN) {
-                        blockList.add(new HeredocLinkWhiteSpaceTokenBlock(child, heredocPrefixLength , spacingBuilder));
+                        blockList.add(new HeredocLineWhiteSpaceTokenBlock(child, heredocPrefixLength , spacingBuilder));
                     } else {
                         blockList.add(new Block(child, spacingBuilder));
                     }
@@ -89,15 +92,25 @@ class HeredocLineBlock extends AbstractBlock {
     public TextRange getTextRange() {
         if (textRange == null) {
             TextRange superTextRange = super.getTextRange();
-            int startedOffsetWithoutPrefix = superTextRange.getStartOffset() + heredocPrefixLength;
+            int startOffset = superTextRange.getStartOffset();
             int endOffset = superTextRange.getEndOffset();
+            int length = endOffset - startOffset;
+            int maxLength = min(length, heredocPrefixLength);
 
-            /* HeredocLines are generated for the blank lines that only have a newline.  Those lines don't have a
-               whitespace prefix, so don't adjust them. */
-            if (startedOffsetWithoutPrefix < endOffset) {
-                textRange = new TextRange(startedOffsetWithoutPrefix, endOffset);
-            } else {
+            CharSequence charSequence = myNode.getChars();
+            int prefixLength;
+
+            for (prefixLength = 0; prefixLength < maxLength; prefixLength++) {
+                if (!isWhitespace(charSequence.charAt(prefixLength))) {
+                    break;
+                }
+            }
+
+            if (prefixLength == 0) {
                 textRange = superTextRange;
+            } else {
+                int startedOffsetWithoutPrefix = startOffset + prefixLength;
+                textRange = new TextRange(startedOffsetWithoutPrefix, endOffset);
             }
         }
 
