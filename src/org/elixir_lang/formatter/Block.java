@@ -547,8 +547,7 @@ public class Block extends AbstractBlock implements BlockEx {
     @NotNull
     private List<com.intellij.formatting.Block> buildAssociationsBaseChildren(
             @NotNull ASTNode associationsBase,
-            @NotNull Wrap containerAssociationOperationWrap,
-            Indent containerAssociationOperationIndent) {
+            @NotNull Wrap containerAssociationOperationWrap) {
         return buildChildren(
                 associationsBase,
                 (child, childElementType, blockList) -> {
@@ -576,8 +575,7 @@ public class Block extends AbstractBlock implements BlockEx {
                         blockList.addAll(
                                 buildAssociationsBaseChildren(
                                         child,
-                                        associationExpressionWrap,
-                                        associationsExpressionIndent
+                                        associationExpressionWrap
                                 )
                         );
                     } else if (childElementType == COMMA) {
@@ -1521,7 +1519,7 @@ public class Block extends AbstractBlock implements BlockEx {
         List<com.intellij.formatting.Block> blockList = new ArrayList<>();
 
         if (childElementType == ASSOCIATIONS_BASE) {
-            blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
+            blockList.addAll(buildAssociationsBaseChildren(child, mapArgumentsTailWrap));
         } else if (childElementType == ASSOCIATIONS) {
             blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else if (childElementType == KEYWORDS) {
