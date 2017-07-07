@@ -823,21 +823,6 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private Block buildChild(@NotNull ASTNode child,
-                             @Nullable Alignment alignment,
-                             @Nullable Wrap childrenWrap) {
-        return new Block(
-                child,
-                null,
-                alignment,
-                spacingBuilder,
-                null,
-                childrenWrap,
-                null
-        );
-    }
-
-    @NotNull
-    private Block buildChild(@NotNull ASTNode child,
                              @Nullable Wrap wrap,
                              @Nullable Indent indent,
                              @Nullable Wrap childrenWrap) {
