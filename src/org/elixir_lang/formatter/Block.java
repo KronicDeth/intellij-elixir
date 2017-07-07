@@ -1867,7 +1867,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     if (operatorRule != null) {
                         ASTNode wordOperator = operatorRule.findChildByType(BOOLEAN_WORD_OPERATOR_TOKEN_SET);
 
-                        if (wordOperator != null) {
+                        if (wordOperator != null && codeStyleSettings != null) {
                             alignOperands = codeStyleSettings.ALIGN_BOOLEAN_OPERANDS;
                         }
                     }
