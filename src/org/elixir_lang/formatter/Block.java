@@ -854,23 +854,6 @@ public class Block extends AbstractBlock implements BlockEx {
     }
 
     @NotNull
-    private Block buildChild(@NotNull ASTNode child,
-                             @Nullable Wrap wrap,
-                             @Nullable Indent indent,
-                             @Nullable Wrap childrenWrap,
-                             @Nullable Alignment childrenAlignment) {
-        return new Block(
-                child,
-                wrap,
-                null,
-                spacingBuilder,
-                indent,
-                childrenWrap,
-                childrenAlignment
-        );
-    }
-
-    @NotNull
     private List<com.intellij.formatting.Block> buildChildren(@NotNull ASTNode parent,
                                                               @Nullable Wrap parentWrap,
                                                               @Nullable Alignment parentAlignment,
