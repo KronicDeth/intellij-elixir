@@ -1051,7 +1051,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == END_OF_EXPRESSION) {
                         blockList.addAll(buildEndOfExpressionChildren(child, null, childrenIndent));
                     } else if (childElementType == KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
                     } else {
                         blockList.add(buildChild(child, tailWrap, childrenIndent));
                     }
@@ -1357,7 +1357,7 @@ public class Block extends AbstractBlock implements BlockEx {
 
     @NotNull
     private List<com.intellij.formatting.Block> buildKeywordsChildren(@NotNull ASTNode keywords,
-                                                                      @NotNull Wrap keywordPairWrap, Indent keywordPairIndent) {
+                                                                      @NotNull Wrap keywordPairWrap) {
 
         return buildChildren(
                 keywords,
@@ -1505,7 +1505,7 @@ public class Block extends AbstractBlock implements BlockEx {
         } else if (childElementType == ASSOCIATIONS) {
             blockList.addAll(buildAssociationsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
         } else if (childElementType == KEYWORDS) {
-            blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap, mapArgumentsTailIndent));
+            blockList.addAll(buildKeywordsChildren(child, mapArgumentsTailWrap));
         } else {
             blockList.add(buildChild(child, mapArgumentsTailIndent));
         }
@@ -1800,7 +1800,7 @@ public class Block extends AbstractBlock implements BlockEx {
                     } else if (childElementType == COMMA) {
                         blockList.add(buildChild(child));
                     } else if (childElementType == KEYWORDS) {
-                        blockList.addAll(buildKeywordsChildren(child, tailWrap, null));
+                        blockList.addAll(buildKeywordsChildren(child, tailWrap));
                     } else if (childElementType == OPENING_PARENTHESIS) {
                         blockList.add(
                                 buildChild(child, Wrap.createChildWrap(parentWrap, WrapType.CHOP_DOWN_IF_LONG, true))
