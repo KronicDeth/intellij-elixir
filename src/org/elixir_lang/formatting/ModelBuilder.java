@@ -29,7 +29,7 @@ public class ModelBuilder implements FormattingModelBuilder {
             ElixirTypes.MATCHED_CAPTURE_NON_NUMERIC_OPERATION,
             ElixirTypes.UNMATCHED_CAPTURE_NON_NUMERIC_OPERATION
     );
-    private static final boolean DUMP_FORMATTING_AST = true;
+    private static final boolean DUMP_FORMATTING_AST = false;
     private static final TokenSet MULTIPLICATIVE_OPERATOR_TOKEN_SET = TokenSet.create(ElixirTypes.DIVISION_OPERATOR, ElixirTypes.MULTIPLICATION_OPERATOR);
     private static final TokenSet UNARY_OPERATION_TOKEN_SET = TokenSet.create(
             ElixirTypes.MATCHED_UNARY_NON_NUMERIC_OPERATION,
@@ -114,14 +114,16 @@ public class ModelBuilder implements FormattingModelBuilder {
 
     // @see com.jetbrains.python.formatter.PythonFormattingModelBuilder
     private static void printAST(ASTNode node, int indent) {
-        while (node != null) {
+        ASTNode sibling = node;
+
+        while (sibling != null) {
             for (int i = 0; i < indent; i++) {
                 System.out.print(" ");
             }
 
-            System.out.println(node.toString() + " " + node.getTextRange().toString());
-            printAST(node.getFirstChildNode(), indent + 2);
-            node = node.getTreeNext();
+            System.out.println(sibling.toString() + " " + sibling.getTextRange().toString());
+            printAST(sibling.getFirstChildNode(), indent + 2);
+            sibling = sibling.getTreeNext();
         }
     }
 
