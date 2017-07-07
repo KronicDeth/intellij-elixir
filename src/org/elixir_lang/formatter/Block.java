@@ -2312,9 +2312,10 @@ public class Block extends AbstractBlock implements BlockEx {
 
     private boolean lastArgument(@NotNull ASTNode node) {
         boolean lastArgument = true;
+        ASTNode currentNode = node;
 
-        while (node != null) {
-            IElementType elementType = node.getElementType();
+        while (currentNode != null) {
+            IElementType elementType = currentNode.getElementType();
 
             if (elementType == COMMA) {
                 lastArgument = false;
@@ -2322,12 +2323,12 @@ public class Block extends AbstractBlock implements BlockEx {
             } else if (elementType == NO_PARENTHESES_ONE_ARGUMENT) {
                 break;
             } else {
-                ASTNode nextNode = node.getTreeNext();
+                ASTNode nextNode = currentNode.getTreeNext();
 
                 if (nextNode == null) {
-                    node = node.getTreeParent();
+                    currentNode = currentNode.getTreeParent();
                 } else {
-                    node = nextNode;
+                    currentNode = nextNode;
                 }
             }
         }
