@@ -655,6 +655,39 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.TYPE
                         );
                     }
+                } else if (leftOperand instanceof Call) {
+                    Call call = (Call) leftOperand;
+                    PsiElement functionNameElement = call.functionNameElement();
+
+                    if (functionNameElement != null) {
+                        highlight(
+                                functionNameElement.getTextRange(),
+                                annotationHolder,
+                                leftMostFunctionNameTextAttributesKey
+                        );
+                    }
+
+                    PsiElement[] primaryArguments = call.primaryArguments();
+
+                    if (primaryArguments != null) {
+                        highlightTypesAndTypeParameterUsages(
+                                primaryArguments,
+                                typeParameterNameSet,
+                                annotationHolder,
+                                leftMostFunctionArgumentsTextAttributesKey
+                        );
+                    }
+
+                    PsiElement[] secondaryArguments = call.secondaryArguments();
+
+                    if (secondaryArguments != null) {
+                        highlightTypesAndTypeParameterUsages(
+                                secondaryArguments,
+                                typeParameterNameSet,
+                                annotationHolder,
+                                leftMostFunctionArgumentsTextAttributesKey
+                        );
+                    }
                 } else {
                     cannotHighlightTypes(leftOperand);
                 }
@@ -698,6 +731,41 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
     }
 
+    /**
+     * `::` is an error, but can happen due to user error either because they think `::` should work in the `when`
+     * clause or when overtyping the `:` for the proper keyword list used in `when`.
+     */
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(@NotNull Type type,
+                                                                         Set<String> typeParameterNameSet,
+                                                                         AnnotationHolder annotationHolder,
+                                                                         TextAttributesKey typeTextAttributesKey) {
+        PsiElement leftOperand = type.leftOperand();
+
+        if (leftOperand != null) {
+            if (typeParameterNameSet.contains(leftOperand.getText())) {
+                highlight(leftOperand.getTextRange(), annotationHolder, ElixirSyntaxHighlighter.TYPE_PARAMETER);
+            } else {
+                highlightTypesAndTypeParameterUsages(
+                        leftOperand,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                );
+            }
+        }
+
+        PsiElement rightOperand = type.rightOperand();
+
+        if (rightOperand != null) {
+            highlightTypesAndTypeParameterUsages(
+                    rightOperand,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        }
+    }
+
     private void highlightTypesAndSpecificationTypeParameterDeclarations(@NotNull PsiElement psiElement,
                                                                          Set<String> typeParameterNameSet,
                                                                          AnnotationHolder annotationHolder,
@@ -715,6 +783,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
         } else if (psiElement instanceof QuotableKeywordPair) {
             highlightTypesAndSpecificationTypeParameterDeclarations(
                     (QuotableKeywordPair) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof Type) {
+            highlightTypesAndSpecificationTypeParameterDeclarations(
+                    (Type) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
