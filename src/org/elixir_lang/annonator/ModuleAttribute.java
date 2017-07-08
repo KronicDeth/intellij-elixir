@@ -592,7 +592,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 }
             } else if (grandChild instanceof ElixirMatchedWhenOperation) {
                 ElixirMatchedWhenOperation matchedWhenOperation = (ElixirMatchedWhenOperation) grandChild;
-                Set<String> typeParameterNameSet = specificationTypeParameterNameSet(matchedWhenOperation.rightOperand());
+                PsiElement rightOperand = matchedWhenOperation.rightOperand();
+                Set<String> typeParameterNameSet;
+
+                if (rightOperand != null) {
+                    typeParameterNameSet = specificationTypeParameterNameSet(rightOperand);
+                } else {
+                    typeParameterNameSet = Collections.emptySet();
+                }
 
                 PsiElement leftOperand = matchedWhenOperation.leftOperand();
 
@@ -688,8 +695,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 } else {
                     cannotHighlightTypes(leftOperand);
                 }
-
-                Quotable rightOperand = matchedWhenOperation.rightOperand();
 
                 if (rightOperand != null) {
                     highlightTypesAndSpecificationTypeParameterDeclarations(
