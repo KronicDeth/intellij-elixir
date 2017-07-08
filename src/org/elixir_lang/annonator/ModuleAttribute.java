@@ -956,12 +956,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
-        highlightTypesAndTypeParameterUsages(
-                infix.leftOperand(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-        );
+        PsiElement leftOperand = infix.leftOperand();
+
+        if (leftOperand != null) {
+            highlightTypesAndTypeParameterUsages(
+                    leftOperand,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        }
 
         PsiElement rightOperand = infix.rightOperand();
 
