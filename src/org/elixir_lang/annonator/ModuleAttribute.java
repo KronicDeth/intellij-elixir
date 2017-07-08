@@ -562,7 +562,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     if (primaryArguments != null) {
                         highlightTypesAndTypeParameterUsages(
                                 primaryArguments,
-                                Collections.EMPTY_SET,
+                                Collections.emptySet(),
                                 annotationHolder,
                                 leftMostFunctionArgumentsTextAttributesKey
                         );
@@ -573,7 +573,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     if (secondaryArguments != null) {
                         highlightTypesAndTypeParameterUsages(
                                 secondaryArguments,
-                                Collections.EMPTY_SET,
+                                Collections.emptySet(),
                                 annotationHolder,
                                 leftMostFunctionArgumentsTextAttributesKey
                         );
@@ -585,7 +585,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 if (rightOperand != null) {
                     highlightTypesAndTypeParameterUsages(
                             rightOperand,
-                            Collections.EMPTY_SET,
+                            Collections.emptySet(),
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     );
