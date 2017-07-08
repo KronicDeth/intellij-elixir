@@ -1419,12 +1419,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> typeTypeParameterNameSet(PsiElement[] psiElements) {
-        Set<String> typeParameerNameSet = new HashSet<>();
+        Set<String> typeParameterNameSet = new HashSet<>();
 
         for (PsiElement psiElement : psiElements) {
-            typeParameerNameSet.addAll(typeTypeParameterNameSet(psiElement));
+            typeParameterNameSet.addAll(typeTypeParameterNameSet(psiElement));
         }
 
-        return  typeParameerNameSet;
+        return  typeParameterNameSet;
     }
 }
