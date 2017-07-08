@@ -1393,7 +1393,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> specificationTypeParameterNameSet(PsiElement[] psiElements) {
-        Set<String> accumulatedTypeParameterNameSet = new HashSet<String>();
+        Set<String> accumulatedTypeParameterNameSet = new HashSet<>();
 
         for (PsiElement psiElement : psiElements) {
             accumulatedTypeParameterNameSet.addAll(specificationTypeParameterNameSet(psiElement));
@@ -1467,7 +1467,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> typeTypeParameterNameSet(PsiElement[] psiElements) {
-        Set<String> typeParameerNameSet = new HashSet<String>();
+        Set<String> typeParameerNameSet = new HashSet<>();
 
         for (PsiElement psiElement : psiElements) {
             typeParameerNameSet.addAll(typeTypeParameterNameSet(psiElement));
