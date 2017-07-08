@@ -926,14 +926,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (children.length == 3) {
-            highlightTypesAndTypeParameterUsages(
-                    (When) stabParenthesesSignature,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            );
-        } else {
+        } else if (children.length != 3) {
             error("Cannot highlight types and type parameter usages", stabParenthesesSignature);
         }
     }
@@ -1061,16 +1054,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
             );
         } else if (psiElement instanceof InterpolatedString) {
             highlightTypeError(psiElement, annotationHolder, "Strings aren't allowed in types");
-        } else if (psiElement instanceof When) {
-            /* NOTE: MUST be before `Infix` as `When` is a subinterface of
-              `Infix` */
-            highlightTypesAndTypeParameterUsages(
-                    (When) psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            );
-        } else if (psiElement instanceof Infix) {
+        } else if (psiElement instanceof Infix && !(psiElement instanceof When)) {
             highlightTypesAndTypeParameterUsages(
                     (Infix) psiElement,
                     typeParameterNameSet,
@@ -1123,19 +1107,20 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
                    {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
                 psiElement instanceof AtUnqualifiedNoParenthesesCall ||
-                // leave normal highlighting
-                psiElement instanceof BracketOperation ||
-                psiElement instanceof ElixirAlias ||
-                psiElement instanceof ElixirAtom ||
-                psiElement instanceof ElixirAtomKeyword ||
-                psiElement instanceof ElixirBitString ||
-                psiElement instanceof ElixirCharToken ||
-                psiElement instanceof ElixirDecimalWholeNumber ||
-                psiElement instanceof ElixirKeywordKey ||
-                /* happens when :: is typed in `@spec` above function clause that uses `do:` */
-                psiElement instanceof ElixirNoParenthesesKeywords ||
-                psiElement instanceof ElixirUnaryNumericOperation ||
-                psiElement instanceof ElixirVariable
+                        // leave normal highlighting
+                        psiElement instanceof BracketOperation ||
+                        psiElement instanceof ElixirAlias ||
+                        psiElement instanceof ElixirAtom ||
+                        psiElement instanceof ElixirAtomKeyword ||
+                        psiElement instanceof ElixirBitString ||
+                        psiElement instanceof ElixirCharToken ||
+                        psiElement instanceof ElixirDecimalWholeNumber ||
+                        psiElement instanceof ElixirKeywordKey ||
+                        /* happens when :: is typed in `@spec` above function clause that uses `do:` */
+                        psiElement instanceof ElixirNoParenthesesKeywords ||
+                        psiElement instanceof ElixirUnaryNumericOperation ||
+                        psiElement instanceof ElixirVariable ||
+                        psiElement instanceof When
         )) {
             cannotHighlightTypes(psiElement);
         }
@@ -1311,14 +1296,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 error("Cannot highlight types and type parameter usages", unqualifiedParenthesesCall);
             }
         }
-    }
-
-    private void highlightTypesAndTypeParameterUsages(
-            When when,
-            Set<String> typeParameterNameSet,
-            AnnotationHolder annotationHolder,
-            TextAttributesKey typeTextAttributesKey) {
-        return;
     }
 
     private void highlightTypesAndSpecificationTypeParameterDeclarations(
