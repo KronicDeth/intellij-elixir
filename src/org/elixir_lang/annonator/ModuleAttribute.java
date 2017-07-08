@@ -259,8 +259,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     /**
-     * Highlights the function name of the declared @type, @typep, or @opaque as an {@link ElixirSyntaxHighlighter.TYPE}
-     * and the its parameters as {@link ElixirSyntaxHighlighter.TYPE_PARAMETER}.
+     * Highlights the function name of the declared @type, @typep, or @opaque as an {@link ElixirSyntaxHighlighter#TYPE}
+     * and the its parameters as {@link ElixirSyntaxHighlighter#TYPE_PARAMETER}.
      */
     private void highlightType(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                @NotNull final AnnotationHolder annotationHolder) {
