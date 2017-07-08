@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.errorreport.Logger;
@@ -120,9 +121,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );
 
-                        if (!isNonReferencing(atNonNumericOperation) &&
-                                atNonNumericOperation.getReference().resolve() == null) {
-                            holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                        if (!isNonReferencing(atNonNumericOperation)) {
+                            PsiReference reference = atNonNumericOperation.getReference();
+
+                            if (reference != null && reference.resolve() == null) {
+                                holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                            }
                         }
                     }
                 }
@@ -244,9 +248,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
     /**
      * Highlights the function call name as a `ElixirSyntaxHighlighter.SPECIFICATION
-     *
-     * @param atUnqualifiedNoParenthesesCall
-     * @param annotationHolder
      */
     private void highlightSpecification(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                         @NotNull final AnnotationHolder annotationHolder) {
@@ -259,8 +260,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     /**
-     * Highlights the function name of the declared @type, @typep, or @opaque as an {@link ElixirSyntaxHighlighter.TYPE}
-     * and the its parameters as {@link ElixirSyntaxHighlighter.TYPE_PARAMETER}.
+     * Highlights the function name of the declared @type, @typep, or @opaque as an {@link ElixirSyntaxHighlighter#TYPE}
+     * and the its parameters as {@link ElixirSyntaxHighlighter#TYPE_PARAMETER}.
      */
     private void highlightType(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                @NotNull final AnnotationHolder annotationHolder) {
@@ -282,14 +283,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     highlightTypeName(call, annotationHolder);
 
-                    if (call instanceof ElixirMatchedUnqualifiedNoArgumentsCall) {
-                        // no arguments, so nothing else to do
-                    } else if (call instanceof ElixirMatchedUnqualifiedParenthesesCall) {
+                    if (call instanceof ElixirMatchedUnqualifiedParenthesesCall) {
                         typeParameterNameSet = highlightTypeLeftOperand(
                                 (ElixirMatchedUnqualifiedParenthesesCall) call,
                                 annotationHolder
                         );
-                    } else {
+                    } else if (!(call instanceof ElixirMatchedUnqualifiedNoArgumentsCall)) {
                         cannotHighlightTypes(call);
                     }
                 } else {
@@ -310,7 +309,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 // seen as `unquote(ast)`, but could also be just the beginning of typing
                 ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
 
-                if (matchedUnqualifiedParenthesesCall.functionName().equals(UNQUOTE)) {
+                if (UNQUOTE.equals(matchedUnqualifiedParenthesesCall.functionName())) {
                     PsiElement[] secondaryArguments = matchedUnqualifiedParenthesesCall.secondaryArguments();
 
                     if (secondaryArguments != null) {
@@ -358,7 +357,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     highlightTypesAndTypeParameterUsages(
                             quotableKeywordValue,
-                            Collections.<String>emptySet(),
+                            Collections.emptySet(),
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     );
@@ -400,7 +399,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 highlightTypesAndTypeParameterUsages(
                         unqualifiedNoParenthesesCall.getNoParenthesesOneArgument(),
-                        Collections.<String>emptySet(),
+                        Collections.emptySet(),
                         annotationHolder,
                         ElixirSyntaxHighlighter.TYPE
                 );
@@ -410,8 +409,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
-    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull String message) {
-        annotationHolder.createErrorAnnotation(element, message);
+    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder) {
+        annotationHolder.createErrorAnnotation(element, "Strings aren't allowed in types");
     }
 
     private Set<String> highlightTypeLeftOperand(@NotNull final ElixirMatchedUnqualifiedParenthesesCall call,
@@ -429,7 +428,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     primaryArguments,
                     /* as stated above, if there are secondary arguments, then the primary arguments are
                        to quote or some equivalent metaprogramming. */
-                    Collections.<String>emptySet(),
+                    Collections.emptySet(),
                     annotationHolder,
                     ElixirSyntaxHighlighter.TYPE
             );
@@ -527,8 +526,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
     /**
      * Recursively highlights the types under `atUnqualifiedNoParenthesesCall`.
      *
-     * @param atUnqualifiedNoParenthesesCall
-     * @param annotationHolder
      * @param leftMostFunctionNameTextAttributesKey      the {@link ElixirSyntaxHighlighter} {@link TextAttributesKey} for the
      *                                                   name of the callback, type, or function being declared
      * @param leftMostFunctionArgumentsTextAttributesKey the {@link ElixirSyntaxHighlighter} {@link TextAttributesKey} for the
@@ -565,7 +562,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     if (primaryArguments != null) {
                         highlightTypesAndTypeParameterUsages(
                                 primaryArguments,
-                                Collections.EMPTY_SET,
+                                Collections.emptySet(),
                                 annotationHolder,
                                 leftMostFunctionArgumentsTextAttributesKey
                         );
@@ -576,7 +573,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     if (secondaryArguments != null) {
                         highlightTypesAndTypeParameterUsages(
                                 secondaryArguments,
-                                Collections.EMPTY_SET,
+                                Collections.emptySet(),
                                 annotationHolder,
                                 leftMostFunctionArgumentsTextAttributesKey
                         );
@@ -588,14 +585,21 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 if (rightOperand != null) {
                     highlightTypesAndTypeParameterUsages(
                             rightOperand,
-                            Collections.EMPTY_SET,
+                            Collections.emptySet(),
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     );
                 }
             } else if (grandChild instanceof ElixirMatchedWhenOperation) {
                 ElixirMatchedWhenOperation matchedWhenOperation = (ElixirMatchedWhenOperation) grandChild;
-                Set<String> typeParameterNameSet = specificationTypeParameterNameSet(matchedWhenOperation.rightOperand());
+                PsiElement rightOperand = matchedWhenOperation.rightOperand();
+                Set<String> typeParameterNameSet;
+
+                if (rightOperand != null) {
+                    typeParameterNameSet = specificationTypeParameterNameSet(rightOperand);
+                } else {
+                    typeParameterNameSet = Collections.emptySet();
+                }
 
                 PsiElement leftOperand = matchedWhenOperation.leftOperand();
 
@@ -609,38 +613,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     }
 
                     if (strippedTypeOperationLeftOperand instanceof Call) {
-                        Call call = (Call) strippedTypeOperationLeftOperand;
-                        PsiElement functionNameElement = call.functionNameElement();
-
-                        if (functionNameElement != null) {
-                            highlight(
-                                    functionNameElement.getTextRange(),
-                                    annotationHolder,
-                                    leftMostFunctionNameTextAttributesKey
-                            );
-                        }
-
-                        PsiElement[] primaryArguments = call.primaryArguments();
-
-                        if (primaryArguments != null) {
-                            highlightTypesAndTypeParameterUsages(
-                                    primaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    leftMostFunctionArgumentsTextAttributesKey
-                            );
-                        }
-
-                        PsiElement[] secondaryArguments = call.secondaryArguments();
-
-                        if (secondaryArguments != null) {
-                            highlightTypesAndTypeParameterUsages(
-                                    secondaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    leftMostFunctionArgumentsTextAttributesKey
-                            );
-                        }
+                        highlightSpecification(
+                                (Call) strippedTypeOperationLeftOperand,
+                                annotationHolder,
+                                leftMostFunctionNameTextAttributesKey,
+                                leftMostFunctionNameTextAttributesKey,
+                                typeParameterNameSet
+                        );
                     } else {
                         cannotHighlightTypes(strippedTypeOperationLeftOperand);
                     }
@@ -655,11 +634,17 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.TYPE
                         );
                     }
+                } else if (leftOperand instanceof Call) {
+                    highlightSpecification(
+                            (Call) leftOperand,
+                            annotationHolder,
+                            leftMostFunctionNameTextAttributesKey,
+                            leftMostFunctionNameTextAttributesKey,
+                            typeParameterNameSet
+                    );
                 } else {
                     cannotHighlightTypes(leftOperand);
                 }
-
-                Quotable rightOperand = matchedWhenOperation.rightOperand();
 
                 if (rightOperand != null) {
                     highlightTypesAndSpecificationTypeParameterDeclarations(
@@ -670,6 +655,44 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     );
                 }
             }
+        }
+    }
+
+    private void highlightSpecification(@NotNull Call call,
+                                        AnnotationHolder annotationHolder,
+                                        TextAttributesKey leftMostFunctionNameTextAttributesKey,
+                                        TextAttributesKey leftMostFunctionArgumentsTextAttributesKey,
+                                        Set<String> typeParameterNameSet) {
+        PsiElement functionNameElement = call.functionNameElement();
+
+        if (functionNameElement != null) {
+            highlight(
+                    functionNameElement.getTextRange(),
+                    annotationHolder,
+                    leftMostFunctionNameTextAttributesKey
+            );
+        }
+
+        PsiElement[] primaryArguments = call.primaryArguments();
+
+        if (primaryArguments != null) {
+            highlightTypesAndTypeParameterUsages(
+                    primaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    leftMostFunctionArgumentsTextAttributesKey
+            );
+        }
+
+        PsiElement[] secondaryArguments = call.secondaryArguments();
+
+        if (secondaryArguments != null) {
+            highlightTypesAndTypeParameterUsages(
+                    secondaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    leftMostFunctionArgumentsTextAttributesKey
+            );
         }
     }
 
@@ -698,6 +721,41 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
     }
 
+    /**
+     * `::` is an error, but can happen due to user error either because they think `::` should work in the `when`
+     * clause or when overtyping the `:` for the proper keyword list used in `when`.
+     */
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(@NotNull Type type,
+                                                                         Set<String> typeParameterNameSet,
+                                                                         AnnotationHolder annotationHolder,
+                                                                         TextAttributesKey typeTextAttributesKey) {
+        PsiElement leftOperand = type.leftOperand();
+
+        if (leftOperand != null) {
+            if (typeParameterNameSet.contains(leftOperand.getText())) {
+                highlight(leftOperand.getTextRange(), annotationHolder, ElixirSyntaxHighlighter.TYPE_PARAMETER);
+            } else {
+                highlightTypesAndTypeParameterUsages(
+                        leftOperand,
+                        typeParameterNameSet,
+                        annotationHolder,
+                        typeTextAttributesKey
+                );
+            }
+        }
+
+        PsiElement rightOperand = type.rightOperand();
+
+        if (rightOperand != null) {
+            highlightTypesAndTypeParameterUsages(
+                    rightOperand,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        }
+    }
+
     private void highlightTypesAndSpecificationTypeParameterDeclarations(@NotNull PsiElement psiElement,
                                                                          Set<String> typeParameterNameSet,
                                                                          AnnotationHolder annotationHolder,
@@ -715,6 +773,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
         } else if (psiElement instanceof QuotableKeywordPair) {
             highlightTypesAndSpecificationTypeParameterDeclarations(
                     (QuotableKeywordPair) psiElement,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof Type) {
+            highlightTypesAndSpecificationTypeParameterDeclarations(
+                    (Type) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
@@ -854,14 +919,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (children.length == 3) {
-            highlightTypesAndTypeParameterUsages(
-                    (When) stabParenthesesSignature,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            );
-        } else {
+        } else if (children.length != 3) {
             error("Cannot highlight types and type parameter usages", stabParenthesesSignature);
         }
     }
@@ -884,12 +942,16 @@ public class ModuleAttribute implements Annotator, DumbAware {
             Set<String> typeParameterNameSet,
             AnnotationHolder annotationHolder,
             TextAttributesKey typeTextAttributesKey) {
-        highlightTypesAndTypeParameterUsages(
-                infix.leftOperand(),
-                typeParameterNameSet,
-                annotationHolder,
-                typeTextAttributesKey
-        );
+        PsiElement leftOperand = infix.leftOperand();
+
+        if (leftOperand != null) {
+            highlightTypesAndTypeParameterUsages(
+                    leftOperand,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        }
 
         PsiElement rightOperand = infix.rightOperand();
 
@@ -914,9 +976,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
-            /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
-               {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
         } else if (psiElement instanceof ElixirAccessExpression ||
                 psiElement instanceof ElixirAssociationsBase ||
                 psiElement instanceof ElixirAssociations ||
@@ -938,21 +997,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof BracketOperation ||
-                psiElement instanceof ElixirAlias ||
-                psiElement instanceof ElixirAtom ||
-                psiElement instanceof ElixirAtomKeyword ||
-                psiElement instanceof ElixirBitString ||
-                psiElement instanceof ElixirCharToken ||
-                psiElement instanceof ElixirDecimalWholeNumber ||
-                psiElement instanceof ElixirKeywordKey ||
-                /* happens when :: is typed in `@spec` above function clause that uses `do:` */
-                psiElement instanceof ElixirNoParenthesesKeywords ||
-                psiElement instanceof ElixirStringLine ||
-                psiElement instanceof ElixirUnaryNumericOperation ||
-                psiElement instanceof ElixirVariable) {
-            // leave normal highlighting
-        }  else if (psiElement instanceof ElixirMapOperation) {
+        } else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
                     (ElixirMapOperation) psiElement,
                     typeParameterNameSet,
@@ -1001,17 +1046,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else if (psiElement instanceof InterpolatedString) {
-            highlightTypeError(psiElement, annotationHolder, "Strings aren't allowed in types");
-        } else if (psiElement instanceof When) {
-            /* NOTE: MUST be before `Infix` as `When` is a subinterface of
-              `Infix` */
-            highlightTypesAndTypeParameterUsages(
-                    (When) psiElement,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    typeTextAttributesKey
-            );
-        } else if (psiElement instanceof Infix) {
+            highlightTypeError(psiElement, annotationHolder);
+        } else if (psiElement instanceof Infix && !(psiElement instanceof When)) {
             highlightTypesAndTypeParameterUsages(
                     (Infix) psiElement,
                     typeParameterNameSet,
@@ -1060,7 +1096,25 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else {
+        } else if (!(
+                /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+                   {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
+                psiElement instanceof AtUnqualifiedNoParenthesesCall ||
+                        // leave normal highlighting
+                        psiElement instanceof BracketOperation ||
+                        psiElement instanceof ElixirAlias ||
+                        psiElement instanceof ElixirAtom ||
+                        psiElement instanceof ElixirAtomKeyword ||
+                        psiElement instanceof ElixirBitString ||
+                        psiElement instanceof ElixirCharToken ||
+                        psiElement instanceof ElixirDecimalWholeNumber ||
+                        psiElement instanceof ElixirKeywordKey ||
+                        /* happens when :: is typed in `@spec` above function clause that uses `do:` */
+                        psiElement instanceof ElixirNoParenthesesKeywords ||
+                        psiElement instanceof ElixirUnaryNumericOperation ||
+                        psiElement instanceof ElixirVariable ||
+                        psiElement instanceof When
+        )) {
             cannotHighlightTypes(psiElement);
         }
     }
@@ -1237,38 +1291,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
-    private void highlightTypesAndTypeParameterUsages(
-            When when,
-            Set<String> typeParameterNameSet,
-            AnnotationHolder annotationHolder,
-            TextAttributesKey typeTextAttributesKey) {
-        return;
-    }
-
-    private void highlightTypesAndSpecificationTypeParameterDeclarations(
-            ElixirUnmatchedUnqualifiedNoArgumentsCall unmatchedUnqualifiedNoArgumentsCall,
-            Set<String> typeParameterNameSet,
-            AnnotationHolder annotationHolder,
-            TextAttributesKey textAttributesKey
-    ) {
-        String variable = unmatchedUnqualifiedNoArgumentsCall.getText();
-
-        if (typeParameterNameSet.contains(variable)) {
-            highlight(
-                    unmatchedUnqualifiedNoArgumentsCall.getTextRange(),
-                    annotationHolder,
-                    ElixirSyntaxHighlighter.TYPE_PARAMETER
-            );
-        } else {
-            highlightTypesAndTypeParameterUsages(
-                    unmatchedUnqualifiedNoArgumentsCall,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    textAttributesKey
-            );
-        }
-    }
-
     @NotNull
     private Set<String> specificationTypeParameterNameSet(ElixirKeywordPair keywordPair) {
         return Collections.singleton(keywordPair.getKeywordKey().getText());
@@ -1277,6 +1299,25 @@ public class ModuleAttribute implements Annotator, DumbAware {
     @NotNull
     private Set<String> specificationTypeParameterNameSet(ElixirNoParenthesesKeywordPair noParenthesesKeywordPair) {
         return Collections.singleton(noParenthesesKeywordPair.getKeywordKey().getText());
+    }
+
+    /**
+     * A type operator is an error, keyword pairs should be used for `when type: definition` for expression-local types,
+     * but using `::` is a common error, so support it.
+     */
+    @NotNull
+    private Set<String> specificationTypeParameterNameSet(Type type) {
+        PsiElement leftOperand = type.leftOperand();
+        Set<String> typeParameterNameSet;
+
+        if (leftOperand != null) {
+            typeParameterNameSet = Collections.singleton(leftOperand.getText());
+        } else {
+            error("Type does not have a left operand", type);
+            typeParameterNameSet = Collections.emptySet();
+        }
+
+        return typeParameterNameSet;
     }
 
     private Set<String> specificationTypeParameterNameSet(@NotNull PsiElement psiElement) {
@@ -1289,6 +1330,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
             parameterNameSet = specificationTypeParameterNameSet(psiElement.getChildren());
         } else if (psiElement instanceof ElixirKeywordPair) {
             parameterNameSet = specificationTypeParameterNameSet((ElixirKeywordPair) psiElement);
+        } else if (psiElement instanceof Type) {
+            parameterNameSet = specificationTypeParameterNameSet((Type) psiElement);
         } else if (psiElement instanceof ElixirNoParenthesesKeywordPair) {
             parameterNameSet = specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
         } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
@@ -1302,7 +1345,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> specificationTypeParameterNameSet(PsiElement[] psiElements) {
-        Set<String> accumulatedTypeParameterNameSet = new HashSet<String>();
+        Set<String> accumulatedTypeParameterNameSet = new HashSet<>();
 
         for (PsiElement psiElement : psiElements) {
             accumulatedTypeParameterNameSet.addAll(specificationTypeParameterNameSet(psiElement));
@@ -1376,12 +1419,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
     }
 
     private Set<String> typeTypeParameterNameSet(PsiElement[] psiElements) {
-        Set<String> typeParameerNameSet = new HashSet<String>();
+        Set<String> typeParameterNameSet = new HashSet<>();
 
         for (PsiElement psiElement : psiElements) {
-            typeParameerNameSet.addAll(typeTypeParameterNameSet(psiElement));
+            typeParameterNameSet.addAll(typeTypeParameterNameSet(psiElement));
         }
 
-        return  typeParameerNameSet;
+        return  typeParameterNameSet;
     }
 }

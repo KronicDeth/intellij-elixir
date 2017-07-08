@@ -50,7 +50,7 @@ defmodule Kernel.TypespecTest do
   test "unexpected expression in typespec" do
     assert_raise CompileError, ~r"unexpected expression in typespec: \"foobar\"", fn ->
       test_module do
-        @type mytype :: "foobar"
+        @type mytype :: <error descr="Strings aren't allowed in types">"foobar"</error>
       end
     end
   end
