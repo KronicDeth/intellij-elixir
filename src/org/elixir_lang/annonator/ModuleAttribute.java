@@ -283,14 +283,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     highlightTypeName(call, annotationHolder);
 
-                    if (call instanceof ElixirMatchedUnqualifiedNoArgumentsCall) {
-                        // no arguments, so nothing else to do
-                    } else if (call instanceof ElixirMatchedUnqualifiedParenthesesCall) {
+                    if (call instanceof ElixirMatchedUnqualifiedParenthesesCall) {
                         typeParameterNameSet = highlightTypeLeftOperand(
                                 (ElixirMatchedUnqualifiedParenthesesCall) call,
                                 annotationHolder
                         );
-                    } else {
+                    } else if (!(call instanceof ElixirMatchedUnqualifiedNoArgumentsCall)) {
                         cannotHighlightTypes(call);
                     }
                 } else {
@@ -988,9 +986,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof AtUnqualifiedNoParenthesesCall) {
-            /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
-               {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
         } else if (psiElement instanceof ElixirAccessExpression ||
                 psiElement instanceof ElixirAssociationsBase ||
                 psiElement instanceof ElixirAssociations ||
@@ -1012,21 +1007,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else if (psiElement instanceof BracketOperation ||
-                psiElement instanceof ElixirAlias ||
-                psiElement instanceof ElixirAtom ||
-                psiElement instanceof ElixirAtomKeyword ||
-                psiElement instanceof ElixirBitString ||
-                psiElement instanceof ElixirCharToken ||
-                psiElement instanceof ElixirDecimalWholeNumber ||
-                psiElement instanceof ElixirKeywordKey ||
-                /* happens when :: is typed in `@spec` above function clause that uses `do:` */
-                psiElement instanceof ElixirNoParenthesesKeywords ||
-                psiElement instanceof ElixirStringLine ||
-                psiElement instanceof ElixirUnaryNumericOperation ||
-                psiElement instanceof ElixirVariable) {
-            // leave normal highlighting
-        }  else if (psiElement instanceof ElixirMapOperation) {
+        } else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
                     (ElixirMapOperation) psiElement,
                     typeParameterNameSet,
@@ -1134,7 +1115,24 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
-        } else {
+        } else if (!(
+                /* Occurs in the case of typing a {@code @type name ::} above a {@code @doc <HEREDOC>} and the
+                   {@code @doc <HEREDOC>} is interpreted as the right-operand of {@code ::} */
+                psiElement instanceof AtUnqualifiedNoParenthesesCall ||
+                // leave normal highlighting
+                psiElement instanceof BracketOperation ||
+                psiElement instanceof ElixirAlias ||
+                psiElement instanceof ElixirAtom ||
+                psiElement instanceof ElixirAtomKeyword ||
+                psiElement instanceof ElixirBitString ||
+                psiElement instanceof ElixirCharToken ||
+                psiElement instanceof ElixirDecimalWholeNumber ||
+                psiElement instanceof ElixirKeywordKey ||
+                /* happens when :: is typed in `@spec` above function clause that uses `do:` */
+                psiElement instanceof ElixirNoParenthesesKeywords ||
+                psiElement instanceof ElixirUnaryNumericOperation ||
+                psiElement instanceof ElixirVariable
+        )) {
             cannotHighlightTypes(psiElement);
         }
     }
