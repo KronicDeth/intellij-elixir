@@ -108,6 +108,26 @@
             </li>
           </ul>
         </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>Treat <code>::</code> the same as <code>:</code>  in <code>key:</code> after <code>when</code> in type specifications as it's a realistic error.</li>
+            <li>Change <code>.</code> to <code>#</code> when referring to constants in javadocs</li>
+            <li>Remove <code>@param</code> without descriptions</li>
+            <li>Remove explicit type from generics when the type can be inferred.</li>
+            <li>Check if <code>atNonNumericOperation</code> reference is non-<code>null</code> before resolving</li>
+            <li>Swap empty branches to inverted conditions for final <code>else</code>.</li>
+            <li>Check if <code>Type</code> <code>leftOperand</code> is <code>null</code> before using it.</li>
+            <li>Remove empty <code>highlightTypesAndTypeParameterUsages(When...)</code></li>
+            <li>Remove unused <code>highlightTypesAndSpecificationTypeParameterDeclarations</code></li>
+            <li>Flip <code>equals</code> to eliminate need for <code>null</code> check</li>
+            <li>Remove redundant type arguments (<code>&lt;...&gt;</code>)</li>
+            <li>Change <code>Collections.EMPTY_SET</code> to <code>Collections.emptySet()</code> to prevent uncheck cast warnings.</li>
+            <li>Inline constant argument for errors.</li>
+            <li>Check if <code>when</code> <code>rightOperand</code> is non-<code>null</code> before scanning it for parameter names.</li>
+            <li>Fix typos</li>
+          </ul>
+        </li>
       </ul>
       <h1>v5.1.0</h1>
       <ul>

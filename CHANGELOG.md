@@ -176,6 +176,24 @@
     * Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.
     * Indent bit string (`<< >>`) elements when wrapped
 
+### Bug Fixes
+* [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
+  * Treat `::` the same as `:`  in `key:` after `when` in type specifications as it's a realistic error.
+  * Change `.` to `#` when referring to constants in javadocs
+  * Remove `@param` without descriptions
+  * Remove explicit type from generics when the type can be inferred.
+  * Check if `atNonNumericOperation` reference is non-`null` before resolving
+  * Swap empty branches to inverted conditions for final `else`.
+  * Check if `Type` `leftOperand` is `null` before using it.
+  * Remove empty `highlightTypesAndTypeParameterUsages(When...)`
+  * Remove unused `highlightTypesAndSpecificationTypeParameterDeclarations`
+  * Flip `equals` to eliminate need for `null` check
+  * Remove redundant type arguments (`<...>`)
+  * Change `Collections.EMPTY_SET` to `Collections.emptySet()` to prevent uncheck cast warnings.
+  * Inline constant argument for errors.
+  * Check if `when` `rightOperand` is non-`null` before scanning it for parameter names.
+  * Fix typos
+
 ## v5.1.0
 
 ### Enhancements
