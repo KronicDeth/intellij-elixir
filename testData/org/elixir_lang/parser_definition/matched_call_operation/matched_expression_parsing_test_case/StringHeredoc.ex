@@ -25,7 +25,15 @@ Heredoc
 """
 String
 Heredoc
+""" one or two
+"""
+String
+Heredoc
 """ one || two
+"""
+String
+Heredoc
+""" one and two
 """
 String
 Heredoc
@@ -49,6 +57,10 @@ Heredoc
 """
 String
 Heredoc
+""" one / two
+"""
+String
+Heredoc
 """ one * two
 """
 String
@@ -58,6 +70,10 @@ Heredoc
 String
 Heredoc
 """ !one
+"""
+String
+Heredoc
+""" not one
 """
 String
 Heredoc

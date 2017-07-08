@@ -3,17 +3,22 @@
 << one :: two, >>
 << one | two, >>
 << one = two, >>
+<< one or two, >>
 << one || two, >>
+<< one and two, >>
 << one && two, >>
 << one != two, >>
 << one < two, >>
 << one |> two, >>
 << one in two, >>
 << one ++ two, >>
+<< one..two, >>
 << one + two, >>
+<< one / two, >>
 << one * two, >>
 << one ^^^ two, >>
 << !one, >>
+<< not one, >>
 << one.(), >>
 << One.Two[three], >>
 << One.Two, >>

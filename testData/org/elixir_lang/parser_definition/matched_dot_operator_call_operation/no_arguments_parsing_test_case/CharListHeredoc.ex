@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and
+'''
+CharList
+Heredoc
 '''.&&
 '''
 CharList
@@ -41,7 +45,15 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./
+'''
+CharList
+Heredoc
 '''.*
+'''
+CharList
+Heredoc
+'''.or
 '''
 CharList
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 CharList
 Heredoc
 '''.^
+'''
+CharList
+Heredoc
+'''.not
 '''
 CharList
 Heredoc

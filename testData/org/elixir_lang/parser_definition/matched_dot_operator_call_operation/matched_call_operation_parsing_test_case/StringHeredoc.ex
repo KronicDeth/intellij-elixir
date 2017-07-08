@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and Qualifier.qualified positional, key: value
+"""
+String
+Heredoc
 """.&& Qualifier.qualified positional, key: value
 """
 String
@@ -41,7 +45,15 @@ Heredoc
 """
 String
 Heredoc
+"""./ Qualifier.qualified positional, key: value
+"""
+String
+Heredoc
 """.* Qualifier.qualified positional, key: value
+"""
+String
+Heredoc
+""".or Qualifier.qualified positional, key: value
 """
 String
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 String
 Heredoc
 """.^ Qualifier.qualified positional, key: value
+"""
+String
+Heredoc
+""".not Qualifier.qualified positional, key: value
 """
 String
 Heredoc

@@ -55,6 +55,14 @@ public interface ElixirMatchedDotCall extends ElixirMatchedExpression, DotCall<M
   @Nullable
   PsiReference getReference();
 
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedDotCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirMatchedDotCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean isCalling(String resolvedModuleName, String functionName);
 
   boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);

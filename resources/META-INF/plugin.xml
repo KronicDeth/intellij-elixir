@@ -2458,6 +2458,11 @@ Qualifier.
     <codeFoldingOptionsProvider instance="org.elixir_lang.folding.OptionsProvider"/>
     <lang.foldingBuilder language="Elixir" implementationClass="org.elixir_lang.folding.Builder"/>
 
+    <!-- formatting -->
+    <codeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.CodeStyleSettingsProvider"/>
+    <lang.formatter language="Elixir" implementationClass="org.elixir_lang.formatting.ModelBuilder"/>
+    <langCodeStyleSettingsProvider implementation="org.elixir_lang.formatter.settings.LanguageCodeStyleSettingsProvider"/>
+
     <lang.parserDefinition language="Elixir" implementationClass="org.elixir_lang.ElixirParserDefinition"/>
     <lang.psiStructureViewFactory language="Elixir" implementationClass="org.elixir_lang.structure_view.Factory"/>
     <lang.quoteHandler language="Elixir" implementationClass="org.elixir_lang.QuoteHandler"/>

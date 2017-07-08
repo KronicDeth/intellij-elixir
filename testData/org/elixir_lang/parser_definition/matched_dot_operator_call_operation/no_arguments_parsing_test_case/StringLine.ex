@@ -1,3 +1,4 @@
+"String".and
 "String".&&
 "String".|>
 "String".@
@@ -8,7 +9,9 @@
 "String".<-
 "String".in
 "String".=
+"String"./
 "String".*
+"String".or
 "String".||
 "String".|
 "String".<=
@@ -16,6 +19,7 @@
 "String".%
 "String".<>
 "String".^
+"String".not
 "String".after
 "String".do
 "String".when

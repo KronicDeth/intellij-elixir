@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and Qualifier.qualified positional, key: value
+'''
+CharList
+Heredoc
 '''.&& Qualifier.qualified positional, key: value
 '''
 CharList
@@ -41,7 +45,15 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./ Qualifier.qualified positional, key: value
+'''
+CharList
+Heredoc
 '''.* Qualifier.qualified positional, key: value
+'''
+CharList
+Heredoc
+'''.or Qualifier.qualified positional, key: value
 '''
 CharList
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 CharList
 Heredoc
 '''.^ Qualifier.qualified positional, key: value
+'''
+CharList
+Heredoc
+'''.not Qualifier.qualified positional, key: value
 '''
 CharList
 Heredoc

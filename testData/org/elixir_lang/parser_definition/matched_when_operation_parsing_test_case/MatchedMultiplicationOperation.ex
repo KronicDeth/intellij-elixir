@@ -1,1 +1,1 @@
-one * two when three * four
+one * two when three / four

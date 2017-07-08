@@ -14,9 +14,11 @@ function positional, keyword_key: keyword_value | update
 function positional, keyword_key: keyword_value = match_value
 
 # matchedExpressionOrOperation
+function positional, keyword_key: first_value or second_value
 function positional, keyword_key: first_value ||| second_value
 
 # matchedExpressionAndOperation
+function positional, keyword_key: first_value and second_value
 function positional, keyword_key: first_value &&& second_value
 
 # matchedExpressionComparisonOperation
@@ -33,6 +35,7 @@ function positional, keyword_key: value in array_or_range
 
 # matchedExpressionTwoOperation
 function positional, keyword_key: first_list ++ second_list
+function positional, keyword_key: first..last
 
 # matchedExpressionAdditionOperation
 function positional, keyword_key: first_value + second_value

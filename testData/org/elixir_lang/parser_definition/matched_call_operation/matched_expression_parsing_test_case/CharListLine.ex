@@ -4,12 +4,15 @@
 'CharListLine' one :: type
 'CharListLine' one | new
 'CharListLine' one = two
+'CharListLine' one or two
 'CharListLine' one || two
+'CharListLine' one and two
 'CharListLine' one && two
 'CharListLine' one != two
 'CharListLine' one < two
 'CharListLine' one |> two
 'CharListLine' one + two
+'CharListLine' one / two
 'CharListLine' one * two
 'CharListLine' one ^^^ two
 'CharListLine' !one
@@ -21,6 +24,7 @@
 'CharListLine' @1
 'CharListLine' 'CharListLine'
 'CharListLine' !1
+'CharListLine' not 1
 'CharListLine' (;)
 'CharListLine' ?1
 'CharListLine' 'CharListLine'

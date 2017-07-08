@@ -1,3 +1,4 @@
+:atom.and positional
 :atom.&& positional
 :atom.|> positional
 :atom.@ positional
@@ -8,7 +9,9 @@
 :atom.<- positional
 :atom.in positional
 :atom.= positional
+:atom./ positional
 :atom.* positional
+:atom.or positional
 :atom.|| positional
 :atom.| positional
 :atom.<= positional
@@ -16,6 +19,7 @@
 :atom.% positional
 :atom.<> positional
 :atom.^ positional
+:atom.not positional
 :atom.after positional
 :atom.do positional
 :atom.when positional

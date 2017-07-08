@@ -4,12 +4,15 @@ variable one when guard
 variable one :: type
 variable one | new
 variable one = two
+variable one or two
 variable one || two
+variable one and two
 variable one && two
 variable one != two
 variable one < two
 variable one |> two
 variable one + two
+variable one / two
 variable one * two
 variable one ^^^ two
 variable !one
@@ -20,6 +23,7 @@ variable one
 variable @1
 variable &1
 variable !1
+variable not 1
 variable (;)
 variable ?1
 variable 0b10

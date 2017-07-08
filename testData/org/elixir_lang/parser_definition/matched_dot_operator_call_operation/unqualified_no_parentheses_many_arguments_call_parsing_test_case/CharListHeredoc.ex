@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and unqualified positional, key: value
+'''
+CharList
+Heredoc
 '''.&& unqualified positional, key: value
 '''
 CharList
@@ -41,7 +45,15 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./ unqualified positional, key: value
+'''
+CharList
+Heredoc
 '''.* unqualified positional, key: value
+'''
+CharList
+Heredoc
+'''.or unqualified positional, key: value
 '''
 CharList
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 CharList
 Heredoc
 '''.^ unqualified positional, key: value
+'''
+CharList
+Heredoc
+'''.not unqualified positional, key: value
 '''
 CharList
 Heredoc

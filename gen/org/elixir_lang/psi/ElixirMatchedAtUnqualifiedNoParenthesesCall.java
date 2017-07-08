@@ -52,6 +52,10 @@ public interface ElixirMatchedAtUnqualifiedNoParenthesesCall extends ElixirMatch
   @Nullable
   PsiReference getReference();
 
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedAtUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   @NotNull
   SearchScope getUseScope();
 

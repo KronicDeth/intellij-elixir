@@ -1,3 +1,4 @@
+nil.and Qualifier.qualified positional, key: value
 nil.&& Qualifier.qualified positional, key: value
 nil.|> Qualifier.qualified positional, key: value
 nil.@ Qualifier.qualified positional, key: value
@@ -8,7 +9,9 @@ nil.^^^ Qualifier.qualified positional, key: value
 nil.<- Qualifier.qualified positional, key: value
 nil.in Qualifier.qualified positional, key: value
 nil.= Qualifier.qualified positional, key: value
+nil./ Qualifier.qualified positional, key: value
 nil.* Qualifier.qualified positional, key: value
+nil.or Qualifier.qualified positional, key: value
 nil.|| Qualifier.qualified positional, key: value
 nil.| Qualifier.qualified positional, key: value
 nil.<= Qualifier.qualified positional, key: value
@@ -16,6 +19,7 @@ nil.-> Qualifier.qualified positional, key: value
 nil.% Qualifier.qualified positional, key: value
 nil.<> Qualifier.qualified positional, key: value
 nil.^ Qualifier.qualified positional, key: value
+nil.not Qualifier.qualified positional, key: value
 nil.after Qualifier.qualified positional, key: value
 nil.do Qualifier.qualified positional, key: value
 nil.when Qualifier.qualified positional, key: value

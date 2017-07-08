@@ -1,3 +1,4 @@
+nil.and key1: value1, key2: value2
 nil.&& key1: value1, key2: value2
 nil.|> key1: value1, key2: value2
 nil.@ key1: value1, key2: value2
@@ -8,7 +9,9 @@ nil.^^^ key1: value1, key2: value2
 nil.<- key1: value1, key2: value2
 nil.in key1: value1, key2: value2
 nil.= key1: value1, key2: value2
+nil./ key1: value1, key2: value2
 nil.* key1: value1, key2: value2
+nil.or key1: value1, key2: value2
 nil.|| key1: value1, key2: value2
 nil.| key1: value1, key2: value2
 nil.<= key1: value1, key2: value2
@@ -16,6 +19,7 @@ nil.-> key1: value1, key2: value2
 nil.% key1: value1, key2: value2
 nil.<> key1: value1, key2: value2
 nil.^ key1: value1, key2: value2
+nil.not key1: value1, key2: value2
 nil.after key1: value1, key2: value2
 nil.do key1: value1, key2: value2
 nil.when key1: value1, key2: value2

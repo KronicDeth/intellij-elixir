@@ -40,6 +40,10 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   PsiElement functionNameElement();
 
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedQualifiedNoArgumentsCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   @Nullable
@@ -52,6 +56,14 @@ public interface ElixirUnmatchedQualifiedNoArgumentsCall extends ElixirUnmatched
 
   @Nullable
   PsiReference getReference();
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedQualifiedNoArgumentsCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirUnmatchedQualifiedNoArgumentsCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   boolean isCalling(String resolvedModuleName, String functionName);
 

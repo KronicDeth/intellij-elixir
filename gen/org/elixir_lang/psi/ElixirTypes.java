@@ -223,7 +223,8 @@ public interface ElixirTypes {
 
   IElementType AFTER = new ElixirTokenType("after");
   IElementType ALIAS_TOKEN = new ElixirTokenType("Alias");
-  IElementType AND_OPERATOR = new ElixirTokenType("&&&, `and`, &&");
+  IElementType AND_SYMBOL_OPERATOR = new ElixirTokenType("&&&, &&");
+  IElementType AND_WORD_OPERATOR = new ElixirTokenType("`and`");
   IElementType ARROW_OPERATOR = new ElixirTokenType("<<<, <<~, <|>, <~>, >>>, ~>>, <~, |>, ~>");
   IElementType ASSOCIATION_OPERATOR = new ElixirTokenType("=>");
   IElementType ATOM_FRAGMENT = new ElixirTokenType("A-Z, a-z, _, @, 0-9. ?, !");
@@ -254,6 +255,7 @@ public interface ElixirTypes {
   IElementType COMPARISON_OPERATOR = new ElixirTokenType("!==, ===, !=, ==, =~");
   IElementType DECIMAL_MARK = new ElixirTokenType("Decimal Mark (.)");
   IElementType DECIMAL_SEPARATOR = new ElixirTokenType("_");
+  IElementType DIVISION_OPERATOR = new ElixirTokenType("/");
   IElementType DO = new ElixirTokenType("do");
   IElementType DOT_OPERATOR = new ElixirTokenType(".");
   IElementType DUAL_OPERATOR = new ElixirTokenType("+, -");
@@ -291,8 +293,9 @@ public interface ElixirTypes {
   IElementType LITERAL_WORDS_SIGIL_NAME = new ElixirTokenType("W");
   IElementType MAP_OPERATOR = new ElixirTokenType("%{}");
   IElementType MATCH_OPERATOR = new ElixirTokenType("=");
-  IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("*, /");
+  IElementType MULTIPLICATION_OPERATOR = new ElixirTokenType("*");
   IElementType NIL = new ElixirTokenType("nil");
+  IElementType NOT_OPERATOR = new ElixirTokenType("not");
   IElementType OBSOLETE_BINARY_WHOLE_NUMBER_BASE = new ElixirTokenType("B");
   IElementType OBSOLETE_HEXADECIMAL_WHOLE_NUMBER_BASE = new ElixirTokenType("X");
   IElementType OCTAL_WHOLE_NUMBER_BASE = new ElixirTokenType("o");
@@ -300,8 +303,10 @@ public interface ElixirTypes {
   IElementType OPENING_BRACKET = new ElixirTokenType("[");
   IElementType OPENING_CURLY = new ElixirTokenType("{");
   IElementType OPENING_PARENTHESIS = new ElixirTokenType("(");
-  IElementType OR_OPERATOR = new ElixirTokenType("|||, `or`, ||");
+  IElementType OR_SYMBOL_OPERATOR = new ElixirTokenType("|||, ||");
+  IElementType OR_WORD_OPERATOR = new ElixirTokenType("`or`");
   IElementType PIPE_OPERATOR = new ElixirTokenType("|");
+  IElementType RANGE_OPERATOR = new ElixirTokenType("..");
   IElementType REGEX_FRAGMENT = new ElixirTokenType("Regex Fragment");
   IElementType REGEX_HEREDOC_PROMOTER = new ElixirTokenType("Regex Heredoc Promoter (\"\"\", ''')");
   IElementType REGEX_HEREDOC_TERMINATOR = new ElixirTokenType("Regex Heredoc Terminator (\"\"\", ''')");
@@ -332,9 +337,9 @@ public interface ElixirTypes {
   IElementType TILDE = new ElixirTokenType("~");
   IElementType TRUE = new ElixirTokenType("true");
   IElementType TUPLE_OPERATOR = new ElixirTokenType("{}");
-  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, .., <>");
+  IElementType TWO_OPERATOR = new ElixirTokenType("++, --, <>");
   IElementType TYPE_OPERATOR = new ElixirTokenType("::");
-  IElementType UNARY_OPERATOR = new ElixirTokenType("not, ~~~, !, ^");
+  IElementType UNARY_OPERATOR = new ElixirTokenType("~~~, !, ^");
   IElementType UNICODE_ESCAPE_CHARACTER = new ElixirTokenType("u");
   IElementType UNKNOWN_WHOLE_NUMBER_BASE = new ElixirTokenType("A-Z, a, c-n, p-w, z");
   IElementType VALID_BINARY_DIGITS = new ElixirTokenType("0-1");

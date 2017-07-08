@@ -46,7 +46,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "&&",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.AND_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -54,7 +54,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "&&&",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.AND_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.AND_SYMBOL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -193,7 +193,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "and",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.AND_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.AND_WORD_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -289,7 +289,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "not",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.UNARY_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.IDENTIFIER_TOKEN, ElixirFlexLexer.CALL_OR_KEYWORD_PAIR_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -305,7 +305,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "or",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_WORD_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -385,7 +385,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "||",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -393,7 +393,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "|||",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.OR_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.OR_SYMBOL_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )
@@ -468,7 +468,7 @@ public class DotRelativeIdentifierParenthesesCallTest extends Test {
                         {
                                 "/",
                                 Arrays.asList(
-                                        new TokenTypeState(ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
+                                        new TokenTypeState(ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.CALL_MAYBE),
                                         new TokenTypeState(ElixirTypes.CALL, INITIAL_STATE),
                                         new TokenTypeState(ElixirTypes.OPENING_PARENTHESIS, INITIAL_STATE)
                                 )

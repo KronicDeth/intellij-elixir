@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and unqualified positional, key: value
+"""
+String
+Heredoc
 """.&& unqualified positional, key: value
 """
 String
@@ -41,7 +45,15 @@ Heredoc
 """
 String
 Heredoc
+"""./ unqualified positional, key: value
+"""
+String
+Heredoc
 """.* unqualified positional, key: value
+"""
+String
+Heredoc
+""".or unqualified positional, key: value
 """
 String
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 String
 Heredoc
 """.^ unqualified positional, key: value
+"""
+String
+Heredoc
+""".not unqualified positional, key: value
 """
 String
 Heredoc

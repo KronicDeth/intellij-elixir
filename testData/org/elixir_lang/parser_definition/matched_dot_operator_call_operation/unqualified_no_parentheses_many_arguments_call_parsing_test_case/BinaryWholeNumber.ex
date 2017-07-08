@@ -1,3 +1,4 @@
+0b10.and unqualified positional, key: value
 0b10.&& unqualified positional, key: value
 0b10.|> unqualified positional, key: value
 0b10.@ unqualified positional, key: value
@@ -8,7 +9,9 @@
 0b10.<- unqualified positional, key: value
 0b10.in unqualified positional, key: value
 0b10.= unqualified positional, key: value
+0b10./ unqualified positional, key: value
 0b10.* unqualified positional, key: value
+0b10.or unqualified positional, key: value
 0b10.|| unqualified positional, key: value
 0b10.| unqualified positional, key: value
 0b10.<= unqualified positional, key: value
@@ -16,6 +19,7 @@
 0b10.% unqualified positional, key: value
 0b10.<> unqualified positional, key: value
 0b10.^ unqualified positional, key: value
+0b10.not unqualified positional, key: value
 0b10.after unqualified positional, key: value
 0b10.do unqualified positional, key: value
 0b10.when unqualified positional, key: value

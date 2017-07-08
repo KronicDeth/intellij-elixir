@@ -7,14 +7,18 @@ fn (positional, key: value) when guard -> one when guard end
 fn (positional, key: value) when guard -> one :: type end
 fn (positional, key: value) when guard -> one | two end
 fn (positional, key: value) when guard -> one = two end
+fn (positional, key: value) when guard -> one or two end
 fn (positional, key: value) when guard -> one || two end
+fn (positional, key: value) when guard -> one and two end
 fn (positional, key: value) when guard -> one && two end
 fn (positional, key: value) when guard -> one != two end
 fn (positional, key: value) when guard -> one < two end
 fn (positional, key: value) when guard -> one + two end
+fn (positional, key: value) when guard -> one / two end
 fn (positional, key: value) when guard -> one * two end
 fn (positional, key: value) when guard -> one <|> two end
 fn (positional, key: value) when guard -> one ^^^ two end
+fn (positional, key: value) when guard -> !one end
 fn (positional, key: value) when guard -> not one end
 fn (positional, key: value) when guard -> Module.function positional, key: value end
 fn (positional, key: value) when guard -> @function positional, key: value end

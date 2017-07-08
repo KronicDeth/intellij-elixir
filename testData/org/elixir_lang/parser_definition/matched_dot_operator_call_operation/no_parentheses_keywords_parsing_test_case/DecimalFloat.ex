@@ -1,3 +1,4 @@
+1.2e-3.and key1: value1, key2: value2
 1.2e-3.&& key1: value1, key2: value2
 1.2e-3.|> key1: value1, key2: value2
 1.2e-3.@ key1: value1, key2: value2
@@ -8,7 +9,9 @@
 1.2e-3.<- key1: value1, key2: value2
 1.2e-3.in key1: value1, key2: value2
 1.2e-3.= key1: value1, key2: value2
+1.2e-3./ key1: value1, key2: value2
 1.2e-3.* key1: value1, key2: value2
+1.2e-3.or key1: value1, key2: value2
 1.2e-3.|| key1: value1, key2: value2
 1.2e-3.| key1: value1, key2: value2
 1.2e-3.<= key1: value1, key2: value2
@@ -16,6 +19,7 @@
 1.2e-3.% key1: value1, key2: value2
 1.2e-3.<> key1: value1, key2: value2
 1.2e-3.^ key1: value1, key2: value2
+1.2e-3.not key1: value1, key2: value2
 1.2e-3.after key1: value1, key2: value2
 1.2e-3.do key1: value1, key2: value2
 1.2e-3.when key1: value1, key2: value2

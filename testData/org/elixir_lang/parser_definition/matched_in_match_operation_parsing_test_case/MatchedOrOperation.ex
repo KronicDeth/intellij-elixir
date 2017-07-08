@@ -1,2 +1,2 @@
-one or two <- three or four
-one or two \\ three or four
+one or two <- three || four
+one ||| two \\ three or four

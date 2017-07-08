@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and positional
+'''
+CharList
+Heredoc
 '''.&& positional
 '''
 CharList
@@ -41,7 +45,15 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./ positional
+'''
+CharList
+Heredoc
 '''.* positional
+'''
+CharList
+Heredoc
+'''.or positional
 '''
 CharList
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 CharList
 Heredoc
 '''.^ positional
+'''
+CharList
+Heredoc
+'''.not positional
 '''
 CharList
 Heredoc

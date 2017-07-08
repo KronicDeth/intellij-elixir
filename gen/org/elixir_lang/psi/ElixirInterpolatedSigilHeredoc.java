@@ -41,6 +41,9 @@ public interface ElixirInterpolatedSigilHeredoc extends InterpolatedSigilHeredoc
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

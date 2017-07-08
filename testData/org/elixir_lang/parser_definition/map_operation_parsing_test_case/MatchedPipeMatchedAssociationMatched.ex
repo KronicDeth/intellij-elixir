@@ -1,11 +1,11 @@
 %{ one = two | three = four => five = six }
-%{ one || two | three || four => five || six }
-%{ one && two | three && four => five && six }
+%{ one || two | three or four => five ||| six }
+%{ one && two | three and four => five &&& six }
 %{ one != two | three != four => five == six }
 %{ one < two | three > four => five <= six }
 %{ one |> two | three |> four => five <<< six }
 %{ one in two | three in four => five in six }
-%{ one ++ two | three -- four => five <> six }
+%{ one ++ two | three -- four => five..six }
 %{ one + two | three - four => five + six }
 %{ one * two | three / four => five * six }
 %{ one ^^^ two | three ^^^ four => five ^^^ six }

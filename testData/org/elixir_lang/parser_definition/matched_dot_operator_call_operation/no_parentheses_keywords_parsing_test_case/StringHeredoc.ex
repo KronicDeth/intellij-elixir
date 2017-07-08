@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and key1: value1, key2: value2
+"""
+String
+Heredoc
 """.&& key1: value1, key2: value2
 """
 String
@@ -41,7 +45,15 @@ Heredoc
 """
 String
 Heredoc
+"""./ key1: value1, key2: value2
+"""
+String
+Heredoc
 """.* key1: value1, key2: value2
+"""
+String
+Heredoc
+""".or key1: value1, key2: value2
 """
 String
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 String
 Heredoc
 """.^ key1: value1, key2: value2
+"""
+String
+Heredoc
+""".not key1: value1, key2: value2
 """
 String
 Heredoc

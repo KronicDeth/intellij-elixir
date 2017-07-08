@@ -3,16 +3,21 @@
 << one :: two, three: 3 >>
 << one | two, three: 3 >>
 << one = two, three: 3 >>
+<< one or two, three: 3 >>
 << one || two, three: 3 >>
+<< one and two, three: 3 >>
 << one && two, three: 3 >>
 << one != two, three: 3 >>
 << one < two, three: 3 >>
 << one |> two, three: 3 >>
 << one in two, three: 3 >>
 << one ++ two, three: 3 >>
+<< one..two, three: 3 >>
 << one + two, three: 3 >>
+<< one / two, three: 3 >>
 << one * two, three: 3 >>
 << one ^^^ two, three: 3 >>
+<< not one, two: 2 >>
 << !one, two: 2 >>
 << one.(), two: 2 >>
 << One.Two[three], four: 4 >>

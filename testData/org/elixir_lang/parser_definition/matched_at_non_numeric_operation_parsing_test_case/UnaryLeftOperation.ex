@@ -1,1 +1,2 @@
 @!variable
+@not variable

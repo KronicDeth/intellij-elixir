@@ -49,6 +49,10 @@ public interface ElixirMatchedUnqualifiedNoArgumentsCall extends ElixirMatchedEx
   @Nullable
   PsiReference getReference();
 
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedUnqualifiedNoArgumentsCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   @NotNull
   SearchScope getUseScope();
 

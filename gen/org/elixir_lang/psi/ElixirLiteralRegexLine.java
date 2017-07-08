@@ -37,6 +37,9 @@ public interface ElixirLiteralRegexLine extends RegexFragmented, LiteralSigilLin
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

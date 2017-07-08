@@ -1,6 +1,10 @@
 """
 String
 Heredoc
+""".and
+"""
+String
+Heredoc
 """.&&
 """
 String
@@ -41,7 +45,15 @@ Heredoc
 """
 String
 Heredoc
+"""./
+"""
+String
+Heredoc
 """.*
+"""
+String
+Heredoc
+""".or
 """
 String
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 String
 Heredoc
 """.^
+"""
+String
+Heredoc
+""".not
 """
 String
 Heredoc

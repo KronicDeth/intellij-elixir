@@ -1,3 +1,4 @@
+1.2e-3.and Qualifier.qualified positional, key: value
 1.2e-3.&& Qualifier.qualified positional, key: value
 1.2e-3.|> Qualifier.qualified positional, key: value
 1.2e-3.@ Qualifier.qualified positional, key: value
@@ -8,7 +9,9 @@
 1.2e-3.<- Qualifier.qualified positional, key: value
 1.2e-3.in Qualifier.qualified positional, key: value
 1.2e-3.= Qualifier.qualified positional, key: value
+1.2e-3./ Qualifier.qualified positional, key: value
 1.2e-3.* Qualifier.qualified positional, key: value
+1.2e-3.or Qualifier.qualified positional, key: value
 1.2e-3.|| Qualifier.qualified positional, key: value
 1.2e-3.| Qualifier.qualified positional, key: value
 1.2e-3.<= Qualifier.qualified positional, key: value
@@ -16,6 +19,7 @@
 1.2e-3.% Qualifier.qualified positional, key: value
 1.2e-3.<> Qualifier.qualified positional, key: value
 1.2e-3.^ Qualifier.qualified positional, key: value
+1.2e-3.not Qualifier.qualified positional, key: value
 1.2e-3.after Qualifier.qualified positional, key: value
 1.2e-3.do Qualifier.qualified positional, key: value
 1.2e-3.when Qualifier.qualified positional, key: value

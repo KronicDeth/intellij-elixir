@@ -1,1 +1,1 @@
-one and two when three and four
+one and two when three && four

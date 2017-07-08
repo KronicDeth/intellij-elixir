@@ -1,3 +1,4 @@
+Alias.and positional
 Alias.&& positional
 Alias.|> positional
 Alias.@ positional
@@ -8,7 +9,9 @@ Alias.^^^ positional
 Alias.<- positional
 Alias.in positional
 Alias.= positional
+Alias./ positional
 Alias.* positional
+Alias.or positional
 Alias.|| positional
 Alias.| positional
 Alias.<= positional
@@ -16,6 +19,7 @@ Alias.-> positional
 Alias.% positional
 Alias.<> positional
 Alias.^ positional
+Alias.not positional
 Alias.after positional
 Alias.do positional
 Alias.when positional

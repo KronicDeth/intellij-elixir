@@ -25,7 +25,15 @@ Heredoc
 '''
 CharList
 Heredoc
+''' one or two
+'''
+CharList
+Heredoc
 ''' one || two
+'''
+CharList
+Heredoc
+''' one and two
 '''
 CharList
 Heredoc
@@ -49,6 +57,10 @@ Heredoc
 '''
 CharList
 Heredoc
+''' one / two
+'''
+CharList
+Heredoc
 ''' one * two
 '''
 CharList
@@ -58,6 +70,10 @@ Heredoc
 CharList
 Heredoc
 ''' !one
+'''
+CharList
+Heredoc
+''' not one
 '''
 CharList
 Heredoc

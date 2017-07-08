@@ -1,3 +1,4 @@
+0o76543210.and positional
 0o76543210.&& positional
 0o76543210.|> positional
 0o76543210.@ positional
@@ -8,7 +9,9 @@
 0o76543210.<- positional
 0o76543210.in positional
 0o76543210.= positional
+0o76543210./ positional
 0o76543210.* positional
+0o76543210.or positional
 0o76543210.|| positional
 0o76543210.| positional
 0o76543210.<= positional
@@ -16,6 +19,7 @@
 0o76543210.% positional
 0o76543210.<> positional
 0o76543210.^ positional
+0o76543210.not positional
 0o76543210.after positional
 0o76543210.do positional
 0o76543210.when positional

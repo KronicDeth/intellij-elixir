@@ -1,3 +1,4 @@
+nil.and positional
 nil.&& positional
 nil.|> positional
 nil.@ positional
@@ -8,7 +9,9 @@ nil.^^^ positional
 nil.<- positional
 nil.in positional
 nil.= positional
+nil./ positional
 nil.* positional
+nil.or positional
 nil.|| positional
 nil.| positional
 nil.<= positional
@@ -16,6 +19,7 @@ nil.-> positional
 nil.% positional
 nil.<> positional
 nil.^ positional
+nil.not positional
 nil.after positional
 nil.do positional
 nil.when positional

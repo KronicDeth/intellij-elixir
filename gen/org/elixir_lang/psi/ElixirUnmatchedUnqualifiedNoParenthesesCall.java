@@ -43,6 +43,10 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
   @NotNull
   PsiElement functionNameElement();
 
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   boolean isExported();
@@ -57,6 +61,14 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   @Nullable
   PsiReference getReference();
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   boolean isCalling(String resolvedModuleName, String functionName);
 
@@ -103,5 +115,17 @@ public interface ElixirUnmatchedUnqualifiedNoParenthesesCall extends ElixirUnmat
 
   @NotNull
   PsiElement setName(String newName);
+
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirUnmatchedUnqualifiedNoParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
 }

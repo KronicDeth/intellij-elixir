@@ -37,6 +37,9 @@ public interface ElixirInterpolatedCharListSigilLine extends CharListFragmented,
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

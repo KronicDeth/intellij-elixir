@@ -41,6 +41,9 @@ public interface ElixirLiteralRegexHeredoc extends RegexFragmented, LiteralSigil
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

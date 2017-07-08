@@ -1,3 +1,4 @@
+~x{}i.and Qualifier.qualified positional, key: value
 ~x{}i.&& Qualifier.qualified positional, key: value
 ~x{}i.|> Qualifier.qualified positional, key: value
 ~x{}i.@ Qualifier.qualified positional, key: value
@@ -8,7 +9,9 @@
 ~x{}i.<- Qualifier.qualified positional, key: value
 ~x{}i.in Qualifier.qualified positional, key: value
 ~x{}i.= Qualifier.qualified positional, key: value
+~x{}i./ Qualifier.qualified positional, key: value
 ~x{}i.* Qualifier.qualified positional, key: value
+~x{}i.or Qualifier.qualified positional, key: value
 ~x{}i.|| Qualifier.qualified positional, key: value
 ~x{}i.| Qualifier.qualified positional, key: value
 ~x{}i.<= Qualifier.qualified positional, key: value
@@ -16,6 +19,7 @@
 ~x{}i.% Qualifier.qualified positional, key: value
 ~x{}i.<> Qualifier.qualified positional, key: value
 ~x{}i.^ Qualifier.qualified positional, key: value
+~x{}i.not Qualifier.qualified positional, key: value
 ~x{}i.after Qualifier.qualified positional, key: value
 ~x{}i.do Qualifier.qualified positional, key: value
 ~x{}i.when Qualifier.qualified positional, key: value

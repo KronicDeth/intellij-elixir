@@ -1,3 +1,4 @@
+Alias.and
 Alias.&&
 Alias.|>
 Alias.@
@@ -8,7 +9,9 @@ Alias.^^^
 Alias.<-
 Alias.in
 Alias.=
+Alias./
 Alias.*
+Alias.or
 Alias.||
 Alias.|
 Alias.<=
@@ -16,6 +19,7 @@ Alias.->
 Alias.%
 Alias.<>
 Alias.^
+Alias.not
 Alias.after
 Alias.do
 Alias.when

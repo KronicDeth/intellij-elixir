@@ -1,3 +1,12 @@
+@Module.or[key: value]
+@Module.or [key: value]
+@Module.or[()]
+@Module.or [()]
+@Module.or[matched_expression]
+@Module.or [matched_expression]
+@Module.or[matched_expression,]
+@Module.or [matched_expression,]
+
 @Module.||[key: value]
 @Module.|| [key: value]
 @Module.||[()]

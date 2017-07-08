@@ -1,1 +1,2 @@
-!one when !two
+!one when not two
+not one when !two

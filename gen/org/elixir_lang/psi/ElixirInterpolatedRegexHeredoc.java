@@ -41,6 +41,9 @@ public interface ElixirInterpolatedRegexHeredoc extends RegexFragmented, Interpo
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

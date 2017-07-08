@@ -4,12 +4,15 @@
 [] one :: type
 [] one | new
 [] one = two
+[] one or two
 [] one || two
+[] one and two
 [] one && two
 [] one != two
 [] one < two
 [] one |> two
 [] one + two
+[] one / two
 [] one * two
 [] one ^^^ two
 [] !one
@@ -21,6 +24,7 @@
 [] @1
 [] &1
 [] !1
+[] not 1
 [] (;)
 [] ?1
 [] 0b10

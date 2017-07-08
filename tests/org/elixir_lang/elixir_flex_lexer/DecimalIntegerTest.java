@@ -57,7 +57,7 @@ public class DecimalIntegerTest extends TokenTest {
                 { "-", ElixirTypes.DUAL_OPERATOR, ElixirFlexLexer.DUAL_OPERATION, true },
                 { ".", ElixirTypes.DOT_OPERATOR, ElixirFlexLexer.DOT_OPERATION, true },
                 { ".2", ElixirTypes.DECIMAL_MARK, ElixirFlexLexer.DECIMAL_FRACTION, false },
-                { "/", ElixirTypes.MULTIPLICATION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
+                { "/", ElixirTypes.DIVISION_OPERATOR, ElixirFlexLexer.KEYWORD_PAIR_MAYBE, true },
                 { "0", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "1", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },
                 { "2", null, ElixirFlexLexer.DECIMAL_WHOLE_NUMBER, true },

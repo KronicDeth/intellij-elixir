@@ -1,4 +1,4 @@
 !one ++ +two
 ^three -- -four
-not five .. ~~~six
+not five..~~~six
 !seven <> !eight

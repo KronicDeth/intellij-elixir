@@ -4,12 +4,15 @@
 0b10 one :: type
 0b10 one | new
 0b10 one = two
+0b10 one or two
 0b10 one || two
+0b10 one and two
 0b10 one && two
 0b10 one != two
 0b10 one < two
 0b10 one |> two
 0b10 one + two
+0b10 one / two
 0b10 one * two
 0b10 one ^^^ two
 0b10 !one
@@ -21,6 +24,7 @@
 0b10 @1
 0b10 &1
 0b10 !1
+0b10 not 1
 0b10 (;)
 0b10 ?1
 0b10 0b10

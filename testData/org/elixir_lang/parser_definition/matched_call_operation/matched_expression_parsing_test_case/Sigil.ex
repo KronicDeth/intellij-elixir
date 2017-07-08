@@ -4,12 +4,15 @@
 ~x{sigil}modifiers one :: type
 ~x{sigil}modifiers one | new
 ~x{sigil}modifiers one = two
+~x{sigil}modifiers one or two
 ~x{sigil}modifiers one || two
+~x{sigil}modifiers one and two
 ~x{sigil}modifiers one && two
 ~x{sigil}modifiers one != two
 ~x{sigil}modifiers one < two
 ~x{sigil}modifiers one |> two
 ~x{sigil}modifiers one + two
+~x{sigil}modifiers one / two
 ~x{sigil}modifiers one * two
 ~x{sigil}modifiers one ^^^ two
 ~x{sigil}modifiers !one
@@ -21,6 +24,7 @@
 ~x{sigil}modifiers @1
 ~x{sigil}modifiers &1
 ~x{sigil}modifiers !1
+~x{sigil}modifiers not 1
 ~x{sigil}modifiers (;)
 ~x{sigil}modifiers ?1
 ~x{sigil}modifiers 0b10

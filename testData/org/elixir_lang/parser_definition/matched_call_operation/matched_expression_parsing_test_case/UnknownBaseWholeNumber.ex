@@ -4,12 +4,15 @@
 0zZ one :: type
 0zZ one | new
 0zZ one = two
+0zZ one or two
 0zZ one || two
+0zZ one and two
 0zZ one && two
 0zZ one != two
 0zZ one < two
 0zZ one |> two
 0zZ one + two
+0zZ one / two
 0zZ one * two
 0zZ one ^^^ two
 0zZ !one
@@ -21,6 +24,7 @@
 0zZ @1
 0zZ &1
 0zZ !1
+0zZ not 1
 0zZ (;)
 0zZ ?1
 0zZ 0b10

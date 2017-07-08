@@ -122,8 +122,8 @@ FOUR_TOKEN_WHEN_OPERATOR = "when"
 FOUR_TOKEN_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR} |
                       {FOUR_TOKEN_WHEN_OPERATOR}
 
-THREE_TOKEN_AND_OPERATOR = "&&&" |
-                           "and"
+THREE_TOKEN_AND_SYMBOL_OPERATOR = "&&&"
+THREE_TOKEN_AND_WORD_OPERATOR = "and"
 THREE_TOKEN_ARROW_OPERATOR = "<<<" |
                              "<<~" |
                              "<|>" |
@@ -133,22 +133,24 @@ THREE_TOKEN_ARROW_OPERATOR = "<<<" |
 THREE_TOKEN_COMPARISON_OPERATOR = "!==" |
                                   "==="
 THREE_TOKEN_MAP_OPERATOR = "%" {OPENING_CURLY} {CLOSING_CURLY}
-THREE_TOKEN_OR_OPERATOR = "|||"
+THREE_TOKEN_OR_SYMBOL_OPERATOR = "|||"
 // https://github.com/elixir-lang/elixir/commit/3487d00ddb5e90c7cf0e65d03717903b9b27eafd
 THREE_TOKEN_THREE_OPERATOR = "^^^"
-THREE_TOKEN_UNARY_OPERATOR = "not" |
-                             "~~~"
+THREE_TOKEN_NOT_OPERATOR = "not"
+THREE_TOKEN_UNARY_OPERATOR = "~~~"
 
-THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
+THREE_TOKEN_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
+                       {THREE_TOKEN_AND_WORD_OPERATOR} |
                        {THREE_TOKEN_ARROW_OPERATOR} |
                        {THREE_TOKEN_COMPARISON_OPERATOR} |
                        {THREE_TOKEN_MAP_OPERATOR} |
-                       {THREE_TOKEN_OR_OPERATOR} |
+                       {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
                        {THREE_TOKEN_THREE_OPERATOR} |
                        {THREE_TOKEN_UNARY_OPERATOR} |
+                       {THREE_TOKEN_NOT_OPERATOR} |
                        "..."
 
-TWO_TOKEN_AND_OPERATOR = "&&"
+TWO_TOKEN_AND_SYMBOL_OPERATOR = "&&"
 TWO_TOKEN_ARROW_OPERATOR = "<~" |
                            "|>" |
                            "~>"
@@ -158,8 +160,9 @@ TWO_TOKEN_COMPARISON_OPERATOR = "!=" |
                                 "=~"
 TWO_TOKEN_IN_MATCH_OPERATOR = "<-" |
                               "\\\\"
-TWO_TOKEN_OR_OPERATOR = "or" |
-                        "||"
+TWO_TOKEN_OR_WORD_OPERATOR = "or"
+TWO_TOKEN_OR_SYMBOL_OPERATOR = "||"
+TWO_TOKEN_RANGE_OPERATOR = ".."
 TWO_TOKEN_RELATIONAL_OPERATOR = "<=" |
                                 ">="
 TWO_TOKEN_STAB_OPERATOR = "->"
@@ -167,16 +170,17 @@ TWO_TOKEN_TUPLE_OPERATOR = {OPENING_CURLY} {CLOSING_CURLY}
 TWO_TOKEN_TWO_OPERATOR = "++" |
                          "--" |
                          "--" |
-                         ".." |
                          "<>"
 TWO_TOKEN_TYPE_OPERATOR = "::"
 
-TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
+TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_SYMBOL_OPERATOR} |
                      {TWO_TOKEN_ARROW_OPERATOR} |
                      {TWO_TOKEN_ASSOCIATION_OPERATOR} |
                      {TWO_TOKEN_COMPARISON_OPERATOR} |
                      {TWO_TOKEN_IN_MATCH_OPERATOR} |
-                     {TWO_TOKEN_OR_OPERATOR} |
+                     {TWO_TOKEN_OR_WORD_OPERATOR} |
+                     {TWO_TOKEN_OR_SYMBOL_OPERATOR} |
+                     {TWO_TOKEN_RANGE_OPERATOR} |
                      {TWO_TOKEN_RELATIONAL_OPERATOR} |
                      {TWO_TOKEN_STAB_OPERATOR} |
                      {TWO_TOKEN_TUPLE_OPERATOR} |
@@ -185,6 +189,7 @@ TWO_TOKEN_OPERATOR = {TWO_TOKEN_AND_OPERATOR} |
 
 ONE_TOKEN_AT_OPERATOR = "@"
 ONE_TOKEN_CAPTURE_OPERATOR = "&"
+ONE_TOKEN_DIVISION_OPERATOR = "/"
 ONE_TOKEN_DOT_OPERATOR = "."
 /* Dual because they have a dual role as unary operators and binary operators
    @see https://github.com/elixir-lang/elixir/blob/de39bbaca277002797e52ffbde617ace06233a2b/lib/elixir/src/elixir_tokenizer.erl#L31-L32 */
@@ -192,8 +197,7 @@ ONE_TOKEN_DUAL_OPERATOR = "+" |
                           "-"
 ONE_TOKEN_IN_OPERATOR = "in"
 ONE_TOKEN_MATCH_OPERATOR = "="
-ONE_TOKEN_MULTIPLICATION_OPERATOR = "*" |
-                                    "/"
+ONE_TOKEN_MULTIPLICATION_OPERATOR = "*"
 ONE_TOKEN_PIPE_OPERATOR = "|"
 ONE_TOKEN_RELATIONAL_OPERATOR = "<" |
                                 ">"
@@ -202,6 +206,7 @@ ONE_TOKEN_UNARY_OPERATOR = "!" |
                            "^"
 ONE_TOKEN_REFERENCABLE_OPERATOR = {ONE_TOKEN_AT_OPERATOR} |
                                   {ONE_TOKEN_CAPTURE_OPERATOR} |
+                                  {ONE_TOKEN_DIVISION_OPERATOR} |
                                   {ONE_TOKEN_DUAL_OPERATOR} |
                                   {ONE_TOKEN_IN_OPERATOR} |
                                   {ONE_TOKEN_MATCH_OPERATOR} |
@@ -214,14 +219,16 @@ ONE_TOKEN_UNREFERENCABLE_OPERATOR = {ONE_TOKEN_DOT_OPERATOR} |
 ONE_TOKEN_OPERATOR = {ONE_TOKEN_REFERENCABLE_OPERATOR} |
                      {ONE_TOKEN_UNREFERENCABLE_OPERATOR}
 
-AND_OPERATOR = {THREE_TOKEN_AND_OPERATOR} |
-               {TWO_TOKEN_AND_OPERATOR}
+AND_SYMBOL_OPERATOR = {THREE_TOKEN_AND_SYMBOL_OPERATOR} |
+                      {TWO_TOKEN_AND_SYMBOL_OPERATOR}
+AND_WORD_OPERATOR = {THREE_TOKEN_AND_WORD_OPERATOR}
 ARROW_OPERATOR = {THREE_TOKEN_ARROW_OPERATOR} |
                  {TWO_TOKEN_ARROW_OPERATOR}
 ASSOCIATION_OPERATOR = {TWO_TOKEN_ASSOCIATION_OPERATOR}
 AT_OPERATOR = {ONE_TOKEN_AT_OPERATOR}
 BIT_STRING_OPERATOR = {FOUR_TOKEN_BITSTRING_OPERATOR}
 CAPTURE_OPERATOR = {ONE_TOKEN_CAPTURE_OPERATOR}
+DIVISION_OPERATOR = {ONE_TOKEN_DIVISION_OPERATOR}
 DOT_OPERATOR = {ONE_TOKEN_DOT_OPERATOR}
 // Dual because they have a dual role as unary operators and binary operators
 DUAL_OPERATOR = {ONE_TOKEN_DUAL_OPERATOR}
@@ -232,9 +239,12 @@ IN_OPERATOR = {ONE_TOKEN_IN_OPERATOR}
 MAP_OPERATOR = {THREE_TOKEN_MAP_OPERATOR}
 MATCH_OPERATOR = {ONE_TOKEN_MATCH_OPERATOR}
 MULTIPLICATION_OPERATOR = {ONE_TOKEN_MULTIPLICATION_OPERATOR}
-OR_OPERATOR = {THREE_TOKEN_OR_OPERATOR} |
-              {TWO_TOKEN_OR_OPERATOR}
+NOT_OPERATOR = {THREE_TOKEN_NOT_OPERATOR}
+OR_WORD_OPERATOR = {TWO_TOKEN_OR_WORD_OPERATOR}
+OR_SYMBOL_OPERATOR = {THREE_TOKEN_OR_SYMBOL_OPERATOR} |
+                     {TWO_TOKEN_OR_SYMBOL_OPERATOR}
 PIPE_OPERATOR = {ONE_TOKEN_PIPE_OPERATOR}
+RANGE_OPERATOR = {TWO_TOKEN_RANGE_OPERATOR}
 RELATIONAL_OPERATOR = {TWO_TOKEN_RELATIONAL_OPERATOR} |
                       {ONE_TOKEN_RELATIONAL_OPERATOR}
 STAB_OPERATOR = {TWO_TOKEN_STAB_OPERATOR}
@@ -451,8 +461,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
  * Function References
  */
 
-REFERENCE_OPERATOR = "/"
-REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{REFERENCE_OPERATOR}
+REFERENCE_INFIX_OPERATOR = ({WHITE_SPACE}|{EOL})*{DIVISION_OPERATOR}
 
 /*
  * Regular Keywords
@@ -579,8 +588,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before any single operator's match
   {REFERENCABLE_OPERATOR} / {REFERENCE_INFIX_OPERATOR} { pushAndBegin(REFERENCE_OPERATION);
                                                          return ElixirTypes.IDENTIFIER_TOKEN; }
-  {AND_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.AND_OPERATOR; }
+  {AND_SYMBOL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AND_SYMBOL_OPERATOR; }
+  {AND_WORD_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.AND_WORD_OPERATOR; }
   {ARROW_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.ARROW_OPERATOR; }
   {ASSOCIATION_OPERATOR}                     { pushAndBegin(KEYWORD_PAIR_MAYBE);
@@ -637,6 +648,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   {OPENING_BIT}                              { return ElixirTypes.OPENING_BIT; }
   {COMPARISON_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.COMPARISON_OPERATOR; }
+  {DIVISION_OPERATOR}                        { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.DIVISION_OPERATOR; }
   // DOT_OPERATOR is not a valid keywordKey, so no need to go to KEYWORD_PAIR_MAYBE
   {DOT_OPERATOR}                             { pushAndBegin(DOT_OPERATION);
                                                return ElixirTypes.DOT_OPERATOR; }
@@ -664,9 +677,12 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {IDENTIFIER_TOKEN} as "nil" would be parsed as an identifier since it's a lowercase alphanumeric.
   {NIL}                                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.NIL; }
+  // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
+  {NOT_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.NOT_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "or" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {OR_OPERATOR}                              { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.OR_OPERATOR; }
+  {OR_WORD_OPERATOR}                         { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.OR_WORD_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "rescue" would be parsed as an identifier since it's a lowercase alphanumeric.
   {RESCUE}                                   { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RESCUE; }
@@ -676,9 +692,6 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
   // Must be before {UNARY_OPERATOR} as "^^^" is longer than "^" in {UNARY_OPERATOR}
   {THREE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.THREE_OPERATOR; }
-  // Must be before {IDENTIFIER_TOKEN} as "not" would be parsed as an identifier since it's a lowercase alphanumeric.
-  {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
-                                               return ElixirTypes.UNARY_OPERATOR; }
   // Must be before {IDENTIFIER_TOKEN} as "when" would be parsed as an identifier since it's a lowercase alphanumeric.
   {WHEN_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.WHEN_OPERATOR; }
@@ -695,8 +708,12 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.MATCH_OPERATOR; }
   {MULTIPLICATION_OPERATOR}                  { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.MULTIPLICATION_OPERATOR; }
+  {OR_SYMBOL_OPERATOR}                       { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.OR_SYMBOL_OPERATOR; }
   {PIPE_OPERATOR}                            { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.PIPE_OPERATOR; }
+  {RANGE_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                      { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.RELATIONAL_OPERATOR; }
   {SEMICOLON}                                { return ElixirTypes.SEMICOLON; }
@@ -708,6 +725,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                return ElixirTypes.TILDE; }
   {TWO_OPERATOR}                             { pushAndBegin(KEYWORD_PAIR_MAYBE);
                                                return ElixirTypes.TWO_OPERATOR; }
+  {UNARY_OPERATOR}                           { pushAndBegin(KEYWORD_PAIR_MAYBE);
+                                               return ElixirTypes.UNARY_OPERATOR; }
   {VALID_DECIMAL_DIGITS}                     { pushAndBegin(DECIMAL_WHOLE_NUMBER);
                                                return ElixirTypes.VALID_DECIMAL_DIGITS; }
   {QUOTE_HEREDOC_PROMOTER}                   { startQuote(yytext());
@@ -833,8 +852,10 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <DOT_OPERATION> {
   {AFTER}                                           { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.AFTER; }
-  {AND_OPERATOR}                                    { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.AND_OPERATOR; }
+  {AND_SYMBOL_OPERATOR}                             { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_SYMBOL_OPERATOR; }
+  {AND_WORD_OPERATOR}                               { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.AND_WORD_OPERATOR; }
   {ARROW_OPERATOR}                                  { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.ARROW_OPERATOR; }
   {AT_OPERATOR}                                     { yybegin(CALL_MAYBE);
@@ -847,6 +868,8 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.COMPARISON_OPERATOR; }
   {DO}                                              { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DO; }
+  {DIVISION_OPERATOR}                               { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.DIVISION_OPERATOR; }
   {DUAL_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.DUAL_OPERATOR; }
   {END}                                             { yybegin(CALL_MAYBE);
@@ -865,10 +888,14 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
                                                       return ElixirTypes.MULTIPLICATION_OPERATOR; }
   {NIL}                                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.NIL; }
-  {OR_OPERATOR}                                     { yybegin(CALL_MAYBE);
-                                                      return ElixirTypes.OR_OPERATOR; }
+  {OR_SYMBOL_OPERATOR}                              { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.OR_SYMBOL_OPERATOR; }
+  {OR_WORD_OPERATOR}                                { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.OR_WORD_OPERATOR; }
   {PIPE_OPERATOR}                                   { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.PIPE_OPERATOR; }
+  {RANGE_OPERATOR}                                  { yybegin(CALL_MAYBE);
+                                                      return ElixirTypes.RANGE_OPERATOR; }
   {RELATIONAL_OPERATOR}                             { yybegin(CALL_MAYBE);
                                                       return ElixirTypes.RELATIONAL_OPERATOR; }
   {RESCUE}                                          { yybegin(CALL_MAYBE);
@@ -1188,9 +1215,9 @@ GROUP_HEREDOC_TERMINATOR = {QUOTE_HEREDOC_TERMINATOR}|{SIGIL_HEREDOC_TERMINATOR}
 <REFERENCE_OPERATION> {
   {ESCAPED_EOL}|{WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
   {EOL}                        { return ElixirTypes.EOL; }
-  {REFERENCE_OPERATOR}         { org.elixir_lang.lexer.StackFrame stackFrame = pop();
+  {DIVISION_OPERATOR}          { org.elixir_lang.lexer.StackFrame stackFrame = pop();
                                  yybegin(stackFrame.getLastLexicalState());
-                                 return ElixirTypes.MULTIPLICATION_OPERATOR; }
+                                 return ElixirTypes.DIVISION_OPERATOR; }
 }
 
 <SIGIL> {

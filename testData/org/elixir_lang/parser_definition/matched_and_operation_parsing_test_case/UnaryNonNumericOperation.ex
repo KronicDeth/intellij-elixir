@@ -1,3 +1,3 @@
-!one && !two
-!one &&& !two
-!one and !two
+!one && not two
+!one &&& not two
+!one and not two

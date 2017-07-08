@@ -1,3 +1,4 @@
+'CharList'.and unqualified positional, key: value
 'CharList'.&& unqualified positional, key: value
 'CharList'.|> unqualified positional, key: value
 'CharList'.@ unqualified positional, key: value
@@ -8,7 +9,9 @@
 'CharList'.<- unqualified positional, key: value
 'CharList'.in unqualified positional, key: value
 'CharList'.= unqualified positional, key: value
+'CharList'./ unqualified positional, key: value
 'CharList'.* unqualified positional, key: value
+'CharList'.or unqualified positional, key: value
 'CharList'.|| unqualified positional, key: value
 'CharList'.| unqualified positional, key: value
 'CharList'.<= unqualified positional, key: value
@@ -16,6 +19,7 @@
 'CharList'.% unqualified positional, key: value
 'CharList'.<> unqualified positional, key: value
 'CharList'.^ unqualified positional, key: value
+'CharList'.not unqualified positional, key: value
 'CharList'.after unqualified positional, key: value
 'CharList'.do unqualified positional, key: value
 'CharList'.when unqualified positional, key: value

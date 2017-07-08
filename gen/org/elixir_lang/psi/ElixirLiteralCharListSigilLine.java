@@ -37,6 +37,9 @@ public interface ElixirLiteralCharListSigilLine extends CharListFragmented, Lite
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

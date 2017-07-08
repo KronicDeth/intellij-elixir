@@ -41,6 +41,9 @@ public interface ElixirLiteralStringSigilHeredoc extends StringFragmented, Liter
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

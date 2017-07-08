@@ -1,3 +1,4 @@
+:atom.and
 :atom.&&
 :atom.|>
 :atom.@
@@ -8,7 +9,9 @@
 :atom.<-
 :atom.in
 :atom.=
+:atom./
 :atom.*
+:atom.or
 :atom.||
 :atom.|
 :atom.<=
@@ -16,6 +19,7 @@
 :atom.%
 :atom.<>
 :atom.^
+:atom.not
 :atom.after
 :atom.do
 :atom.when

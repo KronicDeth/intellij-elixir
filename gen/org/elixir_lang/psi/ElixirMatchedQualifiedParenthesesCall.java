@@ -56,6 +56,14 @@ public interface ElixirMatchedQualifiedParenthesesCall extends ElixirMatchedExpr
   @Nullable
   PsiReference getReference();
 
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirMatchedQualifiedParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirMatchedQualifiedParenthesesCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean isCalling(String resolvedModuleName, String functionName);
 
   boolean isCalling(String resolvedModuleName, String functionName, int resolvedFinalArity);

@@ -3,13 +3,15 @@
 %{ one when one => two when two }
 %{ one :: two => three :: four }
 %{ one = two => three = four }
-%{ one || two => three || four }
-%{ one && two => three && four }
+%{ one or two => three || four }
+%{ one || two => three ||| four }
+%{ one and two => three && four }
+%{ one && two => three &&& four }
 %{ one != two => three != four }
 %{ one < two => three > four }
 %{ one |> two => three |> four }
 %{ one in two => three in four }
-%{ one ++ two => three -- four }
+%{ one ++ two => three..four }
 %{ one + two => three - four }
 %{ one * two => three / four }
 %{ one ^^^ two => three ^^^ four }

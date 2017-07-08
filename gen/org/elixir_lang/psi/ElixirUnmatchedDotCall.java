@@ -42,6 +42,10 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
   @Nullable
   PsiElement functionNameElement();
 
+  //WARNING: getDoBlock(...) is skipped
+  //matching getDoBlock(ElixirUnmatchedDotCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   boolean hasDoBlockOrKeyword();
 
   @Nullable
@@ -54,6 +58,14 @@ public interface ElixirUnmatchedDotCall extends ElixirUnmatchedExpression, DotCa
 
   @Nullable
   PsiReference getReference();
+
+  //WARNING: getStub(...) is skipped
+  //matching getStub(ElixirUnmatchedDotCall, ...)
+  //methods are not found in ElixirPsiImplUtil
+
+  //WARNING: getUseScope(...) is skipped
+  //matching getUseScope(ElixirUnmatchedDotCall, ...)
+  //methods are not found in ElixirPsiImplUtil
 
   boolean isCalling(String resolvedModuleName, String functionName);
 

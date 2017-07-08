@@ -1,6 +1,10 @@
 '''
 CharList
 Heredoc
+'''.and key1: value1, key2: value2
+'''
+CharList
+Heredoc
 '''.&& key1: value1, key2: value2
 '''
 CharList
@@ -41,7 +45,15 @@ Heredoc
 '''
 CharList
 Heredoc
+'''./ key1: value1, key2: value2
+'''
+CharList
+Heredoc
 '''.* key1: value1, key2: value2
+'''
+CharList
+Heredoc
+'''.or key1: value1, key2: value2
 '''
 CharList
 Heredoc
@@ -70,6 +82,10 @@ Heredoc
 CharList
 Heredoc
 '''.^ key1: value1, key2: value2
+'''
+CharList
+Heredoc
+'''.not key1: value1, key2: value2
 '''
 CharList
 Heredoc

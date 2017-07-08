@@ -37,6 +37,9 @@ public interface ElixirInterpolatedSigilLine extends SigilFragmented, Interpolat
   OtpErlangObject quote();
 
   @NotNull
+  OtpErlangObject quote(OtpErlangObject quotedContent);
+
+  @NotNull
   OtpErlangObject quoteBinary(OtpErlangTuple binary);
 
   @NotNull

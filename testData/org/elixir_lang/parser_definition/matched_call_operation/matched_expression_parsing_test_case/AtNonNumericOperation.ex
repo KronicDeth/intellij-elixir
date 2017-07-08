@@ -4,12 +4,15 @@
 @non_numeric one :: type
 @non_numeric one | new
 @non_numeric one = two
+@non_numeric one or two
 @non_numeric one || two
+@non_numeric one and two
 @non_numeric one && two
 @non_numeric one != two
 @non_numeric one < two
 @non_numeric one |> two
 @non_numeric one + two
+@non_numeric one / two
 @non_numeric one * two
 @non_numeric one ^^^ two
 @non_numeric !one
@@ -20,6 +23,7 @@
 @non_numeric @1
 @non_numeric &1
 @non_numeric !1
+@non_numeric not 1
 @non_numeric (;)
 @non_numeric ?1
 @non_numeric 0b10

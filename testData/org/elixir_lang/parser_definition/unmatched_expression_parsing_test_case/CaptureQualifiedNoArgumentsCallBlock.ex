@@ -19,6 +19,11 @@
 &^1.two do end
 &^1.two.three do end
 
+# Bugged but because it doesn't replicate bug identified by @KronicDeth in
+# https://groups.google.com/d/msg/elixir-lang-core/aZ7KkHrAVzc/g2oA1-6rAQAJ
+#&not 1.two do end
+#&not 1.two.three do end
+
 &fn -> one end.two do end
 &fn -> one end.two.three do end
 

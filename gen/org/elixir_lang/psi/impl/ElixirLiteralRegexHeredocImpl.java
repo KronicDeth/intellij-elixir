@@ -81,6 +81,11 @@ public class ElixirLiteralRegexHeredocImpl extends ASTWrapperPsiElement implemen
   }
 
   @NotNull
+  public OtpErlangObject quote(OtpErlangObject quotedContent) {
+    return ElixirPsiImplUtil.quote(this, quotedContent);
+  }
+
+  @NotNull
   public OtpErlangObject quoteBinary(OtpErlangTuple binary) {
     return ElixirPsiImplUtil.quoteBinary(this, binary);
   }

@@ -4,12 +4,15 @@
 "StringLine" one :: type
 "StringLine" one | new
 "StringLine" one = two
+"StringLine" one or two
 "StringLine" one || two
+"StringLine" one and two
 "StringLine" one && two
 "StringLine" one != two
 "StringLine" one < two
 "StringLine" one |> two
 "StringLine" one + two
+"StringLine" one / two
 "StringLine" one * two
 "StringLine" one ^^^ two
 "StringLine" !one
@@ -21,6 +24,7 @@
 "StringLine" @1
 "StringLine" &1
 "StringLine" !1
+"StringLine" not 1
 "StringLine" (;)
 "StringLine" ?1
 "StringLine" 0b10

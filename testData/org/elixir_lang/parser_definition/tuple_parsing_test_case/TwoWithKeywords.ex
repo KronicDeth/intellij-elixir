@@ -3,14 +3,18 @@
 { one :: two, three: 3 }
 { one | two, three: 3 }
 { one = two, three: 3 }
+{ one or two, three: 3 }
 { one || two, three: 3 }
+{ one and two, three: 3 }
 { one && two, three: 3 }
 { one != two, three: 3 }
 { one < two, three: 3 }
 { one |> two, three: 3 }
 { one in two, three: 3 }
 { one ++ two, three: 3 }
+{ one..two, three: 3 }
 { one + two, three: 3 }
+{ one / two, three: 3 }
 { one * two, three: 3 }
 { one ^^^ two, three: 3 }
 { !one, two: 2 }
@@ -28,6 +32,7 @@
 { @1, two: 2 }
 { &1, two: 2 }
 { !1, two: 2 }
+{ not 1, two: 2 }
 { fn one -> one end, two: 2 }
 { ( one -> one ), two: 2 }
 { ?1, two: 2 }

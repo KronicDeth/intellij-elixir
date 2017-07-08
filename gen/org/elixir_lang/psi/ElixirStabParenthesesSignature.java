@@ -23,6 +23,10 @@ public interface ElixirStabParenthesesSignature extends Quotable, When {
   @Nullable
   ElixirWhenInfixOperator getWhenInfixOperator();
 
+  //WARNING: getNameIdentifier(...) is skipped
+  //matching getNameIdentifier(ElixirStabParenthesesSignature, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   @Nullable
   Quotable leftOperand();
 

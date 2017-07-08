@@ -33,6 +33,10 @@ public interface ElixirNoParenthesesOneArgument extends Arguments, MaybeModuleNa
 
   boolean isModuleName();
 
+  //WARNING: processDeclarations(...) is skipped
+  //matching processDeclarations(ElixirNoParenthesesOneArgument, ...)
+  //methods are not found in ElixirPsiImplUtil
+
   @NotNull
   OtpErlangObject[] quoteArguments();
 

@@ -1,3 +1,12 @@
+@Module.and[key: value]
+@Module.and [key: value]
+@Module.and[()]
+@Module.and [()]
+@Module.and[matched_expression]
+@Module.and [matched_expression]
+@Module.and[matched_expression,]
+@Module.and [matched_expression,]
+
 @Module.&&[key: value]
 @Module.&& [key: value]
 @Module.&&[()]

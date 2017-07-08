@@ -4,12 +4,15 @@
 0o7 one :: type
 0o7 one | new
 0o7 one = two
+0o7 one or two
 0o7 one || two
+0o7 one and two
 0o7 one && two
 0o7 one != two
 0o7 one < two
 0o7 one |> two
 0o7 one + two
+0o7 one / two
 0o7 one * two
 0o7 one ^^^ two
 0o7 !one
@@ -21,6 +24,7 @@
 0o7 @1
 0o7 &1
 0o7 !1
+0o7 not 1
 0o7 (;)
 0o7 ?1
 0o7 0b10

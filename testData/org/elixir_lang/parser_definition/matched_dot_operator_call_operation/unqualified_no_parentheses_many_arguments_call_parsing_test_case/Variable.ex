@@ -1,3 +1,4 @@
+variable.and unqualified positional, key: value
 variable.&& unqualified positional, key: value
 variable.|> unqualified positional, key: value
 variable.@ unqualified positional, key: value
@@ -8,7 +9,9 @@ variable.^^^ unqualified positional, key: value
 variable.<- unqualified positional, key: value
 variable.in unqualified positional, key: value
 variable.= unqualified positional, key: value
+variable./ unqualified positional, key: value
 variable.* unqualified positional, key: value
+variable.or unqualified positional, key: value
 variable.|| unqualified positional, key: value
 variable.| unqualified positional, key: value
 variable.<= unqualified positional, key: value
@@ -16,6 +19,7 @@ variable.-> unqualified positional, key: value
 variable.% unqualified positional, key: value
 variable.<> unqualified positional, key: value
 variable.^ unqualified positional, key: value
+variable.not unqualified positional, key: value
 variable.after unqualified positional, key: value
 variable.do unqualified positional, key: value
 variable.when unqualified positional, key: value

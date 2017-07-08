@@ -35,7 +35,7 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&(";
         reset(charSequence);
 
-        assertEquals(ElixirTypes.AND_OPERATOR, flexLexer.advance());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
         assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
 
         assertEquals(ElixirTypes.CALL, flexLexer.advance());
@@ -52,7 +52,7 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&(";
         reset(charSequence);
 
-        assertEquals(ElixirTypes.AND_OPERATOR, flexLexer.advance());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
         assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
 
         assertEquals(ElixirTypes.CALL, flexLexer.advance());
@@ -69,7 +69,7 @@ public class DotOperationTest extends Test {
         CharSequence charSequence = "&&[";
         reset(charSequence);
 
-        assertEquals(ElixirTypes.AND_OPERATOR, flexLexer.advance());
+        assertEquals(ElixirTypes.AND_SYMBOL_OPERATOR, flexLexer.advance());
         assertEquals(ElixirFlexLexer.CALL_MAYBE, flexLexer.yystate());
 
         assertEquals(ElixirTypes.CALL, flexLexer.advance());

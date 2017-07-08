@@ -9,7 +9,7 @@
 { one < two, three > four, five >= six }
 { one |> two, three <|> four, five <~ six }
 { one in two, three in four, five in six }
-{ one ++ two, three -- four, five <> six }
+{ one ++ two, three -- four, five..six }
 { one + two, three - four, five + six }
 { one * two, three / four, five * six }
 { one ^^^ two, three ^^^ four, five ^^^ six }
