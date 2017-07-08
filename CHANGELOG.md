@@ -3,41 +3,43 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Changelog](#changelog)
-  - [v5.1.0](#v510)
+  - [v5.2.0](#v520)
     - [Enhancements](#enhancements)
+  - [v5.1.0](#v510)
+    - [Enhancements](#enhancements-1)
     - [Bug Fixes](#bug-fixes)
   - [v5.0.0](#v500)
-    - [Enhancements](#enhancements-1)
+    - [Enhancements](#enhancements-2)
     - [Bug Fixes](#bug-fixes-1)
     - [Incompatible Changes](#incompatible-changes)
   - [v4.7.0](#v470)
-    - [Enhancements](#enhancements-2)
+    - [Enhancements](#enhancements-3)
     - [Bug Fixes](#bug-fixes-2)
   - [v4.6.0](#v460)
-    - [Enhancements](#enhancements-3)
+    - [Enhancements](#enhancements-4)
     - [Bug Fixes](#bug-fixes-3)
   - [v4.5.0](#v450)
-    - [Enhancements](#enhancements-4)
-  - [v4.4.0](#v440)
     - [Enhancements](#enhancements-5)
+  - [v4.4.0](#v440)
+    - [Enhancements](#enhancements-6)
     - [Bug Fixes](#bug-fixes-4)
   - [v4.3.0](#v430)
-    - [Enhancements](#enhancements-6)
+    - [Enhancements](#enhancements-7)
     - [Bug Fixes](#bug-fixes-5)
   - [v4.2.0](#v420)
-    - [Enhancements](#enhancements-7)
+    - [Enhancements](#enhancements-8)
     - [Bug Fixes](#bug-fixes-6)
   - [v4.1.0](#v410)
-    - [Enhancements](#enhancements-8)
+    - [Enhancements](#enhancements-9)
     - [Bug Fixes](#bug-fixes-7)
   - [v4.0.0](#v400)
-    - [Enhancements](#enhancements-9)
+    - [Enhancements](#enhancements-10)
     - [Bug Fixes](#bug-fixes-8)
     - [Incompatible Changes](#incompatible-changes-1)
   - [v3.0.1](#v301)
     - [Bug Fixes](#bug-fixes-9)
   - [v3.0.0](#v300)
-    - [Enhancements](#enhancements-10)
+    - [Enhancements](#enhancements-11)
     - [Bug Fixes](#bug-fixes-10)
     - [Incompatible Changes](#incompatible-changes-2)
   - [v2.2.0](#v220)
@@ -47,62 +49,132 @@
     - [Enhancement](#enhancement-1)
     - [Bug Fixes](#bug-fixes-12)
   - [v2.0.0](#v200)
-    - [Enhancements](#enhancements-11)
+    - [Enhancements](#enhancements-12)
     - [Bug Fixes](#bug-fixes-13)
     - [Incompatible Changes](#incompatible-changes-3)
   - [v1.2.1](#v121)
-    - [Enhancements](#enhancements-12)
+    - [Enhancements](#enhancements-13)
     - [Bug Fixes](#bug-fixes-14)
   - [v1.2.0](#v120)
-    - [Enhancements](#enhancements-13)
+    - [Enhancements](#enhancements-14)
     - [Bug Fixes](#bug-fixes-15)
   - [v1.1.0](#v110)
-    - [Enhancements](#enhancements-14)
-  - [v1.0.0](#v100)
     - [Enhancements](#enhancements-15)
+  - [v1.0.0](#v100)
+    - [Enhancements](#enhancements-16)
     - [Bug Fixes](#bug-fixes-16)
     - [Incompatible Fixes](#incompatible-fixes)
   - [v0.3.5](#v035)
-    - [Enhancements](#enhancements-16)
+    - [Enhancements](#enhancements-17)
     - [Bug Fixes](#bug-fixes-17)
   - [v0.3.4](#v034)
-    - [Enhancements](#enhancements-17)
-  - [v0.3.3](#v033)
     - [Enhancements](#enhancements-18)
+  - [v0.3.3](#v033)
+    - [Enhancements](#enhancements-19)
   - [v0.3.2](#v032)
     - [Bug Fixes](#bug-fixes-18)
   - [v0.3.1](#v031)
-    - [Enhancements](#enhancements-19)
-  - [v0.3.0](#v030)
     - [Enhancements](#enhancements-20)
+  - [v0.3.0](#v030)
+    - [Enhancements](#enhancements-21)
     - [Incompatible Changes](#incompatible-changes-4)
   - [v0.2.1](#v021)
-    - [Enhancements](#enhancements-21)
+    - [Enhancements](#enhancements-22)
     - [Bug Fixes](#bug-fixes-19)
   - [v0.2.0](#v020)
-    - [Enhancements](#enhancements-22)
+    - [Enhancements](#enhancements-23)
     - [Incompatible Changes](#incompatible-changes-5)
   - [v0.1.4](#v014)
-    - [Enhancements](#enhancements-23)
+    - [Enhancements](#enhancements-24)
     - [Bug Fixes](#bug-fixes-20)
   - [v0.1.3](#v013)
     - [Bug Fixes](#bug-fixes-21)
   - [v0.1.2](#v012)
-    - [Enhancements](#enhancements-24)
+    - [Enhancements](#enhancements-25)
   - [v0.1.1](#v011)
     - [Bug Fixes](#bug-fixes-22)
   - [v0.1.0](#v010)
-    - [Enhancements](#enhancements-25)
+    - [Enhancements](#enhancements-26)
     - [Bug Fixes](#bug-fixes-23)
   - [v0.0.3](#v003)
-    - [Enhancements](#enhancements-26)
-  - [v0.0.2](#v002)
     - [Enhancements](#enhancements-27)
+  - [v0.0.2](#v002)
+    - [Enhancements](#enhancements-28)
     - [Bug Fixes](#bug-fixes-24)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Changelog
+
+## v5.2.0
+
+### Enhancements
+* [#724](https://github.com/KronicDeth/intellij-elixir/pull/724) - [@KronicDeth](https://github.com/KronicDeth)
+  * Code Formatter
+    * `do` block lines are indented
+    * `do` blocks `end` as the last argument of a no parentheses call unindents to the start of the call
+    * If one clause of a multi-clause anonymous function wraps, all clauses wrap.
+    * Indent after `else`
+    * Indent map and struct keys
+    * All keys wrap if any key wraps
+    * No spaces around...
+      * `.`
+    * Spaces around...
+      * `and`
+      * `in`
+      * `or`
+      * `when`
+    * Configure spaces around...
+      * `=`
+      * `<-` and `\\`
+      * `!=`, `==`, `=~`, `!==`, and `===`
+      *  `<`, `<=`, `>=`, and `>`
+      * `+` and `-`
+      * `*` and `/`
+      * Unary `+`, `-`, `!`, `^`, and `~~~`
+      * `->`
+      * `::`
+      * `|`
+      * `||` and `|||`
+      * `&&` and `&&&`
+      * `<~`, `|>`, `~>`, `<<<`, `<<~`, `<|>`, `<~>`, `>>>`, and `~>>`
+      * `..`
+      * `^^^`
+      * `++`, `--`, `..`, `<>`
+      * `=>`
+    * Configure spaces before...
+      * `,`
+    * No space after...
+      * `@`
+    * Spaces after...
+      * `not`
+      * `fn`
+      * `after`
+      * `catch`
+      * `rescue`
+      * `key:`
+    * Configure space after...
+      * `&`
+      * `,`
+    * Configure spaces within...
+      * `{ }`
+      * `<< >>`
+      * `[ ]`
+      * `( )`
+    * No space around `/` in `&NAME/ARITY` and `&QUALIFIER.NAME/ARITY`
+    * `when` wraps when its right operand wraps, so that guards start with `when` on a newline when they are too long.
+    * Align `|>` at start of indented line for pipelines
+    * Align `end` with start of call instead of start of line for `do` blocks in pipelines
+    * Indent list elements when wrapped
+    * Indent tuple elements when wrapped
+    * Align type definition to right of `::`
+    * Align guard to right of `when` when guards span multiple lines
+    * Align two operator (`++`, `--`, `..`, `<>`) operands, so that `<>` binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.
+    * Align pipe `|` operands, so that alternates in types and specs are aligned instead of continuation indented relative to the first operand.
+    * Comments in `spec` (that is above operands to `|` align with the operands
+    * Remove newlines from pipelines, so that all pipelines start with an initial value or call and each `|>` is the start of a successive line.
+    * Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.
+    * Indent bit string (`<< >>`) elements when wrapped
 
 ## v5.1.0
 

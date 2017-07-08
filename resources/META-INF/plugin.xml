@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>5.1.0</version>
+  <version>5.2.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,106 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v5.2.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>Code Formatter
+              <ul>
+                <li><code>do</code> block lines are indented</li>
+                <li><code>do</code> blocks <code>end</code> as the last argument of a no parentheses call unindents to the start of the call</li>
+                <li>If one clause of a multi-clause anonymous function wraps, all clauses wrap.</li>
+                <li>Indent after <code>else</code></li>
+                <li>Indent map and struct keys</li>
+                <li>All keys wrap if any key wraps</li>
+                <li>No spaces around...
+                  <ul>
+                    <li><code>.</code></li>
+                  </ul>
+                </li>
+                <li>Spaces around...
+                  <ul>
+                    <li><code>and</code></li>
+                    <li><code>in</code></li>
+                    <li><code>or</code></li>
+                    <li><code>when</code></li>
+                  </ul>
+                </li>
+                <li>Configure spaces around...
+                  <ul>
+                    <li><code>=</code></li>
+                    <li><code>&lt;-</code> and <code>\\</code></li>
+                    <li><code>!=</code>, <code>==</code>, <code>=~</code>, <code>!==</code>, and <code>===</code></li>
+                    <li><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, and <code>&gt;</code></li>
+                    <li><code>+</code> and <code>-</code></li>
+                    <li><code>*</code> and <code>/</code></li>
+                    <li>Unary <code>+</code>, <code>-</code>, <code>!</code>, <code>^</code>, and <code>~~~</code></li>
+                    <li><code>-&gt;</code></li>
+                    <li><code>::</code></li>
+                    <li><code>|</code></li>
+                    <li><code>||</code> and <code>|||</code></li>
+                    <li><code>&amp;&amp;</code> and <code>&amp;&amp;&amp;</code></li>
+                    <li><code>&lt;~</code>, <code>|&gt;</code>, <code>~&gt;</code>, <code>&lt;&lt;&lt;</code>, <code>&lt;&lt;~</code>, <code>&lt;|&gt;</code>, <code>&lt;~&gt;</code>, <code>&gt;&gt;&gt;</code>, and <code>~&gt;&gt;</code></li>
+                    <li><code>..</code></li>
+                    <li><code>^^^</code></li>
+                    <li><code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code></li>
+                    <li><code>=&gt;</code></li>
+                  </ul>
+                </li>
+                <li>Configure spaces before...
+                  <ul>
+                    <li><code>,</code></li>
+                  </ul>
+                </li>
+                <li>No space after...
+                  <ul>
+                    <li><code>@</code></li>
+                  </ul>
+                </li>
+                <li>Spaces after...
+                  <ul>
+                    <li><code>not</code></li>
+                    <li><code>fn</code></li>
+                    <li><code>after</code></li>
+                    <li><code>catch</code></li>
+                    <li><code>rescue</code></li>
+                    <li><code>key:</code></li>
+                  </ul>
+                </li>
+                <li>Configure space after...
+                  <ul>
+                    <li><code>&amp;</code></li>
+                    <li><code>,</code></li>
+                  </ul>
+                </li>
+                <li>Configure spaces within...
+                  <ul>
+                    <li><code>{ }</code></li>
+                    <li><code>&lt;&lt; &gt;&gt;</code></li>
+                    <li><code>[ ]</code></li>
+                    <li><code>( )</code></li>
+                  </ul>
+                </li>
+                <li>No space around <code>/</code> in <code>&amp;NAME/ARITY</code> and <code>&amp;QUALIFIER.NAME/ARITY</code></li>
+                <li><code>when</code> wraps when its right operand wraps, so that guards start with <code>when</code> on a newline when they are too long.</li>
+                <li>Align <code>|&gt;</code> at start of indented line for pipelines</li>
+                <li>Align <code>end</code> with start of call instead of start of line for <code>do</code> blocks in pipelines</li>
+                <li>Indent list elements when wrapped</li>
+                <li>Indent tuple elements when wrapped</li>
+                <li>Align type definition to right of <code>::</code></li>
+                <li>Align guard to right of <code>when</code> when guards span multiple lines</li>
+                <li>Align two operator (<code>++</code>, <code>--</code>, <code>..</code>, <code>&lt;&gt;</code>) operands, so that <code>&lt;&gt;</code> binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.</li>
+                <li>Align pipe <code>|</code> operands, so that alternates in types and specs are aligned instead of continuation indented relative to the first operand.</li>
+                <li>Comments in <code>spec</code> (that is above operands to <code>|</code> align with the operands</li>
+                <li>Remove newlines from pipelines, so that all pipelines start with an initial value or call and each <code>|&gt;</code> is the start of a successive line.</li>
+                <li>Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.</li>
+                <li>Indent bit string (<code>&lt;&lt; &gt;&gt;</code>) elements when wrapped</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v5.1.0</h1>
       <ul>
         <li>
