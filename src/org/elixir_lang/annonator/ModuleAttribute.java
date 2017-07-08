@@ -357,7 +357,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                     highlightTypesAndTypeParameterUsages(
                             quotableKeywordValue,
-                            Collections.<String>emptySet(),
+                            Collections.emptySet(),
                             annotationHolder,
                             ElixirSyntaxHighlighter.TYPE
                     );
@@ -399,7 +399,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
                 highlightTypesAndTypeParameterUsages(
                         unqualifiedNoParenthesesCall.getNoParenthesesOneArgument(),
-                        Collections.<String>emptySet(),
+                        Collections.emptySet(),
                         annotationHolder,
                         ElixirSyntaxHighlighter.TYPE
                 );
@@ -428,7 +428,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     primaryArguments,
                     /* as stated above, if there are secondary arguments, then the primary arguments are
                        to quote or some equivalent metaprogramming. */
-                    Collections.<String>emptySet(),
+                    Collections.emptySet(),
                     annotationHolder,
                     ElixirSyntaxHighlighter.TYPE
             );
