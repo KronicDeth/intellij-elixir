@@ -409,8 +409,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
-    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder, @NotNull String message) {
-        annotationHolder.createErrorAnnotation(element, message);
+    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder) {
+        annotationHolder.createErrorAnnotation(element, "Strings aren't allowed in types");
     }
 
     private Set<String> highlightTypeLeftOperand(@NotNull final ElixirMatchedUnqualifiedParenthesesCall call,
@@ -1053,7 +1053,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else if (psiElement instanceof InterpolatedString) {
-            highlightTypeError(psiElement, annotationHolder, "Strings aren't allowed in types");
+            highlightTypeError(psiElement, annotationHolder);
         } else if (psiElement instanceof Infix && !(psiElement instanceof When)) {
             highlightTypesAndTypeParameterUsages(
                     (Infix) psiElement,
