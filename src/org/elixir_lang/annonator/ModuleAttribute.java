@@ -613,38 +613,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     }
 
                     if (strippedTypeOperationLeftOperand instanceof Call) {
-                        Call call = (Call) strippedTypeOperationLeftOperand;
-                        PsiElement functionNameElement = call.functionNameElement();
-
-                        if (functionNameElement != null) {
-                            highlight(
-                                    functionNameElement.getTextRange(),
-                                    annotationHolder,
-                                    leftMostFunctionNameTextAttributesKey
-                            );
-                        }
-
-                        PsiElement[] primaryArguments = call.primaryArguments();
-
-                        if (primaryArguments != null) {
-                            highlightTypesAndTypeParameterUsages(
-                                    primaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    leftMostFunctionArgumentsTextAttributesKey
-                            );
-                        }
-
-                        PsiElement[] secondaryArguments = call.secondaryArguments();
-
-                        if (secondaryArguments != null) {
-                            highlightTypesAndTypeParameterUsages(
-                                    secondaryArguments,
-                                    typeParameterNameSet,
-                                    annotationHolder,
-                                    leftMostFunctionArgumentsTextAttributesKey
-                            );
-                        }
+                        highlightSpecification(
+                                (Call) strippedTypeOperationLeftOperand,
+                                annotationHolder,
+                                leftMostFunctionNameTextAttributesKey,
+                                leftMostFunctionNameTextAttributesKey,
+                                typeParameterNameSet
+                        );
                     } else {
                         cannotHighlightTypes(strippedTypeOperationLeftOperand);
                     }
@@ -660,38 +635,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                         );
                     }
                 } else if (leftOperand instanceof Call) {
-                    Call call = (Call) leftOperand;
-                    PsiElement functionNameElement = call.functionNameElement();
-
-                    if (functionNameElement != null) {
-                        highlight(
-                                functionNameElement.getTextRange(),
-                                annotationHolder,
-                                leftMostFunctionNameTextAttributesKey
-                        );
-                    }
-
-                    PsiElement[] primaryArguments = call.primaryArguments();
-
-                    if (primaryArguments != null) {
-                        highlightTypesAndTypeParameterUsages(
-                                primaryArguments,
-                                typeParameterNameSet,
-                                annotationHolder,
-                                leftMostFunctionArgumentsTextAttributesKey
-                        );
-                    }
-
-                    PsiElement[] secondaryArguments = call.secondaryArguments();
-
-                    if (secondaryArguments != null) {
-                        highlightTypesAndTypeParameterUsages(
-                                secondaryArguments,
-                                typeParameterNameSet,
-                                annotationHolder,
-                                leftMostFunctionArgumentsTextAttributesKey
-                        );
-                    }
+                    highlightSpecification(
+                            (Call) leftOperand,
+                            annotationHolder,
+                            leftMostFunctionNameTextAttributesKey,
+                            leftMostFunctionNameTextAttributesKey,
+                            typeParameterNameSet
+                    );
                 } else {
                     cannotHighlightTypes(leftOperand);
                 }
@@ -705,6 +655,44 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     );
                 }
             }
+        }
+    }
+
+    private void highlightSpecification(@NotNull Call call,
+                                        AnnotationHolder annotationHolder,
+                                        TextAttributesKey leftMostFunctionNameTextAttributesKey,
+                                        TextAttributesKey leftMostFunctionArgumentsTextAttributesKey,
+                                        Set<String> typeParameterNameSet) {
+        PsiElement functionNameElement = call.functionNameElement();
+
+        if (functionNameElement != null) {
+            highlight(
+                    functionNameElement.getTextRange(),
+                    annotationHolder,
+                    leftMostFunctionNameTextAttributesKey
+            );
+        }
+
+        PsiElement[] primaryArguments = call.primaryArguments();
+
+        if (primaryArguments != null) {
+            highlightTypesAndTypeParameterUsages(
+                    primaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    leftMostFunctionArgumentsTextAttributesKey
+            );
+        }
+
+        PsiElement[] secondaryArguments = call.secondaryArguments();
+
+        if (secondaryArguments != null) {
+            highlightTypesAndTypeParameterUsages(
+                    secondaryArguments,
+                    typeParameterNameSet,
+                    annotationHolder,
+                    leftMostFunctionArgumentsTextAttributesKey
+            );
         }
     }
 
