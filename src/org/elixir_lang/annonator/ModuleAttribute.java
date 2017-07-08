@@ -1298,30 +1298,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
-    private void highlightTypesAndSpecificationTypeParameterDeclarations(
-            ElixirUnmatchedUnqualifiedNoArgumentsCall unmatchedUnqualifiedNoArgumentsCall,
-            Set<String> typeParameterNameSet,
-            AnnotationHolder annotationHolder,
-            TextAttributesKey textAttributesKey
-    ) {
-        String variable = unmatchedUnqualifiedNoArgumentsCall.getText();
-
-        if (typeParameterNameSet.contains(variable)) {
-            highlight(
-                    unmatchedUnqualifiedNoArgumentsCall.getTextRange(),
-                    annotationHolder,
-                    ElixirSyntaxHighlighter.TYPE_PARAMETER
-            );
-        } else {
-            highlightTypesAndTypeParameterUsages(
-                    unmatchedUnqualifiedNoArgumentsCall,
-                    typeParameterNameSet,
-                    annotationHolder,
-                    textAttributesKey
-            );
-        }
-    }
-
     @NotNull
     private Set<String> specificationTypeParameterNameSet(ElixirKeywordPair keywordPair) {
         return Collections.singleton(keywordPair.getKeywordKey().getText());
