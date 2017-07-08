@@ -1279,6 +1279,25 @@ public class ModuleAttribute implements Annotator, DumbAware {
         return Collections.singleton(noParenthesesKeywordPair.getKeywordKey().getText());
     }
 
+    /**
+     * A type operator is an error, keyword pairs should be used for `when type: definition` for expression-local types,
+     * but using `::` is a common error, so support it.
+     */
+    @NotNull
+    private Set<String> specificationTypeParameterNameSet(Type type) {
+        PsiElement leftOperand = type.leftOperand();
+        Set<String> typeParameterNameSet;
+
+        if (leftOperand != null) {
+            typeParameterNameSet = Collections.singleton(leftOperand.getText());
+        } else {
+            error("Type does not have a left operand", type);
+            typeParameterNameSet = Collections.emptySet();
+        }
+
+        return typeParameterNameSet;
+    }
+
     private Set<String> specificationTypeParameterNameSet(@NotNull PsiElement psiElement) {
         Set<String> parameterNameSet;
 
@@ -1289,6 +1308,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
             parameterNameSet = specificationTypeParameterNameSet(psiElement.getChildren());
         } else if (psiElement instanceof ElixirKeywordPair) {
             parameterNameSet = specificationTypeParameterNameSet((ElixirKeywordPair) psiElement);
+        } else if (psiElement instanceof Type) {
+            parameterNameSet = specificationTypeParameterNameSet((Type) psiElement);
         } else if (psiElement instanceof ElixirNoParenthesesKeywordPair) {
             parameterNameSet = specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
         } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
