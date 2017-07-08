@@ -309,7 +309,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 // seen as `unquote(ast)`, but could also be just the beginning of typing
                 ElixirMatchedUnqualifiedParenthesesCall matchedUnqualifiedParenthesesCall = (ElixirMatchedUnqualifiedParenthesesCall) grandChild;
 
-                if (matchedUnqualifiedParenthesesCall.functionName().equals(UNQUOTE)) {
+                if (UNQUOTE.equals(matchedUnqualifiedParenthesesCall.functionName())) {
                     PsiElement[] secondaryArguments = matchedUnqualifiedParenthesesCall.secondaryArguments();
 
                     if (secondaryArguments != null) {
