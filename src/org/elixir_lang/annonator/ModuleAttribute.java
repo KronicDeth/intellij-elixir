@@ -10,6 +10,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.tree.TokenSet;
 import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.errorreport.Logger;
@@ -120,9 +121,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
                                 ElixirSyntaxHighlighter.MODULE_ATTRIBUTE
                         );
 
-                        if (!isNonReferencing(atNonNumericOperation) &&
-                                atNonNumericOperation.getReference().resolve() == null) {
-                            holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                        if (!isNonReferencing(atNonNumericOperation)) {
+                            PsiReference reference = atNonNumericOperation.getReference();
+
+                            if (reference != null && reference.resolve() == null) {
+                                holder.createErrorAnnotation(atNonNumericOperation, "Unresolved module attribute");
+                            }
                         }
                     }
                 }
