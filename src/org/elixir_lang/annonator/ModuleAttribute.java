@@ -244,9 +244,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
     /**
      * Highlights the function call name as a `ElixirSyntaxHighlighter.SPECIFICATION
-     *
-     * @param atUnqualifiedNoParenthesesCall
-     * @param annotationHolder
      */
     private void highlightSpecification(@NotNull final AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall,
                                         @NotNull final AnnotationHolder annotationHolder) {
@@ -527,8 +524,6 @@ public class ModuleAttribute implements Annotator, DumbAware {
     /**
      * Recursively highlights the types under `atUnqualifiedNoParenthesesCall`.
      *
-     * @param atUnqualifiedNoParenthesesCall
-     * @param annotationHolder
      * @param leftMostFunctionNameTextAttributesKey      the {@link ElixirSyntaxHighlighter} {@link TextAttributesKey} for the
      *                                                   name of the callback, type, or function being declared
      * @param leftMostFunctionArgumentsTextAttributesKey the {@link ElixirSyntaxHighlighter} {@link TextAttributesKey} for the
