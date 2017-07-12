@@ -1,5 +1,6 @@
 package org.elixir_lang.mix.runner;
 
+import com.intellij.execution.testframework.sm.ServiceMessageBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,25 +74,16 @@ public class Status {
 
     @NotNull
     String toTeamCity() {
-        StringBuilder teamCity = new StringBuilder("##teamcity[message");
+        ServiceMessageBuilder serviceMessageBuilder = new ServiceMessageBuilder("message");
 
         if (stackTraceLines != null && stackTraceLines.size() > 0) {
-            String errorDetails = StringUtils.join(stackTraceLines, "|n");
-
-            teamCity.append(" errorDetails='")
-                    .append(errorDetails)
-                    .append("'");
+            String errorDetails = StringUtils.join(stackTraceLines, "\n");
+            serviceMessageBuilder.addAttribute("errorDetails", errorDetails);
         }
 
-        teamCity.append(" status='")
-                .append(status)
-                .append("'");
-        teamCity.append(" text='")
-                .append(text)
-                .append("'");
-
-        teamCity.append("]");
-
-        return teamCity.toString();
+        return serviceMessageBuilder
+                .addAttribute("status", status)
+                .addAttribute("text", text)
+                .toString();
     }
 }

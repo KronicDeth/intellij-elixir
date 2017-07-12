@@ -2,16 +2,25 @@ package org.elixir_lang.mix.runner;
 
 import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.testframework.TestConsoleProperties;
+import com.intellij.execution.testframework.sm.ServiceMessageBuilder;
 import com.intellij.execution.testframework.sm.runner.OutputToGeneralTestEventsConverter;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 
 public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEventsConverter {
+    private static final String COMPILATION_FINISHED = compilationMessage("Finished");
+    private static final String COMPILATION_STARTED = compilationMessage("Started");
     private Status stderrStatus = null;
     private Status stdoutStatus = null;
 
     MixOutputToGeneralTestEventsConverter(@NotNull String testFrameworkName, @NotNull TestConsoleProperties consoleProperties) {
         super(testFrameworkName, consoleProperties);
+    }
+
+    private static String compilationMessage(@NotNull String commandSuffix) {
+        return new ServiceMessageBuilder("compilation" + commandSuffix)
+                .addAttribute("compile", "mix")
+                .toString();
     }
 
     /**
@@ -63,19 +72,9 @@ public class MixOutputToGeneralTestEventsConverter extends OutputToGeneralTestEv
     }
 
     private void processStatus(@NotNull Status status, @NotNull Key outputType) {
-        super.processConsistentText(
-                "##teamcity[compilationStarted compile='mix']",
-                outputType,
-                false
-        );
-
+        super.processConsistentText(COMPILATION_STARTED, outputType, false);
         super.processConsistentText(status.toTeamCity(), outputType, false);
-
-        super.processConsistentText(
-                "##teamcity[compilationFinished compile='mix']",
-                outputType,
-                false
-        );
+        super.processConsistentText(COMPILATION_FINISHED, outputType, false);
     }
 
     private void processStatuses() {
