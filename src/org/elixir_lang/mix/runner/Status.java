@@ -89,7 +89,7 @@ public class Status {
     private String fileToTestName(@NotNull String file) {
         String[] parts = file
                 .substring(
-                        0,
+                        "test/".length(),
                         file.length() - ".exs".length()
                 )
                 .split("/");
