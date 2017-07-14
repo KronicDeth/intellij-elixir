@@ -16,7 +16,7 @@ matrix:
   include:
     # version groups based on https://www.jetbrains.com/idea/download/previous.html
 
-    - elixir: 1.4.2
+    - elixir: 1.4.5
       env: IDEA_VERSION="2017.1.5"
       jdk: oraclejdk8
       otp_release: 19.3
@@ -33,7 +33,7 @@ matrix:
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.2
+    - elixir: 1.4.5
       env: IDEA_VERSION="2016.3.7"
       jdk: oraclejdk8
       otp_release: 19.3
@@ -50,7 +50,7 @@ matrix:
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.2
+    - elixir: 1.4.5
       env: IDEA_VERSION="2016.2.5"
       jdk: oraclejdk8
       otp_release: 19.3
@@ -67,7 +67,7 @@ matrix:
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.2
+    - elixir: 1.4.5
       env: IDEA_VERSION="2016.1.4"
       jdk: oraclejdk8
       otp_release: 19.3
@@ -84,7 +84,7 @@ matrix:
       jdk: oraclejdk8
       otp_release: 18.3
 
-    - elixir: 1.4.2
+    - elixir: 1.4.5
       env: IDEA_VERSION="15.0.6"
       jdk: oraclejdk8
       otp_release: 19.3
