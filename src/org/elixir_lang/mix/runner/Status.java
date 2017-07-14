@@ -135,16 +135,24 @@ public class Status {
 
     @NotNull
     private String teamCityTestFinished(@NotNull Map<String, String> attributes) {
+        String name = attributes.get("name");
+
         return ServiceMessageBuilder
-                .testFinished(attributes.get("name"))
+                .testFinished(name)
+                .addAttribute("nodeId", name)
+                .addAttribute("parentNodeId", "0")
                 .toString();
     }
 
     @NotNull
     private String teamCityTestStarted(@NotNull Map<String, String> attributes) {
+        String name = attributes.get("name");
+
         return ServiceMessageBuilder
-                .testStarted(attributes.get("name"))
+                .testStarted(name)
                 .addAttribute("locationHint", attributes.get("locationHint"))
+                .addAttribute("nodeId", name)
+                .addAttribute("parentNodeId", "0")
                 .toString();
     }
 
@@ -180,6 +188,8 @@ public class Status {
                 .testFailed(name)
                 .addAttribute("details", details)
                 .addAttribute("message", text)
+                .addAttribute("nodeId", name)
+                .addAttribute("parentNodeId", "0")
                 .toString();
     }
 

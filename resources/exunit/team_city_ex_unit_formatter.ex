@@ -1,8 +1,14 @@
-# https://github.com/lixhq/teamcity-exunit-formatter
+# Originally based on https://github.com/lixhq/teamcity-exunit-formatter, but it did not work for parallel tests: IDEA
+# does not honor flowId, so needed to use the nodeId/parentNodeIde system
+#
+# nodeId and parentNodeId system is documented in
+# https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000389550/comments/115000330464
 defmodule TeamCityExUnitFormatter do
   @moduledoc false
 
   use GenEvent
+
+  @root_parent_node_id 0
 
   # Functions
 
@@ -11,22 +17,20 @@ defmodule TeamCityExUnitFormatter do
 
   ## GenEvent Callbacks
 
-  def handle_event({:case_finished, %ExUnit.TestCase{name: name}}, config) do
-    put_formatted :test_suite_finished,
-                  name: format_case_name(name)
+  def handle_event({:case_finished, test_case = %ExUnit.TestCase{}}, config) do
+    put_formatted :test_suite_finished, attributes(test_case)
 
     {:ok, config}
   end
 
-  def handle_event({:case_started, %ExUnit.TestCase{name: name}}, config) do
-    put_formatted :test_suite_started,
-                  name: format_case_name(name)
+  def handle_event({:case_started, test_case = %ExUnit.TestCase{}}, config) do
+    put_formatted :test_suite_started, attributes(test_case)
 
     {:ok, config}
   end
 
   def handle_event(
-        {:test_finished, test = %ExUnit.Test{time: time, state: {:failed, {_, reason, _} = failed}}},
+        {:test_finished, test = %ExUnit.Test{state: {:failed, {_, reason, _} = failed},}, time: time},
         config
       ) do
     formatted = ExUnit.Formatter.format_test_failure(
@@ -36,15 +40,19 @@ defmodule TeamCityExUnitFormatter do
       config.width,
       &formatter/2
     )
-    formatted_test_name = format_test_name(test)
+    attributes = attributes(test)
 
     put_formatted :test_failed,
-                  details: formatted,
-                  message: inspect(reason),
-                  name: formatted_test_name
+                  Keyword.merge(
+                    attributes,
+                    details: formatted,
+                    message: inspect(reason)
+                  )
     put_formatted :test_finished,
-                  duration: div(time, 1000),
-                  name: formatted_test_name
+                  Keyword.merge(
+                    attributes,
+                    duration: div(time, 1000)
+                  )
 
     {
       :ok,
@@ -56,7 +64,7 @@ defmodule TeamCityExUnitFormatter do
     }
   end
 
-  def handle_event({:test_finished, test = %ExUnit.Test{time: time, state: {:failed, failed}}}, config)
+  def handle_event({:test_finished, test = %ExUnit.Test{state: {:failed, failed}}, time: time}, config)
       when is_list(failed) do
     formatted = ExUnit.Formatter.format_test_failure(
       test,
@@ -66,15 +74,19 @@ defmodule TeamCityExUnitFormatter do
       &formatter/2
     )
     message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
-    formatted_test_name = format_test_name(test)
+    attributes = attributes(test)
 
     put_formatted :test_failed,
-                  details: formatted,
-                  message: message,
-                 name: formatted_test_name
+                  Keyword.merge(
+                    attributes,
+                    details: formatted,
+                    message: message
+                  )
     put_formatted :test_finished,
-                  duration: div(time, 1000),
-                  name: formatted_test_name
+                  Keyword.merge(
+                    attributes,
+                    duration: div(time, 1000)
+                  )
 
     {
       :ok,
@@ -87,12 +99,10 @@ defmodule TeamCityExUnitFormatter do
   end
 
   def handle_event({:test_finished, test = %ExUnit.Test{state: {:skip, _}}}, config) do
-    formatted_test_name = format_test_name(test)
+    attributes = attributes(test)
 
-    put_formatted :test_ignored,
-                  name: formatted_test_name
-    put_formatted :test_finished,
-                  name: formatted_test_name
+    put_formatted :test_ignored, attributes
+    put_formatted :test_finished, attributes
 
     {
       :ok,
@@ -106,16 +116,22 @@ defmodule TeamCityExUnitFormatter do
 
   def handle_event({:test_finished, test = %ExUnit.Test{time: time}}, config) do
     put_formatted :test_finished,
-                  duration: div(time, 1000),
-                  name: format_test_name(test)
+                  test
+                  |> attributes()
+                  |> Keyword.merge(
+                       duration: div(time, 1000)
+                     )
 
     {:ok, config}
   end
 
   def handle_event({:test_started, test = %ExUnit.Test{tags: tags}}, config) do
     put_formatted :test_started,
-                  locationHint: "file://#{tags[:file]}:#{tags[:line]}",
-                  name: format_test_name(test)
+                  test
+                  |> attributes()
+                  |> Keyword.merge(
+                    locationHint: "file://#{tags[:file]}:#{tags[:line]}"
+                  )
 
     {:ok, config}
   end
@@ -140,6 +156,14 @@ defmodule TeamCityExUnitFormatter do
   end
 
   ## Private Functions
+
+  defp attributes(test_or_test_case) do
+    [
+      nodeId: nodeId(test_or_test_case),
+      name: name(test_or_test_case),
+      parentNodeId: parentNodeId(test_or_test_case)
+    ]
+  end
 
   defp camelize(s) do
     [head | tail] = String.split s, "_"
@@ -173,26 +197,31 @@ defmodule TeamCityExUnitFormatter do
     "#{Atom.to_string k}='#{escape_output v}'"
   end
 
-  defp format_case_name(name) do
-    name
-    |> to_string()
-    |> String.replace(~r/\bElixir\./, "")
-  end
-
-  defp format_test_name(%ExUnit.Test{name: name, case: case_name}) do
-    formatted_name = case Regex.named_captures(
-                            ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
-                            to_string(name)
-                          ) do
+  defp name(%ExUnit.Test{name: name}) do
+    case Regex.named_captures(
+           ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
+           to_string(name)
+         ) do
       nil ->
         name
       %{"arity" => arity, "count" => count, "function" => function, "module" => module} ->
         "#{module}.#{function}/#{arity} doc (#{count})"
     end
-
-    "#{format_case_name(case_name)}.#{formatted_name}"
   end
 
+  defp name(%ExUnit.TestCase{name: name})  do
+    name
+    |> to_string()
+    |> String.replace(~r/\bElixir\./, "")
+  end
+
+  defp nodeId(%ExUnit.Test{case: case_name, name: name}), do: "#{case_name}.#{name}"
+  defp nodeId(%ExUnit.TestCase{name: name}), do: name
+
+  defp parentNodeId(%ExUnit.Test{case: case_name}), do: case_name
+  defp parentNodeId(%ExUnit.TestCase{}), do: @root_parent_node_id
+
+  # DO NOT use `flowId` as an attribute.  IDEA ignores flowId and so it can't be used to interleave async test output
   defp put_formatted(type, attributes) do
     type
     |> format(attributes)
