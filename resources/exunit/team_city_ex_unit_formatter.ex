@@ -29,42 +29,42 @@ defmodule TeamCityExUnitFormatter do
     {:ok, config}
   end
 
-  def handle_event({:test_started, %ExUnit.Test{name: name, case: the_case, tags: tags}}, config) do
+  def handle_event({:test_started, test = %ExUnit.Test{tags: tags}}, config) do
     IO.puts format :test_started,
-                   name: "#{format_case_name(the_case)}.#{name}",
+                   name: format_test_name(test),
                    locationHint: "file://#{tags[:file]}:#{tags[:line]}"
     {:ok, config}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{name: name, case: case_name, time: time, state: {:failed, {_, reason, _} = failed}} = test}, config) do
+  def handle_event({:test_finished, test = %ExUnit.Test{time: time, state: {:failed, {_, reason, _} = failed}}}, config) do
     formatted = ExUnit.Formatter.format_test_failure(test, failed, config.failures_counter + 1, config.width, &formatter/2)
-    formatted_case_name = format_case_name(case_name)
-    IO.puts format :test_failed, name: "#{formatted_case_name}.#{name}", message: inspect(reason), details: formatted
-    IO.puts format :test_finished, name: "#{formatted_case_name}.#{name}", duration: div(time, 1000)
+    formatted_test_name = format_test_name(test)
+    IO.puts format :test_failed, name: formatted_test_name, message: inspect(reason), details: formatted
+    IO.puts format :test_finished, name: formatted_test_name, duration: div(time, 1000)
     {:ok, %{config | tests_counter: config.tests_counter + 1,
                      failures_counter: config.failures_counter + 1}}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{name: name, case: case_name, time: time, state: {:failed, failed}} = test}, config) when is_list(failed) do
+  def handle_event({:test_finished, test = %ExUnit.Test{time: time, state: {:failed, failed}}}, config) when is_list(failed) do
     formatted = ExUnit.Formatter.format_test_failure(test, failed, config.failures_counter + 1, config.width, &formatter/2)
     message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
-    formatted_case_name = format_case_name(case_name)
-    IO.puts format :test_failed, name: "#{formatted_case_name}.#{name}", message: message, details: formatted
-    IO.puts format :test_finished, name: "#{formatted_case_name}.#{name}", duration: div(time, 1000)
+    formatted_test_name = format_test_name(test)
+    IO.puts format :test_failed, name: formatted_test_name, message: message, details: formatted
+    IO.puts format :test_finished, name: formatted_test_name, duration: div(time, 1000)
     {:ok, %{config | tests_counter: config.tests_counter + 1,
                      failures_counter: config.failures_counter + 1}}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{name: name, case: case_name, state: {:skip, _}}}, config) do
-    formatted_case_name = format_case_name(case_name)
-    IO.puts format :test_ignored, name: "#{formatted_case_name}.#{name}"
-    IO.puts format :test_finished, name: "#{formatted_case_name}.#{name}"
+  def handle_event({:test_finished, test = %ExUnit.Test{state: {:skip, _}}}, config) do
+    formatted_test_name = format_test_name(test)
+    IO.puts format :test_ignored, name: formatted_test_name
+    IO.puts format :test_finished, name: formatted_test_name
     {:ok, %{config | tests_counter: config.tests_counter + 1,
                      skipped_counter: config.skipped_counter + 1}}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{name: name, case: case_name, time: time}}, config) do
-    IO.puts format :test_finished, name: "#{format_case_name(case_name)}.#{name}", duration: div(time, 1000)
+  def handle_event({:test_finished, test = %ExUnit.Test{time: time}}, config) do
+    IO.puts format :test_finished, name: format_test_name(test), duration: div(time, 1000)
     {:ok, config}
   end
 
@@ -88,6 +88,20 @@ defmodule TeamCityExUnitFormatter do
     name
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
+  end
+
+  defp format_test_name(%ExUnit.Test{name: name, case: case_name}) do
+    formatted_name = case Regex.named_captures(
+                            ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
+                            to_string(name)
+                          ) do
+      nil ->
+        name
+      %{"arity" => arity, "count" => count, "function" => function, "module" => module} ->
+        "#{module}.#{function}/#{arity} doc (#{count})"
+    end
+
+    "#{format_case_name(case_name)}.#{formatted_name}"
   end
 
   defp camelize(s) do
