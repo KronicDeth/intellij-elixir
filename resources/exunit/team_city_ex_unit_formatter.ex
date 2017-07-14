@@ -197,22 +197,33 @@ defmodule TeamCityExUnitFormatter do
     "#{Atom.to_string k}='#{escape_output v}'"
   end
 
-  defp name(%ExUnit.Test{name: name}) do
-    case Regex.named_captures(
-           ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
-           to_string(name)
-         ) do
-      nil ->
-        name
-      %{"arity" => arity, "count" => count, "function" => function, "module" => module} ->
-        "#{module}.#{function}/#{arity} doc (#{count})"
-    end
-  end
-
-  defp name(%ExUnit.TestCase{name: name})  do
-    name
+  defp format_case_name(case_name) do
+    case_name
     |> to_string()
     |> String.replace(~r/\bElixir\./, "")
+  end
+
+  defp name(test = %ExUnit.Test{name: name}) do
+    named_captures = Regex.named_captures(
+      ~r|test doc at (?<module>.+)\.(?<function>\w+)/(?<arity>\d+) \((?<count>\d+)\)|,
+      to_string(name)
+    )
+    name(test, named_captures)
+  end
+  defp name(%ExUnit.TestCase{name: name}), do: format_case_name(name)
+
+  defp name(%ExUnit.Test{name: name}, nil), do: to_string(name)
+  defp name(
+         %ExUnit.Test{case: case_name},
+         %{"arity" => arity, "count" => count, "function" => function, "module" => module}
+       ) do
+    name = "#{function}/#{arity} doc (#{count})"
+
+    if module <> "Test" == format_case_name(case_name) do
+      name
+    else
+      "#{module}.#{name}"
+    end
   end
 
   defp nodeId(%ExUnit.Test{case: case_name, name: name}), do: "#{case_name}.#{name}"
