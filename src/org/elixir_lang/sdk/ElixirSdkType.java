@@ -341,12 +341,7 @@ public class ElixirSdkType extends SdkType {
           for (File child : files) {
             if (child.isDirectory()) {
               String versionString = child.getName();
-              String[] versionParts = versionString.split("\\.", 3);
-              int major = Integer.parseInt(versionParts[0]);
-              int minor = Integer.parseInt(versionParts[1]);
-              int bugfix = Integer.parseInt(versionParts[2]);
-              Version version = new Version(major, minor, bugfix);
-
+              Version version = Version.parseVersion(versionString);
               homePathByVersion.put(version, child.getAbsolutePath());
             }
           }
