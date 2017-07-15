@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>5.2.0</version>
+  <version>6.0.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,7 +9,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-      <h1>v5.2.0</h1>
+      <h1>v6.0.0</h1>
       <ul>
         <li>
           <p>Enhancements</p>
@@ -106,6 +106,13 @@
                 <li>Indent bit string (<code>&lt;&lt; &gt;&gt;</code>) elements when wrapped</li>
               </ul>
             </li>
+            <li>Update IntelliJ IDEA version to latest in each MINOR version:
+              <ul>
+                <li><code>2017.1.1</code> -&gt; <code>2017.1.5</code></li>
+                <li><code>2016.3.5</code> -&gt; <code>2016.3.7</code></li>
+              </ul>
+            </li>
+            <li>Update Elixir version <code>1.4.2</code> -&gt; <code>1.4.5</code></li>
           </ul>
         </li>
         <li>
@@ -126,6 +133,35 @@
             <li>Inline constant argument for errors.</li>
             <li>Check if <code>when</code> <code>rightOperand</code> is non-<code>null</code> before scanning it for parameter names.</li>
             <li>Fix typos</li>
+            <li>When compilation error is detected during <code>mix test</code>, it will be turned into a test failure.
+              <ul>
+                <li>Compilation errors are any stacktraces to <code>stderr</code> that end in <code>(elixir) lib/kernel/parallel_require.ex:</code>.</li>
+                <li>The test failure for the compilation will be attributed to either <code>mix test</code> or the inferred module name of test file.
+                  <ul>
+                    <li>If the first line of the stacktrace contains <code>test/.*_test.exs:\d+: \(module\)</code>
+                      <ul>
+                        <li>The file and line from that line will be used as the location of failure</li>
+                        <li>The <code>test/</code> and <code>.exs</code> will be stripped from the file and it will be camelized to produce the derived test module name of the failure</li>
+                      </ul>
+                    </li>
+                    <li>Otherwise, <code>mix test</code> is used</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>Rearrange doc test names to emphasize the function being tested: <code>"test doc at MODULE.FUNCTION/ARITY (COUNT)"</code> becomes <code>"MODULE.FUNCTION/ARITY doc (COUNT)"</code>
+              <ul>
+                <li>If <code>MODULE</code> is the same as the test case without the <code>Test</code> suffix, then <code>MODULE.</code> is stripped too and the test name becomes only <code>FUNCTION/ARITY doc (COUNT)</code></li>
+              </ul>
+            </li>
+            <li>Fix parallel test cases nesting under each other due to asynchronous reporting from formatter.  <code>##teamCity</code> <code>testSuiteStarted</code> messages automatically nest, so switched to using <code>nodeId</code> and <code>parentNodeId</code> system, so that nesting is explicit.  This will allow multiple parallel tests to show up in GUI too.</li>
+            <li><code>Elixir.</code> prefix is stripped from test case names.</li>
+          </ul>
+        </li>
+        <li>
+          <p>Incompatible Changes</p>
+          <ul>
+            <li>Drop <code>14.1.X</code> support because it does not have support for nodeId test output, so it's not possible to handle the ExUnit test output in a safe manner while still allowing concurrent output for asynchronous tests.</li>
           </ul>
         </li>
       </ul>

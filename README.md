@@ -46,6 +46,7 @@
       - [Steps](#steps)
       - [Basics](#basics)
         - [Keyboard Shortcuts](#keyboard-shortcuts)
+        - [Environment Variables](#environment-variables)
       - [Breakpoints](#breakpoints)
         - [Accessing Breakpoint Properties](#accessing-breakpoint-properties)
           - [Viewing all breakpoints](#viewing-all-breakpoints)
@@ -139,7 +140,7 @@
 [![Build Status](https://travis-ci.org/KronicDeth/intellij-elixir.svg?branch=master)](https://travis-ci.org/KronicDeth/intellij-elixir)
 
 This is a plugin that adds support for [Elixir](http://elixir-lang.org/) to JetBrains IntelliJ IDEA platform IDEs
-([0xDBE](http://www.jetbrains.com/dbe/), [AppCode](http://www.jetbrains.com/objc/),
+([DataGrip](http://www.jetbrains.com/datagrip/), [AppCode](http://www.jetbrains.com/objc/),
 [IntelliJ IDEA](http://www.jetbrains.com/idea/), [PHPStorm](http://www.jetbrains.com/phpstorm/),
 [PyCharm](http://www.jetbrains.com/pycharm/), [Rubymine](http://www.jetbrains.com/ruby/),
 [WebStorm](http://www.jetbrains.com/webstorm/)).
@@ -1378,6 +1379,12 @@ After you have configured a [run configuration](#run-configuration) for your pro
 | Step Over                               | `F8`             |
 | Step Into                               | `F7`             |
 | View breakpoint details/all breakpoints | `Shift+Cmd+F8`   |
+
+##### Environment Variables
+
+| Variable                           | Example    | Description                     |
+| -----------------------------------|------------| --------------------------------|
+| INTELLIJ\_ELIXIR\_DEBUG\_BLACKLIST | iconv,some | Excluding modules from debugger |
 
 #### Breakpoints
 

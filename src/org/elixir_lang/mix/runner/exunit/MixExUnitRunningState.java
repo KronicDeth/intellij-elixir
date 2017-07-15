@@ -9,13 +9,13 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
-import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
 import org.elixir_lang.mix.runner.MixRunningState;
+import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ final class MixExUnitRunningState extends MixRunningState {
   public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
     ProcessHandler processHandler = startProcess();
 
-    TestConsoleProperties properties = new SMTRunnerConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
+    TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
     ConsoleView console = createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties);
     ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), console);
     return new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
@@ -49,7 +49,7 @@ final class MixExUnitRunningState extends MixRunningState {
 
   @NotNull
   public ConsoleView createConsoleView(Executor executor) {
-    TestConsoleProperties properties = new SMTRunnerConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
+    TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
 
     return createConsole(TEST_FRAMEWORK_NAME, properties);
   }
