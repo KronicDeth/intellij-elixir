@@ -20,7 +20,9 @@ package org.elixir_lang.debugger.xdebug;
 
 import com.ericsson.otp.erlang.OtpErlangPid;
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -342,7 +344,14 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
     LOG.debug("Preparing to run debug target.");
 
     ArrayList<String> elixirParams = new ArrayList<>();
-    elixirParams.addAll(myRunningState.setupElixirParams());
+    RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
+    RunConfiguration runConfiguration = null;
+
+    if (runnerAndConfigurationSettings != null) {
+      runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+    }
+
+    elixirParams.addAll(myRunningState.setupElixirParams(runConfiguration));
     elixirParams.addAll(setUpElixirDebuggerCodePath());
 
     List<String> mixParams = new ArrayList<>();

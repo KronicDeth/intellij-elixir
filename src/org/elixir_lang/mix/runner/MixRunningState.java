@@ -5,6 +5,7 @@ import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.filters.TextConsoleBuilder;
 import com.intellij.execution.filters.TextConsoleBuilderFactory;
 import com.intellij.execution.filters.TextConsoleBuilderImpl;
@@ -14,6 +15,7 @@ import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.execution.ui.ConsoleView;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +53,7 @@ public class MixRunningState extends CommandLineState {
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
     GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(
-      myConfiguration, setupElixirParams(), myConfiguration.getMixArgs()
+      myConfiguration, setupElixirParams(myConfiguration), myConfiguration.getMixArgs()
     );
     return runMix(myConfiguration.getProject(), commandLine);
   }
@@ -63,7 +65,7 @@ public class MixRunningState extends CommandLineState {
   }
 
   @NotNull
-  public List<String> setupElixirParams() throws ExecutionException {
+  public List<String> setupElixirParams(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
     return new ArrayList<>();
   }
 }

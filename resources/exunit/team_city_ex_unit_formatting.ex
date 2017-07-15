@@ -3,41 +3,71 @@
 #
 # nodeId and parentNodeId system is documented in
 # https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000389550/comments/115000330464
-defmodule TeamCityExUnitFormatter do
-  @moduledoc false
-
-  use GenEvent
+defmodule TeamCityExUnitFormatting do
+  # Constants
 
   @root_parent_node_id 0
+
+  # Struct
+
+  defstruct failures_counter: 0,
+            invalids_counter: 0,
+            seed: nil,
+            skipped_counter: 0,
+            tests_counter: 0,
+            trace: false,
+            width: 80
 
   # Functions
 
   @doc false
   def formatter(_color, msg), do: msg
 
-  ## GenEvent Callbacks
+  def new(opts) do
+    {
+      :ok,
+      %__MODULE__{
+        seed: opts[:seed],
+        trace: opts[:trace]
+      }
+    }
+  end
 
-  def handle_event({:case_finished, test_case = %ExUnit.TestCase{}}, config) do
+  def put_event(state, {:case_finished, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_finished, attributes(test_case)
 
-    {:ok, config}
+    state
   end
 
-  def handle_event({:case_started, test_case = %ExUnit.TestCase{}}, config) do
+  def put_event(state, {:case_started, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_started, attributes(test_case)
 
-    {:ok, config}
+    state
   end
 
-  def handle_event(
-        {:test_finished, test = %ExUnit.Test{state: {:failed, {_, reason, _} = failed},}, time: time},
-        config
+  def put_event(
+        state = %__MODULE{
+          failures_counter: failures_counter,
+          tests_counter: tests_counter,
+          width: width
+        },
+        {
+          :test_finished,
+          test = %ExUnit.Test{
+            state: failed = {
+              :failed,
+              {_, reason, _}
+            },
+            time: time
+          }
+        }
       ) do
+    updated_failures_counter = failures_counter + 1
     formatted = ExUnit.Formatter.format_test_failure(
       test,
       failed,
-      config.failures_counter + 1,
-      config.width,
+      updated_failures_counter,
+      width,
       &formatter/2
     )
     attributes = attributes(test)
@@ -54,23 +84,27 @@ defmodule TeamCityExUnitFormatter do
                     duration: div(time, 1000)
                   )
 
-    {
-      :ok,
-      %{
-        config |
-        tests_counter: config.tests_counter + 1,
-        failures_counter: config.failures_counter + 1
-      }
+    %{
+      state |
+      tests_counter: tests_counter + 1,
+      failures_counter: updated_failures_counter
     }
   end
 
-  def handle_event({:test_finished, test = %ExUnit.Test{state: {:failed, failed}}, time: time}, config)
-      when is_list(failed) do
+  def put_event(
+        state = %__MODULE__{
+          failures_counter: failures_counter,
+          width: width,
+          tests_counter: tests_counter
+        },
+        {:test_finished, test = %ExUnit.Test{state: {:failed, failed}, time: time}}
+      ) when is_list(failed) do
+    updated_failures_counter = failures_counter + 1
     formatted = ExUnit.Formatter.format_test_failure(
       test,
       failed,
-      config.failures_counter + 1,
-      config.width,
+      updated_failures_counter,
+      width,
       &formatter/2
     )
     message = Enum.map_join(failed, "", fn {_kind, reason, _stack} -> inspect(reason) end)
@@ -88,33 +122,41 @@ defmodule TeamCityExUnitFormatter do
                     duration: div(time, 1000)
                   )
 
-    {
-      :ok,
-      %{
-        config |
-        tests_counter: config.tests_counter + 1,
-        failures_counter: config.failures_counter + 1
-      }
+    %{
+      state |
+      tests_counter: tests_counter + 1,
+      failures_counter: updated_failures_counter
     }
   end
 
-  def handle_event({:test_finished, test = %ExUnit.Test{state: {:skip, _}}}, config) do
+  def put_event(
+        state = %__MODULE__{
+          tests_counter: tests_counter,
+          skipped_counter: skipped_counter
+        },
+        {:test_finished, test = %ExUnit.Test{state: {:skip, _}}}
+      ) do
     attributes = attributes(test)
 
     put_formatted :test_ignored, attributes
     put_formatted :test_finished, attributes
 
-    {
-      :ok,
-      %{
-        config |
-        tests_counter: config.tests_counter + 1,
-        skipped_counter: config.skipped_counter + 1
-      }
+    %{
+      state |
+      tests_counter: tests_counter + 1,
+      skipped_counter: skipped_counter + 1
     }
   end
 
-  def handle_event({:test_finished, test = %ExUnit.Test{time: time}}, config) do
+  def put_event(
+        state,
+        {
+          :test_finished,
+          test = %ExUnit.Test{
+            time: time
+          }
+        }
+      ) do
     put_formatted :test_finished,
                   test
                   |> attributes()
@@ -122,10 +164,10 @@ defmodule TeamCityExUnitFormatter do
                        duration: div(time, 1000)
                      )
 
-    {:ok, config}
+    state
   end
 
-  def handle_event({:test_started, test = %ExUnit.Test{tags: tags}}, config) do
+  def put_event(state, {:test_started, test = %ExUnit.Test{tags: tags}}) do
     put_formatted :test_started,
                   test
                   |> attributes()
@@ -133,27 +175,10 @@ defmodule TeamCityExUnitFormatter do
                     locationHint: "file://#{tags[:file]}:#{tags[:line]}"
                   )
 
-    {:ok, config}
+    state
   end
 
-  def handle_event(_, config) do
-    {:ok, config}
-  end
-
-  def init(opts) do
-    {
-      :ok,
-      %{
-        failures_counter: 0,
-        invalids_counter: 0,
-        seed: opts[:seed],
-        skipped_counter: 0,
-        tests_counter: 0,
-        trace: opts[:trace],
-        width: 80
-      }
-    }
-  end
+  def put_event(_, state), do: state
 
   ## Private Functions
 
