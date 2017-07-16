@@ -156,6 +156,7 @@
             </li>
             <li>Fix parallel test cases nesting under each other due to asynchronous reporting from formatter.  <code>##teamCity</code> <code>testSuiteStarted</code> messages automatically nest, so switched to using <code>nodeId</code> and <code>parentNodeId</code> system, so that nesting is explicit.  This will allow multiple parallel tests to show up in GUI too.</li>
             <li><code>Elixir.</code> prefix is stripped from test case names.</li>
+            <li>Handle Elixir versions with non-numeric parts</li>
           </ul>
         </li>
         <li>

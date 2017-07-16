@@ -212,6 +212,7 @@
     * If `MODULE` is the same as the test case without the `Test` suffix, then `MODULE.` is stripped too and the test name becomes only `FUNCTION/ARITY doc (COUNT)`
   * Fix parallel test cases nesting under each other due to asynchronous reporting from formatter.  `##teamCity` `testSuiteStarted` messages automatically nest, so switched to using `nodeId` and `parentNodeId` system, so that nesting is explicit.  This will allow multiple parallel tests to show up in GUI too.
   * `Elixir.` prefix is stripped from test case names.
+* [#728](https://github.com/KronicDeth/intellij-elixir/pull/728) - Handle Elixir versions with non-numeric parts - [@pazustep](https://github.com/pazustep)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
