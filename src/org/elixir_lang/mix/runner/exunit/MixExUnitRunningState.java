@@ -4,6 +4,7 @@ import com.intellij.execution.DefaultExecutionResult;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.Executor;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
@@ -11,6 +12,7 @@ import com.intellij.execution.testframework.TestConsoleProperties;
 import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
@@ -18,6 +20,7 @@ import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,13 +154,21 @@ final class MixExUnitRunningState extends MixRunningState {
   }
 
   @NotNull
-  public List<String> setupElixirParams() throws ExecutionException {
+  public List<String> setupElixirParams(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
     List<File> elixirModuleFileList = new ArrayList<>();
 
     try {
       File elixirModulesDir = createElixirModulesDirectory();
 
-      elixirModuleFileList.add(ElixirModules.putFormatterTo(elixirModulesDir));
+      elixirModuleFileList.add(ElixirModules.putFormattingTo(elixirModulesDir));
+
+      Project project = null;
+
+      if (runConfiguration != null) {
+        project = runConfiguration.getProject();
+      }
+
+      elixirModuleFileList.add(ElixirModules.putFormatterTo(elixirModulesDir, project));
 
       // Support for the --formatter option was recently added to Mix. Older versions of Elixir will need to use the
       // custom task we've included in order to support this option
