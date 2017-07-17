@@ -213,6 +213,7 @@
   * Fix parallel test cases nesting under each other due to asynchronous reporting from formatter.  `##teamCity` `testSuiteStarted` messages automatically nest, so switched to using `nodeId` and `parentNodeId` system, so that nesting is explicit.  This will allow multiple parallel tests to show up in GUI too.
   * `Elixir.` prefix is stripped from test case names.
 * [#728](https://github.com/KronicDeth/intellij-elixir/pull/728) - Handle Elixir versions with non-numeric parts - [@pazustep](https://github.com/pazustep)
+* [#734](https://github.com/KronicDeth/intellij-elixir/pull/734) - Use a separate formatter, one GenEvent-based and one GenServer-based, depending on whether the SDK is >= 1.4.0 as that's when GenEvent was deprecated and GenServer was preferred. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
