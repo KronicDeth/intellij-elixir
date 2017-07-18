@@ -5,7 +5,6 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import org.apache.commons.lang.math.IntRange;
-import org.elixir_lang.annonator.Kernel;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
