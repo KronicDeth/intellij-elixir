@@ -214,6 +214,11 @@
   * `Elixir.` prefix is stripped from test case names.
 * [#728](https://github.com/KronicDeth/intellij-elixir/pull/728) - Handle Elixir versions with non-numeric parts - [@pazustep](https://github.com/pazustep)
 * [#734](https://github.com/KronicDeth/intellij-elixir/pull/734) - Use a separate formatter, one GenEvent-based and one GenServer-based, depending on whether the SDK is >= 1.4.0 as that's when GenEvent was deprecated and GenServer was preferred. - [@KronicDeth](https://github.com/KronicDeth)
+* [#736](https://github.com/KronicDeth/intellij-elixir/pull/736) - [@KronicDeth](https://github.com/KronicDeth)
+  * Merge `Callable` and `Kernel` annotators
+  * Use `PsiElementVisitor` instead of `PsiRecursiveElementVisitor`, so that macros in `defmodule` block don't get double annotated.
+  * Instead of erasing and then applying multiple `TextAttributeKey`, erase as before, but then merge the `TextAttributeKey`'s `TextAttributes` and apply as single `setEnforcedTextAttributes`.  For some reason, this fixes the inconsistency of whether `PREDEFINED_CALL` or `MACRO_CALL` is applied first.
+  * In case of multiple `resolved`s, make those that need `PREDEFINED_CALL` to win.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

@@ -158,6 +158,10 @@
             <li><code>Elixir.</code> prefix is stripped from test case names.</li>
             <li>Handle Elixir versions with non-numeric parts</li>
             <li>Use a separate formatter, one GenEvent-based and one GenServer-based, depending on whether the SDK is &gt;= 1.4.0 as that's when GenEvent was deprecated and GenServer was preferred.</li>
+            <li>Merge <code>Callable</code> and <code>Kernel</code> annotators</li>
+            <li>Use <code>PsiElementVisitor</code> instead of <code>PsiRecursiveElementVisitor</code>, so that macros in <code>defmodule</code> block don't get double annotated.</li>
+            <li>Instead of erasing and then applying multiple <code>TextAttributeKey</code>, erase as before, but then merge the <code>TextAttributeKey</code>'s <code>TextAttributes</code> and apply as single <code>setEnforcedTextAttributes</code>.  For some reason, this fixes the inconsistency of whether <code>PREDEFINED_CALL</code> or <code>MACRO_CALL</code> is applied first.</li>
+            <li>In case of multiple <code>resolved</code>s, make those that need <code>PREDEFINED_CALL</code> to win.</li>
           </ul>
         </li>
         <li>
