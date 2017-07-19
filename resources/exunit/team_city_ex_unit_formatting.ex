@@ -30,13 +30,13 @@ defmodule TeamCityExUnitFormatting do
     }
   end
 
-  def put_event(state, {:case_finished, test_case = %ExUnit.TestCase{}}) do
+  def put_event(state = %__MODULE__{}, {:case_finished, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_finished, attributes(test_case)
 
     state
   end
 
-  def put_event(state, {:case_started, test_case = %ExUnit.TestCase{}}) do
+  def put_event(state = %__MODULE__{}, {:case_started, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_started, attributes(test_case)
 
     state
@@ -146,7 +146,7 @@ defmodule TeamCityExUnitFormatting do
   end
 
   def put_event(
-        state,
+        state = %__MODULE__{},
         {
           :test_finished,
           test = %ExUnit.Test{
@@ -164,7 +164,7 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
-  def put_event(state, {:test_started, test = %ExUnit.Test{tags: tags}}) do
+  def put_event(state = %__MODULE__{}, {:test_started, test = %ExUnit.Test{tags: tags}}) do
     put_formatted :test_started,
                   test
                   |> attributes()
