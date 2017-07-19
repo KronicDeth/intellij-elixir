@@ -185,7 +185,12 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
-  def put_event(_, state), do: state
+  def put_event(state = %__MODULE__{}, event) do
+    IO.warn "#{inspect(__MODULE__)} does not know how to process event (#{inspect(event)}).  " <>
+            "Please report this message to https://github.com/KronicDeth/intellij-elixir/issues/new."
+
+    state
+  end
 
   ## Private Functions
 
