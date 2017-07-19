@@ -42,6 +42,16 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
+  def put_event(state = %__MODULE__{}, {:suite_finished, _run_us, _load_us}), do: state
+
+  def put_event(state = %__MODULE__{}, {:suite_started, opts}) do
+    seed = opts[:seed]
+
+    IO.puts "Suite started with seed #{seed}"
+
+    %__MODULE__{state | seed: seed, trace: opts[:trace]}
+  end
+
   def put_event(
         state = %__MODULE{
           failures_counter: failures_counter,
