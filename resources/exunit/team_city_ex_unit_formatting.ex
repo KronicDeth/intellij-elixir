@@ -24,12 +24,9 @@ defmodule TeamCityExUnitFormatting do
   def formatter(_color, msg), do: msg
 
   def new(opts) do
-    {
-      :ok,
-      %__MODULE__{
-        seed: opts[:seed],
-        trace: opts[:trace]
-      }
+    %__MODULE__{
+      seed: opts[:seed],
+      trace: opts[:trace]
     }
   end
 
