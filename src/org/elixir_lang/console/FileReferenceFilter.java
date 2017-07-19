@@ -101,8 +101,8 @@ public final class FileReferenceFilter implements Filter {
     int fileLine = matchGroupToNumber(matcher, myLineMatchGroup);
     int fileColumn = matchGroupToNumber(matcher, myColumnMatchGroup);
 
-    int highlightStartOffset = entireLength - line.length() + matcher.start(0) + 1;
-    int highlightEndOffset = highlightStartOffset + matcher.end(0) - matcher.start(0) - 1;
+    int highlightStartOffset = entireLength - line.length() + matcher.start(1);
+    int highlightEndOffset = highlightStartOffset + matcher.end(matcher.groupCount()) - matcher.start(1);
 
     VirtualFile absolutePath = resolveAbsolutePath(filePath);
     HyperlinkInfo hyperlinkInfo = absolutePath != null ? new OpenFileHyperlinkInfo(myProject, absolutePath, fileLine, fileColumn) : null;
