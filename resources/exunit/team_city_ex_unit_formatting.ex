@@ -24,25 +24,32 @@ defmodule TeamCityExUnitFormatting do
   def formatter(_color, msg), do: msg
 
   def new(opts) do
-    {
-      :ok,
-      %__MODULE__{
-        seed: opts[:seed],
-        trace: opts[:trace]
-      }
+    %__MODULE__{
+      seed: opts[:seed],
+      trace: opts[:trace]
     }
   end
 
-  def put_event(state, {:case_finished, test_case = %ExUnit.TestCase{}}) do
+  def put_event(state = %__MODULE__{}, {:case_finished, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_finished, attributes(test_case)
 
     state
   end
 
-  def put_event(state, {:case_started, test_case = %ExUnit.TestCase{}}) do
+  def put_event(state = %__MODULE__{}, {:case_started, test_case = %ExUnit.TestCase{}}) do
     put_formatted :test_suite_started, attributes(test_case)
 
     state
+  end
+
+  def put_event(state = %__MODULE__{}, {:suite_finished, _run_us, _load_us}), do: state
+
+  def put_event(state = %__MODULE__{}, {:suite_started, opts}) do
+    seed = opts[:seed]
+
+    IO.puts "Suite started with seed #{seed}"
+
+    %__MODULE__{state | seed: seed, trace: opts[:trace]}
   end
 
   def put_event(
@@ -149,7 +156,7 @@ defmodule TeamCityExUnitFormatting do
   end
 
   def put_event(
-        state,
+        state = %__MODULE__{},
         {
           :test_finished,
           test = %ExUnit.Test{
@@ -167,7 +174,7 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
-  def put_event(state, {:test_started, test = %ExUnit.Test{tags: tags}}) do
+  def put_event(state = %__MODULE__{}, {:test_started, test = %ExUnit.Test{tags: tags}}) do
     put_formatted :test_started,
                   test
                   |> attributes()
@@ -178,7 +185,12 @@ defmodule TeamCityExUnitFormatting do
     state
   end
 
-  def put_event(_, state), do: state
+  def put_event(state = %__MODULE__{}, event) do
+    IO.warn "#{inspect(__MODULE__)} does not know how to process event (#{inspect(event)}).  " <>
+            "Please report this message to https://github.com/KronicDeth/intellij-elixir/issues/new."
+
+    state
+  end
 
   ## Private Functions
 
