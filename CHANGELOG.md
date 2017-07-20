@@ -182,6 +182,10 @@
     * `2017.1.1` -> `2017.1.5`
     * `2016.3.5` -> `2016.3.7`
   * Update Elixir version `1.4.2` -> `1.4.5`
+* [#738](https://github.com/KronicDeth/intellij-elixir/pull/738) - [@KronicDeth](https://github.com/KronicDeth)
+  *  `TeamCityExUnitFormatting.put_event`
+    * Always match on `%__MODULE__{}` for state in clauses to prevent state update errors
+    * Match on `:suite_finished` and `:suite_started` events, so that only events added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -219,6 +223,16 @@
   * Use `PsiElementVisitor` instead of `PsiRecursiveElementVisitor`, so that macros in `defmodule` block don't get double annotated.
   * Instead of erasing and then applying multiple `TextAttributeKey`, erase as before, but then merge the `TextAttributeKey`'s `TextAttributes` and apply as single `setEnforcedTextAttributes`.  For some reason, this fixes the inconsistency of whether `PREDEFINED_CALL` or `MACRO_CALL` is applied first.
   * In case of multiple `resolved`s, make those that need `PREDEFINED_CALL` to win.
+* [#738](https://github.com/KronicDeth/intellij-elixir/pull/738) - [@KronicDeth](https://github.com/KronicDeth)
+  * `TeamCityExUnitFormatting.new` should return struct only because none of the formatters expects an `:ok` tuple.
+  * Fix order of `TeamCityExUnitFormatting.put_Event` catchall parameters.
+  * `FileReferenceFilter`
+    * Add `.exs` to pattern for stacktrace linking.
+    * Highlight only stacktrace path and line umber instead of entire line
+    * Better path match in stacktraces
+      * Only accept VirtualFile if it has a suffix matching the stacktrace's path instead of accepting the first index file with a matching basename.
+      * Allow multiple VirtualFiles to be linked if it turns out there is a true file path collision between two OTP apps in the Project or Libraries.
+    * Format and fix warnings
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

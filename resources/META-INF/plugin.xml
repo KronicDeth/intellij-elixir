@@ -113,6 +113,9 @@
               </ul>
             </li>
             <li>Update Elixir version <code>1.4.2</code> -&gt; <code>1.4.5</code></li>
+            <li><code>TeamCityExUnitFormatting.put_event</code></li>
+            <li>Always match on <code>%__MODULE__{}</code> for state in clauses to prevent state update errors</li>
+            <li>Match on <code>:suite_finished</code> and <code>:suite_started</code> events, so that only events added to the interface will be unknown and <code>IO.warn</code> can be used tell anyone spotting the new event to file an issue.</li>
           </ul>
         </li>
         <li>
@@ -162,6 +165,21 @@
             <li>Use <code>PsiElementVisitor</code> instead of <code>PsiRecursiveElementVisitor</code>, so that macros in <code>defmodule</code> block don't get double annotated.</li>
             <li>Instead of erasing and then applying multiple <code>TextAttributeKey</code>, erase as before, but then merge the <code>TextAttributeKey</code>'s <code>TextAttributes</code> and apply as single <code>setEnforcedTextAttributes</code>.  For some reason, this fixes the inconsistency of whether <code>PREDEFINED_CALL</code> or <code>MACRO_CALL</code> is applied first.</li>
             <li>In case of multiple <code>resolved</code>s, make those that need <code>PREDEFINED_CALL</code> to win.</li>
+            <li><code>TeamCityExUnitFormatting.new</code> should return struct only&nbsp;because none of the formatters expects an <code>:ok</code> tuple.</li>
+            <li>Fix order of <code>TeamCityExUnitFormatting.put_Event</code> catchall parameters.</li>
+            <li><code>FileReferenceFilter</code>
+              <ul>
+                <li>Add <code>.exs</code> to pattern for stacktrace linking.</li>
+                <li>Highlight only stacktrace path and line umber instead of entire line</li>
+                <li>Better path match in stacktraces
+                  <ul>
+                    <li>Only accept VirtualFile if it has a suffix matching the stacktrace's path instead of accepting the first index file with a matching basename.</li>
+                    <li>Allow multiple VirtualFiles to be linked if it turns out there is a true file path collision between two OTP apps in the Project or Libraries.</li>
+                  </ul>
+                </li>
+                <li>Format and fix warnings</li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>
