@@ -53,15 +53,15 @@ public final class FileReferenceFilter implements Filter {
         }
         TreeMap<Integer, String> map = new TreeMap<>();
         map.put(filePathIndex, PATH_MACROS);
-        expression = StringUtil.replace(expression, PATH_MACROS, FILE_PATH_REGEXP);
+        String regex = StringUtil.replace(expression, PATH_MACROS, FILE_PATH_REGEXP);
 
         if (lineIndex != -1) {
-            expression = StringUtil.replace(expression, LINE_MACROS, NUMBER_REGEXP);
+            regex = StringUtil.replace(regex, LINE_MACROS, NUMBER_REGEXP);
             map.put(lineIndex, LINE_MACROS);
         }
 
         if (columnIndex != -1) {
-            expression = StringUtil.replace(expression, COLUMN_MACROS, NUMBER_REGEXP);
+            regex = StringUtil.replace(regex, COLUMN_MACROS, NUMBER_REGEXP);
             map.put(columnIndex, COLUMN_MACROS);
         }
 
@@ -83,7 +83,7 @@ public final class FileReferenceFilter implements Filter {
         myFileMatchGroup = filePathIndex;
         myLineMatchGroup = lineIndex;
         myColumnMatchGroup = columnIndex;
-        myPattern = Pattern.compile(expression, Pattern.MULTILINE);
+        myPattern = Pattern.compile(regex, Pattern.MULTILINE);
     }
 
     private static int matchGroupToNumber(@NotNull Matcher matcher, int matchGroup) {
