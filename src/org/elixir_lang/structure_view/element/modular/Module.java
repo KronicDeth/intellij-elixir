@@ -13,12 +13,9 @@ import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
+import org.elixir_lang.psi.operation.Or;
 import org.elixir_lang.structure_view.element.*;
-import org.elixir_lang.structure_view.element.CallDefinition;
-import org.elixir_lang.structure_view.element.CallDefinitionClause;
-import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.Exception;
-import org.elixir_lang.structure_view.element.Overridable;
 import org.elixir_lang.structure_view.element.Quote;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.FunctionByNameArity;
 import org.elixir_lang.structure_view.element.call_definition_by_name_arity.MacroByNameArity;
@@ -174,6 +171,7 @@ public class Module extends Element<Call> implements Modular {
         TreeElement[] treeElements = null;
 
         if (childCalls != null) {
+            Queue<Call> childCallQueue = new ArrayDeque<>(Arrays.asList(childCalls));
             int length = childCalls.length;
             final List<TreeElement> treeElementList = new ArrayList<TreeElement>(length);
             FunctionByNameArity functionByNameArity = new FunctionByNameArity(length, treeElementList, modular);
@@ -181,8 +179,12 @@ public class Module extends Element<Call> implements Modular {
             Set<Overridable> overridableSet = new HashSet<Overridable>();
             Set<org.elixir_lang.structure_view.element.Use> useSet = new HashSet<org.elixir_lang.structure_view.element.Use>();
 
-            for (Call childCall : childCalls) {
-                if (Callback.is(childCall)) {
+            while (!childCallQueue.isEmpty()) {
+                Call childCall = childCallQueue.remove();
+
+                if (childCall instanceof Or) {
+                    childCallQueue.addAll(orChildCallList((Or) childCall));
+                } else if (Callback.is(childCall)) {
                     treeElementList.add(new Callback(modular, childCall));
                 } else if (Delegation.is(childCall)) {
                     functionByNameArity.addDelegationToTreeElementList(childCall);
@@ -259,6 +261,24 @@ public class Module extends Element<Call> implements Modular {
         }
 
         return treeElements;
+    }
+
+    private static List<Call> orChildCallList(Or or) {
+        List<Call> childCallList = new ArrayList<>();
+
+        PsiElement leftOperand = or.leftOperand();
+
+        if (leftOperand instanceof Call) {
+            childCallList.add((Call) leftOperand);
+        }
+
+        PsiElement rightOperand = or.rightOperand();
+
+        if (rightOperand instanceof Call) {
+            childCallList.add((Call) rightOperand);
+        }
+
+        return childCallList;
     }
 
     /*
