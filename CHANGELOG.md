@@ -186,6 +186,8 @@
   *  `TeamCityExUnitFormatting.put_event`
     * Always match on `%__MODULE__{}` for state in clauses to prevent state update errors
     * Match on `:suite_finished` and `:suite_started` events, so that only events added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
+* [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned.
+ - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -233,6 +235,9 @@
       * Only accept VirtualFile if it has a suffix matching the stacktrace's path instead of accepting the first index file with a matching basename.
       * Allow multiple VirtualFiles to be linked if it turns out there is a true file path collision between two OTP apps in the Project or Libraries.
     * Format and fix warnings
+* [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - [@KronicDeth](https://github.com/KronicDeth)
+  * Pin promoter for all quotes, including the previously missing `stringLine` and `charListLine`.
+  * Only insert closing quote if previous token was an opening quote.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

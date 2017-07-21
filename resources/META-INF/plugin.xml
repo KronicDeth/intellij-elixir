@@ -116,6 +116,7 @@
             <li><code>TeamCityExUnitFormatting.put_event</code></li>
             <li>Always match on <code>%__MODULE__{}</code> for state in clauses to prevent state update errors</li>
             <li>Match on <code>:suite_finished</code> and <code>:suite_started</code> events, so that only events added to the interface will be unknown and <code>IO.warn</code> can be used tell anyone spotting the new event to file an issue.</li>
+            <li>Instead of pinning position (<code>1</code> for lines or <code>3</code> for heredocs), <code>pin</code> <code>*_PROMOTER</code> token, so it's more obvious the pattern is that the promoter is pinned.</li>
           </ul>
         </li>
         <li>
@@ -180,6 +181,8 @@
                 <li>Format and fix warnings</li>
               </ul>
             </li>
+            <li>Pin promoter for all quotes, including the previously missing <code>stringLine</code> and <code>charListLine</code>.</li>
+            <li>Only insert closing quote if previous token was an opening quote.</li>
           </ul>
         </li>
         <li>
