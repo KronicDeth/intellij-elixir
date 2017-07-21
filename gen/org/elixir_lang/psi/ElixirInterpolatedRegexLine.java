@@ -6,15 +6,16 @@ import com.ericsson.otp.erlang.OtpErlangTuple;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public interface ElixirInterpolatedRegexLine extends RegexFragmented, InterpolatedSigilLine {
 
-  @NotNull
+  @Nullable
   ElixirInterpolatedRegexBody getInterpolatedRegexBody();
 
-  @NotNull
+  @Nullable
   ElixirSigilModifiers getSigilModifiers();
 
   @NotNull

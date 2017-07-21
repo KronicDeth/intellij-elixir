@@ -13,6 +13,7 @@ import org.elixir_lang.psi.ElixirCharListLine;
 import org.elixir_lang.psi.ElixirQuoteCharListBody;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class ElixirCharListLineImpl extends ASTWrapperPsiElement implements Elix
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirQuoteCharListBody getQuoteCharListBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirQuoteCharListBody.class);
   }
 
   @NotNull

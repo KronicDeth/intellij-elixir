@@ -65,24 +65,34 @@ public class QuoteHandler implements MultiCharQuoteHandler {
     @Nullable
     @Override
     public CharSequence getClosingQuote(HighlighterIterator highlighterIterator, int offset) {
-        Document document = highlighterIterator.getDocument();
         CharSequence closingQuote = null;
 
-        if (document != null) {
-            if (offset >= 3) {
-                String openingQuote = document.getText(new TextRange(offset - 3, offset));
+        if (highlighterIterator.getStart() > 0) {
+            highlighterIterator.retreat();
 
-                closingQuote = StackFrame.TERMINATOR_BY_PROMOTER.get(openingQuote);
+            try {
+                IElementType tokenType = highlighterIterator.getTokenType();
 
-                if (closingQuote != null) {
-                    closingQuote = "\n" + closingQuote;
+                if (CLOSING_QUOTE_BY_OPENING_QUOTE.get(tokenType) != null) {
+                    Document document = highlighterIterator.getDocument();
+
+                    if (document != null) {
+                        String promoter = document.getText(
+                                new TextRange(highlighterIterator.getStart(), highlighterIterator.getEnd())
+                        );
+                        String terminator = StackFrame.TERMINATOR_BY_PROMOTER.get(promoter);
+
+                        if (terminator != null) {
+                            if (terminator.length() >= 3) {
+                                closingQuote = "\n" + terminator;
+                            } else {
+                                closingQuote = terminator;
+                            }
+                        }
+                    }
                 }
-            }
-
-            if (closingQuote == null && offset >= 1) {
-                String openingQuote = document.getText(new TextRange(offset - 1, offset));
-
-                closingQuote = StackFrame.TERMINATOR_BY_PROMOTER.get(openingQuote);
+            } finally {
+                highlighterIterator.advance();
             }
         }
 
