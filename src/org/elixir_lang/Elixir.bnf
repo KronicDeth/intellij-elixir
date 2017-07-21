@@ -81,7 +81,7 @@
   /* infix operations that work as name identifier owner calls - specifically support getNameIdentifier so they can
      return their operator, so it is easy to use a different operator when making customer operators like in Bitwise or
      the free arrow operators */
-  implements(        "(un)?matched(Comparison|Multiplication|Or|Relational)Operation")=[
+  implements(        "(un)?matched(Comparison|Multiplication|Relational)Operation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Infix"
   ]
@@ -138,6 +138,12 @@
   implements("(un)?matchedMatchOperation")=[
     "org.elixir_lang.psi.call.Named"
     "org.elixir_lang.psi.operation.Match"
+  ]
+  // methods set by infix operations above
+
+  implements("(un)?matchedOrOperation")=[
+    "org.elixir_lang.psi.call.Named"
+    "org.elixir_lang.psi.operation.Or"
   ]
   // methods set by infix operations above
 
