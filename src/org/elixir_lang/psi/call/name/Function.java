@@ -4,6 +4,7 @@ public class Function {
     public static final String ALIAS = "alias";
     public static final String CASE = "case";
     public static final String COND = "cond";
+    public static final String CREATE = "create";
     public static final String DEF = "def";
     public static final String DEFDELEGATE = "defdelegate";
     public static final String DEFEXCEPTION = "defexception";

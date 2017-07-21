@@ -2134,8 +2134,11 @@ public class ElixirPsiImplUtil {
                 }
             }
         } else if (parent instanceof Arguments ||
+                // See https://github.com/elixir-lang/elixir/blob/v1.5/lib/elixir/lib/protocol.ex#L633
+                parent instanceof AtUnqualifiedNoParenthesesCall ||
                 // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
                 parent instanceof ElixirAccessExpression ||
+                parent instanceof ElixirMatchedParenthesesArguments ||
                 parent instanceof ElixirTuple ||
                 parent instanceof Match ||
                 parent instanceof QualifiedAlias ||
@@ -2145,6 +2148,8 @@ public class ElixirPsiImplUtil {
             Call parentCall = (Call) parent;
 
             if (parentCall.isCalling(KERNEL, ALIAS)) {
+                enclosingMacroCall = parentCall;
+            } else if (parentCall.isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3)) {
                 enclosingMacroCall = parentCall;
             }
         } else if (parent instanceof QuotableKeywordPair) {
