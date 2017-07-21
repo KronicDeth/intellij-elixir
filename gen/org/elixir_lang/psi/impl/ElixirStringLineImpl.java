@@ -13,6 +13,7 @@ import org.elixir_lang.psi.ElixirQuoteStringBody;
 import org.elixir_lang.psi.ElixirStringLine;
 import org.elixir_lang.psi.ElixirVisitor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class ElixirStringLineImpl extends ASTWrapperPsiElement implements Elixir
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirQuoteStringBody getQuoteStringBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirQuoteStringBody.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirQuoteStringBody.class);
   }
 
   @NotNull

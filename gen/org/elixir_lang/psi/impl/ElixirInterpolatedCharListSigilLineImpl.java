@@ -10,6 +10,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.elixir_lang.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -29,15 +30,15 @@ public class ElixirInterpolatedCharListSigilLineImpl extends ASTWrapperPsiElemen
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirInterpolatedCharListBody getInterpolatedCharListBody() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListBody.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirInterpolatedCharListBody.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public ElixirSigilModifiers getSigilModifiers() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, ElixirSigilModifiers.class));
+    return PsiTreeUtil.getChildOfType(this, ElixirSigilModifiers.class);
   }
 
   @NotNull

@@ -1400,7 +1400,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CHAR_LIST_HEREDOC, null);
     r = consumeTokens(b, 1, CHAR_LIST_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 1
+    p = r; // pin = CHAR_LIST_HEREDOC_PROMOTER
     r = r && report_error_(b, charListHeredoc_2(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && consumeToken(b, CHAR_LIST_HEREDOC_TERMINATOR) && r;
@@ -1438,13 +1438,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean charListLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "charListLine")) return false;
     if (!nextTokenIs(b, CHAR_LIST_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CHAR_LIST_LINE, null);
     r = consumeToken(b, CHAR_LIST_PROMOTER);
-    r = r && quoteCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_TERMINATOR);
-    exit_section_(b, m, CHAR_LIST_LINE, r);
-    return r;
+    p = r; // pin = CHAR_LIST_PROMOTER
+    r = r && report_error_(b, quoteCharListBody(b, l + 1));
+    r = p && consumeToken(b, CHAR_LIST_TERMINATOR) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2371,7 +2372,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_CHAR_LIST_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = CHAR_LIST_SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, interpolatedCharListSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -2397,14 +2398,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean interpolatedCharListSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedCharListSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
-    r = r && interpolatedCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_CHAR_LIST_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_CHAR_LIST_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    p = r; // pin = CHAR_LIST_SIGIL_PROMOTER
+    r = r && report_error_(b, interpolatedCharListBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2444,7 +2446,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_REGEX_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = REGEX_HEREDOC_PROMOTER
     r = r && report_error_(b, interpolatedRegexHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, REGEX_HEREDOC_TERMINATOR)) && r;
@@ -2483,14 +2485,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean interpolatedRegexLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
-    r = r && interpolatedRegexBody(b, l + 1);
-    r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_REGEX_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_REGEX_LINE, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_REGEX_SIGIL_NAME, REGEX_PROMOTER);
+    p = r; // pin = REGEX_PROMOTER
+    r = r && report_error_(b, interpolatedRegexBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, REGEX_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2530,7 +2533,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, interpolatedSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -2569,14 +2572,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean interpolatedSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_PROMOTER);
-    r = r && interpolatedSigilBody(b, l + 1);
-    r = r && consumeToken(b, SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_SIGIL_NAME, SIGIL_PROMOTER);
+    p = r; // pin = SIGIL_PROMOTER
+    r = r && report_error_(b, interpolatedSigilBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2629,7 +2633,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_STRING_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = STRING_SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, interpolatedStringSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, STRING_SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -2655,14 +2659,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean interpolatedStringSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedStringSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
-    r = r && interpolatedStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_STRING_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_STRING_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    p = r; // pin = STRING_SIGIL_PROMOTER
+    r = r && report_error_(b, interpolatedStringBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, STRING_SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2702,7 +2707,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_WORDS_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, INTERPOLATING_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = WORDS_HEREDOC_PROMOTER
     r = r && report_error_(b, interpolatedWordsHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, WORDS_HEREDOC_TERMINATOR)) && r;
@@ -2741,14 +2746,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean interpolatedWordsLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "interpolatedWordsLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, INTERPOLATING_WORDS_SIGIL_NAME, WORDS_PROMOTER);
-    r = r && interpolatedWordsBody(b, l + 1);
-    r = r && consumeToken(b, WORDS_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, INTERPOLATED_WORDS_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, INTERPOLATED_WORDS_LINE, null);
+    r = consumeTokens(b, 3, TILDE, INTERPOLATING_WORDS_SIGIL_NAME, WORDS_PROMOTER);
+    p = r; // pin = WORDS_PROMOTER
+    r = r && report_error_(b, interpolatedWordsBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, WORDS_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3039,7 +3045,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LITERAL_CHAR_LIST_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = CHAR_LIST_SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, literalCharListSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -3065,14 +3071,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean literalCharListSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalCharListSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
-    r = r && literalCharListBody(b, l + 1);
-    r = r && consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, LITERAL_CHAR_LIST_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LITERAL_CHAR_LIST_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_CHAR_LIST_SIGIL_NAME, CHAR_LIST_SIGIL_PROMOTER);
+    p = r; // pin = CHAR_LIST_SIGIL_PROMOTER
+    r = r && report_error_(b, literalCharListBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, CHAR_LIST_SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3111,7 +3118,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LITERAL_REGEX_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, LITERAL_REGEX_SIGIL_NAME, REGEX_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = REGEX_HEREDOC_PROMOTER
     r = r && report_error_(b, literalRegexHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, REGEX_HEREDOC_TERMINATOR)) && r;
@@ -3150,14 +3157,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean literalRegexLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalRegexLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_REGEX_SIGIL_NAME, REGEX_PROMOTER);
-    r = r && literalRegexBody(b, l + 1);
-    r = r && consumeToken(b, REGEX_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, LITERAL_REGEX_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LITERAL_REGEX_LINE, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_REGEX_SIGIL_NAME, REGEX_PROMOTER);
+    p = r; // pin = REGEX_PROMOTER
+    r = r && report_error_(b, literalRegexBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, REGEX_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3196,7 +3204,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LITERAL_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, LITERAL_SIGIL_NAME, SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, literalSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -3235,14 +3243,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean literalSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
-    r = r && literalSigilBody(b, l + 1);
-    r = r && consumeToken(b, SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, LITERAL_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LITERAL_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_SIGIL_NAME, SIGIL_PROMOTER);
+    p = r; // pin = SIGIL_PROMOTER
+    r = r && report_error_(b, literalSigilBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3294,7 +3303,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LITERAL_STRING_SIGIL_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = STRING_SIGIL_HEREDOC_PROMOTER
     r = r && report_error_(b, literalStringSigilHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, STRING_SIGIL_HEREDOC_TERMINATOR)) && r;
@@ -3320,14 +3329,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean literalStringSigilLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalStringSigilLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
-    r = r && literalStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_SIGIL_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, LITERAL_STRING_SIGIL_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LITERAL_STRING_SIGIL_LINE, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_STRING_SIGIL_NAME, STRING_SIGIL_PROMOTER);
+    p = r; // pin = STRING_SIGIL_PROMOTER
+    r = r && report_error_(b, literalStringBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, STRING_SIGIL_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -3366,7 +3376,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LITERAL_WORDS_HEREDOC, null);
     r = consumeTokens(b, 3, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 3
+    p = r; // pin = WORDS_HEREDOC_PROMOTER
     r = r && report_error_(b, literalWordsHeredoc_4(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, WORDS_HEREDOC_TERMINATOR)) && r;
@@ -3405,14 +3415,15 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean literalWordsLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literalWordsLine")) return false;
     if (!nextTokenIs(b, TILDE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_PROMOTER);
-    r = r && literalWordsBody(b, l + 1);
-    r = r && consumeToken(b, WORDS_TERMINATOR);
-    r = r && sigilModifiers(b, l + 1);
-    exit_section_(b, m, LITERAL_WORDS_LINE, r);
-    return r;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LITERAL_WORDS_LINE, null);
+    r = consumeTokens(b, 3, TILDE, LITERAL_WORDS_SIGIL_NAME, WORDS_PROMOTER);
+    p = r; // pin = WORDS_PROMOTER
+    r = r && report_error_(b, literalWordsBody(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, WORDS_TERMINATOR)) && r;
+    r = p && sigilModifiers(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -5150,7 +5161,7 @@ public class ElixirParser implements PsiParser, LightPsiParser {
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, STRING_HEREDOC, null);
     r = consumeTokens(b, 1, STRING_HEREDOC_PROMOTER, EOL);
-    p = r; // pin = 1
+    p = r; // pin = STRING_HEREDOC_PROMOTER
     r = r && report_error_(b, stringHeredoc_2(b, l + 1));
     r = p && report_error_(b, heredocPrefix(b, l + 1)) && r;
     r = p && consumeToken(b, STRING_HEREDOC_TERMINATOR) && r;
@@ -5188,13 +5199,14 @@ public class ElixirParser implements PsiParser, LightPsiParser {
   public static boolean stringLine(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stringLine")) return false;
     if (!nextTokenIs(b, STRING_PROMOTER)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, STRING_LINE, null);
     r = consumeToken(b, STRING_PROMOTER);
-    r = r && quoteStringBody(b, l + 1);
-    r = r && consumeToken(b, STRING_TERMINATOR);
-    exit_section_(b, m, STRING_LINE, r);
-    return r;
+    p = r; // pin = STRING_PROMOTER
+    r = r && report_error_(b, quoteStringBody(b, l + 1));
+    r = p && consumeToken(b, STRING_TERMINATOR) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
