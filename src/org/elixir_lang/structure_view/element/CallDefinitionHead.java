@@ -113,6 +113,15 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
             if (stripped instanceof Call) {
                 Call strippedCall = (Call) stripped;
                 name = strippedCall.functionName();
+
+                if ("unquote".equals(name)) {
+                    PsiElement[] primaryArguments = strippedCall.primaryArguments();
+
+                    if (primaryArguments != null && primaryArguments.length == 1) {
+                        name += "(" + primaryArguments[0].getText() + ")";
+                    }
+                }
+
                 arityRange = strippedCall.resolvedFinalArityRange();
                 pair = pair(name, arityRange);
             }
