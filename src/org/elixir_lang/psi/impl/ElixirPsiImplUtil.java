@@ -2134,6 +2134,9 @@ public class ElixirPsiImplUtil {
                 }
             }
         } else if (parent instanceof Arguments ||
+                // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
+                parent instanceof ElixirAccessExpression ||
+                parent instanceof ElixirTuple ||
                 parent instanceof Match ||
                 parent instanceof QualifiedAlias ||
                 parent instanceof QualifiedMultipleAliases) {
