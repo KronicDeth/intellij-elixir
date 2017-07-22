@@ -2846,6 +2846,18 @@ public class ElixirPsiImplUtil {
 
         if (nameIdentifier != null) {
             name = nameIdentifier.getText();
+
+            if (UNQUOTE.equals(name)) {
+                if (namedElement instanceof Call) {
+                    Call namedElementCall = (Call) namedElement;
+
+                    PsiElement[] primaryArguments = namedElementCall.primaryArguments();
+
+                    if (primaryArguments != null && primaryArguments.length == 1) {
+                        name += "(" + primaryArguments[0].getText() + ")";
+                    }
+                }
+            }
         } else {
             if (namedElement instanceof Call) {
                 Call call = (Call) namedElement;
