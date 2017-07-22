@@ -238,6 +238,13 @@
 * [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - [@KronicDeth](https://github.com/KronicDeth)
   * Pin promoter for all quotes, including the previously missing `stringLine` and `charListLine`.
   * Only insert closing quote if previous token was an opening quote.
+* [#742](https://github.com/KronicDeth/intellij-elixir/pull/742) - [@KronicDeth](https://github.com/KronicDeth)
+  * On `unquote`, include argument in name of call definition clause
+  *  Look outside tuple containing `quote` for `enclosingMacroCall`, which allows going to [Phoenix.Template.compile's quote's defp](https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392)
+  * Treat `Module.create` as `Modular
+  * `Or` interface to unify `Matched` and `Unmatched` `Or`s.
+  * Look at both side of `Or` operation for nested child calls for Structure view.
+  * Make `unquote(ARG1)` name for `getName` and indexing
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

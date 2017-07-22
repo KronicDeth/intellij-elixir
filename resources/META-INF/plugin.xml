@@ -183,6 +183,12 @@
             </li>
             <li>Pin promoter for all quotes, including the previously missing <code>stringLine</code> and <code>charListLine</code>.</li>
             <li>Only insert closing quote if previous token was an opening quote.</li>
+            <li>On <code>unquote</code>, include argument in name of call definition clause</li>
+            <li>Look outside tuple containing <code>quote</code> for <code>enclosingMacroCall</code>, which allows going to <a href="https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392">Phoenix.Template.compile's quote's defp</a></li>
+            <li>Treat <code>Module.create</code> as `Modular</li>
+            <li><code>Or</code> interface to unify <code>Matched</code> and <code>Unmatched</code> <code>Or</code>s.</li>
+            <li>Look at both side of <code>Or</code> operation for nested child calls for Structure view.</li>
+            <li>Make <code>unquote(ARG1)</code> name for <code>getName</code> and indexing</li>
           </ul>
         </li>
         <li>
