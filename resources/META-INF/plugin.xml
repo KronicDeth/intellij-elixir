@@ -189,6 +189,8 @@
             <li><code>Or</code> interface to unify <code>Matched</code> and <code>Unmatched</code> <code>Or</code>s.</li>
             <li>Look at both side of <code>Or</code> operation for nested child calls for Structure view.</li>
             <li>Make <code>unquote(ARG1)</code> name for <code>getName</code> and indexing</li>
+            <li><code>ElementDescription</code> for <code>ElixirVariable</code></li>
+            <li>Mark <code>UnqualifiedParenthesesCall</code>s as <code>call</code> instead of <code>variable</code>.</li>
           </ul>
         </li>
         <li>

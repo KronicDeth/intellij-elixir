@@ -245,6 +245,9 @@
   * `Or` interface to unify `Matched` and `Unmatched` `Or`s.
   * Look at both side of `Or` operation for nested child calls for Structure view.
   * Make `unquote(ARG1)` name for `getName` and indexing
+* [#744](https://github.com/KronicDeth/intellij-elixir/pull/744) - [@KronicDeth](https://github.com/KronicDeth)
+  * `ElementDescription` for `ElixirVariable`
+  * Mark `UnqualifiedParenthesesCall`s as `call` instead of `variable`.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
