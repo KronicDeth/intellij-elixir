@@ -536,7 +536,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitMatchedOrOperation(@NotNull ElixirMatchedOrOperation o) {
     visitMatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitOr(o);
   }
 
   public void visitMatchedParenthesesArguments(@NotNull ElixirMatchedParenthesesArguments o) {
@@ -897,7 +897,7 @@ public class ElixirVisitor extends PsiElementVisitor {
   public void visitUnmatchedOrOperation(@NotNull ElixirUnmatchedOrOperation o) {
     visitUnmatchedExpression(o);
     // visitNamed(o);
-    // visitInfix(o);
+    // visitOr(o);
   }
 
   public void visitUnmatchedPipeOperation(@NotNull ElixirUnmatchedPipeOperation o) {

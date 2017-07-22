@@ -2134,6 +2134,12 @@ public class ElixirPsiImplUtil {
                 }
             }
         } else if (parent instanceof Arguments ||
+                // See https://github.com/elixir-lang/elixir/blob/v1.5/lib/elixir/lib/protocol.ex#L633
+                parent instanceof AtUnqualifiedNoParenthesesCall ||
+                // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
+                parent instanceof ElixirAccessExpression ||
+                parent instanceof ElixirMatchedParenthesesArguments ||
+                parent instanceof ElixirTuple ||
                 parent instanceof Match ||
                 parent instanceof QualifiedAlias ||
                 parent instanceof QualifiedMultipleAliases) {
@@ -2142,6 +2148,8 @@ public class ElixirPsiImplUtil {
             Call parentCall = (Call) parent;
 
             if (parentCall.isCalling(KERNEL, ALIAS)) {
+                enclosingMacroCall = parentCall;
+            } else if (parentCall.isCalling(org.elixir_lang.psi.call.name.Module.MODULE, CREATE, 3)) {
                 enclosingMacroCall = parentCall;
             }
         } else if (parent instanceof QuotableKeywordPair) {
@@ -2837,7 +2845,7 @@ public class ElixirPsiImplUtil {
         String name = null;
 
         if (nameIdentifier != null) {
-            name = nameIdentifier.getText();
+            name = unquoteName(namedElement, nameIdentifier.getText());
         } else {
             if (namedElement instanceof Call) {
                 Call call = (Call) namedElement;
@@ -5836,6 +5844,27 @@ if (quoted == null) {
                 expression instanceof PsiWhiteSpace);
 
         return expression;
+    }
+
+    /**
+     * If {@code name} is {@code "unquote"} then the {@link Call#primaryArguments()} single argument is added to the
+     * name.
+     */
+    @Nullable
+    public static String unquoteName(@NotNull PsiElement named, @Nullable String name) {
+        String unquotedName = name;
+
+        if (named instanceof Call && UNQUOTE.equals(name)) {
+            Call namedElementCall = (Call) named;
+
+            PsiElement[] primaryArguments = namedElementCall.primaryArguments();
+
+            if (primaryArguments != null && primaryArguments.length == 1) {
+                unquotedName += "(" + primaryArguments[0].getText() + ")";
+            }
+        }
+
+        return unquotedName;
     }
 
     /**

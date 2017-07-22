@@ -2,9 +2,11 @@ package org.elixir_lang.structure_view.element;
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.util.Pair;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewTypeLocation;
+import org.apache.commons.lang.math.IntRange;
 import org.elixir_lang.navigation.item_presentation.NameArity;
 import org.elixir_lang.navigation.item_presentation.Parent;
 import org.elixir_lang.psi.*;
@@ -209,8 +211,20 @@ public class Callback extends Element<AtUnqualifiedNoParenthesesCall> implements
         Call headCall = headCall(navigationItem);
 
         if (headCall != null) {
-            name = headCall.functionName();
-            arity = headCall.resolvedFinalArity();
+            Pair<String, IntRange> nameArityRange = CallDefinitionHead.nameArityRange(headCall);
+
+            if (nameArityRange != null) {
+                name = nameArityRange.first;
+                IntRange arityRange = nameArityRange.second;
+
+                if (arityRange != null) {
+                    int maximumArity = arityRange.getMaximumInteger();
+
+                    if (arityRange.getMinimumInteger() == maximumArity) {
+                        arity = maximumArity;
+                    }
+                }
+            }
         }
 
         //noinspection ConstantConditions

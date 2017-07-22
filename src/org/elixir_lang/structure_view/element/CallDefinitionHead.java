@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static com.intellij.openapi.util.Pair.pair;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.stripAccessExpression;
+import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.unquoteName;
 import static org.elixir_lang.psi.operation.Normalized.operatorIndex;
 
 public class CallDefinitionHead extends Element<Call> implements Presentable, Visible {
@@ -112,8 +113,10 @@ public class CallDefinitionHead extends Element<Call> implements Presentable, Vi
 
             if (stripped instanceof Call) {
                 Call strippedCall = (Call) stripped;
-                name = strippedCall.functionName();
+
+                name = unquoteName(strippedCall, strippedCall.functionName());
                 arityRange = strippedCall.resolvedFinalArityRange();
+
                 pair = pair(name, arityRange);
             }
         }
