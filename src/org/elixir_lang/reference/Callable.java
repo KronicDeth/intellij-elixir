@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.elixir_lang.psi.ElementDescriptionProvider.VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.*;
 
 public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
@@ -353,7 +354,7 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
         if (location == UsageViewLongNameLocation.INSTANCE || location == UsageViewShortNameLocation.INSTANCE) {
             elementDescription = call.getName();
         } else if (location == UsageViewTypeLocation.INSTANCE) {
-            elementDescription = "variable";
+            elementDescription = VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION;
         }
 
         return elementDescription;
@@ -434,6 +435,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             isVariable = true;
         } else if (call.isCalling(Module.KERNEL, Function.VAR_BANG)) {
             isVariable = true;
+        } else if (call instanceof UnqualifiedParenthesesCall) {
+            isVariable = false;
         } else {
             PsiElement parent = call.getParent();
             isVariable = isVariable(parent);

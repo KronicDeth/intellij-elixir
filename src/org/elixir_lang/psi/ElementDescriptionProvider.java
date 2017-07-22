@@ -1,6 +1,5 @@
 package org.elixir_lang.psi;
 
-import com.ericsson.otp.erlang.OtpErlangObject;
 import com.intellij.psi.ElementDescriptionLocation;
 import com.intellij.psi.PsiElement;
 import com.intellij.usageView.UsageViewLongNameLocation;
@@ -31,6 +30,7 @@ import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
  * {@link org.elixir_lang.FindUsagesProvider#getType(PsiElement)}) together together.
  */
 public class ElementDescriptionProvider implements com.intellij.psi.ElementDescriptionProvider {
+    public static final String VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION = "variable";
     /*
      *
      * Instance Methods
@@ -52,6 +52,8 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             elementDescription = getElementDescription((ElixirIdentifier) element, location);
         } else if (element instanceof ElixirKeywordKey) {
             elementDescription = getElementDescription((ElixirKeywordKey) element, location);
+        } else if (element instanceof ElixirVariable) {
+            elementDescription = getElementDescription((ElixirVariable) element, location);
         } else if (element instanceof MaybeModuleName) {
             elementDescription = getElementDescription((MaybeModuleName) element, location);
         }
@@ -125,6 +127,20 @@ public class ElementDescriptionProvider implements com.intellij.psi.ElementDescr
             if (location == UsageViewTypeLocation.INSTANCE) {
                 elementDescription = "keyword key";
             }
+        }
+
+        return elementDescription;
+    }
+
+    @Nullable
+    private String getElementDescription(@NotNull ElixirVariable variable,
+                                         @NotNull ElementDescriptionLocation location) {
+        String elementDescription = null;
+
+        if (location == UsageViewLongNameLocation.INSTANCE || location == UsageViewShortNameLocation.INSTANCE) {
+            elementDescription = variable.getName();
+        } else if (location == UsageViewTypeLocation.INSTANCE) {
+            elementDescription = VARIABLE_USAGE_VIEW_TYPE_LOCATION_ELEMENT_DESCRIPTION;
         }
 
         return elementDescription;
