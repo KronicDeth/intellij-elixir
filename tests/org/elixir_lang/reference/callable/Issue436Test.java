@@ -23,7 +23,7 @@ public class Issue436Test extends LightCodeInsightFixtureTestCase {
 
         assertInstanceOf(variable, UnqualifiedNoArgumentsCall.class);
         assertFalse("alias is marked as a parameter", isParameter(variable));
-        assertTrue("alias is not marked as a variable", isVariable(variable));
+        assertFalse("alias is marked as a variable", isVariable(variable));
     }
 
     /*

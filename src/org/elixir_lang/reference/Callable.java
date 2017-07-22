@@ -435,6 +435,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             isVariable = true;
         } else if (call.isCalling(Module.KERNEL, Function.VAR_BANG)) {
             isVariable = true;
+        } else if (call instanceof UnqualifiedParenthesesCall) {
+            isVariable = false;
         } else {
             PsiElement parent = call.getParent();
             isVariable = isVariable(parent);
