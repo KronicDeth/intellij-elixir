@@ -2845,19 +2845,7 @@ public class ElixirPsiImplUtil {
         String name = null;
 
         if (nameIdentifier != null) {
-            name = nameIdentifier.getText();
-
-            if (UNQUOTE.equals(name)) {
-                if (namedElement instanceof Call) {
-                    Call namedElementCall = (Call) namedElement;
-
-                    PsiElement[] primaryArguments = namedElementCall.primaryArguments();
-
-                    if (primaryArguments != null && primaryArguments.length == 1) {
-                        name += "(" + primaryArguments[0].getText() + ")";
-                    }
-                }
-            }
+            name = unquoteName(namedElement, nameIdentifier.getText());
         } else {
             if (namedElement instanceof Call) {
                 Call call = (Call) namedElement;
@@ -5856,6 +5844,27 @@ if (quoted == null) {
                 expression instanceof PsiWhiteSpace);
 
         return expression;
+    }
+
+    /**
+     * If {@code name} is {@code "unquote"} then the {@link Call#primaryArguments()} single argument is added to the
+     * name.
+     */
+    @Nullable
+    public static String unquoteName(@NotNull PsiElement named, @Nullable String name) {
+        String unquotedName = name;
+
+        if (named instanceof Call && UNQUOTE.equals(name)) {
+            Call namedElementCall = (Call) named;
+
+            PsiElement[] primaryArguments = namedElementCall.primaryArguments();
+
+            if (primaryArguments != null && primaryArguments.length == 1) {
+                unquotedName += "(" + primaryArguments[0].getText() + ")";
+            }
+        }
+
+        return unquotedName;
     }
 
     /**
