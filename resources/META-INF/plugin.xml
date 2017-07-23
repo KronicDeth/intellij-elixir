@@ -191,6 +191,8 @@
             <li>Make <code>unquote(ARG1)</code> name for <code>getName</code> and indexing</li>
             <li><code>ElementDescription</code> for <code>ElixirVariable</code></li>
             <li>Mark <code>UnqualifiedParenthesesCall</code>s as <code>call</code> instead of <code>variable</code>.</li>
+            <li><code>mix local.hex --force</code> before <code>mix deps.get</code> during project import to prevent prompt for hex update when local hex is earlier than that required by <code>mix</code>.</li>
+            <li>Fix warnings and format <code>MixProjectRootStep</code></li>
           </ul>
         </li>
         <li>
