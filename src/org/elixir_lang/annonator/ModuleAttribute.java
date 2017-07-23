@@ -16,10 +16,7 @@ import org.elixir_lang.ElixirSyntaxHighlighter;
 import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
-import org.elixir_lang.psi.operation.Infix;
-import org.elixir_lang.psi.operation.Match;
-import org.elixir_lang.psi.operation.Type;
-import org.elixir_lang.psi.operation.When;
+import org.elixir_lang.psi.operation.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -27,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.elixir_lang.psi.ElixirTypes.RANGE_OPERATOR;
 import static org.elixir_lang.psi.call.name.Function.UNQUOTE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.identifierName;
@@ -409,8 +407,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
-    private void highlightTypeError(@NotNull PsiElement element, @NotNull AnnotationHolder annotationHolder) {
-        annotationHolder.createErrorAnnotation(element, "Strings aren't allowed in types");
+    private void highlightTypeError(@NotNull PsiElement element,
+                                    @NotNull String message,
+                                    @NotNull AnnotationHolder annotationHolder) {
+        annotationHolder.createErrorAnnotation(element, message);
     }
 
     private Set<String> highlightTypeLeftOperand(@NotNull final ElixirMatchedUnqualifiedParenthesesCall call,
@@ -838,6 +838,37 @@ public class ModuleAttribute implements Annotator, DumbAware {
         );
     }
 
+    private void highlightTypesAndTypeParameterUsages(@NotNull ElixirDecimalFloat decimalFloat,
+                                                      @NotNull AnnotationHolder annotationHolder) {
+        PsiElement parent = decimalFloat.getParent();
+        String message = null;
+
+        if (parent instanceof ElixirAccessExpression) {
+            PsiElement grandParent = parent.getParent();
+
+            if (grandParent instanceof Two) {
+                Two two = (Two) grandParent;
+                Operator operator = two.operator();
+
+                if (operator != null) {
+                    ASTNode[] rangeOperators = operator.getNode().getChildren(TokenSet.create(RANGE_OPERATOR));
+
+                    if (rangeOperators.length > 0) {
+                        message = "Floats aren't allowed in Ranges";
+                    }
+                }
+            }
+        } else {
+            cannotHighlightTypes(decimalFloat);
+        }
+
+        if (message == null) {
+            message = "Float literals are not allowed in types: use float() instead";
+        }
+
+        highlightTypeError(decimalFloat, message, annotationHolder);
+    }
+
     private void highlightTypesAndTypeParameterUsages(ElixirMapOperation mapOperation,
                                                       Set<String> typeParameterNameSet,
                                                       AnnotationHolder annotationHolder,
@@ -997,6 +1028,11 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof ElixirDecimalFloat) {
+            highlightTypesAndTypeParameterUsages(
+                    (ElixirDecimalFloat) psiElement,
+                    annotationHolder
+            );
         } else if (psiElement instanceof ElixirMapOperation) {
             highlightTypesAndTypeParameterUsages(
                     (ElixirMapOperation) psiElement,
@@ -1046,7 +1082,7 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     typeTextAttributesKey
             );
         } else if (psiElement instanceof InterpolatedString) {
-            highlightTypeError(psiElement, annotationHolder);
+            highlightTypeError(psiElement, "Strings aren't allowed in types", annotationHolder);
         } else if (psiElement instanceof Infix && !(psiElement instanceof When)) {
             highlightTypesAndTypeParameterUsages(
                     (Infix) psiElement,
