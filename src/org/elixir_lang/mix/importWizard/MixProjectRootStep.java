@@ -83,18 +83,36 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
       return false;
     }
 
+    String mixPath =  myMixConfigurationForm.getPath();
+
     if(myGetDepsCheckbox.isSelected() && !ApplicationManager.getApplication().isUnitTestMode()){
       if(!myMixConfigurationForm.isPathValid()){
         return false;
       }
-      fetchDependencies(projectRoot, myMixConfigurationForm.getPath());
+
+      final Project project = ProjectImportBuilder.getCurrentProject();
+      String workingDirectory = projectRoot.getCanonicalPath();
+
+      assert workingDirectory != null;
+
+      String elixirPath = maybeProjectToElixirPath(project);
+
+      updateHex(project, workingDirectory, elixirPath, mixPath);
+      fetchDependencies(project, workingDirectory, elixirPath, mixPath);
     }
 
     MixProjectImportBuilder builder = getBuilder();
-    builder.setMixPath(myMixConfigurationForm.getPath());
+    builder.setMixPath(mixPath);
     builder.setIsImportingProject(getWizardContext().isCreatingNewProject());
 
     return builder.setProjectRoot(projectRoot);
+  }
+
+  private static void updateHex(@Nullable final Project project,
+                                @NotNull final String workingDirectory,
+                                @NotNull final String elixirPath,
+                                @NotNull final String mixPath) {
+    mixTask(project, workingDirectory, elixirPath, mixPath, "Updating hex", "local.hex", "--force");
   }
 
   @Override
@@ -144,40 +162,90 @@ public class MixProjectRootStep extends ProjectImportWizardStep {
     return output.trim();
   }
 
-  private static void fetchDependencies(@NotNull final VirtualFile projectRoot, @NotNull final String mixPath){
-    final Project project = ProjectImportBuilder.getCurrentProject();
-    String sdkPath = project != null ? ElixirSdkType.getSdkPath(project) : null;
-    final String elixirPath = sdkPath != null ?
-        JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath() :
-        JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
+  @Nullable
+  private static String maybeProjectToMaybSdkPath(@Nullable Project project) {
+    String sdkPath;
 
-    ProgressManager.getInstance().run(new Task.Modal(project, "Fetching dependencies", true){
-      @Override
-      public void run(@NotNull final ProgressIndicator indicator) {
-        indicator.setIndeterminate(true);
+    if (project != null) {
+      sdkPath = ElixirSdkType.getSdkPath(project);
+    } else {
+      sdkPath = null;
+    }
 
-        GeneralCommandLine commandLine = new GeneralCommandLine();
-        commandLine.withWorkDirectory(projectRoot.getCanonicalPath());
-        commandLine.setExePath(elixirPath);
-        commandLine.addParameter(mixPath);
-        commandLine.addParameter("deps.get");
-        try{
-          OSProcessHandler handler = new OSProcessHandler(commandLine.createProcess(), commandLine.getPreparedCommandLine(Platform.current()));
-          handler.addProcessListener(new ProcessAdapter() {
-            @Override
-            public void onTextAvailable(ProcessEvent event, Key outputType) {
-              String text = event.getText();
-              indicator.setText2(text);
+    return  sdkPath;
+  }
+
+  @NotNull
+  private static String maybeSdkPathToElixirPath(@Nullable String sdkPath) {
+    String elixirPath;
+
+    if (sdkPath != null) {
+      elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
+    } else {
+      elixirPath = JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
+    }
+
+    return elixirPath;
+  }
+
+  @NotNull
+  private static String maybeProjectToElixirPath(@Nullable Project project) {
+    String sdkPath = maybeProjectToMaybSdkPath(project);
+
+    return maybeSdkPathToElixirPath(sdkPath);
+  }
+
+  private static void mixTask(@Nullable final Project project,
+                              @NotNull final String workingDirectory,
+                              @NotNull final String elixirPath,
+                              @NotNull final String mixPath,
+                              @NotNull final String title,
+                              @NotNull final String... parameters) {
+    ProgressManager.getInstance().run(
+            new Task.Modal(project, title, true) {
+              @Override
+              public void run(@NotNull final ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                GeneralCommandLine commandLine = new GeneralCommandLine();
+                commandLine.withWorkDirectory(workingDirectory);
+                commandLine.setExePath(elixirPath);
+                commandLine.addParameter(mixPath);
+
+                for (String parameter : parameters) {
+                  commandLine.addParameter(parameter);
+                }
+
+                try{
+                  OSProcessHandler handler = new OSProcessHandler(
+                          commandLine.createProcess(),
+                          commandLine.getPreparedCommandLine(Platform.current())
+                  );
+                  handler.addProcessListener(
+                          new ProcessAdapter() {
+                            @Override
+                            public void onTextAvailable(ProcessEvent event, Key outputType) {
+                              String text = event.getText();
+                              indicator.setText2(text);
+                            }
+                          }
+                  );
+                  ProcessTerminatedListener.attach(handler);
+                  handler.startNotify();
+                  handler.waitFor();
+                  indicator.setText2("Refreshing");
+                } catch (ExecutionException e){
+                  LOG.warn(e);
+                }
+              }
             }
-          });
-          ProcessTerminatedListener.attach(handler);
-          handler.startNotify();
-          handler.waitFor();
-          indicator.setText2("Refreshing");
-        }catch (ExecutionException e){
-          LOG.warn(e);
-        }
-      }
-    });
+    );
+  }
+
+  private static void fetchDependencies(@Nullable final Project project,
+                                        @NotNull final String workingDirectory,
+                                        @NotNull final String elixirPath,
+                                        @NotNull final String mixPath) {
+    mixTask(project, workingDirectory, elixirPath, mixPath, "Fetching dependencies", "deps.get");
   }
 }
