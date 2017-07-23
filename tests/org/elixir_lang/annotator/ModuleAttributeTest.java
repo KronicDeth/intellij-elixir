@@ -54,6 +54,11 @@ public class ModuleAttributeTest extends LightCodeInsightFixtureTestCase {
         myFixture.checkHighlighting(false, false, true);
     }
 
+    public void testIssue632() {
+        myFixture.configureByFile("issue_632.ex");
+        myFixture.checkHighlighting(false, false, true);
+    }
+
     public void testMatch() {
         myFixture.configureByFile("match.ex");
         myFixture.checkHighlighting(false, false, true);
