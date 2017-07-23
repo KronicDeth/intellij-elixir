@@ -31,221 +31,223 @@ import javax.swing.*;
 import java.io.File;
 
 /**
- * Created by zyuyou on 15/7/1.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/importWizard/RebarProjectRootStep.java
  */
 public class MixProjectRootStep extends ProjectImportWizardStep {
-  private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
+    private static final Logger LOG = Logger.getInstance(MixProjectImportBuilder.class);
+    private static final boolean ourEnabled = !SystemInfo.isWindows;
+    private JCheckBox myGetDepsCheckbox;
+    private MixConfigurationForm myMixConfigurationForm;
+    private JPanel myPanel;
+    private TextFieldWithBrowseButton myProjectRootComponent;
 
-  private JPanel myPanel;
-  private TextFieldWithBrowseButton myProjectRootComponent;
-  private JCheckBox myGetDepsCheckbox;
-  private MixConfigurationForm myMixConfigurationForm;
+    MixProjectRootStep(WizardContext context) {
+        super(context);
 
-  private static final boolean ourEnabled = !SystemInfo.isWindows;
+        String projectFileDirectory = context.getProjectFileDirectory();
+        //noinspection DialogTitleCapitalization
+        myProjectRootComponent.addBrowseFolderListener(
+                "Select mix.exs of a mix project to import",
+                "",
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        );
 
-  public MixProjectRootStep(WizardContext context) {
-    super(context);
+        myProjectRootComponent.setText(projectFileDirectory); // provide project path
 
-    String projectFileDirectory = context.getProjectFileDirectory();
-    myProjectRootComponent.addBrowseFolderListener("Select mix.exs of a mix project to import", "", null,
-        FileChooserDescriptorFactory.createSingleFolderDescriptor());
-
-    myProjectRootComponent.setText(projectFileDirectory); // provide project path
-
-    myGetDepsCheckbox.setVisible(ourEnabled);
-    myMixConfigurationForm.setPath(getMixPath(projectFileDirectory));
-  }
-
-  @Override
-  public JComponent getComponent() {
-    myMixConfigurationForm.createComponent();
-    return myPanel;
-  }
-
-  @Override
-  public void updateDataModel() {
-    String projectRoot = myProjectRootComponent.getText();
-    if(!projectRoot.isEmpty()){
-      suggestProjectNameAndPath(null, projectRoot);
-    }
-  }
-
-  @Override
-  public boolean validate() throws ConfigurationException {
-    String projectRootPath = myProjectRootComponent.getText();
-    if(StringUtil.isEmpty(projectRootPath)){
-      return false;
+        myGetDepsCheckbox.setVisible(ourEnabled);
+        myMixConfigurationForm.setPath(getMixPath(projectFileDirectory));
     }
 
-    VirtualFile projectRoot = LocalFileSystem.getInstance().refreshAndFindFileByPath(projectRootPath);
-    if(projectRoot == null){
-      return false;
+    private static void fetchDependencies(@Nullable final Project project,
+                                          @NotNull final String workingDirectory,
+                                          @NotNull final String elixirPath,
+                                          @NotNull final String mixPath) {
+        mixTask(project, workingDirectory, elixirPath, mixPath, "Fetching dependencies", "deps.get");
     }
 
-    String mixPath =  myMixConfigurationForm.getPath();
+    /**
+     * private methods
+     */
 
-    if(myGetDepsCheckbox.isSelected() && !ApplicationManager.getApplication().isUnitTestMode()){
-      if(!myMixConfigurationForm.isPathValid()){
-        return false;
-      }
+    @NotNull
+    private static String getMixPath(@Nullable String directory) {
+        if (directory != null) {
+            File mix = new File(directory, "mix");
+            if (mix.exists() && mix.canExecute()) {
+                return mix.getPath();
+            }
+        }
 
-      final Project project = ProjectImportBuilder.getCurrentProject();
-      String workingDirectory = projectRoot.getCanonicalPath();
+        String output = "";
+        GeneralCommandLine generalCommandLine = null;
 
-      assert workingDirectory != null;
+        if (SystemInfo.isWindows) {
+            generalCommandLine = new GeneralCommandLine("where");
+            generalCommandLine.addParameter("mix.bat");
+        } else if (SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix) {
+            generalCommandLine = new GeneralCommandLine("which");
+            generalCommandLine.addParameter("mix");
+        }
 
-      String elixirPath = maybeProjectToElixirPath(project);
+        if (generalCommandLine != null) {
+            try {
+                output = ScriptRunnerUtil.getProcessOutput(generalCommandLine);
+            } catch (Exception ignored) {
+                LOG.warn(ignored);
+            }
+        }
 
-      updateHex(project, workingDirectory, elixirPath, mixPath);
-      fetchDependencies(project, workingDirectory, elixirPath, mixPath);
+        return output.trim();
     }
 
-    MixProjectImportBuilder builder = getBuilder();
-    builder.setMixPath(mixPath);
-    builder.setIsImportingProject(getWizardContext().isCreatingNewProject());
+    @NotNull
+    private static String maybeProjectToElixirPath(@Nullable Project project) {
+        String sdkPath = maybeProjectToMaybeSdkPath(project);
 
-    return builder.setProjectRoot(projectRoot);
-  }
+        return maybeSdkPathToElixirPath(sdkPath);
+    }
 
-  private static void updateHex(@Nullable final Project project,
+    @Nullable
+    private static String maybeProjectToMaybeSdkPath(@Nullable Project project) {
+        String sdkPath;
+
+        if (project != null) {
+            sdkPath = ElixirSdkType.getSdkPath(project);
+        } else {
+            sdkPath = null;
+        }
+
+        return sdkPath;
+    }
+
+    @NotNull
+    private static String maybeSdkPathToElixirPath(@Nullable String sdkPath) {
+        String elixirPath;
+
+        if (sdkPath != null) {
+            elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
+        } else {
+            elixirPath = JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
+        }
+
+        return elixirPath;
+    }
+
+    private static void mixTask(@Nullable final Project project,
                                 @NotNull final String workingDirectory,
                                 @NotNull final String elixirPath,
-                                @NotNull final String mixPath) {
-    mixTask(project, workingDirectory, elixirPath, mixPath, "Updating hex", "local.hex", "--force");
-  }
+                                @NotNull final String mixPath,
+                                @NotNull final String title,
+                                @NotNull final String... parameters) {
+        ProgressManager.getInstance().run(
+                new Task.Modal(project, title, true) {
+                    @Override
+                    public void run(@NotNull final ProgressIndicator indicator) {
+                        indicator.setIndeterminate(true);
 
-  @Override
-  @NotNull
-  public JComponent getPreferredFocusedComponent() {
-    return myProjectRootComponent.getTextField();
-  }
+                        GeneralCommandLine commandLine = new GeneralCommandLine();
+                        commandLine.withWorkDirectory(workingDirectory);
+                        commandLine.setExePath(elixirPath);
+                        commandLine.addParameter(mixPath);
 
-  @Override
-  @NotNull
-  protected MixProjectImportBuilder getBuilder() {
-    return (MixProjectImportBuilder) super.getBuilder();
-  }
+                        for (String parameter : parameters) {
+                            commandLine.addParameter(parameter);
+                        }
 
-  /**
-   * private methods
-   * */
-
-  @NotNull
-  private static String getMixPath(@Nullable String directory){
-    if(directory != null){
-      File mix = new File(directory, "mix");
-      if(mix.exists() && mix.canExecute()){
-        return mix.getPath();
-      }
-    }
-
-    String output = "";
-    GeneralCommandLine generalCommandLine = null;
-
-    if (SystemInfo.isWindows) {
-      generalCommandLine = new GeneralCommandLine("where");
-      generalCommandLine.addParameter("mix.bat");
-    } else if (SystemInfo.isMac || SystemInfo.isLinux || SystemInfo.isUnix) {
-      generalCommandLine = new GeneralCommandLine("which");
-      generalCommandLine.addParameter("mix");
-    }
-
-    if (generalCommandLine != null) {
-      try {
-        output = ScriptRunnerUtil.getProcessOutput(generalCommandLine);
-      } catch (Exception ignored) {
-        LOG.warn(ignored);
-      }
-    }
-
-    return output.trim();
-  }
-
-  @Nullable
-  private static String maybeProjectToMaybSdkPath(@Nullable Project project) {
-    String sdkPath;
-
-    if (project != null) {
-      sdkPath = ElixirSdkType.getSdkPath(project);
-    } else {
-      sdkPath = null;
-    }
-
-    return  sdkPath;
-  }
-
-  @NotNull
-  private static String maybeSdkPathToElixirPath(@Nullable String sdkPath) {
-    String elixirPath;
-
-    if (sdkPath != null) {
-      elixirPath = JpsElixirSdkType.getScriptInterpreterExecutable(sdkPath).getAbsolutePath();
-    } else {
-      elixirPath = JpsElixirSdkType.getExecutableFileName(JpsElixirSdkType.SCRIPT_INTERPRETER);
-    }
-
-    return elixirPath;
-  }
-
-  @NotNull
-  private static String maybeProjectToElixirPath(@Nullable Project project) {
-    String sdkPath = maybeProjectToMaybSdkPath(project);
-
-    return maybeSdkPathToElixirPath(sdkPath);
-  }
-
-  private static void mixTask(@Nullable final Project project,
-                              @NotNull final String workingDirectory,
-                              @NotNull final String elixirPath,
-                              @NotNull final String mixPath,
-                              @NotNull final String title,
-                              @NotNull final String... parameters) {
-    ProgressManager.getInstance().run(
-            new Task.Modal(project, title, true) {
-              @Override
-              public void run(@NotNull final ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-
-                GeneralCommandLine commandLine = new GeneralCommandLine();
-                commandLine.withWorkDirectory(workingDirectory);
-                commandLine.setExePath(elixirPath);
-                commandLine.addParameter(mixPath);
-
-                for (String parameter : parameters) {
-                  commandLine.addParameter(parameter);
+                        try {
+                            OSProcessHandler handler = new OSProcessHandler(
+                                    commandLine.createProcess(),
+                                    commandLine.getPreparedCommandLine(Platform.current())
+                            );
+                            handler.addProcessListener(
+                                    new ProcessAdapter() {
+                                        @Override
+                                        public void onTextAvailable(ProcessEvent event, Key outputType) {
+                                            String text = event.getText();
+                                            indicator.setText2(text);
+                                        }
+                                    }
+                            );
+                            ProcessTerminatedListener.attach(handler);
+                            handler.startNotify();
+                            handler.waitFor();
+                            indicator.setText2("Refreshing");
+                        } catch (ExecutionException e) {
+                            LOG.warn(e);
+                        }
+                    }
                 }
+        );
+    }
 
-                try{
-                  OSProcessHandler handler = new OSProcessHandler(
-                          commandLine.createProcess(),
-                          commandLine.getPreparedCommandLine(Platform.current())
-                  );
-                  handler.addProcessListener(
-                          new ProcessAdapter() {
-                            @Override
-                            public void onTextAvailable(ProcessEvent event, Key outputType) {
-                              String text = event.getText();
-                              indicator.setText2(text);
-                            }
-                          }
-                  );
-                  ProcessTerminatedListener.attach(handler);
-                  handler.startNotify();
-                  handler.waitFor();
-                  indicator.setText2("Refreshing");
-                } catch (ExecutionException e){
-                  LOG.warn(e);
-                }
-              }
+    private static void updateHex(@Nullable final Project project,
+                                  @NotNull final String workingDirectory,
+                                  @NotNull final String elixirPath,
+                                  @NotNull final String mixPath) {
+        mixTask(project, workingDirectory, elixirPath, mixPath, "Updating hex", "local.hex", "--force");
+    }
+
+    @Override
+    @NotNull
+    protected MixProjectImportBuilder getBuilder() {
+        return (MixProjectImportBuilder) super.getBuilder();
+    }
+
+    @Override
+    public JComponent getComponent() {
+        myMixConfigurationForm.createComponent();
+        return myPanel;
+    }
+
+    @Override
+    @NotNull
+    public JComponent getPreferredFocusedComponent() {
+        return myProjectRootComponent.getTextField();
+    }
+
+    @Override
+    public void updateDataModel() {
+        String projectRoot = myProjectRootComponent.getText();
+        if (!projectRoot.isEmpty()) {
+            suggestProjectNameAndPath(null, projectRoot);
+        }
+    }
+
+    @Override
+    public boolean validate() throws ConfigurationException {
+        String projectRootPath = myProjectRootComponent.getText();
+        if (StringUtil.isEmpty(projectRootPath)) {
+            return false;
+        }
+
+        VirtualFile projectRoot = LocalFileSystem.getInstance().refreshAndFindFileByPath(projectRootPath);
+        if (projectRoot == null) {
+            return false;
+        }
+
+        String mixPath = myMixConfigurationForm.getPath();
+
+        if (myGetDepsCheckbox.isSelected() && !ApplicationManager.getApplication().isUnitTestMode()) {
+            if (!myMixConfigurationForm.isPathValid()) {
+                return false;
             }
-    );
-  }
 
-  private static void fetchDependencies(@Nullable final Project project,
-                                        @NotNull final String workingDirectory,
-                                        @NotNull final String elixirPath,
-                                        @NotNull final String mixPath) {
-    mixTask(project, workingDirectory, elixirPath, mixPath, "Fetching dependencies", "deps.get");
-  }
+            final Project project = ProjectImportBuilder.getCurrentProject();
+            String workingDirectory = projectRoot.getCanonicalPath();
+
+            assert workingDirectory != null;
+
+            String elixirPath = maybeProjectToElixirPath(project);
+
+            updateHex(project, workingDirectory, elixirPath, mixPath);
+            fetchDependencies(project, workingDirectory, elixirPath, mixPath);
+        }
+
+        MixProjectImportBuilder builder = getBuilder();
+        builder.setMixPath(mixPath);
+        builder.setIsImportingProject(getWizardContext().isCreatingNewProject());
+
+        return builder.setProjectRoot(projectRoot);
+    }
 }
