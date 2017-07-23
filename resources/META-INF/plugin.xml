@@ -193,6 +193,12 @@
             <li>Mark <code>UnqualifiedParenthesesCall</code>s as <code>call</code> instead of <code>variable</code>.</li>
             <li><code>mix local.hex --force</code> before <code>mix deps.get</code> during project import to prevent prompt for hex update when local hex is earlier than that required by <code>mix</code>.</li>
             <li>Fix warnings and format <code>MixProjectRootStep</code></li>
+            <li>Mark <code>ElixirDecimalFloat</code> as error in types.
+              <ul>
+                <li>If in a Range: "Floats aren't allowed in Ranges"</li>
+                <li>Otherwise: "Float literals are not allowed in types.  Use float() instead".</li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>

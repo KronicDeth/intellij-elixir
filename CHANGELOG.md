@@ -248,9 +248,13 @@
 * [#744](https://github.com/KronicDeth/intellij-elixir/pull/744) - [@KronicDeth](https://github.com/KronicDeth)
   * `ElementDescription` for `ElixirVariable`
   * Mark `UnqualifiedParenthesesCall`s as `call` instead of `variable`.
-# [#745](https://github.com/KronicDeth/intellij-elixir/pull/745) - [@KronicDeth](https://github.com/KronicDeth)
+* [#745](https://github.com/KronicDeth/intellij-elixir/pull/745) - [@KronicDeth](https://github.com/KronicDeth)
   * `mix local.hex --force` before `mix deps.get` during project import to prevent prompt for hex update when local hex is earlier than that required by `mix`.
   * Fix warnings and format `MixProjectRootStep`
+* [#746](https://github.com/KronicDeth/intellij-elixir/pull/746) - [@KronicDeth](https://github.com/KronicDeth)
+  * Mark `ElixirDecimalFloat` as error in types.
+    * If in a Range: "Floats aren't allowed in Ranges"
+    * Otherwise: "Float literals are not allowed in types.  Use float() instead".
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
