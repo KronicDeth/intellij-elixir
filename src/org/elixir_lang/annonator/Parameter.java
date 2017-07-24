@@ -173,16 +173,17 @@ public class Parameter {
             parameterizedParameter = putParameterized(parameter, (ElixirAnonymousFunction) parent);
         } else if (parent instanceof InMatch) {
             parameterizedParameter = putParameterized(parameter, (InMatch) parent);
-        } else if (parent instanceof BracketOperation ||
-                    parent instanceof ElixirBlockItem ||
-                    parent instanceof ElixirDoBlock ||
-                    parent instanceof ElixirInterpolation ||
-                    parent instanceof ElixirMapUpdateArguments ||
-                    parent instanceof ElixirMultipleAliases ||
-                    parent instanceof ElixirQuoteStringBody ||
-                    parent instanceof PsiFile ||
-                    parent instanceof QualifiedAlias ||
-                    parent instanceof QualifiedMultipleAliases) {
+        } else if (parent instanceof AtUnqualifiedBracketOperation ||
+                parent instanceof BracketOperation ||
+                parent instanceof ElixirBlockItem ||
+                parent instanceof ElixirDoBlock ||
+                parent instanceof ElixirInterpolation ||
+                parent instanceof ElixirMapUpdateArguments ||
+                parent instanceof ElixirMultipleAliases ||
+                parent instanceof ElixirQuoteStringBody ||
+                parent instanceof PsiFile ||
+                parent instanceof QualifiedAlias ||
+                parent instanceof QualifiedMultipleAliases) {
             parameterizedParameter = new Parameter(parameter.entrance);
         } else {
             error("Don't know how to check if parameter", parent);
