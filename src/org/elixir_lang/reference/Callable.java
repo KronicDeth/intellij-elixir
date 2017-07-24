@@ -314,7 +314,8 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
             // MUST be after any operations because operations also implement Call
             isVariable = isVariable((Call) ancestor);
         } else {
-            if (!(ancestor instanceof AtNonNumericOperation ||
+            if (!(ancestor instanceof AtUnqualifiedBracketOperation ||
+                    ancestor instanceof AtNonNumericOperation ||
                     ancestor instanceof BracketOperation ||
                     ancestor instanceof PsiFile ||
                     ancestor instanceof QualifiedMultipleAliases)) {
