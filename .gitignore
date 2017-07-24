@@ -22,5 +22,7 @@ src/org/elixir_lang/ElixirFlexLexer.java~
 .gradle
 /build
 jps-builder/build
+jps-builder/out
 jps-shared/build
+jps-shared/out
 libs/
