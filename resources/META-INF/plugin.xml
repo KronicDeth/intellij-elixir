@@ -117,6 +117,7 @@
             <li>Always match on <code>%__MODULE__{}</code> for state in clauses to prevent state update errors</li>
             <li>Match on <code>:suite_finished</code> and <code>:suite_started</code> events, so that only events added to the interface will be unknown and <code>IO.warn</code> can be used tell anyone spotting the new event to file an issue.</li>
             <li>Instead of pinning position (<code>1</code> for lines or <code>3</code> for heredocs), <code>pin</code> <code>*_PROMOTER</code> token, so it's more obvious the pattern is that the promoter is pinned.</li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/659" class="issue-link js-issue-link" data-id="218972570" data-error-text="Failed to load issue title" data-permission-text="Issue title is private" title="Don't know how to check if parameter (when element class is org.elixir_lang.psi.impl.ElixirUnmatchedAtUnqualifiedBracketOperationImpl)">#659</a>.</li>
           </ul>
         </li>
         <li>
@@ -199,6 +200,9 @@
                 <li>Otherwise: "Float literals are not allowed in types.  Use float() instead".</li>
               </ul>
             </li>
+            <li>Ignore <code>jps-*/out</code> directories.</li>
+            <li>Look at parent for <code>isParameter</code> for <code>AtUnqualifiedBracketOperation</code>.</li>
+            <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for <code>isVariable</code>.</li>
           </ul>
         </li>
         <li>

@@ -188,6 +188,7 @@
     * Match on `:suite_finished` and `:suite_started` events, so that only events added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
 * [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned.
  - [@KronicDeth](https://github.com/KronicDeth)
+* [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -255,6 +256,10 @@
   * Mark `ElixirDecimalFloat` as error in types.
     * If in a Range: "Floats aren't allowed in Ranges"
     * Otherwise: "Float literals are not allowed in types.  Use float() instead".
+* [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - [@KronicDeth](https://github.com/KronicDeth)
+  * Ignore `jps-*/out` directories.
+  * Look at parent for `isParameter` for `AtUnqualifiedBracketOperation`.
+  * Treat `AtUnqualifiedBracketOperation` the same as `UnqualifiedBracketOperation` for `isVariable`.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
