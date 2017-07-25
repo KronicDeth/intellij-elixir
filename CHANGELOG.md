@@ -189,6 +189,7 @@
 * [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned.
  - [@KronicDeth](https://github.com/KronicDeth)
 * [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
+* [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
