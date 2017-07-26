@@ -4,19 +4,20 @@ import com.google.common.base.Joiner;
 import com.intellij.diagnostic.LogMessageEx;
 import com.intellij.openapi.diagnostic.Attachment;
 import com.intellij.openapi.fileTypes.BinaryFileDecompiler;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
-import org.elixir_lang.beam.chunk.exports.Export;
 import org.elixir_lang.beam.decompiler.Default;
 import org.elixir_lang.beam.decompiler.InfixOperator;
 import org.elixir_lang.beam.decompiler.PrefixOperator;
-import org.elixir_lang.beam.decompiler.SpecialForm;
+import org.elixir_lang.beam.decompiler.Unquoted;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedSet;
 
 import static org.elixir_lang.psi.call.name.Function.DEF;
 import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
@@ -29,7 +30,7 @@ public class Decompiler implements BinaryFileDecompiler {
     static {
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(InfixOperator.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(PrefixOperator.INSTANCE);
-        MACRO_NAME_ARITY_DECOMPILER_LIST.add(SpecialForm.INSTANCE);
+        MACRO_NAME_ARITY_DECOMPILER_LIST.add(Unquoted.INSTANCE);
         MACRO_NAME_ARITY_DECOMPILER_LIST.add(Default.INSTANCE);
     }
 
