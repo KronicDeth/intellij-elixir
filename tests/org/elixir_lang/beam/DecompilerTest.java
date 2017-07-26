@@ -105,9 +105,105 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         );
     }
 
+    public void testIssue672() throws IOException, OtpErlangDecodeException {
+        String testDataPath = getTestDataPath();
+
+        VfsRootAccess.allowRootAccess(testDataPath);
+
+        VirtualFile virtualFile = LocalFileSystem
+                .getInstance()
+                .findFileByIoFile(
+                        new File(testDataPath + "/rebar3_hex_config.beam")
+                );
+
+        assertNotNull(virtualFile);
+
+        Decompiler decompiler = new Decompiler();
+        CharSequence decompiled = decompiler.decompile(virtualFile);
+
+        assertEquals(
+                "# Source code recreated from a .beam file by IntelliJ Elixir\n" +
+                "defmodule :rebar3_hex_config do\n" +
+                "\n" +
+                "  # Macros\n" +
+                "\n" +
+                "  def api_url() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def auth() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def cdn_url() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def unquote(:do)(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def format_error(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def http_proxy() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def https_proxy() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def init(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def module_info() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def module_info(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def path() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def read() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def update(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def username() do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "\n" +
+                "  def write(p0) do\n" +
+                "    # body not decompiled\n" +
+                "  end\n" +
+                "end\n",
+                decompiled.toString()
+        );
+    }
+
     /*
      * Instance Methods
      */
+
+    /*
+     * Protected Instance Methods
+     */
+
+    @Override
+    protected String getTestDataPath() {
+        return "testData/org/elixir_lang/beam/decompiler";
+    }
+
 
     private String ebinDirectory() {
         String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");

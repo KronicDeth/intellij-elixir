@@ -7,13 +7,13 @@ import java.util.Set;
 
 import static org.elixir_lang.beam.decompiler.Default.appendParameters;
 
-public class SpecialForm extends MacroNameArity {
+public class Unquoted extends MacroNameArity {
     /*
      * CONSTANTS
      */
 
     private static final Set<String> SPECIAL_FORM_NAME_SET;
-    public static final MacroNameArity INSTANCE = new SpecialForm();
+    public static final MacroNameArity INSTANCE = new Unquoted();
 
     static {
         SPECIAL_FORM_NAME_SET = new THashSet<String>();
@@ -22,6 +22,7 @@ public class SpecialForm extends MacroNameArity {
         SPECIAL_FORM_NAME_SET.add("&");
         SPECIAL_FORM_NAME_SET.add(".");
         SPECIAL_FORM_NAME_SET.add("<<>>");
+        SPECIAL_FORM_NAME_SET.add("do");
         SPECIAL_FORM_NAME_SET.add("fn");
         SPECIAL_FORM_NAME_SET.add("unquote");
         SPECIAL_FORM_NAME_SET.add("unquote_splicing");
