@@ -261,6 +261,7 @@
   * Ignore `jps-*/out` directories.
   * Look at parent for `isParameter` for `AtUnqualifiedBracketOperation`.
   * Treat `AtUnqualifiedBracketOperation` the same as `UnqualifiedBracketOperation` for `isVariable`.
+* [#748](https://github.com/KronicDeth/intellij-elixir/pull/748) - Include path in error messages from `buildFileStub` - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

@@ -204,6 +204,7 @@
             <li>Ignore <code>jps-*/out</code> directories.</li>
             <li>Look at parent for <code>isParameter</code> for <code>AtUnqualifiedBracketOperation</code>.</li>
             <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for <code>isVariable</code>.</li>
+            <li>Include path in error messages from <code>buildFileStub</code></li>
           </ul>
         </li>
         <li>
