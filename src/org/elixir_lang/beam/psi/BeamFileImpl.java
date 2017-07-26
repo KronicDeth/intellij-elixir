@@ -10,7 +10,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiFileImpl;
@@ -31,7 +30,6 @@ import org.elixir_lang.beam.Beam;
 import org.elixir_lang.beam.MacroNameArity;
 import org.elixir_lang.beam.chunk.Atoms;
 import org.elixir_lang.beam.chunk.Exports;
-import org.elixir_lang.beam.chunk.exports.Export;
 import org.elixir_lang.beam.psi.impl.ModuleElementImpl;
 import org.elixir_lang.beam.psi.impl.ModuleImpl;
 import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
@@ -48,7 +46,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.SortedSet;
 
 import static com.intellij.reference.SoftReference.dereference;
@@ -84,7 +81,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         this.isForDecompiling = isForDecompiling;
     }
 
-    public static PsiFileStub<?> buildFileStub(byte[] bytes) {
+    public static PsiFileStub<?> buildFileStub(@NotNull byte[] bytes, @NotNull String path) {
         ElixirFileStubImpl stub = new ElixirFileStubImpl();
 
         Beam beam = null;
@@ -92,9 +89,9 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         try {
             beam = Beam.from(bytes);
         } catch (IOException e) {
-            LOGGER.error(e);
+            LOGGER.error("IOException during BeamFileImpl.buildFileStub(bytes, " + path + ")",  e);
         } catch (OtpErlangDecodeException e) {
-            LOGGER.error(e);
+            LOGGER.error("OtpErlangDecodeException during BeamFileImpl.buildFileStub(bytes, " + path + ")", e);
         }
 
         ModuleStub moduleStub = buildModuleStub(stub, beam);
