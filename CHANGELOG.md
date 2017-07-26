@@ -190,6 +190,7 @@
  - [@KronicDeth](https://github.com/KronicDeth)
 * [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
 * [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
+* [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Regression test for [#672](https://github.com/KronicDeth/intellij-elixir/issues/672) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -262,6 +263,7 @@
   * Look at parent for `isParameter` for `AtUnqualifiedBracketOperation`.
   * Treat `AtUnqualifiedBracketOperation` the same as `UnqualifiedBracketOperation` for `isVariable`.
 * [#748](https://github.com/KronicDeth/intellij-elixir/pull/748) - Include path in error messages from `buildFileStub` - [@KronicDeth](https://github.com/KronicDeth)
+* [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Erlang allows `do` as a function name, but it's a keyword in Elixir, so wrap it as `unquote(:do)`. The `SpecialForm` decompiler already did this `unquote(...)` wrapping, but `do` is a keyword and not a special form, so rename the decompiler to `Unquoted`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

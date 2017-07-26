@@ -119,6 +119,7 @@
             <li>Instead of pinning position (<code>1</code> for lines or <code>3</code> for heredocs), <code>pin</code> <code>*_PROMOTER</code> token, so it's more obvious the pattern is that the promoter is pinned.</li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/659" class="issue-link js-issue-link" data-id="218972570" data-error-text="Failed to load issue title" data-permission-text="Issue title is private" title="Don't know how to check if parameter (when element class is org.elixir_lang.psi.impl.ElixirUnmatchedAtUnqualifiedBracketOperationImpl)">#659</a>.</li>
             <li>Search for Elixir SDKs in <code>/nix/store</code> on Mac if homebrew path does not exist</li>
+            <li>Regression test for&nbsp;<a href="https://github.com/KronicDeth/intellij-elixir/issues/672">#672</a></li>
           </ul>
         </li>
         <li>
@@ -205,6 +206,7 @@
             <li>Look at parent for <code>isParameter</code> for <code>AtUnqualifiedBracketOperation</code>.</li>
             <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for <code>isVariable</code>.</li>
             <li>Include path in error messages from <code>buildFileStub</code></li>
+            <li>Erlang allows <code>do</code> as a function name, but it's a keyword in Elixir, so wrap it as <code>unquote(:do)</code>. The <code>SpecialForm</code> decompiler already did this <code>unquote(...)</code> wrapping, but <code>do</code> is a keyword and not a special form, so rename the decompiler to <code>Unquoted</code>.</li>
           </ul>
         </li>
         <li>
