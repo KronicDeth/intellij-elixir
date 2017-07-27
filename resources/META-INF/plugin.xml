@@ -120,6 +120,7 @@
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/659" class="issue-link js-issue-link" data-id="218972570" data-error-text="Failed to load issue title" data-permission-text="Issue title is private" title="Don't know how to check if parameter (when element class is org.elixir_lang.psi.impl.ElixirUnmatchedAtUnqualifiedBracketOperationImpl)">#659</a>.</li>
             <li>Search for Elixir SDKs in <code>/nix/store</code> on Mac if homebrew path does not exist</li>
             <li>Regression test for&nbsp;<a href="https://github.com/KronicDeth/intellij-elixir/issues/672">#672</a></li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/674">#674</a></li>
           </ul>
         </li>
         <li>
@@ -207,6 +208,30 @@
             <li>Treat <code>AtUnqualifiedBracketOperation</code> the same as <code>UnqualifiedBracketOperation</code> for <code>isVariable</code>.</li>
             <li>Include path in error messages from <code>buildFileStub</code></li>
             <li>Erlang allows <code>do</code> as a function name, but it's a keyword in Elixir, so wrap it as <code>unquote(:do)</code>. The <code>SpecialForm</code> decompiler already did this <code>unquote(...)</code> wrapping, but <code>do</code> is a keyword and not a special form, so rename the decompiler to <code>Unquoted</code>.</li>
+            <li>
+              <p>Move {3} inside <code>|</code> for <code>SIGIL</code> <code>PROMOTER</code> and <code>TERMINATOR</code>:</p>
+              <blockquote>
+<pre><code>SIGIL_HEREDOC_PROMOTER = ({SIGIL_DOUBLE_QUOTES_PROMOTER}|&gt;
+{SIGIL_SINGLE_QUOTES_PROMOTER}){3}
+SIGIL_HEREDOC_TERMINATOR = ({SIGIL_DOUBLE_QUOTES_TERMINATOR}|&gt;
+{SIGIL_SINGLE_QUOTES_TERMINATOR}){3}
+</code></pre>
+                <p>-- <a href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525</a></p>
+              </blockquote>
+              <p>The <code>|</code> is inside group that is then <code>{3}</code>'d, so it allows either <code>'</code> or <code>"</code> in groups of three.  This is only applies to the sigils.  It's correct for normal string and charlist heredocs:</p>
+              <blockquote>
+<pre><code>CHAR_LIST_HEREDOC_PROMOTER = {CHAR_LIST_PROMOTER}{3}
+CHAR_LIST_HEREDOC_TERMINATOR = {CHAR_LIST_TERMINATOR}{3}
+
+STRING_HEREDOC_PROMOTER = {STRING_PROMOTER}{3}
+STRING_HEREDOC_TERMINATOR = {STRING_TERMINATOR}{3}
+
+QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER}
+QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
+</code></pre>
+                <p>-- <a href="https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448">https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448</a></p>
+              </blockquote>
+            </li>
           </ul>
         </li>
         <li>

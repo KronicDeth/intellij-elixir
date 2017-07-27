@@ -191,6 +191,7 @@
 * [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
 * [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
 * [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Regression test for [#672](https://github.com/KronicDeth/intellij-elixir/issues/672) - [@KronicDeth](https://github.com/KronicDeth)
+* [#750](https://github.com/KronicDeth/intellij-elixir/pull/750) - Regression test for [#674](https://github.com/KronicDeth/intellij-elixir/issues/674) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -264,6 +265,29 @@
   * Treat `AtUnqualifiedBracketOperation` the same as `UnqualifiedBracketOperation` for `isVariable`.
 * [#748](https://github.com/KronicDeth/intellij-elixir/pull/748) - Include path in error messages from `buildFileStub` - [@KronicDeth](https://github.com/KronicDeth)
 * [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Erlang allows `do` as a function name, but it's a keyword in Elixir, so wrap it as `unquote(:do)`. The `SpecialForm` decompiler already did this `unquote(...)` wrapping, but `do` is a keyword and not a special form, so rename the decompiler to `Unquoted`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#750](https://github.com/KronicDeth/intellij-elixir/pull/750) - [@KronicDeth](https://github.com/KronicDeth)
+  * Move {3} inside `|` for `SIGIL` `PROMOTER` and `TERMINATOR`:
+    > ```
+    > SIGIL_HEREDOC_PROMOTER = ({SIGIL_DOUBLE_QUOTES_PROMOTER}|>
+    > {SIGIL_SINGLE_QUOTES_PROMOTER}){3}
+    > SIGIL_HEREDOC_TERMINATOR = ({SIGIL_DOUBLE_QUOTES_TERMINATOR}|>
+    > {SIGIL_SINGLE_QUOTES_TERMINATOR}){3}
+    > ```
+    > -- https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L524-L525
+
+    The `|` is inside group that is then `{3}`'d, so it allows either `'` or `"` in groups of three.  This is only applies to the sigils.  It's correct for normal string and charlist heredocs:
+
+    > ```
+    > CHAR_LIST_HEREDOC_PROMOTER = {CHAR_LIST_PROMOTER}{3}
+    > CHAR_LIST_HEREDOC_TERMINATOR = {CHAR_LIST_TERMINATOR}{3}
+    >
+    > STRING_HEREDOC_PROMOTER = {STRING_PROMOTER}{3}
+    > STRING_HEREDOC_TERMINATOR = {STRING_TERMINATOR}{3}
+    >
+    > QUOTE_HEREDOC_PROMOTER = {CHAR_LIST_HEREDOC_PROMOTER} | {STRING_HEREDOC_PROMOTER}
+    > QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
+    > ```
+    > -- https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
