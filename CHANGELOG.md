@@ -192,6 +192,9 @@
 * [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
 * [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Regression test for [#672](https://github.com/KronicDeth/intellij-elixir/issues/672) - [@KronicDeth](https://github.com/KronicDeth)
 * [#750](https://github.com/KronicDeth/intellij-elixir/pull/750) - Regression test for [#674](https://github.com/KronicDeth/intellij-elixir/issues/674) - [@KronicDeth](https://github.com/KronicDeth)
+* [#751](https://github.com/KronicDeth/intellij-elixir/pull/751) - [@KronicDeth](https://github.com/KronicDeth)
+  * Regression test for [#683](https://github.com/KronicDeth/intellij-elixir/issues/683)
+  * Store expected decompilation in files to shrink `DecompilerTest` length
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -288,6 +291,7 @@
     > QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERMINATOR}
     > ```
     > -- https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448
+* [#751](https://github.com/KronicDeth/intellij-elixir/pull/751) - Unquote function names that start with an uppercase codepoint, so that they aren't parsed as Aliases.  These function names occur in the CORBA modules in OTP. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
