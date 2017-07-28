@@ -1,12 +1,16 @@
 package org.elixir_lang.beam;
 
 import com.ericsson.otp.erlang.OtpErlangDecodeException;
+import com.google.common.io.Files;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess;
 import com.intellij.testFramework.LightCodeInsightTestCase;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class DecompilerTest extends LightCodeInsightTestCase {
     /*
@@ -106,89 +110,11 @@ public class DecompilerTest extends LightCodeInsightTestCase {
     }
 
     public void testIssue672() throws IOException, OtpErlangDecodeException {
-        String testDataPath = getTestDataPath();
+        assertDecompiled("rebar3_hex_config");
+    }
 
-        VfsRootAccess.allowRootAccess(testDataPath);
-
-        VirtualFile virtualFile = LocalFileSystem
-                .getInstance()
-                .findFileByIoFile(
-                        new File(testDataPath + "/rebar3_hex_config.beam")
-                );
-
-        assertNotNull(virtualFile);
-
-        Decompiler decompiler = new Decompiler();
-        CharSequence decompiled = decompiler.decompile(virtualFile);
-
-        assertEquals(
-                "# Source code recreated from a .beam file by IntelliJ Elixir\n" +
-                "defmodule :rebar3_hex_config do\n" +
-                "\n" +
-                "  # Macros\n" +
-                "\n" +
-                "  def api_url() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def auth() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def cdn_url() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def unquote(:do)(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def format_error(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def http_proxy() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def https_proxy() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def init(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def module_info() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def module_info(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def path() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def read() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def update(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def username() do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "\n" +
-                "  def write(p0) do\n" +
-                "    # body not decompiled\n" +
-                "  end\n" +
-                "end\n",
-                decompiled.toString()
-        );
+    public void testIssue683() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("orber_ifr");
     }
 
     /*
@@ -204,6 +130,32 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         return "testData/org/elixir_lang/beam/decompiler";
     }
 
+    /*
+     * Private Instance Methods
+     */
+
+    private void assertDecompiled(String name) throws IOException {
+        String testDataPath = getTestDataPath();
+        String prefix = testDataPath + "/" + name + ".";
+
+        File expectedFile = new File(prefix + "ex");
+        String expected = Files.toString(expectedFile, UTF_8);
+
+        VfsRootAccess.allowRootAccess(testDataPath);
+
+        VirtualFile virtualFile = LocalFileSystem
+                .getInstance()
+                .findFileByIoFile(
+                        new File(prefix + "beam")
+                );
+
+        assertNotNull(virtualFile);
+
+        Decompiler decompiler = new Decompiler();
+        CharSequence decompiled = decompiler.decompile(virtualFile);
+
+        assertEquals(expected, decompiled.toString());
+    }
 
     private String ebinDirectory() {
         String ebinDirectory = System.getenv("ELIXIR_EBIN_DIRECTORY");

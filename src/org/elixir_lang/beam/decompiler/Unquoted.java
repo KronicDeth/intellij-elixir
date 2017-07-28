@@ -40,6 +40,10 @@ public class Unquoted extends MacroNameArity {
         return SPECIAL_FORM_NAME_SET.contains(name);
     }
 
+    private static boolean wouldParseAsAlias(@NotNull String name) {
+        return Character.isUpperCase(name.codePointAt(0));
+    }
+
     /*
      * Instance Methods
      */
@@ -52,8 +56,11 @@ public class Unquoted extends MacroNameArity {
      */
     @Override
     public boolean accept(@NotNull org.elixir_lang.beam.MacroNameArity macroNameArity) {
-        return isSpecialForm(macroNameArity.name);
+        String name = macroNameArity.name;
+
+        return wouldParseAsAlias(name) || isSpecialForm(name);
     }
+
 
     /**
      * Append the decompiled source for {@code macroNameArity} to {@code decompiled}.
