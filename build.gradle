@@ -1,5 +1,5 @@
 plugins {
-  id 'org.jetbrains.intellij' version "0.1.10"
+  id 'org.jetbrains.intellij' version "0.2.15"
   id 'de.undercouch.download' version "3.1.2"
 }
 
@@ -27,16 +27,30 @@ allprojects {
 
   apply plugin: 'org.jetbrains.intellij'
   intellij {
+    if (ideaVersion.startsWith("2017.1.")) {
+      plugins = ['org.jetbrains.erlang:0.9.939']
+    } else if (ideaVersion.startsWith("2016.3.")) {
+      plugins = ['org.jetbrains.erlang:0.9.912']
+    } else if (ideaVersion.startsWith("2016.2.")) {
+      plugins = ['org.jetbrains.erlang:0.8.913']
+    } else if (ideaVersion.startsWith("2016.1.")) {
+      plugins = ['org.jetbrains.erlang:0.7.876']
+    } else if (ideaVersion.startsWith("15.0.")) {
+      plugins = ['org.jetbrains.erlang:0.6.873']
+    } else {
+      throw new IllegalArgumentException("ideaVersion is not a recognized MAJOR.MINOR for IntelliJ Erlang compatibility")
+    }
+
     pluginName 'intellij-elixir'
     version ideaVersion
     downloadSources Boolean.valueOf(sources)
     updateSinceUntilBuild = false
+  }
 
-    publish {
-      username publishUsername
-      password publishPassword
-      channel publishChannel
-    }
+  publishPlugin {
+    username publishUsername
+    password publishPassword
+    channels publishChannels
   }
 
   def compilationPackages = ['org/intellij/elixir/build/**', 'org/intellij/elixir/jps/**']
@@ -64,10 +78,9 @@ allprojects {
 }
 
 repositories {
-  jcenter()
-  flatDir {
-    dirs 'libs'
-  }
+  maven { url 'http://dl.bintray.com/jetbrains/intellij-plugin-service' }
+  maven { url 'https://maven-central.storage.googleapis.com' }
+  mavenCentral()
 }
 
 dependencies {
@@ -75,7 +88,6 @@ dependencies {
   compile project('jps-shared')
   compile group: 'org.erlang.otp', name: 'jinterface', version: '1.6.1'
   compile group: 'commons-io', name: 'commons-io', version: '2.5'
-  compile name: 'erlang'
 
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.9'
   testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
@@ -84,16 +96,6 @@ dependencies {
 project(':jps-builder') {
   dependencies {
     compile project(':jps-shared')
-  }
-
-  intellij {
-    type 'JPS'
-  }
-}
-
-project(':jps-shared') {
-  intellij {
-    type 'JPS'
   }
 }
 
@@ -105,27 +107,6 @@ idea {
   }
   module {
     generatedSourceDirs += file('gen')
-  }
-}
-
-task downloadIntellijErlang {
-  doLast {
-    download {
-      src "https://github.com/ignatov/intellij-erlang/releases/download/%23${intellijErlangRelease}/Erlang.${intellijErlangRelease}.zip"
-      dest "${rootDir}/cache/Erlang.${intellijErlangRelease}.zip"
-      overwrite false
-    }
-
-    copy {
-      from zipTree("${rootDir}/cache/Erlang.${intellijErlangRelease}.zip")
-      into "${rootDir}/cache/"
-      include 'Erlang/lib/erlang.jar'
-    }
-
-    copy {
-      from "${rootDir}/cache/Erlang/lib/erlang.jar"
-      into 'libs/'
-    }
   }
 }
 
@@ -187,7 +168,6 @@ task getQuoter {
 }
 
 compileJava {
-  dependsOn downloadIntellijErlang
 }
 
 compileTestJava {
