@@ -195,6 +195,7 @@
 * [#751](https://github.com/KronicDeth/intellij-elixir/pull/751) - [@KronicDeth](https://github.com/KronicDeth)
   * Regression test for [#683](https://github.com/KronicDeth/intellij-elixir/issues/683)
   * Store expected decompilation in files to shrink `DecompilerTest` length
+* [#754](https://github.com/KronicDeth/intellij-elixir/pull/754) - Update to `org.jetbrains.intellij` `0.2.15` - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -292,6 +293,9 @@
     > ```
     > -- https://github.com/KronicDeth/intellij-elixir/blob/v5.1.0/src/org/elixir_lang/Elixir.flex?utf8=%E2%9C%93#L441-L448
 * [#751](https://github.com/KronicDeth/intellij-elixir/pull/751) - Unquote function names that start with an uppercase codepoint, so that they aren't parsed as Aliases.  These function names occur in the CORBA modules in OTP. - [@KronicDeth](https://github.com/KronicDeth)
+* [#754](https://github.com/KronicDeth/intellij-elixir/pull/754) - [@KronicDeth](https://github.com/KronicDeth)
+  * Using intellij.plugins will prevent packaging intellij-erlang as a runtime dependency, which leads to duplicate templates.
+  * Don't use the `JPS` `type` for `jps-*` projects because their deps become incompatible with other projects.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
