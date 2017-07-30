@@ -1736,7 +1736,7 @@ public class ElixirPsiImplUtil {
 
                 previousSibling = previousSibling.getPrevSibling();
             }
-        } else {
+        } else if (!(lastParent instanceof ElixirFile)) {
             error(
                     PsiElement.class,
                     "Scope is not lastParent's parent\nlastParent:\n" + lastParent.getText(),
