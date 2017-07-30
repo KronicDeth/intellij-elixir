@@ -196,6 +196,7 @@
   * Regression test for [#683](https://github.com/KronicDeth/intellij-elixir/issues/683)
   * Store expected decompilation in files to shrink `DecompilerTest` length
 * [#754](https://github.com/KronicDeth/intellij-elixir/pull/754) - Update to `org.jetbrains.intellij` `0.2.15` - [@KronicDeth](https://github.com/KronicDeth)
+* [#755](https://github.com/KronicDeth/intellij-elixir/pull/755) - Regression test for [#687](https://github.com/KronicDeth/intellij-elixir/issues/687) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -296,6 +297,7 @@
 * [#754](https://github.com/KronicDeth/intellij-elixir/pull/754) - [@KronicDeth](https://github.com/KronicDeth)
   * Using intellij.plugins will prevent packaging intellij-erlang as a runtime dependency, which leads to duplicate templates.
   * Don't use the `JPS` `type` for `jps-*` projects because their deps become incompatible with other projects.
+* [#755](https://github.com/KronicDeth/intellij-elixir/pull/755) - Add missing `break`s to `case` statement in `processDeclarations(Match, ...)` that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came from always fell through to the `RIGHT` case, so it was only, always checking the right operand of the match and never the left operand. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
