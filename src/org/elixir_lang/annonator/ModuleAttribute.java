@@ -465,6 +465,23 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
+
+    private void highlightTypesAndTypeTypeParameterDeclarations(ElixirAlias alias,
+                                                                Set<String> typeParameterNameSet,
+                                                                AnnotationHolder annotationHolder,
+                                                                TextAttributesKey typeTextAttributesKey) {
+        String name = alias.getName();
+        TextAttributesKey textAttributesKey;
+
+        if (typeParameterNameSet.contains(name)) {
+            textAttributesKey = ElixirSyntaxHighlighter.TYPE_PARAMETER;
+        } else {
+            textAttributesKey = typeTextAttributesKey;
+        }
+
+        highlight(alias.getTextRange(), annotationHolder, textAttributesKey);
+    }
+
     private void highlightTypesAndTypeTypeParameterDeclarations(ElixirUnmatchedUnqualifiedNoArgumentsCall psiElement,
                                                                 Set<String> typeParameterNameSet,
                                                                 AnnotationHolder annotationHolder,
@@ -490,6 +507,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 psiElement instanceof ElixirTuple) {
             highlightTypesAndTypeTypeParameterDeclarations(
                     psiElement.getChildren(),
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof ElixirAlias) {
+            highlightTypesAndTypeTypeParameterDeclarations(
+                    (ElixirAlias) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
