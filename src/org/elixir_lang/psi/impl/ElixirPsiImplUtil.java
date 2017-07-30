@@ -1660,12 +1660,15 @@ public class ElixirPsiImplUtil {
                 case LEFT:
                     checkLeft  = true;
                     checkRight = false;
+                    break;
                 case OPERATOR:
                     checkLeft  = true;
                     checkRight = true;
+                    break;
                 case RIGHT:
                     checkLeft  = false;
                     checkRight = true;
+                    break;
             }
         } else if (PsiTreeUtil.isAncestor(match, lastParent, false)) {
             checkLeft  = true;
