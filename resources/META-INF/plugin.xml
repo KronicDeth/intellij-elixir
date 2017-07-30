@@ -125,6 +125,7 @@
             <li>Store expected decompilation in files to shrink <code>DecompilerTest</code> length</li>
             <li>Update to <code>org.jetbrains.intellij</code> <code>0.2.15</code></li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/687">#687</a></li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/692">#692</a></li>
           </ul>
         </li>
         <li>
@@ -240,6 +241,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Using intellij.plugins will prevent packaging intellij-erlang as a runtime dependency, which leads to duplicate templates.</li>
             <li>Don't use the <code>JPS</code> <code>type</code> for <code>jps-*</code> projects because their deps become incompatible with other projects.</li>
             <li>Add missing <code>break</code>s to <code>case</code> statement in <code>processDeclarations(Match, ...)</code> that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came from always fell through to the <code>RIGHT</code> case, so it was only, always checking the right operand of the match and never the left operand.</li>
+            <li>Skip <code>processDeclarationsInPreviousSibling</code> when <code>lastParent</code> is <code>ElixirFile</code></li>
           </ul>
         </li>
         <li>
