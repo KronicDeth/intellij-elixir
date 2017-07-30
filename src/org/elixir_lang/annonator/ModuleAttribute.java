@@ -465,6 +465,23 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
     }
 
+
+    private void highlightTypesAndTypeTypeParameterDeclarations(ElixirAlias alias,
+                                                                Set<String> typeParameterNameSet,
+                                                                AnnotationHolder annotationHolder,
+                                                                TextAttributesKey typeTextAttributesKey) {
+        String name = alias.getName();
+        TextAttributesKey textAttributesKey;
+
+        if (typeParameterNameSet.contains(name)) {
+            textAttributesKey = ElixirSyntaxHighlighter.TYPE_PARAMETER;
+        } else {
+            textAttributesKey = typeTextAttributesKey;
+        }
+
+        highlight(alias.getTextRange(), annotationHolder, textAttributesKey);
+    }
+
     private void highlightTypesAndTypeTypeParameterDeclarations(ElixirUnmatchedUnqualifiedNoArgumentsCall psiElement,
                                                                 Set<String> typeParameterNameSet,
                                                                 AnnotationHolder annotationHolder,
@@ -490,6 +507,13 @@ public class ModuleAttribute implements Annotator, DumbAware {
                 psiElement instanceof ElixirTuple) {
             highlightTypesAndTypeTypeParameterDeclarations(
                     psiElement.getChildren(),
+                    typeParameterNameSet,
+                    annotationHolder,
+                    typeTextAttributesKey
+            );
+        } else if (psiElement instanceof ElixirAlias) {
+            highlightTypesAndTypeTypeParameterDeclarations(
+                    (ElixirAlias) psiElement,
                     typeParameterNameSet,
                     annotationHolder,
                     typeTextAttributesKey
@@ -1407,6 +1431,17 @@ public class ModuleAttribute implements Annotator, DumbAware {
         return nameSet;
     }
 
+    /**
+     * Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
+     * in Java.
+     *
+     * See https://github.com/KronicDeth/intellij-elixir/issues/694
+     */
+    @NotNull
+    private Set<String> typeTypeParameterNameSet(@NotNull ElixirAlias alias) {
+        return Collections.singleton(alias.getName());
+    }
+
     private Set<String> typeTypeParameterNameSet(@NotNull ElixirTuple tuple) {
         Set<String> typeParameterNameSet = null;
 
@@ -1442,6 +1477,12 @@ public class ModuleAttribute implements Annotator, DumbAware {
 
         if (psiElement instanceof ElixirAccessExpression) {
             typeParameterNameSet = typeTypeParameterNameSet(psiElement.getChildren());
+        } else if (psiElement instanceof ElixirAlias) {
+            /* Assume bare aliases are incorrectly capitalized type parameters, say from someone's that used to generics
+               in Java.
+
+               See https://github.com/KronicDeth/intellij-elixir/issues/694 */
+            typeParameterNameSet = typeTypeParameterNameSet((ElixirAlias) psiElement);
         } else if (psiElement instanceof ElixirTuple) {
             typeParameterNameSet = typeTypeParameterNameSet((ElixirTuple) psiElement);
         } else if (psiElement instanceof ElixirUnmatchedUnqualifiedNoArgumentsCall) {
