@@ -242,6 +242,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Don't use the <code>JPS</code> <code>type</code> for <code>jps-*</code> projects because their deps become incompatible with other projects.</li>
             <li>Add missing <code>break</code>s to <code>case</code> statement in <code>processDeclarations(Match, ...)</code> that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came from always fell through to the <code>RIGHT</code> case, so it was only, always checking the right operand of the match and never the left operand.</li>
             <li>Skip <code>processDeclarationsInPreviousSibling</code> when <code>lastParent</code> is <code>ElixirFile</code></li>
+            <li>Remove background color from sigils because it stands out really badly in the Default theme where it's black on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background color in Darcula.</li>
           </ul>
         </li>
         <li>

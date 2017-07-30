@@ -300,6 +300,7 @@
   * Don't use the `JPS` `type` for `jps-*` projects because their deps become incompatible with other projects.
 * [#755](https://github.com/KronicDeth/intellij-elixir/pull/755) - Add missing `break`s to `case` statement in `processDeclarations(Match, ...)` that caused the logic of whether to check left, right, or both operand based on the whether the treeWalkUp came from always fell through to the `RIGHT` case, so it was only, always checking the right operand of the match and never the left operand. - [@KronicDeth](https://github.com/KronicDeth)
 * [#756](https://github.com/KronicDeth/intellij-elixir/pull/756) - Skip `processDeclarationsInPreviousSibling` when `lastParent` is `ElixirFile` - [@KronicDeth](https://github.com/KronicDeth)
+* [#757](https://github.com/KronicDeth/intellij-elixir/pull/757) - Remove background color from sigils because it stands out really badly in the Default theme where it's black on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background color in Darcula. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
