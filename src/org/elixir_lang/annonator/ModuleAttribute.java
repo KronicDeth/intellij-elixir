@@ -816,6 +816,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof UnqualifiedNoParenthesesCall) {
+            highlightTypesAndSpecificationTypeParameterDeclarations(
+                    (UnqualifiedNoParenthesesCall) psiElement
+            );
         } else {
             error("Cannot highlight types and specification type parameter declarations", psiElement);
         }
@@ -848,6 +852,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     ElixirSyntaxHighlighter.TYPE_PARAMETER
             );
+        }
+    }
+
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(
+            UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+            error(
+                    "Cannot highlight types and specification type parameter declarations in UnqualifiedNoParenthesesCall that is not a call definition clause", unqualifiedNoParenthesesCall);
         }
     }
 
