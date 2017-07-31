@@ -17,6 +17,7 @@ import org.elixir_lang.errorreport.Logger;
 import org.elixir_lang.psi.*;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.operation.*;
+import org.elixir_lang.structure_view.element.CallDefinitionClause;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -815,6 +816,10 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     typeTextAttributesKey
             );
+        } else if (psiElement instanceof UnqualifiedNoParenthesesCall) {
+            highlightTypesAndSpecificationTypeParameterDeclarations(
+                    (UnqualifiedNoParenthesesCall) psiElement
+            );
         } else {
             error("Cannot highlight types and specification type parameter declarations", psiElement);
         }
@@ -847,6 +852,14 @@ public class ModuleAttribute implements Annotator, DumbAware {
                     annotationHolder,
                     ElixirSyntaxHighlighter.TYPE_PARAMETER
             );
+        }
+    }
+
+    private void highlightTypesAndSpecificationTypeParameterDeclarations(
+            UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall) {
+        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+            error(
+                    "Cannot highlight types and specification type parameter declarations in UnqualifiedNoParenthesesCall that is not a call definition clause", unqualifiedNoParenthesesCall);
         }
     }
 
@@ -1396,6 +1409,8 @@ public class ModuleAttribute implements Annotator, DumbAware {
             parameterNameSet = specificationTypeParameterNameSet((ElixirNoParenthesesKeywordPair) psiElement);
         } else if (psiElement instanceof UnqualifiedNoArgumentsCall) {
             parameterNameSet = specificationTypeParameterNameSet((UnqualifiedNoArgumentsCall) psiElement);
+        } else if (psiElement instanceof UnqualifiedNoParenthesesCall) {
+            parameterNameSet = specificationTypeParameterNameSet((UnqualifiedNoParenthesesCall) psiElement);
         } else {
             error("Cannot extract specification type parameter name set", psiElement);
             parameterNameSet = Collections.emptySet();
@@ -1429,6 +1444,21 @@ public class ModuleAttribute implements Annotator, DumbAware {
         }
 
         return nameSet;
+    }
+
+    @NotNull
+    private Set<String> specificationTypeParameterNameSet(
+            @NotNull UnqualifiedNoParenthesesCall unqualifiedNoParenthesesCall
+    ) {
+        if (!CallDefinitionClause.is(unqualifiedNoParenthesesCall)) {
+            error(
+                    "Cannot extract specification type parameter name set from " +
+                            "unqualifiedNoParenthesesCall that is a not a call definition clause",
+                    unqualifiedNoParenthesesCall
+            );
+        }
+
+        return Collections.emptySet();
     }
 
     /**
