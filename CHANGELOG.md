@@ -199,7 +199,8 @@
 * [#755](https://github.com/KronicDeth/intellij-elixir/pull/755) - Regression test for [#687](https://github.com/KronicDeth/intellij-elixir/issues/687) - [@KronicDeth](https://github.com/KronicDeth)
 * [#756](https://github.com/KronicDeth/intellij-elixir/pull/756) - Regression test for [#692](https://github.com/KronicDeth/intellij-elixir/issues/692) - [@KronicDeth](https://github.com/KronicDeth)
 * [#758](https://github.com/KronicDeth/intellij-elixir/pull/758) - Regression test for [#694](https://github.com/KronicDeth/intellij-elixir/issues/694) - [@KronicDeth](https://github.com/KronicDeth)
-* [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Regression test for [#699)(https://github.com/KronicDeth/intellij-elixir/issues/699) - [@KronicDeth](https://github.com/KronicDeth)
+* [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Regression test for [#699](https://github.com/KronicDeth/intellij-elixir/issues/699) - [@KronicDeth](https://github.com/KronicDeth)
+* [#760](https://github.com/KronicDeth/intellij-elixir/pull/760) - Use `Elixir.LDAPEx.ELDAPv3.beam` as regression test for [#703](https://github.com/KronicDeth/intellij-elixir/issues/703) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)

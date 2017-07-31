@@ -128,6 +128,7 @@
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/692">#692</a></li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/694">#694</a></li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/699">#699</a></li>
+            <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.</li>
           </ul>
         </li>
         <li>
