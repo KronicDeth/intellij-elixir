@@ -3,12 +3,15 @@ package org.elixir_lang.psi.stub.type.call;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.util.containers.SmartHashSet;
 import com.intellij.util.io.StringRef;
+import gnu.trove.THashSet;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.StubBased;
 import org.elixir_lang.psi.stub.call.Stubbic;
-import org.elixir_lang.structure_view.element.*;
+import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.CallDefinitionHead;
+import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
+import org.elixir_lang.structure_view.element.Callback;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -32,7 +35,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     public static Set<StringRef> readNameSet(@NotNull StubInputStream dataStream) throws IOException {
         int nameSetSize = dataStream.readInt();
 
-        Set<StringRef> nameSet = new SmartHashSet<StringRef>(nameSetSize);
+        Set<StringRef> nameSet = new THashSet<>(nameSetSize);
 
         for (int i = 0; i < nameSetSize; i++) {
             nameSet.add(dataStream.readName());
