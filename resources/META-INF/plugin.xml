@@ -129,6 +129,7 @@
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/694">#694</a></li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/699">#699</a></li>
             <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.</li>
+            <li>Use <code>THashSet</code> instead of the more specific <code>SmartHashSet</code> because <code>THashSet</code> allows <code>null</code> keys, which are expected for the <code>canonicalNameSet</code>.</li>
           </ul>
         </li>
         <li>

@@ -306,6 +306,7 @@
 * [#757](https://github.com/KronicDeth/intellij-elixir/pull/757) - Remove background color from sigils because it stands out really badly in the Default theme where it's black on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background color in Darcula. - [@KronicDeth](https://github.com/KronicDeth)
 * [#758](https://github.com/KronicDeth/intellij-elixir/pull/758) - Treat `Alias` as miscapitalized type parameter. [@KronicDeth](https://github.com/KronicDeth)
 * [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Ignore call definition clauses after `when` in type specifications as it is a common occurrence when typing a specification above a pre-existing call definition clause. - [@KronicDeth](https://github.com/KronicDeth)
+* [#761](https://github.com/KronicDeth/intellij-elixir/pull/761) - Use `THashSet` instead of the more specific `SmartHashSet` because `THashSet` allows `null` keys, which are expected for the `canonicalNameSet`. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
