@@ -21,7 +21,7 @@
 # Color Scheme Design
 
 The color design for `additionalTextAttributes` needs to be similar to color Palettes for Preferences > Editor > Colors & Fonts > Language Defaults, but more obvious, contrasting colors should be chosen when Language Defaults use no attributes or shared attributes for multiple Text Attribute Keys.  This is to ensure that different parts of the language are easier to distinguish visually and so that user stop reporting that IntelliJ Elixir doesn't have syntax highlighting, as was the case before using `additionalTextAttributes`.
- 
+
 ## Categories
 
 Certain Text Attribute Keys, even when not nested in the Preferences > Editor > Colors & Fonts > Elixir share similar hues to show they are related logical concepts.
@@ -47,7 +47,7 @@ The Hue difference isn't exact because the color is stored in RGB, which doesn't
 | Braces and Operators > Dot            | 149° |
 | Braces and Operators > Interpolation  | 120° |
 | Braces and Operators > Operation Sign | 90°  |
-| Braces and Parentheses > Parentheses  | 60°  |                   
+| Braces and Parentheses > Parentheses  | 60°  |
 
 #### Map and Structs
 
@@ -63,7 +63,7 @@ Maps `%{}` and Structs `%Alias{}` both use braces `{}`, but it is helpful to be 
 
 Currently, the Calls category is used to annotate `Kernel` function and macros; and `Kernel.SpecialForms` macros.  A lot of other editors use their "Keywords" color for these function calls, but I don't want developers confusing these predefined functions and macros as Elixir keywords, so "Calls > Predefined" is set to inherit from "Language Defaults > Identifiers > Predefined Symbols", but the color is match the "Keywords".
 
-Because "Calls > Function" and "Calls > Macro" will eventually be used for all function and macro calls, they need to not use the Foreground attribute as it was being used by "Calls > Predefined" already.  Therefore, "Calls > Function" is Italic while "Calls > Macro" is "Bold Italic" as it is a compiled-time function call. 
+Because "Calls > Function" and "Calls > Macro" will eventually be used for all function and macro calls, they need to not use the Foreground attribute as it was being used by "Calls > Predefined" already.  Therefore, "Calls > Function" is Italic while "Calls > Macro" is "Bold Italic" as it is a compiled-time function call.
 
 ### Direct Inheritors of Language Defaults
 
@@ -101,16 +101,16 @@ All Predefined category Text Attribute keys use the orange hue from Keyword in "
 
 For the textual container (Character List and String), String is brighter than "Character List" to show that String is the newer, more preferred format over "Character List".   Importantly, the Hue is exactly the same.
 
-| Text Attribute Key | Hue  | Saturation | Brightness | Relation to other Text Attribute Keys                                                                                                                                                                                                                                                                                                                                    |
-|--------------------|------|------------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Character List     | 97°  | 34%        | 52%        | A darker, less saturated form of String                                                                                                                                                                                                                                                                                                                                  |
-| String             | 97°  | 60%        | 70%        | A brighter, more saturated form of "Character List"                                                                                                                                                                                                                                                                                                                      |
-| Escape Sequence    | 277° | 47%        | 61%        | Escape tokens need to contrast heavily with both "Character List" and "String", so the Hue is +180° while the Saturation and Brightness is the average of the two.  Finally, it is Bold to make it stand out when used in Sigils.                                                                                                                                        |
-| Sigil              | 187° | 60%        | 70%        | Sigil's Hue is +90° from "Character List" and "String", so that it contrasts with "Character List", String, and "Escape Sequence".  It has the same Saturation and Brightness and "String" because it's a new, preferred format like "String". Because Sigil is an injection of a small DSL, it also has a Background color to emphasize it's not exactly Elixir syntax. |
+| Text Attribute Key | Hue  | Saturation | Brightness | Relation to other Text Attribute Keys                                                                                                                                                                                                          |
+|--------------------|------|------------|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Character List     | 97°  | 34%        | 52%        | A darker, less saturated form of String                                                                                                                                                                                                        |
+| String             | 97°  | 60%        | 70%        | A brighter, more saturated form of "Character List"                                                                                                                                                                                            |
+| Escape Sequence    | 277° | 47%        | 61%        | Escape tokens need to contrast heavily with both "Character List" and "String", so the Hue is +180° while the Saturation and Brightness is the average of the two.  Finally, it is Bold to make it stand out when used in Sigils.              |
+| Sigil              | 187° | 60%        | 70%        | Sigil's Hue is +90° from "Character List" and "String", so that it contrasts with "Character List", String, and "Escape Sequence".  It has the same Saturation and Brightness and "String" because it's a new, preferred format like "String". |
 
 ### Type-like
 
-All Type-like Text Attribute Keys have variations on the "Module Attributes > Types > Type" text attributes. 
+All Type-like Text Attribute Keys have variations on the "Module Attributes > Types > Type" text attributes.
 
 | Text Attribute Key                         | Description        | Relation to Other Text Attribute Keys                                     |
 |--------------------------------------------|--------------------|---------------------------------------------------------------------------|
