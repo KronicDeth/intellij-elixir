@@ -1135,9 +1135,9 @@ public class ElixirPsiImplUtil {
                     PsiElement stabChild = stabChildren[0];
 
                     if (stabChild instanceof ElixirStabBody) {
-                        ElixirStabBody stabBody = (ElixirStabBody) stabChild;
+                        List<Call> childCallList = macroChildCallList(stabChild);
 
-                        childCalls = PsiTreeUtil.getChildrenOfType(stabBody, Call.class);
+                        childCalls = childCallList.toArray(new Call[childCallList.size()]);
                     }
                 }
             }
@@ -1169,6 +1169,30 @@ public class ElixirPsiImplUtil {
         }
 
         return childCalls;
+    }
+
+    @NotNull
+    private static List<Call> macroChildCallList(@NotNull PsiElement element) {
+        List<Call> callList;
+
+        if (element instanceof ElixirAccessExpression) {
+            callList = macroChildCallList(element.getFirstChild());
+        } else if (element instanceof ElixirList || element instanceof ElixirStabBody) {
+            callList = new ArrayList<>();
+
+            for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+                if (child instanceof Call) {
+                    Call childCall = (Call) child;
+                    callList.add(childCall);
+                } else if (child instanceof ElixirAccessExpression) {
+                    callList.addAll(macroChildCallList(child));
+                }
+            }
+        } else {
+            callList = Collections.emptyList();
+        }
+
+        return callList;
     }
 
     public static OtpErlangList metadata(ASTNode node) {
