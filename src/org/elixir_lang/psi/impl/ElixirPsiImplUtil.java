@@ -2141,6 +2141,8 @@ public class ElixirPsiImplUtil {
                 parent instanceof AtUnqualifiedNoParenthesesCall ||
                 // See https://github.com/phoenixframework/phoenix/blob/v1.2.4/lib/phoenix/template.ex#L380-L392
                 parent instanceof ElixirAccessExpression ||
+                // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L24-L44
+                parent instanceof ElixirList ||
                 parent instanceof ElixirMatchedParenthesesArguments ||
                 parent instanceof ElixirTuple ||
                 parent instanceof Match ||
