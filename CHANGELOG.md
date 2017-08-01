@@ -311,6 +311,7 @@
 * [#764](https://github.com/KronicDeth/intellij-elixir/pull/764) - [@KronicDeth](https://github.com/KronicDeth)
   * Look above `List` for enclosing modular macro.
   * Look above `ElixirNoParenthesesManyStrictNoParenthesesExpression` for enclosing modular macro.
+* [#765](https://github.com/KronicDeth/intellij-elixir/pull/765) - Remove background color from Sigil Color Scheme Design to match changes in [#757](https://github.com/KronicDeth/intellij-elixir/pull/757). - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

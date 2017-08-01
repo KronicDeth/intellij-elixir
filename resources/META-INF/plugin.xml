@@ -252,6 +252,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Ignore call definition clauses after <code>when</code> in type specifications as it is a common occurrence when typing a specification above a pre-existing call definition clause.</li>
             <li>Look above <code>List</code> for enclosing modular macro.</li>
             <li>Look above <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> for enclosing modular macro.</li>
+            <li>Remove background color from Sigil Color Scheme Design to match changes in <a href="https://github.com/KronicDeth/intellij-elixir/pull/757">#757</a>.</li>
           </ul>
         </li>
         <li>
