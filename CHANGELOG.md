@@ -201,6 +201,7 @@
 * [#758](https://github.com/KronicDeth/intellij-elixir/pull/758) - Regression test for [#694](https://github.com/KronicDeth/intellij-elixir/issues/694) - [@KronicDeth](https://github.com/KronicDeth)
 * [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Regression test for [#699](https://github.com/KronicDeth/intellij-elixir/issues/699) - [@KronicDeth](https://github.com/KronicDeth)
 * [#760](https://github.com/KronicDeth/intellij-elixir/pull/760) - Use `Elixir.LDAPEx.ELDAPv3.beam` as regression test for [#703](https://github.com/KronicDeth/intellij-elixir/issues/703) - [@KronicDeth](https://github.com/KronicDeth)
+* [#764](https://github.com/KronicDeth/intellij-elixir/pull/764) - Show `quote`s in list in macros in Structure View - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -307,6 +308,9 @@
 * [#758](https://github.com/KronicDeth/intellij-elixir/pull/758) - Treat `Alias` as miscapitalized type parameter. [@KronicDeth](https://github.com/KronicDeth)
 * [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Ignore call definition clauses after `when` in type specifications as it is a common occurrence when typing a specification above a pre-existing call definition clause. - [@KronicDeth](https://github.com/KronicDeth)
 * [#761](https://github.com/KronicDeth/intellij-elixir/pull/761) - Use `THashSet` instead of the more specific `SmartHashSet` because `THashSet` allows `null` keys, which are expected for the `canonicalNameSet`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#764](https://github.com/KronicDeth/intellij-elixir/pull/764) - [@KronicDeth](https://github.com/KronicDeth)
+  * Look above `List` for enclosing modular macro.
+  * Look above `ElixirNoParenthesesManyStrictNoParenthesesExpression` for enclosing modular macro.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

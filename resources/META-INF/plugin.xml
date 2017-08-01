@@ -130,6 +130,7 @@
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/699">#699</a></li>
             <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.</li>
             <li>Use <code>THashSet</code> instead of the more specific <code>SmartHashSet</code> because <code>THashSet</code> allows <code>null</code> keys, which are expected for the <code>canonicalNameSet</code>.</li>
+            <li>Show <code>quote</code>s in list in macros in Structure View</li>
           </ul>
         </li>
         <li>
@@ -249,6 +250,8 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Remove background color from sigils because it stands out really badly in the Default theme where it's black on white and while it doesn't in Darcula, it's unnecessary there because it's so close to the editor background color in Darcula.</li>
             <li>Treat <code>Alias</code> as miscapitalized type parameter.</li>
             <li>Ignore call definition clauses after <code>when</code> in type specifications as it is a common occurrence when typing a specification above a pre-existing call definition clause.</li>
+            <li>Look above <code>List</code> for enclosing modular macro.</li>
+            <li>Look above <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> for enclosing modular macro.</li>
           </ul>
         </li>
         <li>
