@@ -2144,6 +2144,8 @@ public class ElixirPsiImplUtil {
                 // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L24-L44
                 parent instanceof ElixirList ||
                 parent instanceof ElixirMatchedParenthesesArguments ||
+                // See https://github.com/absinthe-graphql/absinthe/blob/v1.3.0/lib/absinthe/schema/notation/writer.ex#L96
+                parent instanceof ElixirNoParenthesesManyStrictNoParenthesesExpression ||
                 parent instanceof ElixirTuple ||
                 parent instanceof Match ||
                 parent instanceof QualifiedAlias ||

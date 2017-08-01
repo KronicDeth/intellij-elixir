@@ -3,17 +3,15 @@ package org.elixir_lang.navigation;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.ChooseByNameRegistry;
 import com.intellij.navigation.NavigationItem;
+import com.intellij.psi.PsiElement;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
+import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.structure_view.element.CallDefinition;
 import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.modular.Modular;
 
 public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTestCase {
-    /*
-     * Tests
-     */
-
-    public void testIssue472() {
-        myFixture.configureByFile("issue_472.ex");
+    private static GotoSymbolContributor gotoSymbolContributor() {
         ChooseByNameContributor[] symbolModelContributors = ChooseByNameRegistry
                 .getInstance()
                 .getSymbolModelContributors();
@@ -28,6 +26,21 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
 
         assertNotNull(gotoSymbolContributor);
 
+        return gotoSymbolContributor;
+    }
+
+    @Override
+    protected String getTestDataPath() {
+        return "testData/org/elixir_lang/navigation/goto_symbol_contributor";
+    }
+
+    /*
+     * Tests
+     */
+
+    public void testIssue472() {
+        myFixture.configureByFile("issue_472.ex");
+        GotoSymbolContributor gotoSymbolContributor = gotoSymbolContributor();
         NavigationItem[] itemsByName = gotoSymbolContributor.getItemsByName(
                 "decode_auth_type",
                 "decode_a",
@@ -46,12 +59,30 @@ public class GotoSymbolContributorTest extends LightPlatformCodeInsightFixtureTe
         assertEquals("decode_auth_type", callDefinitionClause.getName());
     }
 
-    /*
-     * Protected Instance Methods
-     */
+    public void testIssue705BeforeCompile() {
+        myFixture.configureByFile("issue_705__before_compile__.ex");
+        PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
 
-    @Override
-    protected String getTestDataPath() {
-        return "testData/org/elixir_lang/navigation/goto_symbol_contributor";
+        Call call = (Call) elementAtCaret.getParent().getParent().getParent().getParent();
+
+        Call enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call);
+        assertNotNull(enclosingModularMacroCall);
+
+        Modular modular = CallDefinitionClause.enclosingModular(call);
+        assertNotNull(modular);
     }
+
+    public void testIssue705TypeFunctions() {
+        myFixture.configureByFile("issue_705_type_functions.ex");
+        PsiElement elementAtCaret = myFixture.getFile().findElementAt(myFixture.getCaretOffset());
+
+        Call call = (Call) elementAtCaret.getParent().getParent().getParent();
+
+        Call enclosingModularMacroCall = CallDefinitionClause.enclosingModularMacroCall(call);
+        assertNotNull(enclosingModularMacroCall);
+
+        Modular modular = CallDefinitionClause.enclosingModular(call);
+        assertNotNull(modular);
+    }
+
 }
