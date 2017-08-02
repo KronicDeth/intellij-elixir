@@ -131,6 +131,12 @@
             <li>Use <code>Elixir.LDAPEx.ELDAPv3.beam</code> as regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/703">#703</a>.</li>
             <li>Use <code>THashSet</code> instead of the more specific <code>SmartHashSet</code> because <code>THashSet</code> allows <code>null</code> keys, which are expected for the <code>canonicalNameSet</code>.</li>
             <li>Show <code>quote</code>s in list in macros in Structure View</li>
+            <li>
+              References will be cached until the file containing the PSI element changes, so that results from
+              <code>Callable#multiResolve</code>, <code>CallDefinitionClause#multiResolve</code>,
+              <code>Module#multiResolve</code>, and <code>ModuleAttribute#multiResolve</code>, which are all the extant
+              references, can be cached and invalidated correctly.
+            </li>
           </ul>
         </li>
         <li>

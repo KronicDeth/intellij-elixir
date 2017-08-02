@@ -202,6 +202,7 @@
 * [#759](https://github.com/KronicDeth/intellij-elixir/pull/759) - Regression test for [#699](https://github.com/KronicDeth/intellij-elixir/issues/699) - [@KronicDeth](https://github.com/KronicDeth)
 * [#760](https://github.com/KronicDeth/intellij-elixir/pull/760) - Use `Elixir.LDAPEx.ELDAPv3.beam` as regression test for [#703](https://github.com/KronicDeth/intellij-elixir/issues/703) - [@KronicDeth](https://github.com/KronicDeth)
 * [#764](https://github.com/KronicDeth/intellij-elixir/pull/764) - Show `quote`s in list in macros in Structure View - [@KronicDeth](https://github.com/KronicDeth)
+* [#768](https://github.com/KronicDeth/intellij-elixir/pull/768) -  References will be cached until the file containing the PSI element changes, so that results from `Callable#multiResolve`, `CallDefinitionClause#multiResolve`, `Module#multiResolve`, and `ModuleAttribute#multiResolve`, which are all the extant references, can be cached and invalidated correctly. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
