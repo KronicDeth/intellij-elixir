@@ -3111,14 +3111,29 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiReference reference = null;
+    private static PsiPolyVariantReference computeReference(@NotNull QualifiableAlias qualifiableAlias,
+                                                            @NotNull PsiElement maxScope) {
+        PsiPolyVariantReference reference = null;
 
         if (isOutermostQualifiableAlias(qualifiableAlias)) {
-            reference = new org.elixir_lang.reference.Module(qualifiableAlias, qualifiableAlias.getContainingFile());
+            reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
         }
 
         return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
+        return getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
+    }
+
+    @Nullable
+    public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias,
+                                                       @NotNull PsiElement maxScope) {
+        return CachedValuesManager.getCachedValue(
+                qualifiableAlias,
+                () -> CachedValueProvider.Result.create(computeReference(qualifiableAlias, maxScope), qualifiableAlias)
+        );
     }
 
     /**
@@ -5750,7 +5765,7 @@ if (quoted == null) {
             if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
                    outermost */
-                PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
+                PsiPolyVariantReference reference = getReference(qualifiableAlias, maxScope);
                 modular = aliasToModular(qualifiableAlias, reference);
             }
         }
