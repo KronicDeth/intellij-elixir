@@ -1,21 +1,16 @@
 package org.elixir_lang.reference;
 
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
-import org.apache.commons.lang.math.IntRange;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
 import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.elixir_lang.psi.impl.ElixirPsiImplUtil.macroChildCalls;
-import static org.elixir_lang.structure_view.element.CallDefinitionClause.enclosingModularMacroCall;
-import static org.elixir_lang.structure_view.element.CallDefinitionSpecification.typeNameArity;
 
 public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiPolyVariantReference {
     /*
@@ -25,7 +20,7 @@ public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiP
      */
 
     @NotNull
-    private final AtUnqualifiedNoParenthesesCall moduleAttribute;
+    public final AtUnqualifiedNoParenthesesCall moduleAttribute;
 
     /*
      *
@@ -79,57 +74,14 @@ public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiP
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        Call enclosingModularMacroCall = enclosingModularMacroCall(moduleAttribute);
-        List<ResolveResult> resolveResultList = null;
-
-        if (enclosingModularMacroCall != null) {
-            Call[] siblings = macroChildCalls(enclosingModularMacroCall);
-
-            if (siblings != null && siblings.length > 0) {
-                Pair<String, Integer> nameArity = typeNameArity(myElement);
-                String name = nameArity.first;
-                int arity = nameArity.second;
-
-                for (Call call : siblings) {
-                    if (org.elixir_lang.structure_view.element.CallDefinitionClause.is(call)) {
-                        Pair<String, IntRange> callNameArityRange =
-                                org.elixir_lang.structure_view.element.CallDefinitionClause.nameArityRange(call);
-
-                        if (callNameArityRange != null) {
-                            String callName = callNameArityRange.first;
-
-                            if (callName.equals(name)) {
-                                IntRange callArityRange = callNameArityRange.second;
-
-                                if (callArityRange.containsInteger(arity)) {
-                                    resolveResultList = add(resolveResultList, call, true);
-                                } else if (arity < callArityRange.getMaximumInteger()) {
-                                    resolveResultList = add(resolveResultList, call, false);
-                                }
-                            } else if (incompleteCode && callName.startsWith(name)) {
-                                IntRange callArityRange = callNameArityRange.second;
-
-                                if (callArityRange.containsInteger(arity)) {
-                                    resolveResultList = add(resolveResultList, call, false);
-                                } else if (arity < callArityRange.getMaximumInteger()) {
-                                    resolveResultList = add(resolveResultList, call, false);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        ResolveResult[] resolveResults;
-
-        if (resolveResultList != null) {
-            resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
-        } else {
-            resolveResults = new ResolveResult[0];
-        }
-
-        return resolveResults;
+        return ResolveCache
+                .getInstance(this.myElement.getProject())
+                .resolveWithCaching(
+                        this,
+                        org.elixir_lang.reference.resolver.CallDefinitionClause.INSTANCE,
+                        false,
+                        incompleteCode
+                );
     }
 
     /**
@@ -142,22 +94,5 @@ public class CallDefinitionClause extends PsiReferenceBase<Call> implements PsiP
     public PsiElement resolve() {
         ResolveResult[] resolveResults = multiResolve(false);
         return resolveResults.length == 1 ? resolveResults[0].getElement() : null;
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    @NotNull
-    private List<ResolveResult> add(@Nullable List<ResolveResult> resolveResultList,
-                                    @NotNull Call call,
-                                    boolean validResult) {
-        if (resolveResultList == null) {
-            resolveResultList = new ArrayList<ResolveResult>();
-        }
-
-        resolveResultList.add(new PsiElementResolveResult(call, validResult));
-
-        return resolveResultList;
     }
 }
