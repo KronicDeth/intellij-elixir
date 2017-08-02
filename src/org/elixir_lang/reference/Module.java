@@ -4,24 +4,24 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.PsiReferenceBase;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.Function;
 import org.elixir_lang.psi.NamedElement;
 import org.elixir_lang.psi.QualifiableAlias;
-import org.elixir_lang.psi.scope.module.MultiResolve;
 import org.elixir_lang.psi.scope.module.Variants;
 import org.elixir_lang.psi.stub.index.AllName;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import static org.elixir_lang.reference.module.ResolvableName.resolvableName;
 
 public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPolyVariantReference {
     /*
@@ -35,7 +35,7 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
      */
 
     @NotNull
-    private PsiElement maxScope;
+    public final PsiElement maxScope;
 
     /*
      * Private Static Methods
@@ -126,49 +126,14 @@ public class Module extends PsiReferenceBase<QualifiableAlias> implements PsiPol
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> resolveResultList = null;
-        final String name = resolvableName(myElement);
-
-        if (name != null) {
-            resolveResultList = MultiResolve.resolveResultList(name, incompleteCode, myElement, maxScope);
-
-            if (resolveResultList == null || resolveResultList.isEmpty()) {
-                resolveResultList = multiResolveProject(
-                        myElement.getProject(),
-                        name
+        return ResolveCache
+                .getInstance(this.myElement.getProject())
+                .resolveWithCaching(
+                        this,
+                        org.elixir_lang.reference.resolver.Module.INSTANCE,
+                        false,
+                        incompleteCode
                 );
-            }
-        }
-
-        ResolveResult[] resolveResults;
-
-        if (resolveResultList == null) {
-            resolveResults = new ResolveResult[0];
-        } else {
-            resolveResults = resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
-        }
-
-        return resolveResults;
-    }
-
-    /*
-     * Private Instance Methods
-     */
-
-    private List<ResolveResult> multiResolveProject(@NotNull Project project,
-                                                    @NotNull String name) {
-        List<ResolveResult> results = new ArrayList<ResolveResult>();
-
-        forEachNavigationElement(project, name, new Function<PsiElement, Boolean>() {
-            @Override
-            public Boolean fun(PsiElement navigationElement) {
-                results.add(new PsiElementResolveResult(navigationElement));
-
-                return true;
-            }
-        });
-
-        return results;
     }
 
     @Nullable
