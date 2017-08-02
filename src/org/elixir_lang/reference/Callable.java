@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewLongNameLocation;
@@ -660,67 +661,9 @@ public class Callable extends PsiReferenceBase<Call> implements PsiPolyVariantRe
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        final List<ResolveResult> resolveResultList = new ArrayList<ResolveResult>();
-        int resolvedFinalArity = myElement.resolvedFinalArity();
-
-        if (myElement instanceof org.elixir_lang.psi.call.qualification.Qualified) {
-            Call modular = qualifiedToModular((org.elixir_lang.psi.call.qualification.Qualified) myElement);
-
-            /* If modular cannot be found then it means that either the qualifier has a typo or its part of
-               .beam-only Module.  Since .beam-only Modules aren't resolvable at this time, assume typo and mark all
-                ResolveResults with `validResult` `false.  Finally, it could also be a variable. */
-            if (modular != null) {
-                Modular.forEachCallDefinitionClauseNameIdentifier(
-                        modular,
-                        myElement.functionName(),
-                        resolvedFinalArity,
-                        new com.intellij.util.Function<PsiElement, Boolean>() {
-                            @Override
-                            public Boolean fun(PsiElement nameIdentifier) {
-                                resolveResultList.add(new PsiElementResolveResult(nameIdentifier, true));
-
-                                return true;
-                            }
-                        }
-                );
-            }
-        } else {
-            /* DO NOT use `getName()` as it will return the NameIdentifier's text, which for `defmodule` is the Alias,
-               not `defmodule` */
-            String name = myElement.functionName();
-
-            if (name != null) {
-                // UnqualifiedNorArgumentsCall prevents `foo()` from being treated as a variable.
-                // resolvedFinalArity prevents `|> foo` from being counted as 0-arity
-                if (myElement instanceof UnqualifiedNoArgumentsCall && resolvedFinalArity == 0) {
-                    List<ResolveResult> variableResolveList =
-                            org.elixir_lang.psi.scope.variable.MultiResolve.resolveResultList(
-                                    name,
-                                    incompleteCode,
-                                    myElement
-                            );
-
-                    if (variableResolveList != null) {
-                        resolveResultList.addAll(variableResolveList);
-                    }
-                }
-
-                List<ResolveResult> callDefinitionClauseResolveResultList =
-                        org.elixir_lang.psi.scope.call_definition_clause.MultiResolve.resolveResultList(
-                                name,
-                                resolvedFinalArity,
-                                incompleteCode,
-                                myElement
-                        );
-
-                if (callDefinitionClauseResolveResultList != null) {
-                    resolveResultList.addAll(callDefinitionClauseResolveResultList);
-                }
-            }
-
-        }
-
-        return resolveResultList.toArray(new ResolveResult[resolveResultList.size()]);
+        return ResolveCache
+                .getInstance(this.myElement.getProject())
+                .resolveWithCaching(this, org.elixir_lang.reference.resolver.Callable.INSTANCE, false, incompleteCode);
     }
 
     /**

@@ -19,6 +19,8 @@ import com.intellij.psi.search.LocalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.usageView.UsageViewUtil;
 import com.intellij.util.containers.SmartHashSet;
@@ -28,25 +30,26 @@ import org.elixir_lang.ElixirLanguage;
 import org.elixir_lang.Macro;
 import org.elixir_lang.annonator.Parameter;
 import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.Quote;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.call.MaybeExported;
 import org.elixir_lang.psi.call.StubBased;
+import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.NoParentheses;
 import org.elixir_lang.psi.call.arguments.star.NoParenthesesOneArgument;
-import org.elixir_lang.psi.call.arguments.None;
 import org.elixir_lang.psi.call.arguments.star.Parentheses;
 import org.elixir_lang.psi.call.name.Function;
 import org.elixir_lang.psi.operation.*;
-import org.elixir_lang.psi.operation.Normalized;
-import org.elixir_lang.psi.operation.Type;
-import org.elixir_lang.psi.operation.infix.*;
+import org.elixir_lang.psi.operation.infix.Position;
+import org.elixir_lang.psi.operation.infix.Triple;
 import org.elixir_lang.psi.qualification.Qualified;
 import org.elixir_lang.psi.qualification.Unqualified;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.elixir_lang.reference.Callable;
 import org.elixir_lang.sdk.ElixirSdkRelease;
-import org.elixir_lang.structure_view.element.*;
+import org.elixir_lang.structure_view.element.CallDefinitionClause;
+import org.elixir_lang.structure_view.element.CallDefinitionSpecification;
+import org.elixir_lang.structure_view.element.Callback;
+import org.elixir_lang.structure_view.element.Delegation;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.elixir_lang.structure_view.element.modular.Module;
 import org.elixir_lang.structure_view.element.modular.Protocol;
@@ -63,9 +66,7 @@ import java.util.stream.Stream;
 import static org.elixir_lang.errorreport.Logger.error;
 import static org.elixir_lang.intellij_elixir.Quoter.*;
 import static org.elixir_lang.psi.call.name.Function.*;
-import static org.elixir_lang.psi.call.name.Module.KERNEL;
-import static org.elixir_lang.psi.call.name.Module.prependElixirPrefix;
-import static org.elixir_lang.psi.call.name.Module.stripElixirPrefix;
+import static org.elixir_lang.psi.call.name.Module.*;
 import static org.elixir_lang.psi.stub.type.call.Stub.isModular;
 import static org.elixir_lang.reference.Callable.*;
 import static org.elixir_lang.reference.ModuleAttribute.isNonReferencing;
@@ -3053,7 +3054,7 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull Call call) {
+    private static PsiReference computeReference(@NotNull Call call) {
         PsiReference reference = null;
 
         /* if the call is just the identifier for a module attribute reference, then don't return a Callable reference,
@@ -3102,14 +3103,42 @@ public class ElixirPsiImplUtil {
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
-        PsiReference reference = null;
+    public static PsiReference getReference(@NotNull Call call) {
+        return CachedValuesManager.getCachedValue(
+                call,
+                () -> CachedValueProvider.Result.create(computeReference(call), call)
+        );
+    }
+
+    @Nullable
+    private static PsiPolyVariantReference computeReference(@NotNull QualifiableAlias qualifiableAlias,
+                                                            @NotNull PsiElement maxScope) {
+        PsiPolyVariantReference reference = null;
 
         if (isOutermostQualifiableAlias(qualifiableAlias)) {
-            reference = new org.elixir_lang.reference.Module(qualifiableAlias, qualifiableAlias.getContainingFile());
+            reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
         }
 
         return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull QualifiableAlias qualifiableAlias) {
+        return getReference(qualifiableAlias, qualifiableAlias.getContainingFile());
+    }
+
+    @Nullable
+    public static PsiPolyVariantReference getReference(@NotNull QualifiableAlias qualifiableAlias,
+                                                       @NotNull PsiElement maxScope) {
+        return CachedValuesManager.getCachedValue(
+                qualifiableAlias,
+                () -> CachedValueProvider.Result.create(computeReference(qualifiableAlias, maxScope), qualifiableAlias)
+        );
+    }
+
+    @NotNull
+    private static PsiReference computeReference(@NotNull final ElixirAtIdentifier atIdentifier) {
+        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
     }
 
     /**
@@ -3124,12 +3153,14 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        // reference the parent AtUnqualifiedNoParenthesesCall
-        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
+        return CachedValuesManager.getCachedValue(
+                atIdentifier,
+                () -> CachedValueProvider.Result.create(computeReference(atIdentifier), atIdentifier)
+        );
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    private static PsiReference computeReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
         PsiReference reference = null;
 
         if (!isNonReferencing(atNonNumericOperation)) {
@@ -3137,6 +3168,14 @@ public class ElixirPsiImplUtil {
         }
 
         return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return CachedValuesManager.getCachedValue(
+                atNonNumericOperation,
+                () -> CachedValueProvider.Result.create(computeReference(atNonNumericOperation), atNonNumericOperation)
+        );
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
@@ -5741,7 +5780,7 @@ if (quoted == null) {
             if (!recursiveKernelImport(qualifiableAlias, maxScope)) {
                 /* need to construct reference directly as qualified aliases don't return a reference except for the
                    outermost */
-                PsiPolyVariantReference reference = new org.elixir_lang.reference.Module(qualifiableAlias, maxScope);
+                PsiPolyVariantReference reference = getReference(qualifiableAlias, maxScope);
                 modular = aliasToModular(qualifiableAlias, reference);
             }
         }
