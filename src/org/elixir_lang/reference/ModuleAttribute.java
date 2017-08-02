@@ -4,24 +4,24 @@ import com.google.common.collect.Sets;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiPolyVariantReferenceBase;
+import com.intellij.psi.ResolveResult;
+import com.intellij.psi.impl.source.resolve.ResolveCache;
 import com.intellij.util.IncorrectOperationException;
-import com.intellij.util.containers.ContainerUtil;
 import org.apache.commons.lang.NotImplementedException;
-import org.elixir_lang.psi.*;
+import org.elixir_lang.psi.AtNonNumericOperation;
+import org.elixir_lang.psi.AtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.ElementFactory;
+import org.elixir_lang.psi.ElixirAtIdentifier;
 import org.elixir_lang.psi.call.Call;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
-import org.elixir_lang.psi.scope.module_attribute.implemetation.For;
-import org.elixir_lang.psi.scope.module_attribute.implemetation.Protocol;
 import org.elixir_lang.structure_view.element.modular.Implementation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static org.elixir_lang.psi.scope.MultiResolve.HAS_VALID_RESULT_CONDITION;
 
 /**
  * Created by limhoff on 12/30/15.
@@ -195,85 +195,19 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> resultList = new ArrayList<ResolveResult>();
-        boolean isNonReferencing = false;
-
-        if (myElement instanceof AtNonNumericOperation) {
-            isNonReferencing = isNonReferencing((AtNonNumericOperation) myElement);
-        } else if (myElement instanceof ElixirAtIdentifier) {
-            isNonReferencing = isNonReferencing((ElixirAtIdentifier) myElement);
-        }
-
-        if (!isNonReferencing) {
-            Boolean validResult;
-
-            validResult = validResult("@protocol", incompleteCode);
-
-            if (validResult != null) {
-                List<ResolveResult> resolveResultList = Protocol.resolveResultList(validResult, myElement);
-
-                if (resolveResultList != null) {
-                    resultList.addAll(resolveResultList);
-                }
-            }
-
-            if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                validResult = validResult("@for", incompleteCode);
-
-                if (validResult != null) {
-                    List<ResolveResult> resolveResultList = For.resolveResultList(validResult, myElement);
-
-                    if (resolveResultList != null) {
-                        resultList.addAll(resolveResultList);
-                    }
-                }
-
-                if (incompleteCode || !ContainerUtil.exists(resultList, HAS_VALID_RESULT_CONDITION)) {
-                    resultList.addAll(multiResolveUpFromElement(myElement, incompleteCode));
-                }
-            }
-        }
-
-        return resultList.toArray(new ResolveResult[resultList.size()]);
+        return ResolveCache
+                .getInstance(this.myElement.getProject())
+                .resolveWithCaching(
+                        this,
+                        org.elixir_lang.reference.resolver.ModuleAttribute.INSTANCE,
+                        false,
+                        incompleteCode
+                );
     }
 
     /*
      * Private Instance Methods
      */
-
-    private List<ResolveResult> multiResolveSibling(PsiElement lastSibling, boolean incompleteCode) {
-        List<ResolveResult> resultList = new ArrayList<ResolveResult>();
-
-        for (PsiElement sibling = lastSibling; sibling != null; sibling = sibling.getPrevSibling()) {
-            if (sibling instanceof AtUnqualifiedNoParenthesesCall) {
-                AtUnqualifiedNoParenthesesCall atUnqualifiedNoParenthesesCall = (AtUnqualifiedNoParenthesesCall) sibling;
-                String moduleAttributeName = ElixirPsiImplUtil.moduleAttributeName(atUnqualifiedNoParenthesesCall);
-                String value = getValue();
-
-                if (moduleAttributeName.equals(value)) {
-                    resultList.add(new PsiElementResolveResult(atUnqualifiedNoParenthesesCall));
-                } else if (incompleteCode && moduleAttributeName.startsWith(value)) {
-                    resultList.add(new PsiElementResolveResult(atUnqualifiedNoParenthesesCall, false));
-                }
-            }
-        }
-
-        return resultList;
-    }
-
-    @NotNull
-    private List<ResolveResult> multiResolveUpFromElement(@NotNull final PsiElement element, boolean incompleteCode) {
-        List<ResolveResult> resultList = new ArrayList<ResolveResult>();
-        PsiElement lastSibling = element;
-
-        while (lastSibling != null) {
-            resultList.addAll(multiResolveSibling(lastSibling, incompleteCode));
-
-            lastSibling = lastSibling.getParent();
-        }
-
-        return resultList;
-    }
 
     private List<LookupElement> getVariantsSibling(PsiElement lastSibling) {
         List<LookupElement> lookupElementList = new ArrayList<LookupElement>();
@@ -322,19 +256,5 @@ public class ModuleAttribute extends PsiPolyVariantReferenceBase<PsiElement> {
         }
 
         return lookupElementList;
-    }
-
-    @Nullable
-    private Boolean validResult(@NotNull String moduleAttributeName, boolean incompleteCode) {
-        Boolean validResult = null;
-        String value = getValue();
-
-        if (value.equals(moduleAttributeName)) {
-            validResult = true;
-        } else if (incompleteCode && moduleAttributeName.startsWith(value)) {
-            validResult = false;
-        }
-
-        return validResult;
     }
 }

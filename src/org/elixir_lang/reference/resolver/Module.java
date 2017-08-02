@@ -62,5 +62,4 @@ public class Module implements ResolveCache.PolyVariantResolver<org.elixir_lang.
 
         return resolveResults;
     }
-
 }
