@@ -3136,6 +3136,11 @@ public class ElixirPsiImplUtil {
         );
     }
 
+    @NotNull
+    private static PsiReference computeReference(@NotNull final ElixirAtIdentifier atIdentifier) {
+        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
+    }
+
     /**
      * <blockquote>
      *     The PSI element at the cursor (the direct tree parent of the token at the cursor position) must be either a
@@ -3148,12 +3153,14 @@ public class ElixirPsiImplUtil {
     @Contract(pure = true)
     @NotNull
     public static PsiReference getReference(@NotNull final ElixirAtIdentifier atIdentifier) {
-        // reference the parent AtUnqualifiedNoParenthesesCall
-        return new org.elixir_lang.reference.ModuleAttribute(atIdentifier);
+        return CachedValuesManager.getCachedValue(
+                atIdentifier,
+                () -> CachedValueProvider.Result.create(computeReference(atIdentifier), atIdentifier)
+        );
     }
 
     @Nullable
-    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+    private static PsiReference computeReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
         PsiReference reference = null;
 
         if (!isNonReferencing(atNonNumericOperation)) {
@@ -3161,6 +3168,14 @@ public class ElixirPsiImplUtil {
         }
 
         return reference;
+    }
+
+    @Nullable
+    public static PsiReference getReference(@NotNull final AtNonNumericOperation atNonNumericOperation) {
+        return CachedValuesManager.getCachedValue(
+                atNonNumericOperation,
+                () -> CachedValueProvider.Result.create(computeReference(atNonNumericOperation), atNonNumericOperation)
+        );
     }
 
     public static boolean hasDoBlockOrKeyword(@NotNull final Call call) {
