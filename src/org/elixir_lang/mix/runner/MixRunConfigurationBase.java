@@ -18,6 +18,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.containers.hash.LinkedHashMap;
 import com.intellij.util.xmlb.SerializationFilter;
 import com.intellij.util.xmlb.XmlSerializer;
+import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.runconfig.ElixirModuleBasedConfiguration;
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -100,23 +101,15 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
   }
 
   @NotNull
-  public List<String> getMixArgs() {
+  public ParametersList mixParametersList() {
     String programParameters = getProgramParameters();
-    List<String> mixArgs = null;
+    ParametersList parametersList = new ParametersList();
 
     if (programParameters != null) {
-      String trimmedProgramParameters = programParameters.trim();
-
-      if (trimmedProgramParameters.length() > 0) {
-        mixArgs = Arrays.asList(programParameters.split("\\s+"));
-      }
+      parametersList.addAll(ParametersList.parse(programParameters));
     }
 
-    if (mixArgs == null) {
-      mixArgs = new ArrayList<>();
-    }
-
-    return mixArgs;
+    return parametersList;
   }
 
   @NotNull

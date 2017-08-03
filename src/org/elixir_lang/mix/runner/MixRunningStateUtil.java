@@ -2,7 +2,6 @@ package org.elixir_lang.mix.runner;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.ParametersList;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -17,7 +16,7 @@ import org.elixir_lang.mix.settings.MixSettings;
 import org.elixir_lang.sdk.ElixirSdkType;
 import org.elixir_lang.utils.ElixirExternalToolsNotificationListener;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.elixir_lang.jps.builder.ParametersList;
 
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class MixRunningStateUtil {
   public static GeneralCommandLine addNewSkipDependencies(@NotNull GeneralCommandLine commandLine,
                                                           @NotNull MixRunConfigurationBase configuration) {
     if (configuration.isSkipDependencies()) {
-      ParametersList parametersList = commandLine.getParametersList();
+      com.intellij.execution.configurations.ParametersList parametersList = commandLine.getParametersList();
 
       if (!parametersList.hasParameter(SKIP_DEPENDENCIES_PARAMETER)) {
         parametersList.add(SKIP_DEPENDENCIES_PARAMETER);
@@ -161,15 +160,17 @@ public class MixRunningStateUtil {
   }
 
   public static GeneralCommandLine commandLine(@NotNull MixRunConfigurationBase configuration,
-                                               @NotNull List<String> elixirParams,
-                                               @NotNull List<String> mixParams) {
+                                               @NotNull ParametersList elixirParametersList,
+                                               @NotNull ParametersList mixParametersList) {
 
     GeneralCommandLine commandLine = getBaseMixCommandLine(configuration);
 
     Project project = configuration.getProject();
     String mixPath = mixPath(project);
 
-    if (mixPath.endsWith(".bat") && elixirParams.isEmpty()) {
+    List<String> elixirParameterList = elixirParametersList.getList();
+
+    if (mixPath.endsWith(".bat") && elixirParameterList.isEmpty()) {
       commandLine.setExePath(mixPath);
     } else {
       mixPath = stripEnd(mixPath, ".bat");
@@ -177,11 +178,11 @@ public class MixRunningStateUtil {
       String elixirPath = elixirPath(sdkPath);
 
       commandLine.setExePath(elixirPath);
-      commandLine.addParameters(elixirParams);
+      commandLine.addParameters(elixirParameterList);
       commandLine.addParameter(mixPath);
     }
 
-    commandLine.addParameters(mixParams);
+    commandLine.addParameters(mixParametersList.getList());
 
     return addNewSkipDependencies(commandLine, configuration);
   }

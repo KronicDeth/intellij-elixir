@@ -7,13 +7,10 @@ import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.settings.MixSettings;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
   MixExUnitRunConfiguration(@NotNull String name, @NotNull Project project){
@@ -34,15 +31,17 @@ public final class MixExUnitRunConfiguration extends MixRunConfigurationBase {
   }
 
   @NotNull
-  public List<String> getMixArgs() {
-    List<String> params = super.getMixArgs();
+  public ParametersList mixParametersList() {
+    ParametersList superParametersList = super.mixParametersList();
+    ParametersList parametersList = new ParametersList();
+
     MixSettings mixSettings = MixSettings.getInstance(getProject());
-
     String task = mixSettings.getSupportsFormatterOption() ? "test" : "test_with_formatter";
+    parametersList.add(task);
 
-    ArrayList<String> mixArgs = new ArrayList<>();
-    mixArgs.addAll(Arrays.asList(task, "--formatter", "TeamCityExUnitFormatter"));
-    mixArgs.addAll(params);
-    return mixArgs;
+    parametersList.addAll("--formatter", "TeamCityExUnitFormatter");
+    parametersList.addAll(superParametersList.getParameters());
+
+    return parametersList;
   }
 }

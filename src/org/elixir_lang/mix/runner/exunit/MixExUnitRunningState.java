@@ -16,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
+import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
@@ -143,18 +144,19 @@ final class MixExUnitRunningState extends MixRunningState {
   }
 
   @NotNull
-  private static List<String> elixirParams(@NotNull Collection<File> elixirModuleFileCollection) {
-    ArrayList<String> elixirParams = new ArrayList<>();
+  private static ParametersList elixirParametersList(@NotNull Collection<File> elixirModuleFileCollection) {
+    ParametersList parametersList = new ParametersList();
+
     for (File elixirModuleFile : elixirModuleFileCollection) {
-      elixirParams.add("-r");
-      elixirParams.add(String.valueOf(elixirModuleFile));
+      parametersList.add("-r");
+      parametersList.add(String.valueOf(elixirModuleFile));
     }
 
-    return elixirParams;
+    return parametersList;
   }
 
   @NotNull
-  public List<String> setupElixirParams(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
+  public ParametersList setupElixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
     List<File> elixirModuleFileList = new ArrayList<>();
 
     try {
@@ -179,6 +181,6 @@ final class MixExUnitRunningState extends MixRunningState {
       throw new ExecutionException(e);
     }
 
-    return elixirParams(elixirModuleFileList);
+    return elixirParametersList(elixirModuleFileList);
   }
 }
