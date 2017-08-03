@@ -102,12 +102,21 @@ public abstract class MixRunConfigurationBase extends ModuleBasedConfiguration<E
   @NotNull
   public List<String> getMixArgs() {
     String programParameters = getProgramParameters();
+    List<String> mixArgs = null;
 
     if (programParameters != null) {
-      return Arrays.asList(programParameters.split("\\s+"));
-    } else {
-      return new ArrayList<>(0);
+      String trimmedProgramParameters = programParameters.trim();
+
+      if (trimmedProgramParameters.length() > 0) {
+        mixArgs = Arrays.asList(programParameters.split("\\s+"));
+      }
     }
+
+    if (mixArgs == null) {
+      mixArgs = new ArrayList<>();
+    }
+
+    return mixArgs;
   }
 
   @NotNull
