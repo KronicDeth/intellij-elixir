@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.ComparisonFailure;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import static org.apache.commons.lang.CharUtils.isAsciiPrintable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -20,14 +19,13 @@ import static org.junit.Assert.*;
  * Created by luke.imhoff on 12/31/14.
  */
 public class Quoter {
-    public static final OtpErlangAtom CODE_KEY = new OtpErlangAtom("code");
-    public static final OtpErlangAtom QUOTED_KEY = new OtpErlangAtom("quoted");
     /* remote name is Elixir.IntellijElixir.Quoter because all aliases in Elixir look like atoms prefixed with
        with Elixir. from erlang's perspective. */
-    public static final String REMOTE_NAME = "Elixir.IntellijElixir.Quoter";
-    public static final int TIMEOUT_IN_MILLISECONDS = 1000;
+    private static final String REMOTE_NAME = "Elixir.IntellijElixir.Quoter";
+    private static final int TIMEOUT_IN_MILLISECONDS = 1000;
 
-    public static void assertMessageReceived(OtpErlangObject message) {
+    @Contract("null -> fail")
+    private static void assertMessageReceived(OtpErlangObject message) {
         assertNotNull(
                 "did not receive message from " + REMOTE_NAME + "@" + IntellijElixir.REMOTE_NODE + ".  Make sure it is running",
                 message
@@ -46,11 +44,7 @@ public class Quoter {
 
             assertEquals(statusString, "error");
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (OtpErlangDecodeException e) {
-            throw new RuntimeException(e);
-        } catch (OtpErlangExit e) {
+        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,12 +56,8 @@ public class Quoter {
         try {
             Quoter.quote(text);
         }
-        catch (IOException ioExeption) {
-            exception = ioExeption;
-        } catch (OtpErlangDecodeException otpErlangDecodeException) {
-            exception = otpErlangDecodeException;
-        } catch (OtpErlangExit otpErlangExit) {
-            exception = otpErlangExit;
+        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
+            exception = e;
         }
 
         assertThat(exception, instanceOf(OtpErlangExit.class));
@@ -105,29 +95,16 @@ public class Quoter {
                 );
             }
         }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (OtpErlangDecodeException e) {
-            throw new RuntimeException(e);
-        } catch (OtpErlangExit e) {
+        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void assertQuotedCorrectly(@NotNull OtpErlangObject expectedQuoted,
-                                             @NotNull OtpErlangObject actualQuoted) {
+    private static void assertQuotedCorrectly(@NotNull OtpErlangObject expectedQuoted,
+                                              @NotNull OtpErlangObject actualQuoted) {
         if(!expectedQuoted.equals(actualQuoted)) {
             throw new ComparisonFailure(null, toString(expectedQuoted), toString(actualQuoted));
         }
-    }
-
-    @Contract(pure = true)
-    @NotNull
-    public static String code(@NotNull OtpErlangMap quotedMessageMap) {
-        OtpErlangBinary actualElixirString = (OtpErlangBinary) quotedMessageMap.get(CODE_KEY);
-        byte[] actualBytes = actualElixirString.binaryValue();
-
-        return new String(actualBytes, Charset.forName("UTF-8"));
     }
 
     public static OtpErlangTuple quote(@NotNull String code) throws IOException, OtpErlangExit, OtpErlangDecodeException {
@@ -146,7 +123,7 @@ public class Quoter {
     }
 
     @NotNull
-    public static String toString(@NotNull OtpErlangBitstr quoted) {
+    private static String toString(@NotNull OtpErlangBitstr quoted) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append('"');
 
@@ -166,7 +143,7 @@ public class Quoter {
     }
 
     @NotNull
-    public static String toString(@NotNull OtpErlangList quoted) {
+    private static String toString(@NotNull OtpErlangList quoted) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("[");
@@ -185,7 +162,7 @@ public class Quoter {
     }
 
     @NotNull
-    public static String toString(@NotNull OtpErlangObject quoted) {
+    private static String toString(@NotNull OtpErlangObject quoted) {
         String string;
 
         if (quoted instanceof OtpErlangBoolean ||
@@ -216,7 +193,7 @@ public class Quoter {
     }
 
     @NotNull
-    public static String toString(@NotNull OtpErlangTuple quoted) {
+    private static String toString(@NotNull OtpErlangTuple quoted) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("{");
