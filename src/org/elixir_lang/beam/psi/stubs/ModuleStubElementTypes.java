@@ -41,7 +41,7 @@ public interface ModuleStubElementTypes {
 
             String macro = dataStream.readName().toString();
 
-            assert dataStream.readInt() == CallDefinitionStubImpl.RESOLVED_FINAL_ARITY;
+            assert dataStream.readVarInt() == CallDefinitionStubImpl.RESOLVED_FINAL_ARITY;
             assert dataStream.readBoolean() == CallDefinitionStubImpl.HAS_DO_BLOCK_OR_KEYWORD;
 
             StringRef nameRef = dataStream.readName();
@@ -52,7 +52,7 @@ public interface ModuleStubElementTypes {
             assert canonicalNameRefSet.size() == 1;
             assert canonicalNameRefSet.iterator().next().toString().equals(name);
 
-            int callDefinitionClauseArity = dataStream.readInt();
+            int callDefinitionClauseArity = dataStream.readVarInt();
 
             return new CallDefinitionStubImpl((ModuleStub) parentStub, macro, name, callDefinitionClauseArity);
         }
@@ -60,7 +60,7 @@ public interface ModuleStubElementTypes {
         @Override
         public void serialize(@NotNull CallDefinitionStub stub, @NotNull StubOutputStream dataStream) throws IOException {
             super.serialize(stub, dataStream);
-            dataStream.writeInt(stub.callDefinitionClauseHeadArity());
+            dataStream.writeVarInt(stub.callDefinitionClauseHeadArity());
         }
     };
 
@@ -85,7 +85,7 @@ public interface ModuleStubElementTypes {
                                       @NotNull StubElement parentStub) throws IOException {
             assert dataStream.readName().toString().equals(ModuleStubImpl.RESOLVED_MODULE_NAME);
             assert dataStream.readName().toString().equals(ModuleStubImpl.RESOLVED_FUNCTION_NAME);
-            assert dataStream.readInt() == ModuleStubImpl.RESOLVED_FINAL_ARITY;
+            assert dataStream.readVarInt() == ModuleStubImpl.RESOLVED_FINAL_ARITY;
             assert dataStream.readBoolean() == ModuleStubImpl.HAS_DO_BLOCK_OR_KEYWORD;
 
             StringRef nameRef = dataStream.readName();

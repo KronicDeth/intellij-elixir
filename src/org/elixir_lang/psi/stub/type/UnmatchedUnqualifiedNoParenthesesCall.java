@@ -52,7 +52,7 @@ public class UnmatchedUnqualifiedNoParenthesesCall extends Stub<org.elixir_lang.
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

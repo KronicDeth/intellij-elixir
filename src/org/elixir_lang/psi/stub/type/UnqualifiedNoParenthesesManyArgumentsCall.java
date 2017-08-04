@@ -50,7 +50,7 @@ public class UnqualifiedNoParenthesesManyArgumentsCall extends Stub<org.elixir_l
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

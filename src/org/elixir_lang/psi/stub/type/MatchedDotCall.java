@@ -50,7 +50,7 @@ public class MatchedDotCall extends Stub<org.elixir_lang.psi.stub.MatchedDotCall
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

@@ -50,7 +50,7 @@ public class UnmatchedAtUnqualifiedNoParenthesesCall extends Stub<org.elixir_lan
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class StubBuilder implements BinaryFileStubBuilder {
     private static final Logger LOGGER = Logger.getInstance(StubBuilder.class);
-    private static final int STUB_VERSION = 0;
+    private static final int STUB_VERSION = 1;
 
     /**
      * @param file a .beam file

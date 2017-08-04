@@ -50,7 +50,7 @@ public class MatchedQualifiedNoArgumentsCall extends Stub<org.elixir_lang.psi.st
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

@@ -50,7 +50,7 @@ public class UnmatchedUnqualifiedNoArgumentsCall extends Stub<org.elixir_lang.ps
                 this,
                 dataStream.readName(),
                 dataStream.readName(),
-                dataStream.readInt(),
+                dataStream.readVarInt(),
                 dataStream.readBoolean(),
                 dataStream.readName(),
                 readNameSet(dataStream)

@@ -18,7 +18,6 @@ import org.elixir_lang.structure_view.element.modular.Protocol;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 
 public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
@@ -33,7 +32,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
     }
 
     public static Set<StringRef> readNameSet(@NotNull StubInputStream dataStream) throws IOException {
-        int nameSetSize = dataStream.readInt();
+        int nameSetSize = dataStream.readVarInt();
 
         Set<StringRef> nameSet = new THashSet<>(nameSetSize);
 
@@ -48,7 +47,7 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
                                                             @NotNull StubOutputStream dataStream) throws IOException {
         dataStream.writeName(stub.resolvedModuleName());
         dataStream.writeName(stub.resolvedFunctionName());
-        dataStream.writeInt(stub.resolvedFinalArity());
+        dataStream.writeVarInt(stub.resolvedFinalArity());
         dataStream.writeBoolean(stub.hasDoBlockOrKeyword());
         dataStream.writeName(stub.getName());
         writeNameSet(dataStream, stub.canonicalNameSet());
@@ -59,10 +58,10 @@ public abstract class Stub<Stub extends org.elixir_lang.psi.stub.call.Stub<Psi>,
      */
 
     private static void writeNameSet(@NotNull StubOutputStream dataStream,
-                                     @NotNull Collection<String> nameCollection) throws IOException {
-        dataStream.writeInt(nameCollection.size());
+                                     @NotNull Set<String> nameSet) throws IOException {
+        dataStream.writeVarInt(nameSet.size());
 
-        for (String name : nameCollection) {
+        for (String name : nameSet) {
             dataStream.writeName(name);
         }
     }
