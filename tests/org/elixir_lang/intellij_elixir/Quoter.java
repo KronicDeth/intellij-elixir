@@ -2,7 +2,6 @@ package org.elixir_lang.intellij_elixir;
 
 import com.ericsson.otp.erlang.*;
 import com.intellij.psi.PsiFile;
-import org.apache.commons.lang.NotImplementedException;
 import org.elixir_lang.GenericServer;
 import org.elixir_lang.IntellijElixir;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
@@ -12,7 +11,6 @@ import org.junit.ComparisonFailure;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import static org.apache.commons.lang.CharUtils.isAsciiPrintable;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -95,10 +93,10 @@ public class Quoter {
                 OtpErlangLong line = (OtpErlangLong) error.elementAt(0);
 
                 OtpErlangBinary messageBinary = (OtpErlangBinary) error.elementAt(1);
-                String message = javaString(messageBinary);
+                String message = ElixirPsiImplUtil.javaString(messageBinary);
 
                 OtpErlangBinary tokenBinary = (OtpErlangBinary) error.elementAt(2);
-                String token = javaString(tokenBinary);
+                String token = ElixirPsiImplUtil.javaString(tokenBinary);
 
                 throw new AssertionError(
                         "intellij_elixir returned \"" + message + "\" on line " + line + " due to " + token  +
@@ -132,118 +130,10 @@ public class Quoter {
         return new String(actualBytes, Charset.forName("UTF-8"));
     }
 
-    @NotNull
-    public static OtpErlangObject elixirCharList(@NotNull final List<Integer> codePointList) {
-        OtpErlangList elixirCodePointList = elixirCodePointList(codePointList);
-
-        return elixirCharList(elixirCodePointList);
-    }
-
-    /*
-     * Erlang will automatically stringify a list that is just a list of LATIN-1 printable code
-     * points.
-     * OtpErlangString and OtpErlangList are not equal when they have the same content, so to check against
-     * Elixir.Code.string_to_quoted, this code must determine if Erlang would return an OtpErlangString instead
-     * of OtpErlangList and do the same.
-     */
-    @NotNull
-    public static OtpErlangObject elixirCharList(@NotNull final OtpErlangList erlangList) {
-        OtpErlangObject charList;
-
-        /* JInterface will return an OtpErlangString in some case and an OtpErlangList in other.  Right now, I'm
-           assuming it works similar to the printing in `iex` and is based on whether the codePoint is printable, but
-           ASCII printable instead of Unicode printable since Erlang is ASCII/LATIN-1 based */
-        if (isErlangPrintable(erlangList))  {
-            try {
-                charList = new OtpErlangString(erlangList);
-            } catch (OtpErlangException e) {
-                throw new NotImplementedException(e);
-            }
-        } else {
-            charList = erlangList;
-        }
-
-        return charList;
-    }
-
-    @NotNull
-    public static OtpErlangList elixirCodePointList(@NotNull final List<Integer> codePointList) {
-        OtpErlangLong[] erlangCodePoints = new OtpErlangLong[codePointList.size()];
-
-        int i = 0;
-        for (int codePoint : codePointList) {
-            erlangCodePoints[i++] = new OtpErlangLong(codePoint);
-        }
-
-        return new OtpErlangList(erlangCodePoints);
-    }
-
-    public static boolean isErlangPrintable(@NotNull final OtpErlangList erlangList) {
-        boolean isErlangPrintable = true;
-
-        for (OtpErlangObject erlangObject : erlangList) {
-
-            if (erlangObject instanceof OtpErlangLong) {
-                OtpErlangLong erlangLong = (OtpErlangLong) erlangObject;
-
-                final int codePoint;
-
-                try {
-                    codePoint = erlangLong.intValue();
-                } catch (OtpErlangRangeException e) {
-                    isErlangPrintable = false;
-                    break;
-                }
-
-                if (!isErlangPrintable(codePoint)) {
-                    isErlangPrintable = false;
-                    break;
-                }
-            } else {
-                isErlangPrintable = false;
-                break;
-            }
-        }
-
-        if (erlangList.arity() == 0) {
-            isErlangPrintable = false;
-        }
-
-        return isErlangPrintable;
-    }
-
-    @NotNull
-    public static OtpErlangBinary elixirString(@NotNull final List<Integer> codePointList) {
-        StringBuilder stringAccumulator = new StringBuilder();
-
-        for (int codePoint : codePointList) {
-            stringAccumulator.appendCodePoint(codePoint);
-        }
-
-        return elixirString(stringAccumulator.toString());
-    }
-
-    @NotNull
-    public static OtpErlangBinary elixirString(@NotNull String javaString) {
-        final byte[] bytes = javaString.getBytes(Charset.forName("UTF-8"));
-        return new OtpErlangBinary(bytes);
-    }
-
-    @Contract(pure = true)
-    public static boolean isErlangPrintable(int codePoint) {
-        return (codePoint >= 0 && codePoint <= 255);
-    }
-
-    @NotNull
-    public static String javaString(@NotNull OtpErlangBinary elixirString) {
-        byte[] bytes = elixirString.binaryValue();
-        return new String(bytes, Charset.forName("UTF-8"));
-    }
-
     public static OtpErlangTuple quote(@NotNull String code) throws IOException, OtpErlangExit, OtpErlangDecodeException {
         final OtpNode otpNode = IntellijElixir.getLocalNode();
         final OtpMbox otpMbox = otpNode.createMbox();
-        OtpErlangObject request = elixirString(code);
+        OtpErlangObject request = ElixirPsiImplUtil.elixirString(code);
 
         return (OtpErlangTuple) GenericServer.call(
                 otpMbox,
