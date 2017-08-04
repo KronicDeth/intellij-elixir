@@ -137,6 +137,7 @@
               <code>Module#multiResolve</code>, and <code>ModuleAttribute#multiResolve</code>, which are all the extant
               references, can be cached and invalidated correctly.
             </li>
+            <li>Use <code>ParameterLists</code> to support Path Variables in program parameters.</li>
           </ul>
         </li>
         <li>
@@ -259,6 +260,8 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Look above <code>List</code> for enclosing modular macro.</li>
             <li>Look above <code>ElixirNoParenthesesManyStrictNoParenthesesExpression</code> for enclosing modular macro.</li>
             <li>Remove background color from Sigil Color Scheme Design to match changes in <a href="https://github.com/KronicDeth/intellij-elixir/pull/757">#757</a>.</li>
+            <li>Check if program parameters is blank before splitting into mix args.</li>
+            <li>Use <code>ParametersList</code> to properly parse quote program parameters.</li>
           </ul>
         </li>
         <li>
