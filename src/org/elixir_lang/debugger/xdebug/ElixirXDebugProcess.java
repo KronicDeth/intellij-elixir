@@ -54,6 +54,7 @@ import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
 import org.elixir_lang.debugger.node.ElixirDebuggerNode;
 import org.elixir_lang.debugger.node.ElixirDebuggerNodeException;
 import org.elixir_lang.debugger.node.ElixirProcessSnapshot;
+import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunConfigurationBase;
 import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixRunningStateUtil;
@@ -65,7 +66,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -343,7 +343,7 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
     OSProcessHandler elixirProcessHandler;
     LOG.debug("Preparing to run debug target.");
 
-    ArrayList<String> elixirParams = new ArrayList<>();
+    ParametersList elixirParametersList = new ParametersList();
     RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
     RunConfiguration runConfiguration = null;
 
@@ -351,19 +351,27 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
       runConfiguration = runnerAndConfigurationSettings.getConfiguration();
     }
 
-    elixirParams.addAll(myRunningState.setupElixirParams(runConfiguration));
-    elixirParams.addAll(setUpElixirDebuggerCodePath());
+    elixirParametersList.addAll(myRunningState.setupElixirParametersList(runConfiguration).getList());
+    elixirParametersList.addAll(setUpElixirDebuggerCodePath());
 
-    List<String> mixParams = new ArrayList<>();
-    mixParams.addAll(Arrays.asList("intellij_elixir.debug_task", "--debugger-port", "" + myDebuggerNode.getLocalDebuggerPort(), "--"));
-    List<String> mixCommandArgs = getRunConfiguration().getMixArgs();
-    mixParams.addAll(mixCommandArgs);
-    if (getRunConfiguration() instanceof MixExUnitRunConfiguration && !mixCommandArgs.contains("--trace")) {
+    ParametersList mixParametersList = new ParametersList();
+    mixParametersList.addAll(
+            "intellij_elixir.debug_task",
+            "--debugger-port",
+            Integer.toString(myDebuggerNode.getLocalDebuggerPort()),
+            "--"
+    );
+    MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
+    ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
+    mixParametersList.addAll(runConfigurationMixParametersList.getList());
+
+    if (mixRunConfigurationBase instanceof MixExUnitRunConfiguration &&
+            !runConfigurationMixParametersList.getList().contains("--trace")) {
       // Prevents tests from timing out while debugging
-      mixParams.add("--trace");
+      mixParametersList.add("--trace");
     }
 
-    GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(getRunConfiguration(), elixirParams, mixParams);
+    GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(mixRunConfigurationBase, elixirParametersList, mixParametersList);
 
     LOG.debug("Running debugger process. Command line (platform-independent): ");
     LOG.debug(commandLine.getCommandLineString());
