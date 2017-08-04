@@ -24,14 +24,6 @@ public class Quoter {
     private static final String REMOTE_NAME = "Elixir.IntellijElixir.Quoter";
     private static final int TIMEOUT_IN_MILLISECONDS = 1000;
 
-    @Contract("null -> fail")
-    private static void assertMessageReceived(OtpErlangObject message) {
-        assertNotNull(
-                "did not receive message from " + REMOTE_NAME + "@" + IntellijElixir.REMOTE_NODE + ".  Make sure it is running",
-                message
-        );
-    }
-
     public static void assertError(PsiFile file) {
         final String text = file.getText();
 
@@ -43,8 +35,7 @@ public class Quoter {
             String statusString = status.atomValue();
 
             assertEquals(statusString, "error");
-        }
-        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
+        } catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
             throw new RuntimeException(e);
         }
     }
@@ -55,12 +46,19 @@ public class Quoter {
 
         try {
             Quoter.quote(text);
-        }
-        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
+        } catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
             exception = e;
         }
 
         assertThat(exception, instanceOf(OtpErlangExit.class));
+    }
+
+    @Contract("null -> fail")
+    private static void assertMessageReceived(OtpErlangObject message) {
+        assertNotNull(
+                "did not receive message from " + REMOTE_NAME + "@" + IntellijElixir.REMOTE_NODE + ".  Make sure it is running",
+                message
+        );
     }
 
     public static void assertQuotedCorrectly(PsiFile file) {
@@ -89,20 +87,19 @@ public class Quoter {
                 String token = ElixirPsiImplUtil.javaString(tokenBinary);
 
                 throw new AssertionError(
-                        "intellij_elixir returned \"" + message + "\" on line " + line + " due to " + token  +
+                        "intellij_elixir returned \"" + message + "\" on line " + line + " due to " + token +
                                 ", use assertQuotesAroundError if error is expect in Elixir natively, " +
                                 "but not in intellij-elixir plugin"
                 );
             }
-        }
-        catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
+        } catch (IOException | OtpErlangDecodeException | OtpErlangExit e) {
             throw new RuntimeException(e);
         }
     }
 
     private static void assertQuotedCorrectly(@NotNull OtpErlangObject expectedQuoted,
                                               @NotNull OtpErlangObject actualQuoted) {
-        if(!expectedQuoted.equals(actualQuoted)) {
+        if (!expectedQuoted.equals(actualQuoted)) {
             throw new ComparisonFailure(null, toString(expectedQuoted), toString(actualQuoted));
         }
     }
@@ -148,7 +145,7 @@ public class Quoter {
 
         stringBuilder.append("[");
 
-        for (int i = 0; i< quoted.arity(); i++) {
+        for (int i = 0; i < quoted.arity(); i++) {
             if (i > 0) {
                 stringBuilder.append(",");
             }
