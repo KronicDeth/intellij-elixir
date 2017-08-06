@@ -5,6 +5,7 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirMatchedQualifiedParenthesesCall;
 import org.elixir_lang.psi.impl.ElixirMatchedQualifiedParenthesesCallImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,16 +45,10 @@ public class MatchedQualifiedParenthesesCall extends Stub<org.elixir_lang.psi.st
 
     @NotNull
     @Override
-    public org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall(
-                parentStub,
-                this,
-                dataStream.readName(),
-                dataStream.readName(),
-                dataStream.readVarInt(),
-                dataStream.readBoolean(),
-                dataStream.readName(),
-                readNameSet(dataStream)
-        );
+    public org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall deserialize(@NotNull StubInputStream dataStream,
+                                                                                StubElement parentStub)
+            throws IOException {
+        Deserialized deserialized = Deserialized.deserialize(dataStream);
+        return new org.elixir_lang.psi.stub.MatchedQualifiedParenthesesCall(parentStub, this, deserialized);
     }
 }

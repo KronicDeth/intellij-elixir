@@ -2,36 +2,20 @@ package org.elixir_lang.psi.stub;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.ElixirMatchedQualifiedNoParenthesesCall;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Set;
 
 public class MatchedQualifiedNoParenthesesCall extends Stub<ElixirMatchedQualifiedNoParenthesesCall> {
     public MatchedQualifiedNoParenthesesCall(
             StubElement parent,
             @NotNull IStubElementType elementType,
-            @Nullable StringRef resolvedModuleName,
-            @Nullable StringRef resolvedFunctionName,
-            int resolvedFinalArity,
-            boolean hasDoBlockOrKeyword,
-            @NotNull StringRef name,
-            @NotNull Set<StringRef> canonicalNameSet
-    ) {
-        super(
-                parent,
-                elementType,
-                resolvedModuleName,
-                resolvedFunctionName,
-                resolvedFinalArity,
-                hasDoBlockOrKeyword,
-                name,
-                canonicalNameSet
-        );
+            @NotNull Deserialized deserialized) {
+        super(parent, elementType, deserialized);
     }
 
     public MatchedQualifiedNoParenthesesCall(

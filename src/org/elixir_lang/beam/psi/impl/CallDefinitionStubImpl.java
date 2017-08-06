@@ -1,11 +1,15 @@
 package org.elixir_lang.beam.psi.impl;
 
+import com.intellij.util.io.StringRef;
 import org.elixir_lang.beam.psi.CallDefinition;
 import org.elixir_lang.beam.psi.stubs.CallDefinitionStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
 
@@ -35,6 +39,30 @@ public class CallDefinitionStubImpl<T extends CallDefinition> extends StubbicBas
      */
     private final int callDefinitionClauseHeadArity;
 
+    public CallDefinitionStubImpl(@NotNull ModuleStub parentStub,
+                                  @NotNull Deserialized deserialized,
+                                  int callDefinitionClauseHeadArity) {
+        super(parentStub, ModuleStubElementTypes.CALL_DEFINITION, deserialized.name.toString());
+
+        StringRef resolvedModuleName = deserialized.resolvedModuleName;
+        assert resolvedModuleName != null;
+        assert resolvedModuleName.toString().equals(RESOLVED_MODULE_NAME);
+
+        StringRef resolvedFunctionName = deserialized.resolvedFunctionName;
+        assert resolvedFunctionName != null;
+
+        this.resolvedFunctionName = resolvedFunctionName.toString();
+
+        assert deserialized.resolvedFinalArity == RESOLVED_FINAL_ARITY;
+
+        assert deserialized.hasDoBlockOrKeyword == HAS_DO_BLOCK_OR_KEYWORD;
+
+        Set<StringRef> canonicalNameSet = deserialized.canonicalNameSet;
+        assert canonicalNameSet.size() == 1;
+        assert canonicalNameSet.iterator().next().toString().equals(this.getName());
+
+        this.callDefinitionClauseHeadArity = callDefinitionClauseHeadArity;
+    }
 
     public CallDefinitionStubImpl(@NotNull ModuleStub parentStub,
                                   @NotNull String macro,

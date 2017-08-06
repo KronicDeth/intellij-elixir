@@ -10,8 +10,6 @@ import org.elixir_lang.psi.call.Call;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
 
 // I normally wouldn't add the redundant StubBased prefix, but it makes generating from Elixir.bnf work
@@ -72,6 +70,21 @@ public class Stub<T extends org.elixir_lang.psi.call.StubBased> extends NamedStu
     }
 
     public Stub(StubElement parent,
+                @NotNull IStubElementType elementType,
+                @NotNull Deserialized deserialized) {
+        this(
+                parent,
+                elementType,
+                deserialized.resolvedModuleName,
+                deserialized.resolvedFunctionName,
+                deserialized.resolvedFinalArity,
+                deserialized.hasDoBlockOrKeyword,
+                deserialized.name,
+                deserialized.canonicalNameSet
+        );
+    }
+
+    private Stub(StubElement parent,
                 @NotNull IStubElementType elementType,
                 @Nullable StringRef resolvedModuleName,
                 @Nullable StringRef resolvedFunctionName,

@@ -5,8 +5,10 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirUnqualifiedNoParenthesesManyArgumentsCall;
 import org.elixir_lang.psi.impl.ElixirUnqualifiedNoParenthesesManyArgumentsCallImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -44,16 +46,11 @@ public class UnqualifiedNoParenthesesManyArgumentsCall extends Stub<org.elixir_l
 
     @NotNull
     @Override
-    public org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall(
-                parentStub,
-                this,
-                dataStream.readName(),
-                dataStream.readName(),
-                dataStream.readVarInt(),
-                dataStream.readBoolean(),
-                dataStream.readName(),
-                readNameSet(dataStream)
-        );
+    public org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall deserialize(
+            @NotNull StubInputStream dataStream,
+            @Nullable StubElement parentStub
+    ) throws IOException {
+        Deserialized deserialized = Deserialized.deserialize(dataStream);
+        return new org.elixir_lang.psi.stub.UnqualifiedNoParenthesesManyArgumentsCall(parentStub, this, deserialized);
     }
 }

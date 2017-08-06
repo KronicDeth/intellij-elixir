@@ -4,6 +4,7 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirUnmatchedUnqualifiedParenthesesCall;
 import org.elixir_lang.psi.impl.ElixirUnmatchedUnqualifiedParenthesesCallImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,15 +51,7 @@ public class UnmatchedUnqualifiedParenthesesCall extends Stub<org.elixir_lang.ps
             @NotNull StubInputStream dataStream,
             StubElement parentStub
     ) throws IOException {
-        return new org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall(
-                parentStub,
-                this,
-                dataStream.readName(),
-                dataStream.readName(),
-                dataStream.readVarInt(),
-                dataStream.readBoolean(),
-                dataStream.readName(),
-                readNameSet(dataStream)
-        );
+        Deserialized deserialized = Deserialized.deserialize(dataStream);
+        return new org.elixir_lang.psi.stub.UnmatchedUnqualifiedParenthesesCall(parentStub, this, deserialized);
     }
 }

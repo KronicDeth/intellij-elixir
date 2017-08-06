@@ -5,8 +5,10 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirMatchedDotCall;
 import org.elixir_lang.psi.impl.ElixirMatchedDotCallImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -28,6 +30,7 @@ public class MatchedDotCall extends Stub<org.elixir_lang.psi.stub.MatchedDotCall
         return new ElixirMatchedDotCallImpl(stub, this);
     }
 
+    @NotNull
     @Override
     public org.elixir_lang.psi.stub.MatchedDotCall createStub(@NotNull ElixirMatchedDotCall psi, StubElement parentStub) {
         return new org.elixir_lang.psi.stub.MatchedDotCall(
@@ -44,16 +47,9 @@ public class MatchedDotCall extends Stub<org.elixir_lang.psi.stub.MatchedDotCall
 
     @NotNull
     @Override
-    public org.elixir_lang.psi.stub.MatchedDotCall deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new org.elixir_lang.psi.stub.MatchedDotCall(
-                parentStub,
-                this,
-                dataStream.readName(),
-                dataStream.readName(),
-                dataStream.readVarInt(),
-                dataStream.readBoolean(),
-                dataStream.readName(),
-                readNameSet(dataStream)
-        );
+    public org.elixir_lang.psi.stub.MatchedDotCall deserialize(@NotNull StubInputStream dataStream,
+                                                               @Nullable StubElement parentStub) throws IOException {
+        Deserialized deserialized = Deserialized.deserialize(dataStream);
+        return new org.elixir_lang.psi.stub.MatchedDotCall(parentStub, this, deserialized);
     }
 }

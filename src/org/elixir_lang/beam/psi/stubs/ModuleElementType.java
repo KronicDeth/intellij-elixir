@@ -5,13 +5,13 @@ import com.intellij.lang.LighterAST;
 import com.intellij.lang.LighterASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.call.Stubbic;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 import static org.elixir_lang.psi.stub.type.Named.indexStubbic;
-import static org.elixir_lang.psi.stub.type.call.Stub.serializeStubbic;
 
 /**
  *
@@ -60,12 +60,12 @@ public abstract class ModuleElementType<S extends StubElement & Stubbic, P exten
      * Serializes {@code stub} as a {@link Stubbic}.
      *
      * @param stub created by {@link org.elixir_lang.beam.psi.BeamFileImpl#buildFileStub(byte[], String)}
-     * @param dataStream stream to write {@code stub} to
+     * @param stubOutputStream stream to write {@code stub} to
      * @throws IOException if {@code dataStream} cannot be written to
      */
     @Override
-    public void serialize(@NotNull S stub, @NotNull StubOutputStream dataStream) throws IOException {
-        serializeStubbic(stub, dataStream);
+    public void serialize(@NotNull S stub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+        Deserialized.serialize(stubOutputStream, stub);
     }
 
     /**
