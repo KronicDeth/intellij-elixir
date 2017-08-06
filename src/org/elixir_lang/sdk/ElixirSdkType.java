@@ -365,6 +365,7 @@ public class ElixirSdkType extends SdkType {
                 File nixOSRoot = new File("/nix/store/");
 
                 if (nixOSRoot.isDirectory()) {
+                    //noinspection ResultOfMethodCallIgnored
                     nixOSRoot.listFiles(
                             (dir, name) -> {
                                 Matcher matcher = NIX_PATTERN.matcher(name);
