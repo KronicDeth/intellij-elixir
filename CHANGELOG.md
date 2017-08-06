@@ -317,6 +317,9 @@
 * [#769](https://github.com/KronicDeth/intellij-elixir/pull/769) - [@KronicDeth](https://github.com/KronicDeth)
   * Check if program parameters is blank before splitting into mix args.
   * Use `ParametersList` to properly parse quote program parameters.
+* [#773](https://github.com/KronicDeth/intellij-elixir/pull/773) - [@KronicDeth](https://github.com/KronicDeth)
+  * Move `Quoter` into `test` directory, so it and its dependency on `JUnit` is only used for test compilation and runtime and not the shipped runtime.
+  * Fix `Quoter` warnings and format.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

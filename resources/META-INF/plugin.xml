@@ -262,6 +262,8 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Remove background color from Sigil Color Scheme Design to match changes in <a href="https://github.com/KronicDeth/intellij-elixir/pull/757">#757</a>.</li>
             <li>Check if program parameters is blank before splitting into mix args.</li>
             <li>Use <code>ParametersList</code> to properly parse quote program parameters.</li>
+            <li>Move <code>Quoter</code> into <code>test</code> directory, so it and its dependency on <code>JUnit</code> is only used for test compilation and runtime and not the shipped runtime.</li>
+            <li>Fix <code>Quoter</code> warnings and format.</li>
           </ul>
         </li>
         <li>
