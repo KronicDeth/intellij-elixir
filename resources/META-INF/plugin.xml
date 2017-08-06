@@ -138,6 +138,8 @@
               references, can be cached and invalidated correctly.
             </li>
             <li>Use <code>ParameterLists</code> to support Path Variables in program parameters.</li>
+            <li>Adjust SDK home path when <code>bin</code>, <code>lib,</code> or <code>src</code> to parent directory.</li>
+            <li>Format <code>ElixirSdkType</code>.</li>
           </ul>
         </li>
         <li>
@@ -264,6 +266,13 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>Use <code>ParametersList</code> to properly parse quote program parameters.</li>
             <li>Move <code>Quoter</code> into <code>test</code> directory, so it and its dependency on <code>JUnit</code> is only used for test compilation and runtime and not the shipped runtime.</li>
             <li>Fix <code>Quoter</code> warnings and format.</li>
+            <li>
+              Show expected SDK home path structure when invalid.
+              <a href="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png" target="_blank">
+                <img src="https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png" alt="screen shot 2017-08-06 at 2 28 36 pm" style="max-width:100%;">
+              </a>
+            </li>
+            <li>Suppress invalid warnings in <code>ElixirSdkType</code>.</li>
           </ul>
         </li>
         <li>
