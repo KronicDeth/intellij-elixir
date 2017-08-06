@@ -38,11 +38,12 @@ import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 public class ElixirSdkType extends SdkType {
     private static final Logger LOG = Logger.getInstance(ElixirSdkType.class);
+    private static final Pattern NIX_PATTERN = Pattern.compile(".+-elixir-(\\d+)\\.(\\d+)\\.(\\d+)");
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private final Map<String, ElixirSdkRelease> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
-    private static final Pattern NIX_PATTERN = Pattern.compile(".+-elixir-(\\d+)\\.(\\d+)\\.(\\d+)");public ElixirSdkType() {
+    public ElixirSdkType() {
         super(JpsElixirModelSerializerExtension.ELIXIR_SDK_TYPE_ID);
     }
 
@@ -226,6 +227,31 @@ public class ElixirSdkType extends SdkType {
         return true;
     }
 
+    /**
+     * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
+     * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
+     * validity.
+     *
+     * @param homePath the path selected in the file chooser.
+     * @return the path to be used as the SDK home.
+     */
+    @NotNull
+    @Override
+    public String adjustSelectedSdkHome(@NotNull String homePath) {
+        File homePathFile = new File(homePath);
+        String adjustedSdkHome = homePath;
+
+        if (homePathFile.isDirectory()) {
+            String baseName = FilenameUtils.getBaseName(homePath);
+
+            if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
+                adjustedSdkHome = homePathFile.getParent();
+            }
+        }
+
+        return adjustedSdkHome;
+    }
+
     @Nullable
     @Override
     public AdditionalDataConfigurable createAdditionalDataConfigurable(@NotNull SdkModel sdkModel, @NotNull SdkModificator sdkModificator) {
@@ -272,12 +298,12 @@ public class ElixirSdkType extends SdkType {
     @Override
     public FileChooserDescriptor getHomeChooserDescriptor() {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, false, false, false, false) {
-          @Override
-          public void validateSelectedFiles(VirtualFile[] files) throws Exception {
-              if (files.length != 0){
-                  validateSdkHomePath(files[0]);
-              }
-          }
+            @Override
+            public void validateSelectedFiles(VirtualFile[] files) throws Exception {
+                if (files.length != 0) {
+                    validateSdkHomePath(files[0]);
+                }
+            }
         };
 
         descriptor.setTitle(ProjectBundle.message("sdk.configure.home.title", getPresentableName()));
@@ -344,7 +370,7 @@ public class ElixirSdkType extends SdkType {
                                 Matcher matcher = NIX_PATTERN.matcher(name);
                                 boolean accept = false;
 
-                                if (matcher.matches()){
+                                if (matcher.matches()) {
                                     int major = Integer.parseInt(matcher.group(1));
                                     int minor = Integer.parseInt(matcher.group(2));
                                     int bugfix = Integer.parseInt(matcher.group(3));
@@ -391,20 +417,20 @@ public class ElixirSdkType extends SdkType {
         if (virtualFile.isDirectory()) {
             message =
                     "A valid home for " + getPresentableName() + " has the following structure:\n" +
-                    "\n" +
-                    "ELIXIR_SDK_HOME\n" +
-                    "* bin\n" +
-                    "** elixir\n" +
-                    "** elixirc\n" +
-                    "** iex\n" +
-                    "** mix\n" +
-                    "* lib\n" +
-                    "** eex\n" +
-                    "** elixir\n" +
-                    "** ex_unit\n" +
-                    "** iex\n" +
-                    "** logger\n" +
-                    "** mix\n";
+                            "\n" +
+                            "ELIXIR_SDK_HOME\n" +
+                            "* bin\n" +
+                            "** elixir\n" +
+                            "** elixirc\n" +
+                            "** iex\n" +
+                            "** mix\n" +
+                            "* lib\n" +
+                            "** eex\n" +
+                            "** elixir\n" +
+                            "** ex_unit\n" +
+                            "** iex\n" +
+                            "** logger\n" +
+                            "** mix\n";
         } else {
             message = "A directory must be select for the home for " + getPresentableName();
         }
@@ -451,31 +477,6 @@ public class ElixirSdkType extends SdkType {
         return homePathByVersion().values();
     }
 
-    /**
-     * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
-     * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
-     * validity.
-     *
-     * @param homePath the path selected in the file chooser.
-     * @return the path to be used as the SDK home.
-     */
-    @NotNull
-    @Override
-    public String adjustSelectedSdkHome(@NotNull String homePath) {
-        File homePathFile = new File(homePath);
-        String adjustedSdkHome = homePath;
-
-        if (homePathFile.isDirectory()) {
-            String baseName = FilenameUtils.getBaseName(homePath);
-
-            if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
-                adjustedSdkHome = homePathFile.getParent();
-            }
-        }
-
-        return adjustedSdkHome;
-    }
-
     @Override
     public String suggestSdkName(@Nullable String currentSdkName, @NotNull String sdkHome) {
         return getDefaultSdkName(sdkHome, detectSdkVersion(sdkHome));
@@ -485,7 +486,7 @@ public class ElixirSdkType extends SdkType {
         final String selectedPath = virtualFile.getPath();
         boolean valid = isValidSdkHome(selectedPath);
 
-        if (!valid){
+        if (!valid) {
             valid = isValidSdkHome(adjustSelectedSdkHome(selectedPath));
 
             if (!valid) {
