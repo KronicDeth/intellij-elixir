@@ -2,9 +2,11 @@ package org.elixir_lang.sdk;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectBundle;
 import com.intellij.openapi.projectRoots.*;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
 import com.intellij.openapi.roots.*;
@@ -266,6 +268,23 @@ public class ElixirSdkType extends SdkType {
         return getDefaultDocumentationUrl(getRelease(sdk));
     }
 
+    @NotNull
+    @Override
+    public FileChooserDescriptor getHomeChooserDescriptor() {
+        final FileChooserDescriptor descriptor = new FileChooserDescriptor(false, true, false, false, false, false) {
+          @Override
+          public void validateSelectedFiles(VirtualFile[] files) throws Exception {
+              if (files.length != 0){
+                  validateSdkHomePath(files[0]);
+              }
+          }
+        };
+
+        descriptor.setTitle(ProjectBundle.message("sdk.configure.home.title", getPresentableName()));
+
+        return descriptor;
+    }
+
     @Override
     public Icon getIcon() {
         return ElixirIcons.FILE;
@@ -360,6 +379,39 @@ public class ElixirSdkType extends SdkType {
         return homePathByVersion;
     }
 
+    @NotNull
+    private Exception invalidSdkHomeException(@NotNull VirtualFile virtualFile) {
+        return new Exception(invalidSdkHomeMessage(virtualFile));
+    }
+
+    @NotNull
+    private String invalidSdkHomeMessage(@NotNull VirtualFile virtualFile) {
+        String message;
+
+        if (virtualFile.isDirectory()) {
+            message =
+                    "A valid home for " + getPresentableName() + " has the following structure:\n" +
+                    "\n" +
+                    "ELIXIR_SDK_HOME\n" +
+                    "* bin\n" +
+                    "** elixir\n" +
+                    "** elixirc\n" +
+                    "** iex\n" +
+                    "** mix\n" +
+                    "* lib\n" +
+                    "** eex\n" +
+                    "** elixir\n" +
+                    "** ex_unit\n" +
+                    "** iex\n" +
+                    "** logger\n" +
+                    "** mix\n";
+        } else {
+            message = "A directory must be select for the home for " + getPresentableName();
+        }
+
+        return message;
+    }
+
     @Override
     public boolean isValidSdkHome(@NotNull String path) {
         File elixir = JpsElixirSdkType.getScriptInterpreterExecutable(path);
@@ -429,5 +481,16 @@ public class ElixirSdkType extends SdkType {
         return getDefaultSdkName(sdkHome, detectSdkVersion(sdkHome));
     }
 
+    private void validateSdkHomePath(@NotNull VirtualFile virtualFile) throws Exception {
+        final String selectedPath = virtualFile.getPath();
+        boolean valid = isValidSdkHome(selectedPath);
 
+        if (!valid){
+            valid = isValidSdkHome(adjustSelectedSdkHome(selectedPath));
+
+            if (!valid) {
+                throw invalidSdkHomeException(virtualFile);
+            }
+        }
+    }
 }
