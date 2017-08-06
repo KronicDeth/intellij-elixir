@@ -15,6 +15,8 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
+import gnu.trove.THashSet;
+import org.apache.commons.io.FilenameUtils;
 import org.elixir_lang.icons.ElixirIcons;
 import org.elixir_lang.jps.model.JpsElixirModelSerializerExtension;
 import org.elixir_lang.jps.model.JpsElixirSdkType;
@@ -24,15 +26,17 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
 import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 public class ElixirSdkType extends SdkType {
     private static final Logger LOG = Logger.getInstance(ElixirSdkType.class);
+    private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
     private final Map<String, ElixirSdkRelease> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
@@ -393,6 +397,31 @@ public class ElixirSdkType extends SdkType {
     @Override
     public Collection<String> suggestHomePaths() {
         return homePathByVersion().values();
+    }
+
+    /**
+     * If a path selected in the file chooser is not a valid SDK home path, and the base name is one of the commonly
+     * incorrectly selected subdirectories - bin, lib, or src - then return the parent path, so it can be checked for
+     * validity.
+     *
+     * @param homePath the path selected in the file chooser.
+     * @return the path to be used as the SDK home.
+     */
+    @NotNull
+    @Override
+    public String adjustSelectedSdkHome(@NotNull String homePath) {
+        File homePathFile = new File(homePath);
+        String adjustedSdkHome = homePath;
+
+        if (homePathFile.isDirectory()) {
+            String baseName = FilenameUtils.getBaseName(homePath);
+
+            if (SDK_HOME_CHILD_BASE_NAME_SET.contains(baseName)) {
+                adjustedSdkHome = homePathFile.getParent();
+            }
+        }
+
+        return adjustedSdkHome;
     }
 
     @Override
