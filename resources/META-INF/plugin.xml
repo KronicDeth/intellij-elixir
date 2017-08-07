@@ -275,6 +275,14 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             </li>
             <li>Suppress invalid warnings in <code>ElixirSdkType</code>.</li>
             <li>Always check if resolution result is right operand of match.</li>
+            <li>
+              <code>CallDefinitionClause</code> <code>InsertHandler</code> always assumed there was a character after
+              the insert location, but when inserting at the very end of the file, there isn't, which caused an
+              <code>IndexOutOfBoundsException</code>.  Only check if the following character is not a space,
+              <code>(</code>, or <code>[</code> when the document is longer than the tail offset to prevent the
+              <code>IndexOutOfBoundsException</code>.  If the insertion is at the end of the file, then the
+              <code>()</code> will always be inserted.
+            </li>
           </ul>
         </li>
         <li>
