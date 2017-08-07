@@ -29,12 +29,6 @@ import static org.elixir_lang.psi.operation.infix.Normalized.rightOperand;
 
 public abstract class Variable implements PsiScopeProcessor {
     /*
-     * CONSTANTS
-     */
-
-    public static Key<Boolean> MAYBE_MACRO = new Key<Boolean>("MAYBE_MACRO");
-
-    /*
      *
      * Instance Methods
      *
@@ -340,13 +334,12 @@ public abstract class Variable implements PsiScopeProcessor {
                 if (match instanceof UnqualifiedNoArgumentsCall && resolvedFinalArity == 0) {
                     keepProcessing = executeOnVariable((PsiNamedElement) match, state);
                 } else if (maybeMacro(match, state)) {
-                    ResolveState maybeMacroState = state.put(MAYBE_MACRO, true);
                     /* macros uses in stab signatures see
                        @see https://github.com/elixir-lang/elixir/blob/0c9e72c8d7be3ee502c43762e0ccbbf244198aeb/lib/elixir/lib/stream/reducers.ex#L7 */
                     PsiElement[] finalArguments = finalArguments(match);
 
                     if (finalArguments != null) {
-                        keepProcessing = execute(finalArguments, maybeMacroState);
+                        keepProcessing = execute(finalArguments, state);
                     }
                 }
             }
