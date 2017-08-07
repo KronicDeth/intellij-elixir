@@ -14,12 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
+import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATU8;
 import static org.elixir_lang.beam.chunk.Chunk.TypeID.EXPT;
 import static org.elixir_lang.beam.chunk.Chunk.length;
 import static org.elixir_lang.beam.chunk.Chunk.typeID;
@@ -166,7 +168,13 @@ public class Beam {
         Chunk chunk = chunk(ATOM);
 
         if (chunk != null) {
-            atoms = Atoms.from(chunk);
+            atoms = Atoms.from(chunk, ATOM, Charset.forName("LATIN1"));
+        } else {
+            chunk = chunk(ATU8);
+
+            if (chunk != null) {
+                atoms = Atoms.from(chunk, ATU8, Charset.forName("UTF-8"));
+            }
         }
 
         return atoms;
