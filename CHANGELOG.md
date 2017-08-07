@@ -207,6 +207,7 @@
 * [#774](https://github.com/KronicDeth/intellij-elixir/pull/774) - [@KronicDeth](https://github.com/KronicDeth)
   * Adjust SDK home path when `bin`, `lib,` or `src` to parent directory.
   * Format `ElixirSdkType`.
+* [#775](https://github.com/KronicDeth/intellij-elixir/pull/775) - Regression test for [#354](https://github.com/KronicDeth/intellij-elixir/issues/354) - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -326,6 +327,7 @@
 * [#774](https://github.com/KronicDeth/intellij-elixir/pull/774) - [@KronicDeth](https://github.com/KronicDeth)
   * Show expected SDK home path structure when invalid. ![screen shot 2017-08-06 at 2 28 36 pm](https://user-images.githubusercontent.com/298259/29006393-5ce71dfe-7ab4-11e7-88c9-732856f6259d.png)
   * Suppress invalid warnings in `ElixirSdkType`.
+* [#775](https://github.com/KronicDeth/intellij-elixir/pull/775) - Always check if resolution result is right operand of match. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

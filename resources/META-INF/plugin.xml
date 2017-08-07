@@ -140,6 +140,7 @@
             <li>Use <code>ParameterLists</code> to support Path Variables in program parameters.</li>
             <li>Adjust SDK home path when <code>bin</code>, <code>lib,</code> or <code>src</code> to parent directory.</li>
             <li>Format <code>ElixirSdkType</code>.</li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/354">#354</a></li>
           </ul>
         </li>
         <li>
@@ -273,6 +274,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
               </a>
             </li>
             <li>Suppress invalid warnings in <code>ElixirSdkType</code>.</li>
+            <li>Always check if resolution result is right operand of match.</li>
           </ul>
         </li>
         <li>
