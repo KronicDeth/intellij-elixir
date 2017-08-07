@@ -117,8 +117,12 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertDecompiled("orber_ifr");
     }
 
-    public void testIssue703() throws  IOException, OtpErlangDecodeException {
+    public void testIssue703() throws IOException, OtpErlangDecodeException {
         assertDecompiled("Elixir.LDAPEx.ELDAPv3");
+    }
+
+    public void testIssue722() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("OTP20/Elixir.Kernel");
     }
 
     /*
