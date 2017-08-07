@@ -208,6 +208,22 @@
   * Adjust SDK home path when `bin`, `lib,` or `src` to parent directory.
   * Format `ElixirSdkType`.
 * [#775](https://github.com/KronicDeth/intellij-elixir/pull/775) - Regression test for [#354](https://github.com/KronicDeth/intellij-elixir/issues/354) - [@KronicDeth](https://github.com/KronicDeth)
+* [#777](https://github.com/KronicDeth/intellij-elixir/pull/777) - [@KronicDeth](https://github.com/KronicDeth)
+  * Include specific message for each decompilation error reason.
+  * Regression test for #772
+  * `AtU8` UTF8 atoms chunk decompilation to support OTP 20 compiled `.beam` files.
+  * Regression test for Elixir 1.5.0 announcement to ensure that unicode from `AtU8` chunk can be read from beam file produced by following Elixir code:
+        ```elixir
+        defmodule AtU8Test do
+          def こんにちは世界 do
+            :こんにちは世界
+
+             saudação = "Bom dia!"
+
+            saudação
+          end
+        end
+        ```
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -329,6 +345,7 @@
   * Suppress invalid warnings in `ElixirSdkType`.
 * [#775](https://github.com/KronicDeth/intellij-elixir/pull/775) - Always check if resolution result is right operand of match. - [@KronicDeth](https://github.com/KronicDeth)
 * [#776](https://github.com/KronicDeth/intellij-elixir/pull/776) - `CallDefinitionClause` `InsertHandler` always assumed there was a character after the insert location, but when inserting at the very end of the file, there isn't, which caused an `IndexOutOfBoundsException`.  Only check if the following character is not a space, `(`, or `[` when the document is longer than the tail offset to prevent the `IndexOutOfBoundsException`.  If the insertion is at the end of the file, then the `()` will always be inserted. - [@KronicDeth](https://github.com/KronicDeth)
+* [#777](https://github.com/KronicDeth/intellij-elixir/pull/777) - `Decompilated` -> `Decompilation` - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

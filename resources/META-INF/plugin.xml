@@ -141,6 +141,23 @@
             <li>Adjust SDK home path when <code>bin</code>, <code>lib,</code> or <code>src</code> to parent directory.</li>
             <li>Format <code>ElixirSdkType</code>.</li>
             <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/354">#354</a></li>
+            <li>Include specific message for each decompilation error reason.</li>
+            <li>Regression test for <a href="https://github.com/KronicDeth/intellij-elixir/issues/772" class="issue-link js-issue-link" data-id="248110529" data-error-text="Failed to load issue title" data-permission-text="Issue title is private" title="Decompilation not working with OTP 20 using AtU8 chunk for ASCII atoms">#772</a></li>
+            <li><code>AtU8</code> UTF8 atoms chunk decompilation to support OTP 20 compiled <code>.beam</code> files.</li>
+            <li>
+              Regression test for Elixir 1.5.0 announcement to ensure that unicode from <code>AtU8</code> chunk can be read from beam file produced by following Elixir code:
+<pre><code>
+defmodule AtU8Test do
+  def こんにちは世界 do
+    :こんにちは世界
+
+     saudação = "Bom dia!"
+
+    saudação
+  end
+end
+</code></pre>
+            </li>
           </ul>
         </li>
         <li>
@@ -283,6 +300,7 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
               <code>IndexOutOfBoundsException</code>.  If the insertion is at the end of the file, then the
               <code>()</code> will always be inserted.
             </li>
+            <li><code>Decompilated</code> -&gt; <code>Decompilation</code></li>
           </ul>
         </li>
         <li>
