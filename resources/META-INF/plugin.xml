@@ -158,6 +158,7 @@ defmodule AtU8Test do
 end
 </code></pre>
             </li>
+            <li>Guard against read/write mismatch in stubs</li>
           </ul>
         </li>
         <li>
@@ -301,6 +302,10 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
               <code>()</code> will always be inserted.
             </li>
             <li><code>Decompilated</code> -&gt; <code>Decompilation</code></li>
+            <li>
+              The lower-level <code>Data(Output|IntputStream</code> <code>(write|read)Int</code> don't work correctly
+              with sizes, so use the JetBrains <code>(write|read)VarInt</code> ones instead.
+            </li>
           </ul>
         </li>
         <li>

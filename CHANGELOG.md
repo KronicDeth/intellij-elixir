@@ -224,6 +224,7 @@
           end
         end
         ```
+* [#771](https://github.com/KronicDeth/intellij-elixir/pull/771) - Guard against read/write mismatch in stubs - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -346,6 +347,7 @@
 * [#775](https://github.com/KronicDeth/intellij-elixir/pull/775) - Always check if resolution result is right operand of match. - [@KronicDeth](https://github.com/KronicDeth)
 * [#776](https://github.com/KronicDeth/intellij-elixir/pull/776) - `CallDefinitionClause` `InsertHandler` always assumed there was a character after the insert location, but when inserting at the very end of the file, there isn't, which caused an `IndexOutOfBoundsException`.  Only check if the following character is not a space, `(`, or `[` when the document is longer than the tail offset to prevent the `IndexOutOfBoundsException`.  If the insertion is at the end of the file, then the `()` will always be inserted. - [@KronicDeth](https://github.com/KronicDeth)
 * [#777](https://github.com/KronicDeth/intellij-elixir/pull/777) - `Decompilated` -> `Decompilation` - [@KronicDeth](https://github.com/KronicDeth)
+* [#771](https://github.com/KronicDeth/intellij-elixir/pull/771) - The lower-level `Data(Output|IntputStream` `(write|read)Int` don't work correctly with sizes, so use the JetBrains `(write|read)VarInt` ones instead. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
