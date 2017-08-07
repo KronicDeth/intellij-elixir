@@ -125,6 +125,10 @@ public class DecompilerTest extends LightCodeInsightTestCase {
         assertDecompiled("OTP20/Elixir.Kernel");
     }
 
+    public void testElixir_1_5_0() throws IOException, OtpErlangDecodeException {
+        assertDecompiled("OTP20/Elixir.AtU8Test");
+    }
+
     /*
      * Instance Methods
      */
