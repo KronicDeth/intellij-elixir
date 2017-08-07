@@ -1,12 +1,12 @@
 package org.elixir_lang.psi.scope.variable;
 
-import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.containers.ContainerUtil;
-import org.elixir_lang.psi.*;
-import org.elixir_lang.psi.call.Call;
+import org.elixir_lang.psi.Arguments;
+import org.elixir_lang.psi.ElixirDoBlock;
+import org.elixir_lang.psi.ElixirStab;
+import org.elixir_lang.psi.ElixirStabBody;
 import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.elixir_lang.psi.operation.Match;
 import org.elixir_lang.psi.scope.Variable;
@@ -186,43 +186,37 @@ public class MultiResolve extends Variable {
                recursive call.  If the recursive call got the same result, stop the recursion by not checking for
                rebinding */
             if (lastBinding == null || !element.isEquivalentTo(lastBinding)) {
-                if (!(element instanceof Call) ||
-                        !isInDeclaringScope((Call) element, state) ||
-                        /* if maybe a macro, then it could potentially not be a macro, in which case prefer the early
-                           declaration */
-                        Boolean.TRUE.equals(state.get(MAYBE_MACRO))) {
-                    Match matchAncestor = PsiTreeUtil.getContextOfType(element, Match.class);
+                Match matchAncestor = PsiTreeUtil.getContextOfType(element, Match.class);
 
-                    if (matchAncestor != null) {
-                        PsiElement rightOperand = matchAncestor.rightOperand();
+                if (matchAncestor != null) {
+                    PsiElement rightOperand = matchAncestor.rightOperand();
 
-                        if (rightOperand != null) {
+                    if (rightOperand != null) {
                         /* right-hand match can only be declarative if it is not already bound, so need to try to
                            resolve further up to try to find if {@code element} is already bound */
-                            if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
-                                // previous sibling or parent to search for earlier binding
-                                PsiElement expression = previousExpression(matchAncestor);
+                        if (PsiTreeUtil.isAncestor(rightOperand, element, false)) {
+                            // previous sibling or parent to search for earlier binding
+                            PsiElement expression = previousExpression(matchAncestor);
 
-                                if (expression != null) {
-                                    List<ResolveResult> preboundResolveResultList = resolveResultList(
-                                            name,
-                                            incompleteCode,
-                                            expression,
-                                            ResolveState
-                                                    .initial()
-                                                    .put(ENTRANCE, matchAncestor)
-                                                    .put(LAST_BINDING_KEY, element)
-                                    );
+                            if (expression != null) {
+                                List<ResolveResult> preboundResolveResultList = resolveResultList(
+                                        name,
+                                        incompleteCode,
+                                        expression,
+                                        ResolveState
+                                                .initial()
+                                                .put(ENTRANCE, matchAncestor)
+                                                .put(LAST_BINDING_KEY, element)
+                                );
 
-                                    if (preboundResolveResultList != null && preboundResolveResultList.size() > 0) {
-                                        if (resolveResultList == null) {
-                                            resolveResultList = preboundResolveResultList;
-                                        } else {
-                                            resolveResultList.addAll(preboundResolveResultList);
-                                        }
-
-                                        added = true;
+                                if (preboundResolveResultList != null && preboundResolveResultList.size() > 0) {
+                                    if (resolveResultList == null) {
+                                        resolveResultList = preboundResolveResultList;
+                                    } else {
+                                        resolveResultList.addAll(preboundResolveResultList);
                                     }
+
+                                    added = true;
                                 }
                             }
                         }
