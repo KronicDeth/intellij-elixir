@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedSet;
 
+import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
 import static org.elixir_lang.psi.call.name.Function.DEF;
 import static org.elixir_lang.psi.call.name.Function.DEFMACRO;
 import static org.elixir_lang.psi.call.name.Module.ELIXIR_PREFIX;
@@ -36,7 +37,7 @@ public class Decompiler implements BinaryFileDecompiler {
 
     @NotNull
     private static CharSequence decompiled(@Nullable Beam beam) {
-        StringBuilder decompiled = new StringBuilder("Decompilated Error");
+        StringBuilder decompiled = new StringBuilder("# Decompilation Error: ");
 
         if (beam != null) {
             Atoms atoms = beam.atoms();
@@ -57,8 +58,14 @@ public class Decompiler implements BinaryFileDecompiler {
                     appendExports(decompiled, beam, atoms);
 
                     decompiled.append("end\n");
+                } else {
+                    decompiled.append("No module name found in ").append(ATOM).append(" chunk in BEAM");
                 }
+            } else {
+                decompiled.append("No ").append(ATOM).append(" chunk found in BEAM");
             }
+        } else {
+            decompiled.append("BEAM format could not be read");
         }
 
         return decompiled;

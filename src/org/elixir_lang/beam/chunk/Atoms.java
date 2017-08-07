@@ -4,11 +4,11 @@ import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
 import static org.elixir_lang.beam.chunk.Chunk.unsignedByte;
 import static org.elixir_lang.beam.chunk.Chunk.unsignedInt;
 
@@ -18,13 +18,9 @@ public class Atoms {
      */
 
     @NotNull
-    private List<String> atomList;
+    private final List<String> atomList;
 
-    /*
-     * Constructors
-     */
-
-    public Atoms(@NotNull List<String> atomList) {
+    private Atoms(@NotNull List<String> atomList) {
         this.atomList = Collections.unmodifiableList(atomList);
     }
 
@@ -33,23 +29,23 @@ public class Atoms {
      */
 
     @Nullable
-    public static Atoms from(@NotNull Chunk chunk) {
+    public static Atoms from(@NotNull Chunk chunk, @NotNull Chunk.TypeID typeID, @NotNull Charset charset) {
         Atoms atoms = null;
 
-        if (chunk.typeID.equals(ATOM.toString()) && chunk.data.length >= 4) {
+        if (chunk.typeID.equals(typeID.toString()) && chunk.data.length >= 4) {
             int offset = 0;
             Pair<Long, Integer> atomCountByteCount = unsignedInt(chunk.data, offset);
             long atomCount = atomCountByteCount.first;
             offset += atomCountByteCount.second;
 
-            List<String> atomList = new ArrayList<String>();
+            List<String> atomList = new ArrayList<>();
 
             for (long i = 0; i < atomCount; i++) {
                 Pair<Integer, Integer> atomLengthByteCount = unsignedByte(chunk.data[offset]);
                 int atomLength = atomLengthByteCount.first;
                 offset += atomLengthByteCount.second;
 
-                String entry = new String(chunk.data, offset, atomLength);
+                String entry = new String(chunk.data, offset, atomLength, charset);
                 offset += atomLength;
                 atomList.add(entry);
             }
@@ -65,9 +61,8 @@ public class Atoms {
      */
 
     /**
-     *
      * @param index 1-based index.  1 is reserved for {#link moduleName}
-     * @return atom if
+     * @return atom if it exists
      */
     @Nullable
     public String get(int index) {
