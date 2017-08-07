@@ -4,7 +4,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.util.io.StringRef;
 import org.elixir_lang.beam.psi.CallDefinition;
 import org.elixir_lang.beam.psi.CallDefinitionElement;
 import org.elixir_lang.beam.psi.Module;
@@ -13,12 +12,13 @@ import org.elixir_lang.beam.psi.impl.CallDefinitionImpl;
 import org.elixir_lang.beam.psi.impl.CallDefinitionStubImpl;
 import org.elixir_lang.beam.psi.impl.ModuleImpl;
 import org.elixir_lang.beam.psi.impl.ModuleStubImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.Set;
 
-import static org.elixir_lang.psi.stub.type.call.Stub.readNameSet;
+import static org.elixir_lang.psi.stub.call.Deserialized.readGuarded;
+import static org.elixir_lang.psi.stub.call.Deserialized.writeGuarded;
 
 // See com.intellij.psi.impl.java.stubs.JavaStubElementTypes
 public interface ModuleStubElementTypes {
@@ -36,31 +36,26 @@ public interface ModuleStubElementTypes {
 
         @NotNull
         @Override
-        public CallDefinitionStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-            assert dataStream.readName().toString().equals(CallDefinitionStubImpl.RESOLVED_MODULE_NAME);
+        public CallDefinitionStub deserialize(@NotNull StubInputStream stubInputStream,
+                                              @NotNull StubElement parentStub) throws IOException {
+            Deserialized deserialized = Deserialized.deserialize(stubInputStream);
+            int callDefinitionClauseArity = deserializeCallDefinitionClauseArity(stubInputStream);
 
-            String macro = dataStream.readName().toString();
+            return new CallDefinitionStubImpl((ModuleStub) parentStub, deserialized, callDefinitionClauseArity);
+        }
 
-            assert dataStream.readInt() == CallDefinitionStubImpl.RESOLVED_FINAL_ARITY;
-            assert dataStream.readBoolean() == CallDefinitionStubImpl.HAS_DO_BLOCK_OR_KEYWORD;
-
-            StringRef nameRef = dataStream.readName();
-            String name = nameRef.toString();
-
-            Set<StringRef> canonicalNameRefSet = readNameSet(dataStream);
-
-            assert canonicalNameRefSet.size() == 1;
-            assert canonicalNameRefSet.iterator().next().toString().equals(name);
-
-            int callDefinitionClauseArity = dataStream.readInt();
-
-            return new CallDefinitionStubImpl((ModuleStub) parentStub, macro, name, callDefinitionClauseArity);
+        int deserializeCallDefinitionClauseArity(@NotNull StubInputStream stubInputStream) throws IOException {
+            return readGuarded(stubInputStream, StubInputStream::readVarInt);
         }
 
         @Override
-        public void serialize(@NotNull CallDefinitionStub stub, @NotNull StubOutputStream dataStream) throws IOException {
-            super.serialize(stub, dataStream);
-            dataStream.writeInt(stub.callDefinitionClauseHeadArity());
+        public void serialize(@NotNull CallDefinitionStub stub,
+                              @NotNull StubOutputStream stubOutputStream) throws IOException {
+            super.serialize(stub, stubOutputStream);
+            writeGuarded(
+                    stubOutputStream,
+                    guardedStubOutputStream -> guardedStubOutputStream.writeVarInt(stub.callDefinitionClauseHeadArity())
+            );
         }
     };
 
@@ -81,22 +76,11 @@ public interface ModuleStubElementTypes {
 
         @NotNull
         @Override
-        public ModuleStub deserialize(@NotNull StubInputStream dataStream,
+        public ModuleStub deserialize(@NotNull StubInputStream stubInputStream,
                                       @NotNull StubElement parentStub) throws IOException {
-            assert dataStream.readName().toString().equals(ModuleStubImpl.RESOLVED_MODULE_NAME);
-            assert dataStream.readName().toString().equals(ModuleStubImpl.RESOLVED_FUNCTION_NAME);
-            assert dataStream.readInt() == ModuleStubImpl.RESOLVED_FINAL_ARITY;
-            assert dataStream.readBoolean() == ModuleStubImpl.HAS_DO_BLOCK_OR_KEYWORD;
+            Deserialized deserialized = Deserialized.deserialize(stubInputStream);
 
-            StringRef nameRef = dataStream.readName();
-            String name = nameRef.toString();
-
-            Set<StringRef> canonicalNameRefSet = readNameSet(dataStream);
-
-            assert canonicalNameRefSet.size() == 1;
-            assert canonicalNameRefSet.iterator().next().toString().equals(name);
-
-            return new ModuleStubImpl(parentStub, name);
+            return new ModuleStubImpl(parentStub, deserialized);
         }
     };
 }

@@ -2,36 +2,15 @@ package org.elixir_lang.psi.stub;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.util.io.StringRef;
 import org.elixir_lang.psi.ElixirMatchedAtUnqualifiedNoParenthesesCall;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.call.Stub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Set;
 
 public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtUnqualifiedNoParenthesesCall> {
-    public MatchedAtUnqualifiedNoParenthesesCall(
-            StubElement parent,
-            @NotNull IStubElementType elementType,
-            @Nullable StringRef resolvedModuleName,
-            @Nullable StringRef resolvedFunctionName,
-            int resolvedFinalArity,
-            boolean hasDoBlockOrKeyword,
-            @NotNull StringRef name,
-            @NotNull Set<StringRef> canonicalNameSet
-    ) {
-        super(parent,
-                elementType,
-                resolvedModuleName,
-                resolvedFunctionName,
-                resolvedFinalArity,
-                hasDoBlockOrKeyword,
-                name,
-                canonicalNameSet);
-    }
-
     public MatchedAtUnqualifiedNoParenthesesCall(
             StubElement parent,
             @NotNull IStubElementType elementType,
@@ -52,5 +31,11 @@ public class MatchedAtUnqualifiedNoParenthesesCall extends Stub<ElixirMatchedAtU
                 name,
                 canonicalNameSet
         );
+    }
+
+    public MatchedAtUnqualifiedNoParenthesesCall(StubElement parentStub,
+                                                 IStubElementType elementType,
+                                                 Deserialized deserialized) {
+        super(parentStub, elementType, deserialized);
     }
 }

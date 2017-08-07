@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 
 public class File extends IStubFileElementType<org.elixir_lang.psi.stub.File> {
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
     public static final IStubFileElementType INSTANCE = new File();
 
     public File() {

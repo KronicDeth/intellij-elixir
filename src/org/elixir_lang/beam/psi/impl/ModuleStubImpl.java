@@ -1,12 +1,16 @@
 package org.elixir_lang.beam.psi.impl;
 
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.util.io.StringRef;
 import org.elixir_lang.beam.psi.Module;
 import org.elixir_lang.beam.psi.stubs.ModuleStub;
 import org.elixir_lang.beam.psi.stubs.ModuleStubElementTypes;
 import org.elixir_lang.psi.call.name.Function;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 import static org.elixir_lang.psi.call.name.Function.DEFMODULE;
 import static org.elixir_lang.psi.call.name.Module.KERNEL;
@@ -15,13 +19,34 @@ import static org.elixir_lang.psi.call.name.Module.KERNEL;
  * See {@link com.intellij.psi.impl.java.stubs.impl.PsiClassStubImpl}
  */
 public class ModuleStubImpl<T extends Module> extends StubbicBase<T> implements ModuleStub<T> {
-    public static final int RESOLVED_FINAL_ARITY = 2;
-    public static final String RESOLVED_FUNCTION_NAME = DEFMODULE;
-    public static final String RESOLVED_MODULE_NAME = KERNEL;
+    private static final int RESOLVED_FINAL_ARITY = 2;
+    private static final String RESOLVED_FUNCTION_NAME = DEFMODULE;
+    private static final String RESOLVED_MODULE_NAME = KERNEL;
 
     public ModuleStubImpl(@NotNull StubElement parentStub,
                           @NotNull String name) {
         super(parentStub, ModuleStubElementTypes.MODULE, name);
+    }
+
+    public ModuleStubImpl(@NotNull StubElement parentStub,
+                          @NotNull Deserialized deserialized) {
+        super(parentStub, ModuleStubElementTypes.MODULE, deserialized.name.toString());
+
+        StringRef resolvedModuleName = deserialized.resolvedModuleName;
+        assert resolvedModuleName != null;
+        assert resolvedModuleName.getString().equals(RESOLVED_MODULE_NAME);
+
+        StringRef resolvedFunctionName = deserialized.resolvedFunctionName;
+        assert resolvedFunctionName != null;
+        assert resolvedFunctionName.toString().equals(RESOLVED_FUNCTION_NAME);
+
+        assert  deserialized.resolvedFinalArity == RESOLVED_FINAL_ARITY;
+
+        assert  deserialized.hasDoBlockOrKeyword == HAS_DO_BLOCK_OR_KEYWORD;
+
+        Set<StringRef> canonicalNameSet = deserialized.canonicalNameSet;
+        assert canonicalNameSet.size() == 1;
+        assert canonicalNameSet.iterator().next().toString().equals(this.getName());
     }
 
     /**

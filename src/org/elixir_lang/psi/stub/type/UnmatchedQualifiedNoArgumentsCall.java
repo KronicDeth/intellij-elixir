@@ -5,8 +5,10 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.stubs.StubInputStream;
 import org.elixir_lang.psi.ElixirUnmatchedQualifiedNoArgumentsCall;
 import org.elixir_lang.psi.impl.ElixirUnmatchedQualifiedNoArgumentsCallImpl;
+import org.elixir_lang.psi.stub.call.Deserialized;
 import org.elixir_lang.psi.stub.type.call.Stub;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -44,16 +46,10 @@ public class UnmatchedQualifiedNoArgumentsCall extends Stub<org.elixir_lang.psi.
 
     @NotNull
     @Override
-    public org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
-        return new org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall(
-                parentStub,
-                this,
-                dataStream.readName(),
-                dataStream.readName(),
-                dataStream.readInt(),
-                dataStream.readBoolean(),
-                dataStream.readName(),
-                readNameSet(dataStream)
-        );
+    public org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall deserialize(@NotNull StubInputStream dataStream,
+                                                                                  @Nullable StubElement parentStub)
+            throws IOException {
+        Deserialized deserialized = Deserialized.deserialize(dataStream);
+        return new org.elixir_lang.psi.stub.UnmatchedQualifiedNoArgumentsCall(parentStub, this, deserialized);
     }
 }

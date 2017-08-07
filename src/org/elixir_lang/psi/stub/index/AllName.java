@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class AllName extends StringStubIndexExtension<NamedElement> {
     public static final StubIndexKey<String, NamedElement> KEY = StubIndexKey.createIndexKey("elixir.all.name");
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     @Override
     public int getVersion() {
