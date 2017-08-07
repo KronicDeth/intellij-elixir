@@ -36,7 +36,7 @@ public class Decompiler implements BinaryFileDecompiler {
 
     @NotNull
     private static CharSequence decompiled(@Nullable Beam beam) {
-        StringBuilder decompiled = new StringBuilder("Decompilated Error");
+        StringBuilder decompiled = new StringBuilder("Decompilation Error");
 
         if (beam != null) {
             Atoms atoms = beam.atoms();
