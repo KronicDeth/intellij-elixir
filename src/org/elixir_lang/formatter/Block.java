@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
 import static org.apache.commons.lang.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
 import static org.elixir_lang.psi.ElixirTypes.FN;
@@ -2217,6 +2218,20 @@ public class Block extends AbstractBlock implements BlockEx {
     @Override
     public Indent getIndent() {
         return indent;
+    }
+
+    @NotNull
+    @Override
+    public ChildAttributes getChildAttributes(int newChildIndex) {
+        ChildAttributes childAttributes;
+
+        if (newChildIndex > 0) {
+           childAttributes = DELEGATE_TO_PREV_CHILD;
+        } else {
+           childAttributes = super.getChildAttributes(newChildIndex);
+        }
+
+        return childAttributes;
     }
 
     /**
