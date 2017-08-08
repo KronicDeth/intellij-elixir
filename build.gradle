@@ -27,20 +27,25 @@ allprojects {
 
   apply plugin: 'org.jetbrains.intellij'
   intellij {
+    def intellij_erlang_version
+
     if (ideaVersion.startsWith("2017.1.")) {
-      plugins = ['org.jetbrains.erlang:0.9.939']
+      intellij_erlang_version = "0.9.939"
     } else if (ideaVersion.startsWith("2016.3.")) {
-      plugins = ['org.jetbrains.erlang:0.9.912']
+      intellij_erlang_version = "0.9.912"
     } else if (ideaVersion.startsWith("2016.2.")) {
-      plugins = ['org.jetbrains.erlang:0.8.913']
+      intellij_erlang_version = "0.8.913"
     } else if (ideaVersion.startsWith("2016.1.")) {
-      plugins = ['org.jetbrains.erlang:0.7.876']
+      intellij_erlang_version = "0.7.876"
     } else if (ideaVersion.startsWith("15.0.")) {
-      plugins = ['org.jetbrains.erlang:0.6.873']
+      intellij_erlang_version = "0.6.873"
     } else {
       throw new IllegalArgumentException("ideaVersion is not a recognized MAJOR.MINOR for IntelliJ Erlang compatibility")
     }
 
+    plugins = ["org.jetbrains.erlang:${intellij_erlang_version}",
+               // always have IdeaVIM installed in sandbox
+               "IdeaVIM:0.48"]
     pluginName 'intellij-elixir'
     version ideaVersion
     downloadSources Boolean.valueOf(sources)
