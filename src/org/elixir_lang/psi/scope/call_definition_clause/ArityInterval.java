@@ -23,6 +23,7 @@ class ArityInterval {
      * CONSTANTS
      */
 
+    private static final ArityInterval ZERO = new ArityInterval(0);
     private static final ArityInterval ONE = new ArityInterval(1);
     private static final ArityInterval ONE_TWO = new ArityInterval(1, 2);
     private static final Map<String, ArityInterval> KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME =
@@ -36,6 +37,7 @@ class ArityInterval {
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("import", ONE_TWO);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("quote", ONE_TWO);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("require", ONE_TWO);
+        KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("super", ZERO);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("with", ONE);
     }
 
