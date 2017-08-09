@@ -24,14 +24,16 @@ class ArityInterval {
      */
 
     private static final ArityInterval ONE = new ArityInterval(1);
+    private static final ArityInterval ONE_TWO = new ArityInterval(1, 2);
     private static final Map<String, ArityInterval> KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME =
             new THashMap<String, ArityInterval>();
 
     static {
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("__aliases__", ONE);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("__block__", ONE);
-        KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("alias", new ArityInterval(1, 2));
+        KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("alias", ONE_TWO);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("for", ONE);
+        KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("import", ONE_TWO);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("with", ONE);
     }
 
