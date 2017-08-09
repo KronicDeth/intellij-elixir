@@ -317,6 +317,14 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
               constant, <code>DELEGATE_TO_PREV_CHILD</code> that can be used to just use the last child's indent as long
               as there is one, which appears to work well for stabs (do block bodies, etc).
             </li>
+            <li>
+              Increase suspect <code>nameSetSize</code> from <code>4</code> to <code>10</code> because a
+              <code>Poison.Encoder</code> has an <code>impl</code> module for 4 types, and so has 4 canonical names.
+            </li>
+            <li>
+              Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't
+              read-ahead as this can mess up OK namesets.
+            </li>
           </ul>
         </li>
         <li>

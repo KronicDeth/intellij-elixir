@@ -350,6 +350,9 @@
 * [#777](https://github.com/KronicDeth/intellij-elixir/pull/777) - `Decompilated` -> `Decompilation` - [@KronicDeth](https://github.com/KronicDeth)
 * [#771](https://github.com/KronicDeth/intellij-elixir/pull/771) - The lower-level `Data(Output|IntputStream` `(write|read)Int` don't work correctly with sizes, so use the JetBrains `(write|read)VarInt` ones instead. - [@KronicDeth](https://github.com/KronicDeth)
 * [#782](https://github.com/KronicDeth/intellij-elixir/pull/782) - Delegate `ChildAttributes` to previous child when available: `Block.getChildAttributes` is used when Enter is pressed to determine the indentation and alignment.  Using the default implementation, newlines in stabs look overly indented, but there is a constant, `DELEGATE_TO_PREV_CHILD` that can be used to just use the last child's indent as long as there is one, which appears to work well for stabs (do block bodies, etc). - [@KronicDeth](https://github.com/KronicDeth)
+* [#783](https://github.com/KronicDeth/intellij-elixir/pull/783) - [@KronicDeth](https://github.com/KronicDeth)
+  * Increase suspect `nameSetSize` from `4` to `10` because a `Poison.Encoder` has an `impl` module for 4 types, and so has 4 canonical names.
+  * Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't read-ahead as this can mess up OK namesets.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
