@@ -19,6 +19,7 @@ public class Deserialized {
        https://github.com/KronicDeth/intellij-elixir/issues/767 */
     private static final int GUARD_LENGTH = 0;
     private static final Logger LOGGER = Logger.getInstance(Deserialized.class);
+    private static final int SUSPECT_NAME_SET_SIZE = 10;
 
     static {
         int i;
@@ -165,10 +166,30 @@ public class Deserialized {
         int nameSetSize = dataStream.readVarInt();
         assertGuard(dataStream, END);
 
-        if (nameSetSize > 3) {
-            byte[] readAhead = new byte[BEGIN.length];
-            int bytesRead = dataStream.read(readAhead);
-            LOGGER.error("readNameSet read " + bytesRead + " of " + readAhead.length + " unexpected bytes `" + hexString(readAhead) + "`");
+        if (nameSetSize >= SUSPECT_NAME_SET_SIZE) {
+            int readAheadLength = BEGIN.length;
+            StringBuilder stringBuilder = new StringBuilder("readNameSet nameSetSize (")
+                    .append(nameSetSize)
+                    .append(") is suspect (>= ")
+                    .append(SUSPECT_NAME_SET_SIZE)
+                    .append(").");
+
+            if (readAheadLength > 0) {
+                stringBuilder = stringBuilder.append("StubIndex may be corrupt.");
+                LOGGER.warn(stringBuilder.toString());
+            } else {
+                byte[] readAhead = new byte[readAheadLength];
+                int bytesRead = dataStream.read(readAhead);
+                stringBuilder = stringBuilder
+                        .append("Read ahead read ")
+                        .append(bytesRead)
+                        .append(" of ")
+                        .append(readAheadLength)
+                        .append(" unexpected bytes `")
+                        .append(hexString(readAhead))
+                        .append("`");
+                LOGGER.error(stringBuilder.toString());
+            }
         }
         Set<StringRef> nameSet = new THashSet<>(nameSetSize);
 
