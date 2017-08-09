@@ -30,6 +30,7 @@ class ArityInterval {
     static {
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("__aliases__", ONE);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("__block__", ONE);
+        KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("alias", new ArityInterval(1, 2));
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("for", ONE);
         KERNEL_SPECIAL_FORM_ARITY_INTERVAL_BY_NAME.put("with", ONE);
     }
