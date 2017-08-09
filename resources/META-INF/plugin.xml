@@ -159,6 +159,10 @@ end
 </code></pre>
             </li>
             <li>Guard against read/write mismatch in stubs</li>
+            <li>
+              Always install <code>IdeaVIM</code> in the gradle sandbox because it got annoying having to reinstall it
+              when the sandbox reset.
+            </li>
           </ul>
         </li>
         <li>
@@ -305,6 +309,13 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
             <li>
               The lower-level <code>Data(Output|IntputStream</code> <code>(write|read)Int</code> don't work correctly
               with sizes, so use the JetBrains <code>(write|read)VarInt</code> ones instead.
+            </li>
+            <li>
+              Delegate <code>ChildAttributes</code> to previous child when available:
+              <code>Block.getChildAttributes</code> is used when Enter is pressed to determine the indentation and
+              alignment.  Using the default implementation, newlines in stabs look overly indented, but there is a
+              constant, <code>DELEGATE_TO_PREV_CHILD</code> that can be used to just use the last child's indent as long
+              as there is one, which appears to work well for stabs (do block bodies, etc).
             </li>
           </ul>
         </li>
