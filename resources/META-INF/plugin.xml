@@ -325,6 +325,15 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
               Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't
               read-ahead as this can mess up OK namesets.
             </li>
+            <li>Override <code>Kernel.SpecialFroms</code> arity intervals
+              <ul>
+                <li><code>alias</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:as</code> option.</li>
+                <li><code>import</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:except</code> or <code>:only</code> options.</li>
+                <li><code>quote</code> overridden from <code>2</code> to <code>1-2</code> to support block without options.</li>
+                <li><code>require</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:as</code> option.</li>
+                <li><code>super</code> overridden from <code>1</code> to <code>0-</code> to support calling any super method.</li>
+              </ul>
+            </li>
           </ul>
         </li>
         <li>

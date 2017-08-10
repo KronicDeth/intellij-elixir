@@ -353,6 +353,13 @@
 * [#783](https://github.com/KronicDeth/intellij-elixir/pull/783) - [@KronicDeth](https://github.com/KronicDeth)
   * Increase suspect `nameSetSize` from `4` to `10` because a `Poison.Encoder` has an `impl` module for 4 types, and so has 4 canonical names.
   * Only read-ahead if guard length is non-zero; otherwise, only warn the nameSetSize may be suspect and don't read-ahead as this can mess up OK namesets.
+* [#784](https://github.com/KronicDeth/intellij-elixir/pull/784) - [@KronicDeth](https://github.com/KronicDeth)
+  * Override `Kernel.SpecialFroms` arity intervals
+    * `alias` overridden from `2` to `1-2` to support without `:as` option.
+    * `import` overridden from `2` to `1-2` to support without `:except` or `:only` options.
+    * `quote` overridden from `2` to `1-2` to support block without options.
+    * `require` overridden from `2` to `1-2` to support without `:as` option.
+    * `super` overridden from `1` to `0-` to support calling any super method.
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)
