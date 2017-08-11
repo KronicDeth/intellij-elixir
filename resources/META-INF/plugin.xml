@@ -163,6 +163,8 @@ end
               Always install <code>IdeaVIM</code> in the gradle sandbox because it got annoying having to reinstall it
               when the sandbox reset.
             </li>
+            <li>Merge both homebrew and nix store on Mac</li>
+            <li>Merge default and nix store on Linux</li>
           </ul>
         </li>
         <li>

@@ -226,6 +226,9 @@
         ```
 * [#771](https://github.com/KronicDeth/intellij-elixir/pull/771) - Guard against read/write mismatch in stubs - [@KronicDeth](https://github.com/KronicDeth)
 * [#782](https://github.com/KronicDeth/intellij-elixir/pull/782) - Always install `IdeaVIM` in the gradle sandbox because it got annoying having to reinstall it when the sandbox reset. - [@KronicDeth](https://github.com/KronicDeth)
+* [#786](https://github.com/KronicDeth/intellij-elixir/pull/786) - [@KronicDeth](https://github.com/KronicDeth)
+  * Merge both homebrew and nix store on Mac
+  * Merge default and nix store on Linux
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
