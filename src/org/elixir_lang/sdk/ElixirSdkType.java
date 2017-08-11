@@ -37,9 +37,15 @@ import static org.elixir_lang.sdk.ElixirSystemUtil.STANDARD_TIMEOUT;
 import static org.elixir_lang.sdk.ElixirSystemUtil.transformStdoutLine;
 
 public class ElixirSdkType extends SdkType {
+    public static final Version UNKNOWN_VERSION = new Version(0, 0, 0);
+    private static final File HOMEBREW_ROOT = new File("/usr/local/Cellar/elixir");
+    private static final String LINUX_DEFAULT_HOME_PATH = "/usr/local/lib/elixir";
     private static final Logger LOG = Logger.getInstance(ElixirSdkType.class);
     private static final Pattern NIX_PATTERN = Pattern.compile(".+-elixir-(\\d+)\\.(\\d+)\\.(\\d+)");
+    private static final File NIX_STORE = new File("/nix/store/");
     private static final Set<String> SDK_HOME_CHILD_BASE_NAME_SET = new THashSet<>(Arrays.asList("bin", "lib", "src"));
+    private static final String WINDOWS_32BIT_DEFAULT_HOME_PATH = "C:\\Program Files\\Elixir";
+    private static final String WINDOWS_64BIT_DEFAULT_HOME_PATH = "C:\\Program Files (x86)\\Elixir";
     private final Map<String, ElixirSdkRelease> mySdkHomeToReleaseCache =
             ApplicationManager.getApplication().isUnitTestMode() ? new HashMap<>() : new WeakHashMap<>();
 
@@ -195,6 +201,45 @@ public class ElixirSdkType extends SdkType {
         return dir.isDirectory();
     }
 
+    private static void mergeHomebrew(Map<Version, String> homePathByVersion) {
+        if (HOMEBREW_ROOT.isDirectory()) {
+            File[] files = HOMEBREW_ROOT.listFiles();
+            if (files != null) {
+                for (File child : files) {
+                    if (child.isDirectory()) {
+                        String versionString = child.getName();
+                        Version version = Version.parseVersion(versionString);
+                        homePathByVersion.put(version, child.getAbsolutePath());
+                    }
+                }
+            }
+        }
+    }
+
+    private static void mergeNixStore(Map<Version, String> homePathByVersion) {
+        if (NIX_STORE.isDirectory()) {
+            //noinspection ResultOfMethodCallIgnored
+            NIX_STORE.listFiles(
+                    (dir, name) -> {
+                        Matcher matcher = NIX_PATTERN.matcher(name);
+                        boolean accept = false;
+
+                        if (matcher.matches()) {
+                            int major = Integer.parseInt(matcher.group(1));
+                            int minor = Integer.parseInt(matcher.group(2));
+                            int bugfix = Integer.parseInt(matcher.group(3));
+
+                            Version version = new Version(major, minor, bugfix);
+
+                            homePathByVersion.put(version, new File(dir, name).getAbsolutePath());
+                            accept = true;
+                        }
+                        return accept;
+                    }
+            );
+        }
+    }
+
     private static void setupLocalSdkPaths(@NotNull SdkModificator sdkModificator) {
         String sdkHome = sdkModificator.getHomePath();
 
@@ -348,59 +393,24 @@ public class ElixirSdkType extends SdkType {
         );
 
         if (SystemInfo.isMac) {
-            File homebrewRoot = new File("/usr/local/Cellar/elixir");
-
-            if (homebrewRoot.isDirectory()) {
-                File[] files = homebrewRoot.listFiles();
-                if (files != null) {
-                    for (File child : files) {
-                        if (child.isDirectory()) {
-                            String versionString = child.getName();
-                            Version version = Version.parseVersion(versionString);
-                            homePathByVersion.put(version, child.getAbsolutePath());
-                        }
-                    }
-                }
-            } else {
-                File nixOSRoot = new File("/nix/store/");
-
-                if (nixOSRoot.isDirectory()) {
-                    //noinspection ResultOfMethodCallIgnored
-                    nixOSRoot.listFiles(
-                            (dir, name) -> {
-                                Matcher matcher = NIX_PATTERN.matcher(name);
-                                boolean accept = false;
-
-                                if (matcher.matches()) {
-                                    int major = Integer.parseInt(matcher.group(1));
-                                    int minor = Integer.parseInt(matcher.group(2));
-                                    int bugfix = Integer.parseInt(matcher.group(3));
-
-                                    Version version = new Version(major, minor, bugfix);
-
-                                    homePathByVersion.put(version, new File(dir, name).getAbsolutePath());
-                                    accept = true;
-                                }
-                                return accept;
-                            }
-                    );
-                }
-            }
+            mergeHomebrew(homePathByVersion);
+            mergeNixStore(homePathByVersion);
         } else {
-            Version version = new Version(0, 0, 0);
-            String sdkPath = "";
+            String sdkPath;
 
             if (SystemInfo.isWindows) {
                 if (SystemInfo.is32Bit) {
-                    sdkPath = "C:\\Program Files\\Elixir";
+                    sdkPath = WINDOWS_32BIT_DEFAULT_HOME_PATH;
                 } else {
-                    sdkPath = "C:\\Program Files (x86)\\Elixir";
+                    sdkPath = WINDOWS_64BIT_DEFAULT_HOME_PATH;
                 }
-            } else if (SystemInfo.isLinux) {
-                sdkPath = "/usr/local/lib/elixir";
-            }
 
-            homePathByVersion.put(version, sdkPath);
+                homePathByVersion.put(UNKNOWN_VERSION, sdkPath);
+            } else if (SystemInfo.isLinux) {
+                homePathByVersion.put(UNKNOWN_VERSION, LINUX_DEFAULT_HOME_PATH);
+
+                mergeNixStore(homePathByVersion);
+            }
         }
 
         return homePathByVersion;
