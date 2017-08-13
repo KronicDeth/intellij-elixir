@@ -99,6 +99,12 @@
       - [Module](#module)
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
+    - [Formatting](#formatting)
+      - [Directory](#directory)
+      - [File](#file)
+        - [Other File](#other-file)
+        - [Current File](#current-file)
+      - [Selection](#selection)
     - [Go To Symbol](#go-to-symbol)
     - [Go To Test](#go-to-test)
     - [Go To Test Subject](#go-to-test-subject)
@@ -2181,6 +2187,135 @@ If you hold `Cmd` and hover over the `@module_attribute` before clicking, the ta
     3. `Cmd+Click`
 
 If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color.
+
+### Formatting
+
+IntelliJ Elixir can reformat code to follow a consistent style.
+
+* `do` block lines are indented
+* `do` blocks `end` as the last argument of a no parentheses call unindents to the start of the call
+* If one clause of a multi-clause anonymous function wraps, all clauses wrap.
+* Indent after `else`
+* Indent map and struct keys
+* All keys wrap if any key wraps
+* No spaces around...
+  * `.`
+* Spaces around...
+  * `and`
+  * `in`
+  * `or`
+  * `when`
+* Configure spaces around...
+  * `=`
+  * `<-` and `\\`
+  * `!=`, `==`, `=~`, `!==`, and `===`
+  *  `<`, `<=`, `>=`, and `>`
+  * `+` and `-`
+  * `*` and `/`
+  * Unary `+`, `-`, `!`, `^`, and `~~~`
+  * `->`
+  * `::`
+  * `|`
+  * `||` and `|||`
+  * `&&` and `&&&`
+  * `<~`, `|>`, `~>`, `<<<`, `<<~`, `<|>`, `<~>`, `>>>`, and `~>>`
+  * `..`
+  * `^^^`
+  * `++`, `--`, `..`, `<>`
+  * `=>`
+* Configure spaces before...
+  * `,`
+* No space after...
+  * `@`
+* Spaces after...
+  * `not`
+  * `fn`
+  * `after`
+  * `catch`
+  * `rescue`
+  * `key:`
+* Configure space after...
+  * `&`
+  * `,`
+* Configure spaces within...
+  * `{ }`
+  * `<< >>`
+  * `[ ]`
+  * `( )`
+* No space around `/` in `&NAME/ARITY` and `&QUALIFIER.NAME/ARITY`
+* `when` wraps when its right operand wraps, so that guards start with `when` on a newline when they are too long.
+* Align `|>` at start of indented line for pipelines
+* Align `end` with start of call instead of start of line for `do` blocks in pipelines
+* Indent list elements when wrapped
+* Indent tuple elements when wrapped
+* Align type definition to right of `::`
+* Align guard to right of `when` when guards span multiple lines
+* Align two operator (`++`, `--`, `..`, `<>`) operands, so that `<>` binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.
+* Align pipe `|` operands, so that alternates in types and specs are aligned instead of continuation indented relative to the first operand.
+* Comments in `spec` (that is above operands to `|` align with the operands
+* Remove newlines from pipelines, so that all pipelines start with an initial value or call and each `|>` is the start of a successive line.
+* Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.
+* Indent bit string (`<< >>`) elements when wrapped
+
+#### Directory
+
+All files in a directory can be reformatted.
+
+Using context menu:
+
+1. Open the Project pane
+2. Right-click the directory
+3. Select Reformat Code
+4. Set the desired options in the Reformat Code dialog
+5. Click Run
+
+Using keyboard shortcuts:
+
+1. Open the Project pane
+2. Select the directory
+3. `Alt+Cmd+L`
+4. Set the desired options in the Reformat Code dialog
+5. Click Run
+
+#### File
+
+##### Other File
+
+All lines in a file can be reformatted.
+
+Using context menu:
+
+1. Open the Project pane
+2. Right-click the file
+3. Select Reformat Code
+4. Set the desired options in the Reformat Code dialog
+5. Click OK
+
+Using keyboard shortcuts:
+
+1. Open the Project pane
+2. Select the file
+3. `Alt+Cmd+L`
+4. Set the desired options in the Reformat Code dialog
+5. Click OK
+
+##### Current File
+
+All the lines in the current editor tab file can be reformatted with the
+current settings.
+
+* Code > Reformat
+* `Alt+Cmd+L`
+  * `Alt+Shift+Cmd+L` to get the Reformat Code dialog.
+
+#### Selection
+
+A subset of a file can be reformatted.
+
+1. Highlight the selection
+2. Use the Reformat Code action
+   * Code > Reformat Code
+   * `Alt+Shift+Cmd+L`
 
 ### Go To Symbol
 
