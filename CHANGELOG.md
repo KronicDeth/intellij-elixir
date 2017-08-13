@@ -229,6 +229,7 @@
 * [#786](https://github.com/KronicDeth/intellij-elixir/pull/786) - [@KronicDeth](https://github.com/KronicDeth)
   * Merge both homebrew and nix store on Mac
   * Merge default and nix store on Linux
+* [#789](https://github.com/KronicDeth/intellij-elixir/pull/789) - Format `MixRunningStateUtil` and fix warnings. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Bug Fixes
 * [#726](https://github.com/KronicDeth/intellij-elixir/pull/726) - [@KronicDeth](https://github.com/KronicDeth)
@@ -363,6 +364,7 @@
     * `quote` overridden from `2` to `1-2` to support block without options.
     * `require` overridden from `2` to `1-2` to support without `:as` option.
     * `super` overridden from `1` to `0-` to support calling any super method.
+* [#789](https://github.com/KronicDeth/intellij-elixir/pull/789) - `elixir.bat` in at least Elixir 1.5.1, will not properly parse a mix path with spaces in it on Windows even when the path has outer quotes (see elixir-lang/elixir#6455). It is not possible to use inner quotes, as you can do in cmd.exe, using the JetBrains and Java libraries hat auto-matically quote, so instead bypass the bad quoting in `elixir.bat` by doing what `elixir.bat` does: call `erl.exe` with all the SDK ebin paths added with `-pa`, then `-noshell -s elixir start_cli` to run Elixir and`-extra` to run requires (`-r`), mix and its tasks. - [@KronicDeth](https://github.com/KronicDeth)
 
 ### Incompatible Changes
 * [#732](https://github.com/KronicDeth/intellij-elixir/pull/732) - [@KronicDeth](https://github.com/KronicDeth)

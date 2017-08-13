@@ -165,6 +165,7 @@ end
             </li>
             <li>Merge both homebrew and nix store on Mac</li>
             <li>Merge default and nix store on Linux</li>
+            <li>Format <code>MixRunningStateUtil</code> and fix warnings.</li>
           </ul>
         </li>
         <li>
@@ -335,6 +336,16 @@ QUOTE_HEREDOC_TERMINATOR = {CHAR_LIST_HEREDOC_TERMINATOR} | {STRING_HEREDOC_TERM
                 <li><code>require</code> overridden from <code>2</code> to <code>1-2</code> to support without <code>:as</code> option.</li>
                 <li><code>super</code> overridden from <code>1</code> to <code>0-</code> to support calling any super method.</li>
               </ul>
+            </li>
+            <li>
+              <code>elixir.bat</code> in at least Elixir 1.5.1, will not properly parse a mix path with spaces in it on
+              Windows even when the path has outer quotes (see
+              <a href="https://github.com/elixir-lang/elixir/issues/6455">elixir-lang/elixir#6455</a>). It is not
+              possible to use inner quotes, as you can do in cmd.exe, using the JetBrains and Java libraries that
+              auto-matically quote, so instead bypass the bad quoting in <code>elixir.bat</code> by doing what
+              <code>elixir.bat</code> does: call <code>erl.exe</code> with all the SDK ebin paths added with
+              <code>-pa</code>, then <code>-noshell -s elixir start_cli</code> to run Elixir and<code>-extra</code> to
+              run requires (<code>-r</code>), mix and its tasks.
             </li>
           </ul>
         </li>
