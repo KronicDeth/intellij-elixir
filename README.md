@@ -99,6 +99,12 @@
       - [Module](#module)
       - [Module Attribute](#module-attribute)
       - [Parameters and Variables](#parameters-and-variables-1)
+    - [Formatting](#formatting)
+      - [Directory](#directory)
+      - [File](#file)
+        - [Other File](#other-file)
+        - [Current File](#current-file)
+      - [Selection](#selection)
     - [Go To Symbol](#go-to-symbol)
     - [Go To Test](#go-to-test)
     - [Go To Test Subject](#go-to-test-subject)
@@ -171,12 +177,19 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
 4. Select a Project SDK directory by clicking Configure.
    ![Project SDK](/screenshots/features/project/SDK.png?raw=true "Project SDK")
 4. Select a Project SDK directory by clicking Configure.
-5. The plugin will automatically find the newest version of Elixir installed. (**NOTE: SDK detection only works for
-   Linux, homebrew installs on OSX, and Windows.  [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues)
-   with information about Elixir install locations on your operating system and package manager to have SDK detection
-   added for it.**)
-6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
-    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+5. The plugin will automatically find the newest version of Elixir installed.
+   * macOS / OSX
+     * Homebrew (`/usr/local/Cellar/elixir`)
+     * Nix (`/nix/store`)
+   * Linux
+     * `/usr/local/lib/elixir`
+     * Nix and NixOS (`/nix/store`)
+   * Windows
+     * 32-bit (`C:\Program Files\Elixir`)
+     * 64-bit (`C:\Program Files (x86)\Elixir`)
+     * (**NOTE: SDK detection only works for
+   [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information about Elixir install locations on your operating system and package manager to have SDK detection added for it.
+6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
 7. Click Next after you select SDK name from the Project SDK list.
 8. Change the `Project name` to the name your want for the project
    ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
@@ -225,6 +238,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 5. Click Next
 6. The "Mix project root" will be filled in with the selected directory.
 7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
+   * If "Fetch dependencies with mix" is checked both `mix hex.local --force` and `mix deps.get` will be run.
 8. Ensure the correct "Mix Path" is detected.  On Windows, the `mix.bat`, such as
    `C:\Program Files (x86)\Elixir\bin\mix.bat` should be used instead of the `mix` file without the extension.
 9. Ensure the "Mix Version" is as expected.  The number in parentheses should match the Elixir version.
@@ -688,6 +702,7 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <ul>
           <li>
             <code>Kernel</code>
+            <ul>
             <ul>
               <li>functions</li>
               <li>macros</li>
@@ -1959,6 +1974,10 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 
 The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix test`, so that you get the standard graphical tree of Test Results
 
+The Run pane will show Test Results.  If there is a compilation error before or during `mix test`, it will be shown as a test failure.  If the compilation failure is in a `_test.exs` file can it can be inferred from the stacktrace, the compilation error will show up as a test failure in that specific module.
+
+`doctest` names are rearranged to emphasize the function being tested: `"test doc at MODULE.FUNCTION/ARITY (COUNT)"` becomes `"MODULE.FUNCTION/ARITY doc (COUNT)"`.  If `MODULE` is the same as the test case without the `Test` suffix, then `MODULE` is stripped too and the test name becomes only `FUNCTION/ARITY doc (COUNT)`.
+
 ##### Creating `mix test` Run Configurations Manually
 
 1. Run > Edit Configurations...
@@ -2181,6 +2200,135 @@ If you hold `Cmd` and hover over the `@module_attribute` before clicking, the ta
     3. `Cmd+Click`
 
 If you hold `Cmd` and hover over the variable before clicking, it will say `parameter` or `variable`, which matches the annotation color.
+
+### Formatting
+
+IntelliJ Elixir can reformat code to follow a consistent style.
+
+* `do` block lines are indented
+* `do` blocks `end` as the last argument of a no parentheses call unindents to the start of the call
+* If one clause of a multi-clause anonymous function wraps, all clauses wrap.
+* Indent after `else`
+* Indent map and struct keys
+* All keys wrap if any key wraps
+* No spaces around...
+  * `.`
+* Spaces around...
+  * `and`
+  * `in`
+  * `or`
+  * `when`
+* Configure spaces around...
+  * `=`
+  * `<-` and `\\`
+  * `!=`, `==`, `=~`, `!==`, and `===`
+  *  `<`, `<=`, `>=`, and `>`
+  * `+` and `-`
+  * `*` and `/`
+  * Unary `+`, `-`, `!`, `^`, and `~~~`
+  * `->`
+  * `::`
+  * `|`
+  * `||` and `|||`
+  * `&&` and `&&&`
+  * `<~`, `|>`, `~>`, `<<<`, `<<~`, `<|>`, `<~>`, `>>>`, and `~>>`
+  * `..`
+  * `^^^`
+  * `++`, `--`, `..`, `<>`
+  * `=>`
+* Configure spaces before...
+  * `,`
+* No space after...
+  * `@`
+* Spaces after...
+  * `not`
+  * `fn`
+  * `after`
+  * `catch`
+  * `rescue`
+  * `key:`
+* Configure space after...
+  * `&`
+  * `,`
+* Configure spaces within...
+  * `{ }`
+  * `<< >>`
+  * `[ ]`
+  * `( )`
+* No space around `/` in `&NAME/ARITY` and `&QUALIFIER.NAME/ARITY`
+* `when` wraps when its right operand wraps, so that guards start with `when` on a newline when they are too long.
+* Align `|>` at start of indented line for pipelines
+* Align `end` with start of call instead of start of line for `do` blocks in pipelines
+* Indent list elements when wrapped
+* Indent tuple elements when wrapped
+* Align type definition to right of `::`
+* Align guard to right of `when` when guards span multiple lines
+* Align two operator (`++`, `--`, `..`, `<>`) operands, so that `<>` binaries are multiple lines align their starts instead of using continuation indent and being indented relative to first operand.
+* Align pipe `|` operands, so that alternates in types and specs are aligned instead of continuation indented relative to the first operand.
+* Comments in `spec` (that is above operands to `|` align with the operands
+* Remove newlines from pipelines, so that all pipelines start with an initial value or call and each `|>` is the start of a successive line.
+* Key exclusivity: if an association operation or keyword key is already on a line, the container value automatically has it's elements wrapped if there is nested associations or keyword pairs, so that two levels of keys are not on the same line.
+* Indent bit string (`<< >>`) elements when wrapped
+
+#### Directory
+
+All files in a directory can be reformatted.
+
+Using context menu:
+
+1. Open the Project pane
+2. Right-click the directory
+3. Select Reformat Code
+4. Set the desired options in the Reformat Code dialog
+5. Click Run
+
+Using keyboard shortcuts:
+
+1. Open the Project pane
+2. Select the directory
+3. `Alt+Cmd+L`
+4. Set the desired options in the Reformat Code dialog
+5. Click Run
+
+#### File
+
+##### Other File
+
+All lines in a file can be reformatted.
+
+Using context menu:
+
+1. Open the Project pane
+2. Right-click the file
+3. Select Reformat Code
+4. Set the desired options in the Reformat Code dialog
+5. Click OK
+
+Using keyboard shortcuts:
+
+1. Open the Project pane
+2. Select the file
+3. `Alt+Cmd+L`
+4. Set the desired options in the Reformat Code dialog
+5. Click OK
+
+##### Current File
+
+All the lines in the current editor tab file can be reformatted with the
+current settings.
+
+* Code > Reformat
+* `Alt+Cmd+L`
+  * `Alt+Shift+Cmd+L` to get the Reformat Code dialog.
+
+#### Selection
+
+A subset of a file can be reformatted.
+
+1. Highlight the selection
+2. Use the Reformat Code action
+   * Code > Reformat Code
+   * `Alt+Shift+Cmd+L`
 
 ### Go To Symbol
 

@@ -16,6 +16,10 @@
 
 # Upgrading
 
+## v6.0.0
+
+IntelliJ IDEA `v14.1.X` is no longer supported because [it lacked the necessary APIs to support concurrent test tracking](https://github.com/KronicDeth/intellij-elixir/pull/732) in the Test Results pane.  You will need to update to a newer version (15+) of IntelliJ IDEA or equivalent JetBrains IDE generation.
+
 ## v5.0.0
 
 Module attribute folding to their value is off by default now.  If you want to re-enable the old behavior, Check Preferences > Editor > General > Code Folding > Elixir Module Attributes.
