@@ -238,6 +238,7 @@ If you've already created a `mix` project, you can load it as an Elixir project 
 5. Click Next
 6. The "Mix project root" will be filled in with the selected directory.
 7. (Optional) Uncheck "Fetch dependencies with mix" if you don't want to run `mix deps.get` when importing the project
+   * If "Fetch dependencies with mix" is checked both `mix hex.local --force` and `mix deps.get` will be run.
 8. Ensure the correct "Mix Path" is detected.  On Windows, the `mix.bat`, such as
    `C:\Program Files (x86)\Elixir\bin\mix.bat` should be used instead of the `mix` file without the extension.
 9. Ensure the "Mix Version" is as expected.  The number in parentheses should match the Elixir version.
@@ -701,6 +702,7 @@ Syntax highlighting of lexer tokens and semantic annotating of parser elements c
         <ul>
           <li>
             <code>Kernel</code>
+            <ul>
             <ul>
               <li>functions</li>
               <li>macros</li>
