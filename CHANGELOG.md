@@ -186,8 +186,7 @@
   *  `TeamCityExUnitFormatting.put_event`
     * Always match on `%__MODULE__{}` for state in clauses to prevent state update errors
     * Match on `:suite_finished` and `:suite_started` events, so that only events added to the interface will be unknown and `IO.warn` can be used tell anyone spotting the new event to file an issue.
-* [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned.
- - [@KronicDeth](https://github.com/KronicDeth)
+* [#741](https://github.com/KronicDeth/intellij-elixir/pull/741) - Instead of pinning position (`1` for lines or `3` for heredocs), `pin` `*_PROMOTER` token, so it's more obvious the pattern is that the promoter is pinned. - [@KronicDeth](https://github.com/KronicDeth)
 * [#747](https://github.com/KronicDeth/intellij-elixir/pull/747) - Regression test for [#659](https://github.com/KronicDeth/intellij-elixir/issues/659) - [@KronicDeth](https://github.com/KronicDeth)
 * [#629](https://github.com/KronicDeth/intellij-elixir/pull/629) - Search for Elixir SDKs in `/nix/store` on Mac if homebrew path does not exist - [@KronicDeth](https://github.com/KronicDeth)
 * [#749](https://github.com/KronicDeth/intellij-elixir/pull/749) - Regression test for [#672](https://github.com/KronicDeth/intellij-elixir/issues/672) - [@KronicDeth](https://github.com/KronicDeth)
