@@ -189,8 +189,7 @@ If you want to create a basic (non-`mix`) Elixir project with a `lib` directory,
      * 64-bit (`C:\Program Files (x86)\Elixir`)
      * (**NOTE: SDK detection only works for
    [Open an issue](https://github.com/KronicDeth/intellij-elixir/issues) with information about Elixir install locations on your operating system and package manager to have SDK detection added for it.
-6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select
-    the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.
+6. If the automatic detection doesn't find your Elixir SDK or you want to use an older version, manually select select the directory above the `bin` directory containing `elixir`, `elixirc`, `iex`, and `mix`.  If the `bin`, `lib,` or `src` directory is incorrectly selected, it will be corrected to the parent directory.
 7. Click Next after you select SDK name from the Project SDK list.
 8. Change the `Project name` to the name your want for the project
    ![File > New > Project > Settings](/screenshots/features/project/new/Settings.png?raw=true "New Elixir Project Settings")
@@ -1972,6 +1971,10 @@ Much like `rake` tasks in Rubymine, this plugin can run `mix` tasks.
 #### `mix test`
 
 The `mix test` task gets a special type of Run Configuration, `Elixir Mix ExUnit`.  Using this Run Configuration type instead, of the basic `Elixir Mix` Run Configuration will cause the IDE to attach a special formatter to `mix test`, so that you get the standard graphical tree of Test Results
+
+The Run pane will show Test Results.  If there is a compilation error before or during `mix test`, it will be shown as a test failure.  If the compilation failure is in a `_test.exs` file can it can be inferred from the stacktrace, the compilation error will show up as a test failure in that specific module.
+
+`doctest` names are rearranged to emphasize the function being tested: `"test doc at MODULE.FUNCTION/ARITY (COUNT)"` becomes `"MODULE.FUNCTION/ARITY doc (COUNT)"`.  If `MODULE` is the same as the test case without the `Test` suffix, then `MODULE` is stripped too and the test name becomes only `FUNCTION/ARITY doc (COUNT)`.
 
 ##### Creating `mix test` Run Configurations Manually
 
