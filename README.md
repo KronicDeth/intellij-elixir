@@ -3471,12 +3471,26 @@ If you would like to make a donation you can use Paypal:
 
 If you'd like to use a different donation mechanism (such as Patreon), please open an issue.
 
-### Public Donors
+### Donors
 
 I'd like to thank those who have donated to help support this project.
 
-* Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
-* William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
+* Adrian Philipp ([@adri](https://github.com/adri))
+* Artem Hordynskyi
+* Bjorgvin Reynisson
+* Garrett Hart ([@https://github.com/thirdshift](https://github.com/thirdshift))
 * Gerard de Brieder ([@smeevil](https://github.com/smeevil)) of [govannon.nl](http://govannon.nl)
+* Jeremy Jackson ([@jejacks0n](https://github.com/jejacks0n))
+* Josh Taylor ([@joshuataylor](https://github.com/joshuataylor))
+* Maximilian Buschner
+* Nguyen Le
+* Percy Grunwald ([@pgrunwald](https://github.com/pgrunwald))
+* Purelogic Apps
+* Raúl Vázquez González ([@rvazquezglez](https://github.com/rvazquezglez))
+* Robin Hillard ([@robinhillard](https://github.com/robinhillard)) of [rocketboots.com](http://www.rocketboots.com)
+* Ryan Scheel ([@Havvy](https://github.com/Havvy))
+* Tynes Consulting
+* William De Melo Gueiros ([williamgueiros](https://github.com/williamgueiros))
+* Yicheng Dong
 * [TreasureData](https://www.treasuredata.com/)
 
