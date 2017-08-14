@@ -34,14 +34,11 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.util.ResourceUtil;
 import com.intellij.util.containers.ContainerUtil;
-import com.intellij.util.io.URLUtil;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -50,6 +47,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import org.elixir_lang.ElixirFileType;
+import org.elixir_lang.debugger.ElixirModules;
 import org.elixir_lang.debugger.node.ElixirDebuggerEventListener;
 import org.elixir_lang.debugger.node.ElixirDebuggerNode;
 import org.elixir_lang.debugger.node.ElixirDebuggerNodeException;
@@ -64,9 +62,7 @@ import org.elixir_lang.psi.impl.ElixirPsiImplUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
-import java.net.URL;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -115,33 +111,16 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
   }
 
   @NotNull
-  private static List<String> setUpElixirDebuggerCodePath() throws ExecutionException {
-    LOG.debug("Setting up debugger environment.");
+  private static ParametersList addRequires(@NotNull ParametersList elixirParametersList) throws ExecutionException {
+    ParametersList updated;
+
     try {
-      String[] files = {"Elixir.Mix.Tasks.IntellijElixir.DebugTask.beam", "Elixir.IntellijElixir.DebugServer.beam"};
-      File tempDirectory = FileUtil.createTempDirectory("intellij_elixir_debugger", null);
-      LOG.debug("Debugger elixir files will be put to: " + tempDirectory.getPath());
-      for (String file : files) {
-        copyFileTo(file, tempDirectory);
-      }
-      LOG.debug("Debugger elixir files were copied successfully.");
-      return Arrays.asList("-pa", tempDirectory.getPath());
-    }
-    catch (IOException e) {
+      updated = ElixirModules.add(elixirParametersList);
+    } catch (IOException e) {
       throw new ExecutionException("Failed to setup debugger environment", e);
     }
-  }
 
-  private static void copyFileTo(@NotNull String fileName, File directory) throws IOException {
-    URL fileUrl = ResourceUtil.getResource(ElixirXDebugProcess.class, "/debugger/_build/shared/lib/intellij_elixir_debugger/ebin", fileName);
-    if (fileUrl == null) {
-      throw new IOException("Failed to locate debugger module: " + fileName);
-    }
-    try (BufferedInputStream inputStream = new BufferedInputStream(URLUtil.openStream(fileUrl))) {
-      try (BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(new File(directory, fileName)))) {
-        FileUtil.copy(inputStream, outputStream);
-      }
-    }
+    return updated;
   }
 
   @Override
@@ -343,7 +322,6 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
     OSProcessHandler elixirProcessHandler;
     LOG.debug("Preparing to run debug target.");
 
-    ParametersList elixirParametersList = new ParametersList();
     RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
     RunConfiguration runConfiguration = null;
 
@@ -351,8 +329,8 @@ class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventLi
       runConfiguration = runnerAndConfigurationSettings.getConfiguration();
     }
 
-    elixirParametersList.addAll(myRunningState.setupElixirParametersList(runConfiguration).getList());
-    elixirParametersList.addAll(setUpElixirDebuggerCodePath());
+    ParametersList elixirParametersList = myRunningState.elixirParametersList(runConfiguration);
+    addRequires(elixirParametersList);
 
     ParametersList mixParametersList = new ParametersList();
     mixParametersList.addAll(

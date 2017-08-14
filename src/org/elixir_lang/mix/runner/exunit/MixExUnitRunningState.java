@@ -13,23 +13,21 @@ import com.intellij.execution.testframework.sm.SMTestRunnerConnectionUtil;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.io.FileUtil;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ProjectRootManager;
 import org.elixir_lang.console.ElixirConsoleUtil;
 import org.elixir_lang.exunit.ElixirModules;
 import org.elixir_lang.jps.builder.ParametersList;
 import org.elixir_lang.mix.runner.MixRunningState;
 import org.elixir_lang.mix.runner.MixTestConsoleProperties;
 import org.elixir_lang.mix.settings.MixSettings;
+import org.elixir_lang.sdk.ElixirSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 final class MixExUnitRunningState extends MixRunningState {
   private static final Logger LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(MixExUnitRunningState.class);
@@ -135,52 +133,36 @@ final class MixExUnitRunningState extends MixRunningState {
     return consoleView;
   }
 
-  private static File createElixirModulesDirectory() throws IOException {
-    return FileUtil.createTempDirectory("intellij_elixir_modules", null);
-  }
-
-  private boolean useCustomMixTask() {
-    return !MixSettings.getInstance(myConfiguration.getProject()).getSupportsFormatterOption();
-  }
-
   @NotNull
-  private static ParametersList elixirParametersList(@NotNull Collection<File> elixirModuleFileCollection) {
-    ParametersList parametersList = new ParametersList();
+  private static ParametersList elixirParametersList(@Nullable Project project) throws IOException {
+    Sdk sdk = null;
+    boolean useCustomMixTask = false;
 
-    for (File elixirModuleFile : elixirModuleFileCollection) {
-      parametersList.add("-r");
-      parametersList.add(String.valueOf(elixirModuleFile));
+    if (project != null) {
+      sdk = ProjectRootManager.getInstance(project).getProjectSdk();
+      useCustomMixTask = !MixSettings.getInstance(project).getSupportsFormatterOption();
     }
 
-    return parametersList;
+    return elixirParametersList(sdk, useCustomMixTask);
   }
 
   @NotNull
-  public ParametersList setupElixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
-    List<File> elixirModuleFileList = new ArrayList<>();
+  private static ParametersList elixirParametersList(@Nullable Sdk sdk, boolean useCustomMixTask) throws IOException {
+    return ElixirModules.parametersList(ElixirSdkType.getRelease(sdk), useCustomMixTask);
+  }
+
+  @NotNull
+  public ParametersList elixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
+    Project project = null;
+
+    if (runConfiguration != null) {
+      project = runConfiguration.getProject();
+    }
 
     try {
-      File elixirModulesDir = createElixirModulesDirectory();
-
-      elixirModuleFileList.add(ElixirModules.putFormattingTo(elixirModulesDir));
-
-      Project project = null;
-
-      if (runConfiguration != null) {
-        project = runConfiguration.getProject();
-      }
-
-      elixirModuleFileList.add(ElixirModules.putFormatterTo(elixirModulesDir, project));
-
-      // Support for the --formatter option was recently added to Mix. Older versions of Elixir will need to use the
-      // custom task we've included in order to support this option
-      if (useCustomMixTask()) {
-        elixirModuleFileList.add(ElixirModules.putMixTaskTo(elixirModulesDir));
-      }
-    } catch(IOException e) {
-      throw new ExecutionException(e);
+      return elixirParametersList(project);
+    } catch (IOException ioException) {
+      throw new ExecutionException(ioException);
     }
-
-    return elixirParametersList(elixirModuleFileList);
   }
 }

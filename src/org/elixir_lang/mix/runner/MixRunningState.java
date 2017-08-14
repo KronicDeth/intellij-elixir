@@ -51,7 +51,7 @@ public class MixRunningState extends CommandLineState {
   @Override
   protected ProcessHandler startProcess() throws ExecutionException {
     GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(
-      myConfiguration, setupElixirParametersList(myConfiguration), myConfiguration.mixParametersList()
+      myConfiguration, elixirParametersList(myConfiguration), myConfiguration.mixParametersList()
     );
     return runMix(myConfiguration.getProject(), commandLine);
   }
@@ -63,7 +63,7 @@ public class MixRunningState extends CommandLineState {
   }
 
   @NotNull
-  public ParametersList setupElixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
+  public ParametersList elixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
     return new ParametersList();
   }
 }
