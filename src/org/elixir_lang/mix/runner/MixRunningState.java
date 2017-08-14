@@ -21,49 +21,48 @@ import org.jetbrains.annotations.Nullable;
 import static org.elixir_lang.mix.runner.MixRunningStateUtil.runMix;
 
 /**
- * Created by zyuyou on 15/7/8.
  * https://github.com/ignatov/intellij-erlang/blob/master/src/org/intellij/erlang/rebar/runner/RebarRunningState.java
  */
 public class MixRunningState extends CommandLineState {
-  protected final MixRunConfigurationBase myConfiguration;
+    protected final MixRunConfigurationBase myConfiguration;
 
-  public MixRunningState(@NotNull ExecutionEnvironment environment, MixRunConfigurationBase configuration) {
-    super(environment);
-    myConfiguration = configuration;
-  }
+    public MixRunningState(@NotNull ExecutionEnvironment environment, MixRunConfigurationBase configuration) {
+        super(environment);
+        myConfiguration = configuration;
+    }
 
-  @NotNull
-  @Override
-  public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
-    TextConsoleBuilder consoleBuilder = new TextConsoleBuilderImpl(myConfiguration.getProject()) {
-      @Override
-      public ConsoleView getConsole() {
-        ConsoleView consoleView = super.getConsole();
-        ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), consoleView);
-        return consoleView;
-      }
-    };
-    setConsoleBuilder(consoleBuilder);
-    return super.execute(executor, runner);
-  }
+    @NotNull
+    public ConsoleView createConsoleView(Executor executor) {
+        TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(myConfiguration.getProject());
+        return consoleBuilder.getConsole();
+    }
 
-  @NotNull
-  @Override
-  protected ProcessHandler startProcess() throws ExecutionException {
-    GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(
-      myConfiguration, setupElixirParametersList(myConfiguration), myConfiguration.mixParametersList()
-    );
-    return runMix(myConfiguration.getProject(), commandLine);
-  }
+    @NotNull
+    public ParametersList elixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
+        return new ParametersList();
+    }
 
-  @NotNull
-  public ConsoleView createConsoleView(Executor executor) {
-    TextConsoleBuilder consoleBuilder = TextConsoleBuilderFactory.getInstance().createBuilder(myConfiguration.getProject());
-    return consoleBuilder.getConsole();
-  }
+    @NotNull
+    @Override
+    public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
+        TextConsoleBuilder consoleBuilder = new TextConsoleBuilderImpl(myConfiguration.getProject()) {
+            @Override
+            public ConsoleView getConsole() {
+                ConsoleView consoleView = super.getConsole();
+                ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), consoleView);
+                return consoleView;
+            }
+        };
+        setConsoleBuilder(consoleBuilder);
+        return super.execute(executor, runner);
+    }
 
-  @NotNull
-  public ParametersList setupElixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
-    return new ParametersList();
-  }
+    @NotNull
+    @Override
+    protected ProcessHandler startProcess() throws ExecutionException {
+        GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(
+                myConfiguration, elixirParametersList(myConfiguration), myConfiguration.mixParametersList()
+        );
+        return runMix(myConfiguration.getProject(), commandLine);
+    }
 }
