@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>org.elixir_lang</id>
   <name>Elixir</name>
-  <version>6.0.0</version>
+  <version>6.1.0</version>
   <vendor email="Kronic.Deth@gmail.com">Luke Imhoff</vendor>
 
   <description><![CDATA[
@@ -9,6 +9,47 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v6.1.0</h1>
+      <ul>
+        <li>
+          <p>Enhancements</p>
+          <ul>
+            <li>
+              Since the process of requiring resource files is the same, <code>org.elixir_lang.ElixirModules</code> has
+              static methods for copying resources out to a temporary directory and adding the
+              <code>-r &lt;temporary_path&gt;</code> for one or more resource files to a new or existing ParametersList.
+              These are now shared for the Mix ExUnit and Debugger code paths.
+            </li>
+            <li>Format class
+              <ul>
+                <li><code>ElixirXDebugProcess</code></li>
+                <li><code>MixExUnitRunningState</code></li>
+                <li><code>MIxRunningState</code></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              The compiled <code>.beam</code> files were removed in
+              <a href="https://github.com/KronicDeth/intellij-elixir/commit/58e7d4aafa6ad44279d15dd92f40c35e00d7357e">
+                <tt>58e7d4a</tt>
+              </a>, which was before v5.1.0, but not all users had problems with using the debugger.
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/739#issuecomment-322032123">persisted</a>
+              (as reported by <a href="https://github.com/erikreedstrom" class="user-mention">@erikreedstrom</a>) when
+              6.0.0 was released; I retried reproducing on a clean VM and I got it.  I'm not sure why it worked for some
+              people in prior releases since the <code>.beam</code> don't exist that were being copied, but now the
+              debugger uses the same system of copying <code>.ex</code> files and requiring them with <code>-r</code>
+              instead of copying <code>.beam</code> and using <code>-pa</code> to add the <code>ebin</code> directory.
+              Fix was verified local under macOS and in Windows VM that reproduced
+              <a href="https://github.com/KronicDeth/intellij-elixir/issues/739">#739</a>.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v6.0.0</h1>
       <ul>
         <li>
