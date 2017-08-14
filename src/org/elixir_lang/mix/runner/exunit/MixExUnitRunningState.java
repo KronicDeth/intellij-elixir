@@ -30,139 +30,139 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 final class MixExUnitRunningState extends MixRunningState {
-  private static final Logger LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(MixExUnitRunningState.class);
+    private static final Logger LOGGER = com.intellij.openapi.diagnostic.Logger.getInstance(MixExUnitRunningState.class);
 
-  private final String TEST_FRAMEWORK_NAME = "ExUnit";
+    private final String TEST_FRAMEWORK_NAME = "ExUnit";
 
-  MixExUnitRunningState(@NotNull ExecutionEnvironment environment, MixExUnitRunConfiguration configuration) {
-    super(environment, configuration);
-  }
+    MixExUnitRunningState(@NotNull ExecutionEnvironment environment, MixExUnitRunConfiguration configuration) {
+        super(environment, configuration);
+    }
 
-  @NotNull
-  @Override
-  public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
-    ProcessHandler processHandler = startProcess();
+    @NotNull
+    private static ParametersList elixirParametersList(@Nullable Project project) throws IOException {
+        Sdk sdk = null;
+        boolean useCustomMixTask = false;
 
-    TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
-    ConsoleView console = createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties);
-    ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), console);
-    return new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
-  }
+        if (project != null) {
+            sdk = ProjectRootManager.getInstance(project).getProjectSdk();
+            useCustomMixTask = !MixSettings.getInstance(project).getSupportsFormatterOption();
+        }
 
-  @NotNull
-  public ConsoleView createConsoleView(Executor executor) {
-    TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
+        return elixirParametersList(sdk, useCustomMixTask);
+    }
 
-    return createConsole(TEST_FRAMEWORK_NAME, properties);
-  }
+    @NotNull
+    private static ParametersList elixirParametersList(@Nullable Sdk sdk, boolean useCustomMixTask) throws IOException {
+        return ElixirModules.parametersList(ElixirSdkType.getRelease(sdk), useCustomMixTask);
+    }
 
-  /**
-   * Unifies the interface for {@code SMTestRunnerConnectionUtil.createConsole} between 141 and later releases
-   */
-  private ConsoleView createConsole(@NotNull String name , @NotNull  TestConsoleProperties testConsoleProperties) {
+    /**
+     * Unifies the interface for {@code SMTestRunnerConnectionUtil.createAndAttachConsole} between 141 and later releases
+     */
+    private ConsoleView createAndAttachConsole(@NotNull String testFrameworkName,
+                                               @NotNull ProcessHandler processHandler,
+                                               @NotNull TestConsoleProperties consoleProperties) throws ExecutionException {
+        Class<SMTestRunnerConnectionUtil> klass = SMTestRunnerConnectionUtil.class;
         ConsoleView consoleView = null;
 
-    try {
-      Method createConsole2 = SMTestRunnerConnectionUtil.class.getMethod(
-              "createConsole",
-              String.class,
-              TestConsoleProperties.class
-      );
+        try {
+            Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class);
 
-      try {
-        // first argument is `null` because it's a static method
-        consoleView = (ConsoleView) createConsole2.invoke(null, name, testConsoleProperties);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        LOGGER.error(e);
-      }
-    } catch (NoSuchMethodException e) {
-      try {
-        Method createConsole3 = SMTestRunnerConnectionUtil.class.getMethod(
-                "createConsole",
-                String.class,
-                TestConsoleProperties.class,
-                ExecutionEnvironment.class
-        );
+            try {
+                consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                LOGGER.error(e);
+            }
+        } catch (NoSuchMethodException noSuchCreateAndAttachConsole3Method) {
+            try {
+                Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class, ExecutionEnvironment.class);
+
+                try {
+                    consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties, getEnvironment());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    LOGGER.error(e);
+                }
+            } catch (NoSuchMethodException noSuchCreateAndAttachConsole4Method) {
+                noSuchCreateAndAttachConsole4Method.printStackTrace();
+            }
+        }
+
+        return consoleView;
+    }
+
+    /**
+     * Unifies the interface for {@code SMTestRunnerConnectionUtil.createConsole} between 141 and later releases
+     */
+    private ConsoleView createConsole(@NotNull String name, @NotNull TestConsoleProperties testConsoleProperties) {
+        ConsoleView consoleView = null;
 
         try {
-          // first argument is `null` because it's a static method
-          consoleView = (ConsoleView) createConsole3.invoke(null, name, testConsoleProperties, null);
-        } catch (IllegalAccessException | InvocationTargetException e1) {
-          LOGGER.error(e1);
+            Method createConsole2 = SMTestRunnerConnectionUtil.class.getMethod(
+                    "createConsole",
+                    String.class,
+                    TestConsoleProperties.class
+            );
+
+            try {
+                // first argument is `null` because it's a static method
+                consoleView = (ConsoleView) createConsole2.invoke(null, name, testConsoleProperties);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                LOGGER.error(e);
+            }
+        } catch (NoSuchMethodException e) {
+            try {
+                Method createConsole3 = SMTestRunnerConnectionUtil.class.getMethod(
+                        "createConsole",
+                        String.class,
+                        TestConsoleProperties.class,
+                        ExecutionEnvironment.class
+                );
+
+                try {
+                    // first argument is `null` because it's a static method
+                    consoleView = (ConsoleView) createConsole3.invoke(null, name, testConsoleProperties, null);
+                } catch (IllegalAccessException | InvocationTargetException e1) {
+                    LOGGER.error(e1);
+                }
+            } catch (NoSuchMethodException e1) {
+                LOGGER.error(e1);
+            }
         }
-      } catch (NoSuchMethodException e1) {
-        LOGGER.error(e1);
-      }
+
+        //noinspection ConstantConditions
+        return consoleView;
     }
 
-    //noinspection ConstantConditions
-    return consoleView;
-  }
+    @NotNull
+    public ConsoleView createConsoleView(Executor executor) {
+        TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
 
-  /**
-   * Unifies the interface for {@code SMTestRunnerConnectionUtil.createAndAttachConsole} between 141 and later releases
-   */
-  private ConsoleView createAndAttachConsole(@NotNull String testFrameworkName,
-                                             @NotNull ProcessHandler processHandler,
-                                             @NotNull TestConsoleProperties consoleProperties) throws ExecutionException {
-    Class<SMTestRunnerConnectionUtil> klass = SMTestRunnerConnectionUtil.class;
-    ConsoleView consoleView = null;
+        return createConsole(TEST_FRAMEWORK_NAME, properties);
+    }
 
-    try {
-      Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class);
+    @NotNull
+    public ParametersList elixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
+        Project project = null;
 
-      try {
-        consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties);
-      } catch (IllegalAccessException | InvocationTargetException e) {
-        LOGGER.error(e);
-      }
-    } catch (NoSuchMethodException noSuchCreateAndAttachConsole3Method) {
-      try {
-        Method createAndAttachConsole = klass.getMethod("createAndAttachConsole", String.class, ProcessHandler.class, TestConsoleProperties.class, ExecutionEnvironment.class);
+        if (runConfiguration != null) {
+            project = runConfiguration.getProject();
+        }
 
         try {
-          consoleView = (ConsoleView) createAndAttachConsole.invoke(null, testFrameworkName, processHandler, consoleProperties, getEnvironment());
-        } catch (IllegalAccessException | InvocationTargetException e) {
-          LOGGER.error(e);
+            return elixirParametersList(project);
+        } catch (IOException ioException) {
+            throw new ExecutionException(ioException);
         }
-      } catch (NoSuchMethodException noSuchCreateAndAttachConsole4Method) {
-        noSuchCreateAndAttachConsole4Method.printStackTrace();
-      }
     }
 
-    return consoleView;
-  }
+    @NotNull
+    @Override
+    public ExecutionResult execute(@NotNull Executor executor, @NotNull ProgramRunner runner) throws ExecutionException {
+        ProcessHandler processHandler = startProcess();
 
-  @NotNull
-  private static ParametersList elixirParametersList(@Nullable Project project) throws IOException {
-    Sdk sdk = null;
-    boolean useCustomMixTask = false;
-
-    if (project != null) {
-      sdk = ProjectRootManager.getInstance(project).getProjectSdk();
-      useCustomMixTask = !MixSettings.getInstance(project).getSupportsFormatterOption();
+        TestConsoleProperties properties = new MixTestConsoleProperties(myConfiguration, TEST_FRAMEWORK_NAME, executor);
+        ConsoleView console = createAndAttachConsole(TEST_FRAMEWORK_NAME, processHandler, properties);
+        ElixirConsoleUtil.attachFilters(myConfiguration.getProject(), console);
+        return new DefaultExecutionResult(console, processHandler, createActions(console, processHandler));
     }
-
-    return elixirParametersList(sdk, useCustomMixTask);
-  }
-
-  @NotNull
-  private static ParametersList elixirParametersList(@Nullable Sdk sdk, boolean useCustomMixTask) throws IOException {
-    return ElixirModules.parametersList(ElixirSdkType.getRelease(sdk), useCustomMixTask);
-  }
-
-  @NotNull
-  public ParametersList elixirParametersList(@Nullable RunConfiguration runConfiguration) throws ExecutionException {
-    Project project = null;
-
-    if (runConfiguration != null) {
-      project = runConfiguration.getProject();
-    }
-
-    try {
-      return elixirParametersList(project);
-    } catch (IOException ioException) {
-      throw new ExecutionException(ioException);
-    }
-  }
 }
