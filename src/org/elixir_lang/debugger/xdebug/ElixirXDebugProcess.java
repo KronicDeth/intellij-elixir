@@ -69,295 +69,298 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.elixir_lang.debugger.ElixirDebuggerLog.LOG;
 
 class ElixirXDebugProcess extends XDebugProcess implements ElixirDebuggerEventListener {
-  private final ExecutionEnvironment myExecutionEnvironment;
-  @NotNull
-  private final MixRunningState myRunningState;
-  @NotNull
-  private final ElixirDebuggerNode myDebuggerNode;
-  @NotNull
-  private final OSProcessHandler myElixirProcessHandler;
+    @NotNull
+    private final XBreakpointHandler<?>[] myBreakpointHandlers = new XBreakpointHandler[]{new ElixirLineBreakpointHandler(this)};
+    @NotNull
+    private final ElixirDebuggerNode myDebuggerNode;
+    @NotNull
+    private final OSProcessHandler myElixirProcessHandler;
+    private final ExecutionEnvironment myExecutionEnvironment;
+    @NotNull
+    private final ConcurrentHashMap<ElixirSourcePosition, XLineBreakpoint<ElixirLineBreakpointProperties>> myPositionToLineBreakpointMap =
+            new ConcurrentHashMap<>();
+    @NotNull
+    private final MixRunningState myRunningState;
 
-  @NotNull
-  private final XBreakpointHandler<?>[] myBreakpointHandlers = new XBreakpointHandler[]{new ElixirLineBreakpointHandler(this)};
-  @NotNull
-  private final ConcurrentHashMap<ElixirSourcePosition, XLineBreakpoint<ElixirLineBreakpointProperties>> myPositionToLineBreakpointMap =
-    new ConcurrentHashMap<>();
+    ElixirXDebugProcess(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
+        super(session);
 
-  ElixirXDebugProcess(@NotNull XDebugSession session, ExecutionEnvironment env) throws ExecutionException {
-    super(session);
+        session.setPauseActionSupported(false);
 
-    session.setPauseActionSupported(false);
+        myExecutionEnvironment = env;
+        myRunningState = (MixRunningState) getRunConfiguration().getState(myExecutionEnvironment.getExecutor(), myExecutionEnvironment);
 
-    myExecutionEnvironment = env;
-    myRunningState = (MixRunningState)getRunConfiguration().getState(myExecutionEnvironment.getExecutor(), myExecutionEnvironment);
+        try {
+            //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
+            myDebuggerNode = new ElixirDebuggerNode(this);
+        } catch (ElixirDebuggerNodeException e) {
+            throw new ExecutionException(e);
+        }
 
-    try {
-      //TODO add the debugger node to disposable hierarchy (we may fail to initialize session so the session will not be stopped!)
-      myDebuggerNode = new ElixirDebuggerNode(this);
-    }
-    catch (ElixirDebuggerNodeException e) {
-      throw new ExecutionException(e);
-    }
-
-    //TODO split running debug target and debugger process spawning
-    myElixirProcessHandler = runDebugTarget();
-  }
-
-  @Nullable
-  private static ElixirSourcePosition getElixirSourcePosition(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint) {
-    XSourcePosition sourcePosition = breakpoint.getSourcePosition();
-
-    return sourcePosition != null ? ElixirSourcePosition.create(sourcePosition) : null;
-  }
-
-  @NotNull
-  private static ParametersList addRequires(@NotNull ParametersList elixirParametersList) throws ExecutionException {
-    ParametersList updated;
-
-    try {
-      updated = ElixirModules.add(elixirParametersList);
-    } catch (IOException e) {
-      throw new ExecutionException("Failed to setup debugger environment", e);
+        //TODO split running debug target and debugger process spawning
+        myElixirProcessHandler = runDebugTarget();
     }
 
-    return updated;
-  }
+    @NotNull
+    private static ParametersList addRequires(@NotNull ParametersList elixirParametersList) throws ExecutionException {
+        ParametersList updated;
 
-  @Override
-  public void debuggerStarted() {
-    getSession().reportMessage("Debug process started", MessageType.INFO);
-  }
+        try {
+            updated = ElixirModules.add(elixirParametersList);
+        } catch (IOException e) {
+            throw new ExecutionException("Failed to setup debugger environment", e);
+        }
 
-  @Override
-  public void sessionInitialized() {
-    myDebuggerNode.runTask();
-  }
-
-  @Override
-  public void failedToInterpretModules(String nodeName, @NotNull List<String> modules) {
-    String messagePrefix = "Failed to interpret modules on node " + nodeName + ": ";
-    String modulesString = StringUtil.join(modules, ", ");
-    String messageSuffix = ".\nMake sure they are compiled with debug_info option, their sources are located in same directory as .beam files, modules are available on the node.";
-    String message = messagePrefix + modulesString + messageSuffix;
-    getSession().reportMessage(message, MessageType.WARNING);
-  }
-
-  @Override
-  public void failedToDebugRemoteNode(String nodeName, String error) {
-    String message = "Failed to debug remote node '" + nodeName + "'. Details: " + error;
-    getSession().reportMessage(message, MessageType.ERROR);
-  }
-
-  @Override
-  public void unknownMessage(String messageText) {
-    getSession().reportMessage("Unknown message received: " + messageText, MessageType.WARNING);
-  }
-
-  @Override
-  public void failedToSetBreakpoint(String module, @NotNull String file, int line, String errorMessage) {
-    ElixirSourcePosition sourcePosition = ElixirSourcePosition.create(file, line);
-    XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint = getLineBreakpoint(sourcePosition);
-    if (breakpoint != null) {
-      getSession().updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, errorMessage);
-    }
-    getSession().reportMessage("Failed to set breakpoint. Module: " + module + " Line: " + (line + 1), MessageType.WARNING);
-  }
-
-  @Override
-  public void breakpointIsSet(String module, String file, int line) {
-  }
-
-  @Override
-  public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<ElixirProcessSnapshot> snapshots) {
-    ElixirProcessSnapshot processInBreakpoint = ContainerUtil.find(snapshots, elixirProcessSnapshot -> elixirProcessSnapshot.getPid().equals(pid));
-    assert processInBreakpoint != null;
-    ElixirSourcePosition breakPosition = ElixirSourcePosition.create(processInBreakpoint);
-    XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint = getLineBreakpoint(breakPosition);
-    ElixirSuspendContext suspendContext = new ElixirSuspendContext(pid, snapshots);
-    if (breakpoint == null) {
-      getSession().positionReached(suspendContext);
-    }
-    else {
-      boolean shouldSuspend = getSession().breakpointReached(breakpoint, null, suspendContext);
-      if (!shouldSuspend) {
-        resume();
-      }
-    }
-  }
-
-  @Override
-  public void debuggerStopped() {
-    getSession().reportMessage("Debug process stopped", MessageType.INFO);
-    getSession().stop();
-  }
-
-  @Nullable
-  private XLineBreakpoint<ElixirLineBreakpointProperties> getLineBreakpoint(@Nullable ElixirSourcePosition sourcePosition) {
-    return sourcePosition != null ? myPositionToLineBreakpointMap.get(sourcePosition) : null;
-  }
-
-  @NotNull
-  @Override
-  public ExecutionConsole createConsole() {
-    ConsoleView consoleView = myRunningState.createConsoleView(myExecutionEnvironment.getExecutor());
-    consoleView.attachToProcess(getProcessHandler());
-    myElixirProcessHandler.startNotify();
-    return consoleView;
-  }
-
-  @NotNull
-  @Override
-  public XBreakpointHandler<?>[] getBreakpointHandlers() {
-    return myBreakpointHandlers;
-  }
-
-  @NotNull
-  @Override
-  public XDebuggerEditorsProvider getEditorsProvider() {
-    return new XDebuggerEditorsProvider() {
-      @NotNull
-      @Override
-      public FileType getFileType() {
-        return ElixirFileType.INSTANCE;
-      }
-
-      @NotNull
-      @Override
-      public Document createDocument(@NotNull Project project,
-                                     @NotNull String text,
-                                     @Nullable XSourcePosition sourcePosition,
-                                     @NotNull EvaluationMode mode) {
-        LightVirtualFile file = new LightVirtualFile("plain-text-elixir-debugger.txt", text);
-        //noinspection ConstantConditions
-        return FileDocumentManager.getInstance().getDocument(file);
-      }
-    };
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void startStepOver() {
-    myDebuggerNode.stepOver();
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void startStepInto() {
-    myDebuggerNode.stepInto();
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void startStepOut() {
-    myDebuggerNode.stepOut();
-  }
-
-  @Override
-  public void stop() {
-    myDebuggerNode.stop();
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void resume() {
-    myDebuggerNode.resume();
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void runToPosition(@NotNull XSourcePosition position) {
-    //TODO implement me
-  }
-
-  @Nullable
-  @Override
-  protected ProcessHandler doGetProcessHandler() {
-    return myElixirProcessHandler;
-  }
-
-  void addBreakpoint(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint) {
-    ElixirSourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
-    if (breakpointPosition == null) return;
-    String moduleName = getModuleName(breakpointPosition);
-    if (moduleName != null) {
-      myPositionToLineBreakpointMap.put(breakpointPosition, breakpoint);
-      myDebuggerNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
-    } else {
-      final String message =
-        "Unable to determine module for breakpoint at " +
-          breakpointPosition.getFile() + " line " + breakpointPosition.getLine();
-      getSession().reportMessage(message, MessageType.ERROR);
-    }
-  }
-
-  @Nullable
-  private String getModuleName(@NotNull ElixirSourcePosition breakpointPosition) {
-    ElixirFile psiFile = (ElixirFile)PsiManager.getInstance(getRunConfiguration().getProject()).findFile(breakpointPosition.getFile());
-    if (psiFile == null) return null;
-
-    PsiElement elem = psiFile.findElementAt(breakpointPosition.getSourcePosition().getOffset());
-    return ElixirPsiImplUtil.getModuleName(elem);
-  }
-
-  void removeBreakpoint(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint,
-                        @SuppressWarnings("UnusedParameters") boolean temporary) {
-    ElixirSourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
-    if (breakpointPosition == null) return;
-    myPositionToLineBreakpointMap.remove(breakpointPosition);
-    String moduleName = getModuleName(breakpointPosition);
-    if (moduleName != null) {
-      myDebuggerNode.removeBreakpoint(moduleName, breakpointPosition.getLine());
-    }
-  }
-
-  @NotNull
-  private MixRunConfigurationBase getRunConfiguration() {
-    MixRunConfigurationBase runConfig = (MixRunConfigurationBase) getSession().getRunProfile();
-    assert runConfig != null;
-    return runConfig;
-  }
-
-  @NotNull
-  private OSProcessHandler runDebugTarget() throws ExecutionException {
-    OSProcessHandler elixirProcessHandler;
-    LOG.debug("Preparing to run debug target.");
-
-    RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
-    RunConfiguration runConfiguration = null;
-
-    if (runnerAndConfigurationSettings != null) {
-      runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+        return updated;
     }
 
-    ParametersList elixirParametersList = myRunningState.elixirParametersList(runConfiguration);
-    addRequires(elixirParametersList);
+    @Nullable
+    private static ElixirSourcePosition getElixirSourcePosition(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint) {
+        XSourcePosition sourcePosition = breakpoint.getSourcePosition();
 
-    ParametersList mixParametersList = new ParametersList();
-    mixParametersList.addAll(
-            "intellij_elixir.debug_task",
-            "--debugger-port",
-            Integer.toString(myDebuggerNode.getLocalDebuggerPort()),
-            "--"
-    );
-    MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
-    ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
-    mixParametersList.addAll(runConfigurationMixParametersList.getList());
-
-    if (mixRunConfigurationBase instanceof MixExUnitRunConfiguration &&
-            !runConfigurationMixParametersList.getList().contains("--trace")) {
-      // Prevents tests from timing out while debugging
-      mixParametersList.add("--trace");
+        return sourcePosition != null ? ElixirSourcePosition.create(sourcePosition) : null;
     }
 
-    GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(mixRunConfigurationBase, elixirParametersList, mixParametersList);
+    void addBreakpoint(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint) {
+        ElixirSourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
+        if (breakpointPosition == null) {
+            return;
+        }
+        String moduleName = getModuleName(breakpointPosition);
+        if (moduleName != null) {
+            myPositionToLineBreakpointMap.put(breakpointPosition, breakpoint);
+            myDebuggerNode.setBreakpoint(moduleName, breakpointPosition.getFile().getPath(), breakpointPosition.getLine());
+        } else {
+            final String message =
+                    "Unable to determine module for breakpoint at " +
+                            breakpointPosition.getFile() + " line " + breakpointPosition.getLine();
+            getSession().reportMessage(message, MessageType.ERROR);
+        }
+    }
 
-    LOG.debug("Running debugger process. Command line (platform-independent): ");
-    LOG.debug(commandLine.getCommandLineString());
+    @Override
+    public void breakpointIsSet(String module, String file, int line) {
+    }
 
-    Process process = commandLine.createProcess();
-    elixirProcessHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
+    @Override
+    public void breakpointReached(@NotNull final OtpErlangPid pid, @NotNull List<ElixirProcessSnapshot> snapshots) {
+        ElixirProcessSnapshot processInBreakpoint = ContainerUtil.find(snapshots, elixirProcessSnapshot -> elixirProcessSnapshot.getPid().equals(pid));
+        assert processInBreakpoint != null;
+        ElixirSourcePosition breakPosition = ElixirSourcePosition.create(processInBreakpoint);
+        XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint = getLineBreakpoint(breakPosition);
+        ElixirSuspendContext suspendContext = new ElixirSuspendContext(pid, snapshots);
+        if (breakpoint == null) {
+            getSession().positionReached(suspendContext);
+        } else {
+            boolean shouldSuspend = getSession().breakpointReached(breakpoint, null, suspendContext);
+            if (!shouldSuspend) {
+                resume();
+            }
+        }
+    }
 
-    LOG.debug("Debugger process started.");
-    return elixirProcessHandler;
-  }
+    @NotNull
+    @Override
+    public ExecutionConsole createConsole() {
+        ConsoleView consoleView = myRunningState.createConsoleView(myExecutionEnvironment.getExecutor());
+        consoleView.attachToProcess(getProcessHandler());
+        myElixirProcessHandler.startNotify();
+        return consoleView;
+    }
+
+    @Override
+    public void debuggerStarted() {
+        getSession().reportMessage("Debug process started", MessageType.INFO);
+    }
+
+    @Override
+    public void debuggerStopped() {
+        getSession().reportMessage("Debug process stopped", MessageType.INFO);
+        getSession().stop();
+    }
+
+    @Nullable
+    @Override
+    protected ProcessHandler doGetProcessHandler() {
+        return myElixirProcessHandler;
+    }
+
+    @Override
+    public void failedToDebugRemoteNode(String nodeName, String error) {
+        String message = "Failed to debug remote node '" + nodeName + "'. Details: " + error;
+        getSession().reportMessage(message, MessageType.ERROR);
+    }
+
+    @Override
+    public void failedToInterpretModules(String nodeName, @NotNull List<String> modules) {
+        String messagePrefix = "Failed to interpret modules on node " + nodeName + ": ";
+        String modulesString = StringUtil.join(modules, ", ");
+        String messageSuffix = ".\nMake sure they are compiled with debug_info option, their sources are located in same directory as .beam files, modules are available on the node.";
+        String message = messagePrefix + modulesString + messageSuffix;
+        getSession().reportMessage(message, MessageType.WARNING);
+    }
+
+    @Override
+    public void failedToSetBreakpoint(String module, @NotNull String file, int line, String errorMessage) {
+        ElixirSourcePosition sourcePosition = ElixirSourcePosition.create(file, line);
+        XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint = getLineBreakpoint(sourcePosition);
+        if (breakpoint != null) {
+            getSession().updateBreakpointPresentation(breakpoint, AllIcons.Debugger.Db_invalid_breakpoint, errorMessage);
+        }
+        getSession().reportMessage("Failed to set breakpoint. Module: " + module + " Line: " + (line + 1), MessageType.WARNING);
+    }
+
+    @NotNull
+    @Override
+    public XBreakpointHandler<?>[] getBreakpointHandlers() {
+        return myBreakpointHandlers;
+    }
+
+    @NotNull
+    @Override
+    public XDebuggerEditorsProvider getEditorsProvider() {
+        return new XDebuggerEditorsProvider() {
+            @NotNull
+            @Override
+            public Document createDocument(@NotNull Project project,
+                                           @NotNull String text,
+                                           @Nullable XSourcePosition sourcePosition,
+                                           @NotNull EvaluationMode mode) {
+                LightVirtualFile file = new LightVirtualFile("plain-text-elixir-debugger.txt", text);
+                //noinspection ConstantConditions
+                return FileDocumentManager.getInstance().getDocument(file);
+            }
+
+            @NotNull
+            @Override
+            public FileType getFileType() {
+                return ElixirFileType.INSTANCE;
+            }
+        };
+    }
+
+    @Nullable
+    private XLineBreakpoint<ElixirLineBreakpointProperties> getLineBreakpoint(@Nullable ElixirSourcePosition sourcePosition) {
+        return sourcePosition != null ? myPositionToLineBreakpointMap.get(sourcePosition) : null;
+    }
+
+    @Nullable
+    private String getModuleName(@NotNull ElixirSourcePosition breakpointPosition) {
+        ElixirFile psiFile = (ElixirFile) PsiManager.getInstance(getRunConfiguration().getProject()).findFile(breakpointPosition.getFile());
+        if (psiFile == null) {
+            return null;
+        }
+
+        PsiElement elem = psiFile.findElementAt(breakpointPosition.getSourcePosition().getOffset());
+        return ElixirPsiImplUtil.getModuleName(elem);
+    }
+
+    @NotNull
+    private MixRunConfigurationBase getRunConfiguration() {
+        MixRunConfigurationBase runConfig = (MixRunConfigurationBase) getSession().getRunProfile();
+        assert runConfig != null;
+        return runConfig;
+    }
+
+    void removeBreakpoint(@NotNull XLineBreakpoint<ElixirLineBreakpointProperties> breakpoint,
+                          @SuppressWarnings("UnusedParameters") boolean temporary) {
+        ElixirSourcePosition breakpointPosition = getElixirSourcePosition(breakpoint);
+        if (breakpointPosition == null) {
+            return;
+        }
+        myPositionToLineBreakpointMap.remove(breakpointPosition);
+        String moduleName = getModuleName(breakpointPosition);
+        if (moduleName != null) {
+            myDebuggerNode.removeBreakpoint(moduleName, breakpointPosition.getLine());
+        }
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void resume() {
+        myDebuggerNode.resume();
+    }
+
+    @NotNull
+    private OSProcessHandler runDebugTarget() throws ExecutionException {
+        OSProcessHandler elixirProcessHandler;
+        LOG.debug("Preparing to run debug target.");
+
+        RunnerAndConfigurationSettings runnerAndConfigurationSettings = myExecutionEnvironment.getRunnerAndConfigurationSettings();
+        RunConfiguration runConfiguration = null;
+
+        if (runnerAndConfigurationSettings != null) {
+            runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+        }
+
+        ParametersList elixirParametersList = myRunningState.elixirParametersList(runConfiguration);
+        addRequires(elixirParametersList);
+
+        ParametersList mixParametersList = new ParametersList();
+        mixParametersList.addAll(
+                "intellij_elixir.debug_task",
+                "--debugger-port",
+                Integer.toString(myDebuggerNode.getLocalDebuggerPort()),
+                "--"
+        );
+        MixRunConfigurationBase mixRunConfigurationBase = getRunConfiguration();
+        ParametersList runConfigurationMixParametersList = mixRunConfigurationBase.mixParametersList();
+        mixParametersList.addAll(runConfigurationMixParametersList.getList());
+
+        if (mixRunConfigurationBase instanceof MixExUnitRunConfiguration &&
+                !runConfigurationMixParametersList.getList().contains("--trace")) {
+            // Prevents tests from timing out while debugging
+            mixParametersList.add("--trace");
+        }
+
+        GeneralCommandLine commandLine = MixRunningStateUtil.commandLine(mixRunConfigurationBase, elixirParametersList, mixParametersList);
+
+        LOG.debug("Running debugger process. Command line (platform-independent): ");
+        LOG.debug(commandLine.getCommandLineString());
+
+        Process process = commandLine.createProcess();
+        elixirProcessHandler = new OSProcessHandler(process, commandLine.getCommandLineString());
+
+        LOG.debug("Debugger process started.");
+        return elixirProcessHandler;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void runToPosition(@NotNull XSourcePosition position) {
+        //TODO implement me
+    }
+
+    @Override
+    public void sessionInitialized() {
+        myDebuggerNode.runTask();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void startStepInto() {
+        myDebuggerNode.stepInto();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void startStepOut() {
+        myDebuggerNode.stepOut();
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void startStepOver() {
+        myDebuggerNode.stepOver();
+    }
+
+    @Override
+    public void stop() {
+        myDebuggerNode.stop();
+    }
+
+    @Override
+    public void unknownMessage(String messageText) {
+        getSession().reportMessage("Unknown message received: " + messageText, MessageType.WARNING);
+    }
 }
