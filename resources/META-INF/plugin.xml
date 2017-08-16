@@ -9,6 +9,22 @@
     ]]></description>
 
   <change-notes><![CDATA[
+      <h1>v6.1.1</h1>
+      <ul>
+        <li>
+          <p>Bug Fixes</p>
+          <ul>
+            <li>
+              When <a href="https://github.com/KronicDeth/intellij-elixir/pull/754">#754</a> made
+              <code>intellij-erlang</code> a soft-dependency, it broke the debugger's icons that referenced
+              <code>ErlangIcons</code>, but it turns out all the icon constants were aliases to
+              <code>AllIcons.Debugger</code> constants, so by using the <code>AllIcons.Debugger</code> icons directly,
+              the dependency on <code>ErlangIcons</code> can be removed without the need to copy the image files into
+              <code>intellij-elixir</code>.
+            </li>
+          </ul>
+        </li>
+      </ul>
       <h1>v6.1.0</h1>
       <ul>
         <li>
