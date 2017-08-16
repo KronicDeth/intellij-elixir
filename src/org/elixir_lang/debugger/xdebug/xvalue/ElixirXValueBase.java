@@ -21,10 +21,10 @@ package org.elixir_lang.debugger.xdebug.xvalue;
 import com.ericsson.otp.erlang.OtpErlangAtom;
 import com.ericsson.otp.erlang.OtpErlangLong;
 import com.ericsson.otp.erlang.OtpErlangObject;
+import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.*;
 import com.intellij.xdebugger.frame.presentation.XValuePresentation;
 import org.elixir_lang.debugger.ElixirXValuePresentation;
-import org.intellij.erlang.icons.ErlangIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,7 +103,7 @@ class ElixirXValueBase<T extends OtpErlangObject> extends XValue {
   }
 
   Icon getIcon() {
-    return ErlangIcons.DEBUGGER_VALUE;
+    return AllIcons.Debugger.Value;
   }
 
   private boolean hasChildren() {
@@ -148,7 +148,7 @@ class ElixirPrimitiveXValueBase<T extends OtpErlangObject> extends ElixirXValueB
 
   @Override
   protected Icon getIcon() {
-    return ErlangIcons.DEBUGGER_PRIMITIVE_VALUE;
+    return AllIcons.Debugger.Db_primitive;
   }
 }
 
@@ -159,6 +159,6 @@ class ElixirArrayXValueBase<T extends OtpErlangObject> extends ElixirXValueBase<
 
   @Override
   protected Icon getIcon() {
-    return ErlangIcons.DEBUGGER_ARRAY;
+    return AllIcons.Debugger.Db_array;
   }
 }
