@@ -117,6 +117,7 @@
 
 ### Bug Fixes
 * [#795](https://github.com/KronicDeth/intellij-elixir/pull/795) - When [#754](https://github.com/KronicDeth/intellij-elixir/issues/794) made `intellij-erlang` a soft-dependency, it broke the debugger's icons that referenced `ErlangIcons`, but it turns out all the icon constants were aliases to `AllIcons.Debugger` constants, so by using the `AllIcons.Debugger` icons directly, the dependency on `ErlangIcons` can be removed without the need to copy the image files into `intellij-elixir`. - [@KronicDeth](https://github.com/KronicDeth)
+* [#796](https://github.com/KronicDeth/intellij-elixir/pull/796) - When `do ... end` template is inserted, it did not have a previous child whose attributes to use, so it used the default, which left the cursor unindented.  To get the cursor indented by default, When the `ElementType` is `DO`, apply the `stabChildrenIndent` rules: indent normal and determine whether to indent relative to direct parent using code style setting. - [@KronicDeth](https://github.com/KronicDeth)
 
 ## v6.1.0
 
