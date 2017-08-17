@@ -28,6 +28,7 @@ import java.util.List;
 import static com.intellij.formatting.ChildAttributes.DELEGATE_TO_PREV_CHILD;
 import static org.apache.commons.lang.StringUtils.isWhitespace;
 import static org.elixir_lang.psi.ElixirTypes.*;
+import static org.elixir_lang.psi.ElixirTypes.DO;
 import static org.elixir_lang.psi.ElixirTypes.FN;
 import static org.elixir_lang.psi.ElixirTypes.MULTIPLE_ALIASES;
 import static org.elixir_lang.psi.call.name.Function.IMPORT;
@@ -2227,6 +2228,17 @@ public class Block extends AbstractBlock implements BlockEx {
 
         if (newChildIndex > 0) {
            childAttributes = DELEGATE_TO_PREV_CHILD;
+        } else if (myNode.getElementType() == DO) {
+            boolean indentRelativeToDirectParent =
+                    codeStyleSettings(myNode).ALIGN_UNMATCHED_CALL_DO_BLOCKS ==
+                            CodeStyleSettings.UnmatchedCallDoBlockAlignment.CALL.value;
+            Indent indent = Indent.getNormalIndent(indentRelativeToDirectParent);
+            childAttributes = new ChildAttributes(
+                    indent,
+                    /* all children share the same alignment as expressions inside a doBlock above the stab are assumed
+                       to be aligned on the left-side */
+                    Alignment.createAlignment()
+            );
         } else {
            childAttributes = super.getChildAttributes(newChildIndex);
         }
