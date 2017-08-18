@@ -87,7 +87,7 @@ public class BeamFileImpl extends ModuleElementImpl implements ModuleOwner, PsiC
         Beam beam = null;
 
         try {
-            beam = Beam.from(bytes);
+            beam = Beam.from(bytes, path);
         } catch (IOException e) {
             LOGGER.error("IOException during BeamFileImpl.buildFileStub(bytes, " + path + ")",  e);
         } catch (OtpErlangDecodeException e) {

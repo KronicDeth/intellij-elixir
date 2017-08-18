@@ -101,13 +101,14 @@ public class BeamTest {
     }
 
     private Beam beam(@NotNull String baseName) throws IOException, OtpErlangDecodeException {
+        String path = ebinDirectory + baseName + ".beam";
         DataInputStream dataInputStream = new DataInputStream(
                 new BufferedInputStream(
-                        new FileInputStream(ebinDirectory + baseName + ".beam")
+                        new FileInputStream(path)
                 )
         );
 
-        return Beam.from(dataInputStream);
+        return Beam.from(dataInputStream, path);
     }
 
     @Before

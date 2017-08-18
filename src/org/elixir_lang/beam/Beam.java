@@ -20,9 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATOM;
-import static org.elixir_lang.beam.chunk.Chunk.TypeID.ATU8;
-import static org.elixir_lang.beam.chunk.Chunk.TypeID.EXPT;
+import static org.elixir_lang.beam.chunk.Chunk.TypeID.*;
 import static org.elixir_lang.beam.chunk.Chunk.length;
 import static org.elixir_lang.beam.chunk.Chunk.typeID;
 
@@ -30,18 +28,16 @@ import static org.elixir_lang.beam.chunk.Chunk.typeID;
  * See http://beam-wisdoms.clau.se/en/latest/indepth-beam-file.html
  */
 public class Beam {
-    private static final Logger LOGGER = Logger.getInstance(Beam.class);
+    private static final String HEADER = "FOR1";
 
     /*
      * CONSTANTS
      */
-
-    private static final String HEADER = "FOR1";
+    private static final Logger LOGGER = Logger.getInstance(Beam.class);
 
     /*
      * Fields
      */
-
     private Map<String, Chunk> chunkByTypeID;
 
     /*
@@ -61,39 +57,40 @@ public class Beam {
      */
 
     @Nullable
-    public static Beam from(@NotNull DataInputStream dataInputStream) {
+    public static Beam from(@NotNull DataInputStream dataInputStream, @NotNull String path) {
         String header;
 
         try {
-            header = typeID(dataInputStream);
+            header = typeID(dataInputStream, path);
         } catch (IOException ioException) {
-            LOGGER.error("Could not read header from BEAM DataInputStream", ioException);
+            LOGGER.error("Could not read header from BEAM DataInputStream from " + path, ioException);
             return null;
         }
 
         if (!HEADER.equals(header)) {
+            LOGGER.error("header typeID (" + header + ") did not match expected (" + HEADER + ") from " + path);
             return null;
         }
 
         try {
             length(dataInputStream);
         } catch (IOException ioException) {
-            LOGGER.error("Could not read length from BEAM DataInputStream", ioException);
+            LOGGER.error("Could not read length from BEAM DataInputStream from " + path, ioException);
             return null;
         }
 
         String section;
 
         try {
-            section = typeID(dataInputStream);
+            section = typeID(dataInputStream, path);
         } catch (IOException ioException) {
-            LOGGER.error("Could not read section header from BEAM DataInputStream", ioException);
+            LOGGER.error("Could not read section header from BEAM DataInputStream from " + path, ioException);
             return null;
         }
 
 
         if (!"BEAM".equals(section)) {
-            LOGGER.error("Section header is not BEAM");
+            LOGGER.error("Section header is not BEAM in " + path);
             return null;
         }
 
@@ -104,11 +101,11 @@ public class Beam {
             Chunk chunk;
 
             try {
-                chunk = Chunk.from(dataInputStream);
+                chunk = Chunk.from(dataInputStream, path);
             } catch (IOException ioException) {
                 LOGGER.error(
-                        "Could not read chunk number " + i + "from BEAM DataInputStream.  " +
-                                "Returning truncated Beam object",
+                        "Could not read chunk number " + i + " from BEAM DataInputStream from " + path +
+                                ".  Returning truncated Beam object",
                         ioException
                 );
                 break;
@@ -125,13 +122,14 @@ public class Beam {
     }
 
     @Nullable
-    public static Beam from(@NotNull byte[] content) throws IOException, OtpErlangDecodeException {
-        return from(new DataInputStream(new ByteArrayInputStream(content)));
+    public static Beam from(@NotNull byte[] content, @NotNull String path)
+            throws IOException, OtpErlangDecodeException {
+        return from(new DataInputStream(new ByteArrayInputStream(content)), path);
     }
 
     @Nullable
     public static Beam from(@NotNull FileContent fileContent) throws IOException, OtpErlangDecodeException {
-        return from(fileContent.getContent());
+        return from(fileContent.getContent(), fileContent.getFile().getPath());
     }
 
     @Nullable
@@ -147,7 +145,8 @@ public class Beam {
         }
 
         if (dataInputStream != null) {
-            beam = Beam.from(dataInputStream);
+            String path = virtualFile.getPath();
+            beam = Beam.from(dataInputStream, path);
         }
 
         return beam;
