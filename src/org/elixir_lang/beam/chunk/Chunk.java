@@ -1,5 +1,6 @@
 package org.elixir_lang.beam.chunk;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -15,18 +16,20 @@ import static com.intellij.openapi.util.Pair.pair;
  */
 public class Chunk {
     private static final int ALIGNMENT = 4;
+    private static final Logger LOGGER = Logger.getInstance(Chunk.class);
     @NotNull
     public final String typeID;
     @NotNull
     public final byte[] data;
+
     private Chunk(@NotNull String typeID, @NotNull byte[] data) {
         this.typeID = typeID;
         this.data = data;
     }
 
     @Nullable
-    public static Chunk from(@NotNull DataInputStream dataInputStream) throws IOException {
-        String typeID = typeID(dataInputStream);
+    public static Chunk from(@NotNull DataInputStream dataInputStream, @NotNull String path) throws IOException {
+        String typeID = typeID(dataInputStream, path);
         Chunk chunk = null;
 
         if (typeID != null) {
@@ -48,25 +51,29 @@ public class Chunk {
         return readUnsignedInt(dataInputStream);
     }
 
-    @Nullable
-    public static String typeID(@NotNull DataInputStream dataInputStream) throws IOException {
-        byte[] bytes = new byte[4];
-        int bytesRead = dataInputStream.read(bytes, 0, bytes.length);
-        String typeID = null;
-
-        if (bytesRead == bytes.length) {
-            typeID = new String(bytes);
-        }
-
-        return typeID;
-    }
-
     private static long readUnsignedInt(@NotNull DataInputStream dataInputStream) throws IOException {
         byte[] bytes = new byte[32 / 8];
 
         dataInputStream.readFully(bytes);
 
         return unsignedInt(bytes).first;
+    }
+
+    @Nullable
+    public static String typeID(@NotNull DataInputStream dataInputStream, @NotNull String path) throws IOException {
+        byte[] bytes = new byte[4];
+        int bytesRead = dataInputStream.read(bytes, 0, bytes.length);
+        String typeID = null;
+
+        if (bytesRead == bytes.length) {
+            typeID = new String(bytes);
+        } else if (bytesRead > 0) {
+            LOGGER.error(
+                    "Could not read typeID: read only " + bytesRead + " of " + bytes.length  + " bytes from " + path
+            );
+        }
+
+        return typeID;
     }
 
     @NotNull
