@@ -28,6 +28,7 @@
               when the <code>ElementType</code> is <code>DO</code>, apply the <code>stabChildrenIndent</code> rules:
               indent normal and determine<br> whether to indent relative to direct parent using code style setting.
             </li>
+            <li>Include <code>VirtualFile</code> path in Beam read errors</li>
           </ul>
         </li>
       </ul>
