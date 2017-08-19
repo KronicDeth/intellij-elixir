@@ -60,6 +60,7 @@ allprojects {
     }
 
     changeNotes bodyInnerHTML("resources/META-INF/changelog.html")
+    pluginDescription bodyInnerHTML("resources/META-INF/description.html")
   }
 
   publishPlugin {
